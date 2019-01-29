@@ -13,12 +13,12 @@ var handlers = {
   roomMembers: './live-collection-room-members',
   users: './live-collection-users',
   userGroups: './live-collection-user-groups',
-  groupMembers: './live-collection-group-members',
+  groupMembers: './live-collection-group-members'
 };
 
 module.exports = {
   install: install
-}
+};
 
 var installed = false;
 function install() {
@@ -30,7 +30,11 @@ function install() {
     var emitter = liveCollectionEvents[category];
 
     if (!emitter) {
-      throw new Error('No event emitted defined for ' + category + '. gitter-web-live-collection-events probably needs updating.');
+      throw new Error(
+        'No event emitted defined for ' +
+          category +
+          '. gitter-web-live-collection-events probably needs updating.'
+      );
     }
 
     // Don't load the library until install is called otherwise
@@ -45,11 +49,14 @@ function install() {
         if (possiblePromise) {
           possiblePromise.catch(function(err) {
             logger.error('live-collection handler failed: ' + err, { exception: err });
-            errorReporter(err, { live_collection_handler: 'failed' }, { module: 'live-collection' });
+            errorReporter(
+              err,
+              { live_collection_handler: 'failed' },
+              { module: 'live-collection' }
+            );
           });
         }
       });
     });
   });
-
 }

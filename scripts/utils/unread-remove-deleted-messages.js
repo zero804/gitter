@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -14,18 +14,20 @@ var shimPositionOption = require('../yargs-shim-position-option');
 // require('../../server/event-listeners').install();
 
 var opts = require('yargs')
-  .option('uri', shimPositionOption({
-    position: 0,
-    required: true,
-    description: 'uri of room, eg: gitterHQ/gitter'
-  }))
+  .option(
+    'uri',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'uri of room, eg: gitterHQ/gitter'
+    })
+  )
   .option('dryRun', {
     type: 'boolean',
     description: 'Dry run'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 async function main(uri, dryRun) {
   const room = await troupeService.findByUri(uri);
@@ -33,14 +35,17 @@ async function main(uri, dryRun) {
 
   console.log('QUERYING unread items for ', userIds.length, 'users');
   var allUnread = {};
-  await Promise.map(userIds, function(userId) {
-    return unreadItemService.getUnreadItems(userId, room._id)
-      .then(function(items) {
+  await Promise.map(
+    userIds,
+    function(userId) {
+      return unreadItemService.getUnreadItems(userId, room._id).then(function(items) {
         items.forEach(function(chatId) {
           allUnread[chatId] = true;
         });
-      })
-  }, { concurrency: 5 });
+      });
+    },
+    { concurrency: 5 }
+  );
 
   var ids = mongoUtils.asObjectIDs(Object.keys(allUnread));
   console.log('SEARCHING FOR ', ids.length, 'chat messages');
@@ -50,7 +55,7 @@ async function main(uri, dryRun) {
 
   await Promise.all([
     // Find which messages actually exist
-    persistence.ChatMessage.find({ _id: { $in: ids }})
+    persistence.ChatMessage.find({ _id: { $in: ids } })
       .lean(true)
       .exec()
       .then(function(chats) {
@@ -62,7 +67,7 @@ async function main(uri, dryRun) {
       }),
 
     // Populate our map with information for deleted messages
-    persistence.ChatMessageBackup.find({ _id: { $in: ids }})
+    persistence.ChatMessageBackup.find({ _id: { $in: ids } })
       .lean(true)
       .exec()
       .then(function(chats) {
@@ -80,18 +85,23 @@ async function main(uri, dryRun) {
     return;
   }
 
-  if(!missingIds.length) {
+  if (!missingIds.length) {
     console.log('Nothing missing...');
     return;
   }
 
-  return Promise.map(missingIds, function(itemId) {
-    console.log('REMOVING ', itemId);
+  return Promise.map(
+    missingIds,
+    function(itemId) {
+      console.log('REMOVING ', itemId);
 
-    // Remove the items, slowly
-    return unreadItemService.removeItem(chatMap[itemId].fromUserId, room, chatMap[itemId])
-      .delay(10);
-  }, { concurrency: 1 });
+      // Remove the items, slowly
+      return unreadItemService
+        .removeItem(chatMap[itemId].fromUserId, room, chatMap[itemId])
+        .delay(10);
+    },
+    { concurrency: 1 }
+  );
 }
 
 Promise.resolve(main(opts.uri, opts.dryRun))

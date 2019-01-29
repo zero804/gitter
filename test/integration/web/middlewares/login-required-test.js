@@ -4,7 +4,6 @@ var loginRequired = require('../../test-require')('./web/middlewares/login-requi
 var assert = require('assert');
 
 describe('login-required', function() {
-
   it('redirects to /login by default', function(done) {
     var req = {
       nonApiRoute: true,
@@ -189,5 +188,4 @@ describe('login-required', function() {
 
     loginRequired(req, res);
   });
-
 });

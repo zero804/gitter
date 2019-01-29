@@ -45,37 +45,39 @@ function markAllWeirdRoomsAsReadForUser(userId, roomIds) {
 }
 
 function findAllWeirdRoomIdsForUser(userId, userUnreadRoomIds) {
-  return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
-    .spread(function(userRoomIds) {
-      return _.difference(userUnreadRoomIds, userRoomIds);
-    });
+  return roomService.findAllRoomsIdsForUserIncludingMentions(userId).spread(function(userRoomIds) {
+    return _.difference(userUnreadRoomIds, userRoomIds);
+  });
 }
 
 function logResult(userId, weirdRoomIds) {
-  return Promise.all([
-    userService.findById(userId),
-    troupeService.findByIds(weirdRoomIds)
-  ]).spread(function(user, weirdRooms) {
-    var weirdRoomNames = weirdRooms.map(function(room) { return room.uri; });
-    var dbMisses = weirdRoomIds.length - weirdRooms.length;
+  return Promise.all([userService.findById(userId), troupeService.findByIds(weirdRoomIds)]).spread(
+    function(user, weirdRooms) {
+      var weirdRoomNames = weirdRooms.map(function(room) {
+        return room.uri;
+      });
+      var dbMisses = weirdRoomIds.length - weirdRooms.length;
 
-    var log = [user && user.username || '('+userId+')', ':'].concat(weirdRoomNames).concat('with '+dbMisses+' missing rooms').concat(weirdRoomIds).join(' ');
+      var log = [(user && user.username) || '(' + userId + ')', ':']
+        .concat(weirdRoomNames)
+        .concat('with ' + dbMisses + ' missing rooms')
+        .concat(weirdRoomIds)
+        .join(' ');
 
-    console.log('cleared', log);
-  });
+      console.log('cleared', log);
+    }
+  );
 }
 
 function markAllWeirdRoomsAsRead(hash) {
   var promises = Object.keys(hash).map(function(userId) {
-    return findAllWeirdRoomIdsForUser(userId, hash[userId])
-      .then(function(weirdRoomIds) {
-        if (weirdRoomIds.length) {
-          return markAllWeirdRoomsAsReadForUser(userId, weirdRoomIds)
-            .then(function() {
-              return logResult(userId, weirdRoomIds);
-            });
-        }
-      });
+    return findAllWeirdRoomIdsForUser(userId, hash[userId]).then(function(weirdRoomIds) {
+      if (weirdRoomIds.length) {
+        return markAllWeirdRoomsAsReadForUser(userId, weirdRoomIds).then(function() {
+          return logResult(userId, weirdRoomIds);
+        });
+      }
+    });
   });
 
   return Promise.all(promises);

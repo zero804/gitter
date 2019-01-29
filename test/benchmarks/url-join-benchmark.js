@@ -6,18 +6,15 @@ var urljoin = require('url-join');
 var user = { username: 'suprememoocow' };
 
 makeBenchmark({
-
   tests: {
-    'strings': function() {
+    strings: function() {
       var x = '/' + user.username;
       return x;
     },
 
-    'urlJoin': function() {
+    urlJoin: function() {
       var x = urljoin('/', user.username);
       return x;
-    },
-
+    }
   }
-
 });

@@ -17,7 +17,7 @@ function parse(url) {
 }
 
 function decodePart(s) {
-  return decodeURIComponent(s.replace(/\+/g, " "));
+  return decodeURIComponent(s.replace(/\+/g, ' '));
 }
 
 function parseSearch(search) {
@@ -42,7 +42,7 @@ function format(options) {
 
   ['href', 'protocol', 'hostname', 'search', 'hash', 'pathname'].forEach(function(key) {
     if (options.hasOwnProperty(key) && options[key] !== undefined) {
-      if((key === 'protocol' || key === 'hostname') && options[key] === "") return;
+      if ((key === 'protocol' || key === 'hostname') && options[key] === '') return;
       parser[key] = options[key];
     }
   });

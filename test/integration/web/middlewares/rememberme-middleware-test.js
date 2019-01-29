@@ -9,7 +9,7 @@ var rememberMeMiddleware = testRequire('./web/middlewares/rememberme-middleware'
 
 describe('rememberme-middleware #slow', function() {
   var fixture = fixtureLoader.setup({
-    user1: { },
+    user1: {},
     userNoTokens: {
       username: 'remembermetest' + Date.now(),
       githubToken: null
@@ -17,14 +17,16 @@ describe('rememberme-middleware #slow', function() {
   });
 
   it('should generate a token for a user', function() {
-    return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+    return rememberMeMiddleware.testOnly
+      .generateAuthToken(fixture.user1.id)
       .then(function(cookieValue) {
         assert(cookieValue);
       });
   });
 
   it('should validate a token for a user', function() {
-    return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+    return rememberMeMiddleware.testOnly
+      .generateAuthToken(fixture.user1.id)
       .then(function(cookieValue) {
         assert(cookieValue);
 
@@ -38,11 +40,13 @@ describe('rememberme-middleware #slow', function() {
   it('should validate a token for a user twice in quick succession #slow', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
-    return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+    return rememberMeMiddleware.testOnly
+      .generateAuthToken(fixture.user1.id)
       .then(function(cookieValue) {
         assert(cookieValue);
 
-        return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue)
+        return rememberMeMiddleware.testOnly
+          .validateAuthToken(cookieValue)
           .then(function(userId) {
             assert.strictEqual(userId, fixture.user1.id);
 
@@ -59,13 +63,13 @@ describe('rememberme-middleware #slow', function() {
             assert(!userId);
           });
       });
-
   });
 
   it('should delete a token', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
-    return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+    return rememberMeMiddleware.testOnly
+      .generateAuthToken(fixture.user1.id)
       .bind({
         cookieValue: null
       })
@@ -89,7 +93,8 @@ describe('rememberme-middleware #slow', function() {
   });
 
   it('should handle bad keys', function() {
-    return rememberMeMiddleware.testOnly.validateAuthToken("12312123123123123123123123:123123123123123123123123132123")
+    return rememberMeMiddleware.testOnly
+      .validateAuthToken('12312123123123123123123123:123123123123123123123123132123')
       .then(function(userId) {
         assert(!userId);
       });
@@ -97,27 +102,30 @@ describe('rememberme-middleware #slow', function() {
 
   describe('processRememberMeToken', function() {
     it('should cope with a missing user', function() {
-      return rememberMeMiddleware.testOnly.generateAuthToken(new ObjectID())
+      return rememberMeMiddleware.testOnly
+        .generateAuthToken(new ObjectID())
         .then(function(cookieValue) {
           return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
         })
         .then(function(loginInfo) {
           assert(!loginInfo);
-        })
+        });
     });
 
     it('should cope with a user without tokens', function() {
-      return rememberMeMiddleware.testOnly.generateAuthToken(fixture.userNoTokens.id)
+      return rememberMeMiddleware.testOnly
+        .generateAuthToken(fixture.userNoTokens.id)
         .then(function(cookieValue) {
           return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
         })
         .then(function(loginInfo) {
           assert(!loginInfo);
-        })
+        });
     });
 
     it('should authenticate with genuine tokens', function() {
-      return rememberMeMiddleware.testOnly.generateAuthToken(fixture.user1.id)
+      return rememberMeMiddleware.testOnly
+        .generateAuthToken(fixture.user1.id)
         .then(function(cookieValue) {
           return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
         })
@@ -133,12 +141,11 @@ describe('rememberme-middleware #slow', function() {
     });
 
     it('should reject bad cookies', function() {
-      return rememberMeMiddleware.testOnly.processRememberMeToken("123123123:asdasasdasdadasd")
+      return rememberMeMiddleware.testOnly
+        .processRememberMeToken('123123123:asdasasdasdadasd')
         .then(function(loginInfo) {
           assert(!loginInfo);
         });
     });
-
   });
-
 });

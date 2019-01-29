@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const $ = require('jquery');
 const _ = require('underscore');
@@ -39,9 +39,7 @@ require('../behaviors/last-message-seen');
 require('../behaviors/timeago');
 require('../behaviors/tooltip');
 
-
 module.exports = (function() {
-
   var getModelIdClass = function(id) {
     return 'model-id-' + id;
   };
@@ -53,27 +51,27 @@ module.exports = (function() {
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
   var mouseEvents = {
-    'click .js-chat-item-edit':       'toggleEdit',
-    'click .js-chat-item-readby':     'showReadBy',
-    'click .js-chat-item-from':       'mentionUser',
-    'click .js-chat-time':            'permalink',
+    'click .js-chat-item-edit': 'toggleEdit',
+    'click .js-chat-item-readby': 'showReadBy',
+    'click .js-chat-item-from': 'mentionUser',
+    'click .js-chat-time': 'permalink',
     'mouseover .js-chat-item-readby': 'showReadByIntent',
-    'click .webhook':                 'expandActivity',
-    'click':                          'onClick',
-    'click .js-chat-item-actions':    'showActions'
+    'click .webhook': 'expandActivity',
+    click: 'onClick',
+    'click .js-chat-item-actions': 'showActions'
   };
 
   var touchEvents = {
     // click events are delayed in horrible ways for <iOS 9.3
-    'touchstart':                     'onTouchstart',
-    'touchmove':                      'onTouchmove',
-    'touchend':                       'onTouchend'
+    touchstart: 'onTouchstart',
+    touchmove: 'onTouchmove',
+    touchend: 'onTouchend'
   };
 
   var androidTouchEvents = {
     // WebViews in android will only show the keyboard for a focus() if
     // it happens via a click event, but not for a touch event
-    'click':                           'onTap'
+    click: 'onTap'
   };
 
   var ChatItemView = Marionette.ItemView.extend({
@@ -83,7 +81,7 @@ module.exports = (function() {
       };
 
       var id = this.model.get('id');
-      if(id) {
+      if (id) {
         classMap[getModelIdClass(id)] = true;
       }
 
@@ -100,7 +98,7 @@ module.exports = (function() {
 
     behaviors: {
       Widgets: {},
-      UnreadItems: { },
+      UnreadItems: {},
       Highlight: {},
       LastMessageSeen: {},
       TimeAgo: {
@@ -108,13 +106,13 @@ module.exports = (function() {
         el: '.js-chat-time'
       },
       Tooltip: {
-        '.js-chat-time': { titleFn: 'getSentTimeTooltip', html: true },
+        '.js-chat-time': { titleFn: 'getSentTimeTooltip', html: true }
       }
     },
 
     modelEvents: {
-      'syncStatusChange': 'onSyncStatusChange',
-      'change': 'onChange'
+      syncStatusChange: 'onSyncStatusChange',
+      change: 'onChange'
     },
 
     isEditing: false,
@@ -128,7 +126,7 @@ module.exports = (function() {
     },
 
     expandActivity: function() {
-      $('.webhook .commits').slideToggle("fast");
+      $('.webhook .commits').slideToggle('fast');
     },
 
     initialize: function(options) {
@@ -187,7 +185,7 @@ module.exports = (function() {
       data.sentTimeFormattedFull = fullTimeFormat(data.sent);
 
       data.readByText = this.getReadByText(data.readBy);
-      if(!data.html) {
+      if (!data.html) {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
@@ -195,9 +193,9 @@ module.exports = (function() {
     },
 
     getReadByText: function(readByCount) {
-      if(!readByCount) return '';
-      if(this._oneToOne) return ' ';
-      if(readByCount > 10) readByCount = 10;
+      if (!readByCount) return '';
+      if (this._oneToOne) return ' ';
+      if (readByCount > 10) readByCount = 10;
       return readByCount;
     },
 
@@ -240,12 +238,12 @@ module.exports = (function() {
       // That event would cause a `router-app.js -> postMessage('permalink.navigate')` to the chat frame and
       // highlight the message, see `router-chat.js -> case 'permalink.navigate'`
       var timestampLinkElement = this.ui.timestampLink[0];
-      if(timestampLinkElement) {
+      if (timestampLinkElement) {
         dataset.set(timestampLinkElement, 'disableRouting', true);
       }
     },
 
-    onRender: function () {
+    onRender: function() {
       this.updateRender();
       this.timeChange();
     },
@@ -284,7 +282,7 @@ module.exports = (function() {
       }
 
       if (changes && 'id' in changes) {
-        if(sentElement) {
+        if (sentElement) {
           var permalinkUrl = this.getPermalinkUrl();
           if (permalinkUrl.length) {
             sentElement.setAttribute('href', permalinkUrl);
@@ -293,7 +291,7 @@ module.exports = (function() {
       }
 
       if (changes && 'sent' in changes) {
-        if(sentElement) {
+        if (sentElement) {
           var time = this.model.get('sent');
           if (time) {
             var formattedTime = fullTimeFormat(time);
@@ -309,10 +307,10 @@ module.exports = (function() {
       if (!context.isLoggedIn()) this.ui.actions.hide();
     },
     handleUpdateMentionChanges: function(changes) {
-      if(!changes || 'mentioned' in changes) {
+      if (!changes || 'mentioned' in changes) {
         var wasMentioned = this.model.get('mentioned');
         toggleClass(this.el, 'mentioned', wasMentioned);
-        if(wasMentioned) {
+        if (wasMentioned) {
           this.el.setAttribute('aria-live', 'assertive');
           this.el.setAttribute('role', 'alert');
         }
@@ -321,15 +319,15 @@ module.exports = (function() {
     handleUpdateMessageStateChanges: function(changes) {
       var model = this.model;
 
-      if(!changes || 'fromUser' in changes) {
+      if (!changes || 'fromUser' in changes) {
         toggleClass(this.el, 'isViewers', this.isOwnMessage());
       }
 
-      if(!changes || 'editedAt' in changes) {
+      if (!changes || 'editedAt' in changes) {
         toggleClass(this.el, 'hasBeenEdited', this.hasBeenEdited());
       }
 
-      if(!changes || 'burstStart' in changes) {
+      if (!changes || 'burstStart' in changes) {
         toggleClass(this.el, 'burstStart', !!model.get('burstStart'));
         toggleClass(this.el, 'burstContinued', !model.get('burstStart'));
       }
@@ -347,16 +345,16 @@ module.exports = (function() {
         var readByCount = model.get('readBy');
         var oldValue = model.previous('readBy');
         var readByLabel = this.$el.find('.js-chat-item-readby');
-        var className = "chat-item__icon--read-by-some";
+        var className = 'chat-item__icon--read-by-some';
 
-        if(readByLabel.length === 0) {
-          if(readByCount) {
+        if (readByLabel.length === 0) {
+          if (readByCount) {
             RAF(function() {
               readByLabel.addClass(className);
             });
           }
         } else {
-          if((oldValue === 0) !== (readByCount === 0)) {
+          if ((oldValue === 0) !== (readByCount === 0)) {
             // Things have changed
             readByLabel.toggleClass(className, !!readByCount);
           }
@@ -365,7 +363,7 @@ module.exports = (function() {
     },
 
     focusInput: function() {
-      $("#chat-input-textarea").focus();
+      $('#chat-input-textarea').focus();
     },
 
     onEditCancel: function() {
@@ -402,16 +400,20 @@ module.exports = (function() {
       return age <= EDIT_WINDOW;
     },
 
-    isEmbedded: function () {
+    isEmbedded: function() {
       return context().embedded;
     },
 
     canEdit: function() {
-      return this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded();
+      return (
+        this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded()
+      );
     },
 
     canDelete: function() {
-      return this.model.id && !this.isEmbedded() && (this.isOwnMessage() || context.isTroupeAdmin());
+      return (
+        this.model.id && !this.isEmbedded() && (this.isOwnMessage() || context.isTroupeAdmin())
+      );
     },
 
     hasBeenEdited: function() {
@@ -447,16 +449,18 @@ module.exports = (function() {
     },
 
     subst: function(search, replace, global) {
-      if(!this.canEdit()) return;
+      if (!this.canEdit()) return;
 
       var reString = search.replace(/(^|[^\[])\^/g, '$1');
-      var re = new RegExp(reString, global ? "gi" : "i");
+      var re = new RegExp(reString, global ? 'gi' : 'i');
       var newText = this.model.get('text').replace(re, replace);
 
-      this.model.set({
-        text: newText,
-        html: null
-      }).save();
+      this.model
+        .set({
+          text: newText,
+          html: null
+        })
+        .save();
     },
 
     showText: function() {
@@ -484,7 +488,7 @@ module.exports = (function() {
       // chrome 48 android requires the same, but the first textarea autofocus is fine
       textarea.focus();
       // iOS 9 doesnt put the carat at the end of the text
-      textarea.val("").val(unsafeText);
+      textarea.val('').val(unsafeText);
 
       this.listenTo(this.inputBox, 'save', this.onEditSave);
 
@@ -495,20 +499,24 @@ module.exports = (function() {
         // chrome 48 android requires the same, but the first textarea autofocus is fine.
         textarea.focus();
         // iOS 9 doesnt put the carat at the end of the text
-        textarea.val("").val(unsafeText);
+        textarea.val('').val(unsafeText);
       }, 0);
 
       this.listenTo(this.inputBox, 'cancel', this.onEditCancel);
     },
 
     showReadByIntent: function(e) {
-      ReadByPopover.hoverTimeout(e, function() {
-        this.showReadBy(e);
-      }, this);
+      ReadByPopover.hoverTimeout(
+        e,
+        function() {
+          this.showReadBy(e);
+        },
+        this
+      );
     },
 
     showReadBy: function(e) {
-      if(this.popover) return;
+      if (this.popover) return;
 
       var popover = new ReadByPopover({
         model: this.model,
@@ -530,7 +538,7 @@ module.exports = (function() {
 
     showActions: function(e) {
       // Don't show if it's already open.
-      if(this.popover) return;
+      if (this.popover) return;
 
       var actions = new ActionsPopover({
         model: this.model,
@@ -555,13 +563,13 @@ module.exports = (function() {
       e.stopPropagation();
     },
 
-    mentionUser: function () {
-     var mention = "@" + this.model.get('fromUser').username + " ";
-     appEvents.trigger('input.append', mention);
+    mentionUser: function() {
+      var mention = '@' + this.model.get('fromUser').username + ' ';
+      appEvents.trigger('input.append', mention);
     },
 
     permalink: function(e) {
-      if(!this.isPermalinkable) return;
+      if (!this.isPermalinkable) return;
 
       // Can't permalink a chat which hasn't been saved to the server yet
       if (!this.model.id) return;
@@ -590,7 +598,7 @@ module.exports = (function() {
     },
 
     onTouchend: function() {
-      if(this.isDragging) {
+      if (this.isDragging) {
         // just a drag finishing. not a tap.
         this.isDragging = false;
       } else {
@@ -616,7 +624,7 @@ module.exports = (function() {
     },
 
     onTouchEditBlur: function() {
-      if(this.inputBox) {
+      if (this.inputBox) {
         this.toggleEdit();
       }
     },
@@ -651,7 +659,7 @@ module.exports = (function() {
     },
 
     getPermalinkUrl: function() {
-      if(!this.isPermalinkable) return '';
+      if (!this.isPermalinkable) return '';
 
       var modelId = this.model.id;
       if (!modelId) return '';
@@ -680,7 +688,11 @@ module.exports = (function() {
     childView: AvatarView,
     className: 'popoverReadBy',
     initialize: function(options) {
-      this.collection = new chatModels.ReadByCollection(null, { listen: true, chatMessageId: this.model.id, userCollection: options.userCollection });
+      this.collection = new chatModels.ReadByCollection(null, {
+        listen: true,
+        chatMessageId: this.model.id,
+        userCollection: options.userCollection
+      });
       this.collection.loading = true; // Messy workaround until the loading-mixin handles loading/loaded transitions correctly
     },
     onDestroy: function() {
@@ -715,7 +727,7 @@ module.exports = (function() {
       'click .js-chat-action-delete': 'delete',
       'click .js-chat-action-report': 'report',
       'click .js-chat-action-retry': 'retry',
-      'click .js-chat-action-cancel': 'cancel',
+      'click .js-chat-action-cancel': 'cancel'
     },
 
     edit: function() {
@@ -723,15 +735,16 @@ module.exports = (function() {
     },
 
     reply: function() {
-      var mention = "@" + this.model.get('fromUser').username + " ";
+      var mention = '@' + this.model.get('fromUser').username + ' ';
       appEvents.trigger('input.append', mention);
     },
 
     quote: function() {
-      const formattedText = this.model.get('text')
+      const formattedText = this.model
+        .get('text')
         .split(/\r?\n/)
         .map(sentence => `> ${sentence}`)
-        .join('\n')
+        .join('\n');
       appEvents.trigger('input.append', formattedText, { newLine: true });
     },
 
@@ -740,7 +753,13 @@ module.exports = (function() {
     },
 
     report: function() {
-      const apiUrl = urlJoin('/v1/rooms/', context.getTroupeId(), 'chatMessages', this.model.get('id'), 'report');
+      const apiUrl = urlJoin(
+        '/v1/rooms/',
+        context.getTroupeId(),
+        'chatMessages',
+        this.model.get('id'),
+        'report'
+      );
       apiClient.post(apiUrl);
     },
 
@@ -763,7 +782,7 @@ module.exports = (function() {
         return {
           actions: [
             { name: 'retry', description: 'Retry' },
-            { name: 'cancel', description: 'Cancel' },
+            { name: 'cancel', description: 'Cancel' }
           ]
         };
       }
@@ -778,9 +797,7 @@ module.exports = (function() {
       const isOwnMessage = messageAuthor && currentUser && messageAuthor.id === currentUser.id;
 
       var data = {
-        actions: [
-          { name: 'reply', description: 'Reply', disabled: !isPersisted }
-        ]
+        actions: [{ name: 'reply', description: 'Reply', disabled: !isPersisted }]
       };
 
       if (!deleted) {
@@ -804,7 +821,7 @@ module.exports = (function() {
       });
     },
     events: {
-      'click': 'hide'
+      click: 'hide'
     }
   });
 
@@ -815,6 +832,4 @@ module.exports = (function() {
     ActionsView: ActionsView,
     ActionsPopover: ActionsPopover
   };
-
-
 })();

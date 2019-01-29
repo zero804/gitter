@@ -27,7 +27,7 @@ function generateUserSecurityDescriptor(user, options) {
     extraAdmins = [user._id];
   }
 
-  switch(security || null) {
+  switch (security || null) {
     case 'PUBLIC':
     case null:
       return {
@@ -54,7 +54,6 @@ function generateUserSecurityDescriptor(user, options) {
     default:
       throw new StatusError(500, 'Unknown security type: ' + security);
   }
-
 }
 
 function generateOrgSecurityDescriptor(user, options) {
@@ -64,7 +63,7 @@ function generateOrgSecurityDescriptor(user, options) {
 
   assert(linkPath, 'linkPath required');
 
-  switch(security || null) {
+  switch (security || null) {
     case 'PUBLIC':
     case null:
       return {
@@ -151,7 +150,7 @@ function generateDefaultSecurityDescriptor(user, options) {
     members: members,
     extraMembers: [],
     extraAdmins: [user._id]
-  }
+  };
 }
 
 function generateGroupSecurityDescriptor(user, options) {
@@ -192,7 +191,7 @@ function generateGroupSecurityDescriptor(user, options) {
     extraMembers: [],
     extraAdmins: [],
     internalId: internalId
-  }
+  };
 }
 
 function generate(user, options) {
@@ -215,10 +214,10 @@ function generate(user, options) {
       return generateOrgSecurityDescriptor(user, options);
 
     default:
-      throw new StatusError(500, 'Unknown type: ' + options.type)
+      throw new StatusError(500, 'Unknown type: ' + options.type);
   }
 }
 
 module.exports = {
   generate: generate
-}
+};

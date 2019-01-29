@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var modalRegion = require('../../components/modal-region');
@@ -28,15 +28,15 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    return new ChatContainerView(optionsForRegion({
-      collection: this.options.chatCollection,
-      decorators: [emojiDecorator, mobileDecorator]
-    }));
+    return new ChatContainerView(
+      optionsForRegion({
+        collection: this.options.chatCollection,
+        decorators: [emojiDecorator, mobileDecorator]
+      })
+    );
   },
 
   initLoginRegion: function(optionsForRegion) {
     return new MobileLoginButton(optionsForRegion());
-  },
-
-
+  }
 });

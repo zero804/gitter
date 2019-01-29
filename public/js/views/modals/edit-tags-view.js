@@ -18,14 +18,13 @@ var View = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      tagList:  { el: '#tag-list', init: 'initTagList' },
+      tagList: { el: '#tag-list', init: 'initTagList' },
       tagInput: { el: '#tag-input', init: 'initTagListEdit' },
-      tagError: { el: '#tag-error', init: 'initTagError'},
-    },
+      tagError: { el: '#tag-error', init: 'initTagError' }
+    }
   },
 
   initialize: function() {
-
     //TODO --> Fix meta key in OSX chrome changing messages to read ctrl for now
     //jp 5/8/15
     //detect OS to get meta key value
@@ -35,27 +34,27 @@ var View = Marionette.LayoutView.extend({
     var tagCollection = new TagCollection();
     var errorModel = new Backbone.Model({
       message: 'Press ' + meta + '+backspace or delete to remove the last tag',
-      class: 'message',
+      class: 'message'
     });
 
     this.model = new Backbone.Model({
       tagCollection: tagCollection,
       errorModel: errorModel,
-      meta: meta,
+      meta: meta
     });
 
     //get existing tags
     ////TODO need to add error states to the below request
-    apiClient.get('/v1/rooms/' + this.options.roomId)
-      .then(function(data) {
+    apiClient.get('/v1/rooms/' + this.options.roomId).then(
+      function(data) {
         this.model.set(data);
-        var tags = data.tags
-          .filter(function(tagValue) {
-            var testTag = new TagModel().set('value', tagValue, {silent: true});
-            return testTag.isValid();
-          });
+        var tags = data.tags.filter(function(tagValue) {
+          var testTag = new TagModel().set('value', tagValue, { silent: true });
+          return testTag.isValid();
+        });
         this.model.get('tagCollection').add(tags);
-      }.bind(this));
+      }.bind(this)
+    );
 
     //events
     this.listenTo(tagCollection, 'tag:error:duplicate', this.onDuplicateTag);
@@ -66,16 +65,19 @@ var View = Marionette.LayoutView.extend({
     if (e) e.preventDefault();
 
     //TODO --> need to add error states here jp 3/9/15
-    apiClient.put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
-    .then(function() {
-      if (shouldHideDialog) this.dialog.hide();
-    }.bind(this));
+    apiClient
+      .put('/v1/rooms/' + this.options.roomId, { tags: this.model.get('tagCollection').toJSON() })
+      .then(
+        function() {
+          if (shouldHideDialog) this.dialog.hide();
+        }.bind(this)
+      );
   },
 
   onDuplicateTag: function(tag) {
     this.model.get('errorModel').set({
       message: tag + ' has already been entered',
-      isError: false,
+      isError: false
     });
   },
 
@@ -84,27 +86,27 @@ var View = Marionette.LayoutView.extend({
     'tag:error': 'onTagError',
     'tag:warning:empty': 'onTagEmpty',
     'tag:removed': 'onTagRemoved',
-    'tag:added': 'onTagAdded',
+    'tag:added': 'onTagAdded'
   },
 
   onTagEmpty: function() {
     this.model.get('errorModel').set({
       message: 'Press ' + this.model.get('meta') + '+backspace or delete to remove the last tag',
-      isError: false,
+      isError: false
     });
   },
 
   onTagValid: function(el, value) {
     this.model.get('errorModel').set({
       message: 'Press enter to add ' + value,
-      isError: false,
+      isError: false
     });
   },
 
   onTagError: function(el, message) {
     this.model.get('errorModel').set({
       message: message,
-      isError: true,
+      isError: true
     });
   },
 
@@ -127,15 +129,14 @@ var View = Marionette.LayoutView.extend({
 
   initTagError: function(optionsForRegion) {
     return new TagErrorView(optionsForRegion({ model: this.model.get('errorModel') }));
-  },
-
+  }
 });
 
 var Modal = ModalView.extend({
   initialize: function(options) {
     options.title = 'Edit tags';
     ModalView.prototype.initialize.apply(this, arguments);
-    this.view = new View({roomId: options.roomId });
+    this.view = new View({ roomId: options.roomId });
   },
   menuItems: []
 });

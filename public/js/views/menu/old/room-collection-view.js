@@ -1,5 +1,5 @@
 /* eslint complexity: ["error", 13] */
-"use strict";
+'use strict';
 var $ = require('jquery');
 var Popover = require('../../popover');
 var context = require('../../../utils/context');
@@ -15,9 +15,7 @@ var toggleClass = require('../../../utils/toggle-class');
 
 require('jquery-sortable'); // eslint-disable-line node/no-missing-require
 
-
 module.exports = (function() {
-
   var PopoverBodyView = Marionette.ItemView.extend({
     className: 'commit-popover-body',
     template: popoverTemplate,
@@ -29,10 +27,11 @@ module.exports = (function() {
       e.stopPropagation(); // no navigation
 
       // We can't use the userRoom as the room might not be the current one
-      apiClient.user.delete("/rooms/" + this.model.id)
-        .then(function() {
+      apiClient.user.delete('/rooms/' + this.model.id).then(
+        function() {
           this.parentPopover.hide();
-        }.bind(this));
+        }.bind(this)
+      );
     },
     onItemLeave: function(e) {
       e.stopPropagation(); // no navigation
@@ -45,7 +44,7 @@ module.exports = (function() {
       // We can't use the room resource as the room might not be the current one
       apiClient
         .delete('/v1/rooms/' + self.model.id + '/users/' + context.getUserId())
-        .then(function () {
+        .then(function() {
           // leaving the room that you are in should take you home
           if (self.model.id === context.getTroupeId()) {
             appEvents.trigger('navigation', '/home', 'home', '');
@@ -55,7 +54,6 @@ module.exports = (function() {
         });
     }
   });
-
 
   /* @const */
   var MAX_UNREAD = 99;
@@ -68,10 +66,11 @@ module.exports = (function() {
     className: 'room-list-item',
     template: roomListItemTemplate,
     modelEvents: {
-      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom': 'updateRender',
+      'change:unreadItems change:lurk change:activity change:mentions change:name change:currentRoom':
+        'updateRender'
     },
     events: {
-      'click': 'clicked',
+      click: 'clicked',
       'click .js-close-button': 'showPopover'
     },
     ui: {
@@ -82,7 +81,7 @@ module.exports = (function() {
       e.stopPropagation(); // no navigation
 
       var popover = new Popover({
-        view: new PopoverBodyView({model: this.model}),
+        view: new PopoverBodyView({ model: this.model }),
         targetElement: e.target,
         placement: 'horizontal',
         width: '100px'
@@ -104,7 +103,7 @@ module.exports = (function() {
     // eslint-disable-next-line complexity
     updateRender: function(model) {
       var changed = model && model.changed;
-      var attributes = model && model.attributes || this.model.attributes;
+      var attributes = (model && model.attributes) || this.model.attributes;
 
       function hasChanged(property) {
         return changed && changed.hasOwnProperty(property);
@@ -118,7 +117,8 @@ module.exports = (function() {
         if (attributes.currentRoom) toggleClass(el, 'chatting', false);
       }
 
-      if (!changed) { // Only on first render
+      if (!changed) {
+        // Only on first render
         dataset.set(el, 'id', m.id);
       }
 
@@ -126,7 +126,13 @@ module.exports = (function() {
         this.ui.roomName.text(roomNameTrimmer(attributes.name, MAX_NAME_LENGTH));
       }
 
-      if (!changed || (hasChanged('mentions') || hasChanged('activity') || hasChanged('unreadItems') || hasChanged('lurk'))) {
+      if (
+        !changed ||
+        (hasChanged('mentions') ||
+          hasChanged('activity') ||
+          hasChanged('unreadItems') ||
+          hasChanged('lurk'))
+      ) {
         var switches = this.getActivitySwitches(attributes, changed);
 
         var unreadBadgeEl = this.ui.unreadBadge[0];
@@ -140,16 +146,14 @@ module.exports = (function() {
           clearTimeout(this.timeout);
           this.timeout = setTimeout(this.stopActivityPulse.bind(this), 1600);
         }
-
       }
-
     },
 
     stopActivityPulse: function() {
       delete this.timeout;
       var el = this.el;
 
-      if(this.model.id === context.getTroupeId()) {
+      if (this.model.id === context.getTroupeId()) {
         toggleClass(el, 'chatting', false);
         toggleClass(el, 'chatting-now', false);
       } else {
@@ -170,7 +174,7 @@ module.exports = (function() {
       var result = {
         badge: false,
         mention: false,
-        badgeText: "",
+        badgeText: '',
         chatting: false,
         chattingNow: false
       };
@@ -178,14 +182,14 @@ module.exports = (function() {
       if (attributes.mentions) {
         result.badge = true;
         result.mention = true;
-        result.badgeText = "@";
+        result.badgeText = '@';
         return result;
       }
 
       var unreadItems = attributes.unreadItems;
       if (unreadItems) {
         result.badge = true;
-        result.badgeText = unreadItems > MAX_UNREAD ? "99+" : unreadItems;
+        result.badgeText = unreadItems > MAX_UNREAD ? '99+' : unreadItems;
         return result;
       }
 
@@ -198,7 +202,7 @@ module.exports = (function() {
     },
     clicked: function() {
       var model = this.model;
-      if(this.model.get('exists') === false) {
+      if (this.model.get('exists') === false) {
         window.location.hash = '#confirm/' + model.get('uri');
       } else {
         if (this.model.get('url') !== window.location.pathname) {
@@ -209,10 +213,9 @@ module.exports = (function() {
   });
 
   var CollectionView = Marionette.CollectionView.extend({
-
     childView: RoomListItemView,
 
-    childViewOptions: function (item) {
+    childViewOptions: function(item) {
       var options = {};
       if (item && item.id) {
         options.el = this.$el.find('.room-list-item[data-id="' + item.id + '"]')[0];
@@ -223,7 +226,7 @@ module.exports = (function() {
       return options;
     },
 
-    initialize: function (options) {
+    initialize: function(options) {
       if (options.draggable) {
         this.makeDraggable(options.dropTarget);
       }
@@ -233,15 +236,14 @@ module.exports = (function() {
       this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
     },
 
-    onRoomChange: function(){
+    onRoomChange: function() {
       //deselect the current room
-      var currentlySelectedRoom = this.collection.where({ currentRoom: true})[0];
+      var currentlySelectedRoom = this.collection.where({ currentRoom: true })[0];
       if (currentlySelectedRoom) currentlySelectedRoom.set('currentRoom', false);
 
       //select new room
       var newlySelectedRoom = this.collection.get(context.troupe().get('id'));
       if (newlySelectedRoom) newlySelectedRoom.set('currentRoom', true);
-
     },
 
     makeDraggable: function(drop) {
@@ -255,8 +257,8 @@ module.exports = (function() {
         drop: drop,
         distance: 8,
 
-        onDrag: function (item, position) {
-          $(".placeholder").html(item.html());
+        onDrag: function(item, position) {
+          $('.placeholder').html(item.html());
           $('.placeholder').addClass(item.attr('class'));
           item.css(position);
         },
@@ -266,7 +268,8 @@ module.exports = (function() {
           return a;
         },
 
-        isValidTarget: function(item, container) { // jshint unused:true
+        isValidTarget: function(item, container) {
+          // jshint unused:true
           var droppedAt = this.getDropTarget(container.el);
           if (droppedAt === 'favs') {
             $('.dragged').hide();
@@ -283,7 +286,7 @@ module.exports = (function() {
           return false;
         },
 
-        onDrop: function (item, container, _super) {
+        onDrop: function(item, container, _super) {
           var position;
           var el = item[0];
           var model = self.roomsCollection.get(dataset.get(el, 'id'));
@@ -308,11 +311,15 @@ module.exports = (function() {
           _super(item, container);
         },
 
-        onCancel: function (item, container) {
+        onCancel: function(item, container) {
           cancelDrop = true;
           var el = item[0];
 
-          if ($(container.el).parent().attr('id') == 'list-favs') {
+          if (
+            $(container.el)
+              .parent()
+              .attr('id') == 'list-favs'
+          ) {
             var collectionItem = self.roomsCollection.get(dataset.get(el, 'id'));
             collectionItem.save({ favourite: false }, { patch: true });
 
@@ -323,10 +330,8 @@ module.exports = (function() {
           }
         }
       });
-    },
+    }
   });
 
   return CollectionView;
-
-
 })();

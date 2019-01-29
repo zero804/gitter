@@ -1,6 +1,6 @@
 function generatePassword() {
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var text = '';
+  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
   for (var i = 0; i < 24; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -9,66 +9,76 @@ function generatePassword() {
   return text;
 }
 
-[{
-  clientKey: 'web-internal',
+[
+  {
+    clientKey: 'web-internal',
     name: 'Web Client',
-    tag: 'web-app',
-  }, {
+    tag: 'web-app'
+  },
+  {
     clientKey: '1',
     name: 'Gitter OSX',
     tag: 'mac',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: '2',
     name: 'Gitter Beta OSX',
     tag: 'mac-beta',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: '3',
     name: 'Troupe Notifier Mac',
     tag: 'mac-notifier',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: '4',
     name: 'Troupe Notifier Mac Beta',
     tag: 'mac-notifier-beta',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: '5',
     name: 'Troupe for Windows Beta',
     tag: 'windows-notifier-beta',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: '6',
     name: 'Troupe for Windows',
     tag: 'windows-notifier',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: 'ios-beta-dev',
     name: 'Gitter iOS App',
     tag: 'ios-beta-dev',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: 'ios-beta',
     name: 'Gitter iOS App',
     tag: 'ios-beta',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
-  }, {
+  },
+  {
     clientKey: 'ios-prod-dev',
     name: 'Gitter iOS App',
     tag: 'ios-prod-dev',
     registeredRedirectUri: 'https://gitter.im/login/oauth/callback',
     canSkipAuthorization: true
   },
-    {
+  {
     clientKey: 'ios-prod',
     name: 'Gitter iOS App',
     tag: 'ios-prod',
@@ -180,10 +190,9 @@ function generatePassword() {
     tag: 'billing-prod',
     registeredRedirectUri: 'https://billing.gitter.im/login/callback',
     canSkipAuthorization: true
-  },
-]
-.forEach(function(d) {
-  printjson({ clientKey: d.clientKey })
+  }
+].forEach(function(d) {
+  printjson({ clientKey: d.clientKey });
   db.oauthclients.update(
     { clientKey: d.clientKey },
     {
@@ -194,5 +203,6 @@ function generatePassword() {
       registeredRedirectUri: d.registeredRedirectUri,
       canSkipAuthorization: d.canSkipAuthorization
     },
-    true /* upsert */);
-})
+    true /* upsert */
+  );
+});

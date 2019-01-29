@@ -1,17 +1,17 @@
 /*jslint node:true, unused:true*/
 /*global describe:true */
 
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 
 module.exports = function generateTests(fixtures, generator, meta) {
-  if(!meta) meta = {};
+  if (!meta) meta = {};
 
   fixtures.forEach(function(fixture) {
     var thisMeta;
 
-    if(!fixture.meta) {
+    if (!fixture.meta) {
       thisMeta = fixture; // Shorter fixtures
     } else {
       thisMeta = fixture.meta;
@@ -20,9 +20,9 @@ module.exports = function generateTests(fixtures, generator, meta) {
     var name = fixture.name;
     var fixtureMeta = _.extend({}, meta, thisMeta);
 
-    if(fixture.tests) {
+    if (fixture.tests) {
       // Branch
-      if(name) {
+      if (name) {
         describe(name, function() {
           generateTests(fixture.tests, generator, fixtureMeta);
         });
@@ -33,8 +33,5 @@ module.exports = function generateTests(fixtures, generator, meta) {
       // Leaf
       generator(name, fixtureMeta);
     }
-
   });
 };
-
-

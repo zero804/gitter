@@ -19,15 +19,14 @@ var CommunityCreationOrgListView = Marionette.CompositeView.extend({
     var newActiveValue = !view.model.get('active');
 
     var previousActiveModel = this.collection.findWhere({ active: true });
-    if(previousActiveModel) {
+    if (previousActiveModel) {
       previousActiveModel.set('active', false);
     }
     // Toggle active
     view.model.set('active', newActiveValue);
-    if(newActiveValue) {
+    if (newActiveValue) {
       this.trigger('org:activated', view.model);
-    }
-    else {
+    } else {
       this.trigger('org:cleared');
     }
   }

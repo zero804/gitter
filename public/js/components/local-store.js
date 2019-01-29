@@ -9,7 +9,11 @@ var TEST_KEY = '_drafty_test_key';
 
 var windowLocalStorage;
 
-try { windowLocalStorage = window.localStorage; } catch(e) { /* */ }
+try {
+  windowLocalStorage = window.localStorage;
+} catch (e) {
+  /* */
+}
 
 /* Attempts to use localStorage to check whether it's actually available for use */
 function isLocalStorageAvailable() {
@@ -18,7 +22,7 @@ function isLocalStorageAvailable() {
     windowLocalStorage[TEST_KEY] = 1;
     windowLocalStorage.removeItem(TEST_KEY);
     return true;
-  } catch(e) {
+  } catch (e) {
     return false;
   }
 }
@@ -44,14 +48,13 @@ InMemoryStore.prototype = {
 };
 
 /* Localstorage, the default driver */
-function LocalStorageStore() {
-}
+function LocalStorageStore() {}
 
 LocalStorageStore.prototype = {
   get: function(key) {
     try {
       return windowLocalStorage[key] || '';
-    } catch(e) {
+    } catch (e) {
       return '';
     }
   },
@@ -59,7 +62,7 @@ LocalStorageStore.prototype = {
   set: function(key, value) {
     try {
       windowLocalStorage[key] = value;
-    } catch(e) {
+    } catch (e) {
       /* */
     }
   },
@@ -67,7 +70,7 @@ LocalStorageStore.prototype = {
   remove: function(key) {
     try {
       windowLocalStorage.removeItem(key);
-    } catch(e) {
+    } catch (e) {
       /* */
     }
   },
@@ -82,7 +85,7 @@ LocalStorageStore.prototype = {
       }
 
       return result;
-    } catch(e) {
+    } catch (e) {
       return [];
     }
   }

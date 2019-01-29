@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const debug = require('debug-proxy')('app:mobile-native-embedded-chat');
 var $ = require('jquery');
@@ -14,7 +14,6 @@ var onready = require('././utils/onready');
 var FastClick = require('fastclick');
 var appEvents = require('./utils/appevents');
 const toggleDarkTheme = require('./utils/toggle-dark-theme');
-
 
 require('./components/eyeballs-room-sync');
 require('./components/ping');
@@ -35,14 +34,14 @@ onready(function() {
   }).render();
 
   unreadItemsClient.syncCollections({
-    'chat': chatCollection
+    chat: chatCollection
   });
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'), chatCollectionView);
 
   // This is only used for Android (iOS has native inputs)
   var $chatInputWrapper = $('#chat-input-wrapper');
-  if($chatInputWrapper) {
+  if ($chatInputWrapper) {
     var room = context.troupe();
 
     if (!room.get('roomMember')) {
@@ -56,7 +55,7 @@ onready(function() {
     new ChatInputView({
       el: $('#chat-input'),
       model: room,
-      collection: chatCollection,
+      collection: chatCollection
     }).render();
 
     room.on('change:roomMember', function(room, isMember) {
@@ -77,17 +76,16 @@ onready(function() {
     var newMessage = {
       text: text,
       fromUser: context.getUser(),
-      sent: null,
+      sent: null
     };
     chatCollection.create(newMessage);
     appEvents.trigger('chat.send');
   };
 
-  window._toggleDarkTheme = function (isDarkModeOn) {
+  window._toggleDarkTheme = function(isDarkModeOn) {
     debug(`_toggleDarkTheme ${isDarkModeOn}`);
     toggleDarkTheme(isDarkModeOn);
   };
-
 
   // Listen for changes to the room
   liveContext.syncRoom();

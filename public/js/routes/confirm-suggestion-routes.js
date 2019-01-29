@@ -1,7 +1,6 @@
 'use strict';
 
 function createRouter() {
-
   return {
     'confirmSuggested/*uri': function(uri) {
       var dialogRegion = this.dialogRegion;

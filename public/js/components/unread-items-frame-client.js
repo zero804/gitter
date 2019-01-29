@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var context = require('../utils/context');
 var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:unread-items-frame');
-
 
 function limit(fn, context, timeout) {
   return _.throttle(_.bind(fn, context), timeout || 30, { leading: false });
@@ -22,7 +21,11 @@ var TroupeUnreadNotifier = function(troupeCollection) {
   context.troupe().on('change:id', _.bind(this._recount, this));
 
   this._recountLimited = limit(this._recount, this, 50);
-  this._collection.on('change:unreadItems change:mentions reset sync add remove destroy', this._recountLimited, this);
+  this._collection.on(
+    'change:unreadItems change:mentions reset sync add remove destroy',
+    this._recountLimited,
+    this
+  );
 
   this._recountLimited();
 };
@@ -44,8 +47,12 @@ TroupeUnreadNotifier.prototype = {
 
     var currentUnreadTotal;
     var currentTroupeId = context.getTroupeId();
-    if(currentTroupeId) {
-      currentUnreadTotal = c.filter(function(trp) { return trp.id === currentTroupeId; }).reduce(count, 0);
+    if (currentTroupeId) {
+      currentUnreadTotal = c
+        .filter(function(trp) {
+          return trp.id === currentTroupeId;
+        })
+        .reduce(count, 0);
     } else {
       currentUnreadTotal = 0;
     }
@@ -55,21 +62,21 @@ TroupeUnreadNotifier.prototype = {
       current: currentUnreadTotal
     };
 
-    debug('troupeUnreadTotalChange: overall=%s, current=%s', newTroupeUnreadTotal, currentUnreadTotal);
+    debug(
+      'troupeUnreadTotalChange: overall=%s, current=%s',
+      newTroupeUnreadTotal,
+      currentUnreadTotal
+    );
 
     appEvents.trigger('troupeUnreadTotalChange', counts);
-
   }
-
 };
 
 var unreadItemsClient = {
-
   installTroupeListener: function(troupeCollection) {
     /* Store can be optional below */
     new TroupeUnreadNotifier(troupeCollection);
   }
-
 };
 
 // Mainly useful for testing

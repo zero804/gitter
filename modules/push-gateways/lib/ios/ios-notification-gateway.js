@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var apn = require('apn');
 var debug = require('debug')('gitter:infra:ios-notification-gateway');
@@ -28,12 +28,12 @@ var ERROR_DESCRIPTIONS = {
 };
 
 var connections = {
-  'APPLE': createConnection('Prod', true),
+  APPLE: createConnection('Prod', true),
   'APPLE-DEV': createConnection('Dev')
 };
 
 function resolveCertConfig(key) {
-  var relative = config.get(key)
+  var relative = config.get(key);
   if (!relative) return;
 
   return path.resolve(rootDirname, relative);
@@ -49,8 +49,7 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
 
   if (connection === false) {
     return false;
-  }
-  else if (!connection) {
+  } else if (!connection) {
     return Promise.reject(new Error('unknown device type: ' + device.deviceType));
   }
 
@@ -59,8 +58,7 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  return Promise.resolve(true)
-    .delay(1000);
+  return Promise.resolve(true).delay(1000);
 }
 
 function createConnection(suffix, isProduction) {
@@ -71,8 +69,19 @@ function createConnection(suffix, isProduction) {
   var keyConfigKey = 'apn:key' + suffix;
   var key = resolveCertConfig(keyConfigKey);
 
-  if(!cert || !key) {
-    logger.warn('ios push notification gateway (' + suffix + ') missing config, ' + certConfigKey + ':' + cert + ' ' + keyConfigKey + ':' + key);
+  if (!cert || !key) {
+    logger.warn(
+      'ios push notification gateway (' +
+        suffix +
+        ') missing config, ' +
+        certConfigKey +
+        ':' +
+        cert +
+        ' ' +
+        keyConfigKey +
+        ':' +
+        key
+    );
     return false;
   }
 
@@ -84,19 +93,30 @@ function createConnection(suffix, isProduction) {
   });
 
   connection.on('error', function(err) {
-    logger.error('ios push notification gateway (' + suffix + ') experienced an error', { error: err.message });
+    logger.error('ios push notification gateway (' + suffix + ') experienced an error', {
+      error: err.message
+    });
     errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
   connection.on('socketError', function(err) {
-    logger.error('ios push notification gateway (' + suffix + ') experienced a socketError', { error: err.message });
+    logger.error('ios push notification gateway (' + suffix + ') experienced a socketError', {
+      error: err.message
+    });
     errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   });
 
   connection.on('transmissionError', function(errCode, notification, device) {
-    var err = new Error('apn transmission error ' + errCode +': ' + ERROR_DESCRIPTIONS[errCode]);
+    var err = new Error('apn transmission error ' + errCode + ': ' + ERROR_DESCRIPTIONS[errCode]);
     if (errCode === 8) {
-      logger.warn('ios push notification gateway (' + suffix + ') invalid device token for "' + suffix + '". Need to remove the following device sometime:', { device: device });
+      logger.warn(
+        'ios push notification gateway (' +
+          suffix +
+          ') invalid device token for "' +
+          suffix +
+          '". Need to remove the following device sometime:',
+        { device: device }
+      );
     } else {
       logger.error('ios push notification gateway (' + suffix + ')', { error: err.message });
       errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
@@ -114,8 +134,7 @@ function sendBadgeUpdateToDevice(device, badge) {
 
   if (connection === false) {
     return false;
-  }
-  else if (!connection) {
+  } else if (!connection) {
     return false;
   }
 
@@ -127,8 +146,7 @@ function sendBadgeUpdateToDevice(device, badge) {
   // timout needed to ensure that the push notification packet is sent.
   // if we dont, SIGINT will kill notifications before they have left.
   // until apn uses proper callbacks, we have to guess that it takes a second.
-  return Promise.resolve(true)
-    .delay(1000);
+  return Promise.resolve(true).delay(1000);
 }
 
 function createFeedbackEmitterForEnv(suffix, isProduction) {
@@ -142,8 +160,19 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
     var keyConfigKey = 'apn:key' + suffix;
     var key = resolveCertConfig(keyConfigKey);
 
-    if(!cert || !key) {
-      logger.warn('ios push notification feedback (' + suffix + ') missing config, ' + certConfigKey + ':' + cert + ' ' + keyConfigKey + ':' + key);
+    if (!cert || !key) {
+      logger.warn(
+        'ios push notification feedback (' +
+          suffix +
+          ') missing config, ' +
+          certConfigKey +
+          ':' +
+          cert +
+          ' ' +
+          keyConfigKey +
+          ':' +
+          key
+      );
       return emitter;
     }
 
@@ -164,16 +193,19 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
     });
 
     feedback.on('error', function(err) {
-      logger.error('ios push notification feedback (' + suffix + ') experienced an error', { error: err.message });
+      logger.error('ios push notification feedback (' + suffix + ') experienced an error', {
+        error: err.message
+      });
       errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
     });
 
     feedback.on('feedbackError', function(err) {
-      logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', { error: err.message });
+      logger.error('ios push notification feedback (' + suffix + ') experienced a feedbackError', {
+        error: err.message
+      });
       errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
     });
-
-  } catch(err) {
+  } catch (err) {
     logger.error('Unable to start feedback service (' + suffix + ')', { exception: err });
     errorReporter(err, { apnEnv: suffix }, { module: 'ios-notification-gateway' });
   }
@@ -181,10 +213,9 @@ function createFeedbackEmitterForEnv(suffix, isProduction) {
   return emitter;
 }
 
-
 function createFeedbackEmitter() {
   /* Only create the feedback listeners for the current environment */
-  switch(config.get('NODE_ENV') || 'dev') {
+  switch (config.get('NODE_ENV') || 'dev') {
     case 'prod':
       return createFeedbackEmitterForEnv('Prod', true);
 
@@ -200,4 +231,4 @@ module.exports = {
   sendNotificationToDevice: Promise.method(sendNotificationToDevice),
   sendBadgeUpdateToDevice: Promise.method(sendBadgeUpdateToDevice),
   createFeedbackEmitter: createFeedbackEmitter
-}
+};

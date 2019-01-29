@@ -1,7 +1,18 @@
 'use strict';
 
 function getCookie(cookieName) {
-  return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(cookieName).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+  return (
+    decodeURIComponent(
+      document.cookie.replace(
+        new RegExp(
+          '(?:(?:^|.*;)\\s*' +
+            encodeURIComponent(cookieName).replace(/[\-\.\+\*]/g, '\\$&') +
+            '\\s*\\=\\s*([^;]*).*$)|^.*$'
+        ),
+        '$1'
+      )
+    ) || null
+  );
 }
 
 function getVariant(testName) {
@@ -9,7 +20,9 @@ function getVariant(testName) {
 }
 
 function listVariants() {
-  var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/);
+  var aKeys = document.cookie
+    .replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, '')
+    .split(/\s*(?:\=[^;]*)?;\s*/);
   return aKeys.reduce(function(memo, key) {
     if (key.indexOf('variant_') !== 0) return memo;
 

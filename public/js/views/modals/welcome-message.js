@@ -16,30 +16,31 @@ var View = Marionette.ItemView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
   },
 
-  menuItemClicked: function (type){
-    switch(type) {
+  menuItemClicked: function(type) {
+    switch (type) {
       case 'submit':
-        apiClient.user
-          .post('/rooms', { id: context.troupe().id })
-          .then(function(body) {
+        apiClient.user.post('/rooms', { id: context.troupe().id }).then(
+          function(body) {
             context.setTroupe(body);
             this.destroyWelcomeMessage();
-          }.bind(this));
+          }.bind(this)
+        );
         break;
     }
   },
 
-  onRender: function (){
-    apiClient.room.get('/meta/welcome-message').then(function(welcomeMessage){
-      this.ui.welcomeMessage.html(welcomeMessage.html);
-    }.bind(this));
+  onRender: function() {
+    apiClient.room.get('/meta/welcome-message').then(
+      function(welcomeMessage) {
+        this.ui.welcomeMessage.html(welcomeMessage.html);
+      }.bind(this)
+    );
   },
 
-  destroyWelcomeMessage: function (){
+  destroyWelcomeMessage: function() {
     this.dialog.hide();
     this.dislog = null;
-  },
-
+  }
 });
 
 var Modal = ModalView.extend({
@@ -48,7 +49,12 @@ var Modal = ModalView.extend({
     this.view = new View(attrs, options);
   },
   menuItems: [
-    { action: 'submit', pull: 'right', text: 'I Understand', className: 'modal--default__footer__btn' }
+    {
+      action: 'submit',
+      pull: 'right',
+      text: 'I Understand',
+      className: 'modal--default__footer__btn'
+    }
   ]
 });
 

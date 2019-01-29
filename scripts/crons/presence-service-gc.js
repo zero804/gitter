@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -13,7 +13,7 @@ var start = Date.now();
 var bayeux = new BayeuxCluster(true); // Lightweight bayeux cluster
 
 presenceService.collectGarbage(bayeux, function(err) {
-  if(err) {
+  if (err) {
     winston.error('presence-gc failed: ' + err, { exception: err });
   }
 

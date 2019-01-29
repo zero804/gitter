@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
@@ -25,10 +25,9 @@ function createOAuthClients(expected, fixture) {
     if (key.match(/^oAuthClient/)) {
       var expectedOAuthClient = expected[key];
 
-      return createOAuthClient(key, expectedOAuthClient)
-        .then(function(oAuthClient) {
-          fixture[key] = oAuthClient;
-        });
+      return createOAuthClient(key, expectedOAuthClient).then(function(oAuthClient) {
+        fixture[key] = oAuthClient;
+      });
     }
 
     return null;

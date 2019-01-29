@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var context = require('../../../utils/context');
 var clientEnv = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
@@ -10,8 +10,7 @@ var logout = require('../../../utils/logout');
 
 require('../../behaviors/widgets');
 
-module.exports = (function () {
-
+module.exports = (function() {
   return Marionette.ItemView.extend({
     template: template,
     className: function() {
@@ -19,7 +18,7 @@ module.exports = (function () {
       return isMobile() ? 'menu-header menu-header--expanded' : 'menu-header';
     },
     events: {
-      'click': 'toggleExpanded',
+      click: 'toggleExpanded',
       'click #link-home': 'homeClicked',
       'click #link-logout': 'logoutClicked'
     },
@@ -29,10 +28,10 @@ module.exports = (function () {
     },
 
     modelEvents: {
-      'change': 'render'
+      change: 'render'
     },
 
-    serializeData: function () {
+    serializeData: function() {
       var userModel = context.user().toJSON();
       var isNativeResult = isNative();
 
@@ -57,7 +56,7 @@ module.exports = (function () {
       this.$el.toggleClass('menu-header--expanded');
     },
 
-    homeClicked: function (e) {
+    homeClicked: function(e) {
       e.preventDefault();
       if (context().user.url !== window.location.pathname) {
         appEvents.trigger('navigation', '/home', 'home', 'home');
@@ -69,5 +68,4 @@ module.exports = (function () {
       logout();
     }
   });
-
 })();

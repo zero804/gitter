@@ -24,7 +24,7 @@ function getSourceMapOptions(mapsSubDir) {
     dest: path.relative('./output/assets/js/' + suffix + '/', './output/maps/' + suffix + '/'),
     options: {
       sourceRoot: path.relative('./output/maps/' + suffix, './output/assets/js/' + suffix),
-      sourceMappingURLPrefix: sourceMapUrl,
+      sourceMappingURLPrefix: sourceMapUrl
     }
   };
 }

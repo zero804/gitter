@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const env = require('gitter-web-env');
 const config = env.config;

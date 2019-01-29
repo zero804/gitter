@@ -1,26 +1,26 @@
-"use strict";
+'use strict';
 
 var compileTemplate = require('./compile-web-template');
 var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
   //NEW LEFT MENU
-  "js/views/menu/room/layout/room-menu-layout",
-  "js/views/menu/room/primary-collection/primary-collection-item-view",
-  "js/views/menu/room/minibar/minibar-item-view",
+  'js/views/menu/room/layout/room-menu-layout',
+  'js/views/menu/room/primary-collection/primary-collection-item-view',
+  'js/views/menu/room/minibar/minibar-item-view',
 
   //OLD MENU
-  "js/views/menu/old/tmpl/troupeMenu",
-  "js/views/menu/old/tmpl/profile",
-  "js/views/menu/old/tmpl/org-list-item",
+  'js/views/menu/old/tmpl/troupeMenu',
+  'js/views/menu/old/tmpl/profile',
+  'js/views/menu/old/tmpl/org-list-item',
 
-  "js/views/archive/tmpl/archive-navigation-view",
-  "js/views/app/tmpl/headerViewTemplate",
-  "js/views/app/tmpl/headerViewTemplate",
-  "js/views/chat/tmpl/chatInputView",
-  "js/views/chat/tmpl/chat-input-box",
-  "js/views/chat/tmpl/chat-input-buttons",
-  "js/views/chat/tmpl/join-room-view",
+  'js/views/archive/tmpl/archive-navigation-view',
+  'js/views/app/tmpl/headerViewTemplate',
+  'js/views/app/tmpl/headerViewTemplate',
+  'js/views/chat/tmpl/chatInputView',
+  'js/views/chat/tmpl/chat-input-box',
+  'js/views/chat/tmpl/chat-input-buttons',
+  'js/views/chat/tmpl/join-room-view',
   'js/views/people/tmpl/peopleCollectionView',
   'js/views/explore/tmpl/explore-view',
   'js/views/org-directory/org-directory-header-view',
@@ -32,11 +32,11 @@ var PRERENDERED_VIEWS = [
 
   /* new */
 ].reduce(function(memo, v) {
-  memo[v] = compileTemplate(v + ".hbs");
+  memo[v] = compileTemplate(v + '.hbs');
   return memo;
 }, {});
 
-module.exports = exports = function (templateFile, options) {
+module.exports = exports = function(templateFile, options) {
   var hash = options.hash;
 
   var template = PRERENDERED_VIEWS[templateFile];

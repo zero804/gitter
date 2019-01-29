@@ -10,20 +10,19 @@ var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect'
 function fillTwitterUsernames() {
   return new Promise(function(resolve, reject) {
     // There are 7482 matches in production at the time of writing
-    var stream = persistence.Identity
-      .find({
-        provider: 'twitter',
-        username: {
-          $exists: false
-        }
-      })
+    var stream = persistence.Identity.find({
+      provider: 'twitter',
+      username: {
+        $exists: false
+      }
+    })
       .select('userId')
       .lean()
       .slaveOk()
       .stream();
 
-    var pipe = stream.pipe(through2Concurrent.obj({ maxConcurrency: 10 },
-      function(identity, enc, cb) {
+    var pipe = stream.pipe(
+      through2Concurrent.obj({ maxConcurrency: 10 }, function(identity, enc, cb) {
         return persistence.User.findById(identity.userId)
           .select('username')
           .lean()
@@ -44,13 +43,13 @@ function fillTwitterUsernames() {
                 username: username
               }
             };
-            return persistence.Identity.findOneAndUpdate(query, update)
-              .exec();
+            return persistence.Identity.findOneAndUpdate(query, update).exec();
           })
           .nodeify(cb);
-      }));
+      })
+    );
 
-    pipe.on('data', function() { });
+    pipe.on('data', function() {});
 
     pipe.on('end', function() {
       resolve();
@@ -62,7 +61,6 @@ function fillTwitterUsernames() {
   });
 }
 
-
 onMongoConnect()
   .then(function() {
     return fillTwitterUsernames();
@@ -72,7 +70,7 @@ onMongoConnect()
     shutdown.shutdownGracefully();
   })
   .catch(function(err) {
-    console.error("error:", err);
-    console.error("stack:", err.stack);
+    console.error('error:', err);
+    console.error('stack:', err.stack);
     shutdown.shutdownGracefully(1);
   });

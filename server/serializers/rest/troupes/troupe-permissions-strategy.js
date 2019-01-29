@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 var logger = require('gitter-web-env').logger;
-var userService = require("gitter-web-users");
+var userService = require('gitter-web-users');
 var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
@@ -16,7 +16,6 @@ function TroupePermissionsStrategy(options) {
 }
 
 TroupePermissionsStrategy.prototype = {
-
   preload: function(troupes) {
     if (troupes.isEmpty()) return;
 
@@ -24,23 +23,24 @@ TroupePermissionsStrategy.prototype = {
     var currentUserId = this.currentUserId;
 
     return Promise.try(function() {
-        if (currentUser) {
-          return currentUser;
-        }
+      if (currentUser) {
+        return currentUser;
+      }
 
-        if (currentUserId) {
-          return userService.findById(currentUserId)
-        }
-      })
+      if (currentUserId) {
+        return userService.findById(currentUserId);
+      }
+    })
       .bind(this)
       .then(function(user) {
         // setup this.isAdmin _before_ possibly returning, otherwise map will npe
-        var isAdmin = this.isAdmin = {};
+        var isAdmin = (this.isAdmin = {});
 
         if (!user) return;
 
         return Promise.map(troupes.toArray(), function(troupe) {
-          return policyFactory.createPolicyForRoom(user, troupe)
+          return policyFactory
+            .createPolicyForRoom(user, troupe)
             .then(function(policy) {
               return policy.canAdmin();
             })

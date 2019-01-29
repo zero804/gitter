@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 
@@ -7,11 +7,10 @@ var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
  * @return promise of a relative URL
  */
 function whereToNext(user) {
-  return recentRoomService.findInitialRoomUrlForUser(user)
-    .then(function(url) {
-      if (url) return url;
-      return user.username ? '/' + user.username : '/home/explore';
-    });
+  return recentRoomService.findInitialRoomUrlForUser(user).then(function(url) {
+    if (url) return url;
+    return user.username ? '/' + user.username : '/home/explore';
+  });
 }
 exports.whereToNext = whereToNext;
 

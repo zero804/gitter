@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var http = require('http');
 var useragent = require('useragent');
@@ -15,14 +15,21 @@ ServerResponsePrototype.relativeRedirect = function(status, url) {
   var req = this.req;
   var body;
 
-  if(!url) {
+  if (!url) {
     url = status;
     status = 302;
   }
 
   // Support text/{plain,html} by default
   if (req.accepts('html')) {
-    body = '<p>' + http.STATUS_CODES[status] + '. Redirecting to <a href="' + url + '">' + url + '</a></p>';
+    body =
+      '<p>' +
+      http.STATUS_CODES[status] +
+      '. Redirecting to <a href="' +
+      url +
+      '">' +
+      url +
+      '</a></p>';
     this.header('Content-Type', 'text/html');
   } else {
     body = http.STATUS_CODES[status] + '. Redirecting to ' + url;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/font-setup');
 
@@ -22,75 +22,61 @@ require('@gitterhq/styleguide/css/components/buttons.css');
 var active = [];
 
 var featuredRooms = [
- { uri: 'angular-ui/ng-grid',
-   name: 'Angular UI',
-   language: 'JavaScript',
-   locale: 'en'
- },
- { uri: 'postcss/postcss',
-   name: 'Postcss',
-   language: 'CSS',
-   locale: 'en'
- },
- { uri: 'gitterHQ/nodejs',
-   name: '#nodejs',
-   channel: true,
-   language: 'JavaScript',
-   locale: 'en'
- },
- { uri: 'scala/scala',
-   name: 'Scala',
-   language: 'Scala',
-   locale: 'en'
- },
- { uri: 'mozillascience/community',
-  name: 'Mozilla Science',
-  language: 'Mozilla Science Lab community',
-  locale: 'en'
- },
- { uri: 'deeplearning4j/deeplearning4j',
-   name: 'Deeplearning4J',
-   language: 'Deep Learning for Java',
-   locale: 'en'
- },
- { uri: 'numenta/public',
-   name: 'Numenta',
-   language: 'Machine Intelligence Research',
-   locale: 'en'
- },
- { uri: 'Aurelia/Discuss',
-   name: 'Aurelia',
-   language: 'JavaScript',
-   locale: 'en'
- },
- { uri: 'Dogfalo/materialize',
-   name: 'Materialize',
-   language: 'CSS',
-   locale: 'en'
- },
- { uri: 'google/material-design-lite',
-  name: 'Material Design Lite',
-  language: 'Google Material Design Lite',
-  locale: 'en'
- },
- { uri: 'aws/aws-sdk-ruby',
-  name: 'AWS Ruby SDK',
-  language: 'The official AWS SDK for Ruby',
-  locale: 'en'
- }
+  { uri: 'angular-ui/ng-grid', name: 'Angular UI', language: 'JavaScript', locale: 'en' },
+  { uri: 'postcss/postcss', name: 'Postcss', language: 'CSS', locale: 'en' },
+  { uri: 'gitterHQ/nodejs', name: '#nodejs', channel: true, language: 'JavaScript', locale: 'en' },
+  { uri: 'scala/scala', name: 'Scala', language: 'Scala', locale: 'en' },
+  {
+    uri: 'mozillascience/community',
+    name: 'Mozilla Science',
+    language: 'Mozilla Science Lab community',
+    locale: 'en'
+  },
+  {
+    uri: 'deeplearning4j/deeplearning4j',
+    name: 'Deeplearning4J',
+    language: 'Deep Learning for Java',
+    locale: 'en'
+  },
+  {
+    uri: 'numenta/public',
+    name: 'Numenta',
+    language: 'Machine Intelligence Research',
+    locale: 'en'
+  },
+  { uri: 'Aurelia/Discuss', name: 'Aurelia', language: 'JavaScript', locale: 'en' },
+  { uri: 'Dogfalo/materialize', name: 'Materialize', language: 'CSS', locale: 'en' },
+  {
+    uri: 'google/material-design-lite',
+    name: 'Material Design Lite',
+    language: 'Google Material Design Lite',
+    locale: 'en'
+  },
+  {
+    uri: 'aws/aws-sdk-ruby',
+    name: 'AWS Ruby SDK',
+    language: 'The official AWS SDK for Ruby',
+    locale: 'en'
+  }
 ];
 
 function random(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function shuffle(array){
-  for(var j, x, i = array.length; i; j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x);
+function shuffle(array) {
+  for (
+    var j, x, i = array.length;
+    i;
+    j = Math.floor(Math.random() * i), x = array[--i], array[i] = array[j], array[j] = x
+  );
   return array;
 }
 
 function roomByLocale(locale) {
-  var rooms = featuredRooms.filter(function(r) { return r.locale === locale;});
+  var rooms = featuredRooms.filter(function(r) {
+    return r.locale === locale;
+  });
   if (rooms.length) {
     active.push(rooms[0].name);
     return rooms[0];
@@ -128,9 +114,16 @@ function initEmbedPanel() {
 
     $this.html(
       // TODO: send more than just the username
-      '<img src="' + resolveUserAvatarUrl({ username: owner }, 48*2) + '" width="48" height="48">' +
-      '<h3>' + room.name + '</h3>' +
-      '<em>' + room.language + '</em>');
+      '<img src="' +
+        resolveUserAvatarUrl({ username: owner }, 48 * 2) +
+        '" width="48" height="48">' +
+        '<h3>' +
+        room.name +
+        '</h3>' +
+        '<em>' +
+        room.language +
+        '</em>'
+    );
   });
 
   tabs.on('click', function() {
@@ -139,7 +132,7 @@ function initEmbedPanel() {
 
     tabs.removeClass('active');
     $this.addClass('active');
-    $('#embedded-chat').attr({src: '/' + rooms[tabIndex].uri + '/~embed'});
+    $('#embedded-chat').attr({ src: '/' + rooms[tabIndex].uri + '/~embed' });
   });
 }
 
@@ -150,9 +143,10 @@ function initAppsPanelScrollListener() {
   $window.on('scroll', function(e) {
     e.preventDefault();
 
-    var hasScrolledHalfwayThroughPanel = $window.scrollTop() + $window.height() / 2 > $panel.position().top;
+    var hasScrolledHalfwayThroughPanel =
+      $window.scrollTop() + $window.height() / 2 > $panel.position().top;
 
-    if(hasScrolledHalfwayThroughPanel) {
+    if (hasScrolledHalfwayThroughPanel) {
       $panel.addClass('visible');
       $window.off('scroll');
     }
@@ -163,32 +157,40 @@ function initMapMessages() {
   //  Make sure we don't randomly generate people in the ocean
   // Commented out coords are on south america that interfere with the cta buttons
   var coords = shuffle([
-    [64, 113], [150, 142], /*[194, 222],*/ [345, 221], [275, 70],
-    [340, 95], [490, 141], [531, 206], [579, 268], [345, 104],
-    [532, 21], [218, 48], [384, 226], /*[153, 226],*/ [420, 157]
+    [64, 113],
+    [150, 142],
+    /*[194, 222],*/ [345, 221],
+    [275, 70],
+    [340, 95],
+    [490, 141],
+    [531, 206],
+    [579, 268],
+    [345, 104],
+    [532, 21],
+    [218, 48],
+    [384, 226],
+    /*[153, 226],*/ [420, 157]
   ]);
 
   var $map = $('.map');
 
-  apiClient.priv.get('/sample-chats')
-    .then(function(messages) {
-      setInterval(function() {
-        var chatMessage = messages.shift();
-        var pos = coords.shift();
+  apiClient.priv.get('/sample-chats').then(function(messages) {
+    setInterval(function() {
+      var chatMessage = messages.shift();
+      var pos = coords.shift();
 
-        if(!chatMessage || !pos) return;
-        messages.push(chatMessage);
-        coords.push(pos);
+      if (!chatMessage || !pos) return;
+      messages.push(chatMessage);
+      coords.push(pos);
 
-        var $el = createMessageElement(chatMessage, pos);
-        addMessageElementToMap($el, $map);
+      var $el = createMessageElement(chatMessage, pos);
+      addMessageElementToMap($el, $map);
 
-        setTimeout(function() {
-          removeItemFromMap($el);
-        }, 2000);
-
+      setTimeout(function() {
+        removeItemFromMap($el);
       }, 2000);
-    });
+    }, 2000);
+  });
 }
 
 function createMessageElement(chatMessage, pos) {
@@ -218,14 +220,18 @@ function addMessageElementToMap($message, $map) {
 
 function removeItemFromMap($message) {
   var children = $message.children();
-  $(children[0]).removeClass('enter').animate({ opacity: 0 }, function () {
-    setTimeout(function () {
-      $message.children().removeClass('enter').animate({ opacity: 0 }, function () {
-        $message.remove();
-      });
-    }, 7500);
-
-  });
+  $(children[0])
+    .removeClass('enter')
+    .animate({ opacity: 0 }, function() {
+      setTimeout(function() {
+        $message
+          .children()
+          .removeClass('enter')
+          .animate({ opacity: 0 }, function() {
+            $message.remove();
+          });
+      }, 7500);
+    });
   // $message.children().removeClass('enter').animate({opacity: 0}, function() {
   //   $message.remove();
   // });
@@ -236,17 +242,20 @@ function cycleElements($els, time) {
   var tallestHeight = 0;
   $els.each(function() {
     var height = $(this).outerHeight();
-    if(height > tallestHeight) {
+    if (height > tallestHeight) {
       tallestHeight = height;
     }
   });
   $els.parent().css('height', tallestHeight);
 
-  setInterval(function () {
-    var active = $els.filter('.visible').removeClass('visible').addClass('going');
+  setInterval(function() {
+    var active = $els
+      .filter('.visible')
+      .removeClass('visible')
+      .addClass('going');
     var target = active.next();
 
-    if(!target.length) {
+    if (!target.length) {
       target = $els.first();
     }
 

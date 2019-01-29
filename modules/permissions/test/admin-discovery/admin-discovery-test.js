@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
-
+var proxyquireNoCallThru = require('proxyquire').noCallThru();
 
 describe('admin-discovery', function() {
   describe('integration tests #slow', function() {
@@ -27,78 +26,67 @@ describe('admin-discovery', function() {
           externalId: 'external3',
           extraAdmins: ['user1']
         }
-      },
-
+      }
     });
 
     beforeEach(function() {
       githubOrgs = null;
       adminDiscovery = proxyquireNoCallThru('../../lib/admin-discovery/index', {
         './github-org': function() {
-          return Promise.resolve(githubOrgs)
+          return Promise.resolve(githubOrgs);
         }
       });
-    })
+    });
 
     describe('discoverAdminGroups', function() {
-
       it('should return nothing for users who are not admins of any groups', function() {
-        return adminDiscovery.discoverAdminGroups(fixture.user2)
-          .then(function(groups) {
-            assert.deepEqual(groups, []);
-          });
+        return adminDiscovery.discoverAdminGroups(fixture.user2).then(function(groups) {
+          assert.deepEqual(groups, []);
+        });
       });
 
       it('should return groups where the user is in the GH_ORG by linkPath', function() {
         githubOrgs = {
           type: 'GH_ORG',
           linkPath: [URI]
-        }
+        };
 
-        return adminDiscovery.discoverAdminGroups(fixture.user2)
-          .then(function(groups) {
-            assert.strictEqual(groups.length, 1);
-            assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
-          });
+        return adminDiscovery.discoverAdminGroups(fixture.user2).then(function(groups) {
+          assert.strictEqual(groups.length, 1);
+          assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
+        });
       });
 
       it('should return groups where the user is in the GH_ORG by externalId', function() {
         githubOrgs = {
           type: 'GH_ORG',
           externalId: 'external3'
-        }
+        };
 
-        return adminDiscovery.discoverAdminGroups(fixture.user2)
-          .then(function(groups) {
-            assert.strictEqual(groups.length, 1);
-            assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
-          });
-      });
-
-    });
-
-
-    it('should return rooms where the user is in extraAdmins', function() {
-      return adminDiscovery.discoverAdminGroups(fixture.user1)
-        .then(function(groups) {
+        return adminDiscovery.discoverAdminGroups(fixture.user2).then(function(groups) {
           assert.strictEqual(groups.length, 1);
           assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
         });
+      });
+    });
+
+    it('should return rooms where the user is in extraAdmins', function() {
+      return adminDiscovery.discoverAdminGroups(fixture.user1).then(function(groups) {
+        assert.strictEqual(groups.length, 1);
+        assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
+      });
     });
 
     it('should return rooms where the user is in extraAdmins and an org member without dups', function() {
       githubOrgs = {
         type: 'GH_ORG',
         linkPath: [URI]
-      }
+      };
 
-      return adminDiscovery.discoverAdminGroups(fixture.user1)
-        .then(function(groups) {
-          assert.strictEqual(groups.length, 1);
-          assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
-        });
+      return adminDiscovery.discoverAdminGroups(fixture.user1).then(function(groups) {
+        assert.strictEqual(groups.length, 1);
+        assert.strictEqual(String(groups[0]._id), String(fixture.group1._id));
+      });
     });
-
-
   });
 });

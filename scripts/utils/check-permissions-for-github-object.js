@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var validateUri = require('gitter-web-github').GitHubUriValidator;
 var userService = require('gitter-web-users');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory')
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 function execute(username, uri) {
-  return userService.findByUsername(username)
+  return userService
+    .findByUsername(username)
     .bind({
       user: null
     })
@@ -53,8 +54,7 @@ var opts = require('yargs')
     description: 'GitHub object to check permissions of'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 execute(opts.username, opts.uri)
   .catch(function(e) {

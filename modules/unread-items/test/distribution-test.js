@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Distribution = require('../lib/distribution');
 var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
@@ -13,7 +13,6 @@ function assertIteratorDeepEqual(iterator, expected) {
 
 describe('distribution', function() {
   describe('getConnectedActivityUserIds', function() {
-
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
         membersWithFlags: [
@@ -37,11 +36,9 @@ describe('distribution', function() {
 
       assertIteratorDeepEqual(distribution.getConnectedActivityUserIds(), []);
     });
-
   });
 
   describe('getWebNotifications', function() {
-
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
         membersWithFlags: [
@@ -127,14 +124,20 @@ describe('distribution', function() {
         membersWithFlags: [
           { userId: '1', flags: roomMembershipFlags.hashToFlags({ unread: true, desktop: true }) },
           { userId: '2', flags: roomMembershipFlags.hashToFlags({ unread: true, desktop: false }) },
-          { userId: '3', flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: true }) },
-          { userId: '4', flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: false }) }
+          {
+            userId: '3',
+            flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: true })
+          },
+          {
+            userId: '4',
+            flags: roomMembershipFlags.hashToFlags({ activity: true, desktop: false })
+          }
         ],
         presence: {
           '1': 'online',
           '2': 'online',
           '3': 'online',
-          '4': 'online',
+          '4': 'online'
         }
       });
 
@@ -146,13 +149,13 @@ describe('distribution', function() {
         membersWithFlags: [
           { userId: '1', flags: MODES.all },
           { userId: '2', flags: MODES.announcement },
-          { userId: '3', flags: MODES.mute },
+          { userId: '3', flags: MODES.mute }
         ],
         announcement: true,
         presence: {
           '1': 'online',
           '2': 'online',
-          '3': 'online',
+          '3': 'online'
         }
       });
 
@@ -165,10 +168,34 @@ describe('distribution', function() {
           { userId: '1', flags: MODES.all },
           { userId: '2', flags: MODES.announcement },
           { userId: '3', flags: MODES.mute },
-          { userId: '4', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: true, desktop: true }) },
-          { userId: '5', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: true, desktop: false }) },
-          { userId: '6', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: false, desktop: true }) },
-          { userId: '7', flags: roomMembershipFlags.hashToFlags({ activity: true, mention: false, desktop: false }) },
+          {
+            userId: '4',
+            flags: roomMembershipFlags.hashToFlags({ activity: true, mention: true, desktop: true })
+          },
+          {
+            userId: '5',
+            flags: roomMembershipFlags.hashToFlags({
+              activity: true,
+              mention: true,
+              desktop: false
+            })
+          },
+          {
+            userId: '6',
+            flags: roomMembershipFlags.hashToFlags({
+              activity: true,
+              mention: false,
+              desktop: true
+            })
+          },
+          {
+            userId: '7',
+            flags: roomMembershipFlags.hashToFlags({
+              activity: true,
+              mention: false,
+              desktop: false
+            })
+          }
         ],
         mentions: ['1', '2', '3', '4', '5', '6', '7'],
         presence: {
@@ -178,33 +205,26 @@ describe('distribution', function() {
           '4': 'online',
           '5': 'online',
           '6': 'online',
-          '7': 'online',
+          '7': 'online'
         }
       });
 
       assertIteratorDeepEqual(distribution.getWebNotifications(), ['1', '2', '3', '4', '5', '6']);
     });
-
   });
 
   describe('getNotifyNewRoom', function() {
-
     it('should handle values', function() {
       var distribution = new Distribution({
-        membersWithFlags: [
-          { userId: '1' },
-          { userId: '2' },
-        ],
+        membersWithFlags: [{ userId: '1' }, { userId: '2' }],
         nonMemberMentions: ['1', '2']
       });
 
       assertIteratorDeepEqual(distribution.getNotifyNewRoom(), ['1', '2']);
     });
-
   });
 
   describe('getPushCandidatesWithoutMention', function() {
-
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
         membersWithFlags: [
@@ -215,7 +235,7 @@ describe('distribution', function() {
           { userId: '5', flags: MODES.all },
           { userId: '6', flags: MODES.all },
           { userId: '7', flags: MODES.all },
-          { userId: '8', flags: MODES.all },
+          { userId: '8', flags: MODES.all }
         ],
         presence: {
           '1': 'inroom',
@@ -224,7 +244,7 @@ describe('distribution', function() {
           '4': 'push',
           '5': 'push_connected',
           '6': 'push_notified_connected',
-          '7': 'push_notified',
+          '7': 'push_notified'
         }
       });
 
@@ -241,7 +261,7 @@ describe('distribution', function() {
           { userId: '5', flags: MODES.announcement },
           { userId: '6', flags: MODES.announcement },
           { userId: '7', flags: MODES.announcement },
-          { userId: '8', flags: MODES.announcement },
+          { userId: '8', flags: MODES.announcement }
         ],
         presence: {
           '1': 'inroom',
@@ -250,7 +270,7 @@ describe('distribution', function() {
           '4': 'push',
           '5': 'push_connected',
           '6': 'push_notified_connected',
-          '7': 'push_notified',
+          '7': 'push_notified'
         }
       });
 
@@ -267,7 +287,7 @@ describe('distribution', function() {
           { userId: '5', flags: MODES.mute },
           { userId: '6', flags: MODES.mute },
           { userId: '7', flags: MODES.mute },
-          { userId: '8', flags: MODES.mute },
+          { userId: '8', flags: MODES.mute }
         ],
         presence: {
           '1': 'inroom',
@@ -276,7 +296,7 @@ describe('distribution', function() {
           '4': 'push',
           '5': 'push_connected',
           '6': 'push_notified_connected',
-          '7': 'push_notified',
+          '7': 'push_notified'
         }
       });
 
@@ -290,11 +310,9 @@ describe('distribution', function() {
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithoutMention(), []);
     });
-
   });
 
   describe('getPushCandidatesWithMention', function() {
-
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
         membersWithFlags: [
@@ -305,7 +323,7 @@ describe('distribution', function() {
           { userId: '5', flags: MODES.all },
           { userId: '6', flags: MODES.all },
           { userId: '7', flags: MODES.all },
-          { userId: '8', flags: MODES.all },
+          { userId: '8', flags: MODES.all }
         ],
         mentions: ['1', '2', '3', '4', '5', '6', '7', '8'],
         presence: {
@@ -315,7 +333,7 @@ describe('distribution', function() {
           '4': 'push',
           '5': 'push_connected',
           '6': 'push_notified_connected',
-          '8': 'push_notified',
+          '8': 'push_notified'
         }
       });
 
@@ -327,17 +345,17 @@ describe('distribution', function() {
         membersWithFlags: [
           { userId: '1', flags: MODES.all },
           { userId: '2', flags: MODES.announcement },
-          { userId: '3', flags: MODES.mute },
+          { userId: '3', flags: MODES.mute }
         ],
         announcement: true,
         presence: {
           '1': 'push_notified',
           '2': 'push_notified',
-          '3': 'push_notified',
+          '3': 'push_notified'
         }
       });
 
-      assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), ['1','2']);
+      assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), ['1', '2']);
     });
 
     it('should handle distributions without mentions', function() {
@@ -351,17 +369,15 @@ describe('distribution', function() {
         presence: {
           '1': 'push',
           '2': 'push',
-          '3': 'push',
+          '3': 'push'
         }
       });
 
       assertIteratorDeepEqual(distribution.getPushCandidatesWithMention(), []);
     });
-
   });
 
   describe('getTroupeUnreadCountsChange', function() {
-
     it('should handle users in various connected states', function() {
       var distribution = new Distribution({
         membersWithFlags: [
@@ -383,15 +399,17 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1', unreadCount: 1, mentionCount: 1 },
-        { userId: '2', unreadCount: 2, mentionCount: 2 },
-        { userId: '3', unreadCount: 3, mentionCount: 3 },
-        { userId: '4', unreadCount: 4, mentionCount: 4 },
-        { userId: '5', unreadCount: 5, mentionCount: 5 },
-        { userId: '6', unreadCount: 6, mentionCount: 6 },
-        { userId: '7', unreadCount: 7, mentionCount: 7 },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1', unreadCount: 1, mentionCount: 1 },
+          { userId: '2', unreadCount: 2, mentionCount: 2 },
+          { userId: '3', unreadCount: 3, mentionCount: 3 },
+          { userId: '4', unreadCount: 4, mentionCount: 4 },
+          { userId: '5', unreadCount: 5, mentionCount: 5 },
+          { userId: '6', unreadCount: 6, mentionCount: 6 },
+          { userId: '7', unreadCount: 7, mentionCount: 7 }
+        ])
+      );
 
       assertIteratorDeepEqual(results.getTroupeUnreadCountsChange(), [
         { userId: '1', total: 1, mentions: 1 },
@@ -409,24 +427,26 @@ describe('distribution', function() {
           { userId: '2', flags: MODES.all },
           { userId: '3', flags: MODES.all },
           { userId: '4', flags: MODES.all },
-          { userId: '5', flags: MODES.all },
+          { userId: '5', flags: MODES.all }
         ],
         presence: {
           '1': 'inroom',
           '2': 'inroom',
           '3': 'inroom',
           '4': 'inroom',
-          '5': 'inroom',
+          '5': 'inroom'
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1', unreadCount: 0, mentionCount: 0 },
-        { userId: '2', unreadCount: 2, mentionCount: 0 },
-        { userId: '3', unreadCount: 0, mentionCount: 3 },
-        { userId: '4', unreadCount: 4, mentionCount: 4 },
-        { userId: '5' },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1', unreadCount: 0, mentionCount: 0 },
+          { userId: '2', unreadCount: 2, mentionCount: 0 },
+          { userId: '3', unreadCount: 0, mentionCount: 3 },
+          { userId: '4', unreadCount: 4, mentionCount: 4 },
+          { userId: '5' }
+        ])
+      );
 
       assertIteratorDeepEqual(results.getTroupeUnreadCountsChange(), [
         { userId: '1', total: 0, mentions: 0 },
@@ -459,17 +479,19 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1', badgeUpdate: true },
-        { userId: '2', badgeUpdate: true },
-        { userId: '3', badgeUpdate: true },
-        { userId: '4', badgeUpdate: true },
-        { userId: '5', badgeUpdate: true },
-        { userId: '6', badgeUpdate: true },
-        { userId: '7', badgeUpdate: true },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1', badgeUpdate: true },
+          { userId: '2', badgeUpdate: true },
+          { userId: '3', badgeUpdate: true },
+          { userId: '4', badgeUpdate: true },
+          { userId: '5', badgeUpdate: true },
+          { userId: '6', badgeUpdate: true },
+          { userId: '7', badgeUpdate: true }
+        ])
+      );
 
-      assertIteratorDeepEqual(results.getBadgeUpdates(), ['1','2','3','4','5','6']);
+      assertIteratorDeepEqual(results.getBadgeUpdates(), ['1', '2', '3', '4', '5', '6']);
     });
 
     it('should handle different values for counts', function() {
@@ -478,22 +500,24 @@ describe('distribution', function() {
           { userId: '1', flags: MODES.all },
           { userId: '2', flags: MODES.all },
           { userId: '3', flags: MODES.all },
-          { userId: '4', flags: MODES.all },
+          { userId: '4', flags: MODES.all }
         ],
         presence: {
           '1': 'inroom',
           '2': 'inroom',
           '3': 'inroom',
-          '4': 'inroom',
+          '4': 'inroom'
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1', badgeUpdate: true },
-        { userId: '2', badgeUpdate: false },
-        { userId: '3' },
-        { userId: '4' },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1', badgeUpdate: true },
+          { userId: '2', badgeUpdate: false },
+          { userId: '3' },
+          { userId: '4' }
+        ])
+      );
 
       assertIteratorDeepEqual(results.getBadgeUpdates(), ['1']);
     });
@@ -522,17 +546,19 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1' },
-        { userId: '2' },
-        { userId: '3' },
-        { userId: '4' },
-        { userId: '5' },
-        { userId: '6' },
-        { userId: '7' },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1' },
+          { userId: '2' },
+          { userId: '3' },
+          { userId: '4' },
+          { userId: '5' },
+          { userId: '6' },
+          { userId: '7' }
+        ])
+      );
 
-      assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1','2','3','5','6']);
+      assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1', '2', '3', '5', '6']);
     });
 
     it('should treat announcements as mentions', function() {
@@ -541,26 +567,23 @@ describe('distribution', function() {
           { userId: '1', flags: MODES.announcement },
           { userId: '2', flags: MODES.announcement },
           { userId: '3', flags: MODES.announcement },
-          { userId: '4', flags: MODES.mute },
+          { userId: '4', flags: MODES.mute }
         ],
         announcement: true,
         presence: {
           '1': 'online',
           '2': 'online',
-          '4': 'online',
+          '4': 'online'
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1' },
-        { userId: '2' },
-        { userId: '3' },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([{ userId: '1' }, { userId: '2' }, { userId: '3' }])
+      );
 
       assertIteratorDeepEqual(results.getNewUnreadWithMention(), ['1', '2']);
     });
   });
-
 
   describe('getNewUnreadWithoutMention', function() {
     it('should handle users in various connected states', function() {
@@ -584,17 +607,19 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1' },
-        { userId: '2' },
-        { userId: '3' },
-        { userId: '4' },
-        { userId: '5' },
-        { userId: '6' },
-        { userId: '7' },
-      ]));
+      var results = distribution.resultsProcessor(
+        lazy([
+          { userId: '1' },
+          { userId: '2' },
+          { userId: '3' },
+          { userId: '4' },
+          { userId: '5' },
+          { userId: '6' },
+          { userId: '7' }
+        ])
+      );
 
-      assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), ['1','2','3','5','6']);
+      assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), ['1', '2', '3', '5', '6']);
     });
 
     it('should treat announcements as mentions', function() {
@@ -615,14 +640,9 @@ describe('distribution', function() {
         }
       });
 
-      var results = distribution.resultsProcessor(lazy([
-        { userId: '1' },
-        { userId: '2' },
-      ]));
+      var results = distribution.resultsProcessor(lazy([{ userId: '1' }, { userId: '2' }]));
 
       assertIteratorDeepEqual(results.getNewUnreadWithoutMention(), []);
     });
-
   });
-
 });

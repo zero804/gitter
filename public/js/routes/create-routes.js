@@ -13,9 +13,11 @@ function createRoutes(options) {
 
       require.ensure(['../views/modals/confirm-repo-room-view'], function(require) {
         var confirmRepoRoomView = require('../views/modals/confirm-repo-room-view');
-        dialogRegion.show(new confirmRepoRoomView.Modal({
-          uri: uri,
-        }));
+        dialogRegion.show(
+          new confirmRepoRoomView.Modal({
+            uri: uri
+          })
+        );
       });
     },
 
@@ -30,12 +32,12 @@ function createRoutes(options) {
       });
     },
 
-    'createcommunity': function() {
+    createcommunity: function() {
       var dialogRegion = this.dialogRegion;
 
       presentCreateCommunityDialog({
         dialogRegion: dialogRegion
-      })
+      });
     }
   };
 }

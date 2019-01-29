@@ -2,13 +2,13 @@
 
 var Promise = require('bluebird');
 var Lazy = require('lazy.js');
-var reportOnStrategy = require('./strategy-tracing').reportOnStrategy
+var reportOnStrategy = require('./strategy-tracing').reportOnStrategy;
 
 /**
  * Serialize some items using a strategy, returning a promise
  */
 module.exports = Promise.method(function serialize(items, strat) {
-  if(items === null || items === undefined) {
+  if (items === null || items === undefined) {
     return null;
   }
 
@@ -38,16 +38,14 @@ module.exports = Promise.method(function serialize(items, strat) {
 
       reportOnStrategy(strat, start, n);
 
-      var serialized = seq.map(strat.map.bind(strat))
-        .filter(function(f) {
-          return f !== undefined && f !== null;
-        });
+      var serialized = seq.map(strat.map.bind(strat)).filter(function(f) {
+        return f !== undefined && f !== null;
+      });
 
-      if(strat.postProcess) {
+      if (strat.postProcess) {
         return strat.postProcess(serialized);
       } else {
         return serialized.toArray();
       }
     });
-
 });

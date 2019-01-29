@@ -33,12 +33,14 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
     },
 
     org: function(model) {
-      if(model.get('isOneToOne')) { return false; }
+      if (model.get('isOneToOne')) {
+        return false;
+      }
       var groupId = this.roomModel.get('groupId');
       return orgFavouriteFilter(model.attributes, groupId);
     },
 
-    tempOrg: function(model){
+    tempOrg: function(model) {
       var groupName = getOrgNameFromUri(document.location.pathname);
       return getOrgNameFromUri(model.get('uri')) === groupName;
     },
@@ -49,7 +51,7 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
   //When we start dragging an element we want to display all the
   //items within the favourite collection so a user can order it properly
   //JP 1/4/16
-  onDragStart: function () {
+  onDragStart: function() {
     var originalFilter = this._visiblePredicate;
 
     //Set a property on the item views model
@@ -66,24 +68,23 @@ var FilteredFavouriteCollection = FilteredRoomCollection.extend({
     this.setVisibilePredicate(this.visiblePredicates.default);
   },
 
-  onDragEnd: function () {
+  onDragEnd: function() {
     this.forEach(function(model) {
       model.set('isTempItem', false);
-    })
+    });
 
     // Reapply the original visiblePredicates to remove
     // the temp items
     this.onModelChangeState();
   },
 
-  onRemoveFavourite: function (id){
+  onRemoveFavourite: function(id) {
     var model = this.findWhere({ id: id });
-    if(model) {
+    if (model) {
       model.set('favourite', false);
       model.save();
     }
-  },
-
+  }
 });
 
 module.exports = FilteredFavouriteCollection;

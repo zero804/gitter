@@ -10,11 +10,14 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
-var AggrSchema = new Schema({
-  "troupeId1": { type: ObjectId },
-  "troupeId2": { type: ObjectId },
-  "commonUsers": { type: Number },
-}, { collection: 'tmp_user_aggregation' });
+var AggrSchema = new Schema(
+  {
+    troupeId1: { type: ObjectId },
+    troupeId2: { type: ObjectId },
+    commonUsers: { type: Number }
+  },
+  { collection: 'tmp_user_aggregation' }
+);
 
 function findTopRooms() {
   return persistenceService.Troupe.find({}, 'uri')
@@ -27,7 +30,7 @@ function findTopRooms() {
         memo[room._id] = room.uri;
         return memo;
       }, {});
-    })
+    });
 }
 
 function getWeight(x) {
@@ -41,7 +44,7 @@ function getWeight(x) {
 // Create digraph G
 function makeGraph(topRooms) {
   return new Promise(function(resolve, reject) {
-    var g = graphviz.digraph("G");
+    var g = graphviz.digraph('G');
     var c = 0;
     var Model = mongoose.model('AggrSchema', AggrSchema);
     Model.find()
@@ -54,19 +57,21 @@ function makeGraph(topRooms) {
         if (c % 1000 === 0) console.log(c);
         var uri1 = topRooms[x.troupeId1];
         var uri2 = topRooms[x.troupeId2];
-        g.addNode("" + x.troupeId1, { label: uri1 || "" });
-        g.addNode("" + x.troupeId2, { label: uri2 || "" });
+        g.addNode('' + x.troupeId1, { label: uri1 || '' });
+        g.addNode('' + x.troupeId2, { label: uri2 || '' });
         var weight = getWeight(x.commonUsers);
-        g.addEdge("" + x.troupeId1, "" + x.troupeId2, { weight: weight });
+        g.addEdge('' + x.troupeId1, '' + x.troupeId2, { weight: weight });
       })
       .on('error', reject)
       .on('end', function() {
-        fs.writeFileSync('room-connections-' + new Date().toISOString().replace(/:/g, '_') + '.dot', g.to_dot());
+        fs.writeFileSync(
+          'room-connections-' + new Date().toISOString().replace(/:/g, '_') + '.dot',
+          g.to_dot()
+        );
         resolve();
       });
   });
 }
-
 
 findTopRooms()
   .then(makeGraph)

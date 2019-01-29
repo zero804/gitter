@@ -36,12 +36,13 @@ require('./components/focus-events');
 // Preload widgets
 require('./components/ping');
 
-onready(function() { // eslint-disable-line max-statements
+onready(function() {
+  // eslint-disable-line max-statements
 
   appEvents.on('navigation', function(url, type, title, options) {
     options = options || {};
 
-    if(!url && options.refresh) {
+    if (!url && options.refresh) {
       window.location.reload();
       return;
     }
@@ -58,7 +59,7 @@ onready(function() { // eslint-disable-line max-statements
       // Remember that (window.parent === window) when there is no parent frame
       window.parent.location.href = url;
     }
- });
+  });
 
   require('./components/link-handler').installLinkHandler();
 
@@ -90,14 +91,11 @@ onready(function() { // eslint-disable-line max-statements
       if (message.event && message.event.origin) origin = message.event.origin;
       message.event = {
         origin: origin,
-        preventDefault: function() {
-        },
+        preventDefault: function() {},
 
-        stopPropagation: function() {
-        },
+        stopPropagation: function() {},
 
-        stopImmediatePropagation: function() {
-        },
+        stopImmediatePropagation: function() {}
       };
     };
 
@@ -106,12 +104,12 @@ onready(function() { // eslint-disable-line max-statements
         makeEvent(message);
         appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
         appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
-      break;
+        break;
 
       case 'focus':
         makeEvent(message);
         appEvents.trigger('focus.request.' + message.focus, message.event);
-      break;
+        break;
 
       case 'permalink.navigate':
         var query = message.query;
@@ -122,7 +120,7 @@ onready(function() { // eslint-disable-line max-statements
           appEvents.trigger('chatCollectionView:permalinkHighlight', aroundId);
         }
 
-      break;
+        break;
 
       case 'change:room':
         perfTiming.start('room-switch.render');
@@ -141,12 +139,12 @@ onready(function() { // eslint-disable-line max-statements
 
         //after the room change is complete, focus on the chat input jp 5/11/15
         appEvents.trigger('focus.request.chat');
-      break;
+        break;
 
       case 'about.to.leave.current.room':
         context.troupe().set('aboutToLeave', true);
 
-      break;
+        break;
 
       case 'roomList':
         appEvents.trigger('chat-cache:preload', message.rooms);
@@ -154,7 +152,11 @@ onready(function() { // eslint-disable-line max-statements
     }
   });
 
-  frameUtils.postMessage({ type: 'context.troupeId', troupeId: context.getTroupeId(), name: context.troupe().get('name') });
+  frameUtils.postMessage({
+    type: 'context.troupeId',
+    troupeId: context.getTroupeId(),
+    name: context.troupe().get('name')
+  });
 
   appEvents.on('route', function(hash) {
     frameUtils.postMessage({ type: 'route', hash: hash });
@@ -183,7 +185,11 @@ onready(function() { // eslint-disable-line max-statements
   });
 
   appEvents.on('unreadItemsCount', function(newCount) {
-    frameUtils.postMessage({ type: 'unreadItemsCount', count: newCount, troupeId: context.getTroupeId() });
+    frameUtils.postMessage({
+      type: 'unreadItemsCount',
+      count: newCount,
+      troupeId: context.getTroupeId()
+    });
   });
 
   appEvents.on('clearActivityBadge', function() {
@@ -200,28 +206,28 @@ onready(function() { // eslint-disable-line max-statements
 
       // JSON serialisation makes it not possible to send the event object
       // Keep track of the origin in case of return
-      event: {origin: event.origin},
-      handler: handler,
+      event: { origin: event.origin },
+      handler: handler
     };
     frameUtils.postMessage(message);
   });
 
   // Bubble chat toggle events
   appEvents.on('chat.edit.show', function() {
-    frameUtils.postMessage({type: 'chat.edit.show'});
+    frameUtils.postMessage({ type: 'chat.edit.show' });
   });
 
   appEvents.on('chat.edit.hide', function() {
-    frameUtils.postMessage({type: 'chat.edit.hide'});
+    frameUtils.postMessage({ type: 'chat.edit.hide' });
   });
 
   // Send focus events to app frame
   appEvents.on('focus.request.app.in', function(event) {
-    frameUtils.postMessage({type: 'focus', focus: 'in', event: event});
+    frameUtils.postMessage({ type: 'focus', focus: 'in', event: event });
   });
 
   appEvents.on('focus.request.app.out', function(event) {
-    frameUtils.postMessage({type: 'focus', focus: 'out', event: event});
+    frameUtils.postMessage({ type: 'focus', focus: 'out', event: event });
   });
 
   appEvents.on('ajaxError', function() {
@@ -232,17 +238,16 @@ onready(function() { // eslint-disable-line max-statements
     appEvents.triggerParent('user_notification', {
       title: 'Failed to remove user',
       text: message,
-      className: 'notification-error',
+      className: 'notification-error'
     });
   };
 
   appEvents.on('command.room.remove', function(username) {
     if (!username) return;
 
-    apiClient.room.delete('/users/' + username + '?type=username', '')
-      .catch(function(e) {
-        notifyRemoveError(e.friendlyMessage || 'Unable to remove user');
-      });
+    apiClient.room.delete('/users/' + username + '?type=username', '').catch(function(e) {
+      notifyRemoveError(e.friendlyMessage || 'Unable to remove user');
+    });
   });
 
   var appView = new ChatToolbarInputLayout({
@@ -263,10 +268,9 @@ onready(function() { // eslint-disable-line max-statements
       notificationRoutes(),
       roomRoutes({
         rosterCollection: itemCollections.roster
-      }),
+      })
     ]
   });
-
 
   var showingHelp = false;
   var hideHelp = function() {
@@ -285,7 +289,7 @@ onready(function() { // eslint-disable-line max-statements
     if (showingHelp === 'markdown') hideHelp();
     else {
       appEvents.trigger('focus.request.out', event);
-      router.navigate('markdown', {trigger: true});
+      router.navigate('markdown', { trigger: true });
       showingHelp = 'markdown';
     }
   });
@@ -294,7 +298,7 @@ onready(function() { // eslint-disable-line max-statements
     if (showingHelp === 'keys') hideHelp();
     else {
       appEvents.trigger('focus.request.out', event);
-      router.navigate('keys', {trigger: true});
+      router.navigate('keys', { trigger: true });
       showingHelp = 'keys';
     }
   });

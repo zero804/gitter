@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 
@@ -9,7 +9,8 @@ function LastTroupeAccessTimesForUserStrategy(options) {
 
 LastTroupeAccessTimesForUserStrategy.prototype = {
   preload: function() {
-    return recentRoomCore.getTroupeLastAccessTimesForUserExcludingHidden(this.userId)
+    return recentRoomCore
+      .getTroupeLastAccessTimesForUserExcludingHidden(this.userId)
       .bind(this)
       .then(function(times) {
         this.timesIndexed = times;
@@ -24,6 +25,5 @@ LastTroupeAccessTimesForUserStrategy.prototype = {
 
   name: 'LastTroupeAccessTimesForUserStrategy'
 };
-
 
 module.exports = LastTroupeAccessTimesForUserStrategy;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var testRequire = require('../../test-require');
@@ -50,5 +50,4 @@ describe('isolate-burst-array', function() {
 
     assert.deepEqual(id(result), [0, 1, 2, 3]);
   });
-
 });

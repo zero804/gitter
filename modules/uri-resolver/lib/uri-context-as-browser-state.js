@@ -5,7 +5,7 @@ function uriContextAsBrowserState(uriContext) {
     return {
       uri: uriContext.uri,
       type: 'home'
-    }
+    };
   }
 
   var troupe = uriContext.troupe;
@@ -14,7 +14,7 @@ function uriContextAsBrowserState(uriContext) {
       uri: uriContext.uri,
       type: 'room',
       roomId: troupe.id
-    }
+    };
   }
 
   var group = uriContext.group;
@@ -23,7 +23,7 @@ function uriContextAsBrowserState(uriContext) {
       uri: uriContext.uri,
       type: 'group',
       groupId: group.id
-    }
+    };
   }
 }
 

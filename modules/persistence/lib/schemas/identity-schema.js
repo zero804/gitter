@@ -6,7 +6,6 @@ var ObjectId = Schema.ObjectId;
 
 module.exports = {
   install: function(mongooseConnection) {
-
     var IdentitySchema = new Schema({
       userId: { type: ObjectId, required: true },
       provider: { type: String, required: true },
@@ -28,19 +27,21 @@ module.exports = {
     IdentitySchema.index({ provider: 1, providerKey: 1 }, { unique: true });
     IdentitySchema.index({ email: 1 });
 
-    IdentitySchema.extraIndices = [{
-      keys: {
-        provider: 1,
-        username: 1
-      },
-      options: {
-        background: true,
-        unique: true,
-        partialFilterExpression: {
-          username: { $exists: true },
+    IdentitySchema.extraIndices = [
+      {
+        keys: {
+          provider: 1,
+          username: 1
+        },
+        options: {
+          background: true,
+          unique: true,
+          partialFilterExpression: {
+            username: { $exists: true }
+          }
         }
       }
-    }];
+    ];
 
     var Identity = mongooseConnection.model('Identity', IdentitySchema);
 

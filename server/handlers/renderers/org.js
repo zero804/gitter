@@ -35,14 +35,16 @@ function findRooms(groupId, user, currentPage) {
   var skip = (currentPage - 1) * ROOMS_PER_PAGE;
   if (skip > 2000) throw new StatusError(400);
 
-  return groupBrowserService.findRoomsWithPagination(groupId, userId, {
+  return groupBrowserService
+    .findRoomsWithPagination(groupId, userId, {
       skip: skip,
       limit: ROOMS_PER_PAGE
     })
     .then(function(roomBrowseResult) {
       var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
 
-      return restSerializer.serialize(roomBrowseResult.results, strategy)
+      return restSerializer
+        .serialize(roomBrowseResult.results, strategy)
         .then(function(serializedRooms) {
           roomBrowseResult.results = serializedRooms;
           return roomBrowseResult;
@@ -54,56 +56,57 @@ function getRoomMembersForRooms(rooms) {
   var roomMembershipIdMap = {};
   var userIdMap = {};
 
-  return Promise.all(rooms.map(function(room) {
-    return roomMembershipService.findMembersForRoom(room.id, { limit: 5 })
-      .then(function(userIds) {
-        roomMembershipIdMap[room.id] = userIds;
-        userIds.forEach(function(userId) {
-          userIdMap[userId] = true;
+  return Promise.all(
+    rooms.map(function(room) {
+      return roomMembershipService
+        .findMembersForRoom(room.id, { limit: 5 })
+        .then(function(userIds) {
+          roomMembershipIdMap[room.id] = userIds;
+          userIds.forEach(function(userId) {
+            userIdMap[userId] = true;
+          });
         });
-      });
-  }))
-  .then(function() {
-    var userIds = Object.keys(userIdMap);
-    return userService.findByIds(userIds)
-      .then(function(users) {
+    })
+  )
+    .then(function() {
+      var userIds = Object.keys(userIdMap);
+      return userService.findByIds(userIds).then(function(users) {
         return users.reduce(function(map, user) {
           map[user.id] = user;
           return map;
         }, {});
       });
-  })
-  .then(function(userMap) {
-    return rooms.reduce(function(roomMembershipMap, room) {
-      roomMembershipMap[room.id] = (roomMembershipIdMap[room.id] || []).map(function(userId) {
-        return userMap[userId];
-      });
-      return roomMembershipMap;
-    }, {});
-  });
+    })
+    .then(function(userMap) {
+      return rooms.reduce(function(roomMembershipMap, room) {
+        roomMembershipMap[room.id] = (roomMembershipIdMap[room.id] || []).map(function(userId) {
+          return userMap[userId];
+        });
+        return roomMembershipMap;
+      }, {});
+    });
 }
 
 function getRoomsWithMembership(groupId, user, currentPage) {
-  return findRooms(groupId, user, currentPage)
-    .then(function(roomBrowseResult) {
-      var rooms = roomBrowseResult.results;
+  return findRooms(groupId, user, currentPage).then(function(roomBrowseResult) {
+    var rooms = roomBrowseResult.results;
 
-      return getRoomMembersForRooms(rooms)
-        .then(function(roomMembershipMap) {
-          return rooms.map(function(room) {
-            room.users = (roomMembershipMap[room.id] || []).map(function(user) {
-              user.avatarUrl = avatars.getForUser(user);
-              return user;
-            });
-
-            return room;
+    return getRoomMembersForRooms(rooms)
+      .then(function(roomMembershipMap) {
+        return rooms.map(function(room) {
+          room.users = (roomMembershipMap[room.id] || []).map(function(user) {
+            user.avatarUrl = avatars.getForUser(user);
+            return user;
           });
-        })
-        .then(function(rooms) {
-          roomBrowseResult.results = rooms;
-          return roomBrowseResult;
+
+          return room;
         });
-    });
+      })
+      .then(function(rooms) {
+        roomBrowseResult.results = rooms;
+        return roomBrowseResult;
+      });
+  });
 }
 
 function renderOrgPage(req, res, next) {
@@ -147,9 +150,12 @@ function renderOrgPage(req, res, next) {
 
         var fullUrl = clientEnv.basePath + '/' + serializedGroup.homeUri;
         var text = encodeURIComponent('Explore our chat community on Gitter:');
-        var url = 'https://twitter.com/share?' +
-          'text=' + text +
-          '&url=' + fullUrl +
+        var url =
+          'https://twitter.com/share?' +
+          'text=' +
+          text +
+          '&url=' +
+          fullUrl +
           '&related=gitchat' +
           '&via=gitchat';
 
@@ -171,11 +177,11 @@ function renderOrgPage(req, res, next) {
             pageCount: pageCount
           }
         });
-      });
-  })
-  .catch(next);
+      }
+    );
+  }).catch(next);
 }
 
 module.exports = exports = {
-  renderOrgPage: renderOrgPage,
+  renderOrgPage: renderOrgPage
 };

@@ -15,8 +15,7 @@ var opts = require('yargs')
     description: 'Dry-run. Do not execute, just print out candidates'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var Promise = require('bluebird');
 var userService = require('gitter-web-users');
@@ -34,14 +33,15 @@ function getOtherUserId(userId, room) {
   if (room.oneToOneUsers.length !== 2) return null;
 
   if (mongoUtils.objectIDsEqual(room.oneToOneUsers[0].userId, userId)) {
-    return room.oneToOneUsers[1].userId
+    return room.oneToOneUsers[1].userId;
   } else {
-    return room.oneToOneUsers[0].userId
+    return room.oneToOneUsers[0].userId;
   }
 }
 
 function findCandidates(username, dryRun) {
-  return userService.findByUsername(username)
+  return userService
+    .findByUsername(username)
     .bind({
       user: null
     })
@@ -65,7 +65,6 @@ function findCandidates(username, dryRun) {
         return unreadCount.unreadItems === 0 && unreadCount.mentions === 0;
       });
 
-
       this.candidates = candidates;
       return recentRoomCore.getTroupeLastAccessTimesForUser(this.user._id);
     })
@@ -85,10 +84,8 @@ function findCandidates(username, dryRun) {
       } else {
         return removeCandidates(this.user, candidates);
       }
-
-    })
+    });
 }
-
 
 function printCandidates(user, candidates) {
   var otherUserIds = candidates
@@ -97,36 +94,34 @@ function printCandidates(user, candidates) {
     })
     .filter(Boolean);
 
-  return userService.findByIds(otherUserIds)
-    .then(function(users) {
-      var userHash = collections.indexById(users);
+  return userService.findByIds(otherUserIds).then(function(users) {
+    var userHash = collections.indexById(users);
 
-      candidates.forEach(function(room) {
-        var otherUserId = getOtherUserId(user._id, room);
-        var otherUser = userHash[otherUserId];
-        var username = otherUser && otherUser.username;
-        console.log(username + '\t' + room.lastAccessTime);
-      })
-
-    })
+    candidates.forEach(function(room) {
+      var otherUserId = getOtherUserId(user._id, room);
+      var otherUser = userHash[otherUserId];
+      var username = otherUser && otherUser.username;
+      console.log(username + '\t' + room.lastAccessTime);
+    });
+  });
 }
 
-
 function removeCandidates(user, candidates) {
-  return Promise.map(candidates, function(room) {
-    console.log('removing', room._id, user._id);
-    return roomService.removeUserIdFromRoom(room, user._id)
-      .then(function() {
+  return Promise.map(
+    candidates,
+    function(room) {
+      console.log('removing', room._id, user._id);
+      return roomService.removeUserIdFromRoom(room, user._id).then(function() {
         var otherUserId = getOtherUserId(user._id, room);
         if (!otherUserId) return;
 
         return roomService.removeUserIdFromRoom(room, otherUserId);
       });
-  }, { concurrency: 1 })
-  .delay(5000);
+    },
+    { concurrency: 1 }
+  ).delay(5000);
 }
 
-findCandidates(opts.username, opts.dryRun)
-  .finally(function() {
-    shutdown.shutdownGracefully();
-  });
+findCandidates(opts.username, opts.dryRun).finally(function() {
+  shutdown.shutdownGracefully();
+});

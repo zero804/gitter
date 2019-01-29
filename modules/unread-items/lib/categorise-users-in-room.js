@@ -29,7 +29,7 @@ var STATUS_PUSH_NOTIFIED_CONNECTED = 'push_notified_connected';
  *  - push_notified_connected: similar to push_notified, but user is connected via bayeux
  *  - <doesnotexist>: user is offline, nothing more to do
  */
-module.exports = function (roomId, userIds) {
+module.exports = function(roomId, userIds) {
   if (!userIds || !userIds.length) return Promise.resolve({});
 
   return Promise.join(
@@ -46,7 +46,7 @@ module.exports = function (roomId, userIds) {
           result[userId] = STATUS_INROOM;
         } else {
           var status = onlineStatus[userId];
-          switch(status) {
+          switch (status) {
             case 'online':
               result[userId] = STATUS_ONLINE;
               break;
@@ -64,14 +64,16 @@ module.exports = function (roomId, userIds) {
         return result;
       }
 
-      return pushNotificationService.findUsersWithDevices(mobileAndOffline)
+      return pushNotificationService
+        .findUsersWithDevices(mobileAndOffline)
         .then(function(withDevices) {
           if (!withDevices.length) {
             /* No devices with push... */
             return result;
           }
 
-          return pushNotificationFilter.findUsersInRoomAcceptingNotifications(roomId, withDevices)
+          return pushNotificationFilter
+            .findUsersInRoomAcceptingNotifications(roomId, withDevices)
             .then(function(usersWithDevicesAcceptingNotifications) {
               _.each(usersWithDevicesAcceptingNotifications, function(userId) {
                 if (result[userId] === STATUS_MOBILE) {
@@ -94,6 +96,6 @@ module.exports = function (roomId, userIds) {
               return result;
             });
         });
-    });
-
+    }
+  );
 };

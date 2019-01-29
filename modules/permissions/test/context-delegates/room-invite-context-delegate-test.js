@@ -33,8 +33,7 @@ describe('room-invite-context-delegate', function() {
         secret: secret,
         state: state,
         reminderSent: null
-      })
-      .return(secret);
+      }).return(secret);
     }
     return Promise.join(
       createInvite(null, 'PENDING'),
@@ -44,47 +43,43 @@ describe('room-invite-context-delegate', function() {
         secret1 = s1;
         secret2 = s2;
         secret3 = s3;
-      });
+      }
+    );
   });
 
   it('should allow an invite to be used', function() {
     var r = new RoomInviteContextDelegate(userId1, troupeId, secret1);
-    return r.isMember()
-      .then(function(result) {
-        assert.strictEqual(result, true);
-      });
+    return r.isMember().then(function(result) {
+      assert.strictEqual(result, true);
+    });
   });
 
   it('should allow a rejected invite to be re-used by the same user', function() {
     var r = new RoomInviteContextDelegate(userId2, troupeId, secret3);
-    return r.isMember()
-      .then(function(result) {
-        assert.strictEqual(result, true);
-      });
+    return r.isMember().then(function(result) {
+      assert.strictEqual(result, true);
+    });
   });
 
   it('should not allow an accepted invite to be re-used by the same user', function() {
     var r = new RoomInviteContextDelegate(userId1, troupeId, secret2);
-    return r.isMember()
-      .then(function(result) {
-        assert.strictEqual(result, false);
-      });
+    return r.isMember().then(function(result) {
+      assert.strictEqual(result, false);
+    });
   });
 
   it('should not allow an rejected invite to be re-used by the another user', function() {
     var r = new RoomInviteContextDelegate(userId1, troupeId, secret3);
-    return r.isMember()
-      .then(function(result) {
-        assert.strictEqual(result, false);
-      });
+    return r.isMember().then(function(result) {
+      assert.strictEqual(result, false);
+    });
   });
 
   it('should not allow an invalid secret to be used', function() {
     var r = new RoomInviteContextDelegate(userId1, troupeId, 'fobar' + Math.random());
-    return r.isMember()
-      .then(function(result) {
-        assert.strictEqual(result, false);
-      });
+    return r.isMember().then(function(result) {
+      assert.strictEqual(result, false);
+    });
   });
 
   it('should handle handleReadAccessFailure when the user is not in the room', function() {

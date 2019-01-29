@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -21,7 +21,7 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
       screenReadUsername: true
     };
 
-    if(item && item.id) {
+    if (item && item.id) {
       var prerenderedUserEl = this.$el.find('.js-model-id-' + item.id)[0];
       if (prerenderedUserEl) {
         options.el = prerenderedUserEl;
@@ -31,7 +31,7 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
     return options;
   },
   collectionEvents: {
-    'reset': 'onCollectionReset',
+    reset: 'onCollectionReset'
   },
   onCollectionReset: function() {
     if (this.collection.length) return;
@@ -42,7 +42,7 @@ var PeopleCollectionView = Marionette.CollectionView.extend({
     while ((child = el.firstChild)) {
       el.removeChild(child);
     }
-  },
+  }
 });
 
 var RemainingView = Marionette.ItemView.extend({
@@ -51,7 +51,7 @@ var RemainingView = Marionette.ItemView.extend({
   template: remainingTempate,
 
   modelEvents: {
-    'change:id': 'render',
+    'change:id': 'render'
   },
 
   serializeData: function() {
@@ -73,32 +73,36 @@ var ExpandableRosterView = Marionette.LayoutView.extend({
 
   behaviors: {
     Isomorphic: {
-      rosterRegion: { el: "#roster-region", init: 'initRosterRegion' },
-      remainingRegion: { el: "#remaining-region", init: 'initRemainingRegion' }
+      rosterRegion: { el: '#roster-region', init: 'initRosterRegion' },
+      remainingRegion: { el: '#remaining-region', init: 'initRemainingRegion' }
     }
   },
 
   initRosterRegion: function(optionsForRegion) {
-    return new PeopleCollectionView(optionsForRegion({
-      collection: this.options.rosterCollection,
-      filter: function(child, index) { // jshint unused:true
-        return index < 25; // Only show the first 25 users
-      }
-    }));
+    return new PeopleCollectionView(
+      optionsForRegion({
+        collection: this.options.rosterCollection,
+        filter: function(child, index) {
+          // jshint unused:true
+          return index < 25; // Only show the first 25 users
+        }
+      })
+    );
   },
 
   initRemainingRegion: function(optionsForRegion) {
-    return new RemainingView(optionsForRegion({
-      model: context.troupe()
-    }));
-  },
-
+    return new RemainingView(
+      optionsForRegion({
+        model: context.troupe()
+      })
+    );
+  }
 });
 
 var AllUsersModal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
-    options.title = "People";
+    options.title = 'People';
     ModalView.prototype.initialize.call(this, options);
     this.view = new PeopleCollectionView(options);
   }

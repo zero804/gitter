@@ -1,6 +1,6 @@
 'use strict';
 
-var restSerializer = require("../../../serializers/rest-serializer");
+var restSerializer = require('../../../serializers/rest-serializer');
 
 function SecurityResourceExtraAdminsRoute(options) {
   this.id = options.id;
@@ -19,10 +19,10 @@ SecurityResourceExtraAdminsRoute.prototype.index = function(req) {
       return sdService.listExtraAdmins();
     })
     .then(function(userIds) {
-      var strategy = new restSerializer.UserIdStrategy({ });
+      var strategy = new restSerializer.UserIdStrategy({});
       return restSerializer.serialize(userIds, strategy);
     });
-}
+};
 
 /**
  * Add an extraAdmin to a descriptor
@@ -36,16 +36,16 @@ SecurityResourceExtraAdminsRoute.prototype.create = function(req) {
       return sdService.addExtraAdmin(userId);
     })
     .then(function() {
-      var strategy = new restSerializer.UserIdStrategy({ });
+      var strategy = new restSerializer.UserIdStrategy({});
       return restSerializer.serializeObject(userId, strategy);
     });
-}
+};
 
 /**
  * Remove an extraAdmin from a descriptor
  */
 SecurityResourceExtraAdminsRoute.prototype.destroy = function(req, res) {
-  var userId = req.params[this.id]
+  var userId = req.params[this.id];
   return this.getSecurityDescriptorWithPolicyService(req)
     .then(function(sdService) {
       return sdService.removeExtraAdmin(userId);
@@ -54,6 +54,6 @@ SecurityResourceExtraAdminsRoute.prototype.destroy = function(req, res) {
       res.status(204);
       return null;
     });
-}
+};
 
 module.exports = SecurityResourceExtraAdminsRoute;

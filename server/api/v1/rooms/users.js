@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 var restful = require('../../../services/restful');
-var userService = require("gitter-web-users");
-var restSerializer = require("../../../serializers/rest-serializer");
+var userService = require('gitter-web-users');
+var restSerializer = require('../../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var troupeService = require("gitter-web-rooms/lib/troupe-service");
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
@@ -14,7 +14,8 @@ var SEARCH_EXPIRES_SECONDS = 60;
 var SEARCH_EXPIRES_MILLISECONDS = SEARCH_EXPIRES_SECONDS * 1000;
 
 function getTroupeUserFromId(troupeId, userId) {
-  return troupeService.findByIdLeanWithMembership(troupeId, userId)
+  return troupeService
+    .findByIdLeanWithMembership(troupeId, userId)
     .spread(function(troupe, isMember) {
       if (!isMember) return;
 
@@ -23,16 +24,16 @@ function getTroupeUserFromId(troupeId, userId) {
 }
 
 function getTroupeUserFromUsername(troupeId, username) {
-  return userService.findByUsername(username)
-    .then(function(user) {
-      if (!user) return;
-      return troupeService.findByIdLeanWithMembership(troupeId, user.id)
-        .spread(function(troupe, isMember) {
-          if (!isMember) return;
+  return userService.findByUsername(username).then(function(user) {
+    if (!user) return;
+    return troupeService
+      .findByIdLeanWithMembership(troupeId, user.id)
+      .spread(function(troupe, isMember) {
+        if (!isMember) return;
 
-          return user;
-        });
+        return user;
       });
+  });
 }
 
 module.exports = {
@@ -46,11 +47,15 @@ module.exports = {
       searchTerm: req.query.q
     };
 
-    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
+    return restful
+      .serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
       .then(function(result) {
         if (typeof req.query.q === 'string') {
           res.setHeader('Cache-Control', 'public, max-age=' + SEARCH_EXPIRES_SECONDS);
-          res.setHeader('Expires', new Date(Date.now() + SEARCH_EXPIRES_MILLISECONDS).toUTCString());
+          res.setHeader(
+            'Expires',
+            new Date(Date.now() + SEARCH_EXPIRES_MILLISECONDS).toUTCString()
+          );
         }
         return result;
       });
@@ -60,20 +65,18 @@ module.exports = {
     var username = req.body.username;
     if (!username) throw new StatusError(400);
     username = String(req.body.username);
-    return Promise.join(
-      loadTroupeFromParam(req),
-      userService.findByUsername(username),
-      function(troupe, userToAdd) {
-        if (!troupe) throw new StatusError(404);
+    return Promise.join(loadTroupeFromParam(req), userService.findByUsername(username), function(
+      troupe,
+      userToAdd
+    ) {
+      if (!troupe) throw new StatusError(404);
 
-        var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
-        return roomWithPolicyService.addUserToRoom(userToAdd)
-          .return(userToAdd);
-      })
-      .then(function(userToAdd) {
-        var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serializeObject(userToAdd, strategy);
-      });
+      var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+      return roomWithPolicyService.addUserToRoom(userToAdd).return(userToAdd);
+    }).then(function(userToAdd) {
+      var strategy = new restSerializer.UserStrategy();
+      return restSerializer.serializeObject(userToAdd, strategy);
+    });
   },
 
   /**
@@ -116,5 +119,4 @@ module.exports = {
 
     throw new StatusError(404);
   }
-
 };

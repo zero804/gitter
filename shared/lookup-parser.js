@@ -38,10 +38,9 @@ function parseLookups(response, fill) {
 
   return response.items;
 }
-exports.parseLookups = parseLookups
+exports.parseLookups = parseLookups;
 
 function parseChats(response) {
   return parseLookups(response, { fromUser: 'users' });
 }
 exports.parseChats = parseChats;
-

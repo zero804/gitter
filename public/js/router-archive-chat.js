@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
@@ -22,14 +22,11 @@ require('./views/widgets/avatar');
 
 require('@gitterhq/styleguide/css/components/buttons.css');
 
-
-
 onready(function() {
-
-  $(document).on("click", "a", function(e) {
-    if(this.href) {
+  $(document).on('click', 'a', function(e) {
+    if (this.href) {
       var href = $(this).attr('href');
-      if(href.indexOf('#') === 0) {
+      if (href.indexOf('#') === 0) {
         e.preventDefault();
         window.location = href;
       }
@@ -38,10 +35,10 @@ onready(function() {
   });
 
   // When a user clicks an internal link, prevent it from opening in a new window
-  $(document).on("click", "a.link", function(e) {
+  $(document).on('click', 'a.link', function(e) {
     var basePath = clientEnv['basePath'];
     var href = e.target.getAttribute('href');
-    if(!href || href.indexOf(basePath) !== 0) {
+    if (!href || href.indexOf(basePath) !== 0) {
       return;
     }
 
@@ -65,6 +62,4 @@ onready(function() {
     nextDate: archiveContext.nextDate,
     previousDate: archiveContext.previousDate
   }).render();
-
-
 });

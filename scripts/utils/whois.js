@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true, unused:true */
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
@@ -12,20 +12,23 @@ env.installUncaughtExceptionHandler();
 
 var CliOutput = require('./cli-output');
 
-var cliOutput = new CliOutput({
-  userId: { width: 32 },
-  username: { width: 20 },
-  email: { width: 32 }
-}, {
-  all: { flag: true },
-  usernames: { flag: true },
-  userIds: { flag: true, default: true }
-});
+var cliOutput = new CliOutput(
+  {
+    userId: { width: 32 },
+    username: { width: 20 },
+    email: { width: 32 }
+  },
+  {
+    all: { flag: true },
+    usernames: { flag: true },
+    userIds: { flag: true, default: true }
+  }
+);
 
 var opts = cliOutput.opts;
 
 function getUsers(opts) {
-  if(opts.usernames) {
+  if (opts.usernames) {
     return userService.findByUsernames(opts._);
   } else {
     return userService.findByIds(opts._);
@@ -34,11 +37,10 @@ function getUsers(opts) {
 
 function attachEmailAdresses(users) {
   var promises = users.map(function(user) {
-    return emailService(user)
-      .then(function(emailAdress) {
-        user.email = emailAdress;
-        return user;
-      });
+    return emailService(user).then(function(emailAdress) {
+      user.email = emailAdress;
+      return user;
+    });
   });
 
   return Promise.all(promises);
@@ -57,7 +59,7 @@ function printResults(users) {
 }
 
 function die(err) {
-  if(err) {
+  if (err) {
     console.error(err);
   }
 

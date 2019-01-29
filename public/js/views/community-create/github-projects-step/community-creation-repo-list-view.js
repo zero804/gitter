@@ -7,7 +7,6 @@ var CommunityCreationRepoListTemplate = require('./community-creation-repo-list-
 var CommunityCreationRepoListEmptyTemplate = require('./community-creation-repo-list-empty-view.hbs');
 var CommunityCreationRepoListItemView = require('./community-creation-repo-list-item-view');
 
-
 var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
   template: CommunityCreationRepoListEmptyTemplate,
   ui: {
@@ -16,7 +15,12 @@ var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
   },
   initialize: function() {
     this.listenTo(this.collection, 'request', this.onCollectionFetch.bind(this), this);
-    this.listenTo(this.collection, 'reset sync snapshot', this.onCollectionDoneLoading.bind(this), this);
+    this.listenTo(
+      this.collection,
+      'reset sync snapshot',
+      this.onCollectionDoneLoading.bind(this),
+      this
+    );
   },
 
   onRender: function() {
@@ -32,10 +36,10 @@ var CommunityCreationRepoListEmptyView = Marionette.ItemView.extend({
   },
 
   updateNoteHiddenStates: function(shouldHideEmptyNode, shouldHideLoadingNote) {
-    if(this.ui.emptyNote.length && this.ui.emptyNote[0].classList) {
+    if (this.ui.emptyNote.length && this.ui.emptyNote[0].classList) {
       toggleClass(this.ui.emptyNote[0], 'hidden', shouldHideEmptyNode);
     }
-    if(this.ui.loadingNote.length && this.ui.loadingNote[0].classList) {
+    if (this.ui.loadingNote.length && this.ui.loadingNote[0].classList) {
       toggleClass(this.ui.loadingNote[0], 'hidden', shouldHideLoadingNote);
     }
   }
@@ -60,15 +64,14 @@ var CommunityCreationRepoListView = Marionette.CompositeView.extend({
     var newActiveValue = !view.model.get('active');
 
     var previousActiveModel = this.collection.findWhere({ active: true });
-    if(previousActiveModel) {
+    if (previousActiveModel) {
       previousActiveModel.set('active', false);
     }
     // Toggle active
     view.model.set('active', newActiveValue);
-    if(newActiveValue) {
+    if (newActiveValue) {
       this.trigger('repo:activated', view.model);
-    }
-    else {
+    } else {
       this.trigger('repo:cleared');
     }
   }

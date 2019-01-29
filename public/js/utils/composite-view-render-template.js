@@ -5,7 +5,6 @@ var Marionette = require('backbone.marionette');
 //Marionette has not released https://github.com/marionettejs/backbone.marionette/pull/2565
 //so this is needed JP 17/2/16
 module.exports = function compositeViewRenderTemplate() {
-
   var data = {};
   data = this.serializeData();
   data = this.mixinTemplateHelpers(data);

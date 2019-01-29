@@ -17,16 +17,13 @@ describe('validate-markdown', function() {
     it(name + ' ' + key, function() {
       assert.strictEqual(validateMarkdown(key), result);
     });
-  })
+  });
 
   it('should not validate things that are not strings', function() {
-    assert.strictEqual(validateMarkdown({foo: 'bar'}), false);
+    assert.strictEqual(validateMarkdown({ foo: 'bar' }), false);
     assert.strictEqual(validateMarkdown([]), false);
     assert.strictEqual(validateMarkdown(100), false);
     assert.strictEqual(validateMarkdown(undefined), false);
     assert.strictEqual(validateMarkdown(null), false);
   });
-
 });
-
-

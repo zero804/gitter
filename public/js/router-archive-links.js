@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
@@ -18,19 +18,20 @@ require('./components/ping');
 
 require('@gitterhq/styleguide/css/components/buttons.css');
 
-
 onready(function() {
   require('./components/link-handler').installLinkHandler();
   appEvents.on('navigation', function(url) {
     window.location = url;
   });
 
-  $('#noindex').on("change", function() {
+  $('#noindex').on('change', function() {
     var noindex = $('#noindex')[0].checked;
 
-    apiClient.room.put('', { noindex: !noindex })
+    apiClient.room
+      .put('', { noindex: !noindex })
       .then(function() {
-        var msg = 'Room indexing disabled. The change will take effect the next time a search engine crawls this room.';
+        var msg =
+          'Room indexing disabled. The change will take effect the next time a search engine crawls this room.';
         $('#noindexStatus').html(!noindex ? msg : '');
       })
       .catch(function() {
@@ -38,10 +39,10 @@ onready(function() {
       });
   });
   // When a user clicks an internal link, prevent it from opening in a new window
-  $(document).on("click", "a.link", function(e) {
+  $(document).on('click', 'a.link', function(e) {
     var basePath = clientEnv['basePath'];
     var href = e.target.getAttribute('href');
-    if(!href || href.indexOf(basePath) !== 0) {
+    if (!href || href.indexOf(basePath) !== 0) {
       return;
     }
 

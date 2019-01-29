@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* Would be nice if we could just fold this into prerender-helper, but at the moment
  * async helpers for express-hbs only take a single parameter and we can't use them
@@ -11,7 +11,9 @@ var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
-var chatWrapper = compileTemplate.compileString('<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>');
+var chatWrapper = compileTemplate.compileString(
+  '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>'
+);
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
 var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
@@ -43,7 +45,6 @@ module.exports = exports = function(model, params) {
   var tz = root.tz;
   var tzOffset = root.tzOffset;
   var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
-
 
   var text = model.text || '';
   var html = model.html || model.text || '';

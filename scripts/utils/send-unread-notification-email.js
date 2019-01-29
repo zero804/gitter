@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
@@ -23,15 +23,14 @@ var opts = require('yargs')
     type: 'array'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 Promise.props({
   user: userService.findByUsername(opts.username),
   rooms: troupeService.findByUris(opts.roomUri)
 })
   .then(({ user, rooms }) => {
-    const roomData = rooms.map((room) => {
+    const roomData = rooms.map(room => {
       const fakeChatMessage = {
         text: 'Test message',
         fromUser: {
@@ -52,7 +51,7 @@ Promise.props({
   .then(({ fake }) => {
     console.log(`Using fake mailer? ${fake}`);
   })
-  .catch((err) => {
+  .catch(err => {
     console.log('err', err, err.stack);
   })
   .finally(function() {

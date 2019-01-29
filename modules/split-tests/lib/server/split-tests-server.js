@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -7,7 +7,7 @@ var debug = require('debug')('gitter:infra:split-tests');
 var ONE_WEEK = 7 * 86400000;
 
 function getGroup() {
-  return (((Math.floor(Math.random() * 2) + 1) % 2)) === 0 ? 'control' : 'treatment';
+  return (Math.floor(Math.random() * 2) + 1) % 2 === 0 ? 'control' : 'treatment';
 }
 
 function getVariantFromRequest(req, testName) {
@@ -43,9 +43,9 @@ function configure(req, res, testName, disableSet) {
 
     debug('Setting split test cookie %s to %s', value);
     res.cookie(cookieName, value, {
-      domain: nconf.get("web:cookieDomain"),
+      domain: nconf.get('web:cookieDomain'),
       httpOnly: false,
-      secure: nconf.get("web:secureCookies"),
+      secure: nconf.get('web:secureCookies'),
       maxAge: ONE_WEEK
     });
   }
@@ -68,7 +68,6 @@ function selectTemplate(variant, controlTemplate, variantTemplate) {
   debug('Selected template %s for variant %s', template, variant);
   return template;
 }
-
 
 module.exports = {
   configure: configure,

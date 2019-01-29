@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
@@ -10,20 +10,18 @@ function GitHubRepoService(user) {
   this.accessToken = userTokenSelector(user);
 }
 
-
 /**
  * Returns the information about the specified repo
  * @return the promise of information about a repo
  */
- GitHubRepoService.prototype.getRepo = function(repo) {
-  return tentacles.repo.get(repo, { accessToken: this.accessToken })
-    .then(function(result) {
-      if (!result) return result;
-      if (result.full_name && result.full_name !== repo) {
-        appEvents.repoRenameDetected(repo,result.full_name);
-      }
-      return result;
-    });
+GitHubRepoService.prototype.getRepo = function(repo) {
+  return tentacles.repo.get(repo, { accessToken: this.accessToken }).then(function(result) {
+    if (!result) return result;
+    if (result.full_name && result.full_name !== repo) {
+      appEvents.repoRenameDetected(repo, result.full_name);
+    }
+    return result;
+  });
 };
 
 /**
@@ -36,7 +34,7 @@ GitHubRepoService.prototype.isCollaborator = function(repo, username) {
 /**
  *
  */
- GitHubRepoService.prototype.getCollaborators = function(repo, options) {
+GitHubRepoService.prototype.getCollaborators = function(repo, options) {
   return tentacles.repoCollaborator.list(repo, {
     accessToken: this.accessToken,
     firstPageOnly: options && options.firstPageOnly
@@ -54,7 +52,7 @@ GitHubRepoService.prototype.getCommits = function(repo, options) {
   }
 
   if (options && options.author) {
-    query = { author: options.author }
+    query = { author: options.author };
   }
 
   return tentacles.repoCommit.list(repo, {
@@ -63,7 +61,6 @@ GitHubRepoService.prototype.getCommits = function(repo, options) {
     query: query
   });
 };
-
 
 /**
  *  Returns repo stargazers
@@ -80,10 +77,11 @@ GitHubRepoService.prototype.getStargazers = function(repo, options) {
  */
 GitHubRepoService.prototype.getIssues = function(repo, options) {
   var query = {
-    state: options && options.state || 'all',
-  }
+    state: (options && options.state) || 'all'
+  };
 
-  return tentacles.issue.listForRepo(repo, {
+  return tentacles.issue
+    .listForRepo(repo, {
       query: query,
       accessToken: this.accessToken,
       firstPageOnly: options && options.firstPageOnly
@@ -96,7 +94,6 @@ GitHubRepoService.prototype.getIssues = function(repo, options) {
       return issues;
     });
 };
-
 
 GitHubRepoService.prototype.getRecentlyStarredRepos = function() {
   return tentacles.starring.listForAuthUser({
@@ -112,7 +109,7 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
 
 GitHubRepoService.prototype.getAllReposForAuthUser = function() {
   return tentacles.repo.listForAuthUser({
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
@@ -140,7 +137,6 @@ GitHubRepoService.prototype.getReposForUser = function(username, options) {
     query: query
   });
 };
-
 
 module.exports = wrap(GitHubRepoService, function() {
   return [this.accessToken || ''];

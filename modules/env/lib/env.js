@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var gitterEnv = require('@gitterhq/env');
 var path = require('path');

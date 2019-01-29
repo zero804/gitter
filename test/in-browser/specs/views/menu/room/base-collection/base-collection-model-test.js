@@ -7,7 +7,6 @@ var sinon = require('sinon');
 var BaseCollectionModel = require('public/js/views/menu/room/base-collection/base-collection-model');
 
 describe('BaseCollectionModel()', function() {
-
   var model;
   var roomMenuModel;
   beforeEach(function() {
@@ -43,5 +42,4 @@ describe('BaseCollectionModel()', function() {
     roomMenuModel.trigger('change:state:post');
     assert.equal(1, model.onOrg.callCount);
   });
-
 });

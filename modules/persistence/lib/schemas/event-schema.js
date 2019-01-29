@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
@@ -10,15 +10,15 @@ var installVersionIncMiddleware = require('../install-version-inc-middleware');
 //
 var EventSchema = new Schema({
   fromUserId: ObjectId,
-  toTroupeId: ObjectId,  //TODO: rename to troupeId
+  toTroupeId: ObjectId, //TODO: rename to troupeId
   text: String,
   html: String,
   meta: Schema.Types.Mixed,
   payload: Schema.Types.Mixed,
-  sent: { type: Date, "default": Date.now },
-  editedAt: { type: Date, "default": null },
-  _tv: { type: 'MongooseNumber', 'default': 0 },
-  _md: Number,          // Meta parse version
+  sent: { type: Date, default: Date.now },
+  editedAt: { type: Date, default: null },
+  _tv: { type: 'MongooseNumber', default: 0 },
+  _md: Number // Meta parse version
 });
 EventSchema.index({ toTroupeId: 1, sent: -1 });
 EventSchema.schemaTypeName = 'EventSchema';

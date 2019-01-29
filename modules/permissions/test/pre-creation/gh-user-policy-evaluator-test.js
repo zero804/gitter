@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('gh-user-policy-evaluator', function() {
-
   describe('#slow', function() {
     fixtureLoader.disableMongoTableScans();
     fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
@@ -13,27 +12,27 @@ describe('gh-user-policy-evaluator', function() {
     function expect(GhUserPolicyEvaluator, user, uri, expected) {
       var evaluator = new GhUserPolicyEvaluator(user, uri);
       return Promise.props({
-          canRead: evaluator.canRead(),
-          canWrite: evaluator.canWrite(),
-          canJoin: evaluator.canJoin(),
-          canAdmin: evaluator.canAdmin(),
-          canAddUser: evaluator.canAddUser(),
-        })
+        canRead: evaluator.canRead(),
+        canWrite: evaluator.canWrite(),
+        canJoin: evaluator.canJoin(),
+        canAdmin: evaluator.canAdmin(),
+        canAddUser: evaluator.canAddUser()
+      })
         .then(function(access) {
           assert.deepEqual(access, expected);
 
           var evaluator = new GhUserPolicyEvaluator(user, uri);
           return Promise.props({
-              canRead: evaluator.canRead(),
-              canWrite: evaluator.canWrite(),
-              canJoin: evaluator.canJoin(),
-              canAdmin: evaluator.canAdmin(),
-              canAddUser: evaluator.canAddUser(),
-            });
+            canRead: evaluator.canRead(),
+            canWrite: evaluator.canWrite(),
+            canJoin: evaluator.canJoin(),
+            canAdmin: evaluator.canAdmin(),
+            canAddUser: evaluator.canAddUser()
+          });
         })
         .then(function(access) {
           assert.deepEqual(access, expected);
-        })
+        });
     }
 
     describe('precreate user orgs', function() {

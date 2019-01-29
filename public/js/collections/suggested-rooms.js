@@ -15,7 +15,7 @@ var SuggestedRoomsCollection = Backbone.Collection.extend({
   fetchForRoom: function() {
     this.url = apiClient.room.channel('/suggestedRooms');
     this.fetch();
-  },
+  }
 });
 
 /* Filters out any rooms the user is already in, provided in options.roomCollection */
@@ -41,10 +41,10 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
 
   fetchForRoom: function() {
     this.getUnderlying().fetchForRoom();
-  },
+  }
 });
 
 module.exports = {
   Collection: SuggestedRoomsCollection,
-  Filtered: FilteredSuggestionsCollection,
+  Filtered: FilteredSuggestionsCollection
 };

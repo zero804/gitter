@@ -1,12 +1,12 @@
 'use strict';
 
 var providerMap = {
-  'gitlab': 'GitLab',
-  'github': 'GitHub',
-  'twitter': 'Twitter',
-  'linkedin': 'LinkedIn',
-  'google': 'Google',
-  'facebook': 'Facebook',
+  gitlab: 'GitLab',
+  github: 'GitHub',
+  twitter: 'Twitter',
+  linkedin: 'LinkedIn',
+  google: 'Google',
+  facebook: 'Facebook'
 };
 
 function makeRoomProviderSentence(troupeProviders) {
@@ -21,16 +21,16 @@ function makeRoomProviderSentence(troupeProviders) {
   var parts = [];
   names.forEach(function(name, index) {
     parts.push(name);
-    if (index < names.length-1) {
-      if (index == names.length-2) {
+    if (index < names.length - 1) {
+      if (index == names.length - 2) {
         parts.push(' and ');
       } else {
         parts.push(', ');
       }
     }
-  })
+  });
   var joinedNames = parts.join('');
 
-  return 'Only '+joinedNames+' users can join this room.';
+  return 'Only ' + joinedNames + ' users can join this room.';
 }
 module.exports = makeRoomProviderSentence;

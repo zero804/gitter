@@ -14,8 +14,7 @@ function GroupPolicyDelegate(userId, userLoader, securityDescriptor) {
 
 GroupPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
-
-    switch(policyName) {
+    switch (policyName) {
       case 'GROUP_ADMIN':
         return this._isAdmin();
 
@@ -46,14 +45,14 @@ GroupPolicyDelegate.prototype = {
 
     // Late load this to prevent circular dependencies
     var policyFactory = require('../policy-factory');
-    var promise = this._isAdminPromise = policyFactory.createPolicyForGroupIdWithUserLoader(this._userId, this._userLoader, internalId)
+    var promise = (this._isAdminPromise = policyFactory
+      .createPolicyForGroupIdWithUserLoader(this._userId, this._userLoader, internalId)
       .then(function(policy) {
         return policy.canAdmin();
-      });
+      }));
 
     return promise;
   }
-
 };
 
 module.exports = GroupPolicyDelegate;

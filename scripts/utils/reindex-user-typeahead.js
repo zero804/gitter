@@ -7,7 +7,7 @@ var shutdown = require('shutdown');
 
 onMongoConnect()
   .then(function() {
-    console.log('Reindexing. Run with DEBUG=* to get more info. See you in roughly 10mins!')
+    console.log('Reindexing. Run with DEBUG=* to get more info. See you in roughly 10mins!');
     return typeahead.reindex();
   })
   .then(function() {
@@ -15,6 +15,6 @@ onMongoConnect()
     shutdown.shutdownGracefully();
   })
   .catch(function(err) {
-    console.error("error:", err);
+    console.error('error:', err);
     shutdown.shutdownGracefully(1);
   });

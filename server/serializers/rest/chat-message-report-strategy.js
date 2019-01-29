@@ -10,10 +10,10 @@ function ChatMessageReportStrategy(options) {
 
   this.preload = function(chatMessageReports) {
     // We can't use a `Array.reduce` because there is some magic `Sequence` methods expected that would get stripped :shrug:
-    const reporterUserIds = chatMessageReports.map((report) => report.reporterUserId);
-    const messageUserIds = chatMessageReports.map((report) => report.messageUserId);
+    const reporterUserIds = chatMessageReports.map(report => report.reporterUserId);
+    const messageUserIds = chatMessageReports.map(report => report.messageUserId);
 
-    const chatIds = chatMessageReports.map((report) => report.messageId);
+    const chatIds = chatMessageReports.map(report => report.messageId);
 
     return Promise.all([
       userIdStategy.preload(reporterUserIds.concat(messageUserIds)),
@@ -48,6 +48,5 @@ function ChatMessageReportStrategy(options) {
 ChatMessageReportStrategy.prototype = {
   name: 'ChatMessageReportStrategy'
 };
-
 
 module.exports = ChatMessageReportStrategy;

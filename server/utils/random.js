@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var crypto = require('crypto');
 var Promise = require('bluebird');
@@ -9,8 +9,8 @@ var shortTokenLength = 4;
 
 function generateTokenOfLength(length, cb) {
   return Promise.fromCallback(function(callback) {
-      crypto.randomBytes(length, callback);
-    })
+    crypto.randomBytes(length, callback);
+  })
     .then(function(buf) {
       return buf.toString('hex');
     })

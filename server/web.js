@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/diagnostics');
 
@@ -25,12 +25,12 @@ require('./web/passport').install();
 
 require('./event-listeners').install();
 
-if(nconf.get('ws:startFayeInPrimaryApp')) {
+if (nconf.get('ws:startFayeInPrimaryApp')) {
   var bayeux = require('./web/bayeux');
   bayeux.attach(server);
 }
 
-if (nconf.get("web:startApiInPrimaryApp")) {
+if (nconf.get('web:startApiInPrimaryApp')) {
   app.use('/api', require('./api/'));
 }
 app.use('/api_web', require('./api-web/'));
@@ -42,14 +42,14 @@ app.use(require('./web/middlewares/express-error-handler'));
 
 require('./workers').listen();
 
-var port = nconf.get("PORT");
+var port = nconf.get('PORT');
 
 if (!process.env.DISABLE_API_WEB_LISTEN) {
   onMongoConnect(function() {
     serverStats('web', server);
 
-    server.listen(port, undefined, nconf.get("web:backlog"), function() {
-      winston.info("Listening on " + port);
+    server.listen(port, undefined, nconf.get('web:backlog'), function() {
+      winston.info('Listening on ' + port);
     });
   });
 }

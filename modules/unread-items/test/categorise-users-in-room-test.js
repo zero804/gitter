@@ -21,7 +21,7 @@ describe('categorise-users-in-room', function() {
     pushNotificationServiceMock = {
       findUsersWithDevices: function() {
         return Promise.resolve(devices);
-      },
+      }
     };
 
     pushNotificationFilterMock = {
@@ -30,13 +30,11 @@ describe('categorise-users-in-room', function() {
       }
     };
 
-
-    categoriseUsersInRoom = proxyquireNoCallThru("../lib/categorise-users-in-room", {
+    categoriseUsersInRoom = proxyquireNoCallThru('../lib/categorise-users-in-room', {
       'gitter-web-presence': presenceMock,
       'gitter-web-push-notifications': pushNotificationServiceMock,
       'gitter-web-push-notification-filter': pushNotificationFilterMock
     });
-
   });
 
   it('should handle online users in room', function(done) {
@@ -109,8 +107,7 @@ describe('categorise-users-in-room', function() {
 
   it('should handle non-connected mobile users not in room with devices', function(done) {
     onlineUsers = ['user2'];
-    userCategories = {
-    };
+    userCategories = {};
     devices = ['user1'];
     usersAcceptingNotifications = ['user1'];
 
@@ -138,8 +135,7 @@ describe('categorise-users-in-room', function() {
 
   it('should handle non-connected mobile users not in room with devices who have already been notified', function(done) {
     onlineUsers = ['user2'];
-    userCategories = {
-    };
+    userCategories = {};
     devices = ['user1'];
     usersAcceptingNotifications = [];
 
@@ -149,6 +145,4 @@ describe('categorise-users-in-room', function() {
       })
       .nodeify(done);
   });
-
-
 });

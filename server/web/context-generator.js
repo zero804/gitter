@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
-var assert = require("assert");
+var assert = require('assert');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var restSerializer = require("../serializers/rest-serializer");
+var restSerializer = require('../serializers/rest-serializer');
 var userService = require('gitter-web-users');
 var roomMetaService = require('gitter-web-rooms/lib/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
@@ -35,42 +35,39 @@ function generateMainMenuContext(req, leftMenu) {
   var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
-      contextGeneratorRequest(req),
-      user ? serializeUser(user) : null,
-      serializeGroupForMainMenu(uriContext, user, leftMenu),
-      troupe ? serializeTroupe(troupe, user) : undefined,
-    ])
-    .spread(function (reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
-      if (!leftMenu) leftMenu = {};
-      // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
-      var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
-      delete leftMenu.suggestedRoomsHidden;
+    contextGeneratorRequest(req),
+    user ? serializeUser(user) : null,
+    serializeGroupForMainMenu(uriContext, user, leftMenu),
+    troupe ? serializeTroupe(troupe, user) : undefined
+  ]).spread(function(reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
+    if (!leftMenu) leftMenu = {};
+    // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
+    var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
+    delete leftMenu.suggestedRoomsHidden;
 
-      var serializedContext = _.extend({}, reqContextHash, {
-        roomMember: roomMember,
-        user: serializedUser,
-        group: serializedGroup,
-        troupe: serializedTroupe,
-        suggestedRoomsHidden: suggestedRoomsHidden,
-        leftRoomMenuState: leftMenu,
-      });
-
-      return serializedContext;
+    var serializedContext = _.extend({}, reqContextHash, {
+      roomMember: roomMember,
+      user: serializedUser,
+      group: serializedGroup,
+      troupe: serializedTroupe,
+      suggestedRoomsHidden: suggestedRoomsHidden,
+      leftRoomMenuState: leftMenu
     });
+
+    return serializedContext;
+  });
 }
 
 function generateBasicContext(req) {
   var user = req.user;
 
-  return Promise.all([
-      contextGeneratorRequest(req),
-      user ? serializeUser(user) : null,
-    ])
-    .spread(function (reqContextHash, serializedUser) {
+  return Promise.all([contextGeneratorRequest(req), user ? serializeUser(user) : null]).spread(
+    function(reqContextHash, serializedUser) {
       return _.extend({}, reqContextHash, {
-        user: serializedUser,
+        user: serializedUser
       });
-    });
+    }
+  );
 }
 
 /**
@@ -84,10 +81,7 @@ function generateSocketContext(userId, troupeId) {
 
   return getUser()
     .then(function(user) {
-      return [
-        user && serializeUser(user),
-        troupeId && serializeTroupeId(troupeId, user)
-      ];
+      return [user && serializeUser(user), troupeId && serializeTroupeId(troupeId, user)];
     })
     .spread(function(serializedUser, serializedTroupe) {
       return {
@@ -111,17 +105,25 @@ function generateTroupeContext(req, extras) {
     contextGeneratorRequest(req),
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
-    troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false,
-  ])
-  .spread(function(reqContextHash, serializedUser, serializedTroupe, welcomeMessage) {
-    var roomHasWelcomeMessage = !!(welcomeMessage && welcomeMessage.text && welcomeMessage.text.length);
+    troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false
+  ]).spread(function(reqContextHash, serializedUser, serializedTroupe, welcomeMessage) {
+    var roomHasWelcomeMessage = !!(
+      welcomeMessage &&
+      welcomeMessage.text &&
+      welcomeMessage.text.length
+    );
 
-    return _.extend({}, reqContextHash, {
-      roomMember: roomMember,
-      user: serializedUser,
-      troupe: serializedTroupe,
-      roomHasWelcomeMessage: roomHasWelcomeMessage
-    }, extras);
+    return _.extend(
+      {},
+      reqContextHash,
+      {
+        roomMember: roomMember,
+        user: serializedUser,
+        troupe: serializedTroupe,
+        roomHasWelcomeMessage: roomHasWelcomeMessage
+      },
+      extras
+    );
   });
 }
 
@@ -190,4 +192,4 @@ module.exports = {
   generateMainMenuContext: generateMainMenuContext,
   generateSocketContext: generateSocketContext,
   generateTroupeContext: generateTroupeContext
-}
+};

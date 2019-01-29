@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/font-setup');
 
@@ -27,7 +27,6 @@ require('./views/widgets/avatar');
 require('./components/ping');
 
 onready(function() {
-
   require('./components/link-handler').installLinkHandler();
 
   appEvents.on('navigation', function(url) {
@@ -52,9 +51,9 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      "": "hideModal",
-      "people": "people",
-      "login": "login"
+      '': 'hideModal',
+      people: 'people',
+      login: 'login'
     },
 
     hideModal: function() {
@@ -62,27 +61,27 @@ onready(function() {
     },
 
     people: function() {
-      appView.dialogRegion.show(new PeopleModal({
-        rosterCollection: itemCollections.roster
-      }));
+      appView.dialogRegion.show(
+        new PeopleModal({
+          rosterCollection: itemCollections.roster
+        })
+      );
     },
 
     login: function(query) {
-      var options = (query) ? urlParse('?'+query, true).query : {};
+      var options = query ? urlParse('?' + query, true).query : {};
       appView.dialogRegion.show(new LoginView(options));
-    },
-
+    }
   });
 
   var router = new Router();
 
   appEvents.on('loginClicked', function(route) {
-    router.navigate(route, {trigger: true});
+    router.navigate(route, { trigger: true });
   });
 
   // // Listen for changes to the room
   // liveContext.syncRoom();
 
   Backbone.history.start();
-
 });

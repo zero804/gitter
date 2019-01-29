@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
@@ -16,7 +16,7 @@ function GitHubOrgService(user) {
  */
 GitHubOrgService.prototype.getOrg = function(org) {
   return tentacles.org.get(org, {
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
@@ -36,25 +36,25 @@ GitHubOrgService.prototype.someMembers = function(org) {
   }
   return tentacles.orgMember.listMembers(org, {
     accessToken: this.accessToken,
-    firstPageOnly: true,
+    firstPageOnly: true
   });
 };
 
 GitHubOrgService.prototype.member = function(org, username) {
   return tentacles.orgMember.checkMembershipForUser(org, username, {
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
 GitHubOrgService.prototype.getRepos = function(org) {
   return tentacles.repo.listForOrg(org, {
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
 GitHubOrgService.prototype.getMembership = function(org, username) {
   return tentacles.orgMember.getMembershipForUser(org, username, {
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
@@ -63,10 +63,11 @@ GitHubOrgService.prototype.getMembership = function(org, username) {
  */
 GitHubOrgService.prototype.getIssues = function(org, options) {
   var query = {
-    state: options && options.state || 'all',
-  }
+    state: (options && options.state) || 'all'
+  };
 
-  return tentacles.issue.listForOrgForAuthUser(org, {
+  return tentacles.issue
+    .listForOrgForAuthUser(org, {
       query: query,
       accessToken: this.accessToken,
       firstPageOnly: !options || options.firstPageOnly !== false

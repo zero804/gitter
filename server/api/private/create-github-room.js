@@ -1,24 +1,24 @@
 'use strict';
 
-var roomService = require("gitter-web-rooms");
-var restSerializer = require("../../serializers/rest-serializer");
+var roomService = require('gitter-web-rooms');
+var restSerializer = require('../../serializers/rest-serializer');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 
 function createRepoRoom(req, res, next) {
   return Promise.try(function() {
-      var roomUri = req.query.uri || req.body.uri;
-      roomUri = roomUri ? String(roomUri) : undefined;
+    var roomUri = req.query.uri || req.body.uri;
+    roomUri = roomUri ? String(roomUri) : undefined;
 
-      var addBadge = req.body.addBadge || false;
+    var addBadge = req.body.addBadge || false;
 
-      if (!roomUri) throw new StatusError(400);
+    if (!roomUri) throw new StatusError(400);
 
-      // TODO: change this to a simple resolve,
-      // except in the case of a user
-      return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge });
-    })
-    .then(function (createResult) {
+    // TODO: change this to a simple resolve,
+    // except in the case of a user
+    return roomService.createRoomByUri(req.user, roomUri, { ignoreCase: true, addBadge: addBadge });
+  })
+    .then(function(createResult) {
       var strategy = new restSerializer.TroupeStrategy({
         currentUserId: req.user.id,
         currentUser: req.user,
@@ -39,7 +39,7 @@ function createRepoRoom(req, res, next) {
 
       res.send(serialized);
     })
-    .catch(next)
+    .catch(next);
 }
 
 module.exports = createRepoRoom;

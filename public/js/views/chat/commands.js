@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var context = require('../../utils/context');
@@ -8,13 +8,12 @@ var unreadItemsClient = require('../../components/unread-items-client');
 var isMobile = require('../../utils/is-mobile');
 
 function updateNotifications(mode) {
-  apiClient.userRoom.put('/settings/notifications', { mode: mode })
-    .then(function() {
-      appEvents.triggerParent('user_notification', {
-        title: "Notifications",
-        text: "Notification settings have been updated for this room"
-      });
+  apiClient.userRoom.put('/settings/notifications', { mode: mode }).then(function() {
+    appEvents.triggerParent('user_notification', {
+      title: 'Notifications',
+      text: 'Notification settings have been updated for this room'
     });
+  });
 }
 
 var commandsList = [
@@ -23,7 +22,7 @@ var commandsList = [
     description: 'Ban somebody from the room.',
     criteria: function() {
       var isOrgRoom = false;
-      if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
+      if (context.troupe().get('githubType') == 'ORG') isOrgRoom = true;
       return !context.inOneToOneTroupeContext() && context.isTroupeAdmin() && !isOrgRoom;
     },
     completion: 'ban @',
@@ -34,16 +33,17 @@ var commandsList = [
       var user = userMatch[1];
       var removeMessages = !!userMatch[3];
 
-      apiClient.room.post('/bans', { username: user, removeMessages: removeMessages })
+      apiClient.room
+        .post('/bans', { username: user, removeMessages: removeMessages })
         .catch(function(e) {
           var errorMessage;
-          switch(e.status) {
+          switch (e.status) {
             case 403:
               errorMessage = 'You do not have permission to ban people.';
               break;
 
             case 400:
-              errorMessage = e.friendlyMessage || "Ban failed";
+              errorMessage = e.friendlyMessage || 'Ban failed';
               break;
 
             case 404:
@@ -70,7 +70,7 @@ var commandsList = [
       var channelMatch = text.match(/^\s*\/channel(?:\s+(\w+))?/);
       var channel = channelMatch[1];
 
-      if(channel) {
+      if (channel) {
         appEvents.trigger('route', 'createroom/' + channel);
       } else {
         appEvents.trigger('route', 'createroom');
@@ -98,16 +98,15 @@ var commandsList = [
     },
     action: function() {
       context.troupe().set('aboutToLeave', true);
-      apiClient.room.delete('/users/' + context.getUserId(), { })
-        .then(function() {
-          appEvents.trigger('navigation', '/home', 'home', '');
-          context.troupe().set('roomMember', false);
-        });
+      apiClient.room.delete('/users/' + context.getUserId(), {}).then(function() {
+        appEvents.trigger('navigation', '/home', 'home', '');
+        context.troupe().set('roomMember', false);
+      });
     }
   },
   {
     command: 'me',
-    description: 'Let people know what\'s happening',
+    description: "Let people know what's happening",
     completion: 'me ',
     regexp: /^\/me/
   },
@@ -151,7 +150,13 @@ var commandsList = [
       var search = re[1];
       var replace = re[2];
       var global = !!re[3];
-      appEvents.trigger('chatCollectionView:substLastChat', context.getUserId(), search, replace, global);
+      appEvents.trigger(
+        'chatCollectionView:substLastChat',
+        context.getUserId(),
+        search,
+        replace,
+        global
+      );
     }
   },
   {
@@ -178,7 +183,7 @@ var commandsList = [
     description: 'Unban somebody from the room',
     criteria: function() {
       var isOrgRoom = false;
-      if (context.troupe().get("githubType") == "ORG") isOrgRoom = true;
+      if (context.troupe().get('githubType') == 'ORG') isOrgRoom = true;
       return !context.inOneToOneTroupeContext() && context.isTroupeAdmin() && !isOrgRoom;
     },
     completion: 'unban @',
@@ -188,32 +193,30 @@ var commandsList = [
       if (!userMatch) return;
       var user = userMatch[1];
 
-      apiClient.room.delete('/bans/' + user, { })
-        .catch(function(e) {
-          var errorMessage;
-          switch(e.status) {
-            case 403:
-              errorMessage = 'You do not have permission to unban people.';
-              break;
+      apiClient.room.delete('/bans/' + user, {}).catch(function(e) {
+        var errorMessage;
+        switch (e.status) {
+          case 403:
+            errorMessage = 'You do not have permission to unban people.';
+            break;
 
-            case 400:
-              errorMessage = e.friendlyMessage || "Unban failed";
-              break;
+          case 400:
+            errorMessage = e.friendlyMessage || 'Unban failed';
+            break;
 
-            case 404:
-              errorMessage = 'That person is not on the banned list.';
-              break;
-            default:
-              errorMessage = 'Unban failed';
-          }
+          case 404:
+            errorMessage = 'That person is not on the banned list.';
+            break;
+          default:
+            errorMessage = 'Unban failed';
+        }
 
-          appEvents.triggerParent('user_notification', {
-            title: 'Could not unban user',
-            text: errorMessage,
-            className: 'notification-error'
-          });
+        appEvents.triggerParent('user_notification', {
+          title: 'Could not unban user',
+          text: errorMessage,
+          className: 'notification-error'
         });
-
+      });
     }
   },
   {
@@ -270,16 +273,10 @@ var commandsList = [
 
       apiClient.user.put('/settings/defaultRoomMode', { mode: topicMatch[1], override: override });
     }
-  },
-
-
-
-
-
+  }
 ];
 
 module.exports = {
-
   size: commandsList.length,
 
   getSuggestions: function(term) {
@@ -294,5 +291,4 @@ module.exports = {
       return text.match(cmd.regexp);
     });
   }
-
 };

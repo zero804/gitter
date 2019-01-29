@@ -9,7 +9,6 @@ var ExpandedPeopleListView = require('../shared/community-creation-expanded-peop
 require('@gitterhq/styleguide/css/components/headings.css');
 require('@gitterhq/styleguide/css/components/buttons.css');
 
-
 var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
@@ -20,16 +19,21 @@ module.exports = CommunityCreateBaseStepView.extend({
   prevStep: stepConstants.INVITE,
   behaviors: {
     Isomorphic: {
-      troubleInviteListView: { el: '.community-create-trouble-invite-list-root', init: 'initTroubleInviteListView' }
-    },
+      troubleInviteListView: {
+        el: '.community-create-trouble-invite-list-root',
+        init: 'initTroubleInviteListView'
+      }
+    }
   },
 
   initTroubleInviteListView: function(optionsForRegion) {
-    this.troubleInviteListView = new ExpandedPeopleListView(optionsForRegion({
-      collection: this.communityCreateModel.invites,
-      // Only show invites without an email address
-      communityCreateModel: this.communityCreateModel
-    }));
+    this.troubleInviteListView = new ExpandedPeopleListView(
+      optionsForRegion({
+        collection: this.communityCreateModel.invites,
+        // Only show invites without an email address
+        communityCreateModel: this.communityCreateModel
+      })
+    );
 
     return this.troubleInviteListView;
   },
@@ -50,6 +54,9 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onAllowTweetBadgerInputChange: function() {
-    this.communityCreateModel.set('allowTweetBadger', this.ui.allowTweetBadgerOptionInput[0].checked);
-  },
+    this.communityCreateModel.set(
+      'allowTweetBadger',
+      this.ui.allowTweetBadgerOptionInput[0].checked
+    );
+  }
 });

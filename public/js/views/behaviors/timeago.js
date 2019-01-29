@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
@@ -31,26 +31,31 @@ function timeRemainingTodayLocalTZ(time) {
   var nowDay = now.getDate();
 
   if (time instanceof Date) {
-    if (time.getDate() === nowDay &&
-        time.getMonth() === nowMonth &&
-        time.getFullYear() === nowYear) {
-      return MS_IN_DAY - time.getHours() * MS_IN_HOUR +
-                      time.getMinutes() * MS_IN_MINUTE +
-                      time.getSeconds() * MS_IN_SECOND +
-                      time.getMilliseconds();
+    if (
+      time.getDate() === nowDay &&
+      time.getMonth() === nowMonth &&
+      time.getFullYear() === nowYear
+    ) {
+      return (
+        MS_IN_DAY -
+        time.getHours() * MS_IN_HOUR +
+        time.getMinutes() * MS_IN_MINUTE +
+        time.getSeconds() * MS_IN_SECOND +
+        time.getMilliseconds()
+      );
     }
   }
 
   // Deal with moment dates
   if (time.date) {
-    if (time.date() === nowDay &&
-        time.month() === nowMonth &&
-        time.year() === nowYear) {
-
-      return MS_IN_DAY - time.hour() * MS_IN_HOUR +
-                      time.minute() * MS_IN_MINUTE +
-                      time.second() * MS_IN_SECOND +
-                      time.millisecond();
+    if (time.date() === nowDay && time.month() === nowMonth && time.year() === nowYear) {
+      return (
+        MS_IN_DAY -
+        time.hour() * MS_IN_HOUR +
+        time.minute() * MS_IN_MINUTE +
+        time.second() * MS_IN_SECOND +
+        time.millisecond()
+      );
     }
   }
 
@@ -65,7 +70,7 @@ var Behavior = Marionette.Behavior.extend({
 
   ui: function() {
     return {
-      'time': this.options.el
+      time: this.options.el
     };
   },
 
@@ -99,7 +104,7 @@ var Behavior = Marionette.Behavior.extend({
 
   renderTime: function(time) {
     var timeElement = this.ui.time[0];
-    if(timeElement) {
+    if (timeElement) {
       var text = timeFormat(time, { compact: this.options.compact });
       timeElement.textContent = text;
     }

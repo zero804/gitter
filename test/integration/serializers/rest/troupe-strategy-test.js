@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils')
+var assertUtils = require('../../assert-utils');
 var env = require('gitter-web-env');
 var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -36,15 +36,15 @@ describe('TroupeStrategy', function() {
       providers: ['github'],
       tags: ['foo'],
       security: 'PUBLIC'
-    },
+    }
   });
 
   it('should serialize a troupe', function() {
-    var strategy = new TroupeStrategy({ });
+    var strategy = new TroupeStrategy({});
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -58,16 +58,17 @@ describe('TroupeStrategy', function() {
           noindex: false,
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should serialize a troupe with currentUserId', function() {
-    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
+    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id });
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -85,17 +86,17 @@ describe('TroupeStrategy', function() {
           roomMember: true,
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should serialize providers with includeProviders', function() {
-    var strategy = new TroupeStrategy({ includeProviders: true});
+    var strategy = new TroupeStrategy({ includeProviders: true });
     var t = fixture.troupe3;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assert.equal(s[0].providers[0], 'github');
-      });
+    return serialize([t], strategy).then(function(s) {
+      assert.equal(s[0].providers[0], 'github');
+    });
   });
 
   // TODO: includeGroups
@@ -103,19 +104,18 @@ describe('TroupeStrategy', function() {
   it('should serialize tags with includeTags', function() {
     var strategy = new TroupeStrategy({ includeTags: true });
     var t = fixture.troupe3;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assert.equal(s[0].tags[0], 'foo');
-      });
+    return serialize([t], strategy).then(function(s) {
+      assert.equal(s[0].tags[0], 'foo');
+    });
   });
 
   it('should serialize a one-to-one troupe with currentUserId', function() {
-    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id});
+    var strategy = new TroupeStrategy({ currentUserId: fixture.user1._id });
     var u2 = fixture.user2;
     var t = fixture.troupe2;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: u2.displayName,
           topic: '',
@@ -128,9 +128,9 @@ describe('TroupeStrategy', function() {
             username: u2.username,
             displayName: u2.displayName,
             url: '/' + u2.username,
-            avatarUrl:  nconf.get('avatar:officialHost') + '/g/u/' + u2.username,
-            avatarUrlSmall: '/api/private/user-avatar/'+u2.username+'?s=60',
-            avatarUrlMedium: '/api/private/user-avatar/'+u2.username+'?s=128',
+            avatarUrl: nconf.get('avatar:officialHost') + '/g/u/' + u2.username,
+            avatarUrlSmall: '/api/private/user-avatar/' + u2.username + '?s=60',
+            avatarUrlMedium: '/api/private/user-avatar/' + u2.username + '?s=128',
             staff: false,
             v: 1
           },
@@ -143,8 +143,9 @@ describe('TroupeStrategy', function() {
           roomMember: true,
           public: false,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should skip unread counts with currentUserId and options.skipUnreadCounts', function() {
@@ -153,9 +154,9 @@ describe('TroupeStrategy', function() {
       skipUnreadCounts: true
     });
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -171,8 +172,9 @@ describe('TroupeStrategy', function() {
           roomMember: true,
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should include permissions with currentUser and includePermissions', function() {
@@ -182,9 +184,9 @@ describe('TroupeStrategy', function() {
       includePermissions: true
     });
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -211,16 +213,17 @@ describe('TroupeStrategy', function() {
           },
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should include if an owner is an org with includeOwner', function() {
     var strategy = new TroupeStrategy({ includeOwner: true });
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -234,16 +237,17 @@ describe('TroupeStrategy', function() {
           noindex: false,
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should include room membership with isRoomMember', function() {
     var strategy = new TroupeStrategy({ isRoomMember: true });
     var t = fixture.troupe1;
-    return serialize([t], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([t], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: t.id,
           name: t.uri,
           topic: '',
@@ -258,8 +262,9 @@ describe('TroupeStrategy', function() {
           roomMember: true,
           public: true,
           v: 1
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   describe('oneToOneOtherUserSequence', function() {
@@ -271,30 +276,42 @@ describe('TroupeStrategy', function() {
     });
 
     it('should deal with non-one-to-one troupes sequences', function() {
-      var x = lazy([{
-        uri: 'x'
-      }, {
-        uri: 'y'
-      }]);
+      var x = lazy([
+        {
+          uri: 'x'
+        },
+        {
+          uri: 'y'
+        }
+      ]);
       assert.deepEqual(oneToOneOtherUserSequence('1', x).toArray(), []);
     });
 
     it('should deal with one-to-one troupe sequences with strings', function() {
-      var x = lazy([{
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: '1'
-        }, {
-          userId: '2'
-        }]
-      }, {
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: '1'
-        }, {
-          userId: '3'
-        }]
-      }]);
+      var x = lazy([
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: '1'
+            },
+            {
+              userId: '2'
+            }
+          ]
+        },
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: '1'
+            },
+            {
+              userId: '3'
+            }
+          ]
+        }
+      ]);
       assert.deepEqual(oneToOneOtherUserSequence('1', x).toArray(), ['2', '3']);
     });
 
@@ -303,21 +320,30 @@ describe('TroupeStrategy', function() {
       var o2 = new ObjectID();
       var o3 = new ObjectID();
 
-      var x = lazy([{
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1
-        }, {
-          userId: o2
-        }]
-      }, {
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1
-        }, {
-          userId: o3
-        }]
-      }]);
+      var x = lazy([
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1
+            },
+            {
+              userId: o2
+            }
+          ]
+        },
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1
+            },
+            {
+              userId: o3
+            }
+          ]
+        }
+      ]);
       assert.deepEqual(oneToOneOtherUserSequence(o1, x).toArray(), [o2, o3]);
     });
 
@@ -326,21 +352,30 @@ describe('TroupeStrategy', function() {
       var o2 = new ObjectID();
       var o3 = new ObjectID();
 
-      var x = lazy([{
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1
-        }, {
-          userId: o2
-        }]
-      }, {
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1
-        }, {
-          userId: o3
-        }]
-      }]);
+      var x = lazy([
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1
+            },
+            {
+              userId: o2
+            }
+          ]
+        },
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1
+            },
+            {
+              userId: o3
+            }
+          ]
+        }
+      ]);
       assert.deepEqual(oneToOneOtherUserSequence(o1.toHexString(), x).toArray(), [o2, o3]);
     });
 
@@ -349,23 +384,31 @@ describe('TroupeStrategy', function() {
       var o2 = new ObjectID().toHexString();
       var o3 = new ObjectID().toHexString();
 
-      var x = lazy([{
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1.toHexString()
-        }, {
-          userId: o2
-        }]
-      }, {
-        oneToOne: true,
-        oneToOneUsers: [{
-          userId: o1.toHexString()
-        }, {
-          userId: o3
-        }]
-      }]);
+      var x = lazy([
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1.toHexString()
+            },
+            {
+              userId: o2
+            }
+          ]
+        },
+        {
+          oneToOne: true,
+          oneToOneUsers: [
+            {
+              userId: o1.toHexString()
+            },
+            {
+              userId: o3
+            }
+          ]
+        }
+      ]);
       assert.deepEqual(oneToOneOtherUserSequence(o1, x).toArray(), [o2, o3]);
     });
-
   });
 });

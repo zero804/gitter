@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var commands = require('../commands');
 var template = require('./tmpl/typeahead.hbs');
@@ -17,7 +17,7 @@ module.exports = function() {
         description: cmd.description
       });
     },
-    replace: function (cmd) {
+    replace: function(cmd) {
       return '$1/' + cmd.completion;
     }
   };

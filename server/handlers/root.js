@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const Promise = require('bluebird');
 const env = require('gitter-web-env');
@@ -28,36 +28,36 @@ var slashdotEffectSurvivalMode = survivalMode || !!process.env.SLASHDOT_EFFECT_S
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.get(nconf.get('web:homeurl'),
+router.get(
+  nconf.get('web:homeurl'),
   identifyRoute('homepage'),
   preventClickjackingMiddleware,
   featureToggles,
   require('../web/middlewares/unawesome-browser'),
   function(req, res, next) {
-
-    if(req.user && req.query.redirect !== 'no') {
+    if (req.user && req.query.redirect !== 'no') {
       loginUtils.redirectUserToDefaultTroupe(req, res, next);
       return;
     }
 
     var locale = req.i18n.getLocale();
-    var requested = req.headers["accept-language"] || "";
-    requested = requested.split(";")[0] || "";
+    var requested = req.headers['accept-language'] || '';
+    requested = requested.split(';')[0] || '';
     requested = requested.split(/,\s*/)[0];
-    requested = requested.split("-")[0];
+    requested = requested.split('-')[0];
 
     var requestLangCode, requestLangLocalName;
     if (locale !== requested) {
-      var requestLang = langs.where("1", requested);
+      var requestLang = langs.where('1', requested);
       if (requestLang) {
-        requestLangCode = requestLang["1"];
+        requestLangCode = requestLang['1'];
         requestLangLocalName = requestLang.local;
       }
     }
 
-    var translatedBy = req.i18n.__("Translated By");
+    var translatedBy = req.i18n.__('Translated By');
     /* i18n doesn't like empty strings. Use a dash as a proxy */
-    if (translatedBy === "-") translatedBy = "";
+    if (translatedBy === '-') translatedBy = '';
 
     // when the viewer is not logged in:
     res.render('homepage', {
@@ -72,73 +72,75 @@ router.get(nconf.get('web:homeurl'),
       translated: translatedBy,
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-      socialMetadata: social.getMetadata(),
+      socialMetadata: social.getMetadata()
     });
-  });
-
-
-if (nconf.get('web:homeurl') !== '/') {
-  router.get('/',
-    identifyRoute('homepage-landing'),
-    preventClickjackingMiddleware,
-    function(req, res) {
-      if(req.user) {
-        if(req.query.redirect === 'no') {
-          res.relativeRedirect(nconf.get('web:homeurl') + '?redirect=no');
-        } else {
-          res.relativeRedirect(nconf.get('web:homeurl'));
-        }
-        return;
-      }
-
-      res.render('landing');
-    });
-}
-
-router.get('/apps',
-  identifyRoute('homepage-apps'),
-  preventClickjackingMiddleware,
-  function (req, res) {
-    res.render('apps', {
-      homeUrl: nconf.get('web:homeurl')
-    });
-  });
-
-router.get('/robots.txt',
-  identifyRoute('homepage-robots'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.set('Content-Type', 'text/text');
-    res.render('robotstxt', {
-      allowCrawling: nconf.get('sitemap:allowCrawling'),
-      sitemap: nconf.get('sitemap:location')
-    });
-  });
-
-router.get('/humans.txt',
-  identifyRoute('homepage-humans'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.set('Content-Type', 'text/text');
-    res.render('humanstxt');
-  });
-
-router.get('/-/unawesome-browser',
-  identifyRoute('homepage-unawesome-browser'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.status(406/* Not Acceptable */).render('unawesome-browser', { });
-  });
-
-router.get('/about/early-bird',
-  identifyRoute('earlybird'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.relativeRedirect('/');
   }
 );
 
-router.get('/about/gitlab/mailing-list',
+if (nconf.get('web:homeurl') !== '/') {
+  router.get('/', identifyRoute('homepage-landing'), preventClickjackingMiddleware, function(
+    req,
+    res
+  ) {
+    if (req.user) {
+      if (req.query.redirect === 'no') {
+        res.relativeRedirect(nconf.get('web:homeurl') + '?redirect=no');
+      } else {
+        res.relativeRedirect(nconf.get('web:homeurl'));
+      }
+      return;
+    }
+
+    res.render('landing');
+  });
+}
+
+router.get('/apps', identifyRoute('homepage-apps'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.render('apps', {
+    homeUrl: nconf.get('web:homeurl')
+  });
+});
+
+router.get('/robots.txt', identifyRoute('homepage-robots'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.set('Content-Type', 'text/text');
+  res.render('robotstxt', {
+    allowCrawling: nconf.get('sitemap:allowCrawling'),
+    sitemap: nconf.get('sitemap:location')
+  });
+});
+
+router.get('/humans.txt', identifyRoute('homepage-humans'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.set('Content-Type', 'text/text');
+  res.render('humanstxt');
+});
+
+router.get(
+  '/-/unawesome-browser',
+  identifyRoute('homepage-unawesome-browser'),
+  preventClickjackingMiddleware,
+  function(req, res) {
+    res.status(406 /* Not Acceptable */).render('unawesome-browser', {});
+  }
+);
+
+router.get('/about/early-bird', identifyRoute('earlybird'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.relativeRedirect('/');
+});
+
+router.get(
+  '/about/gitlab/mailing-list',
   ensureLoggedIn,
   identifyRoute('gitlab-mailing-list'),
   preventClickjackingMiddleware,
@@ -151,49 +153,48 @@ router.get('/about/gitlab/mailing-list',
     });
 
     res.render('gitlab-mailing-list');
-  });
-
+  }
+);
 
 // old campaign that still gets some hits
-router.get('/about/*',
-  identifyRoute('homepage-about'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.redirect(nconf.get('web:homeurl'));
-  });
-
+router.get('/about/*', identifyRoute('homepage-about'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.redirect(nconf.get('web:homeurl'));
+});
 
 // This really doesn't seem like the right place for this?
 // Does anyone know what this is for?
-router.get('/_s/cdn/*',
-  identifyRoute('homepage-cdn'),
-  preventClickjackingMiddleware,
-  function(req, res) {
-    res.redirect(req.path.replace('/_s/cdn', ''));
-  });
+router.get('/_s/cdn/*', identifyRoute('homepage-cdn'), preventClickjackingMiddleware, function(
+  req,
+  res
+) {
+  res.redirect(req.path.replace('/_s/cdn', ''));
+});
 
-router.get('/-/admin/chat-message-reports',
+router.get(
+  '/-/admin/chat-message-reports',
   identifyRoute('admin-chat-message-reports'),
   preventClickjackingMiddleware,
   function(req, res) {
-    if(!req.user || !req.user.staff) {
+    if (!req.user || !req.user.staff) {
       throw new StatusError(403, 'Only staff can view this area');
     }
 
     Promise.props({
       troupeContext: contextGenerator.generateBasicContext(req),
       snapshots: generateAdminChatMessageReportSnapshot(req)
-    })
-      .then(function({ troupeContext, snapshots }) {
-        troupeContext.snapshots = snapshots;
+    }).then(function({ troupeContext, snapshots }) {
+      troupeContext.snapshots = snapshots;
 
-        res.render('admin/chat-message-reports', {
-          bootScriptName: 'chat-message-reports',
-          cssFileName: 'styles/router-admin-dashboard.css',
-          troupeContext: troupeContext,
-        });
+      res.render('admin/chat-message-reports', {
+        bootScriptName: 'chat-message-reports',
+        cssFileName: 'styles/router-admin-dashboard.css',
+        troupeContext: troupeContext
       });
-  });
-
+    });
+  }
+);
 
 module.exports = router;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -13,7 +13,7 @@ var callbackUrlBuilder = require('./callback-url-builder');
 
 function gitlabOauthCallback(req, token, refreshToken, profile, done) {
   var gitlabUser = {
-    username: profile.username+'_gitlab',
+    username: profile.username + '_gitlab',
     displayName: profile.displayName,
     gravatarImageUrl: profile.avatarUrl
   };
@@ -28,9 +28,9 @@ function gitlabOauthCallback(req, token, refreshToken, profile, done) {
     avatar: profile.avatarUrl
   };
 
-  return userService.findOrCreateUserForProvider(gitlabUser, gitlabIdentity)
+  return userService
+    .findOrCreateUserForProvider(gitlabUser, gitlabIdentity)
     .spread(function(user, isNewUser) {
-
       trackSignupOrLogin(req, user, isNewUser, 'gitlab');
       updateUserLocale(req, user);
 
@@ -39,14 +39,17 @@ function gitlabOauthCallback(req, token, refreshToken, profile, done) {
     .asCallback(done);
 }
 
-var gitlabStrategy = new GitLabStrategy({
+var gitlabStrategy = new GitLabStrategy(
+  {
     clientID: config.get('gitlaboauth:client_id'),
     clientSecret: config.get('gitlaboauth:client_secret'),
     callbackURL: callbackUrlBuilder('gitlab'),
     passReqToCallback: true,
     scope: ['read_user', 'api'],
     scopeSeparator: ' '
-  }, gitlabOauthCallback);
+  },
+  gitlabOauthCallback
+);
 
 gitlabStrategy.name = 'gitlab';
 

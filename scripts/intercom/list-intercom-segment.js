@@ -1,11 +1,10 @@
 #!/usr/bin/env node
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
-
 
 var opts = require('yargs')
   .option('segment', {
@@ -14,11 +13,10 @@ var opts = require('yargs')
     description: 'Id of the segment to list'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-var stream = getIntercomStream({ client: intercom.client, key: 'users'}, function() {
-  return intercom.client.users.listBy({segment_id: opts.segment});
+var stream = getIntercomStream({ client: intercom.client, key: 'users' }, function() {
+  return intercom.client.users.listBy({ segment_id: opts.segment });
 });
 
 stream

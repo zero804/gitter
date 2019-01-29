@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var SecurityResourceRoute = require('../common/create-security-resource');
 var sdWithPolicyFactory = require('../../../services/security-descriptor-with-policy-service');
@@ -10,6 +10,6 @@ module.exports = new SecurityResourceRoute({
     return Promise.resolve(sdWithPolicyFactory.createForGroup(req.group, req.userGroupPolicy));
   },
   subresourcesRoot: {
-    'extraAdmins': require('./security-extra-admins')
+    extraAdmins: require('./security-extra-admins')
   }
-})
+});

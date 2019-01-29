@@ -53,7 +53,7 @@ var CommunityCreateModel = Backbone.Model.extend({
         linkPath: selectedOrg.get('name'),
         name: selectedOrg.get('name'),
         url: urlJoin('https://github.com', selectedOrg.get('name'))
-      }
+      };
     }
 
     // Repo based?
@@ -68,13 +68,12 @@ var CommunityCreateModel = Backbone.Model.extend({
         linkPath: selectedRepo.get('uri'),
         name: selectedRepo.get('name'),
         url: urlJoin('https://github.com', selectedRepo.get('uri'))
-      }
+      };
     }
 
     return {
       type: null
-    }
-
+    };
   },
 
   addInvitation: function(type, externalId, displayName, avatarUrl) {
@@ -104,7 +103,8 @@ var CommunityCreateModel = Backbone.Model.extend({
 
     if (type !== 'email') {
       // Check if we need to capture the email address
-      apiClient.priv.get('/check-invite', { type: type, externalId: externalId })
+      apiClient.priv
+        .get('/check-invite', { type: type, externalId: externalId })
         .then(function() {
           invite.set({
             inviteStatus: INVITE_STATUS_READY
@@ -132,7 +132,7 @@ var CommunityCreateModel = Backbone.Model.extend({
       return {
         type: githubInfo.type,
         linkPath: githubInfo.linkPath
-      }
+      };
     }
 
     return undefined; // No security info
@@ -175,7 +175,6 @@ var CommunityCreateModel = Backbone.Model.extend({
         },
         error: reject
       });
-
     });
   },
 
@@ -183,8 +182,8 @@ var CommunityCreateModel = Backbone.Model.extend({
     var resetOrgs = !options;
     var resetRepos = !options || options.repo;
     return Promise.all([
-      resetOrgs && this.refreshCollection(this.orgs, { }),
-      resetRepos && this.refreshCollection(this.repos, { type: 'admin' }),
+      resetOrgs && this.refreshCollection(this.orgs, {}),
+      resetRepos && this.refreshCollection(this.repos, { type: 'admin' })
     ]);
   },
 
@@ -218,18 +217,17 @@ var CommunityCreateModel = Backbone.Model.extend({
       return {
         githubOrgId: null,
         githubRepoId: matchingRepoItem.get('id')
-      }
+      };
     }
 
     return {
       githubOrgId: null,
       githubRepoId: null
     };
-
   },
 
   updateGitHubInfoToMatchSlug: function() {
-    if(this.get('isUsingExplicitGitHubProject')) return;
+    if (this.get('isUsingExplicitGitHubProject')) return;
     var communitySlug = this.get('communitySlug');
     var githubInfo = this.findGitHubObjectForSlug(communitySlug);
     this.set(githubInfo);

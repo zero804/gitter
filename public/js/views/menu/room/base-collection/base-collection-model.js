@@ -3,19 +3,25 @@
 var Backbone = require('backbone');
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     header: false,
-    active: false,
+    active: false
   },
 
   constructor: function(attrs, options) {
     if (!options || !options.roomMenuModel) {
-      throw new Error('A valid instance of roomMenuModel must be passed to a new instance of BaseCollectionModel');
+      throw new Error(
+        'A valid instance of roomMenuModel must be passed to a new instance of BaseCollectionModel'
+      );
     }
 
     this.roomMenuModel = options.roomMenuModel;
-    this.listenTo(options.roomMenuModel, 'change:state change:searchTerm', this.determineActiveState, this);
+    this.listenTo(
+      options.roomMenuModel,
+      'change:state change:searchTerm',
+      this.determineActiveState,
+      this
+    );
     this.listenTo(options.collection, 'sync reset', this.determineActiveState, this);
     Backbone.Model.prototype.constructor.apply(this, arguments);
 
@@ -47,11 +53,20 @@ module.exports = Backbone.Model.extend({
     }
   },
 
-  onAll:       function() { this.onDefault(); },
-  onSearch:    function() { this.onDefault(); },
-  onPeople:    function() { this.onDefault(); },
-  onOrg:       function() { this.onDefault(); },
-  onGroup:     function() { this.onDefault(); },
-  onDefault:   function() {},
-
+  onAll: function() {
+    this.onDefault();
+  },
+  onSearch: function() {
+    this.onDefault();
+  },
+  onPeople: function() {
+    this.onDefault();
+  },
+  onOrg: function() {
+    this.onDefault();
+  },
+  onGroup: function() {
+    this.onDefault();
+  },
+  onDefault: function() {}
 });

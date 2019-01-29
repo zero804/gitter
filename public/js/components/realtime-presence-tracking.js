@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../utils/context');
 var eyeballsDetector = require('./eyeballs-detector');
@@ -20,6 +20,6 @@ module.exports = {
   },
 
   getEyeballs: function() {
-    return (track && eyeballsDetector.getEyeballs()) ? 1 : 0;
+    return track && eyeballsDetector.getEyeballs() ? 1 : 0;
   }
 };

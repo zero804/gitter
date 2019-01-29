@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // fastclick doesnt increment event.detail for double, triple clicks
 // as its a read only value, so this class works around that.
@@ -16,7 +16,7 @@ DoubleTapper.prototype.registerTap = function() {
   this._tapCount++;
 
   clearTimeout(this._timeout);
-  this._timeout = setTimeout(function () {
+  this._timeout = setTimeout(function() {
     self._tapCount = 0;
   }, DOUBLE_TAP_TIME);
 

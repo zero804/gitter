@@ -10,26 +10,26 @@ var debug = require('debug')('gitter:app:uri-resolver');
 var StatusError = require('statuserror');
 
 function resolveFromLookup(uriLookup, userId) {
-  if(uriLookup.userId) {
+  if (uriLookup.userId) {
     /* The uri is for a user */
-    return userService.findById(uriLookup.userId)
-      .then(function(user) {
-        if(!user) {
-          return null;
-        }
+    return userService.findById(uriLookup.userId).then(function(user) {
+      if (!user) {
+        return null;
+      }
 
-        return {
-          user: user,
-          uri: user.username,
-          room: null,
-          roomMember: null,
-          group: null
-        };
-      });
+      return {
+        user: user,
+        uri: user.username,
+        room: null,
+        roomMember: null,
+        group: null
+      };
+    });
   }
 
-  if(uriLookup.troupeId) {
-    return troupeService.findByIdLeanWithMembership(uriLookup.troupeId, userId)
+  if (uriLookup.troupeId) {
+    return troupeService
+      .findByIdLeanWithMembership(uriLookup.troupeId, userId)
       .then(function(troupeAndRoomMember) {
         var troupe = troupeAndRoomMember[0];
         var roomMember = troupeAndRoomMember[1];
@@ -47,19 +47,17 @@ function resolveFromLookup(uriLookup, userId) {
 
   if (uriLookup.groupId) {
     /* The uri is for a group */
-    return groupService.findById(uriLookup.groupId, { lean: true })
-      .then(function(group) {
-        if (!group) return null;
+    return groupService.findById(uriLookup.groupId, { lean: true }).then(function(group) {
+      if (!group) return null;
 
-        return {
-          user: null,
-          uri: group.homeUri,
-          room: null,
-          roomMember: null,
-          group: group
-        };
-
-      });
+      return {
+        user: null,
+        uri: group.homeUri,
+        room: null,
+        roomMember: null,
+        group: group
+      };
+    });
   }
 
   throw new StatusError(404);
@@ -69,33 +67,34 @@ function resolveFromLookup(uriLookup, userId) {
  * Returns { user, troupe, roomMember, group }
  */
 function uriResolver(userId, uri, options) {
-  debug("uriResolver %s", uri);
+  debug('uriResolver %s', uri);
   var ignoreCase = options && options.ignoreCase;
 
-  return uriLookupService.lookupUri(uri)
-    .then(function (uriLookup) {
-      if (!uriLookup) return null;
+  return uriLookupService.lookupUri(uri).then(function(uriLookup) {
+    if (!uriLookup) return null;
 
-      // Resolve the object from the uriLookup
-      return resolveFromLookup(uriLookup, userId)
-        .tap(function(resolved) {
-          // Lookup returned a dud? Remove it...
-          if (!resolved) {
-            return uriLookupService.removeBadUri(uri);
-          }
+    // Resolve the object from the uriLookup
+    return resolveFromLookup(uriLookup, userId).tap(function(resolved) {
+      // Lookup returned a dud? Remove it...
+      if (!resolved) {
+        return uriLookupService.removeBadUri(uri);
+      }
 
-          // URI mismatch? Perhaps we should redirect...
-          if (resolved.uri !== uri) {
-            if (ignoreCase && resolved.uri.toLowerCase() === uri.toLowerCase()) {
-              logger.info('Ignoring incorrect case for room', { providedUri: uri, correctUri: resolved.uri });
-            } else {
-              var redirect = new StatusError(301);
-              redirect.path = '/' + resolved.uri;
-              throw redirect;
-            }
-          }
-        });
+      // URI mismatch? Perhaps we should redirect...
+      if (resolved.uri !== uri) {
+        if (ignoreCase && resolved.uri.toLowerCase() === uri.toLowerCase()) {
+          logger.info('Ignoring incorrect case for room', {
+            providedUri: uri,
+            correctUri: resolved.uri
+          });
+        } else {
+          var redirect = new StatusError(301);
+          redirect.path = '/' + resolved.uri;
+          throw redirect;
+        }
+      }
     });
+  });
 }
 
 module.exports = uriResolver;

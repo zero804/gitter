@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Troupe = require('gitter-web-persistence').Troupe;
 var Group = require('gitter-web-persistence').Group;
@@ -19,12 +19,12 @@ function getUsedLinkPaths(type, linkPaths) {
     getUsedLinkPathsForModel(Group, type, linkPaths),
     getUsedLinkPathsForModel(Troupe, type, linkPaths),
     function(groups, repos) {
-      return groups.concat(repos)
-        .reduce(function(map, linkPath) {
-          map[linkPath] = true;
-          return map;
-        }, {});
-    });
+      return groups.concat(repos).reduce(function(map, linkPath) {
+        map[linkPath] = true;
+        return map;
+      }, {});
+    }
+  );
 }
 
 module.exports = {

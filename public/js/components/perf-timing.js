@@ -44,7 +44,6 @@ function perfImplementation() {
 
       performance.clearMeasures(req.name);
     }
-
   }, 3000);
 
   return {
@@ -69,17 +68,15 @@ function perfImplementation() {
       // https://connect.microsoft.com/IE/feedback/details/1884529/bug-in-html5-performance-api
       try {
         performance.measure(PREFIX + name, markName);
-      }
-      catch(err) {
+      } catch (err) {
         //...
       }
     }
   };
 }
 
-
 var implementation;
-if(window.performance && window.performance.mark && window.performance.measure) {
+if (window.performance && window.performance.mark && window.performance.measure) {
   implementation = perfImplementation();
 } else {
   implementation = shimImplemtation();

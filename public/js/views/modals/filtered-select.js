@@ -6,11 +6,10 @@ var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filter
 
 var FilteredSelect = Marionette.ItemView.extend({
   events: {
-    'focus': 'onActivate',
-    'blur': 'hide',
-    'click': 'onActivate'
+    focus: 'onActivate',
+    blur: 'hide',
+    click: 'onActivate'
   },
-
 
   initialize: function(options) {
     this.filter = options.filter;
@@ -58,7 +57,7 @@ var FilteredSelect = Marionette.ItemView.extend({
   },
 
   onActivate: function() {
-    if(this.el.value) {
+    if (this.el.value) {
       this.show();
     }
   },
@@ -76,13 +75,14 @@ var FilteredSelect = Marionette.ItemView.extend({
   },
 
   refilter: function(input, collection, success) {
-    collection.setFilter(function(model) {
-      return this.filter(input, model);
-    }.bind(this));
+    collection.setFilter(
+      function(model) {
+        return this.filter(input, model);
+      }.bind(this)
+    );
 
     if (success) success();
   }
-
 });
 
 module.exports = FilteredSelect;

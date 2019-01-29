@@ -1,17 +1,15 @@
-"use strict";
+'use strict';
 var dataset = require('../../utils/dataset-shim');
 
 module.exports = (function() {
-
-
   function getContainer(self) {
-    if(self.$childViewContainer) return self.$childViewContainer;
+    if (self.$childViewContainer) return self.$childViewContainer;
     return self.$el;
   }
 
   return {
     events: {
-      'keydown': 'selectKeydown',
+      keydown: 'selectKeydown',
       'mouseover li:not(.divider):visible': 'selectMouseOver',
       'click li': 'selectClicked'
     },
@@ -24,13 +22,13 @@ module.exports = (function() {
       var currentActive = $items.filter('.active');
       var newActive = e.currentTarget;
 
-      if(currentActive[0] === newActive) return;
+      if (currentActive[0] === newActive) return;
 
       currentActive.removeClass('active');
-      newActive.classList.add("active");
+      newActive.classList.add('active');
     },
-    selectKeydown: function (e) {
-      switch(e.keyCode) {
+    selectKeydown: function(e) {
+      switch (e.keyCode) {
         case 13:
           this.simulateClick();
           return;
@@ -57,18 +55,20 @@ module.exports = (function() {
       var $c = getContainer(this);
 
       var first = $c.find('li:not(.divider):visible.active').first();
-      if(first.length) {
+      if (first.length) {
         first.trigger('click');
       } else {
         this._moveSelect(0);
-        $c.find('li:not(.divider):visible.active').first().trigger('click');
+        $c.find('li:not(.divider):visible.active')
+          .first()
+          .trigger('click');
       }
     },
     selectActive: function() {
       this.simulateClick();
     },
     selectClicked: function(e) {
-      if(!this.collection) return;
+      if (!this.collection) return;
       var selected = e.currentTarget;
       var cid = dataset.get(selected, 'cid');
       var model = this.collection.get(cid);
@@ -76,29 +76,29 @@ module.exports = (function() {
 
       this.trigger('selectClicked');
 
-      if(!this.options.allowClickPropagation) {
+      if (!this.options.allowClickPropagation) {
         e.preventDefault();
         e.stopPropagation();
       }
     },
     onAddChild: function(childView) {
-      if(this.selectedModel && childView.model.id && childView.model.id == this.selectedModel.id) {
+      if (this.selectedModel && childView.model.id && childView.model.id == this.selectedModel.id) {
         childView.$el.addClass('selected');
       }
     },
     setSelected: function(model) {
-      if(this.selectedModel) {
+      if (this.selectedModel) {
         this.selectedModel.trigger('unselected');
 
         var oldSelectedView = this.children.findByModel(this.selectedModel);
-        if(oldSelectedView) {
+        if (oldSelectedView) {
           oldSelectedView.$el.removeClass('selected');
         }
       }
 
       this.selectedModel = model;
 
-      if(model) {
+      if (model) {
         model.trigger('selected');
         var selectedView = this.children.findByModel(model);
         selectedView.$el.addClass('selected');
@@ -110,20 +110,20 @@ module.exports = (function() {
       var $active = $c.find('li.active:not(.divider):visible');
 
       var active = $active[0];
-      if(!active) return;
+      if (!active) return;
 
       var cid = dataset.get(active, 'cid');
       var model = this.collection.get(cid);
       return model;
     },
     setActive: function(model) {
-      if(!model) return;
+      if (!model) return;
 
       var activeView = this.children.findByModel(model);
-      if(!activeView) return;
+      if (!activeView) return;
 
       /* Already active? */
-      if(activeView.$el.hasClass('active')) return;
+      if (activeView.$el.hasClass('active')) return;
 
       var $c = getContainer(this);
       $c.find('li.active:not(.divider):visible').removeClass('active');
@@ -139,18 +139,18 @@ module.exports = (function() {
 
       var currentActive = $items.filter('.active');
       var index = $items.index(currentActive);
-      if(!~index) {
+      if (!~index) {
         index = 0;
       } else {
         index = index + delta;
-        if(index < 0) {
+        if (index < 0) {
           index = 0;
-        } else if(index >= $items.length) {
+        } else if (index >= $items.length) {
           index = $items.length - 1;
         }
       }
 
-      if(index != currentActive) {
+      if (index != currentActive) {
         var newActive = $items.eq(index);
         currentActive.removeClass('active');
         newActive.addClass('active');
@@ -158,6 +158,4 @@ module.exports = (function() {
       }
     }
   };
-
-
 })();

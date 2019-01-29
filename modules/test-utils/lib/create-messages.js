@@ -1,9 +1,8 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var debug = require('debug')('gitter:tests:test-fixtures');
-
 
 function createMessage(fixtureName, f) {
   debug('Creating %s', fixtureName);
@@ -21,22 +20,21 @@ function createMessage(fixtureName, f) {
     sent: f.sent,
     editedAt: f.editedAt,
     pub: f.pub || false,
-    readBy: f.readBy,
+    readBy: f.readBy
   });
 }
 
 function createMessages(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
-     if (key.match(/^message(?!Report)/)) {
+    if (key.match(/^message(?!Report)/)) {
       var expectedMessage = expected[key];
 
       expectedMessage.fromUserId = fixture[expectedMessage.user]._id;
       expectedMessage.toTroupeId = fixture[expectedMessage.troupe]._id;
 
-      return createMessage(key, expectedMessage)
-        .then(function(message) {
-          fixture[key] = message;
-        });
+      return createMessage(key, expectedMessage).then(function(message) {
+        fixture[key] = message;
+      });
     }
 
     return null;

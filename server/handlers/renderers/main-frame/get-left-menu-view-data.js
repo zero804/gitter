@@ -11,12 +11,16 @@ function getLeftMenuViewData(options) {
 
   var parsedRooms, parsedFavourites;
 
-  if(leftMenu.state === 'group') {
+  if (leftMenu.state === 'group') {
     parsedRooms = groups;
     parsedFavourites = [];
   } else {
     parsedRooms = parseRoomsIntoLeftMenuRoomList(leftMenu.state, rooms, leftMenu.groupId);
-    parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(leftMenu.state, rooms, leftMenu.groupId);
+    parsedFavourites = parseRoomsIntoLeftMenuFavouriteRoomList(
+      leftMenu.state,
+      rooms,
+      leftMenu.groupId
+    );
   }
 
   var groupFavourites = parseGroupsIntoLeftMenuFavouriteGroupList(groups);
@@ -30,6 +34,5 @@ function getLeftMenuViewData(options) {
 
   return serializedData;
 }
-
 
 module.exports = getLeftMenuViewData;

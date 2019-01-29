@@ -12,8 +12,7 @@ function standardHandler(settingsKey) {
       return userSettingsService.getUserSettings(user._id, settingsKey);
     },
     set: function(user, value) {
-      return userSettingsService.setUserSettings(user._id, settingsKey, value)
-        .return(value);
+      return userSettingsService.setUserSettings(user._id, settingsKey, value).return(value);
     }
   };
 }
@@ -34,16 +33,14 @@ var HANDLERS = {
   /* Left Room Menu */
   leftRoomMenu: {
     get: function(user) {
-      return userSettingsService.getUserSettings(user._id, 'leftRoomMenu')
-        .then(function(result) {
-          cleanLeftRoomSettings(result);
-          return result;
-        })
+      return userSettingsService.getUserSettings(user._id, 'leftRoomMenu').then(function(result) {
+        cleanLeftRoomSettings(result);
+        return result;
+      });
     },
     set: function(user, value) {
       cleanLeftRoomSettings(value);
-      return userSettingsService.setUserSettings(user._id, 'leftRoomMenu', value)
-        .return(value);
+      return userSettingsService.setUserSettings(user._id, 'leftRoomMenu', value).return(value);
     }
   },
   rightToolbar: standardHandler('rightToolbar'),
@@ -55,13 +52,15 @@ var HANDLERS = {
   /* Unread Emails Opt-out */
   unread_notifications_optout: {
     get: function(user) {
-      return userSettingsService.getUserSettings(user._id, 'unread_notifications_optout')
+      return userSettingsService
+        .getUserSettings(user._id, 'unread_notifications_optout')
         .then(function(value) {
           return !!value;
         });
     },
     set: function(user, value) {
-      return userSettingsService.setUserSettings(user._id, 'unread_notifications_optout', value ? 1 : 0)
+      return userSettingsService
+        .setUserSettings(user._id, 'unread_notifications_optout', value ? 1 : 0)
         .then(function() {
           return !!value;
         });
@@ -77,7 +76,8 @@ var HANDLERS = {
       var mode = value.mode;
       var override = value.override;
 
-      return userDefaultFlagsUpdateService.updateDefaultModeForUser(user, mode, override)
+      return userDefaultFlagsUpdateService
+        .updateDefaultModeForUser(user, mode, override)
         .then(function() {
           return userDefaultFlagsService.getDefaultFlagDetailsForUserId(user._id);
         });
@@ -96,10 +96,9 @@ function mapHandlers(keys) {
 function getSetting(user, key) {
   var handler = HANDLERS[key];
   if (!handler) throw new StatusError(404);
-  return handler.get(user)
-    .then(function(f) {
-      return f || {};
-    });
+  return handler.get(user).then(function(f) {
+    return f || {};
+  });
 }
 
 /**
@@ -109,8 +108,7 @@ function getSettings(user, keys) {
   var handlers = mapHandlers(keys);
   return Promise.map(handlers, function(handler) {
     return handler.get(user);
-  })
-  .then(function(results) {
+  }).then(function(results) {
     return keys.reduce(function(memo, key, index) {
       memo[key] = results[index];
       return memo;
@@ -141,8 +139,7 @@ function updateSettings(user, valuesHash) {
     var key = keys[index];
     var value = valuesHash[key];
     return handler.set(user, value);
-  })
-  .then(function(results) {
+  }).then(function(results) {
     return keys.reduce(function(memo, key, index) {
       memo[key] = results[index];
       return memo;

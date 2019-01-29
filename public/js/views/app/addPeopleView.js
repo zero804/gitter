@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var ModalView = require('../modals/modal');
 var Backbone = require('backbone');
@@ -27,16 +27,16 @@ var RowView = Marionette.ItemView.extend({
     'submit form': 'invite'
   },
   modelEvents: {
-    'change': 'render'
+    change: 'render'
   },
   behaviors: {
     Widgets: {}
   },
   ui: {
-    email: "input[type=email]"
+    email: 'input[type=email]'
   },
-  tagName: "div",
-  className: "gtrPeopleRosterItem",
+  tagName: 'div',
+  className: 'gtrPeopleRosterItem',
   template: itemTemplate,
   invite: function(e) {
     e.preventDefault();
@@ -45,7 +45,8 @@ var RowView = Marionette.ItemView.extend({
 
     var self = this;
 
-    apiClient.room.post('/invites', { githubUsername: this.model.get('username'), email: email })
+    apiClient.room
+      .post('/invites', { githubUsername: this.model.get('username'), email: email })
       .then(function() {
         model.set({
           email: email,
@@ -55,15 +56,14 @@ var RowView = Marionette.ItemView.extend({
         });
       })
       .catch(function(e) {
-        var message = e.friendlyMessage || "Unable to invite user to Gitter";
+        var message = e.friendlyMessage || 'Unable to invite user to Gitter';
         self.trigger('invite:error', message);
       });
-
   }
 });
 
 var View = Marionette.CompositeView.extend({
-  childViewContainer: ".gtrPeopleAddRoster",
+  childViewContainer: '.gtrPeopleAddRoster',
   childView: RowView,
   template: template,
   ui: {
@@ -75,8 +75,7 @@ var View = Marionette.CompositeView.extend({
   },
 
   initialize: function() {
-    if(!this.collection) {
-
+    if (!this.collection) {
       var ResultsCollection = Backbone.Collection.extend({
         comparator: function(a, b) {
           return b.get('timeAdded') - a.get('timeAdded');
@@ -89,21 +88,22 @@ var View = Marionette.CompositeView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
 
-  onChildviewInviteError: function(childView, message) { // jshint unused:true
+  onChildviewInviteError: function(childView, message) {
+    // jshint unused:true
     this.ui.loading.toggleClass('hide', true);
     this.showValidationMessage(message);
   },
 
-  selected: function (m) {
+  selected: function(m) {
     this.addUserToRoom(m);
     this.typeahead.dropdown.hide();
   },
 
-  menuItemClicked: function (button) {
+  menuItemClicked: function(button) {
     switch (button) {
       case 'share':
         this.dialog.hide();
-        window.location.hash = "#share";
+        window.location.hash = '#share';
         break;
 
       case 'done':
@@ -117,9 +117,9 @@ var View = Marionette.CompositeView.extend({
    *
    * el   DOM Element - element to be animated
    */
-  showMessage: function (el) {
+  showMessage: function(el) {
     el.slideDown('fast');
-    setTimeout(function () {
+    setTimeout(function() {
       el.slideUp('fast');
       return;
     }, 10000);
@@ -135,7 +135,7 @@ var View = Marionette.CompositeView.extend({
     this.showMessage(this.ui.success);
   },
 
-  handleError: function (/*res, status, message */) {
+  handleError: function(/*res, status, message */) {
     // TODO: what should go here?
   },
 
@@ -144,7 +144,7 @@ var View = Marionette.CompositeView.extend({
    *
    * m    BackboneModel - the user to be added to the room
    */
-  addUserToRoom: function (model) {
+  addUserToRoom: function(model) {
     var self = this;
 
     self.ui.loading.toggleClass('hide');
@@ -157,7 +157,8 @@ var View = Marionette.CompositeView.extend({
       body = { email: email };
     }
 
-    return apiClient.room.post('/invites', body)
+    return apiClient.room
+      .post('/invites', body)
       .then(function(invite) {
         self.ui.loading.toggleClass('hide');
         model.set({
@@ -183,7 +184,7 @@ var View = Marionette.CompositeView.extend({
         }
 
         self.typeahead.clear();
-        switch(e.status) {
+        switch (e.status) {
           case 409:
             message = model.get('username') + ' has already been invited';
             break;
@@ -194,7 +195,7 @@ var View = Marionette.CompositeView.extend({
               unreachable: true,
               timeAdded: Date.now(),
               email: null,
-              user: null,
+              user: null
             });
             self.collection.add(model);
             return;
@@ -204,7 +205,7 @@ var View = Marionette.CompositeView.extend({
       });
   },
 
-  onRender: function () {
+  onRender: function() {
     var self = this;
 
     setTimeout(function() {
@@ -220,19 +221,23 @@ var View = Marionette.CompositeView.extend({
           var displayName = m.get('displayName');
           var username = m.get('username');
 
-          return displayName && displayName.indexOf(input) >= 0 ||
-                 username && username.indexOf(input) >= 0;
+          return (
+            (displayName && displayName.indexOf(input) >= 0) ||
+            (username && username.indexOf(input) >= 0)
+          );
         };
       },
       fetch: function(input, collection, fetchSuccess) {
         if (input.indexOf('@') >= 0) {
           if (isEmailAddress(input)) {
-            this.collection.reset([{
-              displayName: input,
-              email: input,
-              avatarUrlSmall: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
-              avatarUrlMedium: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES
-            }]);
+            this.collection.reset([
+              {
+                displayName: input,
+                email: input,
+                avatarUrlSmall: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES,
+                avatarUrlMedium: DEFAULT_AVATAR_UNTIL_AVATARS_SERVICE_ARRIVES
+              }
+            ]);
           } else {
             this.collection.reset([]);
           }
@@ -240,7 +245,10 @@ var View = Marionette.CompositeView.extend({
           return fetchSuccess();
         }
 
-        this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
+        this.collection.fetch(
+          { data: { q: input } },
+          { add: true, remove: true, merge: true, success: fetchSuccess }
+        );
       }
     });
 
@@ -248,7 +256,7 @@ var View = Marionette.CompositeView.extend({
   },
 
   onDestroy: function() {
-    if(this.typeahead) {
+    if (this.typeahead) {
       this.typeahead.destroy();
     }
   }
@@ -256,15 +264,20 @@ var View = Marionette.CompositeView.extend({
 
 var modalButtons = [];
 
-if(context.troupe().get('security') !== 'PRIVATE') {
-  modalButtons.push({ action: "share", pull: 'right', text: "Share this room", className: "modal--default__footer__link"});
+if (context.troupe().get('security') !== 'PRIVATE') {
+  modalButtons.push({
+    action: 'share',
+    pull: 'right',
+    text: 'Share this room',
+    className: 'modal--default__footer__link'
+  });
 }
 
 module.exports = ModalView.extend({
   disableAutoFocus: true,
   initialize: function(options) {
     options = options || {};
-    options.title = options.title || "Add people to this room";
+    options.title = options.title || 'Add people to this room';
 
     ModalView.prototype.initialize.call(this, options);
     this.view = new View(options);

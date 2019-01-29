@@ -3,7 +3,6 @@
 var CommunityCreationOrgListTemplate = require('./community-create-invite-user-result-list-view.hbs');
 var InviteUserResultListItemView = require('./community-create-invite-user-result-list-item-view');
 
-
 var Marionette = require('backbone.marionette');
 
 var InviteUserResultListView = Marionette.CompositeView.extend({
@@ -19,19 +18,17 @@ var InviteUserResultListView = Marionette.CompositeView.extend({
     var newActiveValue = !view.model.get('active');
 
     var previousActiveModel = this.collection.findWhere({ active: true });
-    if(previousActiveModel) {
+    if (previousActiveModel) {
       previousActiveModel.set('active', false);
     }
     // Toggle active
     view.model.set('active', newActiveValue);
-    if(newActiveValue) {
+    if (newActiveValue) {
       this.trigger('user:activated', view.model);
-    }
-    else {
+    } else {
       this.trigger('user:cleared');
     }
   }
-
 });
 
 module.exports = InviteUserResultListView;

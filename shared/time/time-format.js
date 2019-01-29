@@ -31,17 +31,18 @@ module.exports = function timeFormat(time, options) {
 
   var today = moment(now).utcOffset(time.utcOffset());
 
-  if (time.date() === today.date() &&
-      time.month() === today.month() &&
-      time.year() === today.year()) {
-
+  if (
+    time.date() === today.date() &&
+    time.month() === today.month() &&
+    time.year() === today.year()
+  ) {
     // TODO: deal with american `10:20 PM`
-    return time.format("HH:mm");
+    return time.format('HH:mm');
   }
 
   if (time.year() === today.year()) {
-    return time.format(compact ? "MMM DD" : "MMM DD HH:mm");
+    return time.format(compact ? 'MMM DD' : 'MMM DD HH:mm');
   }
 
-  return time.format(compact ? "MMM DD YYYY" : "MMM DD YYYY HH:mm");
+  return time.format(compact ? 'MMM DD YYYY' : 'MMM DD YYYY HH:mm');
 };

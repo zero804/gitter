@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 function getIana() {
   try {
     return new window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch(e) {
+  } catch (e) {
     return;
   }
 }
@@ -11,7 +11,7 @@ function getIana() {
 module.exports = function getTimezoneInfo() {
   var d = new Date();
   var m = d.toTimeString().match(/\(([^\)]+)\)/);
-  var abbr = m && m[1] || '';
+  var abbr = (m && m[1]) || '';
   var offset = d.getTimezoneOffset();
 
   var sign = offset >= 0 ? '+' : '-';

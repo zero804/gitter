@@ -8,7 +8,9 @@ var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filter
 var FilteredRoomCollection = SimpleFilteredCollection.extend({
   initialize: function(models, options) {
     if (!options || !options.roomModel) {
-      throw new Error('A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection');
+      throw new Error(
+        'A valid RoomMenuModel must be passed to a new instance of FilteredRoomCollection'
+      );
     }
 
     this.roomModel = options.roomModel;
@@ -94,8 +96,7 @@ var FilteredRoomCollection = SimpleFilteredCollection.extend({
   setVisibilePredicate: function(predicate) {
     this._visiblePredicate = predicate;
     this.reapplyHideCriteria();
-  },
-
+  }
 });
 
 module.exports = FilteredRoomCollection;

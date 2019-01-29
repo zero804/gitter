@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
@@ -39,13 +39,13 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   onRender: function() {
-    if(!context.isLoggedIn()) return;
+    if (!context.isLoggedIn()) return;
 
     var model = this.view.model;
-    if(!model) return;
+    if (!model) return;
 
     var unread = model.get('unread');
-    if(unread) {
+    if (unread) {
       this.el.classList.add('unread');
     }
   },

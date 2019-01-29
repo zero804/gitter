@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -8,7 +8,8 @@ var shutdown = require('shutdown');
 module.exports = function(prefix, server) {
   var timer = setInterval(function() {
     server.getConnections(function(err, connections) {
-      if(err) return logger.error("Unable to enumerate server connections: " + err, { exception: err });
+      if (err)
+        return logger.error('Unable to enumerate server connections: ' + err, { exception: err });
       stats.gaugeHF(prefix + '.connections', connections);
     });
   }, 1000);
@@ -17,6 +18,4 @@ module.exports = function(prefix, server) {
     clearTimeout(timer);
     callback();
   });
-
-
 };

@@ -8,7 +8,6 @@ var template = require('./tmpl/archive-navigation-view.hbs');
 var heatmapUtils = require('../../components/archive-heatmap-utils');
 
 module.exports = (function() {
-
   var language = context.lang();
 
   return Marionette.ItemView.extend({
@@ -22,13 +21,15 @@ module.exports = (function() {
       var p = this.options.previousDate && moment(this.options.previousDate).utc();
       var n = this.options.nextDate && moment(this.options.nextDate).utc();
 
-      var archiveDate = moment(this.options.archiveDate).utc().locale(language);
+      var archiveDate = moment(this.options.archiveDate)
+        .utc()
+        .locale(language);
 
       var ordinalDate = archiveDate.format('Do');
       var numericDate = archiveDate.format('D');
 
       var ordinalPart;
-      if(ordinalDate.indexOf('' + numericDate) === 0) {
+      if (ordinalDate.indexOf('' + numericDate) === 0) {
         ordinalPart = ordinalDate.substring(('' + numericDate).length);
       } else {
         ordinalPart = '';
@@ -61,14 +62,13 @@ module.exports = (function() {
       // each end just in case for timezones
       var start = moment(a).subtract(32, 'days');
 
-
       heatmapUtils.createResponsiveHeatMap(this.ui.navigation[0], {
         start: start.toDate(),
         range: range
       });
 
       // See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
-      if($(window).width() < 960) {
+      if ($(window).width() < 960) {
         $('.js-archive-navigation-wrapper').hide();
       }
       $('.js-toggle-archive-navigation').on('click', function() {
@@ -76,6 +76,4 @@ module.exports = (function() {
       });
     }
   });
-
-
 })();

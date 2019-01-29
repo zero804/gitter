@@ -1,9 +1,7 @@
-"use strict";
+'use strict';
 var emoji = require('../../../utils/emoji');
 
 module.exports = (function() {
-
-
   var emojify = emoji.emojify;
 
   var decorator = {
@@ -13,6 +11,4 @@ module.exports = (function() {
   };
 
   return decorator;
-
-
 })();

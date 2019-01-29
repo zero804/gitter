@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var Backbone = require('backbone');
@@ -33,11 +33,9 @@ require('./components/eyeballs-room-sync');
 require('./template/helpers/all');
 require('./utils/gesture-controller');
 
-
 onready(function() {
   //Ledt Menu Additions
   //gestures.init();
-
 
   //Remove when left menu is in place
   FastClick.attach(document.body);
@@ -52,7 +50,7 @@ onready(function() {
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
 
   unreadItemsClient.syncCollections({
-    'chat': chatCollection
+    chat: chatCollection
   });
 
   appEvents.on('route', function(fragment) {
@@ -85,7 +83,7 @@ onready(function() {
         rooms: troupeCollections.troupes,
         groups: troupeCollections.groups,
         roomMenuModel: null
-      }),
+      })
     ]
   });
 

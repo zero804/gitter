@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var appEvents = require('gitter-web-appevents');
 var roomService = require('gitter-web-rooms');
@@ -12,7 +12,7 @@ exports.install = function() {
     var uri = data.uri;
     var isPrivate = data.isPrivate;
 
-    if(isPrivate) {
+    if (isPrivate) {
       roomService.ensureRepoRoomSecurity(uri, 'PRIVATE');
     } else {
       roomService.ensureRepoRoomSecurity(uri, 'PUBLIC');

@@ -11,14 +11,14 @@ function renderSecondaryView(req, res, next, options) {
   var uriContext = options.uriContext;
   var troupe = uriContext.troupe;
 
-  if(!troupe) return next('route');
+  if (!troupe) return next('route');
 
   if (!securityDescriptorUtils.isPublic(troupe)) {
     return next(new StatusError(403));
   }
 
   var aroundId = fixMongoIdQueryParam(req.query.at);
-  if(!aroundId) return next(new StatusError(400));
+  if (!aroundId) return next(new StatusError(400));
 
   return renderChat(req, res, next, {
     uriContext: req.uriContext,
@@ -29,11 +29,13 @@ function renderSecondaryView(req, res, next, options) {
     fetchUsers: false,
     generateContext: false,
     unread: false, // Embedded users see chats as read
-    classNames: [ 'card' ],
+    classNames: ['card'],
     filterChats: function(chats) {
       // Only show the burst
       // TODO: move this somewhere useful
-      var permalinkedChat = _.find(chats, function(chat) { return chat.id === aroundId; });
+      var permalinkedChat = _.find(chats, function(chat) {
+        return chat.id === aroundId;
+      });
       if (!permalinkedChat) return [];
 
       var burstChats = isolateBurst(chats, permalinkedChat);
@@ -50,4 +52,4 @@ function hasSecondaryView() {
 module.exports = {
   renderSecondaryView: renderSecondaryView,
   hasSecondaryView: hasSecondaryView
-}
+};

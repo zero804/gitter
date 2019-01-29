@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true */
-"use strict";
+'use strict';
 
 process.env.NO_AUTO_INDEX = 1;
 
@@ -14,9 +14,7 @@ var opts = require('yargs')
     description: 'Token to delete'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
-
+  .alias('help', 'h').argv;
 
 function runScript(token) {
   return oauthService.deleteToken(token);

@@ -17,33 +17,38 @@ var View = Marionette.ItemView.extend({
     welcomeMessagePreviewButton: '#preview-welcome-message',
     welcomeMessagePreviewContainer: '#welcome-message-preview-container',
     editWelcomeMessageButton: '#close-welcome-message-preview',
-    errorMessage: '#error-message',
+    errorMessage: '#error-message'
   },
 
-  events:   {
+  events: {
     'click #close-settings': 'destroySettings',
     'click @ui.welcomeMessagePreviewButton': 'previewWelcomeMessage',
-    'click @ui.editWelcomeMessageButton': 'editWelcomeMessage',
+    'click @ui.editWelcomeMessageButton': 'editWelcomeMessage'
   },
 
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
-    apiClient.room.get('/meta/welcome-message')
-    .then(function(welcomeMessage){
-      welcomeMessage = (welcomeMessage || { text: '', html: '' });
-      if(!!welcomeMessage.text.length) { return this.initWithMessage(welcomeMessage); }
-      return this.initEmptyTextArea();
-    }.bind(this))
-    .catch(this.showError.bind(this));
+    apiClient.room
+      .get('/meta/welcome-message')
+      .then(
+        function(welcomeMessage) {
+          welcomeMessage = welcomeMessage || { text: '', html: '' };
+          if (!!welcomeMessage.text.length) {
+            return this.initWithMessage(welcomeMessage);
+          }
+          return this.initEmptyTextArea();
+        }.bind(this)
+      )
+      .catch(this.showError.bind(this));
   },
 
-  destroySettings: function () {
+  destroySettings: function() {
     this.dialog.hide();
     this.dialog = null;
   },
 
-  menuItemClicked: function(action){
-    switch(action) {
+  menuItemClicked: function(action) {
+    switch (action) {
       case 'submit':
         this.formSubmit();
         break;
@@ -59,11 +64,11 @@ var View = Marionette.ItemView.extend({
     }
   },
 
-  initEmptyTextArea: function (){
+  initEmptyTextArea: function() {
     this.ui.welcomeMessage.attr('placeholder', 'Add a new welcome message here');
   },
 
-  initWithMessage: function (msg){
+  initWithMessage: function(msg) {
     this.ui.welcomeMessage.val(msg.text);
   },
 
@@ -71,19 +76,21 @@ var View = Marionette.ItemView.extend({
     this.update();
   },
 
-  previewWelcomeMessage: function (e){
+  previewWelcomeMessage: function(e) {
     e.preventDefault();
     this.setPreviewLoadingState();
     toggleClass(this.el, 'preview', true);
     //hide the text area
     this.ui.welcomeMessage[0].classList.add('hidden');
-    this.fetchRenderedHTML().then(function(html){
-      this.ui.welcomeMessagePreviewContainer.html(html);
-      toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
-    }.bind(this));
+    this.fetchRenderedHTML().then(
+      function(html) {
+        this.ui.welcomeMessagePreviewContainer.html(html);
+        toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', false);
+      }.bind(this)
+    );
   },
 
-  editWelcomeMessage: function (e){
+  editWelcomeMessage: function(e) {
     e.preventDefault();
     this.setPreviewLoadingState();
     toggleClass(this.el, 'preview', false);
@@ -91,40 +98,46 @@ var View = Marionette.ItemView.extend({
     this.ui.welcomeMessage[0].classList.remove('hidden');
   },
 
-  setPreviewLoadingState: function (){
+  setPreviewLoadingState: function() {
     this.ui.welcomeMessagePreviewContainer.html('Loading ...');
     toggleClass(this.ui.welcomeMessagePreviewContainer[0], 'loading', true);
   },
 
-  fetchRenderedHTML: function (){
-    return apiClient.post('/private/markdown-preview', { text: this.getWelcomeMessageContent() }, { dataType: 'text'})
+  fetchRenderedHTML: function() {
+    return apiClient
+      .post(
+        '/private/markdown-preview',
+        { text: this.getWelcomeMessageContent() },
+        { dataType: 'text' }
+      )
       .catch(this.showError.bind(this));
   },
 
-  getWelcomeMessageContent: function (){
+  getWelcomeMessageContent: function() {
     return this.ui.welcomeMessage.val();
   },
 
   formSubmit: function() {
-    var providers = (this.ui.githubOnly.is(':checked')) ? ['github'] : [];
+    var providers = this.ui.githubOnly.is(':checked') ? ['github'] : [];
     var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
-      apiClient.room.put('/meta/welcome-message', { welcomeMessage: welcomeMessageContent }),
+      apiClient.room.put('/meta/welcome-message', { welcomeMessage: welcomeMessageContent })
     ])
-    .spread(function(updatedTroupe /*, metaResponse*/){
-      context.setTroupe(updatedTroupe);
-      this.destroySettings();
-    }.bind(this))
-    .catch(this.showError.bind(this));
+      .spread(
+        function(updatedTroupe /*, metaResponse*/) {
+          context.setTroupe(updatedTroupe);
+          this.destroySettings();
+        }.bind(this)
+      )
+      .catch(this.showError.bind(this));
   },
 
-  showError: function (err){
+  showError: function(err) {
     this.ui.errorMessage[0].classList.remove('hidden');
     this.ui.welcomeMessage.attr('disabled', true);
-  },
-
+  }
 });
 
 var Modal = ModalView.extend({

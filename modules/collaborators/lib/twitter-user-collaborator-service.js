@@ -18,9 +18,15 @@ function TwitterUserCollaboratorService(user, identity) {
 
 TwitterUserCollaboratorService.prototype.findCollaborators = function() {
   var username = this.identity.username;
-  var twitterService = new TwitterService(CONSUMER_KEY, CONSUMER_SECRET, this.identity.accessToken, this.identity.accessTokenSecret);
+  var twitterService = new TwitterService(
+    CONSUMER_KEY,
+    CONSUMER_SECRET,
+    this.identity.accessToken,
+    this.identity.accessTokenSecret
+  );
 
-  return twitterService.findFollowers(username)
+  return twitterService
+    .findFollowers(username)
     .then(function(followers) {
       debug('Twitter followers', followers.length, followers);
       followers.sort(function(a, b) {

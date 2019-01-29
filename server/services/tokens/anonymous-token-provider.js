@@ -7,7 +7,7 @@ var random = require('../../utils/random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto = require('crypto');
 
-var password = config.get("tokens:anonymousPassword");
+var password = config.get('tokens:anonymousPassword');
 
 function encrypt(tokenPair) {
   var cipher = crypto.createCipher('aes128', password);
@@ -18,7 +18,7 @@ function decrypt(encrypted) {
   try {
     var decipher = crypto.createDecipher('aes128', password);
     return decipher.update(encrypted, 'base64', 'ascii') + decipher.final('ascii');
-  } catch(e) {
+  } catch (e) {
     return null;
   }
 }
@@ -26,11 +26,12 @@ module.exports = {
   getToken: function(userId, clientId, callback) {
     if (userId) return callback();
 
-    return random.generateShortToken()
+    return random
+      .generateShortToken()
       .then(function(token) {
         // Anonymous tokens start with a `$`
         var tokenPair = token.substring(0, 4) + clientId;
-        return "$" + encrypt(tokenPair);
+        return '$' + encrypt(tokenPair);
       })
       .nodeify(callback);
   },
@@ -49,7 +50,6 @@ module.exports = {
     }
 
     return callback(null, [null, clientId]);
-
   },
 
   cacheToken: function(userId, clientId, token, callback) {

@@ -16,7 +16,8 @@ function getModels() {
     });
 }
 
-indexManager.reconcileIndices(getModels())
+indexManager
+  .reconcileIndices(getModels())
   .then(function(results) {
     console.log(JSON.stringify(results, null, '  '));
     process.exit();

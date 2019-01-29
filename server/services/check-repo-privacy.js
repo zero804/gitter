@@ -1,5 +1,4 @@
-
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -15,20 +14,19 @@ var securityDescriptorUpdater = require('gitter-web-permissions/lib/security-des
 function checkRepoPrivacy(uri) {
   var repoService = new GithubRepoService();
 
-  return repoService.getRepo(uri)
-    .then(function(repo) {
-      if (repo && !repo.private) {
-        logger.info('GitHub repo is public. Updating security descriptors', {
-          uri: uri
-        });
-
-        return securityDescriptorUpdater.updatePublicFlagForRepo(uri, true);
-      }
-
-      logger.info('GitHub repo not found. It may either be private or deleting. Ignoring for now', {
+  return repoService.getRepo(uri).then(function(repo) {
+    if (repo && !repo.private) {
+      logger.info('GitHub repo is public. Updating security descriptors', {
         uri: uri
       });
+
+      return securityDescriptorUpdater.updatePublicFlagForRepo(uri, true);
+    }
+
+    logger.info('GitHub repo not found. It may either be private or deleting. Ignoring for now', {
+      uri: uri
     });
+  });
 }
 
 module.exports = checkRepoPrivacy;

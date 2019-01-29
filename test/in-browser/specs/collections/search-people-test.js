@@ -6,10 +6,9 @@ var Backbone = require('backbone');
 var SearchPeopleCollection = require('public/js/collections/search-people');
 
 describe('SearchPeopleCollection', function() {
-
   var collection;
   var model;
-  beforeEach(function(){
+  beforeEach(function() {
     model = new Backbone.Model({ searchTerm: 'test' });
     collection = new SearchPeopleCollection(null, { contextModel: model });
   });
@@ -23,5 +22,4 @@ describe('SearchPeopleCollection', function() {
     model.set('searchTerm', 'thisisatest');
     assert.equal('/v1/user', collection.url());
   });
-
 });

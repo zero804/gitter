@@ -5,18 +5,20 @@ var logger = env.logger;
 var conf = env.config;
 
 /* Uses the no-persist redis */
-var redisClient = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get("redis_nopersist"));
-var STANDARD_TTL = 10 * 60;     /* 10 minutes */
+var redisClient = env.redis.createClient(
+  process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get('redis_nopersist')
+);
+var STANDARD_TTL = 10 * 60; /* 10 minutes */
 var ANONYMOUS_TTL = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
 
-var tokenLookupCachePrefix = "token:c:";
-var tokenValidationCachePrefix = "token:t:";
+var tokenLookupCachePrefix = 'token:c:';
+var tokenValidationCachePrefix = 'token:t:';
 
 module.exports = {
   getToken: function(userId, clientId, callback) {
     if (!userId) return callback();
 
-    redisClient.get(tokenLookupCachePrefix + userId + ":" + clientId, callback);
+    redisClient.get(tokenLookupCachePrefix + userId + ':' + clientId, callback);
   },
 
   validateToken: function(token, callback) {
@@ -27,9 +29,9 @@ module.exports = {
         return callback();
       }
 
-      if(!value) return callback();
+      if (!value) return callback();
 
-      var parts = ("" + value).split(':', 2);
+      var parts = ('' + value).split(':', 2);
       var userId = parts[0] || null;
       var clientId = parts[1];
 
@@ -49,10 +51,10 @@ module.exports = {
 
     var cacheTimeout = userId ? STANDARD_TTL : ANONYMOUS_TTL;
 
-    multi.setex(tokenValidationCachePrefix + token, cacheTimeout, (userId || "") + ":" + clientId);
+    multi.setex(tokenValidationCachePrefix + token, cacheTimeout, (userId || '') + ':' + clientId);
 
-    if(userId) {
-      multi.setex(tokenLookupCachePrefix + userId + ":" + clientId, cacheTimeout, token);
+    if (userId) {
+      multi.setex(tokenLookupCachePrefix + userId + ':' + clientId, cacheTimeout, token);
     }
 
     multi.exec(callback);
@@ -73,15 +75,19 @@ module.exports = {
       // Anonymous tokens don't have this
       if (!userId) return redisClient.del(tokenValidationCachePrefix + token, callback);
 
-      return redisClient.del(tokenValidationCachePrefix + token, tokenLookupCachePrefix + userId + ":" + clientId, callback);
+      return redisClient.del(
+        tokenValidationCachePrefix + token,
+        tokenLookupCachePrefix + userId + ':' + clientId,
+        callback
+      );
     });
   },
 
   invalidateCache: function(callback) {
     redisClient.keys('token:*', function(err, results) {
-      if(err) return callback(err);
+      if (err) return callback(err);
 
-      if(!results.length) return callback();
+      if (!results.length) return callback();
 
       redisClient.del(results, callback);
     });

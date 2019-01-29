@@ -33,7 +33,7 @@ module.exports = {
   },
 
   respond: function(req, res, responseBody) {
-    switch(req.accepts(['json', 'text'])) {
+    switch (req.accepts(['json', 'text'])) {
       case 'json':
         res.send(responseBody);
         break;
@@ -42,7 +42,5 @@ module.exports = {
         res.sendStatus(200);
         break;
     }
-
   }
-
 };

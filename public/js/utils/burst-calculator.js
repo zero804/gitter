@@ -1,11 +1,9 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var Backbone = require('backbone');
 
 module.exports = (function() {
-
-
   // const - 5 minutes window to merge messages into previous burst
   var BURST_WINDOW = 5 * 60 * 1000;
 
@@ -16,7 +14,7 @@ module.exports = (function() {
    * collection   Array or Backbone.Collection - Structure in which a check is performed
    * returns      Backbone.Collection - the converted structure
    */
-  function toCollection (collection) {
+  function toCollection(collection) {
     if (_.isArray(collection)) return new Backbone.Collection(collection);
     return collection;
   }
@@ -27,7 +25,7 @@ module.exports = (function() {
    * index Number - index used to find burst start
    * @return Number - the index of burstStart found above
    */
-  function findBurstAbove (index) {
+  function findBurstAbove(index) {
     var chat = null;
     if (index === 0) return index;
     while (index--) {
@@ -43,7 +41,7 @@ module.exports = (function() {
    * index Number - index used to find burst start
    * @return Number - the index of burstStart found below
    */
-  function findBurstBelow (index) {
+  function findBurstBelow(index) {
     if (index === this.length - 1) return index;
     var chat = null;
     while (index < this.length) {
@@ -62,8 +60,8 @@ module.exports = (function() {
    * model    Backbone.Model - the model that is to be added to the collection
    * returns  void - it simply calls parse(), which mutates the collection directly
    */
-  function findSlice (model) {
-    if('burstStart' in model.attributes) return; // already calculated bursts for this batch
+  function findSlice(model) {
+    if ('burstStart' in model.attributes) return; // already calculated bursts for this batch
     var index = this.indexOf(model);
     var start = findBurstAbove.call(this, index);
     var end = findBurstBelow.call(this, index);
@@ -78,12 +76,11 @@ module.exports = (function() {
    *
    * returns  void - it mutates the object directly
    */
-  function calculateBurst (chat, state) {
-
+  function calculateBurst(chat, state) {
     var fromUser = chat.get('fromUser');
     var sent = chat.get('sent');
     var user = fromUser && fromUser.username;
-    var time = sent && new Date(sent).valueOf() || Date.now();
+    var time = (sent && new Date(sent).valueOf()) || Date.now();
 
     if (chat.get('status')) {
       state.burstStart = true;
@@ -100,7 +97,7 @@ module.exports = (function() {
       return;
     }
 
-    var outsideBurstWindow = ((time - state.time) > BURST_WINDOW);
+    var outsideBurstWindow = time - state.time > BURST_WINDOW;
 
     if (state.prevIsStatus || user !== state.user || outsideBurstWindow) {
       state.burstStart = true;
@@ -125,13 +122,13 @@ module.exports = (function() {
    *
    * returns Object - the mutated collection (Backbone.Collection.toJSON())
    */
-  function parse (collection_, start, end) {
+  function parse(collection_, start, end) {
     var collection = toCollection(collection_);
 
     // pre-run checks
     if (!collection) return;
-    start = (typeof start !== 'undefined') ? start : 0; // start defaults at index 0
-    end = (typeof end !== 'undefined') ? end : collection.length - 1; // end defaults at index n
+    start = typeof start !== 'undefined' ? start : 0; // start defaults at index 0
+    end = typeof end !== 'undefined' ? end : collection.length - 1; // end defaults at index n
 
     var state = {
       user: null,
@@ -141,20 +138,18 @@ module.exports = (function() {
       time: null
     };
 
-    collection
-      .slice(start, end + 1)
-      .forEach(function (chat, index) {
-        // IMPORTANT: index is modified, to cater for the use of `slice()`
-        index = index + start;
+    collection.slice(start, end + 1).forEach(function(chat, index) {
+      // IMPORTANT: index is modified, to cater for the use of `slice()`
+      index = index + start;
 
-        if (index > 0) state.prevIsStatus = collection.at(index - 1).get('status');
-        calculateBurst(chat, state);
+      if (index > 0) state.prevIsStatus = collection.at(index - 1).get('status');
+      calculateBurst(chat, state);
 
-        chat.set('burstStart', state.burstStart);
-        // chat.set('burstFinal', false);
+      chat.set('burstStart', state.burstStart);
+      // chat.set('burstFinal', false);
 
-        if (index > 0) collection.at(index - 1).set('burstFinal', state.prevFinal);
-      });
+      if (index > 0) collection.at(index - 1).set('burstFinal', state.prevFinal);
+    });
 
     return collection.toJSON();
   }
@@ -164,5 +159,4 @@ module.exports = (function() {
     calc: findSlice,
     parse: parse
   };
-
 })();

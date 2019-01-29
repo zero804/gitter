@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
@@ -16,4 +16,3 @@ GitHubUserService.prototype.getUser = function(user) {
 module.exports = wrap(GitHubUserService, function() {
   return [this.accessToken || ''];
 });
-

@@ -1,6 +1,6 @@
 'use strict';
 
-function generateNewChatNotifications(notificationType, notificationDetails/*, device*/) {
+function generateNewChatNotifications(notificationType, notificationDetails /*, device*/) {
   var room = notificationDetails.room;
   var chats = notificationDetails.chats;
 
@@ -23,7 +23,7 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
           username: chat.fromUser.username,
           displayName: chat.fromUser.displayName,
           avatarUrl: chat.fromUser.avatarUrl
-        }
+        };
       }
       return {
         id: chat.id,
@@ -32,15 +32,14 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
         fromUser: fromUser
       };
     })
-  }
+  };
 }
 
 function generateNotifications(notificationType, notificationDetails, device) {
-  switch(notificationType) {
+  switch (notificationType) {
     case 'new_chat':
       return generateNewChatNotifications(notificationType, notificationDetails, device);
   }
-
 }
 
 module.exports = generateNotifications;

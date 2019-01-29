@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -12,7 +12,7 @@ var checkRepoPrivacy = require('../../services/check-repo-privacy');
 var StatusError = require('statuserror');
 
 const WEBHOOKS_SECRET = config.get('webhooks:secret');
-if(!WEBHOOKS_SECRET) {
+if (!WEBHOOKS_SECRET) {
   winston.error('No webhooks secret provided');
 }
 
@@ -23,14 +23,13 @@ function checkRepo(meta) {
   var event = meta.event;
   var repo = meta.repo;
 
-  if(service === 'github' && event === 'public' && repo) {
+  if (service === 'github' && event === 'public' && repo) {
     stats.event('webhook.github.public');
 
     /* Do this asynchronously */
-    checkRepoPrivacy(repo)
-      .catch(function(err) {
-        winston.error('Repo privacy check failed: ' + err, { exception: err });
-      });
+    checkRepoPrivacy(repo).catch(function(err) {
+      winston.error('Repo privacy check failed: ' + err, { exception: err });
+    });
   }
 }
 
@@ -38,14 +37,14 @@ function decipherHash(hash) {
   try {
     var decipher = crypto.createDecipher('aes256', WEBHOOKS_SECRET);
     return decipher.update(hash, 'hex', 'utf8') + decipher.final('utf8');
-  } catch(err) {
+  } catch (err) {
     /* */
   }
 }
 
 module.exports = function(req, res, next) {
   var troupeId = decipherHash(req.params.hash);
-  if(!troupeId) {
+  if (!troupeId) {
     stats.event('webhook.invalid.hash');
     return next(new StatusError(400, 'Invalid Troupe hash'));
   }
@@ -54,13 +53,14 @@ module.exports = function(req, res, next) {
   var meta = req.body.meta;
   var payload = req.body.payload;
 
-  if(meta) {
+  if (meta) {
     checkRepo(meta);
   }
 
-  return troupeService.findById(troupeId)
+  return troupeService
+    .findById(troupeId)
     .then(function(troupe) {
-      if(!troupe) return new StatusError(404);
+      if (!troupe) return new StatusError(404);
 
       return eventService.newEventToTroupe(troupe, null, message, meta, payload);
     })

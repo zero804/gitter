@@ -15,8 +15,7 @@ function GhUserPolicyDelegate(userId, userLoader, securityDescriptor) {
 
 GhUserPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
-
-    switch(policyName) {
+    switch (policyName) {
       case 'GH_USER_SAME':
         return this._usernameMatchesUri();
 
@@ -43,18 +42,16 @@ GhUserPolicyDelegate.prototype = {
     var linkPath = this._securityDescriptor.linkPath;
     if (!linkPath) return false;
 
-    return this._userLoader()
-      .then(function(user) {
-        if (!user) return false;
-        if (!isGitHubUser(user)) return false;
+    return this._userLoader().then(function(user) {
+      if (!user) return false;
+      if (!isGitHubUser(user)) return false;
 
-        var currentUserName = user.username;
-        if (!currentUserName) return false;
+      var currentUserName = user.username;
+      if (!currentUserName) return false;
 
-        return currentUserName.toLowerCase() === linkPath.toLowerCase();
-      });
+      return currentUserName.toLowerCase() === linkPath.toLowerCase();
+    });
   }
-
 };
 
 module.exports = GhUserPolicyDelegate;

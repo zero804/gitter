@@ -6,14 +6,17 @@ var assert = require('assert');
 describe('social', function() {
   it('generates a twitter share url', function() {
     var url = social.generateTwitterShareUrl('owner/room');
-    assert.equal(url, 'https://twitter.com/share?text=Join%20the%20chat%20room%20on%20Gitter%20for%20owner%2Froom%3A&url=https://gitter.im/owner/room&related=gitchat&via=gitchat');
+    assert.equal(
+      url,
+      'https://twitter.com/share?text=Join%20the%20chat%20room%20on%20Gitter%20for%20owner%2Froom%3A&url=https://gitter.im/owner/room&related=gitchat&via=gitchat'
+    );
   });
 
   it('throws if it cant generate a twitter share url', function() {
     var expected;
     try {
       social.generateTwitterShareUrl();
-    } catch(e) {
+    } catch (e) {
       expected = e;
     }
 
@@ -29,7 +32,7 @@ describe('social', function() {
     var expected;
     try {
       social.generateFacebookShareUrl();
-    } catch(e) {
+    } catch (e) {
       expected = e;
     }
 
@@ -38,14 +41,17 @@ describe('social', function() {
 
   it('generates a linkedin share url', function() {
     var url = social.generateLinkedinShareUrl('owner/room');
-    assert.equal(url, 'https://www.linkedin.com/shareArticle?mini=true&url=https://gitter.im/owner/room&title=owner%2Froom%20on%20Gitter&summary=Join%20the%20chat%20room%20on%20Gitter%20for%20owner%2Froom&source=Gitter');
+    assert.equal(
+      url,
+      'https://www.linkedin.com/shareArticle?mini=true&url=https://gitter.im/owner/room&title=owner%2Froom%20on%20Gitter&summary=Join%20the%20chat%20room%20on%20Gitter%20for%20owner%2Froom&source=Gitter'
+    );
   });
 
   it('throws if it cant generate a linkedin share url', function() {
     var expected;
     try {
       social.generateLinkedinShareUrl();
-    } catch(e) {
+    } catch (e) {
       expected = e;
     }
 
@@ -61,7 +67,7 @@ describe('social', function() {
     var expected;
     try {
       social.generateGooglePlusShareUrl();
-    } catch(e) {
+    } catch (e) {
       expected = e;
     }
 

@@ -8,5 +8,4 @@ var stepConstants = {
   OVERVIEW: 'overview'
 };
 
-
 module.exports = stepConstants;

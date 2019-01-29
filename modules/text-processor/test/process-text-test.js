@@ -9,7 +9,7 @@ describe('process-text', function() {
     ['I love cats', 'I love cats'],
     ['', ''],
     [' ', ''],
-    [{foo: 'bar'}, '[object Object]'],
+    [{ foo: 'bar' }, '[object Object]'],
     [[], ''],
     [100, '100'],
     [undefined, ''],
@@ -23,13 +23,9 @@ describe('process-text', function() {
     var name = 'should convert';
 
     it(name + ' ' + key, function() {
-      return processText(key)
-        .then(function(parsed) {
-          assert.strictEqual(parsed.html, result);
-        });
+      return processText(key).then(function(parsed) {
+        assert.strictEqual(parsed.html, result);
+      });
     });
-  })
-
+  });
 });
-
-

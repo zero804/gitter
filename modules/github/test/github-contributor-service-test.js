@@ -1,8 +1,8 @@
 /*global describe:true, it:true */
-"use strict";
+'use strict';
 
 var _ = require('underscore');
-var assert = require("assert");
+var assert = require('assert');
 var GithubContibutorService = require('..').GitHubContributorService;
 
 describe('github-contributor-service #slow #github', function() {
@@ -11,12 +11,12 @@ describe('github-contributor-service #slow #github', function() {
 
     gh.getContributors('faye/faye')
       .then(function(contributors) {
-        assert(_.find(contributors, function(c) { return c.login === 'jcoglan'; }));
+        assert(
+          _.find(contributors, function(c) {
+            return c.login === 'jcoglan';
+          })
+        );
       })
       .nodeify(done);
   });
-
-
-
-
 });

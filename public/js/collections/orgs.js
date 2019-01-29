@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
@@ -21,6 +21,6 @@ var OrgCollection = LiveCollection.extend({
 });
 
 module.exports = {
-  OrgCollection:    OrgCollection,
-  OrgModel:         OrgModel
+  OrgCollection: OrgCollection,
+  OrgModel: OrgModel
 };

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var Backbone = require('backbone');
@@ -62,4 +62,4 @@ module.exports = {
   getEyeballs: getEyeballs,
   forceActivity: forceActivity,
   events: events
-}
+};

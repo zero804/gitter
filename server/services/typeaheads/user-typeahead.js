@@ -12,43 +12,41 @@ module.exports.query = function(text, options) {
   var roomId = (options || {}).roomId;
 
   if (roomId) {
-    return troupeService.findById(roomId)
-      .then(function(room) {
-        if (room.oneToOne) {
-          return oneToOneTypeahead.query(text, room);
-        } else {
-          // elastic typeahead doesnt know about oneToOnes
-          return alphaFallbackTypeahead(text, { roomId: roomId });
-        }
-      });
+    return troupeService.findById(roomId).then(function(room) {
+      if (room.oneToOne) {
+        return oneToOneTypeahead.query(text, room);
+      } else {
+        // elastic typeahead doesnt know about oneToOnes
+        return alphaFallbackTypeahead(text, { roomId: roomId });
+      }
+    });
   } else {
     return alphaFallbackTypeahead(text);
   }
-}
+};
 
 // while we are using elasticsearch 5 alphas, we better have a fallback
 function alphaFallbackTypeahead(text, options) {
-  return elasticTypeahead.query(text, options)
-    .catch(function(err) {
-      logger.error('typeahead alpha experienced an error, falling back to old typeahead', { error: err.message });
-      errorReporter(err, {text: text, options: options}, { module: 'user-typeahead' });
+  return elasticTypeahead.query(text, options).catch(function(err) {
+    logger.error('typeahead alpha experienced an error, falling back to old typeahead', {
+      error: err.message
+    });
+    errorReporter(err, { text: text, options: options }, { module: 'user-typeahead' });
 
-      return oldTypeahead(text, options);
-    })
+    return oldTypeahead(text, options);
+  });
 }
 
 function oldTypeahead(text, options) {
   var roomId = (options || {}).roomId || '*';
 
   if (roomId) {
-    return userSearchService.searchForUsersInRoom(text, roomId)
-      .then(function(res) {
-        return res.results;
-      });
+    return userSearchService.searchForUsersInRoom(text, roomId).then(function(res) {
+      return res.results;
+    });
   } else {
-    return userSearchService.globalUserSearch(text)
-      .then(function(res) {
-        return res.results;
-      });
+    return userSearchService.globalUserSearch(text).then(function(res) {
+      return res.results;
+    });
   }
 }

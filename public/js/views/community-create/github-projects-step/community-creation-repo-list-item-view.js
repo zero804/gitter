@@ -16,7 +16,7 @@ var CommunityCreationRepoListItemView = Marionette.ItemView.extend({
   className: 'community-create-repo-list-item',
 
   triggers: {
-    'click': 'item:activated'
+    click: 'item:activated'
   },
 
   modelEvents: {
@@ -38,7 +38,7 @@ var CommunityCreationRepoListItemView = Marionette.ItemView.extend({
   },
   onActiveChange: function() {
     toggleClass(this.$el[0], 'active', this.model.get('active'));
-  },
+  }
 });
 
 module.exports = CommunityCreationRepoListItemView;

@@ -10,9 +10,9 @@ function memoizePromise(name, fn) {
   return function memoizedPromise() {
     if (this[promiseName]) return this[promiseName];
 
-    var promise = this[promiseName] = Promise.resolve(fn.call(this));
+    var promise = (this[promiseName] = Promise.resolve(fn.call(this)));
     return promise;
-  }
+  };
 }
 
 function unmemoize(self, name) {

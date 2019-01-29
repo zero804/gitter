@@ -15,7 +15,7 @@ module.exports = {
             _retry_on_conflict: update._retry_on_conflict
           }
         });
-        body.push(update.body)
+        body.push(update.body);
         return body;
       }, [])
     };
@@ -35,7 +35,7 @@ module.exports = {
       if (item.update.error) {
         errors.push({
           path: req.body[index * 2],
-          body: req.body[(index * 2) + 1],
+          body: req.body[index * 2 + 1],
           resp: item
         });
       }
@@ -43,6 +43,8 @@ module.exports = {
 
     if (!errors.length) return;
 
-    return new Error('elastic bulk upload failed for some. failures: ' + JSON.stringify(errors, null, 2))
+    return new Error(
+      'elastic bulk upload failed for some. failures: ' + JSON.stringify(errors, null, 2)
+    );
   }
 };

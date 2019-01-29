@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -13,7 +13,6 @@ var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var session = require('express-session');
 var appTag = require('./app-tag');
-
 
 /**
  * Only serve static assets in dev mode,
@@ -42,14 +41,13 @@ function getSessionStore() {
       logger.error('connect-redis reported a redis error: ' + err, { exception: err });
     }
   });
-
 }
 
 function configureLocals(app) {
   var locals = app.locals;
 
-  locals.googleTrackingId = config.get("stats:ga:key");
-  locals.googleTrackingDomain = config.get("stats:ga:domain");
+  locals.googleTrackingId = config.get('stats:ga:key');
+  locals.googleTrackingDomain = config.get('stats:ga:domain');
   locals.liveReload = config.get('web:liveReload');
   locals.stagingText = appTag.text;
   locals.stagingLink = appTag.link;
@@ -59,9 +57,7 @@ function configureLocals(app) {
   locals.headlineGitterGroups = config.get('headlineNumbers:gitterGroups');
   locals.headlineGitterCountries = config.get('headlineNumbers:gitterCountries');
 
-  locals.dnsPrefetch = (config.get('cdn:hosts') || []).concat([
-    config.get('ws:hostname')
-  ]);
+  locals.dnsPrefetch = (config.get('cdn:hosts') || []).concat([config.get('ws:hostname')]);
 }
 
 module.exports = {
@@ -73,25 +69,28 @@ module.exports = {
 
     configureLocals(app);
 
-    app.engine('hbs', expressHbs.express3({
-      partialsDir: resolveStatic('/templates/partials'),
-      onCompile: function(exhbs, source) {
-         return exhbs.handlebars.compile(source, {preventIndent: true});
-      },
-      layoutsDir: resolveStatic('/layouts'),
-      contentHelperName: 'content'
-    }));
+    app.engine(
+      'hbs',
+      expressHbs.express3({
+        partialsDir: resolveStatic('/templates/partials'),
+        onCompile: function(exhbs, source) {
+          return exhbs.handlebars.compile(source, { preventIndent: true });
+        },
+        layoutsDir: resolveStatic('/layouts'),
+        contentHelperName: 'content'
+      })
+    );
 
     app.disable('x-powered-by');
     app.set('view engine', 'hbs');
     app.set('views', resolveStatic('/templates'));
     app.set('trust proxy', true);
 
-    if(config.get('express:viewCache')) {
+    if (config.get('express:viewCache')) {
       app.enable('view cache');
     }
 
-    if(shouldServeStaticAssets()) {
+    if (shouldServeStaticAssets()) {
       /* Serve static content */
       require('./express-static').install(app);
     }
@@ -106,24 +105,25 @@ module.exports = {
     app.use(require('./middlewares/ie6-post-caching'));
     app.use(require('./middlewares/i18n'));
 
-    app.use(session({
-      secret: config.get('web:sessionSecret'),
-      key: config.get('web:cookiePrefix') + 'session',
-      store: getSessionStore(),
-      cookie: {
-        path: '/',
-        httpOnly: true,
-        maxAge: 14400000,
-        domain: config.get("web:cookieDomain"),
-        secure: config.get("web:secureCookies")
-      },
-      resave: true,
-      saveUninitialized: true // Passport will force a save anyway
-    }));
+    app.use(
+      session({
+        secret: config.get('web:sessionSecret'),
+        key: config.get('web:cookiePrefix') + 'session',
+        store: getSessionStore(),
+        cookie: {
+          path: '/',
+          httpOnly: true,
+          maxAge: 14400000,
+          domain: config.get('web:cookieDomain'),
+          secure: config.get('web:secureCookies')
+        },
+        resave: true,
+        saveUninitialized: true // Passport will force a save anyway
+      })
+    );
 
     app.use(passport.initialize());
     app.use(passport.session());
-
 
     app.use(require('./middlewares/authenticate-bearer'));
     app.use(rememberMe.rememberMeMiddleware);

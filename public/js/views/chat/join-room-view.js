@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/join-room-view.hbs');
@@ -26,17 +26,15 @@ var JoinRoomView = Marionette.ItemView.extend({
   },
 
   joinRoom: function(e) {
-
     var isEmbedded = false;
     var roomPostOptions = {
       id: context.getTroupeId()
     };
 
-    if(frameUtils.hasParentFrameSameOrigin()) {
+    if (frameUtils.hasParentFrameSameOrigin()) {
       var parsed = urlParse(window.parent.location.href, true);
       roomPostOptions.source = parsed.query.source;
-    }
-    else {
+    } else {
       isEmbedded = true;
       roomPostOptions.source = '~embed';
     }
@@ -44,7 +42,7 @@ var JoinRoomView = Marionette.ItemView.extend({
     //If the room has a welcome message
     //and we aren't in an embedded frame
     //get outta here and let the browser do its thing
-    if(context.roomHasWelcomeMessage() && !isEmbedded) {
+    if (context.roomHasWelcomeMessage() && !isEmbedded) {
       return;
     }
 
@@ -54,11 +52,9 @@ var JoinRoomView = Marionette.ItemView.extend({
       e.stopImmediatePropagation();
     }
 
-    return apiClient.user
-      .post('/rooms', roomPostOptions)
-      .then(function(body) {
-        context.setTroupe(body);
-      });
+    return apiClient.user.post('/rooms', roomPostOptions).then(function(body) {
+      context.setTroupe(body);
+    });
   },
 
   serializeData: function() {
@@ -66,10 +62,9 @@ var JoinRoomView = Marionette.ItemView.extend({
     var troupeProviders = context.troupe().get('providers');
     return {
       allowJoin: userCanJoinRoom(userProviders, troupeProviders),
-      disallowJoinReason: makeRoomProviderSentence(troupeProviders),
-    }
+      disallowJoinReason: makeRoomProviderSentence(troupeProviders)
+    };
   }
-
 });
 
 module.exports = JoinRoomView;

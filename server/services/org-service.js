@@ -5,7 +5,7 @@ var securityDescriptorFinder = require('gitter-web-permissions/lib/security-desc
 
 function getOrgsForUser(user) {
   var backendMuxer = new BackendMuxer(user);
-  return backendMuxer.findOrgs()
+  return backendMuxer.findOrgs();
 }
 
 function getUnusedOrgsForUser(user) {

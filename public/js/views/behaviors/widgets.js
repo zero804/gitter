@@ -6,7 +6,6 @@ var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var unsafeParseHtml = require('../../utils/unsafe-parse-html');
 
-
 var cachedWidgets = {};
 
 function register(widgets) {
@@ -36,27 +35,30 @@ WidgetManager.prototype.destroy = function() {
 function render(template, data, view) {
   if (!template) {
     var pseudoSelectorString = '';
-    if(view) {
+    if (view) {
       pseudoSelectorString += view.childViewContainer;
-      if(view.$el.length > 0) {
+      if (view.$el.length > 0) {
         var viewEl = view.$el[0];
-        if(viewEl.id) {
+        if (viewEl.id) {
           pseudoSelectorString += '#' + viewEl.id;
         }
-        if(viewEl.classList.length > 0) {
+        if (viewEl.classList.length > 0) {
           pseudoSelectorString += '.' + Array.prototype.join(viewEl.classList, '.');
         }
       }
     }
 
-    throw new Error('Cannot render the template since it\'s false, null or undefined. For context, we tried to render into this element: ' + pseudoSelectorString);
+    throw new Error(
+      "Cannot render the template since it's false, null or undefined. For context, we tried to render into this element: " +
+        pseudoSelectorString
+    );
   }
 
   var templateFunc;
-  if (typeof template === 'function'){
-   templateFunc = template;
+  if (typeof template === 'function') {
+    templateFunc = template;
   } else {
-   templateFunc = Marionette.TemplateCache.get(template);
+    templateFunc = Marionette.TemplateCache.get(template);
   }
 
   var generatedText = templateFunc(data);
@@ -64,7 +66,7 @@ function render(template, data, view) {
   var prerenderedViews = data.prerenderedViews;
 
   // No widgets? Just return the text
-  if(!prerenderedViews) return generatedText;
+  if (!prerenderedViews) return generatedText;
 
   var dom = unsafeParseHtml(generatedText);
   var widgetManager = view.widgetManager;
@@ -72,7 +74,7 @@ function render(template, data, view) {
   var widgetsRendered = dom.querySelectorAll('.widget');
   var widgetsRenderedLen = widgetsRendered.length;
 
-  if(widgetsRenderedLen && !widgetManager) {
+  if (widgetsRenderedLen && !widgetManager) {
     // Create a region manager if one doesn't already exist
     widgetManager = new WidgetManager();
     view.widgetManager = widgetManager;
@@ -109,9 +111,8 @@ function getPrerendered(widgetName, model, id) {
 }
 
 var Behavior = Marionette.Behavior.extend({
-
   initialize: function() {
-    if(this.view.templateHelpers) throw new Error('Cannot use templateHelpers with Widgets');
+    if (this.view.templateHelpers) throw new Error('Cannot use templateHelpers with Widgets');
     this.view.templateHelpers = function() {
       // TODO: add global template helpers
       return {
@@ -121,7 +122,7 @@ var Behavior = Marionette.Behavior.extend({
     };
   },
   onDestroy: function() {
-    if(this.view.widgetManager) {
+    if (this.view.widgetManager) {
       this.view.widgetManager.destroy();
       this.view.widgetManager = null;
     }
@@ -134,7 +135,6 @@ Marionette.Renderer = {
 };
 
 behaviourLookup.register('Widgets', Behavior);
-
 
 module.exports = {
   register: register,

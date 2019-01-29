@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
@@ -37,27 +37,26 @@ require('../behaviors/timeago');
 require('../behaviors/tooltip');
 
 module.exports = (function() {
-
   var serviceTemplates = {
-    bitbucket:  bitbucketTemplate,
-    huboard:    huboardTemplate,
-    jenkins:    jenkinsTemplate,
-    travis:     travisTemplate,
-    sprintly:   sprintlyTemplate,
-    trello:     trelloTemplate
+    bitbucket: bitbucketTemplate,
+    huboard: huboardTemplate,
+    jenkins: jenkinsTemplate,
+    travis: travisTemplate,
+    sprintly: sprintlyTemplate,
+    trello: trelloTemplate
   };
 
   var githubTemplates = {
-    push:           githubPushTemplate,
-    issues:         githubIssuesTemplate,
-    issue_comment:  githubIssueCommentTemplate,
+    push: githubPushTemplate,
+    issues: githubIssuesTemplate,
+    issue_comment: githubIssueCommentTemplate,
     commit_comment: githubCommitCommentTemplate,
-    pull_request:   githubPullRequestTemplate,
-    gollum:         githubGollumTemplate,
-    fork:           githubForkTemplate,
-    member:         githubMemberTemplate,
-    public:         githubPublicTemplate,
-    watch:          githubWatchTemplate
+    pull_request: githubPullRequestTemplate,
+    gollum: githubGollumTemplate,
+    fork: githubForkTemplate,
+    member: githubMemberTemplate,
+    public: githubPublicTemplate,
+    watch: githubWatchTemplate
   };
 
   function getTemplateForModel(model) {
@@ -69,7 +68,7 @@ module.exports = (function() {
       return githubTemplates[event];
     }
 
-    if(meta.prerendered) {
+    if (meta.prerendered) {
       return prerenderedTemplate;
     }
 
@@ -98,7 +97,7 @@ module.exports = (function() {
         '#time': {
           titleFn: 'getTimeTooltip',
           placement: 'left'
-        },
+        }
       }
     },
 
@@ -128,7 +127,12 @@ module.exports = (function() {
       } catch (e) {
         var modelData = this.model && this.model.attributes;
         appEvents.trigger('bugreport', e, { extra: modelData });
-        debug('Err rendering activity item: error=%s, stack=%s, data=%j', e.message, e.stack, modelData);
+        debug(
+          'Err rendering activity item: error=%s, stack=%s, data=%j',
+          e.message,
+          e.stack,
+          modelData
+        );
         return {};
       }
     },
@@ -168,13 +172,13 @@ module.exports = (function() {
     childView: ActivityItemView,
     collectionEvents: {
       'add reset sync reset loaded loading': '_showHideHeader',
-      'reset': 'onCollectionReset',
+      reset: 'onCollectionReset'
     },
     childViewOptions: function(item) {
-      if(item && item.id) {
+      if (item && item.id) {
         // This allows the chat collection view to bind to an existing element...
         var e = this.$el.find('.model-id-' + item.id)[0];
-        if(e) return { el: e };
+        if (e) return { el: e };
       }
     },
     getEmptyView: function() {
@@ -203,15 +207,13 @@ module.exports = (function() {
       // so that they get to
       var viewReloading = this.collection.length === 0 && this.collection.loading;
       this.$el.toggleClass('loading', viewReloading);
-      var headerVisible = !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
+      var headerVisible =
+        !context.inOneToOneTroupeContext() && !!(context.isTroupeAdmin() || this.collection.length);
       this.ui.header.toggle(headerVisible);
     },
 
-    _renderTemplate: compositeViewRenderTemplate,
-
+    _renderTemplate: compositeViewRenderTemplate
   });
 
-
   return ActivityView;
-
 })();

@@ -11,8 +11,7 @@ var chokidar = require('chokidar');
 
 var lessDependencyMapUtils = require('./lib/less-dependency-map-utils');
 
-
-var transformPathsToAbsolute = function(paths, /*option*/basePath) {
+var transformPathsToAbsolute = function(paths, /*option*/ basePath) {
   paths = [].concat(paths);
   basePath = basePath || process.cwd();
   return paths.map(function(entryPoint) {
@@ -25,7 +24,6 @@ var transformEntryPointToDestFile = function(entryPoint, dest) {
   return transformPathsToAbsolute(path.join(dest, fileName))[0];
 };
 
-
 var getLastModifiedTime = function(targetFile) {
   return stat(targetFile)
     .catch(function() {
@@ -37,7 +35,6 @@ var getLastModifiedTime = function(targetFile) {
       return targetStats.mtime;
     });
 };
-
 
 var defaults = {
   lessOptions: {},
@@ -53,32 +50,34 @@ var LessWatcher = function(entryPoints, options) {
   this.watchHandle = null;
 };
 
-
 LessWatcher.prototype.generateDepMap = function() {
   var depMap = {};
   var absoluteEntryPoints = transformPathsToAbsolute(this.entryPoints);
   var lessOptions = this.opts.lessOptions;
 
-  var depMapGeneratedPromise = Promise.all(absoluteEntryPoints.map(function(entryPoint) {
-    return lessDependencyMapUtils.generateLessDependencyMap(entryPoint, lessOptions)
-      .then(function(partialDepMap) {
-        depMap = lessDependencyMapUtils.extendDepMaps(depMap, partialDepMap);
-      });
-  }));
+  var depMapGeneratedPromise = Promise.all(
+    absoluteEntryPoints.map(function(entryPoint) {
+      return lessDependencyMapUtils
+        .generateLessDependencyMap(entryPoint, lessOptions)
+        .then(function(partialDepMap) {
+          depMap = lessDependencyMapUtils.extendDepMaps(depMap, partialDepMap);
+        });
+    })
+  );
 
-  return depMapGeneratedPromise
-    .then(function() {
-      return depMap;
-    });
+  return depMapGeneratedPromise.then(function() {
+    return depMap;
+  });
 };
 
 LessWatcher.prototype.getDepMap = function() {
-  return this.depMap ?
-    Promise.resolve(this.depMap) :
-    this.generateDepMap()
-      .tap(function(depMap) {
-        this.depMap = depMap;
-      }.bind(this));
+  return this.depMap
+    ? Promise.resolve(this.depMap)
+    : this.generateDepMap().tap(
+        function(depMap) {
+          this.depMap = depMap;
+        }.bind(this)
+      );
 };
 
 LessWatcher.prototype.getDirtyEntryPoints = function() {
@@ -93,40 +92,38 @@ LessWatcher.prototype.getDirtyEntryPoints = function() {
       var filesToCheck = Object.keys(depMap).concat(absoluteEntryPoints);
 
       return Promise.map(filesToCheck, function(needleFile) {
-        return getLastModifiedTime(needleFile)
-          .then(function(needleMTime) {
-            var affectedEntryPoints = lessDependencyMapUtils.getEntryPointsAffectedByFile(
-              depMap,
-              absoluteEntryPoints,
-              needleFile
-            );
+        return getLastModifiedTime(needleFile).then(function(needleMTime) {
+          var affectedEntryPoints = lessDependencyMapUtils.getEntryPointsAffectedByFile(
+            depMap,
+            absoluteEntryPoints,
+            needleFile
+          );
 
-            return Promise.each(affectedEntryPoints, function(entryPoint) {
-              var destFile = transformEntryPointToDestFile(entryPoint, opts.dest);
+          return Promise.each(affectedEntryPoints, function(entryPoint) {
+            var destFile = transformEntryPointToDestFile(entryPoint, opts.dest);
 
-              // Compare the entry(root) compiled file time to the needle(child) file time
-              return getLastModifiedTime(destFile)
-                .then(function(destMTime) {
-                  var destTime = new Date(destMTime).getTime();
-                  var needleTime = new Date(needleMTime).getTime();
+            // Compare the entry(root) compiled file time to the needle(child) file time
+            return getLastModifiedTime(destFile).then(function(destMTime) {
+              var destTime = new Date(destMTime).getTime();
+              var needleTime = new Date(needleMTime).getTime();
 
-                  if (destTime < needleTime) {
-                    dirtyEntryMap[entryPoint] = true;
-                  }
-                });
+              if (destTime < needleTime) {
+                dirtyEntryMap[entryPoint] = true;
+              }
             });
           });
+        });
       });
     })
     .then(function() {
       return Object.keys(dirtyEntryMap);
     });
-}
+};
 
-LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
+LessWatcher.prototype.startWatching = function(/*optional*/ newWatchGlob) {
   console.log('Starting to watch Less');
 
-  if(newWatchGlob) {
+  if (newWatchGlob) {
     this.opts.watchGlob = newWatchGlob;
   }
 
@@ -144,7 +141,7 @@ LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
     })
     .then(function(depMap) {
       this.watchHandle = chokidar.watch(opts.watchGlob).on('all', function(e, needleFile) {
-        if(e === 'change') {
+        if (e === 'change') {
           console.log(e, needleFile);
           var needlePath = path.resolve(process.cwd(), needleFile);
           var absoluteEntryPoints = transformPathsToAbsolute(entryPoints);
@@ -161,19 +158,20 @@ LessWatcher.prototype.startWatching = function(/*optional*/newWatchGlob) {
         }
       });
     });
-
 };
 
 LessWatcher.prototype.stopWatching = function() {
-  if(this.watchHandle) {
+  if (this.watchHandle) {
     this.watchHandle.close();
   }
 };
 
-
 // A nice wrapper so we don't have to use `new` in client code
 module.exports = function() {
-  var watcher = new (Function.prototype.bind.apply(LessWatcher, [null].concat(Array.prototype.slice.call(arguments))));
+  var watcher = new (Function.prototype.bind.apply(
+    LessWatcher,
+    [null].concat(Array.prototype.slice.call(arguments))
+  ))();
 
   return watcher;
 };

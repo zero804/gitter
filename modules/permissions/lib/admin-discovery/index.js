@@ -16,7 +16,7 @@ function singleOrInManyQuery(item) {
 }
 
 function descriptorSearchAsQuery(descriptorSearch) {
-  var disjunction = []
+  var disjunction = [];
   var query = {
     $or: disjunction
   };
@@ -35,7 +35,7 @@ function descriptorSearchAsQuery(descriptorSearch) {
     });
   }
 
-  assert(disjunction.length >= 1, 'At least one disjunction should have been provided')
+  assert(disjunction.length >= 1, 'At least one disjunction should have been provided');
 
   return query;
 }
@@ -45,15 +45,14 @@ function descriptorSearchAsQuery(descriptorSearch) {
  * is a GitHub org admin
  */
 function findModelsForOrgAdmin(Model, user) {
-  return githubOrgAdminDiscovery(user)
-    .then(function(descriptorSearch) {
-      if (!descriptorSearch) return;
+  return githubOrgAdminDiscovery(user).then(function(descriptorSearch) {
+    if (!descriptorSearch) return;
 
-      var query = descriptorSearchAsQuery(descriptorSearch)
-      return Model.find(query)
-        .lean()
-        .exec();
-    });
+    var query = descriptorSearchAsQuery(descriptorSearch);
+    return Model.find(query)
+      .lean()
+      .exec();
+  });
 }
 
 /**
@@ -76,10 +75,11 @@ function discoverAdminGroups(user) {
     adminGroupFinder.findAdminGroupsOfTypeForUserId('GH_REPO', userId),
     findModelsForExtraAdmin(Group, userId),
     function(orgModels, repoModels, extraAdminModels) {
-      return mongoUtils.unionModelsById([orgModels, repoModels, extraAdminModels])
-    });
+      return mongoUtils.unionModelsById([orgModels, repoModels, extraAdminModels]);
+    }
+  );
 }
 
 module.exports = {
   discoverAdminGroups: Promise.method(discoverAdminGroups)
-}
+};

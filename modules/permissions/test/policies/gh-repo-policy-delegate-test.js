@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var proxyquireNoCallThru = require('proxyquire').noCallThru();
 
 describe('gh-repo-policy-delegate', function() {
-
   var REPO1_PUSH_USER = { _id: '1', username: 'x', githubToken: '1' };
   var NOT_REPO1_PUSH_USER = { _id: '2', username: 'y', githubToken: '2' };
   var NO_ACCESS_REPO1_USER = { _id: '3', username: 'y', githubToken: '3' };
@@ -14,22 +13,90 @@ describe('gh-repo-policy-delegate', function() {
   var REPO2 = 'repo2';
 
   var FIXTURES = [
-    { name: 'is repo push member, for repo access ', repo: REPO1, user: REPO1_PUSH_USER, policy: 'GH_REPO_ACCESS', expectedResult: true },
-    { name: 'is repo push member, for push access ', repo: REPO1, user: REPO1_PUSH_USER, policy: 'GH_REPO_PUSH', expectedResult: true },
+    {
+      name: 'is repo push member, for repo access ',
+      repo: REPO1,
+      user: REPO1_PUSH_USER,
+      policy: 'GH_REPO_ACCESS',
+      expectedResult: true
+    },
+    {
+      name: 'is repo push member, for push access ',
+      repo: REPO1,
+      user: REPO1_PUSH_USER,
+      policy: 'GH_REPO_PUSH',
+      expectedResult: true
+    },
 
-    { name: 'is repo no-push member, for repo access ', repo: REPO1, user: NOT_REPO1_PUSH_USER, policy: 'GH_REPO_ACCESS', expectedResult: true },
-    { name: 'is repo no-push member, for push access ', repo: REPO1, user: NOT_REPO1_PUSH_USER, policy: 'GH_REPO_PUSH', expectedResult: false },
+    {
+      name: 'is repo no-push member, for repo access ',
+      repo: REPO1,
+      user: NOT_REPO1_PUSH_USER,
+      policy: 'GH_REPO_ACCESS',
+      expectedResult: true
+    },
+    {
+      name: 'is repo no-push member, for push access ',
+      repo: REPO1,
+      user: NOT_REPO1_PUSH_USER,
+      policy: 'GH_REPO_PUSH',
+      expectedResult: false
+    },
 
-    { name: 'has no access to repo, for repo access', repo: REPO1, user: NO_ACCESS_REPO1_USER, policy: 'GH_REPO_ACCESS', expectedResult: false },
-    { name: 'has no access to repo, for repo access', repo: REPO1, user: NO_ACCESS_REPO1_USER, policy: 'GH_REPO_PUSH', expectedResult: false },
+    {
+      name: 'has no access to repo, for repo access',
+      repo: REPO1,
+      user: NO_ACCESS_REPO1_USER,
+      policy: 'GH_REPO_ACCESS',
+      expectedResult: false
+    },
+    {
+      name: 'has no access to repo, for repo access',
+      repo: REPO1,
+      user: NO_ACCESS_REPO1_USER,
+      policy: 'GH_REPO_PUSH',
+      expectedResult: false
+    },
 
-    { name: 'non github user can access public repo', repo: REPO1, user: NON_GITHUB_USER, policy: 'GH_REPO_ACCESS', expectedResult: true },
-    { name: 'non github user can not admin public repo', repo: REPO1, user: NON_GITHUB_USER, policy: 'GH_REPO_PUSH', expectedResult: false },
+    {
+      name: 'non github user can access public repo',
+      repo: REPO1,
+      user: NON_GITHUB_USER,
+      policy: 'GH_REPO_ACCESS',
+      expectedResult: true
+    },
+    {
+      name: 'non github user can not admin public repo',
+      repo: REPO1,
+      user: NON_GITHUB_USER,
+      policy: 'GH_REPO_PUSH',
+      expectedResult: false
+    },
 
-    { name: 'non github user can access public room', repo: REPO2, user: NON_GITHUB_USER, policy: 'GH_REPO_ACCESS', sdPublic: true, expectedResult: true },
-    { name: 'non github user can not admin public room', repo: REPO2, user: NON_GITHUB_USER, policy: 'GH_REPO_PUSH', sdPublic: true, expectedResult: false },
+    {
+      name: 'non github user can access public room',
+      repo: REPO2,
+      user: NON_GITHUB_USER,
+      policy: 'GH_REPO_ACCESS',
+      sdPublic: true,
+      expectedResult: true
+    },
+    {
+      name: 'non github user can not admin public room',
+      repo: REPO2,
+      user: NON_GITHUB_USER,
+      policy: 'GH_REPO_PUSH',
+      sdPublic: true,
+      expectedResult: false
+    },
 
-    { name: 'invalid policy', repo: REPO1, user: REPO1_PUSH_USER, policy: 'INVALID', expectedResult: false },
+    {
+      name: 'invalid policy',
+      repo: REPO1,
+      user: REPO1_PUSH_USER,
+      policy: 'INVALID',
+      expectedResult: false
+    }
   ];
 
   var GhRepoPolicyDelegate;
@@ -49,7 +116,7 @@ describe('gh-repo-policy-delegate', function() {
           return {
             permissions: {
               push: false,
-              admin: false,
+              admin: false
             }
           };
         }
@@ -62,7 +129,7 @@ describe('gh-repo-policy-delegate', function() {
           return {
             permissions: {
               push: false,
-              admin: false,
+              admin: false
             }
           };
         }
@@ -85,8 +152,7 @@ describe('gh-repo-policy-delegate', function() {
       var securityDescriptor = {
         linkPath: meta.repo,
         public: !!meta.sdPublic
-      }
-
+      };
 
       var user = meta.user;
       var userId = user && user._id;
@@ -97,17 +163,19 @@ describe('gh-repo-policy-delegate', function() {
 
       var delegate = new GhRepoPolicyDelegate(userId, userLoader, securityDescriptor);
 
-      return delegate.hasPolicy(meta.policy)
-        .then(function(result) {
-          if(meta.expectedResult === 'throw') {
+      return delegate.hasPolicy(meta.policy).then(
+        function(result) {
+          if (meta.expectedResult === 'throw') {
             assert.ok(false, 'Expected exception');
           }
           assert.strictEqual(result, meta.expectedResult);
-        }, function(err) {
-          if(meta.expectedResult !== 'throw') {
-            throw err
+        },
+        function(err) {
+          if (meta.expectedResult !== 'throw') {
+            throw err;
           }
-        })
+        }
+      );
     });
-  })
+  });
 });

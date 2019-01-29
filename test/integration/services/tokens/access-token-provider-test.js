@@ -7,11 +7,9 @@ var Promise = require('bluebird');
 var assert = require('assert');
 
 describe('access-token-provider', function() {
-
   require('./provider-tests-common-full')(accessTokenProvider);
 
   describe('idempotency #slow', function() {
-
     // Set to skip until this problematic test can be
     // sorted out. See https://github.com/troupe/gitter-webapp/issues/882
     // AN 25 Jan 2016
@@ -28,13 +26,12 @@ describe('access-token-provider', function() {
       ]).then(function(items) {
         var firstToken = items[0];
 
-        assert(items.every(function(token) {
-          return token === firstToken;
-        }));
+        assert(
+          items.every(function(token) {
+            return token === firstToken;
+          })
+        );
       });
-
     });
-
   });
-
 });

@@ -6,7 +6,7 @@ var TWEET_MAX_CHARACTER_LIMIT = 140;
 function countMaxUsernamesForTweet(mentionList, size) {
   var count = 0;
   var characters = 0;
-  while(count < mentionList.length) {
+  while (count < mentionList.length) {
     var nextTwitterUserLength = mentionList[count].length;
 
     if (count > 0) {
@@ -20,7 +20,6 @@ function countMaxUsernamesForTweet(mentionList, size) {
     }
 
     count++;
-
   }
 
   return count;
@@ -28,7 +27,8 @@ function countMaxUsernamesForTweet(mentionList, size) {
 
 function composeTweetAndDequeue(invitingUserName, mentionList, name, url) {
   var baseMessagePre = 'Hey ';
-  var baseMessagePost = ' you\'ve been invited to the ' + name + ' community by ' + invitingUserName + '.\n' + url;
+  var baseMessagePost =
+    " you've been invited to the " + name + ' community by ' + invitingUserName + '.\n' + url;
   var baseMessageLength = baseMessagePre.length + baseMessagePost.length;
 
   var count = countMaxUsernamesForTweet(mentionList, TWEET_MAX_CHARACTER_LIMIT - baseMessageLength);
@@ -38,13 +38,12 @@ function composeTweetAndDequeue(invitingUserName, mentionList, name, url) {
   return baseMessagePre + usernames.join(' ') + baseMessagePost;
 }
 
-
 function badgerMessageComposer(invitingUserName, mentionList, name, url) {
   if (!mentionList.length) return [];
   mentionList = _.uniq(mentionList);
 
   var tweets = [];
-  while(mentionList.length) {
+  while (mentionList.length) {
     var tweet = composeTweetAndDequeue(invitingUserName, mentionList, name, url);
     if (tweet) {
       tweets.push(tweet);
@@ -53,6 +52,5 @@ function badgerMessageComposer(invitingUserName, mentionList, name, url) {
 
   return tweets;
 }
-
 
 module.exports = badgerMessageComposer;

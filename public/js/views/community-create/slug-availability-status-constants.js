@@ -9,5 +9,4 @@ var slugAvailabilityStatusConstants = {
   INVALID: 'invalid'
 };
 
-
 module.exports = slugAvailabilityStatusConstants;

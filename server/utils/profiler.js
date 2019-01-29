@@ -1,3 +1,3 @@
-"use strict";
+'use strict';
 
-require('webkit-devtools-agent'); // eslint-disable-line 
+require('webkit-devtools-agent'); // eslint-disable-line

@@ -24,16 +24,19 @@ function RoomInviteContextDelegate(userId, roomId, secret) {
 RoomInviteContextDelegate.prototype = {
   isMember: memoizePromise('isMember', function() {
     return TroupeInvite.count({
-        troupeId: this.roomId,
-        secret: this.secret,
-        $or: [{
+      troupeId: this.roomId,
+      secret: this.secret,
+      $or: [
+        {
           userId: null,
           state: 'PENDING'
-        }, {
+        },
+        {
           userId: this.userId,
           state: { $in: ['PENDING', 'REJECTED'] }
-        }]
-      })
+        }
+      ]
+    })
       .exec()
       .then(function(count) {
         return count > 0;
@@ -42,7 +45,10 @@ RoomInviteContextDelegate.prototype = {
 
   handleReadAccessFailure: Promise.method(function() {
     // Access to the room was denied.
-    logger.info('room-invite-context: user denied access to room', { userId: this.userId, roomId: this.roomId });
+    logger.info('room-invite-context: user denied access to room', {
+      userId: this.userId,
+      roomId: this.roomId
+    });
   })
 };
 

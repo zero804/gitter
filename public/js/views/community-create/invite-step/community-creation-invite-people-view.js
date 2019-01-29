@@ -22,26 +22,33 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      userResultListView: { el: '.community-create-invite-user-result-list-root', init: 'initUserResultListView' },
+      userResultListView: {
+        el: '.community-create-invite-user-result-list-root',
+        init: 'initUserResultListView'
+      },
       inviteListView: { el: '.community-create-invite-list-root', init: 'initInviteListView' }
-    },
+    }
   },
 
   initUserResultListView: function(optionsForRegion) {
-    this.userResultListView = new UserResultListView(optionsForRegion({
-      collection: this.userResultCollection
-    }));
+    this.userResultListView = new UserResultListView(
+      optionsForRegion({
+        collection: this.userResultCollection
+      })
+    );
 
     this.listenTo(this.userResultListView, 'user:activated', this.onPersonSelected, this);
     return this.userResultListView;
   },
 
   initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new CommunityCreationPeopleListView(optionsForRegion({
-      collection: this.communityCreateModel.invites,
-      communityCreateModel: this.communityCreateModel,
-      allowRemove: true
-    }));
+    this.inviteListView = new CommunityCreationPeopleListView(
+      optionsForRegion({
+        collection: this.communityCreateModel.invites,
+        communityCreateModel: this.communityCreateModel,
+        allowRemove: true
+      })
+    );
 
     this.listenTo(this.inviteListView, 'invite:remove', this.onInviteRemoved, this);
     return this.inviteListView;
@@ -58,7 +65,6 @@ module.exports = CommunityCreateBaseStepView.extend({
     'input @ui.peopleInput': 'onPeopleInputUpdate',
     'submit @ui.emailForm': 'onEmailSubmit'
   }),
-
 
   initialize: function() {
     _super.initialize.apply(this, arguments);
@@ -95,7 +101,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     var type = person.get('type');
     var externalId = person.get('externalId');
-    if(!type) {
+    if (!type) {
       // For now, search results come from GitHub
       // TODO: when we add a local user search, adjust the type here
       type = 'github';
@@ -117,7 +123,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   onEmailSubmit: function(e) {
     var newEmailAddress = this.ui.emailInput[0].value;
 
-    if(newEmailAddress.length) {
+    if (newEmailAddress.length) {
       var avatarUrl = avatars.getForGravatarEmail(newEmailAddress);
       this.communityCreateModel.addInvitation('email', newEmailAddress, newEmailAddress, avatarUrl);
     }
@@ -126,5 +132,5 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.ui.emailInput[0].value = '';
 
     e.preventDefault();
-  },
+  }
 });

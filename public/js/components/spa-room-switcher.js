@@ -8,13 +8,16 @@ function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLoc
   this._troupes = troupesCollection;
   this._baseUrl = baseUrl;
   this._locationDelegate = locationDelegate;
-  this._windowLocationDelegate = windowLocationDelegate || function() { return window.location; }; // Makes testing in node easier.
+  this._windowLocationDelegate =
+    windowLocationDelegate ||
+    function() {
+      return window.location;
+    }; // Makes testing in node easier.
   this._isLoadingIFrame = false;
 }
 
 _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
   change: function(iframeUrl) {
-
     if (iframeUrl.search(/^https?:/i) < 0 && iframeUrl.charAt(0) !== '/') {
       // fix for IE 10 giving iframeUrls with first slash missing
       iframeUrl = '/' + iframeUrl;
@@ -29,14 +32,16 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       // TODO: this should move across to the resolve service
       self._isLoadingIFrame = true;
       var windowHash = windowLocation.hash;
-      var hash = (!windowHash || windowHash === '#') ? '#initial' : windowHash;
+      var hash = !windowHash || windowHash === '#' ? '#initial' : windowHash;
 
       targetParsed.hash = hash;
       var href = urlParser.format(targetParsed);
-      href = /^\/orgs\/([^\/]+)\/rooms\/?/.test(targetParsed.pathname) ? getOrgRoomUrl(targetParsed.pathname) : href;
+      href = /^\/orgs\/([^\/]+)\/rooms\/?/.test(targetParsed.pathname)
+        ? getOrgRoomUrl(targetParsed.pathname)
+        : href;
 
       // If the only thing that differs is the hash, then force a reload
-      if (href.replace(/#.*$/,'') === frameLocation.href.replace(/#.*$/,'')) {
+      if (href.replace(/#.*$/, '') === frameLocation.href.replace(/#.*$/, '')) {
         self.trigger('reload');
       } else {
         self.trigger('replace', href);
@@ -46,7 +51,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
     //if we are ever in the process of loading a frame
     //throw the baby out with the bath water and refresh the whole frame
     //JP 4/11/15
-    if(this._isLoadingIFrame) return fallback();
+    if (this._isLoadingIFrame) return fallback();
 
     // The frame is currently pointing at another site. Unlikely but possible
     var currentDomain = frameLocation.protocol + '//' + frameLocation.host;
@@ -78,14 +83,13 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
 
     return {
       roomUrl: match[1],
-      type: match[3],
+      type: match[3]
     };
   },
 
-  setIFrameLoadingState: function (state){
+  setIFrameLoadingState: function(state) {
     this._isLoadingIFrame = state;
-  },
-
+  }
 });
 
 function getOrgRoomUrl(pathname) {

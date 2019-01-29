@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var mailer = env.mailer;
@@ -11,14 +11,14 @@ var VALID_TEMPLATES = {
   'invitation-v2': invitationMapping,
   'invitation-reminder-v2': invitationMapping,
   'unread-notification': unreadNoticationMapping,
-  'created-room': createdRoomMapping,
+  'created-room': createdRoomMapping
 };
 
 exports.sendEmail = function(options) {
-  var mandrillTemplateName = options.templateFile.replace(/\_/g,'-');
+  var mandrillTemplateName = options.templateFile.replace(/\_/g, '-');
 
   var mapper = VALID_TEMPLATES[mandrillTemplateName];
-  if(!mapper) return Promise.reject('Unknown mandrill template: ' + mandrillTemplateName);
+  if (!mapper) return Promise.reject('Unknown mandrill template: ' + mandrillTemplateName);
 
   options.templateName = mandrillTemplateName;
   options.data = mapper(options.data);
@@ -28,14 +28,13 @@ exports.sendEmail = function(options) {
 
 function addedToRoomMapping(data) {
   return {
-    NAME:    data.recipientName,
-    SENDER:  data.senderName,
+    NAME: data.recipientName,
+    SENDER: data.senderName,
     ROOMURI: data.roomUri,
     ROOMURL: data.roomUrl,
-    UNSUB:   data.unsubscribeUrl,
-    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', {email: true})
+    UNSUB: data.unsubscribeUrl,
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
-
 }
 
 function invitationMapping(data) {
@@ -51,34 +50,36 @@ function invitationMapping(data) {
 }
 
 function unreadNoticationMapping(data) {
-
   return {
-    NAME:       data.recipientName,
-    SENDER:     data.senderName,
-    ROOMURI:    data.roomUri,
-    ROOMURL:    data.roomUrl,
-    UNSUB:      data.unsubscribeUrl,
-    HTML:       mailerTemplate("unread_notification_html", data),
-    MICRODATA:  mailerTemplate("unread_notification_microdata", data),
-    PLAINTEXT:  mailerTemplate("unread_notification", data),
-    LOGOURL:    cdn('images/logo/gitter-logo-email-64.png', {email: true})
+    NAME: data.recipientName,
+    SENDER: data.senderName,
+    ROOMURI: data.roomUri,
+    ROOMURL: data.roomUrl,
+    UNSUB: data.unsubscribeUrl,
+    HTML: mailerTemplate('unread_notification_html', data),
+    MICRODATA: mailerTemplate('unread_notification_microdata', data),
+    PLAINTEXT: mailerTemplate('unread_notification', data),
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
-
 }
 
 function createdRoomMapping(data) {
-  var twitterSnippet = data.isPublic ? '<tr><td><br><a href="' + data.twitterURL + '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>' : '';
+  var twitterSnippet = data.isPublic
+    ? '<tr><td><br><a href="' +
+      data.twitterURL +
+      '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>'
+    : '';
 
   return {
-    NAME:        data.recipientName,
-    SENDER:      data.senderName,
-    ROOMURI:     data.roomUri,
-    ROOMURL:     data.roomUrl,
-    UNSUB:       data.unsubscribeUrl,
-    TWITTERURL:  twitterSnippet,
-    ORGNOTE:     '', // No used since splitsville
-    ROOMTYPE:    data.roomType,
-    LOGOURL:     cdn('images/logo/gitter-logo-email-64.png', {email: true})
+    NAME: data.recipientName,
+    SENDER: data.senderName,
+    ROOMURI: data.roomUri,
+    ROOMURL: data.roomUrl,
+    UNSUB: data.unsubscribeUrl,
+    TWITTERURL: twitterSnippet,
+    ORGNOTE: '', // No used since splitsville
+    ROOMTYPE: data.roomType,
+    LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
 

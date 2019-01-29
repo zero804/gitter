@@ -1,8 +1,7 @@
-
 var jQuery = require('jquery');
 
 /** @license jQuery Easing v1.3: Copyright (c) 2008 George McGinley Smith | BSD License: http://www.opensource.org/licenses/bsd-license.php
-*/
+ */
 
 /*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
@@ -11,204 +10,194 @@ var jQuery = require('jquery');
  * to offer multiple easing options
  *
  * TERMS OF USE - jQuery Easing
- * 
- * Open source under the BSD License. 
- * 
+ *
+ * Open source under the BSD License.
+ *
  * Copyright Â© 2008 George McGinley Smith
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
  * are permitted provided that the following conditions are met:
- * 
- * Redistributions of source code must retain the above copyright notice, this list of 
+ *
+ * Redistributions of source code must retain the above copyright notice, this list of
  * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list 
- * of conditions and the following disclaimer in the documentation and/or other materials 
+ * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
  * provided with the distribution.
- * 
- * Neither the name of the author nor the names of contributors may be used to endorse 
+ *
+ * Neither the name of the author nor the names of contributors may be used to endorse
  * or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
  * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
  *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
+ *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
  * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
- * OF THE POSSIBILITY OF SUCH DAMAGE. 
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
-*/
+ */
 
 // t: current time, b: begInnIng value, c: change In value, d: duration
 jQuery.easing['jswing'] = jQuery.easing['swing'];
 
-jQuery.extend( jQuery.easing,
-{
-	def: 'easeOutQuad',
-	swing: function (x, t, b, c, d) {
-		//alert(jQuery.easing.default);
-		return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
-	},
-	easeInQuad: function (x, t, b, c, d) {
-		return c*(t/=d)*t + b;
-	},
-	easeOutQuad: function (x, t, b, c, d) {
-		return -c *(t/=d)*(t-2) + b;
-	},
-	easeInOutQuad: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t + b;
-		return -c/2 * ((--t)*(t-2) - 1) + b;
-	},
-	easeInCubic: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t + b;
-	},
-	easeOutCubic: function (x, t, b, c, d) {
-		return c*((t=t/d-1)*t*t + 1) + b;
-	},
-	easeInOutCubic: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t + b;
-		return c/2*((t-=2)*t*t + 2) + b;
-	},
-	easeInQuart: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t*t + b;
-	},
-	easeOutQuart: function (x, t, b, c, d) {
-		return -c * ((t=t/d-1)*t*t*t - 1) + b;
-	},
-	easeInOutQuart: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-		return -c/2 * ((t-=2)*t*t*t - 2) + b;
-	},
-	easeInQuint: function (x, t, b, c, d) {
-		return c*(t/=d)*t*t*t*t + b;
-	},
-	easeOutQuint: function (x, t, b, c, d) {
-		return c*((t=t/d-1)*t*t*t*t + 1) + b;
-	},
-	easeInOutQuint: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-		return c/2*((t-=2)*t*t*t*t + 2) + b;
-	},
-	easeInSine: function (x, t, b, c, d) {
-		return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
-	},
-	easeOutSine: function (x, t, b, c, d) {
-		return c * Math.sin(t/d * (Math.PI/2)) + b;
-	},
-	easeInOutSine: function (x, t, b, c, d) {
-		return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-	},
-	easeInExpo: function (x, t, b, c, d) {
-		return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
-	},
-	easeOutExpo: function (x, t, b, c, d) {
-		return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
-	},
-	easeInOutExpo: function (x, t, b, c, d) {
-		if (t==0) return b;
-		if (t==d) return b+c;
-		if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-		return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-	},
-	easeInCirc: function (x, t, b, c, d) {
-		return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
-	},
-	easeOutCirc: function (x, t, b, c, d) {
-		return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
-	},
-	easeInOutCirc: function (x, t, b, c, d) {
-		if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
-		return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
-	},
-	easeInElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-	},
-	easeOutElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
-	},
-	easeInOutElastic: function (x, t, b, c, d) {
-		var s=1.70158;var p=0;var a=c;
-		if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-		if (a < Math.abs(c)) { a=c; var s=p/4; }
-		else var s = p/(2*Math.PI) * Math.asin (c/a);
-		if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-		return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
-	},
-	easeInBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158;
-		return c*(t/=d)*t*((s+1)*t - s) + b;
-	},
-	easeOutBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158;
-		return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
-	},
-	easeInOutBack: function (x, t, b, c, d, s) {
-		if (s == undefined) s = 1.70158; 
-		if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-		return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
-	},
-	easeInBounce: function (x, t, b, c, d) {
-		return c - jQuery.easing.easeOutBounce (x, d-t, 0, c, d) + b;
-	},
-	easeOutBounce: function (x, t, b, c, d) {
-		if ((t/=d) < (1/2.75)) {
-			return c*(7.5625*t*t) + b;
-		} else if (t < (2/2.75)) {
-			return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
-		} else if (t < (2.5/2.75)) {
-			return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
-		} else {
-			return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
-		}
-	},
-	easeInOutBounce: function (x, t, b, c, d) {
-		if (t < d/2) return jQuery.easing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-		return jQuery.easing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
-	}
+jQuery.extend(jQuery.easing, {
+  def: 'easeOutQuad',
+  swing: function(x, t, b, c, d) {
+    //alert(jQuery.easing.default);
+    return jQuery.easing[jQuery.easing.def](x, t, b, c, d);
+  },
+  easeInQuad: function(x, t, b, c, d) {
+    return c * (t /= d) * t + b;
+  },
+  easeOutQuad: function(x, t, b, c, d) {
+    return -c * (t /= d) * (t - 2) + b;
+  },
+  easeInOutQuad: function(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return (c / 2) * t * t + b;
+    return (-c / 2) * (--t * (t - 2) - 1) + b;
+  },
+  easeInCubic: function(x, t, b, c, d) {
+    return c * (t /= d) * t * t + b;
+  },
+  easeOutCubic: function(x, t, b, c, d) {
+    return c * ((t = t / d - 1) * t * t + 1) + b;
+  },
+  easeInOutCubic: function(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return (c / 2) * t * t * t + b;
+    return (c / 2) * ((t -= 2) * t * t + 2) + b;
+  },
+  easeInQuart: function(x, t, b, c, d) {
+    return c * (t /= d) * t * t * t + b;
+  },
+  easeOutQuart: function(x, t, b, c, d) {
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+  },
+  easeInOutQuart: function(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return (c / 2) * t * t * t * t + b;
+    return (-c / 2) * ((t -= 2) * t * t * t - 2) + b;
+  },
+  easeInQuint: function(x, t, b, c, d) {
+    return c * (t /= d) * t * t * t * t + b;
+  },
+  easeOutQuint: function(x, t, b, c, d) {
+    return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+  },
+  easeInOutQuint: function(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return (c / 2) * t * t * t * t * t + b;
+    return (c / 2) * ((t -= 2) * t * t * t * t + 2) + b;
+  },
+  easeInSine: function(x, t, b, c, d) {
+    return -c * Math.cos((t / d) * (Math.PI / 2)) + c + b;
+  },
+  easeOutSine: function(x, t, b, c, d) {
+    return c * Math.sin((t / d) * (Math.PI / 2)) + b;
+  },
+  easeInOutSine: function(x, t, b, c, d) {
+    return (-c / 2) * (Math.cos((Math.PI * t) / d) - 1) + b;
+  },
+  easeInExpo: function(x, t, b, c, d) {
+    return t == 0 ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+  },
+  easeOutExpo: function(x, t, b, c, d) {
+    return t == d ? b + c : c * (-Math.pow(2, (-10 * t) / d) + 1) + b;
+  },
+  easeInOutExpo: function(x, t, b, c, d) {
+    if (t == 0) return b;
+    if (t == d) return b + c;
+    if ((t /= d / 2) < 1) return (c / 2) * Math.pow(2, 10 * (t - 1)) + b;
+    return (c / 2) * (-Math.pow(2, -10 * --t) + 2) + b;
+  },
+  easeInCirc: function(x, t, b, c, d) {
+    return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+  },
+  easeOutCirc: function(x, t, b, c, d) {
+    return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+  },
+  easeInOutCirc: function(x, t, b, c, d) {
+    if ((t /= d / 2) < 1) return (-c / 2) * (Math.sqrt(1 - t * t) - 1) + b;
+    return (c / 2) * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+  },
+  easeInElastic: function(x, t, b, c, d) {
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t == 0) return b;
+    if ((t /= d) == 1) return b + c;
+    if (!p) p = d * 0.3;
+    if (a < Math.abs(c)) {
+      a = c;
+      var s = p / 4;
+    } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
+    return -(a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p)) + b;
+  },
+  easeOutElastic: function(x, t, b, c, d) {
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t == 0) return b;
+    if ((t /= d) == 1) return b + c;
+    if (!p) p = d * 0.3;
+    if (a < Math.abs(c)) {
+      a = c;
+      var s = p / 4;
+    } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
+    return a * Math.pow(2, -10 * t) * Math.sin(((t * d - s) * (2 * Math.PI)) / p) + c + b;
+  },
+  easeInOutElastic: function(x, t, b, c, d) {
+    var s = 1.70158;
+    var p = 0;
+    var a = c;
+    if (t == 0) return b;
+    if ((t /= d / 2) == 2) return b + c;
+    if (!p) p = d * (0.3 * 1.5);
+    if (a < Math.abs(c)) {
+      a = c;
+      var s = p / 4;
+    } else var s = (p / (2 * Math.PI)) * Math.asin(c / a);
+    if (t < 1)
+      return (
+        -0.5 * (a * Math.pow(2, 10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p)) + b
+      );
+    return (
+      a * Math.pow(2, -10 * (t -= 1)) * Math.sin(((t * d - s) * (2 * Math.PI)) / p) * 0.5 + c + b
+    );
+  },
+  easeInBack: function(x, t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    return c * (t /= d) * t * ((s + 1) * t - s) + b;
+  },
+  easeOutBack: function(x, t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+  },
+  easeInOutBack: function(x, t, b, c, d, s) {
+    if (s == undefined) s = 1.70158;
+    if ((t /= d / 2) < 1) return (c / 2) * (t * t * (((s *= 1.525) + 1) * t - s)) + b;
+    return (c / 2) * ((t -= 2) * t * (((s *= 1.525) + 1) * t + s) + 2) + b;
+  },
+  easeInBounce: function(x, t, b, c, d) {
+    return c - jQuery.easing.easeOutBounce(x, d - t, 0, c, d) + b;
+  },
+  easeOutBounce: function(x, t, b, c, d) {
+    if ((t /= d) < 1 / 2.75) {
+      return c * (7.5625 * t * t) + b;
+    } else if (t < 2 / 2.75) {
+      return c * (7.5625 * (t -= 1.5 / 2.75) * t + 0.75) + b;
+    } else if (t < 2.5 / 2.75) {
+      return c * (7.5625 * (t -= 2.25 / 2.75) * t + 0.9375) + b;
+    } else {
+      return c * (7.5625 * (t -= 2.625 / 2.75) * t + 0.984375) + b;
+    }
+  },
+  easeInOutBounce: function(x, t, b, c, d) {
+    if (t < d / 2) return jQuery.easing.easeInBounce(x, t * 2, 0, c, d) * 0.5 + b;
+    return jQuery.easing.easeOutBounce(x, t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+  }
 });
-
 /*
- *
- * TERMS OF USE - EASING EQUATIONS
- * 
- * Open source under the BSD License. 
- * 
- * Copyright Â© 2001 Robert Penner
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without modification, 
- * are permitted provided that the following conditions are met:
- * 
- * Redistributions of source code must retain the above copyright notice, this list of 
- * conditions and the following disclaimer.
- * Redistributions in binary form must reproduce the above copyright notice, this list 
- * of conditions and the following disclaimer in the documentation and/or other materials 
- * provided with the distribution.
- * 
- * Neither the name of the author nor the names of contributors may be used to endorse 
- * or promote products derived from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY 
- * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
- *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED 
- * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
- * OF THE POSSIBILITY OF SUCH DAMAGE. 
- *
- *//*
  * jQuery JSONP Core Plugin 2.4.0 (2012-08-21)
  *
  * https://github.com/jaubourg/jquery-jsonp
@@ -218,283 +207,297 @@ jQuery.extend( jQuery.easing,
  * This document is licensed as free software under the terms of the
  * MIT License: http://www.opensource.org/licenses/mit-license.php
  */
-( function( $ ) {
 
-	// ###################### UTILITIES ##
+/*
+ *
+ * TERMS OF USE - EASING EQUATIONS
+ *
+ * Open source under the BSD License.
+ *
+ * Copyright Â© 2001 Robert Penner
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list of
+ * conditions and the following disclaimer.
+ * Redistributions in binary form must reproduce the above copyright notice, this list
+ * of conditions and the following disclaimer in the documentation and/or other materials
+ * provided with the distribution.
+ *
+ * Neither the name of the author nor the names of contributors may be used to endorse
+ * or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ *  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ *  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ * AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */ (function($) {
+  // ###################### UTILITIES ##
 
-	// Noop
-	function noop() {
-	}
+  // Noop
+  function noop() {}
 
-	// Generic callback
-	function genericCallback( data ) {
-		lastValue = [ data ];
-	}
+  // Generic callback
+  function genericCallback(data) {
+    lastValue = [data];
+  }
 
-	// Call if defined
-	function callIfDefined( method , object , parameters ) {
-		return method && method.apply( object.context || object , parameters );
-	}
+  // Call if defined
+  function callIfDefined(method, object, parameters) {
+    return method && method.apply(object.context || object, parameters);
+  }
 
-	// Give joining character given url
-	function qMarkOrAmp( url ) {
-		return /\?/ .test( url ) ? "&" : "?";
-	}
+  // Give joining character given url
+  function qMarkOrAmp(url) {
+    return /\?/.test(url) ? '&' : '?';
+  }
 
-	var // String constants (for better minification)
-		STR_ASYNC = "async",
-		STR_CHARSET = "charset",
-		STR_EMPTY = "",
-		STR_ERROR = "error",
-		STR_INSERT_BEFORE = "insertBefore",
-		STR_JQUERY_JSONP = "_jqjsp",
-		STR_ON = "on",
-		STR_ON_CLICK = STR_ON + "click",
-		STR_ON_ERROR = STR_ON + STR_ERROR,
-		STR_ON_LOAD = STR_ON + "load",
-		STR_ON_READY_STATE_CHANGE = STR_ON + "readystatechange",
-		STR_READY_STATE = "readyState",
-		STR_REMOVE_CHILD = "removeChild",
-		STR_SCRIPT_TAG = "<script>",
-		STR_SUCCESS = "success",
-		STR_TIMEOUT = "timeout",
+  var // String constants (for better minification)
+    STR_ASYNC = 'async',
+    STR_CHARSET = 'charset',
+    STR_EMPTY = '',
+    STR_ERROR = 'error',
+    STR_INSERT_BEFORE = 'insertBefore',
+    STR_JQUERY_JSONP = '_jqjsp',
+    STR_ON = 'on',
+    STR_ON_CLICK = STR_ON + 'click',
+    STR_ON_ERROR = STR_ON + STR_ERROR,
+    STR_ON_LOAD = STR_ON + 'load',
+    STR_ON_READY_STATE_CHANGE = STR_ON + 'readystatechange',
+    STR_READY_STATE = 'readyState',
+    STR_REMOVE_CHILD = 'removeChild',
+    STR_SCRIPT_TAG = '<script>',
+    STR_SUCCESS = 'success',
+    STR_TIMEOUT = 'timeout',
+    // Window
+    win = window,
+    // Deferred
+    Deferred = $.Deferred,
+    // Head element
+    head = $('head')[0] || document.documentElement,
+    // Page cache
+    pageCache = {},
+    // Counter
+    count = 0,
+    // Last returned value
+    lastValue,
+    // ###################### DEFAULT OPTIONS ##
+    xOptionsDefaults = {
+      //beforeSend: undefined,
+      //cache: false,
+      callback: STR_JQUERY_JSONP,
+      //callbackParameter: undefined,
+      //charset: undefined,
+      //complete: undefined,
+      //context: undefined,
+      //data: "",
+      //dataFilter: undefined,
+      //error: undefined,
+      //pageCache: false,
+      //success: undefined,
+      //timeout: 0,
+      //traditional: false,
+      url: location.href
+    },
+    // opera demands sniffing :/
+    opera = win.opera,
+    // IE < 10
+    oldIE = !!$('<div>')
+      .html('<!--[if IE]><i><![endif]-->')
+      .find('i').length;
 
-		// Window
-		win = window,
-		// Deferred
-		Deferred = $.Deferred,
-		// Head element
-		head = $( "head" )[ 0 ] || document.documentElement,
-		// Page cache
-		pageCache = {},
-		// Counter
-		count = 0,
-		// Last returned value
-		lastValue,
+  // ###################### MAIN FUNCTION ##
+  function jsonp(xOptions) {
+    // Build data with default
+    xOptions = $.extend({}, xOptionsDefaults, xOptions);
 
-		// ###################### DEFAULT OPTIONS ##
-		xOptionsDefaults = {
-			//beforeSend: undefined,
-			//cache: false,
-			callback: STR_JQUERY_JSONP,
-			//callbackParameter: undefined,
-			//charset: undefined,
-			//complete: undefined,
-			//context: undefined,
-			//data: "",
-			//dataFilter: undefined,
-			//error: undefined,
-			//pageCache: false,
-			//success: undefined,
-			//timeout: 0,
-			//traditional: false,
-			url: location.href
-		},
+    // References to xOptions members (for better minification)
+    var successCallback = xOptions.success,
+      errorCallback = xOptions.error,
+      completeCallback = xOptions.complete,
+      dataFilter = xOptions.dataFilter,
+      callbackParameter = xOptions.callbackParameter,
+      successCallbackName = xOptions.callback,
+      cacheFlag = xOptions.cache,
+      pageCacheFlag = xOptions.pageCache,
+      charset = xOptions.charset,
+      url = xOptions.url,
+      data = xOptions.data,
+      timeout = xOptions.timeout,
+      pageCached,
+      // Abort/done flag
+      done = 0,
+      // Life-cycle functions
+      cleanUp = noop,
+      // Support vars
+      supportOnload,
+      supportOnreadystatechange,
+      // Request execution vars
+      firstChild,
+      script,
+      scriptAfter,
+      timeoutTimer;
 
-		// opera demands sniffing :/
-		opera = win.opera,
+    // If we have Deferreds:
+    // - substitute callbacks
+    // - promote xOptions to a promise
+    Deferred &&
+      Deferred(function(defer) {
+        defer.done(successCallback).fail(errorCallback);
+        successCallback = defer.resolve;
+        errorCallback = defer.reject;
+      }).promise(xOptions);
 
-		// IE < 10
-		oldIE = !!$( "<div>" ).html( "<!--[if IE]><i><![endif]-->" ).find("i").length;
+    // Create the abort method
+    xOptions.abort = function() {
+      !done++ && cleanUp();
+    };
 
-	// ###################### MAIN FUNCTION ##
-	function jsonp( xOptions ) {
+    // Call beforeSend if provided (early abort if false returned)
+    if (callIfDefined(xOptions.beforeSend, xOptions, [xOptions]) === !1 || done) {
+      return xOptions;
+    }
 
-		// Build data with default
-		xOptions = $.extend( {} , xOptionsDefaults , xOptions );
+    // Control entries
+    url = url || STR_EMPTY;
+    data = data
+      ? typeof data == 'string'
+        ? data
+        : $.param(data, xOptions.traditional)
+      : STR_EMPTY;
 
-		// References to xOptions members (for better minification)
-		var successCallback = xOptions.success,
-			errorCallback = xOptions.error,
-			completeCallback = xOptions.complete,
-			dataFilter = xOptions.dataFilter,
-			callbackParameter = xOptions.callbackParameter,
-			successCallbackName = xOptions.callback,
-			cacheFlag = xOptions.cache,
-			pageCacheFlag = xOptions.pageCache,
-			charset = xOptions.charset,
-			url = xOptions.url,
-			data = xOptions.data,
-			timeout = xOptions.timeout,
-			pageCached,
+    // Build final url
+    url += data ? qMarkOrAmp(url) + data : STR_EMPTY;
 
-			// Abort/done flag
-			done = 0,
+    // Add callback parameter if provided as option
+    callbackParameter && (url += qMarkOrAmp(url) + encodeURIComponent(callbackParameter) + '=?');
 
-			// Life-cycle functions
-			cleanUp = noop,
+    // Add anticache parameter if needed
+    !cacheFlag && !pageCacheFlag && (url += qMarkOrAmp(url) + '_' + new Date().getTime() + '=');
 
-			// Support vars
-			supportOnload,
-			supportOnreadystatechange,
+    // Replace last ? by callback parameter
+    url = url.replace(/=\?(&|$)/, '=' + successCallbackName + '$1');
 
-			// Request execution vars
-			firstChild,
-			script,
-			scriptAfter,
-			timeoutTimer;
+    // Success notifier
+    function notifySuccess(json) {
+      if (!done++) {
+        cleanUp();
+        // Pagecache if needed
+        pageCacheFlag && (pageCache[url] = { s: [json] });
+        // Apply the data filter if provided
+        dataFilter && (json = dataFilter.apply(xOptions, [json]));
+        // Call success then complete
+        callIfDefined(successCallback, xOptions, [json, STR_SUCCESS, xOptions]);
+        callIfDefined(completeCallback, xOptions, [xOptions, STR_SUCCESS]);
+      }
+    }
 
-		// If we have Deferreds:
-		// - substitute callbacks
-		// - promote xOptions to a promise
-		Deferred && Deferred(function( defer ) {
-			defer.done( successCallback ).fail( errorCallback );
-			successCallback = defer.resolve;
-			errorCallback = defer.reject;
-		}).promise( xOptions );
+    // Error notifier
+    function notifyError(type) {
+      if (!done++) {
+        // Clean up
+        cleanUp();
+        // If pure error (not timeout), cache if needed
+        pageCacheFlag && type != STR_TIMEOUT && (pageCache[url] = type);
+        // Call error then complete
+        callIfDefined(errorCallback, xOptions, [xOptions, type]);
+        callIfDefined(completeCallback, xOptions, [xOptions, type]);
+      }
+    }
 
-		// Create the abort method
-		xOptions.abort = function() {
-			!( done++ ) && cleanUp();
-		};
+    // Check page cache
+    if (pageCacheFlag && (pageCached = pageCache[url])) {
+      pageCached.s ? notifySuccess(pageCached.s[0]) : notifyError(pageCached);
+    } else {
+      // Install the generic callback
+      // (BEWARE: global namespace pollution ahoy)
+      win[successCallbackName] = genericCallback;
 
-		// Call beforeSend if provided (early abort if false returned)
-		if ( callIfDefined( xOptions.beforeSend , xOptions , [ xOptions ] ) === !1 || done ) {
-			return xOptions;
-		}
+      // Create the script tag
+      script = $(STR_SCRIPT_TAG)[0];
+      script.id = STR_JQUERY_JSONP + count++;
 
-		// Control entries
-		url = url || STR_EMPTY;
-		data = data ? ( (typeof data) == "string" ? data : $.param( data , xOptions.traditional ) ) : STR_EMPTY;
+      // Set charset if provided
+      if (charset) {
+        script[STR_CHARSET] = charset;
+      }
 
-		// Build final url
-		url += data ? ( qMarkOrAmp( url ) + data ) : STR_EMPTY;
+      opera && opera.version() < 11.6
+        ? // onerror is not supported: do not set as async and assume in-order execution.
+          // Add a trailing script to emulate the event
+          ((scriptAfter = $(STR_SCRIPT_TAG)[0]).text =
+            "document.getElementById('" + script.id + "')." + STR_ON_ERROR + '()')
+        : // onerror is supported: set the script as async to avoid requests blocking each others
+          (script[STR_ASYNC] = STR_ASYNC);
 
-		// Add callback parameter if provided as option
-		callbackParameter && ( url += qMarkOrAmp( url ) + encodeURIComponent( callbackParameter ) + "=?" );
+      // Internet Explorer: event/htmlFor trick
+      if (oldIE) {
+        script.htmlFor = script.id;
+        script.event = STR_ON_CLICK;
+      }
 
-		// Add anticache parameter if needed
-		!cacheFlag && !pageCacheFlag && ( url += qMarkOrAmp( url ) + "_" + ( new Date() ).getTime() + "=" );
+      // Attached event handlers
+      script[STR_ON_LOAD] = script[STR_ON_ERROR] = script[STR_ON_READY_STATE_CHANGE] = function(
+        result
+      ) {
+        // Test readyState if it exists
+        if (!script[STR_READY_STATE] || !/i/.test(script[STR_READY_STATE])) {
+          try {
+            script[STR_ON_CLICK] && script[STR_ON_CLICK]();
+          } catch (_) {}
 
-		// Replace last ? by callback parameter
-		url = url.replace( /=\?(&|$)/ , "=" + successCallbackName + "$1" );
+          result = lastValue;
+          lastValue = 0;
+          result ? notifySuccess(result[0]) : notifyError(STR_ERROR);
+        }
+      };
 
-		// Success notifier
-		function notifySuccess( json ) {
+      // Set source
+      script.src = url;
 
-			if ( !( done++ ) ) {
+      // Re-declare cleanUp function
+      cleanUp = function(i) {
+        timeoutTimer && clearTimeout(timeoutTimer);
+        script[STR_ON_READY_STATE_CHANGE] = script[STR_ON_LOAD] = script[STR_ON_ERROR] = null;
+        head[STR_REMOVE_CHILD](script);
+        scriptAfter && head[STR_REMOVE_CHILD](scriptAfter);
+      };
 
-				cleanUp();
-				// Pagecache if needed
-				pageCacheFlag && ( pageCache [ url ] = { s: [ json ] } );
-				// Apply the data filter if provided
-				dataFilter && ( json = dataFilter.apply( xOptions , [ json ] ) );
-				// Call success then complete
-				callIfDefined( successCallback , xOptions , [ json , STR_SUCCESS, xOptions ] );
-				callIfDefined( completeCallback , xOptions , [ xOptions , STR_SUCCESS ] );
+      // Append main script
+      head[STR_INSERT_BEFORE](script, (firstChild = head.firstChild));
 
-			}
-		}
+      // Append trailing script if needed
+      scriptAfter && head[STR_INSERT_BEFORE](scriptAfter, firstChild);
 
-		// Error notifier
-		function notifyError( type ) {
+      // If a timeout is needed, install it
+      timeoutTimer =
+        timeout > 0 &&
+        setTimeout(function() {
+          notifyError(STR_TIMEOUT);
+        }, timeout);
+    }
 
-			if ( !( done++ ) ) {
+    return xOptions;
+  }
 
-				// Clean up
-				cleanUp();
-				// If pure error (not timeout), cache if needed
-				pageCacheFlag && type != STR_TIMEOUT && ( pageCache[ url ] = type );
-				// Call error then complete
-				callIfDefined( errorCallback , xOptions , [ xOptions , type ] );
-				callIfDefined( completeCallback , xOptions , [ xOptions , type ] );
+  // ###################### SETUP FUNCTION ##
+  jsonp.setup = function(xOptions) {
+    $.extend(xOptionsDefaults, xOptions);
+  };
 
-			}
-		}
-
-		// Check page cache
-		if ( pageCacheFlag && ( pageCached = pageCache[ url ] ) ) {
-
-			pageCached.s ? notifySuccess( pageCached.s[ 0 ] ) : notifyError( pageCached );
-
-		} else {
-
-			// Install the generic callback
-			// (BEWARE: global namespace pollution ahoy)
-			win[ successCallbackName ] = genericCallback;
-
-			// Create the script tag
-			script = $( STR_SCRIPT_TAG )[ 0 ];
-			script.id = STR_JQUERY_JSONP + count++;
-
-			// Set charset if provided
-			if ( charset ) {
-				script[ STR_CHARSET ] = charset;
-			}
-
-			opera && opera.version() < 11.60 ?
-				// onerror is not supported: do not set as async and assume in-order execution.
-				// Add a trailing script to emulate the event
-				( ( scriptAfter = $( STR_SCRIPT_TAG )[ 0 ] ).text = "document.getElementById('" + script.id + "')." + STR_ON_ERROR + "()" )
-			:
-				// onerror is supported: set the script as async to avoid requests blocking each others
-				( script[ STR_ASYNC ] = STR_ASYNC )
-
-			;
-
-			// Internet Explorer: event/htmlFor trick
-			if ( oldIE ) {
-				script.htmlFor = script.id;
-				script.event = STR_ON_CLICK;
-			}
-
-			// Attached event handlers
-			script[ STR_ON_LOAD ] = script[ STR_ON_ERROR ] = script[ STR_ON_READY_STATE_CHANGE ] = function ( result ) {
-
-				// Test readyState if it exists
-				if ( !script[ STR_READY_STATE ] || !/i/.test( script[ STR_READY_STATE ] ) ) {
-
-					try {
-
-						script[ STR_ON_CLICK ] && script[ STR_ON_CLICK ]();
-
-					} catch( _ ) {}
-
-					result = lastValue;
-					lastValue = 0;
-					result ? notifySuccess( result[ 0 ] ) : notifyError( STR_ERROR );
-
-				}
-			};
-
-			// Set source
-			script.src = url;
-
-			// Re-declare cleanUp function
-			cleanUp = function( i ) {
-				timeoutTimer && clearTimeout( timeoutTimer );
-				script[ STR_ON_READY_STATE_CHANGE ] = script[ STR_ON_LOAD ] = script[ STR_ON_ERROR ] = null;
-				head[ STR_REMOVE_CHILD ]( script );
-				scriptAfter && head[ STR_REMOVE_CHILD ]( scriptAfter );
-			};
-
-			// Append main script
-			head[ STR_INSERT_BEFORE ]( script , ( firstChild = head.firstChild ) );
-
-			// Append trailing script if needed
-			scriptAfter && head[ STR_INSERT_BEFORE ]( scriptAfter , firstChild );
-
-			// If a timeout is needed, install it
-			timeoutTimer = timeout > 0 && setTimeout( function() {
-				notifyError( STR_TIMEOUT );
-			} , timeout );
-
-		}
-
-		return xOptions;
-	}
-
-	// ###################### SETUP FUNCTION ##
-	jsonp.setup = function( xOptions ) {
-		$.extend( xOptionsDefaults , xOptions );
-	};
-
-	// ###################### INSTALL in jQuery ##
-	$.jsonp = jsonp;
-
-} )( jQuery );
+  // ###################### INSTALL in jQuery ##
+  $.jsonp = jsonp;
+})(jQuery);
 /** @license jQuery Tools 1.2.3: Tero Piirainen | Public domain
-*/
+ */
 
 /**
  * jQuery Tools 1.2.3 / Expose - Dim the lights
@@ -517,70 +520,74 @@ jQuery.extend( jQuery.easing,
  */
 
 (function($) {
-	$.tools = $.tools || {version: '2013-02-15'};
-	var tool = $.tools.expose = {
-		conf: {
-			maskId: 'exposeMask',
-			loadSpeed: 'slow',
-			closeSpeed: 'fast',
-			zIndex: 9998,
-			opacity: 0.8,
-			startOpacity: 0,
-			color: '#fff'
-		}
-	};
-	var mask, exposed, loaded, config, overlayIndex;
-	$.mask = {
-		load: function(conf, els) {
-			if (loaded) { return this; }
-			conf = conf || config;
-			config = conf = $.extend($.extend({}, tool.conf), conf);
-			mask = $("#" + conf.maskId);
-			if (!mask.length) {
-				mask = $('<div/>').attr("id", conf.maskId);
-				$("body").append(mask);
-			}
-			mask.css({
-				position: 'fixed',
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				display: 'block',
-				opacity: conf.opacity,
-				zIndex: conf.zIndex,
-				backgroundColor: conf.color
-			});
+  $.tools = $.tools || { version: '2013-02-15' };
+  var tool = ($.tools.expose = {
+    conf: {
+      maskId: 'exposeMask',
+      loadSpeed: 'slow',
+      closeSpeed: 'fast',
+      zIndex: 9998,
+      opacity: 0.8,
+      startOpacity: 0,
+      color: '#fff'
+    }
+  });
+  var mask, exposed, loaded, config, overlayIndex;
+  $.mask = {
+    load: function(conf, els) {
+      if (loaded) {
+        return this;
+      }
+      conf = conf || config;
+      config = conf = $.extend($.extend({}, tool.conf), conf);
+      mask = $('#' + conf.maskId);
+      if (!mask.length) {
+        mask = $('<div/>').attr('id', conf.maskId);
+        $('body').append(mask);
+      }
+      mask.css({
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'block',
+        opacity: conf.opacity,
+        zIndex: conf.zIndex,
+        backgroundColor: conf.color
+      });
 
-			if (els && els.length) {
-				overlayIndex = els.eq(0).css("zIndex");
-				exposed = els.css({ zIndex: Math.max(conf.zIndex + 1, overlayIndex == 'auto' ? 0 : overlayIndex)});
-			}
+      if (els && els.length) {
+        overlayIndex = els.eq(0).css('zIndex');
+        exposed = els.css({
+          zIndex: Math.max(conf.zIndex + 1, overlayIndex == 'auto' ? 0 : overlayIndex)
+        });
+      }
 
-			loaded = true;
+      loaded = true;
 
-			return this;
-		},
-		close: function() {
-			if (loaded) {
-				mask.fadeOut(config.closeSpeed, function() {
-					if (exposed) {
-						exposed.css({zIndex: overlayIndex});
-					}
-				});
-				loaded = false;
-			}
-			return this;
-		}
-	};
-	$.fn.mask = function(conf) {
-		$.mask.load(conf);
-		return this;
-	};
-	$.fn.expose = function(conf) {
-		$.mask.load(conf, this);
-		return this;
-	};
+      return this;
+    },
+    close: function() {
+      if (loaded) {
+        mask.fadeOut(config.closeSpeed, function() {
+          if (exposed) {
+            exposed.css({ zIndex: overlayIndex });
+          }
+        });
+        loaded = false;
+      }
+      return this;
+    }
+  };
+  $.fn.mask = function(conf) {
+    $.mask.load(conf);
+    return this;
+  };
+  $.fn.expose = function(conf) {
+    $.mask.load(conf, this);
+    return this;
+  };
 })(jQuery);
 /** @license jquery.transloadit2.js: Copyright (c) 2013 Transloadit Ltd | MIT License: http://www.opensource.org/licenses/mit-license.php
  *
@@ -589,39 +596,41 @@ jQuery.extend( jQuery.easing,
  * Transloadit servers allow browsers to cache jquery.transloadit2.js for 1 hour.
  * keep this in mind when rolling out fixes.
  */
-!function($) {
-  var PROTOCOL = (document.location.protocol == 'https:') ? 'https://' : 'http://';
+!(function($) {
+  var PROTOCOL = document.location.protocol == 'https:' ? 'https://' : 'http://';
 
   var DEFAULT_SERVICE = PROTOCOL + 'api2.transloadit.com/';
 
   var OPTIONS = {
-    service                      : DEFAULT_SERVICE,
-    assets                       : PROTOCOL+'assets.transloadit.com/',
-    beforeStart                  : function() {return true;},
-    onFileSelect                 : function() {},
-    onStart                      : function() {},
-    onProgress                   : function() {},
-    onUpload                     : function() {},
-    onResult                     : function() {},
-    onCancel                     : function() {},
-    onError                      : function() {},
-    onSuccess                    : function() {},
-    interval                     : 2500,
-    pollTimeout                  : 8000,
-    poll404Retries               : 15,
-    pollConnectionRetries        : 5,
-    wait                         : false,
-    processZeroFiles             : true,
-    triggerUploadOnFileSelection : false,
-    autoSubmit                   : true,
-    modal                        : true,
-    exclude                      : '',
-    fields                       : false,
-    params                       : null,
-    signature                    : null,
-    region                       : 'us-east-1',
-    debug                        : true,
-    locale                       : 'en'
+    service: DEFAULT_SERVICE,
+    assets: PROTOCOL + 'assets.transloadit.com/',
+    beforeStart: function() {
+      return true;
+    },
+    onFileSelect: function() {},
+    onStart: function() {},
+    onProgress: function() {},
+    onUpload: function() {},
+    onResult: function() {},
+    onCancel: function() {},
+    onError: function() {},
+    onSuccess: function() {},
+    interval: 2500,
+    pollTimeout: 8000,
+    poll404Retries: 15,
+    pollConnectionRetries: 5,
+    wait: false,
+    processZeroFiles: true,
+    triggerUploadOnFileSelection: false,
+    autoSubmit: true,
+    modal: true,
+    exclude: '',
+    fields: false,
+    params: null,
+    signature: null,
+    region: 'us-east-1',
+    debug: true,
+    locale: 'en'
   };
 
   var I18N = {
@@ -630,8 +639,8 @@ jQuery.extend( jQuery.easing,
       'errors.CONNECTION_ERROR': 'There was a problem connecting to the upload server',
       'errors.unknown': 'There was an internal error.',
       'errors.tryAgain': 'Please try your upload again.',
-      'errors.troubleshootDetails': 'If you would like our help to troubleshoot this, ' +
-          'please email us this information:',
+      'errors.troubleshootDetails':
+        'If you would like our help to troubleshoot this, ' + 'please email us this information:',
       cancel: 'Cancel',
       details: 'Details',
       startingUpload: 'Starting upload ...',
@@ -643,8 +652,8 @@ jQuery.extend( jQuery.easing,
       'errors.CONNECTION_ERROR': 'サーバー接続に問題があります',
       'errors.unknown': '通信環境に問題があります',
       'errors.tryAgain': 'しばらくしてから再度投稿してください',
-      'errors.troubleshootDetails': '解決できない場合は、こちらにお問い合わせください ' +
-          '下記の情報をメールでお送りください:',
+      'errors.troubleshootDetails':
+        '解決できない場合は、こちらにお問い合わせください ' + '下記の情報をメールでお送りください:',
       cancel: 'キャンセル',
       details: '詳細',
       startingUpload: '投稿中 ...',
@@ -682,7 +691,7 @@ jQuery.extend( jQuery.easing,
       return;
     }
 
-    if (args.length == 1 && typeof args[0] == 'object' || args[0] === undefined) {
+    if ((args.length == 1 && typeof args[0] == 'object') || args[0] === undefined) {
       args.unshift('init');
     }
 
@@ -700,7 +709,7 @@ jQuery.extend( jQuery.easing,
     }
 
     r = uploader[method].apply(uploader, args);
-    return (r === undefined) ? this : r;
+    return r === undefined ? this : r;
   };
 
   $.fn.transloadit.i18n = I18N;
@@ -708,32 +717,32 @@ jQuery.extend( jQuery.easing,
   function Uploader() {
     this.assemblyId = null;
 
-    this.instance      = null;
+    this.instance = null;
     this.documentTitle = null;
-    this.timer         = null;
-    this._options      = {};
-    this.uploads       = [];
-    this.results       = {};
-    this.ended         = null;
-    this.pollStarted   = null;
-    this.pollRetries   = 0;
-    this.started       = false;
-    this.assembly      = null;
-    this.params        = null;
+    this.timer = null;
+    this._options = {};
+    this.uploads = [];
+    this.results = {};
+    this.ended = null;
+    this.pollStarted = null;
+    this.pollRetries = 0;
+    this.started = false;
+    this.assembly = null;
+    this.params = null;
 
     this.bytesReceivedBefore = 0;
-    this.lastPoll            = 0;
+    this.lastPoll = 0;
 
-    this.$params     = null;
-    this.$form       = null;
-    this.$files      = null;
+    this.$params = null;
+    this.$form = null;
+    this.$files = null;
     this.$fileClones = null;
-    this.$iframe     = null;
-    this.$modal      = null;
+    this.$iframe = null;
+    this.$modal = null;
 
     this._lastMSecs = 0;
     this._lastNSecs = 0;
-    this._clockseq  = 0;
+    this._clockseq = 0;
 
     this._animatedTo100 = false;
     this._uploadFileIds = [];
@@ -778,18 +787,18 @@ jQuery.extend( jQuery.easing,
   Uploader.prototype.getBoredInstance = function() {
     var self = this;
 
-    this.instance              = null;
-    var url                    = this._options['service'] + 'instances/bored';
+    this.instance = null;
+    var url = this._options['service'] + 'instances/bored';
     var canUseCustomBoredLogic = true;
 
     function proceed() {
       $.jsonp({
-        url               : url,
-        timeout           : self._options.pollTimeout,
-        callbackParameter : 'callback',
-        success           : function(instance) {
+        url: url,
+        timeout: self._options.pollTimeout,
+        callbackParameter: 'callback',
+        success: function(instance) {
           if (instance.error) {
-            self.ended   = true;
+            self.ended = true;
             instance.url = url;
             self.renderError(instance);
             self._options.onError(instance);
@@ -807,8 +816,8 @@ jQuery.extend( jQuery.easing,
               if (err) {
                 self.ended = true;
                 err = {
-                  error   : 'BORED_INSTANCE_ERROR',
-                  message : self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
+                  error: 'BORED_INSTANCE_ERROR',
+                  message: self.i18n('errors.BORED_INSTANCE_ERROR') + ' ' + err.message
                 };
                 self.renderError(err);
                 self._options.onError(err);
@@ -827,10 +836,10 @@ jQuery.extend( jQuery.easing,
           reason += ', err: ' + jsonpErr;
 
           var err = {
-            error   : 'CONNECTION_ERROR',
-            message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : reason,
-            url     : url
+            error: 'CONNECTION_ERROR',
+            message: self.i18n('errors.CONNECTION_ERROR'),
+            reason: reason,
+            url: url
           };
           self.renderError(err);
           self._options.onError(err);
@@ -846,7 +855,7 @@ jQuery.extend( jQuery.easing,
   };
 
   Uploader.prototype._findBoredInstanceUrl = function(cb) {
-    var self   = this;
+    var self = this;
     var region = this._options.region;
     var domain = 's3';
 
@@ -855,12 +864,12 @@ jQuery.extend( jQuery.easing,
     }
 
     var url = PROTOCOL + domain + '.amazonaws.com/infra-' + region;
-    url    += '.transloadit.com/cached_instances.json';
+    url += '.transloadit.com/cached_instances.json';
 
     $.ajax({
-      url      : url,
-      datatype : 'json',
-      timeout  : 5000,
+      url: url,
+      datatype: 'json',
+      timeout: 5000,
       success: function(result) {
         var instances = self._shuffle(result.uploaders);
         self._findResponsiveInstance(instances, 0, cb);
@@ -880,12 +889,12 @@ jQuery.extend( jQuery.easing,
     }
 
     var self = this;
-    var url  = instances[index];
+    var url = instances[index];
 
     $.jsonp({
-      url               : PROTOCOL + url,
-      timeout           : 3000,
-      callbackParameter : 'callback',
+      url: PROTOCOL + url,
+      timeout: 3000,
+      callbackParameter: 'callback',
       success: function(result) {
         cb(null, url);
       },
@@ -899,8 +908,8 @@ jQuery.extend( jQuery.easing,
     var shuffled = [];
     var rand;
     for (var i = 0; i < arr.length; i++) {
-      rand           = Math.floor(Math.random() * (i + 1));
-      shuffled[i]    = shuffled[rand];
+      rand = Math.floor(Math.random() * (i + 1));
+      shuffled[i] = shuffled[rand];
       shuffled[rand] = arr[i];
     }
     return shuffled;
@@ -909,15 +918,15 @@ jQuery.extend( jQuery.easing,
   Uploader.prototype.start = function() {
     var self = this;
 
-    this.started             = false;
-    this.ended               = false;
+    this.started = false;
+    this.ended = false;
     this.bytesReceivedBefore = 0;
-    this.pollRetries         = 0;
-    this.uploads             = [];
-    this._animatedTo100      = false;
-    this._uploadFileIds      = [];
-    this._resultFileIds      = [];
-    this.results             = {};
+    this.pollRetries = 0;
+    this.uploads = [];
+    this._animatedTo100 = false;
+    this._uploadFileIds = [];
+    this._resultFileIds = [];
+    this.results = {};
 
     this.assemblyId = this._genUuid();
 
@@ -931,20 +940,26 @@ jQuery.extend( jQuery.easing,
       $clone.insertAfter(this);
     });
 
-    this.$iframe = $('<iframe id="transloadit-'+this.assemblyId+'" name="transloadit-'+this.assemblyId+'"/>')
+    this.$iframe = $(
+      '<iframe id="transloadit-' +
+        this.assemblyId +
+        '" name="transloadit-' +
+        this.assemblyId +
+        '"/>'
+    )
       .appendTo('body')
       .hide();
 
-    var url = PROTOCOL+this.instance+'/assemblies/'+this.assemblyId+'?redirect=false';
+    var url = PROTOCOL + this.instance + '/assemblies/' + this.assemblyId + '?redirect=false';
 
     if (this._options.formData) {
-      var paramsFieldVal = this.$form.find("input[name=params]").val();
+      var paramsFieldVal = this.$form.find('input[name=params]').val();
 
       if (this._options.formData instanceof FormData) {
-        this._options.formData.append("params", paramsFieldVal);
+        this._options.formData.append('params', paramsFieldVal);
       } else {
         var formData = new FormData(this.$form);
-        formData.append("params", paramsFieldVal);
+        formData.append('params', paramsFieldVal);
 
         for (var i = 0; i < this._options.formData.length; i++) {
           var tupel = this._options.formData[i];
@@ -955,7 +970,7 @@ jQuery.extend( jQuery.easing,
       }
 
       var f = new XMLHttpRequest();
-      f.open("POST", url);
+      f.open('POST', url);
       f.send(this._options.formData);
     } else {
       this.$uploadForm = $('<form enctype="multipart/form-data" />')
@@ -992,25 +1007,25 @@ jQuery.extend( jQuery.easing,
       // shadow form
       $fieldsToClone = $fieldsToClone.filter('[type!=submit]');
 
-
       var $clones = this.clone($fieldsToClone);
 
       if (this._options.params && !this.$params) {
-        $clones = $clones.add('<input name="params" value=\'' + JSON.stringify(this._options.params) + '\'>');
+        $clones = $clones.add(
+          '<input name="params" value=\'' + JSON.stringify(this._options.params) + "'>"
+        );
       }
       if (this._options.signature) {
-        $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + '\'>');
+        $clones = $clones.add('<input name="signature" value=\'' + this._options.signature + "'>");
       }
 
       if (typeof this._options.fields == 'object') {
         for (var fieldName in this._options.fields) {
           var fieldValue = this._options.fields[fieldName];
-          $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + '\'>');
+          $clones = $clones.add('<input name="' + fieldName + '" value=\'' + fieldValue + "'>");
         }
       }
 
       $clones.prependTo(this.$uploadForm);
-
 
       // now add all selects as hidden fields
       $selects.each(function() {
@@ -1030,8 +1045,8 @@ jQuery.extend( jQuery.easing,
   };
 
   Uploader.prototype.clone = function($obj) {
-    var $result         = $obj.clone();
-    var myTextareas     = $obj.filter('textarea');
+    var $result = $obj.clone();
+    var myTextareas = $obj.filter('textarea');
     var resultTextareas = $result.filter('textarea');
 
     for (var i = 0; i < myTextareas.length; ++i) {
@@ -1042,9 +1057,7 @@ jQuery.extend( jQuery.easing,
   };
 
   Uploader.prototype.detectFileInputs = function() {
-    var $files = this.$form
-      .find('input[type=file]')
-      .not(this._options.exclude);
+    var $files = this.$form.find('input[type=file]').not(this._options.exclude);
 
     if (!this._options['processZeroFiles']) {
       $files = $files.filter(function() {
@@ -1075,7 +1088,10 @@ jQuery.extend( jQuery.easing,
 
     if (this.params.redirect_url) {
       this.$form.attr('action', this.params.redirect_url);
-    } else if (this._options.autoSubmit && (this.$form.attr('action') == this._options.service+'assemblies')) {
+    } else if (
+      this._options.autoSubmit &&
+      this.$form.attr('action') == this._options.service + 'assemblies'
+    ) {
       alert('Error: input[name=params] does not include a redirect_url');
       return;
     }
@@ -1098,17 +1114,17 @@ jQuery.extend( jQuery.easing,
     this.pollStarted = +new Date();
 
     var instance = 'status-' + this.instance;
-    var url      = PROTOCOL + instance + '/assemblies/'+this.assemblyId;
+    var url = PROTOCOL + instance + '/assemblies/' + this.assemblyId;
 
     if (query) {
       url += query;
     }
 
     $.jsonp({
-      url               : url,
-      timeout           : self._options.pollTimeout,
-      callbackParameter : 'callback',
-      success           : function(assembly) {
+      url: url,
+      timeout: self._options.pollTimeout,
+      callbackParameter: 'callback',
+      success: function(assembly) {
         if (self.ended) {
           return;
         }
@@ -1146,8 +1162,8 @@ jQuery.extend( jQuery.easing,
         self.pollRetries = 0;
         var isUploading = assembly.ok === 'ASSEMBLY_UPLOADING';
         var isExecuting = assembly.ok === 'ASSEMBLY_EXECUTING';
-        var isCanceled  = assembly.ok === 'ASSEMBLY_CANCELED';
-        var isComplete  = assembly.ok === 'ASSEMBLY_COMPLETED';
+        var isCanceled = assembly.ok === 'ASSEMBLY_CANCELED';
+        var isComplete = assembly.ok === 'ASSEMBLY_COMPLETED';
 
         if (assembly.bytes_expected > 0) {
           self._options.onProgress(assembly.bytes_received, assembly.bytes_expected, assembly);
@@ -1167,7 +1183,7 @@ jQuery.extend( jQuery.easing,
           self.results[step] = self.results[step] || [];
 
           for (var j = 0; j < assembly.results[step].length; j++) {
-            var result   = assembly.results[step][j];
+            var result = assembly.results[step][j];
             var resultId = step + '_' + result.id;
 
             if ($.inArray(resultId, self._resultFileIds) === -1) {
@@ -1208,7 +1224,7 @@ jQuery.extend( jQuery.easing,
           return;
         }
 
-        var ping    = self.pollStarted - +new Date();
+        var ping = self.pollStarted - +new Date();
         var timeout = ping < self._options.interval ? self._options.interval : ping;
 
         self.timer = setTimeout(function() {
@@ -1230,10 +1246,10 @@ jQuery.extend( jQuery.easing,
           reason += ', err: ' + jsonpErr;
 
           var err = {
-            error   : 'CONNECTION_ERROR',
-            message : self.i18n('errors.CONNECTION_ERROR'),
-            reason  : reason,
-            url     : url
+            error: 'CONNECTION_ERROR',
+            message: self.i18n('errors.CONNECTION_ERROR'),
+            reason: reason,
+            url: url
           };
           self.renderError(err);
           self._options.onError(err);
@@ -1251,7 +1267,6 @@ jQuery.extend( jQuery.easing,
     document.title = this.documentTitle;
     this.ended = true;
   };
-
 
   Uploader.prototype.cancel = function() {
     // @todo this has still a race condition if a new upload is started
@@ -1304,9 +1319,7 @@ jQuery.extend( jQuery.easing,
     }
 
     if (this._options.autoSubmit) {
-      this.$form
-        .unbind('submit.transloadit')
-        .submit();
+      this.$form.unbind('submit.transloadit').submit();
     }
   };
 
@@ -1316,32 +1329,38 @@ jQuery.extend( jQuery.easing,
   };
 
   Uploader.prototype.showModal = function() {
-    this.$modal =
-      $('<div id="transloadit">'+
-        '<div class="content">'+
-          '<a href="#close" class="close">'+ this.i18n('cancel') +'</a>'+
-          '<p class="status"></p>'+
-          '<div class="progress progress-striped">' +
-            '<div class="bar"><span class="percent"></span></div>' +
-          '</div>' +
-          '<label>'+ this.i18n('startingUpload')+'</label>' +
-          '<p class="error"></p>'+
-          '<div class="error-details-toggle"><a href="#">'+ this.i18n('details') +'</a></div>' +
-          '<p class="error-details"></p>'+
-        '</div>'+
-      '</div>')
-      .appendTo('body');
+    this.$modal = $(
+      '<div id="transloadit">' +
+        '<div class="content">' +
+        '<a href="#close" class="close">' +
+        this.i18n('cancel') +
+        '</a>' +
+        '<p class="status"></p>' +
+        '<div class="progress progress-striped">' +
+        '<div class="bar"><span class="percent"></span></div>' +
+        '</div>' +
+        '<label>' +
+        this.i18n('startingUpload') +
+        '</label>' +
+        '<p class="error"></p>' +
+        '<div class="error-details-toggle"><a href="#">' +
+        this.i18n('details') +
+        '</a></div>' +
+        '<p class="error-details"></p>' +
+        '</div>' +
+        '</div>'
+    ).appendTo('body');
 
     $.extend(this.$modal, {
-      '$content'            : this.$modal.find('.content'),
-      '$close'              : this.$modal.find('.close'),
-      '$label'              : this.$modal.find('label'),
-      '$progress'           : this.$modal.find('.progress'),
-      '$percent'            : this.$modal.find('.progress .percent'),
-      '$progressBar'        : this.$modal.find('.progress .bar'),
-      '$error'              : this.$modal.find('.error'),
-      '$errorDetails'       : this.$modal.find('.error-details'),
-      '$errorDetailsToggle' : this.$modal.find('.error-details-toggle')
+      $content: this.$modal.find('.content'),
+      $close: this.$modal.find('.close'),
+      $label: this.$modal.find('label'),
+      $progress: this.$modal.find('.progress'),
+      $percent: this.$modal.find('.progress .percent'),
+      $progressBar: this.$modal.find('.progress .bar'),
+      $error: this.$modal.find('.error'),
+      $errorDetails: this.$modal.find('.error-details'),
+      $errorDetailsToggle: this.$modal.find('.error-details-toggle')
     });
 
     var self = this;
@@ -1351,12 +1370,12 @@ jQuery.extend( jQuery.easing,
     this.$modal.$errorDetailsToggle.hide();
 
     var expose = this.$modal.expose({
-      api          : true,
-      maskId       : 'transloadit_expose',
-      opacity      : 0.9,
-      loadSpeed    : 250,
-      closeOnEsc   : false,
-      closeOnClick : false
+      api: true,
+      maskId: 'transloadit_expose',
+      opacity: 0.9,
+      loadSpeed: 250,
+      closeOnEsc: false,
+      closeOnClick: false
     });
 
     this.$modal.$close.click(function() {
@@ -1378,14 +1397,10 @@ jQuery.extend( jQuery.easing,
     this.$modal.$progress.hide();
     this.$modal.$label.hide();
 
-    var errorMsg = err.error+': ' + err.message + '<br /><br />';
-    errorMsg += (err.reason || '');
+    var errorMsg = err.error + ': ' + err.message + '<br /><br />';
+    errorMsg += err.reason || '';
 
-    var errorsRequiringDetails = [
-      'CONNECTION_ERROR',
-      'BORED_INSTANCE_ERROR',
-      'ASSEMBLY_NOT_FOUND'
-    ];
+    var errorsRequiringDetails = ['CONNECTION_ERROR', 'BORED_INSTANCE_ERROR', 'ASSEMBLY_NOT_FOUND'];
     if ($.inArray(err.error, errorsRequiringDetails) === -1) {
       this.$modal.$error.html(errorMsg).show();
       return;
@@ -1395,22 +1410,21 @@ jQuery.extend( jQuery.easing,
     this.$modal.$error.html(text).show();
 
     var assemblyId = err.assemblyId ? err.assemblyId : this.assemblyId;
-    var self       = this;
-    var ip         = null;
+    var self = this;
+    var ip = null;
 
     $.getJSON(PROTOCOL + 'jsonip.com/', function(ipData) {
       ip = ipData.ip;
-    })
-    .always(function() {
+    }).always(function() {
       var details = {
-        endpoint     : err.url,
-        instance     : self.instance,
-        assembly_id  : assemblyId,
-        ip           : ip,
-        time         : self.getUTCDatetime(),
-        agent        : navigator.userAgent,
-        poll_retries : self.pollRetries,
-        error        : errorMsg
+        endpoint: err.url,
+        instance: self.instance,
+        assembly_id: assemblyId,
+        ip: ip,
+        time: self.getUTCDatetime(),
+        agent: navigator.userAgent,
+        poll_retries: self.pollRetries,
+        error: errorMsg
       };
       $.post(PROTOCOL + 'status.transloadit.com/client_error', details);
 
@@ -1422,7 +1436,9 @@ jQuery.extend( jQuery.easing,
       var detailsTxt = self.i18n('errors.troubleshootDetails') + '<br /><br />';
       self.$modal.$errorDetails.hide().html(detailsTxt + detailsArr.join('<br />'));
 
-      self.$modal.$errorDetailsToggle.show().find('a')
+      self.$modal.$errorDetailsToggle
+        .show()
+        .find('a')
         .off('click')
         .on('click', function(e) {
           e.preventDefault();
@@ -1436,20 +1452,20 @@ jQuery.extend( jQuery.easing,
       return;
     }
 
-    var progress = assembly.bytes_received / assembly.bytes_expected * 100;
+    var progress = (assembly.bytes_received / assembly.bytes_expected) * 100;
     if (progress > 100) {
       progress = 0;
     }
 
-    var bytesReceived     = assembly.bytes_received - this.bytesReceivedBefore;
+    var bytesReceived = assembly.bytes_received - this.bytesReceivedBefore;
     var timeSinceLastPoll = +new Date() - this.lastPoll;
-    var duration          = progress === 100 ? 1000 : this._options.interval * 2;
+    var duration = progress === 100 ? 1000 : this._options.interval * 2;
 
     var mbReceived = (assembly.bytes_received / 1024 / 1024).toFixed(2);
     var mbExpected = (assembly.bytes_expected / 1024 / 1024).toFixed(2);
-    var uploadRate = ((bytesReceived / 1024) / (timeSinceLastPoll / 1000)).toFixed(1);
+    var uploadRate = (bytesReceived / 1024 / (timeSinceLastPoll / 1000)).toFixed(1);
 
-    var outstanding  = assembly.bytes_expected - assembly.bytes_received;
+    var outstanding = assembly.bytes_expected - assembly.bytes_received;
     var speedInBytes = (bytesReceived / (timeSinceLastPoll / 1000)).toFixed(1);
 
     var durationLeft = '';
@@ -1457,15 +1473,13 @@ jQuery.extend( jQuery.easing,
       durationLeft = this._duration(outstanding / speedInBytes);
     }
 
-    txt = this.i18n('uploadProgress',
-      mbReceived, mbExpected, uploadRate, durationLeft
-    );
+    txt = this.i18n('uploadProgress', mbReceived, mbExpected, uploadRate, durationLeft);
 
     if (!this._animatedTo100) {
       this.$modal.$label.text(txt);
     }
 
-    var totalWidth           = parseInt(this.$modal.$progress.css('width'), 10);
+    var totalWidth = parseInt(this.$modal.$progress.css('width'), 10);
     this.bytesReceivedBefore = assembly.bytes_received;
 
     if (bytesReceived <= 0 && !isAssemblyComplete) {
@@ -1479,14 +1493,14 @@ jQuery.extend( jQuery.easing,
     }
 
     this.$modal.$progressBar.stop().animate(
-      {width: progress + '%'},
+      { width: progress + '%' },
       {
         duration: duration,
         easing: 'linear',
         progress: function(promise, currPercent, remainingMs) {
           var width = parseInt(self.$modal.$progressBar.css('width'), 10);
 
-          var percent = (width * 100 / totalWidth).toFixed(0);
+          var percent = ((width * 100) / totalWidth).toFixed(0);
           if (percent > 100) {
             percent = 100;
           }
@@ -1514,8 +1528,11 @@ jQuery.extend( jQuery.easing,
     }
 
     CSS_LOADED = true;
-    $('<link rel="stylesheet" type="text/css" href="' + this._options.assets + 'css/transloadit2-latest.css" />')
-      .appendTo('head');
+    $(
+      '<link rel="stylesheet" type="text/css" href="' +
+        this._options.assets +
+        'css/transloadit2-latest.css" />'
+    ).appendTo('head');
   };
 
   Uploader.prototype.getUTCDatetime = function() {
@@ -1529,11 +1546,11 @@ jQuery.extend( jQuery.easing,
       now.getUTCSeconds()
     );
 
-    var pad = function (n) {
+    var pad = function(n) {
       return n < 10 ? '0' + n : n;
     };
     var tz = d.getTimezoneOffset();
-    var tzs = (tz > 0 ? "-" : "+") + pad(parseInt(tz / 60, 10));
+    var tzs = (tz > 0 ? '-' : '+') + pad(parseInt(tz / 60, 10));
 
     if (tz % 60 !== 0) {
       tzs += pad(tz % 60);
@@ -1543,17 +1560,25 @@ jQuery.extend( jQuery.easing,
       tzs = 'Z';
     }
 
-    return d.getFullYear() + '-' +
-        pad(d.getMonth() + 1) + '-' +
-        pad(d.getDate()) + 'T' +
-        pad(d.getHours()) + ':' +
-        pad(d.getMinutes()) + ':' +
-        pad(d.getSeconds()) + tzs;
+    return (
+      d.getFullYear() +
+      '-' +
+      pad(d.getMonth() + 1) +
+      '-' +
+      pad(d.getDate()) +
+      'T' +
+      pad(d.getHours()) +
+      ':' +
+      pad(d.getMinutes()) +
+      ':' +
+      pad(d.getSeconds()) +
+      tzs
+    );
   };
 
   Uploader.prototype._duration = function(t) {
-    var min   = 60;
-    var h     = 60 * min;
+    var min = 60;
+    var h = 60 * min;
     var hours = Math.floor(t / h);
 
     t -= hours * h;
@@ -1583,14 +1608,14 @@ jQuery.extend( jQuery.easing,
   Uploader.prototype._genUuid = function(options, buf, offset) {
     options = options || {};
 
-    var i = buf && offset || 0;
+    var i = (buf && offset) || 0;
     var b = buf || [];
 
     var _rnds = new Array(16);
     var _rng = function() {
       for (var j = 0, r; j < 16; j++) {
         if ((j & 0x03) === 0) r = Math.random() * 0x100000000;
-        _rnds[j] = r >>> ((j & 0x03) << 3) & 0xff;
+        _rnds[j] = (r >>> ((j & 0x03) << 3)) & 0xff;
       }
 
       return _rnds;
@@ -1599,10 +1624,14 @@ jQuery.extend( jQuery.easing,
 
     var _nodeId = [
       _seedBytes[0] | 0x01,
-      _seedBytes[1], _seedBytes[2], _seedBytes[3], _seedBytes[4], _seedBytes[5]
+      _seedBytes[1],
+      _seedBytes[2],
+      _seedBytes[3],
+      _seedBytes[4],
+      _seedBytes[5]
     ];
 
-    this._clockseq = (_seedBytes[6] << 8 | _seedBytes[7]) & 0x3fff;
+    this._clockseq = ((_seedBytes[6] << 8) | _seedBytes[7]) & 0x3fff;
     var clockseq = options.clockseq != null ? options.clockseq : this._clockseq;
 
     var _byteToHex = [];
@@ -1623,11 +1652,11 @@ jQuery.extend( jQuery.easing,
     var nsecs = options.nsecs != null ? options.nsecs : this._lastNSecs + 1;
 
     // Time since last uuid creation (in msecs)
-    var dt = (msecs - this._lastMSecs) + (nsecs - this._lastNSecs)/10000;
+    var dt = msecs - this._lastMSecs + (nsecs - this._lastNSecs) / 10000;
 
     // Per 4.2.1.2, Bump clockseq on clock regression
     if (dt < 0 && options.clockseq == null) {
-      clockseq = clockseq + 1 & 0x3fff;
+      clockseq = (clockseq + 1) & 0x3fff;
     }
 
     // Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
@@ -1638,7 +1667,7 @@ jQuery.extend( jQuery.easing,
 
     // Per 4.2.1.2 Throw error if too many uuids are requested
     if (nsecs >= 10000) {
-      throw new Error('uuid.v1(): Can\'t create more than 10M uuids/sec');
+      throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");
     }
 
     this._lastMSecs = msecs;
@@ -1650,22 +1679,22 @@ jQuery.extend( jQuery.easing,
 
     // `time_low`
     var tl = ((msecs & 0xfffffff) * 10000 + nsecs) % 0x100000000;
-    b[i++] = tl >>> 24 & 0xff;
-    b[i++] = tl >>> 16 & 0xff;
-    b[i++] = tl >>> 8 & 0xff;
+    b[i++] = (tl >>> 24) & 0xff;
+    b[i++] = (tl >>> 16) & 0xff;
+    b[i++] = (tl >>> 8) & 0xff;
     b[i++] = tl & 0xff;
 
     // `time_mid`
-    var tmh = (msecs / 0x100000000 * 10000) & 0xfffffff;
-    b[i++] = tmh >>> 8 & 0xff;
+    var tmh = ((msecs / 0x100000000) * 10000) & 0xfffffff;
+    b[i++] = (tmh >>> 8) & 0xff;
     b[i++] = tmh & 0xff;
 
     // `time_high_and_version`
-    b[i++] = tmh >>> 24 & 0xf | 0x10; // include version
-    b[i++] = tmh >>> 16 & 0xff;
+    b[i++] = ((tmh >>> 24) & 0xf) | 0x10; // include version
+    b[i++] = (tmh >>> 16) & 0xff;
 
     // `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
-    b[i++] = clockseq >>> 8 | 0x80;
+    b[i++] = (clockseq >>> 8) | 0x80;
 
     // `clock_seq_low`
     b[i++] = clockseq & 0xff;
@@ -1678,16 +1707,27 @@ jQuery.extend( jQuery.easing,
     }
 
     function unparse(_buf, offset) {
-      var i = offset || 0, bth = _byteToHex;
+      var i = offset || 0,
+        bth = _byteToHex;
 
-      return  bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]] +
-              bth[_buf[i++]] + bth[_buf[i++]];
+      return (
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]] +
+        bth[_buf[i++]]
+      );
     }
 
     return buf ? buf : unparse(b);
@@ -1711,14 +1751,13 @@ jQuery.extend( jQuery.easing,
 
   Uploader.prototype.i18n = function() {
     var args = Array.prototype.slice.call(arguments);
-    var key  = args.shift();
+    var key = args.shift();
     var locale = this._options.locale;
-    var translated = I18N[locale] && I18N[locale][key] || I18N.en[key];
-    if(!translated) {
+    var translated = (I18N[locale] && I18N[locale][key]) || I18N.en[key];
+    if (!translated) {
       throw new Error('Unknown i18n key: ' + key);
     }
 
     return sprintf(translated, args);
   };
-
-}(jQuery);
+})(jQuery);

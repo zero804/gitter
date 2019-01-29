@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
@@ -31,22 +31,21 @@ var ONE_YEAR_SECONDS = 60 * 60 * 24 * 365; // 1 year
 var ONE_YEAR_MILLISECONDS = ONE_YEAR_SECONDS * 1000;
 
 var validateRoomForReadOnlyAccess = Promise.method(function(user, policy) {
-  return policy.canRead()
-    .then(function(access) {
-      if (access) return;
-      if (!user) throw new StatusError(401); // Very suspect...
-      throw new StatusError(404)
-    });
-})
+  return policy.canRead().then(function(access) {
+    if (access) return;
+    if (!user) throw new StatusError(401); // Very suspect...
+    throw new StatusError(404);
+  });
+});
 
 function generateChatTree(chatActivity) {
   // group things in nested maps
   var yearMap = {};
   _.each(chatActivity, function(count, unixTime) {
-    var date = moment(unixTime, "X");
+    var date = moment(unixTime, 'X');
     var year = date.year();
-    var month = date.format("MM"); // 01-12
-    var day = date.format("DD"); // 01-31
+    var month = date.format('MM'); // 01-12
+    var day = date.format('DD'); // 01-31
     if (!yearMap[year]) {
       yearMap[year] = {};
     }
@@ -65,14 +64,14 @@ function generateChatTree(chatActivity) {
     _.each(monthMap, function(dayMap, month) {
       var dayArray = [];
       _.each(dayMap, function(count, day) {
-        dayArray.push({day: day, count: count});
+        dayArray.push({ day: day, count: count });
       });
-      dayArray = _.sortBy(dayArray, 'day') // not reversed
-      var monthName = moment.months()[parseInt(month, 10)-1];
-      monthArray.push({month: month, monthName: monthName, days: dayArray}); // monthName?
+      dayArray = _.sortBy(dayArray, 'day'); // not reversed
+      var monthName = moment.months()[parseInt(month, 10) - 1];
+      monthArray.push({ month: month, monthName: monthName, days: dayArray }); // monthName?
     });
     monthArray = _.sortBy(monthArray, 'month').reverse();
-    yearArray.push({year: year, months: monthArray});
+    yearArray.push({ year: year, months: monthArray });
   });
   yearArray = _.sortBy(yearArray, 'year').reverse();
   //console.log(JSON.stringify(yearArray, null, 2));
@@ -90,7 +89,7 @@ exports.datesList = [
     var policy = req.uriContext.policy;
 
     // This is where we want non-logged-in users to return
-    if(!user && req.session) {
+    if (!user && req.session) {
       req.session.returnTo = '/' + troupe.uri;
     }
 
@@ -137,7 +136,7 @@ exports.linksList = [
     var policy = req.uriContext.policy;
 
     // This is where we want non-logged-in users to return
-    if(!user && req.session) {
+    if (!user && req.session) {
       req.session.returnTo = '/' + troupe.uri;
     }
 
@@ -199,7 +198,7 @@ exports.chatArchive = [
         var troupeId = troupe.id;
 
         // This is where we want non-logged-in users to return
-        if(!user && req.session) {
+        if (!user && req.session) {
           req.session.returnTo = '/' + troupe.uri;
         }
 
@@ -213,30 +212,45 @@ exports.chatArchive = [
         var previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
         var startDateLocal = dateTZtoUTC(yyyy, mm, dd, res.locals.tzOffset);
-        var endDateLocal = moment(startDateLocal).add(1, 'days').toDate();
+        var endDateLocal = moment(startDateLocal)
+          .add(1, 'days')
+          .toDate();
 
         var today = moment().endOf('day');
-        if(moment(nextDateUTC).endOf('day').isAfter(today)) {
+        if (
+          moment(nextDateUTC)
+            .endOf('day')
+            .isAfter(today)
+        ) {
           nextDateUTC = null;
         }
 
-        if(moment(previousDateUTC).startOf('day').isBefore(moment([2013, 11, 1]))) {
+        if (
+          moment(previousDateUTC)
+            .startOf('day')
+            .isBefore(moment([2013, 11, 1]))
+        ) {
           previousDateUTC = null;
         }
 
-        debug('Archive searching for messages in troupe %s in date range %s-%s', troupeId, startDateLocal, endDateLocal);
-        return chatService.findChatMessagesForTroupeForDateRange(troupeId, startDateLocal, endDateLocal)
+        debug(
+          'Archive searching for messages in troupe %s in date range %s-%s',
+          troupeId,
+          startDateLocal,
+          endDateLocal
+        );
+        return chatService
+          .findChatMessagesForTroupeForDateRange(troupeId, startDateLocal, endDateLocal)
           .then(function(chatMessages) {
-
             var strategy = new restSerializer.ChatStrategy({
               unread: false, // All chats are read in the archive
               troupeId: troupeId
             });
 
             return Promise.all([
-                contextGenerator.generateTroupeContext(req),
-                restSerializer.serialize(chatMessages, strategy)
-              ]);
+              contextGenerator.generateTroupeContext(req),
+              restSerializer.serialize(chatMessages, strategy)
+            ]);
           })
           .spread(function(troupeContext, serialized) {
             troupeContext.archive = {
@@ -246,7 +260,7 @@ exports.chatArchive = [
             };
 
             var language = req.headers['accept-language'];
-            if(language) {
+            if (language) {
               language = language.split(';')[0].split(',');
             } else {
               language = 'en-uk';
@@ -262,7 +276,7 @@ exports.chatArchive = [
             var numericDate = startDateLocale.format('D');
 
             var ordinalPart;
-            if(ordinalDate.indexOf('' + numericDate) === 0) {
+            if (ordinalDate.indexOf('' + numericDate) === 0) {
               ordinalPart = ordinalDate.substring(('' + numericDate).length);
             } else {
               ordinalPart = '';
@@ -272,7 +286,11 @@ exports.chatArchive = [
             var dayNameFormatted = numericDate;
             var dayOrdinalFormatted = ordinalPart;
             var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
-            var nextDateFormatted = n && moment(n.valueOf()).locale(language).format('Do MMM YYYY');
+            var nextDateFormatted =
+              n &&
+              moment(n.valueOf())
+                .locale(language)
+                .format('Do MMM YYYY');
             var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
             var monthYearFormatted = startDateLocale.format('MMM YYYY');
 
@@ -323,9 +341,8 @@ exports.chatArchive = [
 
               showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
               fonts: fonts.getFonts(),
-              hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+              hasCachedFonts: fonts.hasCachedFonts(req.cookies)
             });
-
           });
       })
       .catch(next);

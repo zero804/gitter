@@ -16,13 +16,13 @@ var CloseIconView = ItemView.extend({
   }),
 
   events: {
-    'mouseenter': 'onItemMouseEnter',
-    'mouseleave': 'onItemMouseLeave',
-    'click': 'onItemClicked'
+    mouseenter: 'onItemMouseEnter',
+    mouseleave: 'onItemMouseLeave',
+    click: 'onItemClicked'
   },
 
   initialize: function(attrs) {
-    this.iconOpts = _.extend({}, this.defaults, (attrs.icon || {}));
+    this.iconOpts = _.extend({}, this.defaults, attrs.icon || {});
     this.iconHover = false;
     this.roomMenuModel = attrs.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:roomMenuIsPinned', this.updatePinnedState, this);
@@ -42,7 +42,7 @@ var CloseIconView = ItemView.extend({
     this.trigger('minibar-item:close');
   },
 
-  getPinnedState: function(){
+  getPinnedState: function() {
     return !!this.roomMenuModel.get('roomMenuIsPinned');
   },
 
@@ -59,7 +59,6 @@ var CloseIconView = ItemView.extend({
   onRender: function() {
     this.setupCloseIcon();
   }
-
 });
 
 cocktail.mixin(CloseIconView, closeViewMixin);

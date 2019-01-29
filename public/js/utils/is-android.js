@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 module.exports = function(userAgentString) {
   var stringToTest = userAgentString || navigator.userAgent;

@@ -12,7 +12,12 @@ var CONSUMER_SECRET = config.get('twitterbadger:consumer_secret');
 var BADGER_ACCESS_TOKEN = config.get('twitterbadger:access_token');
 var BADGER_ACCESS_TOKEN_SECRET = config.get('twitterbadger:access_token_secret');
 
-var twitterService = new TwitterService(CONSUMER_KEY, CONSUMER_SECRET, BADGER_ACCESS_TOKEN, BADGER_ACCESS_TOKEN_SECRET);
+var twitterService = new TwitterService(
+  CONSUMER_KEY,
+  CONSUMER_SECRET,
+  BADGER_ACCESS_TOKEN,
+  BADGER_ACCESS_TOKEN_SECRET
+);
 
 var DEVELOPMENT_TWITTER_ALLOWED = [
   'gitchat',
@@ -34,30 +39,30 @@ var DEVELOPMENT_TWITTER_ALLOWED = [
 }, {});
 
 var userFilter;
-if(process.env.NODE_ENV === 'prod') {
-  userFilter = function() { return true };
+if (process.env.NODE_ENV === 'prod') {
+  userFilter = function() {
+    return true;
+  };
 } else {
   userFilter = function(user) {
     if (!user) return false;
     if (!user.twitterUsername) return false;
 
     // Some mocked users
-    if(/GitterTestUser/.test(user.twitterUsername)) {
+    if (/GitterTestUser/.test(user.twitterUsername)) {
       return true;
     }
 
-    return DEVELOPMENT_TWITTER_ALLOWED[user.twitterUsername.toLowerCase()]
+    return DEVELOPMENT_TWITTER_ALLOWED[user.twitterUsername.toLowerCase()];
   };
-
 }
 
-
 function sendUserInviteTweets(invitingUser, users, name, url) {
-  if(!invitingUser) {
+  if (!invitingUser) {
     throw new Error('No user provided to show as the person inviting other users');
   }
 
-  if(!url) {
+  if (!url) {
     throw new Error('No url provided to point users to');
   }
 
@@ -72,17 +77,20 @@ function sendUserInviteTweets(invitingUser, users, name, url) {
 
   if (!mentionList) return [];
 
-  var invitingUserName = invitingUser.twitterUsername ? ('@' + invitingUser.twitterUsername) : invitingUser.username;
+  var invitingUserName = invitingUser.twitterUsername
+    ? '@' + invitingUser.twitterUsername
+    : invitingUser.username;
   var tweets = badgerMessageComposer(invitingUserName, mentionList, name, url);
 
   debug('Sending tweets: %j', tweets);
-  return Promise.map(tweets, function(tweet) {
-    return twitterService.sendTweet(tweet)
-      .return(tweet);
-  }, { concurrency: 1 });
-
+  return Promise.map(
+    tweets,
+    function(tweet) {
+      return twitterService.sendTweet(tweet).return(tweet);
+    },
+    { concurrency: 1 }
+  );
 }
-
 
 module.exports = {
   sendUserInviteTweets: Promise.method(sendUserInviteTweets)

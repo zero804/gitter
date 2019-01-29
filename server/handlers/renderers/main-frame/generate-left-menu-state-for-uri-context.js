@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var userSettingsService = require('gitter-web-user-settings');
@@ -11,8 +11,7 @@ function calculate(uriContext, options) {
   var suggestedMenuState = options.suggestedMenuState;
   var hasDismissedSuggestions = options.hasDismissedSuggestions;
   var suggestedRoomsHidden = options.suggestedRoomsHidden;
-  var roomMenuIsPinned = options.roomMenuIsPinned === undefined ?
-                          true : options.roomMenuIsPinned;
+  var roomMenuIsPinned = options.roomMenuIsPinned === undefined ? true : options.roomMenuIsPinned;
 
   var menuState;
   var groupId;
@@ -21,50 +20,49 @@ function calculate(uriContext, options) {
     menuState = suggestedMenuState;
   } else if (currentRoom) {
     // But if we find something later, let's use it instead
-    if(currentRoom.groupId && !roomMember) {
+    if (currentRoom.groupId && !roomMember) {
       menuState = 'org';
       groupId = currentRoom.groupId;
     } else {
-      menuState = 'all'
+      menuState = 'all';
     }
   } else if (currentGroup) {
     menuState = 'org';
     groupId = currentGroup._id;
   } else {
-    menuState = 'all'
+    menuState = 'all';
   }
-
 
   return {
     state: menuState,
     groupId: groupId,
     hasDismissedSuggestions: hasDismissedSuggestions,
     suggestedRoomsHidden: suggestedRoomsHidden,
-    roomMenuIsPinned: roomMenuIsPinned,
+    roomMenuIsPinned: roomMenuIsPinned
   };
 }
 
 function getSettingsForUser(userId) {
   if (!userId) return Promise.resolve(null);
 
-  return userSettingsService.getMultiUserSettingsForUserId(userId, ['suggestedRoomsHidden', 'leftRoomMenu']);
+  return userSettingsService.getMultiUserSettingsForUserId(userId, [
+    'suggestedRoomsHidden',
+    'leftRoomMenu'
+  ]);
 }
 
 function generateLeftMenuStateForUriContext(userId, uriContext, suggestedMenuState) {
-  return getSettingsForUser(userId)
-    .then(function(settings) {
-      var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
-      var leftRoomMenuState = settings && settings.leftRoomMenu;
+  return getSettingsForUser(userId).then(function(settings) {
+    var suggestedRoomsHidden = settings && settings.suggestedRoomsHidden;
+    var leftRoomMenuState = settings && settings.leftRoomMenu;
 
-      return calculate(uriContext, {
-        suggestedMenuState: suggestedMenuState,
-        suggestedRoomsHidden: suggestedRoomsHidden,
-        hasDismissedSuggestions: leftRoomMenuState && leftRoomMenuState.hasDismissedSuggestions,
-        roomMenuIsPinned: leftRoomMenuState && leftRoomMenuState.roomMenuIsPinned
-      });
-
+    return calculate(uriContext, {
+      suggestedMenuState: suggestedMenuState,
+      suggestedRoomsHidden: suggestedRoomsHidden,
+      hasDismissedSuggestions: leftRoomMenuState && leftRoomMenuState.hasDismissedSuggestions,
+      roomMenuIsPinned: leftRoomMenuState && leftRoomMenuState.roomMenuIsPinned
     });
+  });
 }
-
 
 module.exports = generateLeftMenuStateForUriContext;

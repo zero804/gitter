@@ -21,7 +21,7 @@ SecurityResourceRoute.prototype.index = function(req) {
       var strategy = restSerializer.SecurityDescriptorStrategy.full();
       return restSerializer.serializeObject(securityDescriptor, strategy);
     });
-}
+};
 
 SecurityResourceRoute.prototype.updateRoot = function(req) {
   return this.getSecurityDescriptorWithPolicyService(req)
@@ -33,9 +33,11 @@ SecurityResourceRoute.prototype.updateRoot = function(req) {
           throw new StatusError(400, 'extraAdmins must be an array');
         }
 
-        if (!extraAdmins.every(function(id) {
-          return mongoUtils.isLikeObjectId(id);
-        })) {
+        if (
+          !extraAdmins.every(function(id) {
+            return mongoUtils.isLikeObjectId(id);
+          })
+        ) {
           throw new StatusError(400, 'extraAdmins must be user identifiers');
         }
       }
@@ -45,9 +47,9 @@ SecurityResourceRoute.prototype.updateRoot = function(req) {
       });
     })
     .then(function(securityDescriptor) {
-      var strategy = restSerializer.SecurityDescriptorStrategy.full()
+      var strategy = restSerializer.SecurityDescriptorStrategy.full();
       return restSerializer.serializeObject(securityDescriptor, strategy);
     });
-}
+};
 
 module.exports = SecurityResourceRoute;

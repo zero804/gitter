@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* Force a connection */
 require('gitter-web-persistence');
@@ -12,17 +12,17 @@ describe('start', function() {
   this.timeout(30000);
 
   before(function() {
-    return onMongoConnect()
-      .then(function() {
-        var redis = env.redis.getClient();
-        var noPersistRedis = env.redis.createClient(process.env.REDIS_NOPERSIST_CONNECTION_STRING || env.config.get("redis_nopersist"));
+    return onMongoConnect().then(function() {
+      var redis = env.redis.getClient();
+      var noPersistRedis = env.redis.createClient(
+        process.env.REDIS_NOPERSIST_CONNECTION_STRING || env.config.get('redis_nopersist')
+      );
 
-        return Promise.map([redis, noPersistRedis], function(r) {
-          return Promise.fromCallback(function(callback) {
-            r.info(callback);
-          });
+      return Promise.map([redis, noPersistRedis], function(r) {
+        return Promise.fromCallback(function(callback) {
+          r.info(callback);
         });
       });
+    });
   });
-
 });

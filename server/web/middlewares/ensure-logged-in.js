@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var loginRequired = require('./login-required');
 
@@ -9,4 +9,3 @@ module.exports = function(req, res, next) {
 
   loginRequired(req, res, next);
 };
-

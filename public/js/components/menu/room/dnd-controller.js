@@ -5,7 +5,6 @@ var dragula = require('dragula');
 var _ = require('underscore');
 
 var DNDCtrl = function() {
-
   this.onMouseUp = this.onMouseUp.bind(this);
   this.panelRef = document.querySelector('.room-menu__panel');
 
@@ -22,30 +21,35 @@ var DNDCtrl = function() {
 };
 
 DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
-
-  shouldItemMove: function (el) {
-
-    return (el.tagName !== 'A' &&
-            !el.classList.contains('search-message-empty-container') &&
-            el.id !== 'empty-view');
+  shouldItemMove: function(el) {
+    return (
+      el.tagName !== 'A' &&
+      !el.classList.contains('search-message-empty-container') &&
+      el.id !== 'empty-view'
+    );
   },
 
-  pushContainer: function (el) {
+  pushContainer: function(el) {
     this.drag.containers.push(el);
   },
 
   //TODO TEST THIS
-  removeContainer: function (el) {
+  removeContainer: function(el) {
     var index = this.drag.containers.indexOf(el);
-    if (index === -1) { return; }
+    if (index === -1) {
+      return;
+    }
 
     this.drag.containers.splice(index, 1);
   },
 
   // eslint-disable-next-line complexity
-  onItemDropped: function(el, target, source, sibling) {//jshint unused: true
+  onItemDropped: function(el, target, source, sibling) {
+    //jshint unused: true
     //guard against no drop target
-    if(!target || !target.dataset) { return }
+    if (!target || !target.dataset) {
+      return;
+    }
 
     var id = el.dataset.id;
     var type = el.dataset.type;
@@ -53,33 +57,30 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
 
     if (type === 'room' && target.classList.contains('collection-list--primary')) {
       this.trigger('room-menu:remove-favourite', id);
-    }
-    else if (type === 'room' && target.classList.contains('collection-list--favourite')) {
+    } else if (type === 'room' && target.classList.contains('collection-list--favourite')) {
       this.trigger('room-menu:sort-favourite', id, siblingID);
-    }
-    else if (target.classList.contains('minibar-collection-list')) {
+    } else if (target.classList.contains('minibar-collection-list')) {
       this.trigger('minibar:update-favourite-group', id, type, siblingID);
-      if(type === 'room' || type === 'room-list-group') {
+      if (type === 'room' || type === 'room-list-group') {
         this.drag.cancel(true);
       }
-    }
-    else if (type === 'minibar-group' && !target.classList.contains('minibar-collection-list')) {
+    } else if (type === 'minibar-group' && !target.classList.contains('minibar-collection-list')) {
       this.trigger('minibar:remove-favourite-group', id);
     }
 
     this.onDragEnd();
   },
 
-  onDragStart: function () {
+  onDragStart: function() {
     this.mirror = document.querySelector('gu-mirror');
     this.trigger('dnd:start-drag');
     window.addEventListener('mouseup', this.onMouseUp);
   },
 
-  onDragEnd: function (el) {
+  onDragEnd: function(el) {
     this.mirror = null;
     window.removeEventListener('mouseup', this.onMouseUp);
-    if(el) {
+    if (el) {
       el.classList.remove('hidden');
       el.classList.remove('will-hideaway');
     }
@@ -87,11 +88,12 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     this.trigger('dnd:end-drag');
   },
 
-  onMouseUp: function () {
+  onMouseUp: function() {
     this.onDragEnd();
   },
 
-  onContainerHover: function (el, container) { //jshint unused: true
+  onContainerHover: function(el, container) {
+    //jshint unused: true
     var mirror;
     var transit;
 
@@ -99,19 +101,26 @@ DNDCtrl.prototype = _.extend(DNDCtrl.prototype, Backbone.Events, {
     if (container.classList.contains('collection-list--favourite')) {
       mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
-      if (mirror) { mirror.classList.add('hidden'); }
-      if(transit) { transit.classList.remove('will-hideaway'); }
+      if (mirror) {
+        mirror.classList.add('hidden');
+      }
+      if (transit) {
+        transit.classList.remove('will-hideaway');
+      }
     }
 
     //If we hover over the primary collection show the drag mirror
     else if (container.classList.contains('collection-list--primary')) {
       mirror = document.querySelector('.gu-mirror');
       transit = document.querySelector('.gu-transit');
-      if (mirror) { mirror.classList.remove('hidden'); }
-      if(transit) { transit.classList.add('will-hideaway'); }
+      if (mirror) {
+        mirror.classList.remove('hidden');
+      }
+      if (transit) {
+        transit.classList.add('will-hideaway');
+      }
     }
-  },
-
+  }
 });
 
 module.exports = DNDCtrl;

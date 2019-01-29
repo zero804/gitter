@@ -9,14 +9,13 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('invite-service', function() {
   describe('integration tests #slow', function() {
-
     describe('createInvite', function() {
-
       it('should create an invite', function() {
         var roomId = new ObjectID();
         var invitedBy = new ObjectID();
 
-        return invitesService.createInvite(roomId, {
+        return invitesService
+          .createInvite(roomId, {
             type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
@@ -37,7 +36,8 @@ describe('invite-service', function() {
         var roomId = new ObjectID();
         var invitedBy = new ObjectID();
 
-        return invitesService.createInvite(roomId, {
+        return invitesService
+          .createInvite(roomId, {
             type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
@@ -45,11 +45,11 @@ describe('invite-service', function() {
           })
           .then(function() {
             return invitesService.createInvite(roomId, {
-                type: 'github',
-                externalId: 'gitterawesome',
-                invitedByUserId: invitedBy,
-                emailAddress: 'test@gitter.im'
-              });
+              type: 'github',
+              externalId: 'gitterawesome',
+              invitedByUserId: invitedBy,
+              emailAddress: 'test@gitter.im'
+            });
           })
           .then(function() {
             assert.ok(false, 'Expected exception');
@@ -67,7 +67,8 @@ describe('invite-service', function() {
         var userId = new ObjectID();
         var userId2 = new ObjectID();
 
-        return invitesService.createInvite(roomId, {
+        return invitesService
+          .createInvite(roomId, {
             type: 'github',
             externalId: 'gitterawesome',
             invitedByUserId: invitedBy,
@@ -90,13 +91,14 @@ describe('invite-service', function() {
           })
           .then(function(invite) {
             assert.strictEqual(String(invite._id), String(this.invite._id));
-            return invitesService.accept(userId2, this.invite.secret)
+            return invitesService
+              .accept(userId2, this.invite.secret)
               .then(function() {
                 assert.ok(false, 'Expected exception');
               })
               .catch(StatusError, function(err) {
                 assert.strictEqual(err.status, 404);
-              })
+              });
           })
           .then(function() {
             return TroupeInvite.findById(this.invite._id);
@@ -104,11 +106,9 @@ describe('invite-service', function() {
           .then(function(invite) {
             assert.strictEqual(invite.state, 'ACCEPTED');
             assert.strictEqual(String(invite.userId), String(userId));
-          })
+          });
       });
-
     });
-
   });
 
   describe('findInvitesForReminder #slow', function() {
@@ -118,10 +118,11 @@ describe('invite-service', function() {
     });
 
     it('should return invites', function() {
-      return invitesService.createInvite(fixture.troupe1._id, {
+      return invitesService
+        .createInvite(fixture.troupe1._id, {
           type: 'email',
           emailAddress: fixtureLoader.generateEmail(),
-          invitedByUserId: fixture.user1._id,
+          invitedByUserId: fixture.user1._id
         })
         .bind({
           inviteId: null
@@ -145,7 +146,7 @@ describe('invite-service', function() {
           assert.strictEqual(String(originalInvite.invite._id), String(inviteId));
           assert.strictEqual(String(originalInvite.invitedByUser._id), String(fixture.user1._id));
           assert.strictEqual(String(originalInvite.troupe._id), String(fixture.troupe1._id));
-        })
+        });
     });
   });
 });

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var chatModels = require('../chat');
 var context = require('../../utils/context');
@@ -11,9 +11,9 @@ chatCollection.on('error', errorHandle.bind(null, 'chat-collection'));
 
 // Keep the unread items up to date on the model
 // This allows the unread items client to mark model items as read
-if(context.isLoggedIn()) {
+if (context.isLoggedIn()) {
   unreadItemsClient.syncCollections({
-    'chat': chatCollection
+    chat: chatCollection
   });
 }
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -9,8 +9,8 @@ var debug = require('debug')('gitter:infra:timezone-middleware');
 function parseOffset(value) {
   if (value.length !== 5) return;
   var sign = value[0];
-  var hours = parseInt(value.substr(1,2), 10);
-  var mins = parseInt(value.substr(3,2), 10);
+  var hours = parseInt(value.substr(1, 2), 10);
+  var mins = parseInt(value.substr(3, 2), 10);
 
   if (sign !== '+' && sign !== '-') return;
   if (isNaN(hours) || isNaN(mins)) return;
@@ -39,11 +39,12 @@ function parseTimezoneCookie(value) {
  * called outside of the promise-chain.
  */
 function updateUserTzInfo(user, timezoneInfo) {
-  debug("Saving timezone information for user %s: %j", user.username, timezoneInfo);
-  userService.updateTzInfo(user._id, timezoneInfo)
+  debug('Saving timezone information for user %s: %j', user.username, timezoneInfo);
+  userService
+    .updateTzInfo(user._id, timezoneInfo)
     .catch(function(err) {
-      logger.error("Unable to save timezone info for user", { exception: err });
-      errorReporter(err, { user: user.username }, { module: 'timezone-middleware'});
+      logger.error('Unable to save timezone info for user', { exception: err });
+      errorReporter(err, { user: user.username }, { module: 'timezone-middleware' });
     })
     .done();
 }
@@ -54,7 +55,7 @@ module.exports = function(req, res, next) {
   var parsed = parseTimezoneCookie(req.cookies.gitter_tz);
   var userTz = req.user && req.user.tz;
 
-  debug("User presented timezone cookie %j", parsed);
+  debug('User presented timezone cookie %j', parsed);
 
   if (parsed) {
     if (userTz) {
@@ -67,10 +68,13 @@ module.exports = function(req, res, next) {
       }
 
       /* Has the user presented us with new timezone information? If so, update */
-      if (userTz.offset !== parsed.offset || userTz.abbr !== parsed.abbr || userTz.iana !== parsed.iana) {
+      if (
+        userTz.offset !== parsed.offset ||
+        userTz.abbr !== parsed.abbr ||
+        userTz.iana !== parsed.iana
+      ) {
         updateUserTzInfo(req.user, parsed);
       }
-
     } else if (req.user) {
       /* First time we've got timezone information from this user, so save it */
       updateUserTzInfo(req.user, parsed);
@@ -88,7 +92,6 @@ module.exports = function(req, res, next) {
       /* No cookie, no saved state, default to UTC */
       res.locals.tzOffset = 0;
     }
-
   }
 
   next();

@@ -4,9 +4,8 @@ var cdn = require('gitter-web-cdn');
 
 var scriptID = 'gitter-dark';
 
-module.exports = function toggleDarkTheme(shouldAdd){
-
-  if(shouldAdd) {
+module.exports = function toggleDarkTheme(shouldAdd) {
+  if (shouldAdd) {
     //Build a new link element
     darkThemeLink = document.createElement('link');
     darkThemeLink.rel = 'stylesheet';
@@ -19,4 +18,4 @@ module.exports = function toggleDarkTheme(shouldAdd){
 
   var darkThemeLink = document.getElementById(scriptID);
   return darkThemeLink.remove();
-}
+};

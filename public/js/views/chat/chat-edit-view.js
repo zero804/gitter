@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var appEvents = require('../../utils/appevents');
 var hasScrollBars = require('../../utils/scrollbar-detect');
@@ -8,13 +8,12 @@ var isMobile = require('../../utils/is-mobile');
 var RAF = require('../../utils/raf');
 
 var ChatEditView = Marionette.ItemView.extend({
-
   template: false,
 
   events: {
-    'textInput': 'onTextInput',
-    'input': 'onInput',
-    'blur': 'onBlur'
+    textInput: 'onTextInput',
+    input: 'onInput',
+    blur: 'onBlur'
   },
 
   keyboardEvents: {
@@ -23,7 +22,7 @@ var ChatEditView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    if(hasScrollBars()) {
+    if (hasScrollBars()) {
       this.$el.addClass('scroller');
     }
 
@@ -98,8 +97,7 @@ var ChatEditView = Marionette.ItemView.extend({
       $textarea.css('height', newHeight);
       appEvents.trigger('chatCollectionView:viewportResize', true);
     }
-  },
-
+  }
 });
 
 cocktail.mixin(ChatEditView, KeyboardEventMixin);

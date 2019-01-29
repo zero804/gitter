@@ -16,11 +16,10 @@ function userLoader(userId, user) {
   return function() {
     if (userPromise) return userPromise;
 
-    userPromise = persistence.User.findById(userId, null, { lean: true })
-      .exec();
+    userPromise = persistence.User.findById(userId, null, { lean: true }).exec();
 
     return userPromise;
-  }
+  };
 }
 
 module.exports = userLoader;

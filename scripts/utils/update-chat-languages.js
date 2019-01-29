@@ -20,30 +20,32 @@ var running;
 
 var batch = new BatchStream({ size: BATCH_SIZE });
 
-var stream = persistence.ChatMessage
-  .find({
-    $or: [{
-      lang: null,
-    }, {
+var stream = persistence.ChatMessage.find({
+  $or: [
+    {
+      lang: null
+    },
+    {
       lang: { $exists: false }
-    }]
-  })
+    }
+  ]
+})
   .select('text')
   .stream();
 
 stream.pipe(batch);
 
-stream.on('error', function (err) {
+stream.on('error', function(err) {
   console.log('err.stack:', err.stack);
 });
 
-batch.on('data', function (chatMessages) {
+batch.on('data', function(chatMessages) {
   var self = this;
 
   running = true;
   this.pause(); // pause the stream
   run(chatMessages)
-    .then(function () {
+    .then(function() {
       self.resume(); // Resume
       running = false;
       if (batchComplete) {
@@ -54,26 +56,21 @@ batch.on('data', function (chatMessages) {
 });
 
 function batchProcessingComplete() {
-  return Promise.delay(1000)
-    .then(function() {
-      logProgress();
-      console.log('[FINISHED]\tquitting...');
-      shutdown.shutdownGracefully();
-    });
+  return Promise.delay(1000).then(function() {
+    logProgress();
+    console.log('[FINISHED]\tquitting...');
+    shutdown.shutdownGracefully();
+  });
 }
 
-batch.on('end', function () {
-  if(!running) batchProcessingComplete();
+batch.on('end', function() {
+  if (!running) batchProcessingComplete();
   batchComplete = true;
 });
 
 // purely for logging
 function logProgress() {
-  console.log(
-    '[PROGRESS]',
-    '\tprocessed:', totalProcessed,
-    '\tsuccess:', success
-  );
+  console.log('[PROGRESS]', '\tprocessed:', totalProcessed, '\tsuccess:', success);
 }
 
 // reponsible for running the procedure
@@ -84,23 +81,27 @@ function run(chatMessages) {
 
   if (runCalled % BATCH_SIZE === 0) logProgress();
 
-  return Promise.all(chatMessages.map(function(chat) {
-    return processText(chat.text)
-      .then(function(result) {
-        totalProcessed += 1;
-        if(totalProcessed % 1000 === 0) {
-          logProgress();
-        }
-        if(result.lang) {
-          return persistence.ChatMessage.findByIdAndUpdate(chat.id, { $set: { lang: result.lang }})
-            .exec()
-            .then(function() {
-              success++;
-            });
-        }
-      })
-      .catch(function (err) {
-        console.error(err.stack);
-      });
-  }));
+  return Promise.all(
+    chatMessages.map(function(chat) {
+      return processText(chat.text)
+        .then(function(result) {
+          totalProcessed += 1;
+          if (totalProcessed % 1000 === 0) {
+            logProgress();
+          }
+          if (result.lang) {
+            return persistence.ChatMessage.findByIdAndUpdate(chat.id, {
+              $set: { lang: result.lang }
+            })
+              .exec()
+              .then(function() {
+                success++;
+              });
+          }
+        })
+        .catch(function(err) {
+          console.error(err.stack);
+        });
+    })
+  );
 }

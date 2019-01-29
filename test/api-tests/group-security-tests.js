@@ -12,9 +12,9 @@ describe('group-security-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -32,7 +32,7 @@ describe('group-security-api', function() {
         admins: 'MANUAL',
         extraAdmins: ['user1']
       },
-      users: ['user1'],
+      users: ['user1']
     },
     group2: {
       securityDescriptor: {
@@ -40,7 +40,7 @@ describe('group-security-api', function() {
         members: 'PUBLIC',
         admins: 'MANUAL',
         extraAdmins: ['user1']
-      },
+      }
     },
     group3: {
       securityDescriptor: {
@@ -48,9 +48,8 @@ describe('group-security-api', function() {
         members: 'PUBLIC',
         admins: 'MANUAL',
         extraAdmins: ['user1']
-      },
-    },
-
+      }
+    }
   });
 
   it('GET /v1/groups/:groupId/security', function() {
@@ -64,7 +63,7 @@ describe('group-security-api', function() {
           type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
-        })
+        });
       });
   });
 
@@ -82,7 +81,7 @@ describe('group-security-api', function() {
           type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
-        })
+        });
       });
   });
 
@@ -101,7 +100,7 @@ describe('group-security-api', function() {
           type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
-        })
+        });
       });
   });
 
@@ -142,9 +141,6 @@ describe('group-security-api', function() {
       .del('/v1/groups/' + groupId + '/security/extraAdmins/' + userId)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(204)
-      .then(function() {
-
-      })
+      .then(function() {});
   });
-
-})
+});

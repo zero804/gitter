@@ -17,7 +17,7 @@ routes.login = [
   trackLoginForProvider('linkedin'),
   passport.authorize('linkedin', {
     failWithError: true,
-    state: Math.floor(Math.random()*100000),
+    state: Math.floor(Math.random() * 100000)
   })
 ];
 

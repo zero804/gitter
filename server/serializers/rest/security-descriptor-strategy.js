@@ -1,7 +1,6 @@
-"use strict";
+'use strict';
 
-function SimpleSecurityDescriptorStrategy() {
-}
+function SimpleSecurityDescriptorStrategy() {}
 
 SimpleSecurityDescriptorStrategy.prototype = {
   preload: function() {
@@ -14,15 +13,14 @@ SimpleSecurityDescriptorStrategy.prototype = {
 
     return {
       type: sd.type || null,
-      linkPath: sd.linkPath || undefined,
+      linkPath: sd.linkPath || undefined
     };
   },
 
   name: 'SimpleSecurityDescriptorStrategy'
 };
 
-function FullSecurityDescriptorStrategy() {
-}
+function FullSecurityDescriptorStrategy() {}
 
 FullSecurityDescriptorStrategy.prototype = {
   preload: function() {
@@ -43,7 +41,6 @@ FullSecurityDescriptorStrategy.prototype = {
 
   name: 'FullSecurityDescriptorStrategy'
 };
-
 
 function slim() {
   return new SimpleSecurityDescriptorStrategy();

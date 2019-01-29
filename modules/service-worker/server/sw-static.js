@@ -19,14 +19,18 @@ function createStatic() {
       }
     };
 
-    res.sendFile(staticFile, options, function (err) {
+    res.sendFile(staticFile, options, function(err) {
       if (err) return next(err);
     });
-  }
+  };
 }
 
 function install(app) {
-  if (process.env.NODE_ENV === 'dev' || process.env.NODE_ENV === 'test'  || process.env.NODE_ENV === 'test-docker') {
+  if (
+    process.env.NODE_ENV === 'dev' ||
+    process.env.NODE_ENV === 'test' ||
+    process.env.NODE_ENV === 'test-docker'
+  ) {
     app.use('/', require('../dev/webpack-middleware').create());
   } else {
     app.get('/sw.js', createStatic());

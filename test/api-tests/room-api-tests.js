@@ -13,9 +13,9 @@ describe('room-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -29,12 +29,12 @@ describe('room-api', function() {
     user3: {
       accessToken: 'web-internal'
     },
-    group1: { },
+    group1: {},
     troupe1: {
       security: 'PUBLIC',
       users: ['user1'],
       securityDescriptor: {
-        extraAdmins: ['user3'],
+        extraAdmins: ['user3']
       },
       group: 'group1'
     }
@@ -100,8 +100,8 @@ describe('room-api', function() {
       .then(function(result) {
         var body = result.body;
         assert.strictEqual(body.uri, fixture.troupe1.uri);
-      })
-  })
+      });
+  });
 
   it('POST /v1/rooms/ with a user', function() {
     return request(app)
@@ -114,7 +114,7 @@ describe('room-api', function() {
       .then(function(result) {
         var body = result.body;
         assert.strictEqual(body.user.username, fixture.user1.username);
-      })
+      });
   });
 
   it('GET /v1/rooms/:roomId/suggestedRooms', function() {
@@ -135,7 +135,10 @@ describe('room-api', function() {
           assert(suggestion.hasOwnProperty('tags'));
           assert(suggestion.hasOwnProperty('description'));
           assert(suggestion.hasOwnProperty('exists'));
-          assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
+          assert(
+            (suggestion.exists === true && suggestion.id) ||
+              (suggestion.exists === false && !suggestion.id)
+          );
         });
       });
   });
@@ -151,5 +154,4 @@ describe('room-api', function() {
       .set('x-access-token', fixture.user3.accessToken)
       .expect(200);
   });
-
-})
+});

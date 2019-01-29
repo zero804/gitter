@@ -10,13 +10,12 @@ var BACKSPACE_KEY_CODE = 8;
 var DELETE_KEY_CODE = 46;
 
 var TagInputView = Marionette.ItemView.extend({
-
   template: tagInputTemplate,
 
   events: {
-    'submit': 'onTagSubmit',
-    'input': 'onTagInput',
-    'keyup': 'onKeyPressed',
+    submit: 'onTagSubmit',
+    input: 'onTagInput',
+    keyup: 'onKeyPressed'
   },
 
   initialize: function() {
@@ -42,7 +41,7 @@ var TagInputView = Marionette.ItemView.extend({
     // our legit model would stop setting the value after seeing it as invalid
     // which would cause extraneous length errors
     var val = this.getTagInputValue();
-    var testTag = new TagModel().set('value', val, {silent: true});
+    var testTag = new TagModel().set('value', val, { silent: true });
     if (testTag.isValid() && this.model.isValid()) {
       // Add the tag we just entered
       this.collection.addModel(this.model);
@@ -55,14 +54,12 @@ var TagInputView = Marionette.ItemView.extend({
     }
   },
 
-
-
   onTagInput: function(e) {
     if (e) e.preventDefault();
 
     //guard against manual invocation of this function
     var val = this.getTagInputValue();
-    this.model.set('value', val, {validate: true});
+    this.model.set('value', val, { validate: true });
     if (val.length === 0) {
       this.triggerMethod('tag:warning:empty');
     }
@@ -70,9 +67,8 @@ var TagInputView = Marionette.ItemView.extend({
 
   onKeyPressed: function(e) {
     switch (e.keyCode) {
-
       // Submit tag by pressing enter
-      case ENTER_KEY_CODE :
+      case ENTER_KEY_CODE:
         // manually trigger tag submission
         this.onTagSubmit();
         break;
@@ -80,11 +76,11 @@ var TagInputView = Marionette.ItemView.extend({
       // If a user presses (meta+backspace)/delete
       // and the input is empty
       // remove the last tag
-      case DELETE_KEY_CODE :
+      case DELETE_KEY_CODE:
         this.removeLastTag();
         break;
 
-      case BACKSPACE_KEY_CODE :
+      case BACKSPACE_KEY_CODE:
         if (e.metaKey || e.ctrlKey) {
           this.removeLastTag();
         }
@@ -113,8 +109,7 @@ var TagInputView = Marionette.ItemView.extend({
 
   focus: function() {
     this.$el.find('input').focus();
-  },
-
+  }
 });
 
 module.exports = TagInputView;

@@ -13,11 +13,10 @@ var opts = require('yargs')
     string: true
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-
-userService.findByUsername(opts.username)
+userService
+  .findByUsername(opts.username)
   .then(function(user) {
     return emailAddressService(user);
   })

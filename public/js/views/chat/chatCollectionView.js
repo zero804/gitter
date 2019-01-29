@@ -1,5 +1,5 @@
 /* eslint complexity: ["error", 16] */
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
@@ -15,17 +15,22 @@ require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
 
 module.exports = (function() {
-
   function isFirstElementInParent(element) {
     var prev = element.previousSibling;
     if (!prev) return true;
-    return prev.nodeType === 3 /* TEXT */ && !prev.previousSibling && prev.textContent.match(/^[\s\n\r]*$/); /* Whitespace */
+    return (
+      prev.nodeType === 3 /* TEXT */ &&
+      !prev.previousSibling &&
+      prev.textContent.match(/^[\s\n\r]*$/)
+    ); /* Whitespace */
   }
 
   function isLastElementInParent(element) {
     var next = element.nextSibling;
     if (!next) return true;
-    return next.nodeType === 3 /* TEXT */ && !next.nextSibling && next.textContent.match(/^[\s\n\r]*$/); /* Whitespace */
+    return (
+      next.nodeType === 3 /* TEXT */ && !next.nextSibling && next.textContent.match(/^[\s\n\r]*$/)
+    ); /* Whitespace */
   }
 
   function isAtStartOfParent(parent, element) {
@@ -52,7 +57,8 @@ module.exports = (function() {
   function getModelsInRange(collectionView, startElement, endElement) {
     var models = [];
     var i = 0;
-    var child, children = collectionView.children;
+    var child,
+      children = collectionView.children;
 
     /* Find the start element */
     while (i < children.length) {
@@ -79,22 +85,24 @@ module.exports = (function() {
   }
 
   function renderMarkdown(models) {
-    var text = models.map(function(model) {
-      var text;
+    var text = models
+      .map(function(model) {
+        var text;
 
-      if (models.length > 1 && model.get('burstStart')) {
-        var user = model.get('fromUser');
-        var username = user && user.username;
-        if (username) username = '@' + username;
-        text = username + '\n' + model.get('text');
-      } else {
-        text = model.get('text');
-      }
+        if (models.length > 1 && model.get('burstStart')) {
+          var user = model.get('fromUser');
+          var username = user && user.username;
+          if (username) username = '@' + username;
+          text = username + '\n' + model.get('text');
+        } else {
+          text = model.get('text');
+        }
 
-      if (!text) return '';
-      if (text.charAt(text.length - 1) !== '\n') text = text + '\n';
-      return text;
-    }).join('');
+        if (!text) return '';
+        if (text.charAt(text.length - 1) !== '\n') text = text + '\n';
+        return text;
+      })
+      .join('');
 
     if (text.charAt(text.length - 1) === '\n') return text.substring(0, text.length - 1);
 
@@ -112,16 +120,16 @@ module.exports = (function() {
       InfiniteScroll: {
         reverseScrolling: true,
         scrollElementSelector: SCROLL_ELEMENT,
-        contentWrapperSelector: '#chat-container',
+        contentWrapperSelector: '#chat-container'
       },
       SmoothScroll: {
         scrollElementSelector: SCROLL_ELEMENT,
-        contentWrapper: '#chat-container',
-      },
+        contentWrapper: '#chat-container'
+      }
     },
 
     events: {
-      'copy': 'onCopy',
+      copy: 'onCopy'
     },
 
     childView: chatItemView.ChatItemView,
@@ -129,7 +137,7 @@ module.exports = (function() {
     childViewOptions: function(item) {
       var options = {
         decorators: this.decorators,
-        rollers: this.rollers,
+        rollers: this.rollers
       };
 
       if (item && item.id) {
@@ -146,10 +154,14 @@ module.exports = (function() {
       this.viewComparator = this.collection.comparator;
 
       this.listenTo(appEvents, 'chatCollectionView:scrollToBottom', function() {
-        this.collection.fetchLatest({}, function() {
-          this.rollers.scrollToBottom();
-          this.clearHighlight();
-        }, this);
+        this.collection.fetchLatest(
+          {},
+          function() {
+            this.rollers.scrollToBottom();
+            this.clearHighlight();
+          },
+          this
+        );
       });
 
       this.listenTo(appEvents, 'chatCollectionView:selectedChat', function(id, opts) {
@@ -169,7 +181,11 @@ module.exports = (function() {
       });
 
       // Similar to selectedChat, but will force a load if the item is not in the collection
-      this.listenTo(appEvents, 'chatCollectionView:permalinkHighlight', this.highlightPermalinkChat);
+      this.listenTo(
+        appEvents,
+        'chatCollectionView:permalinkHighlight',
+        this.highlightPermalinkChat
+      );
 
       this.listenTo(appEvents, 'chatCollectionView:clearHighlight', this.clearHighlight);
 
@@ -183,8 +199,7 @@ module.exports = (function() {
       /* Scroll to the bottom when the user sends a new chat */
       this.listenTo(appEvents, 'chat.send', function() {
         this.rollers.scrollToBottom();
-        this.collection.fetchLatest({}, function() {
-        }, this);
+        this.collection.fetchLatest({}, function() {}, this);
       });
 
       // Special case when scrolling back down to the bottom.
@@ -214,7 +229,6 @@ module.exports = (function() {
       this.listenTo(context.troupe(), 'change:id', function() {
         this.scrollToBottom();
       });
-
     },
 
     onTrackViewportCenter: function() {
@@ -251,10 +265,13 @@ module.exports = (function() {
       var model = this.collection.get(id);
       if (model) return this.scrollToChat(model);
       var self = this;
-      this.collection.ensureLoaded(id, function() {
-        var model = self.collection.get(id);
-        if (model) return this.scrollToChat(model);
-      }.bind(this));
+      this.collection.ensureLoaded(
+        id,
+        function() {
+          var model = self.collection.get(id);
+          if (model) return this.scrollToChat(model);
+        }.bind(this)
+      );
     },
 
     // used to highlight and "dim" chat messages, the behaviour Highlight responds to these changes.
@@ -301,7 +318,8 @@ module.exports = (function() {
       /* Has a single chat been selected? If so, only use markdown if the WHOLE chat has been selected, and not a partial selection */
       if (startText && endText && startText === endText) {
         /* Partial selection */
-        if (range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length) return;
+        if (range.startOffset > 0 || range.endOffset < range.endContainer.textContent.length)
+          return;
 
         var atStart = isAtStartOfParent(startText, range.startContainer);
         var atEnd = isAtEndOfParent(startText, range.endContainer);
@@ -311,7 +329,11 @@ module.exports = (function() {
       var models = getModelsInRange(this, start, end);
 
       /* If the offset is the end of the start container */
-      if (range.startContainer.textContent.length && range.startContainer.textContent.length === range.startOffset) models.shift();
+      if (
+        range.startContainer.textContent.length &&
+        range.startContainer.textContent.length === range.startOffset
+      )
+        models.shift();
 
       /* ... or the beginning of the end container */
       if (range.endOffset === 0) models.pop();
@@ -373,23 +395,25 @@ module.exports = (function() {
     },
 
     loadAndHighlight: function(id, options) {
-      this.collection.ensureLoaded(id, function(err, model) {
-        if (err) return; // Log this?
-        if (!model) return;
+      this.collection.ensureLoaded(
+        id,
+        function(err, model) {
+          if (err) return; // Log this?
+          if (!model) return;
 
-        // clearing previously highlighted chat.
-        this.clearHighlight();
+          // clearing previously highlighted chat.
+          this.clearHighlight();
 
-        if (!model) return;
+          if (!model) return;
 
-        // highlighting new and replacing "current"
-        this.highlightChat(model, options && options.highlights);
-        this.highlighted = model;
+          // highlighting new and replacing "current"
+          this.highlightChat(model, options && options.highlights);
+          this.highlighted = model;
 
-        // finally scroll to it
-        this.scrollToChat(model);
-
-      }.bind(this));
+          // finally scroll to it
+          this.scrollToChat(model);
+        }.bind(this)
+      );
     },
 
     /**
@@ -445,9 +469,7 @@ module.exports = (function() {
         delete c.permalinkChatId;
       }
     }
-
   });
 
   return ChatCollectionView;
-
 })();

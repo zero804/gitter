@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var resolveUserAvatarSrcSet = require('gitter-web-shared/avatars/resolve-user-avatar-srcset');
 

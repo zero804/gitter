@@ -4,7 +4,6 @@ var DoubleTapper = require('../../../public/js/utils/double-tapper');
 var assert = require('assert');
 
 describe('double-tapper', function() {
-
   it('recognises a single click', function() {
     var doubleTapper = new DoubleTapper();
 
@@ -61,5 +60,4 @@ describe('double-tapper', function() {
       }, 200);
     }, 200);
   });
-
 });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true, unused:true */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var env = require('gitter-web-env');
@@ -15,19 +15,18 @@ function scanEmailNotifications() {
   var cursor = '0';
   function iter() {
     return Promise.fromCallback(function(callback) {
-        redisClient.scan(cursor, 'COUNT', 10000, 'MATCH', 'resque:*', callback);
-      })
-      .spread(function(nextCursor, result) {
-        if (result) {
-          result.forEach(function(key) {
-            console.log(key);
-          });
-        }
+      redisClient.scan(cursor, 'COUNT', 10000, 'MATCH', 'resque:*', callback);
+    }).spread(function(nextCursor, result) {
+      if (result) {
+        result.forEach(function(key) {
+          console.log(key);
+        });
+      }
 
-        if (nextCursor === '0') return;
-        cursor = nextCursor;
-        return iter();
-      });
+      if (nextCursor === '0') return;
+      cursor = nextCursor;
+      return iter();
+    });
   }
 
   return iter();

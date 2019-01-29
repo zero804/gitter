@@ -13,7 +13,7 @@ function childProcessToPromise(executable, command) {
   });
 
   return new Promise(function(resolve, reject) {
-    command.on('close', function (code) {
+    command.on('close', function(code) {
       removeOnExit();
       if (code) {
         reject(new Error(executable + ' exited with ' + code));
@@ -35,8 +35,7 @@ function spawn(executable, args, env) {
       stdio: 'inherit',
       env: _.extend({}, process.env, env)
     });
-  })
-  .then(function(command) {
+  }).then(function(command) {
     return childProcessToPromise(executable, command);
   });
 }
@@ -47,8 +46,7 @@ function fork(script, args, env) {
       stdio: 'inherit',
       env: _.extend({}, process.env, env)
     });
-  })
-  .then(function(command) {
+  }).then(function(command) {
     return childProcessToPromise(script, command);
   });
 }

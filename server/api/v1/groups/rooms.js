@@ -2,7 +2,7 @@
 
 var assert = require('assert');
 var StatusError = require('statuserror');
-var restful = require('../../../services/restful')
+var restful = require('../../../services/restful');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
 var restSerializer = require('../../../serializers/rest-serializer');
 
@@ -25,7 +25,7 @@ function getCreateOptions(input) {
 
     // `type` defaults to null, not undefined
     createOptions.type = castString(input.security.type, null);
-    switch(createOptions.type) {
+    switch (createOptions.type) {
       case null:
       case 'GROUP':
         assert(!linkPath, 'linkPath cannot be specified');
@@ -39,7 +39,6 @@ function getCreateOptions(input) {
 
     // for GitHub and future room types that are backed by other services
     createOptions.linkPath = linkPath;
-
   } else {
     createOptions.security = 'PUBLIC';
   }
@@ -57,7 +56,7 @@ function getCreateOptions(input) {
     createOptions.associateWithGitHubRepo = linkPath;
   }
 
-  createOptions.addBadge = !!input.addBadge
+  createOptions.addBadge = !!input.addBadge;
 
   // keep tracking info around for sendStats
   if (typeof input.source === 'string') {
@@ -85,30 +84,31 @@ module.exports = {
 
     var createOptions = getCreateOptions(req.body);
 
-    var groupWithPolicyService = new GroupWithPolicyService(req.group, req.user, req.userGroupPolicy);
-    return groupWithPolicyService.createRoom(createOptions)
-      .then(function(createResult) {
-        var room = createResult.troupe;
-        var hookCreationFailedDueToMissingScope = createResult.hookCreationFailedDueToMissingScope;
-        var strategy = new restSerializer.TroupeStrategy({
-          currentUserId: req.user.id,
-          currentUser: req.user,
-          includeRolesForTroupe: room,
-          includeBackend: true,
-          // include all these because it will replace the troupe in the context
-          includeTags: true,
-          includeProviders: true,
-          includeGroups: true
-        });
-
-        return restSerializer.serializeObject(room, strategy)
-          .then(function(serialized) {
-            serialized.extra = {
-              hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
-            };
-            return serialized;
-
-          })
+    var groupWithPolicyService = new GroupWithPolicyService(
+      req.group,
+      req.user,
+      req.userGroupPolicy
+    );
+    return groupWithPolicyService.createRoom(createOptions).then(function(createResult) {
+      var room = createResult.troupe;
+      var hookCreationFailedDueToMissingScope = createResult.hookCreationFailedDueToMissingScope;
+      var strategy = new restSerializer.TroupeStrategy({
+        currentUserId: req.user.id,
+        currentUser: req.user,
+        includeRolesForTroupe: room,
+        includeBackend: true,
+        // include all these because it will replace the troupe in the context
+        includeTags: true,
+        includeProviders: true,
+        includeGroups: true
       });
+
+      return restSerializer.serializeObject(room, strategy).then(function(serialized) {
+        serialized.extra = {
+          hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
+        };
+        return serialized;
+      });
+    });
   }
 };

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
@@ -11,7 +11,8 @@ describe('room-removed-users-core', function() {
       var userId = new ObjectID();
       var roomId = new ObjectID();
 
-      return roomRemovedUserCore.addRemovedUser(roomId, userId)
+      return roomRemovedUserCore
+        .addRemovedUser(roomId, userId)
         .then(function() {
           return TroupeRemovedUser.findOne({ troupeId: roomId, userId: userId })
             .lean()
@@ -33,7 +34,8 @@ describe('room-removed-users-core', function() {
       var userId2 = new ObjectID();
       var roomId = new ObjectID();
 
-      return roomRemovedUserCore.addRemovedUsers(roomId, [userId1, userId2])
+      return roomRemovedUserCore
+        .addRemovedUsers(roomId, [userId1, userId2])
         .then(function() {
           return TroupeRemovedUser.findOne({ troupeId: roomId, userId: userId1 })
             .lean()
@@ -56,7 +58,6 @@ describe('room-removed-users-core', function() {
           assert(Date.now() - result.date < 1000);
           assert.equal(String(result.userId), String(userId1));
           assert.equal(String(result.troupeId), String(roomId));
-
         });
     });
   });

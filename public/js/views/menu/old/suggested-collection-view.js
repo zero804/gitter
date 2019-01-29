@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var roomNameTrimmer = require('gitter-web-shared/room-name-trimmer');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/suggested-list-item.hbs');
@@ -7,8 +7,8 @@ var MAX_SUGGESTIONS = 5;
 
 /* How hillbillies manipulate urls */
 function appendToUrl(url, params) {
-  if (url.indexOf('?') >= 0) return url + "&" + params;
-  return url + "?" + params;
+  if (url.indexOf('?') >= 0) return url + '&' + params;
+  return url + '?' + params;
 }
 
 /* This should be united with userhome/suggested-room-collection-view */
@@ -18,7 +18,7 @@ var SuggestedItemView = Marionette.ItemView.extend({
   className: 'room-list-item',
   template: template,
   modelEvents: {
-    change: 'render',
+    change: 'render'
   },
   serializeData: function() {
     var model = this.model;
@@ -34,7 +34,8 @@ module.exports = Marionette.CollectionView.extend({
   tagName: 'ul',
   className: 'room-list',
   childView: SuggestedItemView,
-  filter: function(child, index) { // jshint unused:true
+  filter: function(child, index) {
+    // jshint unused:true
     return index < MAX_SUGGESTIONS;
   }
 });

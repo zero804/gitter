@@ -4,5 +4,5 @@ var ItemView = require('../minibar-item-view');
 var template = require('./people-view.hbs');
 
 module.exports = ItemView.extend({
-  template: template,
+  template: template
 });

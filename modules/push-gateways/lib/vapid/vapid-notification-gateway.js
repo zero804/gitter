@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -17,7 +17,8 @@ function performSetup() {
   webpush.setVapidDetails(
     config.get('vapid:contact'),
     config.get('vapid:publicKey'),
-    config.get('vapid:privateKey'));
+    config.get('vapid:privateKey')
+  );
 
   setup = true;
 }
@@ -43,15 +44,17 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
   var payloadData = vapidNotificationGeneration(notificationType, notificationDetails, device);
   if (!payloadData) return false;
 
-  return Promise.resolve(webpush.sendNotification(pushSubscription, JSON.stringify(payloadData), {
+  return Promise.resolve(
+    webpush.sendNotification(pushSubscription, JSON.stringify(payloadData), {
       TTL: DEFAULT_TTL_SECONDS
-    }))
+    })
+  )
     .return(true)
     .catch(isVapidGoneError, function(err) {
       throw new InvalidRegistrationError(err.message);
-    })
+    });
 }
 
 module.exports = {
   sendNotificationToDevice: Promise.method(sendNotificationToDevice)
-}
+};

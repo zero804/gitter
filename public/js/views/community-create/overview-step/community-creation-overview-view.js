@@ -12,7 +12,6 @@ var apiClient = require('../../../components/api-client');
 require('@gitterhq/styleguide/css/components/headings.css');
 require('@gitterhq/styleguide/css/components/buttons.css');
 
-
 var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
@@ -22,15 +21,20 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   behaviors: {
     Isomorphic: {
-      inviteListView: { el: '.community-create-overview-invite-list-root', init: 'initInviteListView' }
-    },
+      inviteListView: {
+        el: '.community-create-overview-invite-list-root',
+        init: 'initInviteListView'
+      }
+    }
   },
 
   initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new InviteListView(optionsForRegion({
-      collection: this.communityCreateModel.invites,
-      communityCreateModel: this.communityCreateModel,
-    }));
+    this.inviteListView = new InviteListView(
+      optionsForRegion({
+        collection: this.communityCreateModel.invites,
+        communityCreateModel: this.communityCreateModel
+      })
+    );
     return this.inviteListView;
   },
 
@@ -43,7 +47,12 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   initialize: function() {
     _super.initialize.apply(this, arguments);
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.onCommunityDataChange, this);
+    this.listenTo(
+      this.communityCreateModel,
+      'change:communityName change:communitySlug change:githubOrgId',
+      this.onCommunityDataChange,
+      this
+    );
   },
 
   serializeData: function() {
@@ -65,24 +74,22 @@ module.exports = CommunityCreateBaseStepView.extend({
     var communityCreateModel = this.communityCreateModel;
     var groupData = this.communityCreateModel.getSerializedCreateData();
 
-    return apiClient.post('/v1/groups', groupData)
-      .then(function(results) {
-        var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
-        var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
+    return apiClient.post('/v1/groups', groupData).then(function(results) {
+      var defaultRoomName = results && results.defaultRoom && results.defaultRoom.name;
+      var defaultRoomUri = results && results.defaultRoom && results.defaultRoom.uri;
 
-        // Move to the default room
-        appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+      // Move to the default room
+      appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
 
-        // Select the new community in the new left menu
-        appEvents.trigger('left-menu-menu-bar:activate', {
-          state: 'org',
-          groupId: results.id
-        });
-
-        // Hide create community
-        communityCreateModel.set('active', false);
+      // Select the new community in the new left menu
+      appEvents.trigger('left-menu-menu-bar:activate', {
+        state: 'org',
+        groupId: results.id
       });
 
+      // Hide create community
+      communityCreateModel.set('active', false);
+    });
   },
 
   prevStep: function() {
@@ -99,7 +106,6 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.ui.communityNameHeading[0].textContent = data.communityName;
     this.ui.communityUrlSlug[0].textContent = data.communitySlug;
-
 
     this.ui.githubLink[0].setAttribute('href', data.githubLink);
     this.ui.githubName[0].textContent = data.githubName;

@@ -5,25 +5,28 @@ var async = require('async');
 var assert = require('assert');
 
 module.exports = function(underTest) {
-
   describe('non-anonymous', function() {
     var userId, clientId, token, tokens;
 
     beforeEach(function() {
-      userId = mongoUtils.getNewObjectIdString() + "";
-      clientId = mongoUtils.getNewObjectIdString() + "";
-      token = "test" + Math.random() + Date.now();
+      userId = mongoUtils.getNewObjectIdString() + '';
+      clientId = mongoUtils.getNewObjectIdString() + '';
+      token = 'test' + Math.random() + Date.now();
       tokens = [token];
     });
 
     afterEach(function(done) {
-      async.each(tokens, function(token, callback) {
-        if (token) {
-          underTest.deleteToken(token, callback);
-        } else {
-          callback();
-        }
-      }, done);
+      async.each(
+        tokens,
+        function(token, callback) {
+          if (token) {
+            underTest.deleteToken(token, callback);
+          } else {
+            callback();
+          }
+        },
+        done
+      );
     });
 
     it('should not find tokens that do not exist', function(done) {
@@ -41,7 +44,6 @@ module.exports = function(underTest) {
         done();
       });
     });
-
 
     it('should find tokens that have been cached', function(done) {
       underTest.cacheToken(userId, clientId, token, function(err) {
@@ -61,10 +63,8 @@ module.exports = function(underTest) {
             assert.strictEqual(clientId, userClient[1]);
             done();
           });
-
         });
       });
-
     });
 
     it('should not find tokens that have been deleted', function(done) {
@@ -72,7 +72,7 @@ module.exports = function(underTest) {
         if (err) return done(err);
 
         underTest.deleteToken(token, function(err) {
-          if(err) return done(err);
+          if (err) return done(err);
 
           underTest.getToken(userId, clientId, function(err, token2) {
             if (err) return done(err);
@@ -87,19 +87,16 @@ module.exports = function(underTest) {
             });
           });
         });
-
       });
-
     });
   });
-
 
   describe('anonymous', function() {
     var clientId, token;
 
     beforeEach(function() {
-      clientId = mongoUtils.getNewObjectIdString() + "";
-      token = "test" + Math.random() + Date.now();
+      clientId = mongoUtils.getNewObjectIdString() + '';
+      token = 'test' + Math.random() + Date.now();
     });
 
     it('should not find tokens for anonymous users', function(done) {
@@ -123,9 +120,7 @@ module.exports = function(underTest) {
           assert.strictEqual(clientId, userClient[1]);
           done();
         });
-
       });
-
     });
 
     it('should not find tokens that have been deleted', function(done) {
@@ -133,7 +128,7 @@ module.exports = function(underTest) {
         if (err) return done(err);
 
         underTest.deleteToken(token, function(err) {
-          if(err) return done(err);
+          if (err) return done(err);
 
           underTest.validateToken(token, function(err, userClient) {
             if (err) return done(err);
@@ -141,9 +136,7 @@ module.exports = function(underTest) {
             done();
           });
         });
-
       });
-
     });
   });
 };

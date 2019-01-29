@@ -1,6 +1,6 @@
 'use strict';
 
-var LRU = require("lru-cache");
+var LRU = require('lru-cache');
 var MAX_TOKEN_AGE = 2 * 60000; // 2 minutes
 var tokenCache = LRU({
   max: 2048,
@@ -16,7 +16,7 @@ module.exports = {
   getToken: function(userId, clientId, callback) {
     if (!userId) return callback();
 
-    return callback(null, userClientCache.get(userId + ":" + clientId));
+    return callback(null, userClientCache.get(userId + ':' + clientId));
   },
 
   validateToken: function(token, callback) {
@@ -26,7 +26,7 @@ module.exports = {
   cacheToken: function(userId, clientId, token, callback) {
     tokenCache.set(token, [userId, clientId]);
     if (userId) {
-      userClientCache.set(userId + ":" + clientId, token);
+      userClientCache.set(userId + ':' + clientId, token);
     }
     return callback();
   },
@@ -41,7 +41,7 @@ module.exports = {
     if (!userId) return callback();
 
     var clientId = result[1];
-    userClientCache.del(userId + ":" + clientId);
+    userClientCache.del(userId + ':' + clientId);
 
     return callback();
   },

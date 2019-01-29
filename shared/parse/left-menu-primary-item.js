@@ -10,39 +10,44 @@ var getRoomNameFromTroupeName = require('../get-room-name-from-troupe-name');
 
 var clientEnv = require('gitter-client-env');
 
-
 module.exports = function parseContentToTemplateData(data, state) {
-  data.name = (data.name || data.uri || '');
-  if(data.fromUser) {
+  data.name = data.name || data.uri || '';
+  if (data.fromUser) {
     data.name = data.fromUser.username;
   }
 
-  if(data.isSuggestion) {
+  if (data.isSuggestion) {
     data.uri = urlJoin(data.uri, '?source=suggested-menu');
   }
 
-  data.absoluteRoomUri = urlJoin(clientEnv.basePath, (data.uri || data.url));
+  data.absoluteRoomUri = urlJoin(clientEnv.basePath, data.uri || data.url);
 
   //For user results
   if (data.displayName) {
-    return _.extend({}, {
-      name:         roomNameShortener(data.displayName),
-      avatarUrl: avatars.getForUser(data),
-      absoluteRoomUri: data.absoluteRoomUri
-    });
+    return _.extend(
+      {},
+      {
+        name: roomNameShortener(data.displayName),
+        avatarUrl: avatars.getForUser(data),
+        absoluteRoomUri: data.absoluteRoomUri
+      }
+    );
   }
 
-  if(data.isRecentSearch || data.isSearchRepoResult) {
+  if (data.isRecentSearch || data.isSearchRepoResult) {
     var avatarUrl = avatars.getForGitHubUsername(data.name);
     // No avatars on recent searches
-    if(data.isRecentSearch) {
+    if (data.isRecentSearch) {
       avatarUrl = null;
     }
 
-    return _.extend({}, {
-      name: roomNameShortener(data.name),
-      avatarUrl: avatarUrl
-    });
+    return _.extend(
+      {},
+      {
+        name: roomNameShortener(data.name),
+        avatarUrl: avatarUrl
+      }
+    );
   }
 
   var hasMentions = !!data.mentions && data.mentions;
@@ -50,7 +55,6 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   // Make sure we are lurking and we only have activity so we don't override mentions or unread indicators
   var lurkActivity = !!data.activity && (!hasMentions && !unreadItems);
-
 
   var orgName = getOrgNameFromTroupeName(data.name);
   var roomName = getRoomNameFromTroupeName(data.name);
@@ -60,14 +64,13 @@ module.exports = function parseContentToTemplateData(data, state) {
 
   // TODO: Do we want this to be `defaultRoomName` from the group?
   // The default root room has been renamed from `Lobby` to `community`
-  if(roomName === 'Lobby' || roomName === 'community') {
+  if (roomName === 'Lobby' || roomName === 'community') {
     displayName = orgName;
-  }
-  else if(orgName === roomName) {
+  } else if (orgName === roomName) {
     namePieces = data.name.split('/');
   }
   // Get rid of the org prefix, if viewing in a org bucket
-  else if(state === 'org') {
+  else if (state === 'org') {
     displayName = getRoomNameFromTroupeName(data.name);
   }
 
@@ -75,12 +78,12 @@ module.exports = function parseContentToTemplateData(data, state) {
   displayName = roomNameShortener(displayName);
 
   return _.extend({}, data, {
-    isNotOneToOne: (data.githubType !== 'ONETOONE'),
+    isNotOneToOne: data.githubType !== 'ONETOONE',
     displayName: displayName,
     namePieces: namePieces,
     mentions: hasMentions,
     unreadItems: unreadItems,
     lurkActivity: lurkActivity,
-    isSearch: (state === 'search'),
+    isSearch: state === 'search'
   });
 };

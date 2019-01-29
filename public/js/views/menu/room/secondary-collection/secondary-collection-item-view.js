@@ -9,7 +9,6 @@ var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item')
 var parseRoomItemName = require('gitter-web-shared/get-org-menu-state-name-from-troupe-name');
 
 module.exports = BaseCollectionItemView.extend({
-
   initialize: function() {
     BaseCollectionItemView.prototype.initialize.apply(this, arguments);
     this.listenTo(this.roomMenuModel, 'change:state:post', this.onMenuChangeState, this);
@@ -19,7 +18,7 @@ module.exports = BaseCollectionItemView.extend({
     var state = this.roomMenuModel.get('state');
     var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
 
-    if(this.model.get('isSuggestion')) {
+    if (this.model.get('isSuggestion')) {
       var sourceValue = state === 'org' ? 'all-rooms-list' : 'suggested-menu';
       url = urlJoin(url, '?source=' + sourceValue);
     }
@@ -32,11 +31,10 @@ module.exports = BaseCollectionItemView.extend({
     return data;
   },
 
-  onMenuChangeState: function () {
-    var name = (this.model.get('name') || this.model.get('uri') || this.model.get('username'));
-    var content = (this.roomMenuModel.get('state') === 'org') ?
-      parseRoomItemName(name) :
-      roomNameShortener(name);
+  onMenuChangeState: function() {
+    var name = this.model.get('name') || this.model.get('uri') || this.model.get('username');
+    var content =
+      this.roomMenuModel.get('state') === 'org' ? parseRoomItemName(name) : roomNameShortener(name);
     this.ui.title.text(content);
-  },
+  }
 });

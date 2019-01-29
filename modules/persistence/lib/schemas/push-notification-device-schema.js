@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
@@ -15,7 +15,7 @@ var PushNotificationDeviceSchema = new Schema({
   appleToken: String,
   androidToken: String,
   tokenHash: String,
-  deviceType: { type: String, "enum": ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS', 'VAPID']},
+  deviceType: { type: String, enum: ['APPLE', 'APPLE-DEV', 'ANDROID', 'TEST', 'SMS', 'VAPID'] },
   mobileNumber: { type: String },
   vapid: {
     auth: { type: String },
@@ -32,7 +32,6 @@ PushNotificationDeviceSchema.index({ tokenHash: 1 });
 PushNotificationDeviceSchema.index({ mobileNumber: 1 });
 
 PushNotificationDeviceSchema.schemaTypeName = 'PushNotificationDeviceSchema';
-
 
 module.exports = {
   install: function(mongooseConnection) {

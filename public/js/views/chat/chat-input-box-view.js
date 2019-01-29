@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-box.hbs');
@@ -21,7 +21,7 @@ var PLACEHOLDER_COMPOSE_MODE = PLACEHOLDER + ' ' + platformKeys.cmd + '+Enter to
 
 function isStatusMessage(text) {
   // if it starts with '/me' it should be a status update
-  return (/^\/me /).test(text);
+  return /^\/me /.test(text);
 }
 
 function textToStatus(text) {
@@ -39,7 +39,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   ui: {
-    textarea: 'textarea',
+    textarea: 'textarea'
   },
 
   events: {
@@ -63,15 +63,16 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.composeMode = options.composeMode;
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
-    this.listenTo(appEvents, 'focus.request.chat', function() { this.ui.textarea.focus(); });
+    this.listenTo(appEvents, 'focus.request.chat', function() {
+      this.ui.textarea.focus();
+    });
 
-    this.listenTo(context.troupe(), 'change:id', function (model) {
+    this.listenTo(context.troupe(), 'change:id', function(model) {
       // Get drafty to switch rooms
       var drafty = this.drafty;
       if (!drafty) return;
       drafty.setUniqueId(model.id);
     });
-
   },
 
   serializeData: function() {
@@ -155,7 +156,9 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   onKeydown: function(e) {
     if (e.keyCode === 33 || e.keyCode === 34) {
-      appEvents.trigger(e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown');
+      appEvents.trigger(
+        e.keyCode === 33 ? 'chatCollectionView:pageUp' : 'chatCollectionView:pageDown'
+      );
       // dont scroll the textarea
       e.preventDefault();
     }
@@ -208,7 +211,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     // Has a modifier or not in compose mode
     var shouldHandle = handler.mods.length || !isComposeModeEnabled;
 
-    if(!this.isTypeaheadShowing() && shouldHandle) {
+    if (!this.isTypeaheadShowing() && shouldHandle) {
       this.processInput();
       event.preventDefault();
       return false;
@@ -234,7 +237,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   send: function(text) {
     var newMessage = {
       text: text,
-      fromUser: context.getUser(),
+      fromUser: context.getUser()
     };
 
     if (isStatusMessage(text)) {
@@ -257,7 +260,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     if (!this.hasVisibleText()) {
       current = current + text;
     } else {
-      if(options && options.newLine) {
+      if (options && options.newLine) {
         current = current + '\n' + text;
       } else {
         current = current + ' ' + text;
@@ -272,7 +275,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.ui.textarea[0].scrollTop = this.ui.textarea[0].clientHeight;
   },
 
-  createCodeBlockOnNewline: function (event) {
+  createCodeBlockOnNewline: function(event) {
     var text = this.ui.textarea.val();
 
     // only continue if user has just started code block (```)

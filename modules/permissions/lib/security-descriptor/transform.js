@@ -24,7 +24,7 @@ function transformToGroup(sd, groupId) {
     externalId: null,
     extraAdmins: sd.extraAdmins || [],
     extraMembers: sd.extraMembers || []
-  }
+  };
 }
 
 function transformToUnbacked(sd) {
@@ -47,7 +47,7 @@ function transformToUnbacked(sd) {
     externalId: null,
     extraAdmins: sd.extraAdmins || [],
     extraMembers: sd.extraMembers || []
-  }
+  };
 }
 
 function validateTransformation(Model, sd, newType, groupId) {
@@ -71,7 +71,7 @@ function transform(Model, sd, newType, options) {
 
   validateTransformation(Model, sd, newType, groupId);
 
-  switch(sd.type) {
+  switch (sd.type) {
     case 'ONE_TO_ONE':
       // Never allow changing ONE_TO_ONE
       break;
@@ -84,7 +84,7 @@ function transform(Model, sd, newType, options) {
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':
-      switch(newType) {
+      switch (newType) {
         case null:
           return transformToUnbacked(sd);
         case 'GROUP':

@@ -1,19 +1,22 @@
 'use strict';
 
-var BASE_PATH = 'https://gitter.im'
+var BASE_PATH = 'https://gitter.im';
 
-var SPARoomSwitcher = require("proxyquire").noCallThru()('../../../public/js/components/spa-room-switcher', {
-  '../utils/url-parser': {
-    parse: function(href) {
-      return parseUrl(href);
-    },
-    format: function(options) {
-      var partial = url.format(options);
-      var full = url.resolve(BASE_PATH, partial);
-      return full;
+var SPARoomSwitcher = require('proxyquire').noCallThru()(
+  '../../../public/js/components/spa-room-switcher',
+  {
+    '../utils/url-parser': {
+      parse: function(href) {
+        return parseUrl(href);
+      },
+      format: function(options) {
+        var partial = url.format(options);
+        var full = url.resolve(BASE_PATH, partial);
+        return full;
+      }
     }
   }
-});
+);
 
 var Backbone = require('backbone');
 var assert = require('assert');
@@ -49,11 +52,14 @@ function locationDelegate(location) {
   };
 }
 
-
-
 describe('spa-room-switcher', function() {
   it('should switch rooms from one chat room to another', function() {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat'), locationDelegate('https://gitter.im/suprememoocow/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
     var count = 0;
 
     roomSwitcher.on('replace', function(/*href*/) {
@@ -75,7 +81,12 @@ describe('spa-room-switcher', function() {
   });
 
   it('should replace the URL when the room cannot be found', function() {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat'), locationDelegate('https://gitter.im/suprememoocow/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
     var count = 0;
 
     roomSwitcher.on('replace', function(href) {
@@ -96,7 +107,12 @@ describe('spa-room-switcher', function() {
   });
 
   it('should replace the URL when the current frame is not a chat', function() {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~home'), locationDelegate('https://gitter.im/suprememoocow/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~home'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
     var count = 0;
 
     roomSwitcher.on('replace', function(href) {
@@ -117,7 +133,12 @@ describe('spa-room-switcher', function() {
   });
 
   it('should replace the URL when the frame being switched to not a chat', function() {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat'), locationDelegate('https://gitter.im/suprememoocow/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
     var count = 0;
 
     roomSwitcher.on('replace', function(href) {
@@ -138,7 +159,12 @@ describe('spa-room-switcher', function() {
   });
 
   it('should reload the URL when the frame being switched has the same URL as the current room', function() {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
     var count = 0;
 
     roomSwitcher.on('replace', function(/*href*/) {
@@ -157,9 +183,13 @@ describe('spa-room-switcher', function() {
     assert.strictEqual(count, 1);
   });
 
-  it('replace with a path name if a fully qualified org room url is passed', function(){
-
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+  it('replace with a path name if a fully qualified org room url is passed', function() {
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
@@ -176,9 +206,13 @@ describe('spa-room-switcher', function() {
     roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms');
   });
 
-  it('replace with a path name if a fully qualified org room url with a trailing slash is passed', function(){
-
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+  it('replace with a path name if a fully qualified org room url with a trailing slash is passed', function() {
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
@@ -195,9 +229,13 @@ describe('spa-room-switcher', function() {
     roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms/');
   });
 
-  it('replace with a path name if a fully qualified org room url with a trailing ~iframe is passed', function(){
-
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+  it('replace with a path name if a fully qualified org room url with a trailing ~iframe is passed', function() {
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.equal('/orgs/gitterHQ/rooms/~iframe', href);
@@ -214,9 +252,13 @@ describe('spa-room-switcher', function() {
     roomSwitcher.change('http://localhost:5000/orgs/gitterHQ/rooms/~iframe');
   });
 
-  it('should not replace a valid user name with an org room url', function(){
-
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+  it('should not replace a valid user name with an org room url', function() {
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.notEqual('/borgs/~iframe', href);
@@ -233,9 +275,13 @@ describe('spa-room-switcher', function() {
     roomSwitcher.change('http://localhost:5000/borgs');
   });
 
-  it('should not replace a valid repo name with an org room url', function(){
-
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'), locationDelegate('https://gitter.im/suprememoocow/'));
+  it('should not replace a valid repo name with an org room url', function() {
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
+      locationDelegate('https://gitter.im/suprememoocow/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.notEqual('/orgs/porgs/~iframe', href);
@@ -256,7 +302,12 @@ describe('spa-room-switcher', function() {
    * https://github.com/troupe/gitter-webapp/issues/683
    */
   it('should not have issues with the dev-ua room ', function(done) {
-    var roomSwitcher = new SPARoomSwitcher(fixtureTroupes(), BASE_PATH, locationDelegate('https://gitter.im/dev-ua/~chat'), locationDelegate('https://gitter.im/dev-ua/'));
+    var roomSwitcher = new SPARoomSwitcher(
+      fixtureTroupes(),
+      BASE_PATH,
+      locationDelegate('https://gitter.im/dev-ua/~chat'),
+      locationDelegate('https://gitter.im/dev-ua/')
+    );
 
     roomSwitcher.on('replace', function(href) {
       assert.strictEqual('/orgs/dev-ua/rooms/~iframe', href);
@@ -273,5 +324,4 @@ describe('spa-room-switcher', function() {
 
     roomSwitcher.change('https://gitter.im/orgs/dev-ua/rooms/');
   });
-
 });

@@ -33,45 +33,41 @@ var opts = yargs
     description: 'avatar, image or nothing (for documents)'
   })
   .option('room_uri', {
-    required: (argv.type !== 'avatar'),
+    required: argv.type !== 'avatar',
     description: 'room_uri'
   })
   .option('group_uri', {
-    required: (argv.type === 'avatar'),
+    required: argv.type === 'avatar',
     description: 'group_uri'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function getParams() {
   var params = { type: opts.type };
   if (opts.type === 'avatar') {
-    return groupService.findByUri(opts.group_uri, { lean: true })
-      .then(function(group) {
-        if (!group) throw new StatusError(404, 'Group not found.')
-        params.group_id = group._id.toString();
-        return params;
-      });
-
+    return groupService.findByUri(opts.group_uri, { lean: true }).then(function(group) {
+      if (!group) throw new StatusError(404, 'Group not found.');
+      params.group_id = group._id.toString();
+      return params;
+    });
   } else {
     params.room_uri = opts.room_uri;
-    return troupeService.findByUri(opts.room_uri)
-      .then(function(room) {
-        if (!room) throw new StatusError(404, 'Room not found.')
-        params.room_id = room._id.toString();
-        return params;
-      });
+    return troupeService.findByUri(opts.room_uri).then(function(room) {
+      if (!room) throw new StatusError(404, 'Room not found.');
+      params.room_id = room._id.toString();
+      return params;
+    });
   }
 }
 
 function run() {
-  var request = require("supertest-as-promised")(Promise);
+  var request = require('supertest-as-promised')(Promise);
   var app = require('../../server/api');
 
   return getParams()
     .then(function(params) {
-      console.log("using params", params);
+      console.log('using params', params);
       return request(app)
         .get('/private/generate-signature')
         .query(params)
@@ -88,7 +84,7 @@ function run() {
         // not sure this is necessary
         fields: {
           signature: body.sig
-        },
+        }
       };
       transloadit.createAssembly(assemblyParams, function(err, result) {
         if (err) {

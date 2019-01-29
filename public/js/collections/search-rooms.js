@@ -21,6 +21,5 @@ module.exports = BaseResolverCollection.extend({
     }
 
     BaseResolverCollection.prototype.fetch.apply(this, arguments);
-  },
-
+  }
 });

@@ -36,15 +36,15 @@ GhOrgPolicyDelegate.prototype = {
     return {
       type: 'GH_ORG',
       linkPath: sd.linkPath,
-      externalId: sd.externalId,
-    }
+      externalId: sd.externalId
+    };
   },
 
   getPolicyRateLimitKey: function(policyName) {
     if (!this._isValidUser()) return;
     var uri = this._securityDescriptor.linkPath;
 
-    return "GH_ORG:" + this._userId + ":" + uri + ":" + policyName;
+    return 'GH_ORG:' + this._userId + ':' + uri + ':' + policyName;
   },
 
   _isValidUser: function() {
@@ -65,7 +65,7 @@ GhOrgPolicyDelegate.prototype = {
         return ghOrg.member(uri, user.username);
       })
       .catch(function(err) {
-        if(err.errno && err.syscall || err.statusCode >= 500) {
+        if ((err.errno && err.syscall) || err.statusCode >= 500) {
           // GitHub call failed and may be down.
           // We can fall back to whether the user is already in the room
           throw new PolicyDelegateTransportError(err.message);

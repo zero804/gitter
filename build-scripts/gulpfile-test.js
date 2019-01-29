@@ -54,8 +54,7 @@ var argv = require('yargs')
     boolean: true,
     default: false
   })
-  .help('test-help')
-  .argv;
+  .help('test-help').argv;
 
 /* Don't do clean in gulp, use make */
 var RUN_TESTS_IN_PARALLEL = argv['test-parallel'];
@@ -67,8 +66,7 @@ var fast = argv['test-fast'];
 var grep = argv['test-grep'];
 var criticalOnly = argv['test-critical-only'];
 
-var testModules = {
-};
+var testModules = {};
 
 var modulesWithTest = glob.sync('./modules/*/test');
 
@@ -78,14 +76,11 @@ modulesWithTest.forEach(function(testDir) {
   testModules[moduleName] = {
     files: [path.join('modules', moduleName, 'test')],
     isCritical: false
-  }
+  };
 });
 
 testModules['api-tests'] = {
-  files: [
-    './test/api-tests/',
-    './test/api-web-tests/'
-  ],
+  files: ['./test/api-tests/', './test/api-web-tests/'],
   options: {
     // These tests load the entire app, so mocha will sometimes timeout before it even runs the tests
     timeout: 30000
@@ -98,12 +93,13 @@ testModules.integration = {
   isCritical: true
 };
 
-function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line max-statements
+function spawnMochaProcess(moduleName, options, files) {
+  // eslint-disable-line max-statements
   var executable;
   var args;
 
   var argReporter = 'spec';
-  var argTimeout = options && options.timeout || 10000;
+  var argTimeout = (options && options.timeout) || 10000;
   var argGrep = grep;
   var argBail = bail;
   var argInvert = false;
@@ -114,7 +110,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
     NO_AUTO_INDEX: 1,
     TZ: 'UTC',
     GITTER_TEST: 1
-  }
+  };
 
   if (generateCoverage) {
     executable = './node_modules/.bin/nyc';
@@ -124,7 +120,7 @@ function spawnMochaProcess(moduleName, options, files) { // eslint-disable-line 
       'output/coverage-reports/' + moduleName,
       '--reporter',
       'lcov',
-      './node_modules/.bin/mocha',
+      './node_modules/.bin/mocha'
     ];
 
     mkdirp.sync('output/coverage-reports/' + moduleName);
@@ -198,19 +194,15 @@ Object.keys(testModules).forEach(function(moduleName) {
   var testTaskName = 'test:test:' + moduleName;
   subTasks.push(testTaskName);
 
-
   gulp.task(testTaskName, function() {
-    return spawnMochaProcess(moduleName, definition.options, definition.files)
-      .catch(function(err) {
-        if (bail) {
-          throw new Error('Test module ' + moduleName + ' failed. ' + err);
-        }
+    return spawnMochaProcess(moduleName, definition.options, definition.files).catch(function(err) {
+      if (bail) {
+        throw new Error('Test module ' + moduleName + ' failed. ' + err);
+      }
 
-        testingErrors.push(err);
-      })
-
+      testingErrors.push(err);
+    });
   });
-
 });
 
 gulp.task('test:pre-test', function() {
@@ -221,13 +213,13 @@ gulp.task('test:pre-test', function() {
   }
 
   return childProcessPromise.spawn('./scripts/utils/ensure-mongodb-indexes.js', [], env);
-})
+});
 
 if (RUN_TESTS_IN_PARALLEL) {
   // Run tests in parallel
   gulp.task('test:test', subTasks, function() {
     if (testingErrors.length) {
-      return Promise.reject(testingErrors[0])
+      return Promise.reject(testingErrors[0]);
     }
   });
 } else {
@@ -239,7 +231,7 @@ if (RUN_TESTS_IN_PARALLEL) {
       if (err) return callback(err);
 
       if (testingErrors.length) {
-        return callback(testingErrors[0])
+        return callback(testingErrors[0]);
       }
 
       return callback();
@@ -257,19 +249,23 @@ if (generateCoverage) {
 }
 
 gulp.task('test:post-test:merge-lcov', function() {
-  return gulp.src('output/coverage-reports/**/lcov.info')
+  return gulp
+    .src('output/coverage-reports/**/lcov.info')
     .pipe(using())
     .pipe(lcovMerger())
     .pipe(gulp.dest('output/coverage-reports/merged/'));
 });
 
 gulp.task('test:post-test:submit-codecov', ['test:post-test:merge-lcov'], function() {
-  process.env.CODECOV_TOKEN = "4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a";
+  process.env.CODECOV_TOKEN = '4d30a5c7-3839-4396-a2fd-d8f9a68a5c3a';
 
-  return gulp.src('output/coverage-reports/merged/lcov.info')
-    .pipe(codecov({
-      disable: 'gcov'
-    }))
+  return gulp
+    .src('output/coverage-reports/merged/lcov.info')
+    .pipe(
+      codecov({
+        disable: 'gcov'
+      })
+    )
     .on('error', function(err) {
       gutil.log(err);
       this.emit('end');
@@ -279,8 +275,6 @@ gulp.task('test:post-test:submit-codecov', ['test:post-test:merge-lcov'], functi
 /**
  * Hook into the clean stage
  */
-gulp.task('test:clean', function (cb) {
-  del([
-    '.nyc_output/'
-  ], cb);
+gulp.task('test:clean', function(cb) {
+  del(['.nyc_output/'], cb);
 });

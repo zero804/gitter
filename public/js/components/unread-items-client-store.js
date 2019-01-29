@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var Backbone = require('backbone');
 
@@ -7,7 +7,7 @@ function limit(fn, context, timeout) {
 }
 
 function _iteratePreload(incoming, fn, context) {
-  var chats = incoming.chat;      // This is done this way to keep protocol compatibility
+  var chats = incoming.chat; // This is done this way to keep protocol compatibility
   var mentions = incoming.mention;
 
   var items = {};
@@ -26,7 +26,6 @@ function _iteratePreload(incoming, fn, context) {
     var mentioned = items[itemId];
     fn.call(context, itemId, mentioned);
   });
-
 }
 
 var DeletePit = function() {
@@ -63,7 +62,6 @@ DeletePit.prototype = {
   }
 };
 
-
 // -----------------------------------------------------
 // The main component of the unread-items-store
 // Events:
@@ -84,13 +82,11 @@ var UnreadItemStore = function() {
 };
 
 _.extend(UnreadItemStore.prototype, Backbone.Events, {
-
   /**
    * Returns `true` if the result changes the state of the store
    * options: { silent } will not trigger a recount or events
    */
   _unreadItemAdded: function(itemId, mention, options) {
-
     // Four options here:
     // 0 - The item has already been marked as read
     // 1 - new item
@@ -174,9 +170,13 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
   // via Realtime
   add: function(items) {
-    _iteratePreload(items, function(itemId, mention) {
-      this._unreadItemAdded(itemId, mention);
-    }, this);
+    _iteratePreload(
+      items,
+      function(itemId, mention) {
+        this._unreadItemAdded(itemId, mention);
+      },
+      this
+    );
   },
 
   // via Realtime
@@ -204,7 +204,6 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
         self._mentionRemoved(itemId);
       }
     });
-
   },
 
   notifyCount: function() {
@@ -220,10 +219,13 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
   },
 
   getMentions: function() {
-    return Object.keys(this._items).reduce(function(accum, itemId) {
-      if (this._items[itemId]) accum.push(itemId);
-      return accum;
-    }.bind(this), []);
+    return Object.keys(this._items).reduce(
+      function(accum, itemId) {
+        if (this._items[itemId]) accum.push(itemId);
+        return accum;
+      }.bind(this),
+      []
+    );
   },
 
   getLurkMode: function() {
@@ -253,7 +255,6 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this._items = {};
     this.length = 0;
     this.notifyCountLimited();
-
   },
 
   /* Realtime notification that everything was marked as ready somewhere else */
@@ -288,18 +289,20 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this._items = {};
     if (items) {
       this.state = 'LOADED';
-      _iteratePreload(items, function(itemId, mention) {
-        this._unreadItemAdded(itemId, mention, { silent: true });
-      }, this);
+      _iteratePreload(
+        items,
+        function(itemId, mention) {
+          this._unreadItemAdded(itemId, mention, { silent: true });
+        },
+        this
+      );
 
       this.trigger('reset');
       this.notifyCountLimited();
     } else {
       if (this.state === 'LOADED') this.notifyCountLimited();
     }
-
   }
-
 });
 
 module.exports = UnreadItemStore;

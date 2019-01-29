@@ -3,6 +3,6 @@
 module.exports = {
   id: 'orgName',
   subresources: {
-    'suggestedRooms': require('./suggested-rooms')
+    suggestedRooms: require('./suggested-rooms')
   }
 };

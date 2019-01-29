@@ -9,7 +9,7 @@ var crypto = require('crypto');
 var logger = env.logger.get('spam-detection');
 
 var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
-  keyPrefix: "spam:"
+  keyPrefix: 'spam:'
 });
 
 var TTL = 12 * 60 * 60;
@@ -48,7 +48,8 @@ function getWarnAndBanThresholds(text) {
 function addHash(userId, hash, text) {
   var thresholds = getWarnAndBanThresholds(text);
 
-  return redisClient.spamDetectionCountChatForUser('dup:' + String(userId), hash, TTL)
+  return redisClient
+    .spamDetectionCountChatForUser('dup:' + String(userId), hash, TTL)
     .bind({
       thresholds: thresholds,
       text: text,
@@ -68,14 +69,16 @@ function addHash(userId, hash, text) {
       }
 
       return count > thresholds.ban;
-    })
-
+    });
 }
 /**
  * Super basic spam detection
  */
 function detect(userId, text) {
-  var hash = crypto.createHash('md5').update(text).digest('hex');
+  var hash = crypto
+    .createHash('md5')
+    .update(text)
+    .digest('hex');
   return addHash(userId, hash, text);
 }
 

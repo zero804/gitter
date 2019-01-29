@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/tracking');
 var appEvents = require('./utils/appevents');

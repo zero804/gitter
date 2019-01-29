@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function roomNameShortener(name) {
-  if (!name) return "";
+  if (!name) return '';
 
   var resultantName = '';
   name
@@ -10,10 +10,9 @@ module.exports = function roomNameShortener(name) {
     .some(function(piece, index) {
       var newResult = piece + (resultantName.length ? '/' : '') + resultantName;
 
-      if(newResult.length <= 16 || index === 0) {
+      if (newResult.length <= 16 || index === 0) {
         resultantName = newResult;
-      }
-      else {
+      } else {
         // break, we went over with this piece
         return true;
       }

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var appEvents = require('../../../../utils/appevents');
@@ -14,9 +14,7 @@ var _ = require('underscore');
 require('../../../behaviors/isomorphic');
 
 module.exports = Marionette.LayoutView.extend({
-
   behaviors: function() {
-
     var behaviours = {
       Isomorphic: {
         home: { el: '#minibar-all', init: 'initHome' },
@@ -25,84 +23,98 @@ module.exports = Marionette.LayoutView.extend({
         groups: { el: '#minibar-groups', init: 'initGroups' },
         communityCreate: { el: '#minibar-community-create', init: 'initCommunityCreate' },
         close: { el: '#minibar-close', init: 'initClose' },
-        collectionView: { el: '#minibar-collection', init: 'initCollection' },
-      },
+        collectionView: { el: '#minibar-collection', init: 'initCollection' }
+      }
     };
 
     return behaviours;
   },
 
-  initHome: function (optionsForRegion){
-    var homeView = new HomeView(optionsForRegion({
-      model: this.homeModel,
-      roomMenuModel: this.model,
-    }));
+  initHome: function(optionsForRegion) {
+    var homeView = new HomeView(
+      optionsForRegion({
+        model: this.homeModel,
+        roomMenuModel: this.model
+      })
+    );
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(homeView, 'minibar-item:activated', this.onHomeActivate, this);
     return homeView;
   },
 
-  initSearch: function (optionsForRegion){
-    var searchView = new SearchView(optionsForRegion({
-      model: this.searchModel,
-      roomMenuModel: this.model,
-    }));
+  initSearch: function(optionsForRegion) {
+    var searchView = new SearchView(
+      optionsForRegion({
+        model: this.searchModel,
+        roomMenuModel: this.model
+      })
+    );
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(searchView, 'minibar-item:activated', this.onSearchActivate, this);
     return searchView;
   },
 
-  initPeople: function (optionsForRegion){
-    var peopleView = new PeopleView(optionsForRegion({
-      model: this.peopleModel,
-      roomMenuModel: this.model,
-    }));
+  initPeople: function(optionsForRegion) {
+    var peopleView = new PeopleView(
+      optionsForRegion({
+        model: this.peopleModel,
+        roomMenuModel: this.model
+      })
+    );
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(peopleView, 'minibar-item:activated', this.onPeopleActivate, this);
     return peopleView;
   },
 
-  initGroups: function (optionsForRegion){
-    var groupView = new GroupView(optionsForRegion({
-      model: this.groupModel,
-      roomMenuModel: this.model,
-    }));
+  initGroups: function(optionsForRegion) {
+    var groupView = new GroupView(
+      optionsForRegion({
+        model: this.groupModel,
+        roomMenuModel: this.model
+      })
+    );
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(groupView, 'minibar-item:activated', this.onGroupActivate, this);
     return groupView;
   },
 
-  initCommunityCreate: function (optionsForRegion){
-    var communityCreateView = new CommunityCreateView(optionsForRegion({
-      model: this.communityCreateModel,
-      roomMenuModel: this.model
-    }));
+  initCommunityCreate: function(optionsForRegion) {
+    var communityCreateView = new CommunityCreateView(
+      optionsForRegion({
+        model: this.communityCreateModel,
+        roomMenuModel: this.model
+      })
+    );
 
     return communityCreateView;
   },
 
-  initClose: function (optionsForRegion){
-    var closeView = new CloseView(optionsForRegion({
-      model: this.closeModel,
-      roomMenuModel: this.model
-    }));
+  initClose: function(optionsForRegion) {
+    var closeView = new CloseView(
+      optionsForRegion({
+        model: this.closeModel,
+        roomMenuModel: this.model
+      })
+    );
 
     //We have to manually bind child events because of the Isomorphic Behaviour
     this.listenTo(closeView, 'minibar-item:close', this.onCloseClicked, this);
     return closeView;
   },
 
-  initCollection: function (optionsForRegion){
-    var collectionView = new CollectionView(optionsForRegion({
-      collection: this.collection,
-      roomMenuModel: this.model,
-      dndCtrl: this.dndCtrl,
-      keyboardControllerView: this.keyboardControllerView,
-    }));
+  initCollection: function(optionsForRegion) {
+    var collectionView = new CollectionView(
+      optionsForRegion({
+        collection: this.collection,
+        roomMenuModel: this.model,
+        dndCtrl: this.dndCtrl,
+        keyboardControllerView: this.keyboardControllerView
+      })
+    );
 
     this.listenTo(collectionView, 'minibar-item:activated', this.onCollectionItemActivated, this);
     return collectionView;
@@ -131,35 +143,34 @@ module.exports = Marionette.LayoutView.extend({
     this.onMenuChangeState();
   },
 
-  onHomeActivate: function (){
+  onHomeActivate: function() {
     this.changeMenuState('all');
   },
 
-  onSearchActivate: function (){
+  onSearchActivate: function() {
     this.changeMenuState('search');
   },
 
-  onPeopleActivate: function (){
+  onPeopleActivate: function() {
     this.changeMenuState('people');
   },
 
-  onGroupActivate: function(){
+  onGroupActivate: function() {
     this.changeMenuState('group');
   },
 
-  onCollectionItemActivated: function (view, model){
+  onCollectionItemActivated: function(view, model) {
     this.model.set('groupId', model.get('id'));
     this.changeMenuState('org');
   },
 
-  changeMenuState: function(state){
+  changeMenuState: function(state) {
     appEvents.trigger('stats.event', 'minibar.activated.' + state);
     this.model.set({
       panelOpenState: true,
-      state: state,
+      state: state
     });
   },
-
 
   onCloseClicked: function() {
     var newVal = !this.model.get('roomMenuIsPinned');
@@ -173,10 +184,13 @@ module.exports = Marionette.LayoutView.extend({
       } else {
         // We stagger the trigger here so we don't jank the UI
         // resizing the the left-menu and main chat-frame
-        setTimeout(function() {
-          this.model.set({ roomMenuIsPinned: newVal });
-          this.bus.trigger('room-menu:pin', newVal);
-        }.bind(this), ANIMATION_TIME);
+        setTimeout(
+          function() {
+            this.model.set({ roomMenuIsPinned: newVal });
+            this.bus.trigger('room-menu:pin', newVal);
+          }.bind(this),
+          ANIMATION_TIME
+        );
       }
 
       this.model.set({ panelOpenState: newVal });
@@ -188,17 +202,19 @@ module.exports = Marionette.LayoutView.extend({
       this.bus.trigger('room-menu:pin', newVal);
       // We stagger the trigger here so we don't jank the UI
       // resizing the the left-menu and main chat-frame
-      setTimeout(function() {
-        this.model.set({ panelOpenState: newVal });
-      }.bind(this), ANIMATION_TIME);
+      setTimeout(
+        function() {
+          this.model.set({ panelOpenState: newVal });
+        }.bind(this),
+        ANIMATION_TIME
+      );
     }
-
   },
 
-  onMenuChangeState: function (){
+  onMenuChangeState: function() {
     this.clearCurrentActiveElement();
     var state = this.model.get('state');
-    switch(state) {
+    switch (state) {
       case 'all':
         return this.homeModel.set({ active: true, focus: true });
       case 'search':
@@ -210,27 +226,25 @@ module.exports = Marionette.LayoutView.extend({
       case 'org':
         var groupId = this.model.get('groupId');
         var model = this.collection.get(groupId);
-        if(!model) { return; }
+        if (!model) {
+          return;
+        }
         return model.set({ active: true, focus: true });
     }
   },
 
-  clearCurrentActiveElement: function (){
+  clearCurrentActiveElement: function() {
     this.clearFocus();
     var activeModel = this.getActiveItem();
-    if(activeModel) { activeModel.set('active', false); }
+    if (activeModel) {
+      activeModel.set('active', false);
+    }
   },
 
   getAllModels: function() {
-    return [this.homeModel,
-      this.searchModel,
-      this.peopleModel,
-      this.groupModel]
+    return [this.homeModel, this.searchModel, this.peopleModel, this.groupModel]
       .concat(this.collection.models)
-      .concat([
-      this.communityCreateModel,
-      this.closeModel
-    ]);
+      .concat([this.communityCreateModel, this.closeModel]);
   },
 
   getActiveItem: function() {
@@ -241,11 +255,10 @@ module.exports = Marionette.LayoutView.extend({
     });
   },
 
-  clearFocus: function (){
+  clearFocus: function() {
     var models = this.getAllModels();
     models.forEach(function(model) {
       model.set('focus', false);
     });
-  },
-
+  }
 });

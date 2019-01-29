@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var persistence = require('gitter-web-persistence');
@@ -26,14 +26,15 @@ function upsertMetaKey(troupeId, metaKey, value) {
   assert(troupeId && mongoUtils.isLikeObjectId(troupeId));
 
   troupeId = mongoUtils.asObjectID(troupeId);
-  var query = { $set: { } };
+  var query = { $set: {} };
   query.$set[metaKey] = value;
 
-  return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, { upsert: true })
-    .exec();
+  return persistence.TroupeMeta.findOneAndUpdate({ troupeId: troupeId }, query, {
+    upsert: true
+  }).exec();
 }
 
 module.exports = {
   findMetaByTroupeId: findMetaByTroupeId,
-  upsertMetaKey: upsertMetaKey,
+  upsertMetaKey: upsertMetaKey
 };

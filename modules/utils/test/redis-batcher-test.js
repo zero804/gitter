@@ -1,5 +1,5 @@
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var workerQueue = require('../lib/worker-queue-redis');
@@ -26,7 +26,7 @@ describe('redis-batcher', function() {
       assert(items.indexOf('c') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
       assert(items.indexOf('d') >= 0, 'Expected items a,b,c,d, got ' + items.join(','));
 
-      switch(count) {
+      switch (count) {
         case 1:
           underTest.add('chat:1', 'a');
           underTest.add('chat:1', 'b');
@@ -36,9 +36,7 @@ describe('redis-batcher', function() {
 
         case 2:
           return done();
-
       }
-
     }
 
     var underTest = new RedisBatcher('test1-' + uuid.v4(), 0, batchFn);
@@ -49,8 +47,6 @@ describe('redis-batcher', function() {
     underTest.add('chat:1', 'b');
     underTest.add('chat:1', 'c');
     underTest.add('chat:1', 'd');
-
-
   });
 
   it('should keep separate keys separate #slow', function(done) {
@@ -62,7 +58,7 @@ describe('redis-batcher', function() {
 
       assert(items.length === 2, 'Expected 2 items');
 
-      if(key === 'chat:1') {
+      if (key === 'chat:1') {
         assert(items.indexOf('a') >= 0, 'Expected items a,b got ' + items.join(','));
         assert(items.indexOf('b') >= 0, 'Expected items a,b got ' + items.join(','));
       } else {
@@ -70,10 +66,9 @@ describe('redis-batcher', function() {
         assert(items.indexOf('d') >= 0, 'Expected items c,d, got ' + items.join(','));
       }
 
-      if(keys['chat:1'] && keys['chat:2']) {
+      if (keys['chat:1'] && keys['chat:2']) {
         return done();
       }
-
     }
 
     var underTest = new RedisBatcher('test2-' + uuid.v4(), 0, batchFn);
@@ -85,12 +80,9 @@ describe('redis-batcher', function() {
     underTest.add('chat:1', 'b');
     underTest.add('chat:2', 'c');
     underTest.add('chat:2', 'd');
-
-
   });
 
   after(function(done) {
     workerQueue.stopScheduler(done);
   });
-
 });

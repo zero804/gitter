@@ -1,12 +1,10 @@
 /* eslint complexity: ["error", 13] */
-"use strict";
+'use strict';
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var Mutant = require('mutantjs');
 var popoverTemplate = require('./tmpl/popover.hbs');
-
-
 
 var ARROW_WIDTH_PX = 10;
 
@@ -27,14 +25,14 @@ var DEFAULTS = {
 
 function findMaxZIndex(element) {
   var max = 0;
-  while(element && element != document) {
+  while (element && element != document) {
     var style = window.getComputedStyle(element, null);
 
-    if(style) {
+    if (style) {
       var zIndex = style.getPropertyValue('z-index');
-      if(zIndex && zIndex !== 'auto') {
+      if (zIndex && zIndex !== 'auto') {
         zIndex = parseInt(zIndex, 10);
-        if(zIndex > max) {
+        if (zIndex > max) {
           max = zIndex;
         }
       }
@@ -50,26 +48,37 @@ function generatePopoverPosition(placement, targetPos, actualWidth, actualHeight
   var tp;
   switch (placement) {
     case 'bottom':
-      tp = {top: targetPos.top + targetPos.height, left: targetPos.left + targetPos.width / 2 - actualWidth / 2};
+      tp = {
+        top: targetPos.top + targetPos.height,
+        left: targetPos.left + targetPos.width / 2 - actualWidth / 2
+      };
       break;
     case 'top':
-      tp = {top: targetPos.top - actualHeight, left: targetPos.left + targetPos.width / 2 - actualWidth / 2 - 2};
+      tp = {
+        top: targetPos.top - actualHeight,
+        left: targetPos.left + targetPos.width / 2 - actualWidth / 2 - 2
+      };
       break;
     case 'left':
-      tp = {top: targetPos.top + targetPos.height / 2 - actualHeight / 2, right: (document.body.clientWidth - targetPos.left) + ARROW_WIDTH_PX};
+      tp = {
+        top: targetPos.top + targetPos.height / 2 - actualHeight / 2,
+        right: document.body.clientWidth - targetPos.left + ARROW_WIDTH_PX
+      };
       break;
     case 'right':
-      tp = {top: targetPos.top + targetPos.height / 2 - actualHeight / 2, left: targetPos.left + targetPos.width};
+      tp = {
+        top: targetPos.top + targetPos.height / 2 - actualHeight / 2,
+        left: targetPos.left + targetPos.width
+      };
       break;
   }
 
   return tp;
 }
 
-
 var Popover = Marionette.ItemView.extend({
   template: popoverTemplate,
-  className: "popover",
+  className: 'popover',
   initialize: function(options) {
     _.bindAll(this, 'leave', 'enter');
     this.options = _.extend({}, DEFAULTS, options);
@@ -79,7 +88,7 @@ var Popover = Marionette.ItemView.extend({
     this.title = this.options.title;
     this.footerView = this.options.footerView;
 
-    if(this.options.scroller) {
+    if (this.options.scroller) {
       this.$scroller = $(this.options.scroller);
       this.scroller = this.$scroller[0];
     }
@@ -92,7 +101,7 @@ var Popover = Marionette.ItemView.extend({
     this.$targetElement.on('mouseenter', this.enter);
     this.$targetElement.on('mouseleave', this.leave);
     this.once('destroy', function() {
-      if(this.mutant) this.mutant.disconnect();
+      if (this.mutant) this.mutant.disconnect();
     });
   },
 
@@ -105,24 +114,26 @@ var Popover = Marionette.ItemView.extend({
 
     this.view.parentPopover = this;
 
-    if(this.zIndex) {
+    if (this.zIndex) {
       this.el.style.zIndex = this.zIndex + 1;
     }
 
-    if(this.titleView) {
+    if (this.titleView) {
       $e.find('.popover-title').append(this.titleView.render().el);
-    } else if(this.title) {
+    } else if (this.title) {
       $e.find('.popover-title').text(this.title);
     } else {
       $e.find('.popover-title').hide();
     }
 
     $e.find('.popover-content').append(this.view.render().el);
-    $e.find('.popover-inner').css('width', this.options.width).css('min-height', this.options.minHeight);
+    $e.find('.popover-inner')
+      .css('width', this.options.width)
+      .css('min-height', this.options.minHeight);
 
     var fv = this.footerView;
 
-    if(fv) {
+    if (fv) {
       fv.parentPopover = this;
       $e.find('.popover-footer-content').append(fv.render().el);
     }
@@ -134,11 +145,11 @@ var Popover = Marionette.ItemView.extend({
     $e.removeClass('fade top bottom left right in');
   },
 
-  enter: function () {
+  enter: function() {
     if (this.timeout) clearTimeout(this.timeout);
   },
 
-  leave: function () {
+  leave: function() {
     if (!this.options.delay) {
       return self.hide();
     }
@@ -165,7 +176,7 @@ var Popover = Marionette.ItemView.extend({
     }
   },
 
-  show: function () {
+  show: function() {
     var $e = this.render().$el;
     var e = this.el;
 
@@ -204,7 +215,7 @@ var Popover = Marionette.ItemView.extend({
         case 'vertical':
           placement = this.selectBestVerticalPlacement($e, this.targetElement);
           break;
-       case 'horizontal':
+        case 'horizontal':
           placement = this.selectBestHorizontalPlacement($e, this.targetElement);
           break;
       }
@@ -214,18 +225,18 @@ var Popover = Marionette.ItemView.extend({
       this.applyPlacement(tp, placement);
     } finally {
       // This is very important. If you leave it out, Chrome will likely crash.
-      if(this.mutant) this.mutant.takeRecords();
+      if (this.mutant) this.mutant.takeRecords();
     }
   },
 
   selectBestVerticalPlacement: function(div, target) {
     var $target = $(target);
 
-    if(this.scroller) {
+    if (this.scroller) {
       var scrollTop = this.scroller.scrollTop;
       var scrollBottom = this.scroller.scrollTop + this.scroller.clientHeight;
       var middle = (scrollTop + scrollBottom) / 2;
-      if(target.offsetTop > middle) {
+      if (target.offsetTop > middle) {
         return 'top';
       } else {
         return 'bottom';
@@ -233,28 +244,28 @@ var Popover = Marionette.ItemView.extend({
     }
 
     var panel = $target.offsetParent();
-    if(!panel) return 'bottom';
-    if($target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
+    if (!panel) return 'bottom';
+    if ($target.offset().top + div.height() + 20 >= panel[0].clientHeight) {
       return 'top';
     }
 
     return 'bottom';
   },
 
-  selectBestHorizontalPlacement: function(div, target) { // jshint unused:true
+  selectBestHorizontalPlacement: function(div, target) {
+    // jshint unused:true
     // var $target = $(target);
 
     var bounds = target.getBoundingClientRect();
-    if(bounds.left < document.body.clientWidth / 2) {
-      return "right";
+    if (bounds.left < document.body.clientWidth / 2) {
+      return 'right';
     } else {
-      return "left";
+      return 'left';
     }
-
   },
 
   // eslint-disable-next-line complexity, max-statements
-  applyPlacement: function(offset, placement){
+  applyPlacement: function(offset, placement) {
     var $e = this.$el;
     var e = $e[0];
 
@@ -270,10 +281,9 @@ var Popover = Marionette.ItemView.extend({
       if (offset.left < 0) {
         arrowDelta = -2 * offset.left;
         offset.left = 0;
-      }
-      else if (offset.left + actualWidth > window.innerWidth) {
+      } else if (offset.left + actualWidth > window.innerWidth) {
         var overflow = window.innerWidth - (offset.left + actualWidth);
-        arrowDelta = 2* overflow;
+        arrowDelta = 2 * overflow;
         offset.left += overflow;
       }
     } else {
@@ -282,7 +292,7 @@ var Popover = Marionette.ItemView.extend({
         offset.top = 0;
       } else {
         var clientHeight = this.scroller ? this.scroller.clientHeight : window.innerHeight;
-        if(offset.top + height > clientHeight) {
+        if (offset.top + height > clientHeight) {
           arrowDelta = 2 * (clientHeight - offset.top - height - 10);
           offset.top = clientHeight - height - 10;
         }
@@ -293,7 +303,7 @@ var Popover = Marionette.ItemView.extend({
       top: offset.top
     };
 
-    if(offset.right) {
+    if (offset.right) {
       newPosition.left = 'initial';
       newPosition.right = offset.right;
     } else {
@@ -301,11 +311,9 @@ var Popover = Marionette.ItemView.extend({
       newPosition.right = 'initial';
     }
 
-    $e
-      .css(newPosition)
+    $e.css(newPosition)
       .addClass(placement)
       .addClass('in');
-
 
     if (placement == 'top' && actualHeight != height) {
       offset.top = offset.top + height - actualHeight;
@@ -320,13 +328,11 @@ var Popover = Marionette.ItemView.extend({
     if (replace) $e.offset(offset);
   },
 
-  replaceArrow: function(delta, dimension, position){
-    this
-      .arrow()
-      .css(position, delta ? (50 * (1 - delta / dimension) + "%") : '');
+  replaceArrow: function(delta, dimension, position) {
+    this.arrow().css(position, delta ? 50 * (1 - delta / dimension) + '%' : '');
   },
 
-  hide: function () {
+  hide: function() {
     if (this.timeout) clearTimeout(this.timeout);
 
     var $e = this.$el;
@@ -345,7 +351,7 @@ var Popover = Marionette.ItemView.extend({
     return this;
   },
 
-  getTargetPosition: function () {
+  getTargetPosition: function() {
     var el = this.targetElement;
 
     var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
@@ -353,13 +359,13 @@ var Popover = Marionette.ItemView.extend({
     return pos;
   },
 
-  getTitle: function () {
+  getTitle: function() {
     return this.options.title;
   },
 
-  arrow: function(){
-    if(!this.$arrow) {
-      this.$arrow = this.$el.find(".arrow");
+  arrow: function() {
+    if (!this.$arrow) {
+      this.$arrow = this.$el.find('.arrow');
     }
 
     return this.$arrow;
@@ -368,7 +374,7 @@ var Popover = Marionette.ItemView.extend({
 
 Popover.hoverTimeout = function(e, callback, scope) {
   var timeout = setTimeout(function() {
-    if(!timeout) return;
+    if (!timeout) return;
     callback.call(scope, e);
   }, HOVER_DELAY);
 
@@ -384,6 +390,5 @@ Popover.singleton = function(view, popover) {
     view.popover = null;
   });
 };
-
 
 module.exports = Popover;

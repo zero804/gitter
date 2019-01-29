@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('./utils/context');
 var UserHomeView = require('./views/userhome/userHomeView');
@@ -16,7 +16,6 @@ require('./views/widgets/avatar');
 require('./components/ping');
 
 onready(function() {
-
   appEvents.on('navigation', function(url) {
     window.location.href = url;
   });
@@ -38,7 +37,7 @@ onready(function() {
    * Because of this, we have to wait until the realtime connection updates the user
    * model before we can create the view.
    */
-  if(user.get('scopes')) {
+  if (user.get('scopes')) {
     onContextLoad();
   } else {
     user.once('change', onContextLoad);

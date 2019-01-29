@@ -21,7 +21,6 @@ var template = require('./tmpl/permissions-view.hbs');
 
 require('../behaviors/isomorphic');
 
-
 var PermissionsView = Marionette.LayoutView.extend({
   template: template,
 
@@ -43,13 +42,15 @@ var PermissionsView = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       adminListView: { el: '.js-permissions-admin-list-root', init: 'initAdminListView' }
-    },
+    }
   },
 
   initAdminListView: function(optionsForRegion) {
-    this.adminListView = new PermissionsPeopleListView(optionsForRegion({
-      collection: this.model.adminCollection
-    }));
+    this.adminListView = new PermissionsPeopleListView(
+      optionsForRegion({
+        collection: this.model.adminCollection
+      })
+    );
 
     this.listenTo(this.adminListView, 'user:remove', this.onAdminRemoved, this);
     return this.adminListView;
@@ -73,19 +74,19 @@ var PermissionsView = Marionette.LayoutView.extend({
   },
 
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'switch-to-group-entity':
         var entity = this.model.get('entity');
         var groupId = entity && entity.get('groupId');
 
         var group = entity && entity.get('group');
-        if(groupId) {
+        if (groupId) {
           group = this.model.groupCollection.get(groupId);
         }
 
         this.model.set({
           entity: group
-        })
+        });
         break;
       case 'done':
         this.submitNewSecurityDescriptor();
@@ -113,22 +114,27 @@ var PermissionsView = Marionette.LayoutView.extend({
           var displayName = (m.get('displayName') || '').toLowerCase();
           var username = (m.get('username') || '').toLowerCase();
 
-          return fuzzysearch(input.toLowerCase(), displayName) ||
-            fuzzysearch(input.toLowerCase(), username);
+          return (
+            fuzzysearch(input.toLowerCase(), displayName) ||
+            fuzzysearch(input.toLowerCase(), username)
+          );
         };
       },
       fetch: function(input, collection, fetchSuccess) {
-        this.collection.fetch({
-          data: {
-            q: input,
-            type: 'gitter'
+        this.collection.fetch(
+          {
+            data: {
+              q: input,
+              type: 'gitter'
+            }
+          },
+          {
+            add: true,
+            remove: true,
+            merge: true,
+            success: fetchSuccess
           }
-        }, {
-          add: true,
-          remove: true,
-          merge: true,
-          success: fetchSuccess
-        });
+        );
       }
     });
 
@@ -137,7 +143,6 @@ var PermissionsView = Marionette.LayoutView.extend({
     this.onRequestingSecurityDescriptorStatusChange();
     this.onAdminCollectionChange();
   },
-
 
   onPermissionsOptionsSelectChange: function() {
     var currentSd = this.model.get('securityDescriptor');
@@ -165,7 +170,6 @@ var PermissionsView = Marionette.LayoutView.extend({
     this.model.adminCollection.remove(user);
   },
 
-
   initializeForEntity: function() {
     this.fetchSecurityDescriptor()
       .bind(this)
@@ -176,16 +180,18 @@ var PermissionsView = Marionette.LayoutView.extend({
         var permissionOpts = this.getPermissionOptions();
 
         this.ui.permissionsOptionsSelect.html('');
-        permissionOpts.forEach(function(opt) {
-          var optionEl = $('<option></option>');
-          optionEl.text(opt.label);
-          optionEl.attr('value', opt.value);
-          if(opt.selected) {
-            optionEl.attr('selected', opt.selected);
-          }
-          optionEl.appendTo(this.ui.permissionsOptionsSelect);
-        }.bind(this));
-      })
+        permissionOpts.forEach(
+          function(opt) {
+            var optionEl = $('<option></option>');
+            optionEl.text(opt.label);
+            optionEl.attr('value', opt.value);
+            if (opt.selected) {
+              optionEl.attr('selected', opt.selected);
+            }
+            optionEl.appendTo(this.ui.permissionsOptionsSelect);
+          }.bind(this)
+        );
+      });
     this.fetchAdminUsers();
   },
 
@@ -205,8 +211,9 @@ var PermissionsView = Marionette.LayoutView.extend({
     var sdWarningString = '';
     var initialSdType = this.model.get('initialSecurityDescriptorType');
     var isInitialSdTypeGitHubBased = initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
-    if(isInitialSdTypeGitHubBased && initialSdType !== sdType) {
-      sdWarningString = 'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
+    if (isInitialSdTypeGitHubBased && initialSdType !== sdType) {
+      sdWarningString =
+        'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
     }
     this.ui.sdWarning.text(sdWarningString);
     toggleClass(this.ui.sdWarning[0], 'hidden', sdWarningString.length === 0);
@@ -223,7 +230,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     var status = this.model.get('submitSecurityDescriptorStatus');
     var statusString = '';
 
-    if(status === submitSecurityDescriptorStatusConstants.ERROR) {
+    if (status === submitSecurityDescriptorStatusConstants.ERROR) {
       statusString = 'Problem submitting security descriptor';
     }
 
@@ -254,12 +261,15 @@ var PermissionsView = Marionette.LayoutView.extend({
     var sd = this.model.get('securityDescriptor');
     var sdType = sd && sd.type;
 
-    if(isSpinnerHidden && isErrorIconHidden) {
-      toggleClass(this.ui.permissionsOptionsGithubIcon[0], 'hidden', sdType !== 'GH_ORG' && sdType !== 'GH_REPO');
+    if (isSpinnerHidden && isErrorIconHidden) {
+      toggleClass(
+        this.ui.permissionsOptionsGithubIcon[0],
+        'hidden',
+        sdType !== 'GH_ORG' && sdType !== 'GH_REPO'
+      );
       toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
     }
   },
-
 
   // eslint-disable-next-line complexity
   getPermissionOptions: function() {
@@ -267,14 +277,13 @@ var PermissionsView = Marionette.LayoutView.extend({
     var sd = this.model.get('securityDescriptor');
     var permissionOpts = [];
 
-    if(sd && sd.type === 'GH_ORG') {
+    if (sd && sd.type === 'GH_ORG') {
       permissionOpts.push({
         value: 'GH_ORG',
         label: 'Any member of the ' + sd.linkPath + ' organization on GitHub',
         selected: sd.type === 'GH_ORG'
       });
-    }
-    else if(sd && sd.type === 'GH_REPO') {
+    } else if (sd && sd.type === 'GH_REPO') {
       permissionOpts.push({
         value: 'GH_REPO',
         label: 'Anyone with push access to the ' + sd.linkPath + ' repo on GitHub',
@@ -284,21 +293,23 @@ var PermissionsView = Marionette.LayoutView.extend({
 
     var hasGitHubOpts = permissionOpts.length > 0;
 
-
     var groupId = entity && entity.get('groupId');
     var group = entity && entity.get('group');
-    if(groupId) {
+    if (groupId) {
       group = this.model.groupCollection.get(groupId);
     }
-    if(sd && group) {
+    if (sd && group) {
       permissionOpts.push({
         value: 'GROUP',
-        label: 'Any administrator of the ' + (group ? (group.get('name') + ' ') : '') + 'community on Gitter',
+        label:
+          'Any administrator of the ' +
+          (group ? group.get('name') + ' ' : '') +
+          'community on Gitter',
         selected: !hasGitHubOpts && sd.type === 'GROUP'
       });
     }
 
-    if(sd) {
+    if (sd) {
       permissionOpts.push({
         value: 'null',
         label: 'Only the users listed below',
@@ -315,7 +326,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     var baseEntityApiUrl = '/v1/groups';
     // TODO: Better way to tell if it is a room or how to determine associated endpoint???
     var isRoom = entity && entity.get('groupId');
-    if(isRoom) {
+    if (isRoom) {
       baseEntityApiUrl = '/v1/rooms';
     }
 
@@ -324,15 +335,19 @@ var PermissionsView = Marionette.LayoutView.extend({
 
   getApiEndpointForEntity: function() {
     var entity = this.model.get('entity');
-    if(entity) {
+    if (entity) {
       return urlJoin(this.getBaseApiEndpointForEntity(), entity.get('id'));
     }
   },
 
   fetchSecurityDescriptor: function() {
-    this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.PENDING);
+    this.model.set(
+      'requestingSecurityDescriptorStatus',
+      requestingSecurityDescriptorStatusConstants.PENDING
+    );
     var securityApiUrl = urlJoin(this.getApiEndpointForEntity(), 'security');
-    return apiClient.get(securityApiUrl)
+    return apiClient
+      .get(securityApiUrl)
       .bind(this)
       .then(function(sd) {
         this.model.set({
@@ -341,15 +356,21 @@ var PermissionsView = Marionette.LayoutView.extend({
         });
       })
       .catch(function() {
-        this.model.set('requestingSecurityDescriptorStatus', requestingSecurityDescriptorStatusConstants.ERROR);
+        this.model.set(
+          'requestingSecurityDescriptorStatus',
+          requestingSecurityDescriptorStatusConstants.ERROR
+        );
       });
   },
 
   fetchAdminUsers: function() {
     var entity = this.model.get('entity');
 
-    if(entity) {
-      this.model.adminCollection.url = urlJoin(this.getApiEndpointForEntity(), 'security/extraAdmins');
+    if (entity) {
+      this.model.adminCollection.url = urlJoin(
+        this.getApiEndpointForEntity(),
+        'security/extraAdmins'
+      );
       this.model.adminCollection.fetch();
     }
   },
@@ -358,7 +379,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     var modelIsValid = this.model.isValid();
     var errors = !modelIsValid && this.model.validationError;
 
-    if(errors) {
+    if (errors) {
       this.updateModelErrors();
       return;
     }
@@ -369,8 +390,12 @@ var PermissionsView = Marionette.LayoutView.extend({
       return user.get('id');
     });
 
-    this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.PENDING);
-    return apiClient.put(securityApiUrl, sd)
+    this.model.set(
+      'submitSecurityDescriptorStatus',
+      submitSecurityDescriptorStatusConstants.PENDING
+    );
+    return apiClient
+      .put(securityApiUrl, sd)
       .bind(this)
       .then(function(updatedSd) {
         this.model.set({
@@ -383,12 +408,13 @@ var PermissionsView = Marionette.LayoutView.extend({
         this.dialog = null;
       })
       .catch(function() {
-        this.model.set('submitSecurityDescriptorStatus', submitSecurityDescriptorStatusConstants.ERROR);
+        this.model.set(
+          'submitSecurityDescriptorStatus',
+          submitSecurityDescriptorStatusConstants.ERROR
+        );
       });
   }
-
 });
-
 
 var Modal = ModalView.extend({
   disableAutoFocus: true,
@@ -402,12 +428,16 @@ var Modal = ModalView.extend({
     options.title = this.getModalTitle();
     this.options = options;
 
-    options.menuItems = new Backbone.Collection(this.generateMenuItems().concat(options.menuItems || []));
+    options.menuItems = new Backbone.Collection(
+      this.generateMenuItems().concat(options.menuItems || [])
+    );
 
     ModalView.prototype.initialize.call(this, options);
-    this.view = new PermissionsView(_.extend({}, options, {
-      menuItemCollection: options.menuItems
-    }));
+    this.view = new PermissionsView(
+      _.extend({}, options, {
+        menuItemCollection: options.menuItems
+      })
+    );
   },
 
   onEntityChange: function() {
@@ -429,7 +459,7 @@ var Modal = ModalView.extend({
 
     var title = 'Community Permissions';
 
-    if(entity) {
+    if (entity) {
       // TODO: Better way to tell if it is a room or how to determine associated endpoint???
       var isRoom = entity && entity.get('groupId');
 
@@ -445,9 +475,9 @@ var Modal = ModalView.extend({
 
     var items = [];
 
-    if(entity) {
+    if (entity) {
       var groupId = entity.get('groupId');
-      if(groupId) {
+      if (groupId) {
         items.push({
           action: 'switch-to-group-entity',
           pull: 'left',
@@ -464,11 +494,9 @@ var Modal = ModalView.extend({
       className: 'modal--default__footer__btn'
     });
 
-
     return items;
   }
 });
-
 
 module.exports = {
   View: PermissionsView,

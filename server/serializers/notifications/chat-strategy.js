@@ -1,14 +1,16 @@
-"use strict";
+'use strict';
 
 var UserIdStrategy = require('gitter-web-user-serialization/lib/notifications/user-id-strategy');
 
 function ChatStrategy(options) {
-  if(!options) options = {};
+  if (!options) options = {};
 
   var userStategy = new UserIdStrategy(options);
 
   this.preload = function(items) {
-    var users = items.map(function(i) { return i.fromUserId; });
+    var users = items.map(function(i) {
+      return i.fromUserId;
+    });
 
     return userStategy.preload(users);
   };
@@ -22,7 +24,6 @@ function ChatStrategy(options) {
       mentions: item.mentions,
       fromUser: options.user ? options.user : userStategy.map(item.fromUserId)
     };
-
   };
 }
 

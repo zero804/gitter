@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Mutant = require('mutantjs');
 var _ = require('underscore');
 var rafUtils = require('./raf-utils');
@@ -7,8 +7,6 @@ var passiveEventListener = require('./passive-event-listener');
 var raf = require('./raf');
 
 module.exports = (function() {
-
-
   /** @const */ var TRACK_BOTTOM = 1;
   /** @const */ var STABLE = 3;
 
@@ -19,7 +17,6 @@ module.exports = (function() {
 
   /* Put your scrolling panels on rollers */
   function Rollers(target, childContainer, options) {
-
     options = options || {};
 
     this._target = target;
@@ -41,7 +38,14 @@ module.exports = (function() {
     this.mutant = new Mutant(target, adjustScroll, {
       transitions: true,
       observers: { attributes: false, characterData: false },
-      ignoreTransitions: ['opacity', 'background-color', 'border', 'color', 'border-right-color', 'visibility'],
+      ignoreTransitions: [
+        'opacity',
+        'background-color',
+        'border',
+        'color',
+        'border-right-color',
+        'visibility'
+      ]
       //ignoreFilter: function(mutationRecords) {
       //  var filter = mutationRecords.reduce(function(accum, r) {
       //    var v = r.type === 'attributes' && r.attributeName === 'class' && r.target.id === 'chat-container';
@@ -56,7 +60,7 @@ module.exports = (function() {
     function trackLocationAnimationFrame() {
       raf(function() {
         self.trackLocation();
-      })
+      });
     }
 
     var _trackLocation = _.throttle(trackLocationAnimationFrame, 100);
@@ -78,7 +82,7 @@ module.exports = (function() {
     },
 
     initTrackingMode: function() {
-      if(this.isScrolledToBottom()) {
+      if (this.isScrolledToBottom()) {
         this._mode = TRACK_BOTTOM;
       } else {
         // Default to stable mode
@@ -105,7 +109,7 @@ module.exports = (function() {
 
     setModeLocked: function(value) {
       this.modeLocked = value;
-      if(!value) {
+      if (!value) {
         this.trackLocation();
       }
     },
@@ -116,7 +120,7 @@ module.exports = (function() {
 
     enableTrackBottom: function() {
       this.disableTrackBottom = true;
-      if(this.isScrolledToBottom()) {
+      if (this.isScrolledToBottom()) {
         this.trackLocation();
       }
     },
@@ -165,20 +169,20 @@ module.exports = (function() {
       var target = this._target;
       var scrollTop;
 
-      if(options && options.centre) {
+      if (options && options.centre) {
         // Centre the element in the viewport
         var elementHeight = element.offsetHeight;
         var viewportHeight = target.clientHeight;
-        if(elementHeight < viewportHeight) {
-          scrollTop = Math.floor(element.offsetTop + elementHeight/2 - viewportHeight/2);
+        if (elementHeight < viewportHeight) {
+          scrollTop = Math.floor(element.offsetTop + elementHeight / 2 - viewportHeight / 2);
         }
       }
 
-      if(!scrollTop) {
+      if (!scrollTop) {
         scrollTop = element.offsetTop - TOP_OFFSET;
       }
 
-      if(scrollTop < 0) scrollTop = 0;
+      if (scrollTop < 0) scrollTop = 0;
 
       this.scroll(scrollTop);
 
@@ -194,7 +198,7 @@ module.exports = (function() {
 
     /* Update the scrollTop to adjust for reflow when in STABLE mode */
     updateStableTracking: function() {
-      if(!this._stableElement) return;
+      if (!this._stableElement) return;
       var target = this._target;
 
       var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
@@ -206,25 +210,25 @@ module.exports = (function() {
     /* Track current position */
     trackLocation: function() {
       var target = this._target;
-      if(this._postMutateTop === target.scrollTop) {
+      if (this._postMutateTop === target.scrollTop) {
         return true;
       }
 
       var atBottom = target.scrollTop >= target.scrollHeight - target.clientHeight - BOTTOM_MARGIN;
 
-      if(!this.modeLocked) {
-        if(atBottom) {
-          if(this._mode != TRACK_BOTTOM) {
+      if (!this.modeLocked) {
+        if (atBottom) {
+          if (this._mode != TRACK_BOTTOM) {
             this._mode = TRACK_BOTTOM;
           }
         } else {
-          if(this._mode != STABLE) {
+          if (this._mode != STABLE) {
             this._mode = STABLE;
           }
         }
       }
 
-      if(this._mode === STABLE) {
+      if (this._mode === STABLE) {
         this._stableElement = this.getBottomMostVisibleElement();
 
         if (!this._stableElement) return;
@@ -253,9 +257,9 @@ module.exports = (function() {
       var max = scrollTop + clientHeight;
       var children = this._childContainer.children;
 
-      for(var i = children.length - 1; i >= 0; i--) {
+      for (var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
-        if(child.offsetTop < max) {
+        if (child.offsetTop < max) {
           return child;
         }
       }
@@ -270,7 +274,7 @@ module.exports = (function() {
       var max = scrollTop + clientHeight;
       var children = this._childContainer.children;
 
-      for(var i = children.length - 1; i >= 0; i--) {
+      for (var i = children.length - 1; i >= 0; i--) {
         var child = children[i];
         var middle = clientHeight / 2;
         var pos = max - child.offsetTop;
@@ -296,10 +300,8 @@ module.exports = (function() {
       } else {
         this._target.scrollTop = pixelsFromTop;
       }
-
     }
   };
 
   return Rollers;
-
 })();

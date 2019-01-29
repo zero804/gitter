@@ -7,7 +7,6 @@ var GitHubUserCollaboratorService = require('./github-user-collaborator-service'
 var TwitterUserCollaboratorService = require('./twitter-user-collaborator-service');
 var identityService = require('gitter-web-identity');
 
-
 function backedTypeFactory(user, type, linkPath) {
   switch (type) {
     case 'GH_REPO':
@@ -18,25 +17,22 @@ function backedTypeFactory(user, type, linkPath) {
   }
 }
 
-
 function userCollaboratorFactory(user) {
-  return identityService.findPrimaryIdentityForUser(user)
-    .then(function(identity) {
-      if (!identity) return null;
+  return identityService.findPrimaryIdentityForUser(user).then(function(identity) {
+    if (!identity) return null;
 
-      switch(identity.provider) {
-        case identityService.GITHUB_IDENTITY_PROVIDER:
-          return new GitHubUserCollaboratorService(user);
+    switch (identity.provider) {
+      case identityService.GITHUB_IDENTITY_PROVIDER:
+        return new GitHubUserCollaboratorService(user);
 
-        case identityService.TWITTER_IDENTITY_PROVIDER:
-          return new TwitterUserCollaboratorService(user, identity);
+      case identityService.TWITTER_IDENTITY_PROVIDER:
+        return new TwitterUserCollaboratorService(user, identity);
 
-        default:
-          // Possibly warn....
-          return null;
-      }
-    });
-
+      default:
+        // Possibly warn....
+        return null;
+    }
+  });
 }
 
 function findCollaborators(user, type, linkPath) {
@@ -46,21 +42,19 @@ function findCollaborators(user, type, linkPath) {
   // suggestions
 
   return Promise.try(function() {
-      var roomBackendCollaboratorsService = backedTypeFactory(user, type, linkPath);
-      if (!roomBackendCollaboratorsService) return null;
+    var roomBackendCollaboratorsService = backedTypeFactory(user, type, linkPath);
+    if (!roomBackendCollaboratorsService) return null;
 
-      return roomBackendCollaboratorsService.findCollaborators();
-    })
-    .then(function(collaborators) {
-      if (collaborators && collaborators.length) return collaborators;
+    return roomBackendCollaboratorsService.findCollaborators();
+  }).then(function(collaborators) {
+    if (collaborators && collaborators.length) return collaborators;
 
-      return userCollaboratorFactory(user)
-        .then(function(collaboratorsService) {
-          if (!collaboratorsService) return [];
+    return userCollaboratorFactory(user).then(function(collaboratorsService) {
+      if (!collaboratorsService) return [];
 
-          return collaboratorsService.findCollaborators();
-        });
+      return collaboratorsService.findCollaborators();
     });
+  });
 }
 
 module.exports = {

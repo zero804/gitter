@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var context = require('../utils/context');
@@ -24,19 +24,20 @@ function isMobile() {
 }
 
 function authProvider(callback) {
-  context.getAccessToken()
-    .then(function(accessToken) {
-      var mobile = isMobile();
-      var presenceDetails = realtimePresenceTracker.getAuthDetails();
-      var authMessage = _.extend({
+  context.getAccessToken().then(function(accessToken) {
+    var mobile = isMobile();
+    var presenceDetails = realtimePresenceTracker.getAuthDetails();
+    var authMessage = _.extend(
+      {
         token: accessToken,
         version: clientEnv['version'],
         connType: mobile ? 'mobile' : 'online',
-        client: mobile ? 'mobweb' : 'web',
-      }, presenceDetails);
-      return callback(authMessage);
-
-    });
+        client: mobile ? 'mobweb' : 'web'
+      },
+      presenceDetails
+    );
+    return callback(authMessage);
+  });
 }
 
 var handshakeExtension = {
@@ -62,11 +63,10 @@ var handshakeExtension = {
   })
 };
 
-
 var terminating = false;
 
 var accessTokenFailureExtension = {
-  incoming: wrapExtension(function (message, callback) {
+  incoming: wrapExtension(function(message, callback) {
     if (message.error && message.advice && message.advice.reconnect === 'none') {
       // advice.reconnect == 'none': the server has effectively told us to go away for good
       if (!terminating) {
@@ -93,14 +93,11 @@ function getOrCreateClient() {
     fayeUrl: c.fayeUrl,
     authProvider: authProvider,
     fayeOptions: c.options,
-    extensions: [
-      handshakeExtension,
-      accessTokenFailureExtension
-    ],
+    extensions: [handshakeExtension, accessTokenFailureExtension],
     websocketsDisabled: context.hasFeature('disable-websockets')
   });
 
-  client.on('stats', function (type, statName, value) {
+  client.on('stats', function(type, statName, value) {
     appEvents.trigger('stats.' + type, statName, value);
   });
 
@@ -131,13 +128,16 @@ function getOrCreateClient() {
         user.set(message.model);
       }
 
-      switch(message.notification) {
+      switch (message.notification) {
         case 'user_notification':
           // Only send desktop notifications if the user
           // does not have the desktop client open
           // Fixes https://github.com/troupe/gitter-webapp/issues/1254
-          if(context().desktopNotifications) {
-            appEvents.trigger('user_notification', _.extend(message, { notificationKey: message.chatId }));
+          if (context().desktopNotifications) {
+            appEvents.trigger(
+              'user_notification',
+              _.extend(message, { notificationKey: message.chatId })
+            );
           }
           break;
         case 'activity':
@@ -148,58 +148,67 @@ function getOrCreateClient() {
   });
 
   // Subscribe to the token for changes to check if it was revoked
-  if(context.isLoggedIn()) {
-    context.getAccessToken()
-      .then(function(accessToken) {
-        var contextModel = new Backbone.Model({
-          token: accessToken
-        });
-
-        var templateSubscription = client.subscribeTemplate({
-          urlTemplate: '/v1/token/:token',
-          contextModel: contextModel,
-          onMessage: function(message) {
-            switch(message.notification) {
-              case 'token_revoked':
-                log.error('Token was revoked', message);
-                logout('/login/token-revoked');
-                break;
-            }
-          }
-        });
-
-        templateSubscription.on('subscriptionError', function(channel, err) {
-          log.error('Token subscription error' + channel, { exception: err });
-
-          if(err.code === 401 || err.code === 403) {
-            log.error('Token subscription unathorized/forbidden, logging out' + channel, { exception: err });
-            logout('/login/token-revoked');
-          }
-        });
+  if (context.isLoggedIn()) {
+    context.getAccessToken().then(function(accessToken) {
+      var contextModel = new Backbone.Model({
+        token: accessToken
       });
+
+      var templateSubscription = client.subscribeTemplate({
+        urlTemplate: '/v1/token/:token',
+        contextModel: contextModel,
+        onMessage: function(message) {
+          switch (message.notification) {
+            case 'token_revoked':
+              log.error('Token was revoked', message);
+              logout('/login/token-revoked');
+              break;
+          }
+        }
+      });
+
+      templateSubscription.on('subscriptionError', function(channel, err) {
+        log.error('Token subscription error' + channel, { exception: err });
+
+        if (err.code === 401 || err.code === 403) {
+          log.error('Token subscription unathorized/forbidden, logging out' + channel, {
+            exception: err
+          });
+          logout('/login/token-revoked');
+        }
+      });
+    });
   }
 
   return client;
 }
 
-appEvents.on('eyeballsInvalid', function (originalClientId) {
+appEvents.on('eyeballsInvalid', function(originalClientId) {
   debug('Resetting connection after invalid eyeballs');
   reset(originalClientId);
 });
 
-appEvents.on('reawaken', function () {
+appEvents.on('reawaken', function() {
   debug('Recycling connection after reawaken');
   reset(getClientId());
 });
 
 // Cordova events.... doesn't matter if IE8 doesn't handle them
 if (document.addEventListener) {
-  document.addEventListener("deviceReady", function () {
-    document.addEventListener("online", function () {
-      debug('online');
-      testConnection('device_ready');
-    }, false);
-  }, false);
+  document.addEventListener(
+    'deviceReady',
+    function() {
+      document.addEventListener(
+        'online',
+        function() {
+          debug('online');
+          testConnection('device_ready');
+        },
+        false
+      );
+    },
+    false
+  );
 }
 
 function getClientId() {
@@ -217,7 +226,7 @@ function testConnection(reason) {
 module.exports = {
   getClientId: getClientId,
 
-  subscribe: function (channel, callback, context) {
+  subscribe: function(channel, callback, context) {
     return getOrCreateClient().subscribe(channel, callback, context);
   },
 
@@ -225,10 +234,9 @@ module.exports = {
 
   reset: reset,
 
-  getClient: function () {
+  getClient: function() {
     return getOrCreateClient();
   }
-
 };
 
 window._realtime = module.exports;

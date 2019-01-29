@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * NB NB NB: this must remain on the main app, and not on the api.gitter.im
@@ -6,15 +6,15 @@
  */
 module.exports = function(req, res) {
   res.format({
-    text: function(){
+    text: function() {
       res.send('OK');
     },
 
-    html: function(){
+    html: function() {
       res.send('OK');
     },
 
-    json: function(){
+    json: function() {
       res.send({ success: true });
     }
   });

@@ -1,14 +1,17 @@
 /* global describe:true, it:true */
-"use strict";
+'use strict';
 
-var assert = require("assert");
+var assert = require('assert');
 var GitHubIssueService = require('..').GitHubIssueService;
 var GitHubRepoService = require('..').GitHubRepoService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-
 describe('github-issue-service #slow #github', function() {
-  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_REPO_SCOPE_TOKEN', 'GITTER_INTEGRATION_REPO_FULL');
+  fixtureLoader.ensureIntegrationEnvironment(
+    'GITTER_INTEGRATION_USERNAME',
+    'GITTER_INTEGRATION_REPO_SCOPE_TOKEN',
+    'GITTER_INTEGRATION_REPO_FULL'
+  );
 
   var FAKE_USER = {
     username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
@@ -19,8 +22,9 @@ describe('github-issue-service #slow #github', function() {
     var repoService = new GitHubRepoService(FAKE_USER);
     var underTest = new GitHubIssueService(FAKE_USER);
 
-    repoService.getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
-      .then((repo) => {
+    repoService
+      .getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
+      .then(repo => {
         assert.strictEqual(repo.private, false);
       })
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1))
@@ -32,7 +36,8 @@ describe('github-issue-service #slow #github', function() {
   });
 
   // FIXME: This is commented out because we don't have a private repo to test against (private repos cost money)
-  it('return the state for a private repo'/*, function(done) {
+  it(
+    'return the state for a private repo' /*, function(done) {
     var repoService = new GitHubRepoService(FAKE_USER);
     var underTest = new GitHubIssueService(FAKE_USER);
 
@@ -46,22 +51,24 @@ describe('github-issue-service #slow #github', function() {
         assert.strictEqual(f.number, 1);
       })
       .nodeify(done);
-  }*/);
+  }*/
+  );
 
   it('return error for missing issue', function() {
     var repoService = new GitHubRepoService(FAKE_USER);
     var underTest = new GitHubIssueService(FAKE_USER);
 
-    return repoService.getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
-      .then((repo) => {
+    return repoService
+      .getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
+      .then(repo => {
         assert.strictEqual(repo.private, false);
       })
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 999999))
       .then(() => {
-        assert.fail('Shouldn\'t be able to fetch issue in unauthorized private project');
+        assert.fail("Shouldn't be able to fetch issue in unauthorized private project");
       })
-      .catch((err) => {
-        if(err instanceof assert.AssertionError) {
+      .catch(err => {
+        if (err instanceof assert.AssertionError) {
           throw err;
         }
 
@@ -73,8 +80,9 @@ describe('github-issue-service #slow #github', function() {
     var repoService = new GitHubRepoService();
     var underTest = new GitHubIssueService();
 
-    repoService.getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
-      .then((repo) => {
+    repoService
+      .getRepo(fixtureLoader.GITTER_INTEGRATION_REPO_FULL)
+      .then(repo => {
         assert.strictEqual(repo.private, false);
       })
       .then(() => underTest.getIssue(fixtureLoader.GITTER_INTEGRATION_REPO_FULL, 1))
@@ -84,5 +92,4 @@ describe('github-issue-service #slow #github', function() {
       })
       .nodeify(done);
   });
-
 });

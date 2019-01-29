@@ -13,7 +13,7 @@ var app = require('../../server/web');
 
 describe('OAuth tests', function() {
   var fixture = fixtureLoader.setup({
-    user1: { },
+    user1: {},
     oAuthClient1: {
       registeredRedirectUri: 'http://localhost:3434/callback'
     },
@@ -23,7 +23,7 @@ describe('OAuth tests', function() {
     }
   });
 
-  it('GET /login/oauth/token clears out authorization code so it can\'t be re-used', async function() {
+  it("GET /login/oauth/token clears out authorization code so it can't be re-used", async function() {
     this.timeout(8000);
 
     const postData = {
@@ -39,7 +39,10 @@ describe('OAuth tests', function() {
       .send(postData)
       .expect(200)
       .then(function(result) {
-        assert(result.body.access_token && result.body.access_token.length > 0, 'no access token provided in body');
+        assert(
+          result.body.access_token && result.body.access_token.length > 0,
+          'no access token provided in body'
+        );
         assert(result.body.token_type === 'Bearer', 'wrong token_type returned');
       });
 
@@ -49,8 +52,8 @@ describe('OAuth tests', function() {
       .expect(403)
       .then(function(result) {
         assert.deepEqual(result.body, {
-            "error": "invalid_grant",
-            "error_description": "Invalid authorization code"
+          error: 'invalid_grant',
+          error_description: 'Invalid authorization code'
         });
       });
   });

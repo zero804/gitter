@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -20,16 +20,16 @@ function getTransloaditClient() {
     authSecret: nconf.get('transloadit:secret')
   });
 
-  return singletonTransloaditClient
+  return singletonTransloaditClient;
 }
 
 var redisClient = redis.getClient();
 
 function randomString(length) {
-    var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    var result = '';
-    for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
-    return result;
+  var chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  var result = '';
+  for (var i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+  return result;
 }
 
 function parseAndValidateTransloadit(user, input) {
@@ -57,14 +57,14 @@ function parseAndValidateTransloadit(user, input) {
   document template type in place of an avatar would just be broken anyway.
   */
   if (!templateId) {
-    throw new StatusError(500, "templateId required");
+    throw new StatusError(500, 'templateId required');
   }
 
   var params = {
     auth: {},
     template_id: templateId,
     fields: {},
-    steps: {},
+    steps: {}
   };
 
   var metadata = {
@@ -87,7 +87,6 @@ function parseAndValidateTransloadit(user, input) {
     params.steps.export_thumbs = {
       path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
     };
-
   } else if (input.type === 'avatar' && input.group_id) {
     // upload an avatar to a group
     metadata.group_id = input.group_id;
@@ -102,9 +101,8 @@ function parseAndValidateTransloadit(user, input) {
       path: 'groups/' + input.group_id + '/${file.meta.width}',
       bucket: nconf.get('transloadit:avatars:bucket')
     };
-
   } else {
-    throw new StatusError(400, "room or group info required");
+    throw new StatusError(400, 'room or group info required');
   }
 
   return {
@@ -135,11 +133,10 @@ function transloaditSignature(req, res, next) {
       sig: signed.signature,
       params: signed.params
     });
-  })
-  .catch(next);
+  }).catch(next);
 }
 
 module.exports = transloaditSignature;
 module.exports.testOnly = {
   parseAndValidateTransloadit: parseAndValidateTransloadit
-}
+};

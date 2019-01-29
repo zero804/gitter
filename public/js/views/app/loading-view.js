@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var log = require('../../utils/log');
 var appEvents = require('../../utils/appevents');
@@ -29,15 +29,14 @@ var LoadingView = function(iframe, loadingFrame) {
     // the exiting contentDocument is about to be destroyed, but the
     // iframe's new contentDocument will be instantiated in the next event loop.
     setTimeout(function() {
-      if(self.iframe && self.iframe.contentDocument) {
+      if (self.iframe && self.iframe.contentDocument) {
         self.iframe.contentDocument.removeEventListener('DOMContentLoaded', onIframeLoad);
         self.iframe.contentDocument.addEventListener('DOMContentLoaded', onIframeLoad);
       }
       // Retry after another frame if the contentDocument does not exist yet
-      else if(onUnloadAttempts < 3) {
+      else if (onUnloadAttempts < 3) {
         onUnload();
-      }
-      else {
+      } else {
         log.warn('Unable to hook iframe DOMContentLoaded event in loading-view');
       }
     }, 0);

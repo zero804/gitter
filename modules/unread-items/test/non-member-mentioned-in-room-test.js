@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var assert = require("assert");
+var assert = require('assert');
 var chatService = require('gitter-web-chats');
-var unreadItemService = require("../");
-var appEvents = require("gitter-web-appevents");
+var unreadItemService = require('../');
+var appEvents = require('gitter-web-appevents');
 
-describe("unread item end-to-end integration tests #slow", function() {
+describe('unread item end-to-end integration tests #slow', function() {
   var fixture = fixtureLoader.setup({
     user1: { username: true },
     user2: { username: true },
     user3: { username: true },
     troupe1: { users: ['user1'], githubType: 'REPO_CHANNEL', security: 'PUBLIC' },
-    troupe2: { users: ['user1'], githubType: 'ORG_CHANNEL', security: 'PRIVATE' },
+    troupe2: { users: ['user1'], githubType: 'ORG_CHANNEL', security: 'PRIVATE' }
   });
 
   it('should notify when the user has access', function() {
@@ -27,10 +27,11 @@ describe("unread item end-to-end integration tests #slow", function() {
       }
     });
 
-    return chatService.newChatMessageToTroupe(troupe, fixture.user1, {
+    return chatService
+      .newChatMessageToTroupe(troupe, fixture.user1, {
         text: 'Hey there @' + user2.username
       })
-      .delay(200)  // NB: magic number :(
+      .delay(200) // NB: magic number :(
       .bind({})
       .then(function(chat) {
         assert.strictEqual(onUserMentionedInNonMemberRoom, 1);
@@ -59,10 +60,11 @@ describe("unread item end-to-end integration tests #slow", function() {
       }
     });
 
-    return chatService.newChatMessageToTroupe(troupe, fixture.user1, {
+    return chatService
+      .newChatMessageToTroupe(troupe, fixture.user1, {
         text: 'Hey there @' + user3.username
       })
-      .delay(200)  // NB: magic number :(
+      .delay(200) // NB: magic number :(
       .bind({})
       .then(function(chat) {
         assert.strictEqual(onUserMentionedInNonMemberRoom, 0);
@@ -78,6 +80,4 @@ describe("unread item end-to-end integration tests #slow", function() {
         assert.deepEqual(roomIds, []);
       });
   });
-
-
 });

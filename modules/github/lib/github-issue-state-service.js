@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var IssueService = require('./github-issue-service');
@@ -8,10 +8,9 @@ function GitHubIssueStateService(user) {
 }
 
 GitHubIssueStateService.prototype.getIssueState = function(repo, issueNumber) {
-  return this.issueService.getIssue(repo, issueNumber)
-    .then(function(issue) {
-      return issue.state;
-    });
+  return this.issueService.getIssue(repo, issueNumber).then(function(issue) {
+    return issue.state;
+  });
 };
 
 module.exports = wrap(GitHubIssueStateService, function() {

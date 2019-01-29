@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
@@ -11,11 +11,10 @@ var SyncMixin = require('../../collections/sync-mixin');
 var avatars = require('gitter-web-avatars');
 
 module.exports = (function() {
-
   var UserView = Marionette.ItemView.extend({
     template: template,
     modelEvents: {
-        'change': 'render',
+      change: 'render'
     },
     serializeData: function() {
       var data = this.model.toJSON();
@@ -28,7 +27,7 @@ module.exports = (function() {
   var UserPopoverFooterView = Marionette.ItemView.extend({
     template: footerTemplate,
     modelEvents: {
-      change: 'render',
+      change: 'render'
     },
     events: {
       'click #button-onetoone': function() {
@@ -39,7 +38,7 @@ module.exports = (function() {
       'click #button-mention': function() {
         this.parentPopover.hide();
         var username = this.model.get('username');
-        appEvents.trigger('input.append', '@' + username + " ");
+        appEvents.trigger('input.append', '@' + username + ' ');
       },
       'click #button-remove': function() {
         this.parentPopover.hide();
@@ -56,8 +55,8 @@ module.exports = (function() {
       var removable = isntSelf && context.isTroupeAdmin();
 
       // Special case
-      if(context.inOneToOneTroupeContext()) {
-        if(context.troupe().get('user').username === data.username) {
+      if (context.inOneToOneTroupeContext()) {
+        if (context.troupe().get('user').username === data.username) {
           chatPrivately = false;
         }
       }
@@ -70,7 +69,6 @@ module.exports = (function() {
       data.loaded = !!this.model.loaded;
       return data;
     }
-
   });
 
   var UserPopoverView = Popover.extend({
@@ -85,7 +83,7 @@ module.exports = (function() {
         m = {
           username: options.username,
           displayName: options.displayName
-        }
+        };
       }
 
       var username = m.username;
@@ -104,5 +102,4 @@ module.exports = (function() {
   });
 
   return UserPopoverView;
-
 })();

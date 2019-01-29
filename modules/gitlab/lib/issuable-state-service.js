@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var IssuableService = require('./issuable-service');
@@ -11,10 +11,9 @@ function GitLabIssuableStateService(user, type) {
 }
 
 GitLabIssuableStateService.prototype.getIssueState = function(project, iid) {
-  return this.issuableService.getIssue(project, iid)
-    .then(function(issuable) {
-      return issuable.state;
-    });
+  return this.issuableService.getIssue(project, iid).then(function(issuable) {
+    return issuable.state;
+  });
 };
 
 module.exports = cacheWrapper('GitLabIssuableStateService', GitLabIssuableStateService, {

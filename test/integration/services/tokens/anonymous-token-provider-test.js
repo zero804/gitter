@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../../test-require');
 var anonymousTokenProvider = testRequire('./services/tokens/anonymous-token-provider');
@@ -6,17 +6,18 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 
 describe('anonymous-token-provider', function() {
-
-
   describe('anonymous', function() {
     var clientId;
 
     beforeEach(function() {
-      clientId = mongoUtils.getNewObjectIdString() + "";
+      clientId = mongoUtils.getNewObjectIdString() + '';
     });
 
     it('should not validate invalid tokens', function(done) {
-      anonymousTokenProvider.validateToken('$3219128309128301289301283912098312038', function(err, token) {
+      anonymousTokenProvider.validateToken('$3219128309128301289301283912098312038', function(
+        err,
+        token
+      ) {
         if (err) return done(err);
         assert(!token);
         done();
@@ -24,7 +25,7 @@ describe('anonymous-token-provider', function() {
     });
 
     it('should find tokens that have been cached', function(done) {
-      anonymousTokenProvider.getToken(null, clientId, function(err,token) {
+      anonymousTokenProvider.getToken(null, clientId, function(err, token) {
         if (err) return done(err);
         anonymousTokenProvider.validateToken(token, function(err, userClient) {
           if (err) return done(err);
@@ -37,6 +38,5 @@ describe('anonymous-token-provider', function() {
         });
       });
     });
-
   });
 });

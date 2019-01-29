@@ -1,20 +1,20 @@
-"use strict";
-
+'use strict';
 
 module.exports = (function() {
-
-
   /* Given a match in a node, replace the text with an image */
   function highlightTerm(node, term, index) {
-      var highlightElement = document.createElement('em');
-      highlightElement.classList.add('highlight');
+    var highlightElement = document.createElement('em');
+    highlightElement.classList.add('highlight');
 
-      highlightElement.textContent = term;
+    highlightElement.textContent = term;
 
-      node.splitText(index);
-      node.nextSibling.nodeValue = node.nextSibling.nodeValue.substr(term.length, node.nextSibling.nodeValue.length);
-      highlightElement.appendChild(node.splitText(index));
-      node.parentNode.insertBefore(highlightElement, node.nextSibling);
+    node.splitText(index);
+    node.nextSibling.nodeValue = node.nextSibling.nodeValue.substr(
+      term.length,
+      node.nextSibling.nodeValue.length
+    );
+    highlightElement.appendChild(node.splitText(index));
+    node.parentNode.insertBefore(highlightElement, node.nextSibling);
   }
 
   function highlight(el, terms) {
@@ -33,7 +33,8 @@ module.exports = (function() {
 
         return NodeFilter.FILTER_SKIP;
       },
-      false);
+      false
+    );
 
     var nodeList = [];
     var node;
@@ -44,12 +45,12 @@ module.exports = (function() {
     var unifiedReSource = terms
       .map(function(v) {
         var reSource = v.replace(/(^|[^\[])\^/g, '$1');
-        return "(" + reSource + ")";
+        return '(' + reSource + ')';
       })
       .join('|');
 
     /* The regex used to find emoji */
-    var unifiedRe = new RegExp(unifiedReSource, "gi");
+    var unifiedRe = new RegExp(unifiedReSource, 'gi');
 
     nodeList.forEach(function(node) {
       var match, matchIndex;
@@ -59,7 +60,7 @@ module.exports = (function() {
         matches.push(match);
       }
 
-      for (var i = matches.length; i-- > 0;) {
+      for (var i = matches.length; i-- > 0; ) {
         match = matches[i];
         highlightTerm(node, match[0], match.index, matchIndex);
       }
@@ -80,5 +81,4 @@ module.exports = (function() {
     highlight: highlight,
     removeHighlights: removeHighlights
   };
-
 })();

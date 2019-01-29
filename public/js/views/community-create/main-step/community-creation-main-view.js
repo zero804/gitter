@@ -33,7 +33,7 @@ function mapValidations(model, uiMappings) {
     }
 
     domElement.setCustomValidity(message);
-  })
+  });
 }
 
 function updateElementValueAndMaintatinSelection(el, newValue) {
@@ -43,7 +43,7 @@ function updateElementValueAndMaintatinSelection(el, newValue) {
   el.value = newValue;
 
   // Restore selection
-  if(el === document.activeElement) {
+  if (el === document.activeElement) {
     el.setSelectionRange(start, end);
   }
 }
@@ -67,7 +67,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     associatedProjectLink: '.js-community-create-associated-project-link',
     associatedProjectName: '.js-community-create-associated-project-name',
     associatedProjectBadgerOption: '.js-community-create-associated-project-badger-option',
-    associatedProjectBadgerOptionInput: '.js-community-create-associated-project-badger-option-input'
+    associatedProjectBadgerOptionInput:
+      '.js-community-create-associated-project-badger-option-input'
   }),
 
   events: _.extend({}, _super.events, {
@@ -82,14 +83,26 @@ module.exports = CommunityCreateBaseStepView.extend({
     _super.initialize.apply(this, arguments);
 
     var user = context.getUser();
-    this.hasGitHubProvider = user && user.providers && user.providers.some(function(provider) {
-      return provider === 'github';
-    });
+    this.hasGitHubProvider =
+      user &&
+      user.providers &&
+      user.providers.some(function(provider) {
+        return provider === 'github';
+      });
 
-    this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug', this.onCommunityInfoChange, this);
-    this.listenTo(this.communityCreateModel, 'change:communitySlugAvailabilityStatus', this.onSlugAvailabilityStatusChange, this);
+    this.listenTo(
+      this.communityCreateModel,
+      'change:communityName change:communitySlug',
+      this.onCommunityInfoChange,
+      this
+    );
+    this.listenTo(
+      this.communityCreateModel,
+      'change:communitySlugAvailabilityStatus',
+      this.onSlugAvailabilityStatusChange,
+      this
+    );
   },
-
 
   serializeData: function() {
     var data = this.model.toJSON();
@@ -99,7 +112,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   nextStep: function() {
-    if(this.model.isValid()) {
+    if (this.model.isValid()) {
       return stepConstants.INVITE;
     }
   },
@@ -108,8 +121,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     _super.applyValidMessages.call(this);
 
     mapValidations(this.model, {
-      'communityName': this.ui.communityNameInput,
-      'communitySlug': this.ui.communitySlugInput
+      communityName: this.ui.communityNameInput,
+      communitySlug: this.ui.communitySlugInput
     });
   },
 
@@ -133,7 +146,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
 
-    if(this.hasGitHubProvider) {
+    if (this.hasGitHubProvider) {
       var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
 
       var name = githubProjectInfo.name || '';
@@ -161,7 +174,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
 
     var isSlugEmpty = !currentSlug || currentSlug.length === 0;
-    if(isSlugEmpty || !isUsingCustomSlug) {
+    if (isSlugEmpty || !isUsingCustomSlug) {
       this.communityCreateModel.set({
         communitySlug: slugger(newCommunityName),
         // Reset back if we started doing an automatic slug again
@@ -189,7 +202,10 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   checkSlugAvailabilityDebounced: function() {
-    this.communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+    this.communityCreateModel.set(
+      'communitySlugAvailabilityStatus',
+      slugAvailabilityStatusConstants.PENDING
+    );
     this._checkSlugAvailabilityDebounced();
   },
 
@@ -200,16 +216,19 @@ module.exports = CommunityCreateBaseStepView.extend({
     var githubOrgId = communityCreateModel.get('githubOrgId');
     var githubRepoId = communityCreateModel.get('githubRepoId');
     var type = null;
-    if(githubOrgId) {
+    if (githubOrgId) {
       type = 'GH_ORG';
-    }
-    else if(githubRepoId) {
+    } else if (githubRepoId) {
       type = 'GH_REPO';
     }
 
-    communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.PENDING);
+    communityCreateModel.set(
+      'communitySlugAvailabilityStatus',
+      slugAvailabilityStatusConstants.PENDING
+    );
 
-    apiClient.priv.get('/check-group-uri', {
+    apiClient.priv
+      .get('/check-group-uri', {
         uri: slug
       })
       .then(function(res) {
@@ -217,27 +236,41 @@ module.exports = CommunityCreateBaseStepView.extend({
         //
         // Because of the nature of repo URLs `org/repo` and we only pull off the `repo` part,
         // we need to allow creation when nothing is at that URL
-        if(res.type === type || (type === 'GH_REPO' && res.type === null)) {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
-        }
-        else {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
+        if (res.type === type || (type === 'GH_REPO' && res.type === null)) {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.AVAILABLE
+          );
+        } else {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.UNAVAILABLE
+          );
         }
         model.isValid();
       })
       .catch(function(err) {
         var status = err.status;
-        if(status === 409) {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.UNAVAILABLE);
-        }
-        else if(status === 403) {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS);
-        }
-        else if(status === 401) {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AUTHENTICATION_FAILED);
-        }
-        else {
-          communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.INVALID);
+        if (status === 409) {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.UNAVAILABLE
+          );
+        } else if (status === 403) {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS
+          );
+        } else if (status === 401) {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.AUTHENTICATION_FAILED
+          );
+        } else {
+          communityCreateModel.set(
+            'communitySlugAvailabilityStatus',
+            slugAvailabilityStatusConstants.INVALID
+          );
         }
         model.isValid();
       });
@@ -250,8 +283,20 @@ module.exports = CommunityCreateBaseStepView.extend({
   updateSlugAvailabilityStatusIndicator: function() {
     var status = this.communityCreateModel.get('communitySlugAvailabilityStatus');
 
-    this.ui.communitySlugInputWrapper.toggleClass('pending', status === slugAvailabilityStatusConstants.PENDING);
-    this.ui.communitySlugInputWrapper.toggleClass('available', status === slugAvailabilityStatusConstants.AVAILABLE);
-    this.ui.communitySlugInputWrapper.toggleClass('unavailable', status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS || status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED || status === slugAvailabilityStatusConstants.UNAVAILABLE || status === slugAvailabilityStatusConstants.INVALID);
+    this.ui.communitySlugInputWrapper.toggleClass(
+      'pending',
+      status === slugAvailabilityStatusConstants.PENDING
+    );
+    this.ui.communitySlugInputWrapper.toggleClass(
+      'available',
+      status === slugAvailabilityStatusConstants.AVAILABLE
+    );
+    this.ui.communitySlugInputWrapper.toggleClass(
+      'unavailable',
+      status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS ||
+        status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED ||
+        status === slugAvailabilityStatusConstants.UNAVAILABLE ||
+        status === slugAvailabilityStatusConstants.INVALID
+    );
   }
 });

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var roomService = require("gitter-web-rooms");
-var restful = require("../../../services/restful");
-var restSerializer = require("../../../serializers/rest-serializer");
+var roomService = require('gitter-web-rooms');
+var restful = require('../../../services/restful');
+var restSerializer = require('../../../serializers/rest-serializer');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
@@ -20,16 +20,15 @@ function searchRooms(req) {
   };
 
   var userId = user && user.id;
-  return roomService.searchRooms(userId, req.query.q, options)
-    .then(function(rooms) {
-      var strategy = new restSerializer.SearchResultsStrategy({
-        resultItemStrategy: new restSerializer.TroupeStrategy({
-          currentUserId: userId
-        })
-      });
-
-      return restSerializer.serializeObject({ results: rooms }, strategy);
+  return roomService.searchRooms(userId, req.query.q, options).then(function(rooms) {
+    var strategy = new restSerializer.SearchResultsStrategy({
+      resultItemStrategy: new restSerializer.TroupeStrategy({
+        currentUserId: userId
+      })
     });
+
+    return restSerializer.serializeObject({ results: rooms }, strategy);
+  });
 }
 
 module.exports = {
@@ -39,7 +38,7 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    if(req.query.q) {
+    if (req.query.q) {
       return searchRooms(req);
     }
 
@@ -73,20 +72,19 @@ module.exports = {
 
     if (!roomUri) throw new StatusError(400);
 
-    return roomContextService.findContextForRoom(req.user, roomUri)
-      .then(function(room) {
-        var strategy = new restSerializer.TroupeStrategy({
-          currentUserId: req.user.id,
-          currentUser: req.user,
-          includeRolesForTroupe: room,
-          // include all these because it will replace the troupe in the context
-          includeTags: true,
-          includeProviders: true,
-          includeGroups: true
-        });
-
-        return restSerializer.serializeObject(room, strategy);
+    return roomContextService.findContextForRoom(req.user, roomUri).then(function(room) {
+      var strategy = new restSerializer.TroupeStrategy({
+        currentUserId: req.user.id,
+        currentUser: req.user,
+        includeRolesForTroupe: room,
+        // include all these because it will replace the troupe in the context
+        includeTags: true,
+        includeProviders: true,
+        includeGroups: true
       });
+
+      return restSerializer.serializeObject(room, strategy);
+    });
   },
 
   update: function(req) {
@@ -96,23 +94,23 @@ module.exports = {
         var promises = [];
         var updatedTroupe = req.body;
 
-        if(updatedTroupe.autoConfigureHooks) {
+        if (updatedTroupe.autoConfigureHooks) {
           promises.push(roomWithPolicyService.autoConfigureHooks());
         }
 
-        if(updatedTroupe.hasOwnProperty('topic')) {
+        if (updatedTroupe.hasOwnProperty('topic')) {
           promises.push(roomWithPolicyService.updateTopic(updatedTroupe.topic));
         }
 
-        if(updatedTroupe.hasOwnProperty('providers')) {
+        if (updatedTroupe.hasOwnProperty('providers')) {
           promises.push(roomWithPolicyService.updateProviders(updatedTroupe.providers));
         }
 
-        if(updatedTroupe.hasOwnProperty('noindex')) {
+        if (updatedTroupe.hasOwnProperty('noindex')) {
           promises.push(roomWithPolicyService.toggleSearchIndexing(updatedTroupe.noindex));
         }
 
-        if(updatedTroupe.hasOwnProperty('tags')) {
+        if (updatedTroupe.hasOwnProperty('tags')) {
           promises.push(roomWithPolicyService.updateTags(updatedTroupe.tags));
         }
 
@@ -150,14 +148,13 @@ module.exports = {
       throw new StatusError(400, 'Invalid MongoId: ' + id);
     }
 
-    return policyFactory.createPolicyForRoomId(req.user, id)
+    return policyFactory
+      .createPolicyForRoomId(req.user, id)
       .then(function(policy) {
         // TODO: middleware?
         req.userRoomPolicy = policy;
 
-        return req.method === 'GET' ?
-          policy.canRead() :
-          policy.canWrite();
+        return req.method === 'GET' ? policy.canRead() : policy.canWrite();
       })
       .then(function(access) {
         if (access) {
@@ -169,16 +166,15 @@ module.exports = {
   },
 
   subresources: {
-    'issues': require('./issues'),
-    'users': require('./users'),
-    'bans': require('./bans'),
-    'chatMessages': require('./chat-messages'),
-    'collaborators': require('./collaborators'),
-    'suggestedRooms': require('./suggested-rooms'),
-    'events': require('./events'),
-    'meta': require('./meta'),
-    'invites': require('./invites'),
-    'security': require('./security')
+    issues: require('./issues'),
+    users: require('./users'),
+    bans: require('./bans'),
+    chatMessages: require('./chat-messages'),
+    collaborators: require('./collaborators'),
+    suggestedRooms: require('./suggested-rooms'),
+    events: require('./events'),
+    meta: require('./meta'),
+    invites: require('./invites'),
+    security: require('./security')
   }
-
 };

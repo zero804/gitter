@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -6,7 +6,7 @@ var logger = env.logger;
 var stats = env.stats;
 var errorReporter = env.errorReporter;
 
-var resque = require("node-resque");
+var resque = require('node-resque');
 var debug = require('debug')('gitter:infra:worker-queue');
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
@@ -29,7 +29,7 @@ function getConnection() {
   // NB:NB: side effect: workers have always been in db0 and
   // we can no longer change this, which is a pity.
 
-  redisConfiguration = _.extend({ }, redisConfiguration, { redisDb: 0 });
+  redisConfiguration = _.extend({}, redisConfiguration, { redisDb: 0 });
   var redis = env.redis.createClient(redisConfiguration);
 
   var result = {
@@ -38,7 +38,7 @@ function getConnection() {
   };
 
   if (config.get('resque:namespace')) {
-    result.namespace = config.get('resque:namespace');  // Allow tests to use their own ns
+    result.namespace = config.get('resque:namespace'); // Allow tests to use their own ns
   }
 
   return result;
@@ -66,7 +66,7 @@ function createScheduler() {
 
   shutdown.addHandler('worker-queue-scheduler', 90, function(callback) {
     debug('Shutting down scheduler');
-    if(!scheduler.running) return callback();
+    if (!scheduler.running) return callback();
     scheduler.end(callback);
   });
 
@@ -85,26 +85,26 @@ var Queue = function(name, options, loaderFn) {
   var self = this;
 
   this.queueReady = Promise.fromNode(function(callback) {
-    self.internalQueue = new resque.queue({
+    self.internalQueue = new resque.queue(
+      {
         connection: getConnection()
       },
-      {}); // Jobs not defined on queue, only worker
+      {}
+    ); // Jobs not defined on queue, only worker
 
     self.internalQueue.on('error', function(err) {
       logger.error('worker-queue-redis: queue error ' + err, { exception: err });
     });
 
     self.internalQueue.connect(callback);
-
   }).then(function() {
     debug('Queue %s ready to receive messages', name);
     return self.internalQueue;
   });
-
 };
 
 Queue.prototype.invoke = function(data, options, callback) {
-  if(arguments.length == 2 && typeof options == 'function') {
+  if (arguments.length == 2 && typeof options == 'function') {
     callback = options;
     options = {};
   }
@@ -116,7 +116,7 @@ Queue.prototype.invoke = function(data, options, callback) {
       return Promise.fromNode(function(callback) {
         debug('Queueing job for invocation on %s', self.name);
 
-        var delay = options && options.delay || 0;
+        var delay = (options && options.delay) || 0;
 
         // TODO: change 'echo' to 'invoke' 1 September 2015
         // This change needs to happen at least a several releases
@@ -175,7 +175,7 @@ Queue.prototype.createWorker = function() {
      *
      * from https://github.com/taskrabbit/node-resque#notes
      */
-    name: os.hostname() + ":" + process.pid + "+" + uniqueWorkerCounter,
+    name: os.hostname() + ':' + process.pid + '+' + uniqueWorkerCounter,
     queues: [this.name]
   };
 
@@ -203,7 +203,7 @@ Queue.prototype.createWorker = function() {
 
   var worker = new resque.worker(workerOpts, jobs);
   worker.connect(function() {
-    if(scheduler.running) {
+    if (scheduler.running) {
       debug('Starting worker %s immediately', self.name);
       worker.workerCleanup();
       worker.start();
@@ -243,12 +243,12 @@ Queue.prototype.createWorker = function() {
   // });
 
   worker.on('job', function(queue) {
-    debug("Job: %s", queue);
+    debug('Job: %s', queue);
     stats.eventHF('resque.worker.working');
   });
 
-  worker.on('reEnqueue', function(queue/*, job, plugin*/) {
-    debug("Reenqueue job on queue %s", queue);
+  worker.on('reEnqueue', function(queue /*, job, plugin*/) {
+    debug('Reenqueue job on queue %s', queue);
     stats.event('resque.worker.reenqueue');
   });
 
@@ -258,7 +258,7 @@ Queue.prototype.createWorker = function() {
   // });
 
   worker.on('success', function(queue, job) {
-    debug("success for job %j on queue %s", job, queue);
+    debug('success for job %j on queue %s', job, queue);
     stats.eventHF('resque.worker.success');
   });
 
@@ -272,7 +272,7 @@ Queue.prototype.createWorker = function() {
 
 module.exports = {
   queue: function(name, options, loaderFn) {
-    if(!options) options = {};
+    if (!options) options = {};
     return new Queue(name, options, loaderFn);
   },
 

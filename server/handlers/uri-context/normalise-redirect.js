@@ -7,7 +7,7 @@ function normalizeRedirect(roomUrl, req) {
 
   // Do we need to add the subframe on too?
   var m = req.path.match(/\/~\w+$/);
-  var frame = m && m[0] || "";
+  var frame = (m && m[0]) || '';
   if (frame) {
     pathname = pathname + frame;
   }

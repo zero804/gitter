@@ -14,9 +14,9 @@ var statsd = require('./serialize-stats-client');
 var maxSerializerTime = nconf.get('serializer:warning-period');
 
 function reportOnStrategy(strat, start, n) {
-  var statsPrefix = strat.strategyType ?
-          'serializer.' + strat.strategyType + '.' + strat.name :
-          'serializer.' + strat.name;
+  var statsPrefix = strat.strategyType
+    ? 'serializer.' + strat.strategyType + '.' + strat.name
+    : 'serializer.' + strat.name;
 
   statsd.histogram(statsPrefix + '.size', n, 0.1);
 
@@ -24,11 +24,11 @@ function reportOnStrategy(strat, start, n) {
   debug('strategy %s with %s items took %sms to complete', strat.name, n, time);
   statsd.timing(statsPrefix + '.timing', time, 0.1);
 
-  if(time > maxSerializerTime) {
+  if (time > maxSerializerTime) {
     stats.responseTime('serializer.slow.preload', time);
   }
 }
 
 module.exports = {
   reportOnStrategy: reportOnStrategy
-}
+};

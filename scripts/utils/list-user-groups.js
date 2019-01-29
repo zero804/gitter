@@ -11,18 +11,21 @@ var cliff = require('cliff');
 
 var argv = yargs.argv;
 var opts = yargs
-  .option('username', shimPositionOption({
-    position: 0,
-    required: true,
-    description: 'username to look up e.g trevorah',
-    string: true
-  }))
+  .option(
+    'username',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'username to look up e.g trevorah',
+      string: true
+    })
+  )
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function run() {
-  return userService.findByUsername(opts.username)
+  return userService
+    .findByUsername(opts.username)
     .then(function(user) {
       return restful.serializeGroupsForUserId(user._id);
     })

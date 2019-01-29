@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var moment = require('moment');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
@@ -8,9 +8,9 @@ var SyncMixin = require('./sync-mixin');
 var context = require('../utils/context');
 
 var EventModel = Backbone.Model.extend({
-  idAttribute: "id",
+  idAttribute: 'id',
   parse: function(message) {
-    if(message.sent) {
+    if (message.sent) {
       message.sent = moment(message.sent, moment.defaultFormat);
     }
 
@@ -27,7 +27,9 @@ var EventCollection = LiveCollection.extend({
     return realtime.getClient();
   },
   trim: function() {
-    while (this.length > 20) { this.pop(); }
+    while (this.length > 20) {
+      this.pop();
+    }
   },
   modelName: 'event',
   urlTemplate: '/v1/rooms/:troupeId/events',

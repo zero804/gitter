@@ -39,7 +39,6 @@ require('./template/helpers/all');
 require('./components/bug-reporting');
 require('./components/focus-events');
 
-
 require('./utils/tracking');
 require('./components/ping');
 
@@ -48,7 +47,8 @@ require('./views/widgets/avatar');
 
 userNotifications.initUserNotifications();
 
-onready(function() { // eslint-disable-line max-statements
+onready(function() {
+  // eslint-disable-line max-statements
 
   var appLayout = new AppLayout({
     template: false,
@@ -76,7 +76,6 @@ onready(function() { // eslint-disable-line max-statements
 
   Backbone.history.start();
 
-
   var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
@@ -101,18 +100,18 @@ onready(function() { // eslint-disable-line max-statements
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
   function initChatCache() {
-    if(troupeCollections.troupes.length) {
+    if (troupeCollections.troupes.length) {
       postMessage({
         type: 'roomList',
-        rooms: roomListGenerator(troupeCollections.troupes),
+        rooms: roomListGenerator(troupeCollections.troupes)
       });
     } else {
       //if we don't have any troupes in the troupeCollection
       //wait for it to sync before posting the message
-      troupeCollections.troupes.once('sync', function(){
+      troupeCollections.troupes.once('sync', function() {
         postMessage({
           type: 'roomList',
-          rooms: roomListGenerator(troupeCollections.troupes),
+          rooms: roomListGenerator(troupeCollections.troupes)
         });
       });
     }
@@ -123,7 +122,11 @@ onready(function() { // eslint-disable-line max-statements
     return contentFrame.contentWindow.location;
   }
 
-  var roomSwitcher = new SPARoomSwitcher(troupeCollections.troupes, clientEnv.basePath, getContentFrameLocation);
+  var roomSwitcher = new SPARoomSwitcher(
+    troupeCollections.troupes,
+    clientEnv.basePath,
+    getContentFrameLocation
+  );
   roomSwitcher.on('replace', function(href) {
     debug('Room switch: replace %s', href);
 
@@ -221,11 +224,16 @@ onready(function() { // eslint-disable-line max-statements
     var count = message.count;
     var troupeId = message.troupeId;
     if (troupeId !== context.getTroupeId()) {
-      debug('troupeId mismatch in unreadItemsCount: got', troupeId, 'expected', context.getTroupeId());
+      debug(
+        'troupeId mismatch in unreadItemsCount: got',
+        troupeId,
+        'expected',
+        context.getTroupeId()
+      );
     }
 
     var v = {
-      unreadItems: count,
+      unreadItems: count
     };
 
     if (count === 0) {
@@ -243,115 +251,121 @@ onready(function() { // eslint-disable-line max-statements
     allRoomsCollection.patch(troupeId, { activity: 0 });
   }
 
-  window.addEventListener('message', function(e) {
-    if (e.origin !== clientEnv.basePath) {
-      debug('Ignoring message from %s', e.origin);
-      return;
-    }
+  window.addEventListener(
+    'message',
+    function(e) {
+      if (e.origin !== clientEnv.basePath) {
+        debug('Ignoring message from %s', e.origin);
+        return;
+      }
 
-    var message;
-    try {
-      message = JSON.parse(e.data);
-    } catch (err) {
-      /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
-      return;
-    }
+      var message;
+      try {
+        message = JSON.parse(e.data);
+      } catch (err) {
+        /* It seems as through chrome extensions use this event to pass messages too. Ignore them. */
+        return;
+      }
 
-    debug('Received message %j', message);
+      debug('Received message %j', message);
 
-    var makeEvent = function(message) {
-      var origin = 'chat';
-      if (message.event && message.event.origin) origin = message.event.origin;
-      message.event = {
-        origin: origin,
-        preventDefault: function() {
-        },
-        stopPropagation: function() {
-        },
-        stopImmediatePropagation: function() {
-        },
+      var makeEvent = function(message) {
+        var origin = 'chat';
+        if (message.event && message.event.origin) origin = message.event.origin;
+        message.event = {
+          origin: origin,
+          preventDefault: function() {},
+          stopPropagation: function() {},
+          stopImmediatePropagation: function() {}
+        };
       };
-    };
 
-    switch (message.type) {
-      case 'context.troupeId':
-        context.setTroupeId(message.troupeId);
-        titlebarUpdater.setRoomName(message.name);
-        appEvents.trigger('context.troupeId', message.troupeId);
-        break;
+      switch (message.type) {
+        case 'context.troupeId':
+          context.setTroupeId(message.troupeId);
+          titlebarUpdater.setRoomName(message.name);
+          appEvents.trigger('context.troupeId', message.troupeId);
+          break;
 
-      case 'navigation':
-        appEvents.trigger('navigation', message.url, message.urlType, message.title, message.options);
-        break;
+        case 'navigation':
+          appEvents.trigger(
+            'navigation',
+            message.url,
+            message.urlType,
+            message.title,
+            message.options
+          );
+          break;
 
-      case 'route':
-        window.location.hash = '#' + message.hash;
-        break;
+        case 'route':
+          window.location.hash = '#' + message.hash;
+          break;
 
-      // case 'route-silent':
-      //   var routeCb = router.routes[message.hash];
-      //   if(routeCb) {
-      //     routeCb.apply(router, message.args);
-      //   }
-      //   break;
+        // case 'route-silent':
+        //   var routeCb = router.routes[message.hash];
+        //   if(routeCb) {
+        //     routeCb.apply(router, message.args);
+        //   }
+        //   break;
 
-      //when the chat app requests the room list send it
-      case 'request:roomList':
-        initChatCache();
-        break;
+        //when the chat app requests the room list send it
+        case 'request:roomList':
+          initChatCache();
+          break;
 
-      case 'unreadItemsCount':
-        onUnreadItemsCountMessage(message);
-        break;
+        case 'unreadItemsCount':
+          onUnreadItemsCountMessage(message);
+          break;
 
-      case 'clearActivityBadge':
-        onClearActivityBadgeMessage(message);
-        break;
+        case 'clearActivityBadge':
+          onClearActivityBadgeMessage(message);
+          break;
 
-      case 'realtime.testConnection':
-        var reason = message.reason;
-        realtime.testConnection('chat.' + reason);
-      break;
+        case 'realtime.testConnection':
+          var reason = message.reason;
+          realtime.testConnection('chat.' + reason);
+          break;
 
-      // No parameters
-      case 'chat.edit.hide':
-      case 'chat.edit.show':
-      case 'ajaxError':
-        appEvents.trigger(message.type);
-      break;
+        // No parameters
+        case 'chat.edit.hide':
+        case 'chat.edit.show':
+        case 'ajaxError':
+          appEvents.trigger(message.type);
+          break;
 
-      case 'keyboard':
-        makeEvent(message);
-        message.name = (message.name || '');
-        //patch the event key value as this is needed and seems to get lost
-        message.event.key = message.name.split('.').pop();
-        appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
-        appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
-      break;
+        case 'keyboard':
+          makeEvent(message);
+          message.name = message.name || '';
+          //patch the event key value as this is needed and seems to get lost
+          message.event.key = message.name.split('.').pop();
+          appEvents.trigger('keyboard.' + message.name, message.event, message.handler);
+          appEvents.trigger('keyboard.all', message.name, message.event, message.handler);
+          break;
 
-      case 'focus':
-        makeEvent(message);
-        appEvents.trigger('focus.request.' + message.focus, message.event);
-      break;
+        case 'focus':
+          makeEvent(message);
+          appEvents.trigger('focus.request.' + message.focus, message.event);
+          break;
 
-      case 'childframe:loaded':
-        appEvents.trigger('childframe:loaded');
-        roomSwitcher.setIFrameLoadingState(false);
-      break;
+        case 'childframe:loaded':
+          appEvents.trigger('childframe:loaded');
+          roomSwitcher.setIFrameLoadingState(false);
+          break;
 
-      case 'permalink.requested':
-        var url = message.url + '?at=' + message.id;
-        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
-        var title = message.url.substring(1);
-        pushState(frameUrl, title, url);
-      break;
+        case 'permalink.requested':
+          var url = message.url + '?at=' + message.id;
+          var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
+          var title = message.url.substring(1);
+          pushState(frameUrl, title, url);
+          break;
 
-      case 'toggle-dark-theme':
-        toggleDarkTheme(!!message.theme.length);
-        break;
-    }
-  }, false);
-
+        case 'toggle-dark-theme':
+          toggleDarkTheme(!!message.theme.length);
+          break;
+      }
+    },
+    false
+  );
 
   var allRoomsCollection = troupeCollections.troupes;
   new RoomCollectionTracker(allRoomsCollection);
@@ -376,10 +390,6 @@ onready(function() { // eslint-disable-line max-statements
     allRoomsCollection.off('remove', onRoomRemoveHandler);
   });
 
-
-
-
-
   function postMessage(message) {
     chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
   }
@@ -390,7 +400,7 @@ onready(function() { // eslint-disable-line max-statements
     var parsed = urlParser.parse(url);
     var frameUrl = parsed.pathname + '/~' + type + parsed.search;
 
-    if(!url && options.refresh) {
+    if (!url && options.refresh) {
       window.location.reload();
       return;
     }
@@ -399,7 +409,7 @@ onready(function() { // eslint-disable-line max-statements
       pushState(frameUrl, title, url);
       postMessage({
         type: 'permalink.navigate',
-        query: urlParser.parseSearch(parsed.search),
+        query: urlParser.parseSearch(parsed.search)
       });
       return;
     }
@@ -407,13 +417,13 @@ onready(function() { // eslint-disable-line max-statements
     //Update windows location
     pushState(frameUrl, title, url);
 
-    if(options.disableFrameReload) { return; }
+    if (options.disableFrameReload) {
+      return;
+    }
 
     //Redirect the App
     roomSwitcher.change(frameUrl);
   });
-
-
 
   // Call preventDefault() on tab events so that we can manage focus as we want
   appEvents.on('keyboard.tab.next keyboard.tab.prev', function(e) {
@@ -425,7 +435,7 @@ onready(function() { // eslint-disable-line max-statements
     postMessage({
       type: 'focus',
       focus: 'in',
-      event: event,
+      event: event
     });
   });
 
@@ -433,7 +443,7 @@ onready(function() { // eslint-disable-line max-statements
     postMessage({
       type: 'focus',
       focus: 'out',
-      event: event,
+      event: event
     });
   });
 
@@ -458,20 +468,20 @@ onready(function() { // eslint-disable-line max-statements
       // JSON serialisation makes it not possible to send the event object
       // Keep track of the origin in case of return
       event: {
-        origin: event.origin,
+        origin: event.origin
       },
-      handler: handler,
+      handler: handler
     };
     postMessage(message);
   });
 
-
   if (context.popEvent('invite_failed')) {
     appEvents.trigger('user_notification', {
       title: 'Unable to join room',
-      text: 'Unfortunately we were unable to add you to the requested room. Please ' +
-            'check that you have appropriate access and try again.',
-      timeout: 12000,
+      text:
+        'Unfortunately we were unable to add you to the requested room. Please ' +
+        'check that you have appropriate access and try again.',
+      timeout: 12000
     });
   }
 
@@ -501,5 +511,4 @@ onready(function() { // eslint-disable-line max-statements
       });
     }, 10000);
   }
-
 });

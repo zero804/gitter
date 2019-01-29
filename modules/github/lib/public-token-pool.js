@@ -20,7 +20,7 @@ module.exports = function(options, callback, request) {
     accessToken = parsed.query.access_token;
   }
 
-  if(!accessToken) {
+  if (!accessToken) {
     stats.eventHF('github.anonymous.access');
 
     if (!parsed) parsed = url.parse(options.uri || options.url, true);
@@ -33,9 +33,9 @@ module.exports = function(options, callback, request) {
 
     var uri = url.format(parsed);
 
-    if(options.uri) {
+    if (options.uri) {
       options.uri = uri;
-    } else if(options.url) {
+    } else if (options.url) {
       options.url = uri;
     }
   }

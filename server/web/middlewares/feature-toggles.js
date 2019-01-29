@@ -13,7 +13,7 @@ var Criteria = {
     var user = userDetails.user;
     if (!user) return false;
     var timestamp = Math.round(mongoUtils.getTimestampFromObjectId(user._id) / 1000) || 0;
-    return (timestamp % 100 < percent) || undefined;
+    return timestamp % 100 < percent || undefined;
   },
 
   /* Allow a hash of usernames */
@@ -44,20 +44,24 @@ var Criteria = {
 
     // This is copied from gitter-env.
     var lastChar = userId.toString().slice(-1);
-    var userBucket = (parseInt(lastChar+'', 16) % 2) ? 'A' : 'B';
+    var userBucket = parseInt(lastChar + '', 16) % 2 ? 'A' : 'B';
 
-    return (userBucket === bucket) || undefined;
+    return userBucket === bucket || undefined;
   },
 
   createdAfter: function(userDetails, timestamp) {
     var user = userDetails.user;
     if (!user) return false;
     var userTimestamp = mongoUtils.getTimestampFromObjectId(user._id);
-    return (userTimestamp > timestamp) || undefined;
+    return userTimestamp > timestamp || undefined;
   },
 
   bucketCreatedAfter: function(userDetails, opts) {
-    return (Criteria.bucket(userDetails, opts.bucket) && Criteria.createdAfter(userDetails, opts.createdAfter)) || undefined;
+    return (
+      (Criteria.bucket(userDetails, opts.bucket) &&
+        Criteria.createdAfter(userDetails, opts.createdAfter)) ||
+      undefined
+    );
   },
 
   /* Enabled criteria */
@@ -71,7 +75,6 @@ function getFeatures(callback) {
     .lean()
     .exec()
     .then(function(togglesList) {
-
       if (!togglesList || togglesList.length === 0) {
         return callback({});
       }
@@ -93,7 +96,6 @@ fflip.config({
   maxCookieAge: 31 * 86400 * 1000,
   useVetoVoting: true
 });
-
 
 module.exports = [
   fflip.express_middleware,

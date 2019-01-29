@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-buttons.hbs');
@@ -7,7 +7,6 @@ var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var isMobile = require('../../utils/is-mobile');
 require('../behaviors/tooltip');
-
 
 var ChatInputButtons = Marionette.ItemView.extend({
   template: template,
@@ -19,7 +18,7 @@ var ChatInputButtons = Marionette.ItemView.extend({
         placement: 'left',
         customUpdateEvent: 'updateComposeTooltipText'
       },
-      '.js-markdown-help': { titleFn: 'getShowMarkdownTitle', placement: 'left'}
+      '.js-markdown-help': { titleFn: 'getShowMarkdownTitle', placement: 'left' }
     }
   },
 
@@ -28,7 +27,7 @@ var ChatInputButtons = Marionette.ItemView.extend({
   },
 
   events: {
-    'click .js-toggle-compose-mode': 'toggleComposeMode',
+    'click .js-toggle-compose-mode': 'toggleComposeMode'
   },
 
   modelEvents: {
@@ -41,11 +40,11 @@ var ChatInputButtons = Marionette.ItemView.extend({
 
   getComposeModeTitle: function() {
     var mode = this.model.get('isComposeModeEnabled') ? 'chat' : 'compose';
-    return 'Switch to '+ mode +' mode ('+ platformKeys.cmd +' + /)';
+    return 'Switch to ' + mode + ' mode (' + platformKeys.cmd + ' + /)';
   },
 
   getShowMarkdownTitle: function() {
-    return 'Markdown help ('+ platformKeys.cmd +' + '+ platformKeys.gitter +' + m)';
+    return 'Markdown help (' + platformKeys.cmd + ' + ' + platformKeys.gitter + ' + m)';
   },
 
   toggleComposeMode: function() {
@@ -56,7 +55,10 @@ var ChatInputButtons = Marionette.ItemView.extend({
   },
 
   composeModeChanged: function() {
-    this.ui.composeToggle[0].setAttribute('data-compose-mode', this.model.get('isComposeModeEnabled'));
+    this.ui.composeToggle[0].setAttribute(
+      'data-compose-mode',
+      this.model.get('isComposeModeEnabled')
+    );
     this.ui.composeToggle[0].setAttribute('aria-label', this.getComposeModeTitle());
     this.trigger('updateComposeTooltipText');
   },
@@ -69,7 +71,6 @@ var ChatInputButtons = Marionette.ItemView.extend({
 
     return data;
   }
-
 });
 
 cocktail.mixin(ChatInputButtons, KeyboardEventsMixin);

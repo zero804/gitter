@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var sanitizer = require("sanitizer");
+var sanitizer = require('sanitizer');
 
 function uriPolicy(uri) {
   return uri;

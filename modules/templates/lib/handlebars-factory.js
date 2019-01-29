@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Handlebars = require('handlebars');
 var i18nFactory = require('gitter-web-i18n');
@@ -38,4 +38,4 @@ function create() {
 
 module.exports = {
   create: create
-}
+};

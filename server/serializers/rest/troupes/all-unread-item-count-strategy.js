@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var unreadItemService = require('gitter-web-unread-items');
 
@@ -9,7 +9,8 @@ function AllUnreadItemCountStrategy(options) {
 
 AllUnreadItemCountStrategy.prototype = {
   preload: function(troupeIds) {
-    return unreadItemService.getUserUnreadCountsForTroupeIds(this.userId, troupeIds.toArray())
+    return unreadItemService
+      .getUserUnreadCountsForTroupeIds(this.userId, troupeIds.toArray())
       .bind(this)
       .then(function(result) {
         this.unreadCounts = result;

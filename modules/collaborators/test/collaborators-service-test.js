@@ -21,7 +21,8 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for a PUBLIC REPO', function() {
-    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'gitterHQ/gitter')
+    return collaboratorsService
+      .findCollaborators(fixture.user1, 'GH_REPO', 'gitterHQ/gitter')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -32,7 +33,8 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for a PRIVATE REPO', function() {
-    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'troupe/gitter-webapp')
+    return collaboratorsService
+      .findCollaborators(fixture.user1, 'GH_REPO', 'troupe/gitter-webapp')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -43,7 +45,8 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for a unknown REPO', function() {
-    return collaboratorsService.findCollaborators(fixture.user1, 'GH_REPO', 'troupe123123123/xy123123123z')
+    return collaboratorsService
+      .findCollaborators(fixture.user1, 'GH_REPO', 'troupe123123123/xy123123123z')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assertNoDuplicates(collaborators);
@@ -51,7 +54,8 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for an ORG', function() {
-    return collaboratorsService.findCollaborators(fixture.user1, 'GH_ORG', 'troupe')
+    return collaboratorsService
+      .findCollaborators(fixture.user1, 'GH_ORG', 'troupe')
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         assert(collaborators.length > 0);
@@ -62,7 +66,8 @@ describe('collaborators-service #slow #github', function() {
   });
 
   it('should return collaborators for an USER', function() {
-    return collaboratorsService.findCollaborators(fixture.user1, null, null)
+    return collaboratorsService
+      .findCollaborators(fixture.user1, null, null)
       .then(function(collaborators) {
         assert(Array.isArray(collaborators));
         // assert(collaborators.length > 0);
@@ -70,5 +75,4 @@ describe('collaborators-service #slow #github', function() {
         assertNoDuplicates(collaborators);
       });
   });
-
 });

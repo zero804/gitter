@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
@@ -12,10 +12,9 @@ var snapshots = ctx.snapshots || {};
 
 function getGroupModel() {
   var groupData;
-  if(ctx.group) {
+  if (ctx.group) {
     groupData = ctx.group;
-  }
-  else if (ctx.troupe && ctx.troupe.group) {
+  } else if (ctx.troupe && ctx.troupe.group) {
     groupData = ctx.troupe.group;
   }
   return new Backbone.Model(groupData);
@@ -23,11 +22,11 @@ function getGroupModel() {
 
 function getTroupeModel() {
   var troupeModel;
-  if(ctx.troupe) {
+  if (ctx.troupe) {
     troupeModel = ctx.troupe;
-  } else if(ctx.troupeId) {
+  } else if (ctx.troupeId) {
     troupeModel = { id: ctx.troupeId };
-  } else if(qs.troupeId) {
+  } else if (qs.troupeId) {
     troupeModel = { id: qs.troupeId };
   }
 
@@ -37,9 +36,9 @@ function getTroupeModel() {
 function getUserModel() {
   var userModel;
 
-  if(ctx.user) {
+  if (ctx.user) {
     userModel = ctx.user;
-  } else if(ctx.userId) {
+  } else if (ctx.userId) {
     userModel = { id: ctx.userId };
   }
 
@@ -49,11 +48,13 @@ function getUserModel() {
 function getContextModel(troupe, user) {
   var result = new Backbone.Model();
   result.set({ userId: user.id, troupeId: troupe.id });
-  result.listenTo(user, 'change:id', function(user, newId) { // jshint unused:true
+  result.listenTo(user, 'change:id', function(user, newId) {
+    // jshint unused:true
     result.set({ userId: newId });
   });
 
-  result.listenTo(troupe, 'change:id', function(troupe, newId) { // jshint unused:true
+  result.listenTo(troupe, 'change:id', function(troupe, newId) {
+    // jshint unused:true
     result.set({ troupeId: newId });
   });
 
@@ -68,7 +69,8 @@ function getDelayedContextModel(contextModel, delay) {
     result.set({ troupeId: contextModel.get('troupeId') });
   }, delay);
 
-  result.listenTo(contextModel, 'change:userId', function(user, newId) { // jshint unused:true
+  result.listenTo(contextModel, 'change:userId', function(user, newId) {
+    // jshint unused:true
     result.set({ userId: newId });
   });
 
@@ -117,15 +119,13 @@ context.delayedContextModel = function(delay) {
 
 function clearOtherAttributes(s, v) {
   Object.keys(v.attributes).forEach(function(key) {
-    if(!s.hasOwnProperty(key)) {
+    if (!s.hasOwnProperty(key)) {
       s[key] = null;
     }
   });
 
   return s;
 }
-
-
 
 /** TEMP - lets think of a better way to do this... */
 context.setTroupeId = function(value) {
@@ -137,12 +137,11 @@ context.setTroupe = function(value) {
   if (value.group) {
     group.set(clearOtherAttributes(value.group, group));
   } else {
-    debug("Troupe data contains no group: %j", value);
+    debug('Troupe data contains no group: %j', value);
   }
 
   troupe.set(clearOtherAttributes(value, troupe));
 };
-
 
 context.getUserId = function() {
   return user.id;
@@ -161,7 +160,7 @@ context.inTroupeContext = function() {
 };
 
 context.inOneToOneTroupeContext = function() {
-  if(!context.inTroupeContext()) return false;
+  if (!context.inTroupeContext()) return false;
   return !!troupe.get('oneToOne');
 };
 
@@ -186,9 +185,9 @@ context.getTroupe = function() {
 
 context.popEvent = function(name) {
   var events = ctx.events;
-  if(events) {
+  if (events) {
     var i = events.indexOf(name);
-    if(i >= 0) {
+    if (i >= 0) {
       events.splice(i, 1);
       return true;
     }
@@ -197,21 +196,21 @@ context.popEvent = function(name) {
 
 context.getAccessToken = Promise.method(function() {
   var iterations = 0;
-  if(clientEnv['anonymous']) {
+  if (clientEnv['anonymous']) {
     return;
   }
 
   function checkToken() {
     // This is a very rough first attempt
     var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
-    if(token) return token;
+    if (token) return token;
 
     iterations++;
-    if(iterations > 50) {
+    if (iterations > 50) {
       // Force a reload, but don't do it more than once a minute
-      if(window.sessionStorage) {
+      if (window.sessionStorage) {
         var forcedReload = parseInt(window.sessionStorage.getItem('forced_reload'), 10);
-        if(forcedReload && Date.now() < forcedReload) {
+        if (forcedReload && Date.now() < forcedReload) {
           return;
         }
 
@@ -230,7 +229,7 @@ context.getAccessToken = Promise.method(function() {
 
 context.isLoggedIn = function() {
   // If we're in a context where one cannot be logged out...
-  if(clientEnv['loggedIn']) return true;
+  if (clientEnv['loggedIn']) return true;
 
   // TODO: this is not ideal. perhaps make this better
   return !!user.id;
@@ -247,9 +246,9 @@ context.isTroupeAdmin = function() {
 };
 
 context.lang = function() {
-  if(ctx.lang) return ctx.lang;
+  if (ctx.lang) return ctx.lang;
   var e = clientEnv['lang'];
-  if(e) return e;
+  if (e) return e;
   return [window.navigator.language];
 };
 
@@ -262,7 +261,6 @@ context.testOnly = {
     ctx = newContext;
     troupe = getTroupeModel();
     user = getUserModel();
-
   }
 };
 
@@ -284,10 +282,8 @@ context.getSnapshot = function(key) {
   return snapshot;
 };
 
-context.roomHasWelcomeMessage = function(){
+context.roomHasWelcomeMessage = function() {
   return ctx.roomHasWelcomeMessage;
 };
-
-
 
 module.exports = context;

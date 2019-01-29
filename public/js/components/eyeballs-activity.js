@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var passiveEventListener = require('../utils/passive-event-listener');
@@ -35,14 +35,14 @@ EyeballsActivity.prototype.setInactive = function(isInactive) {
   }
 
   this._callback(!isInactive);
-}
+};
 
 /**
  * The user did something
  */
 EyeballsActivity.prototype._registerInteraction = function() {
   this.setInactive(false);
-}
+};
 
 /**
  * This timer occassionally checks whether the user has performed any
@@ -52,26 +52,24 @@ EyeballsActivity.prototype._registerInteraction = function() {
 EyeballsActivity.prototype._startInactivityPoller = function() {
   var self = this;
 
-  if(self._inactivityTimer) return;
+  if (self._inactivityTimer) return;
   self._inactivityTimer = setInterval(function() {
-
     // This is a long timeout, so it could possibly be delayed by
     // the user pausing the application. Therefore just wait for one
     // more period for activity to start again...
 
     setTimeout(function() {
-      if(Date.now() - self._lastUserInteraction > (INACTIVITY - INACTIVITY_POLL)) {
+      if (Date.now() - self._lastUserInteraction > INACTIVITY - INACTIVITY_POLL) {
         self.setInactive(true);
       }
     }, 5);
-
   }, INACTIVITY_POLL);
-}
+};
 
 EyeballsActivity.prototype._stopInactivityPoller = function() {
   if (!this._inactivityTimer) return;
   clearTimeout(this._inactivityTimer);
   this._inactivityTimer = null;
-}
+};
 
 module.exports = EyeballsActivity;

@@ -9,25 +9,25 @@ var exploreService = require('../../server/services/explore-service');
 var shimPositionOption = require('../yargs-shim-position-option');
 var debug = require('debug')('gitter:infra:rooms-by-tag');
 
-
 var argv = yargs.argv;
 var opts = yargs
-  .option('tag', shimPositionOption({
-    position: 0,
-    required: true,
-    description: 'tag to look up'
-  }))
+  .option(
+    'tag',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'tag to look up'
+    })
+  )
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function run() {
   debug('start');
-  return exploreService.fetchByTagsCached([opts.tag])
-    .then(function(rooms) {
-      debug('done');
-      console.log(_.pluck(rooms, 'uri'));
-    });
+  return exploreService.fetchByTagsCached([opts.tag]).then(function(rooms) {
+    debug('done');
+    console.log(_.pluck(rooms, 'uri'));
+  });
 }
 
 run()

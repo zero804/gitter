@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
 var logger = env.logger;
-var mailerService = require("gitter-web-mailer");
+var mailerService = require('gitter-web-mailer');
 var crypto = require('crypto');
 var passphrase = config.get('email:unsubscribeNotificationsSecret');
 var userSettingsService = require('gitter-web-user-settings');
@@ -21,7 +21,7 @@ var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descr
 function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
   var allOneToOne = true;
   var roomNames = troupesWithUnreadCounts.map(function(d) {
-    if(d.troupe.oneToOne) {
+    if (d.troupe.oneToOne) {
       return d.troupe.user.username;
     } else {
       allOneToOne = false;
@@ -29,29 +29,42 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
     }
   });
 
-  switch(roomNames.length) {
-    case 0: return i18n.__("Unread messages on Gitter"); // Wha??
+  switch (roomNames.length) {
+    case 0:
+      return i18n.__('Unread messages on Gitter'); // Wha??
     case 1:
-      if(allOneToOne) {
-        return i18n.__("Unread messages from %s", roomNames[0]);
+      if (allOneToOne) {
+        return i18n.__('Unread messages from %s', roomNames[0]);
       } else {
-        return i18n.__("Unread messages in %s", roomNames[0]);
+        return i18n.__('Unread messages in %s', roomNames[0]);
       }
-      /* break; */
+    /* break; */
 
     case 2:
-      if(allOneToOne) {
-        return i18n.__("Unread messages from %s and %s", roomNames[0], roomNames[1]);
+      if (allOneToOne) {
+        return i18n.__('Unread messages from %s and %s', roomNames[0], roomNames[1]);
       } else {
-        return i18n.__("Unread messages in %s and %s", roomNames[0], roomNames[1]);
+        return i18n.__('Unread messages in %s and %s', roomNames[0], roomNames[1]);
       }
-      /* break; */
+    /* break; */
 
     default:
-      if(allOneToOne) {
-        return i18n.__n("Unread messages from %%s, %%s and one other", "Unread messages from %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
+      if (allOneToOne) {
+        return i18n.__n(
+          'Unread messages from %%s, %%s and one other',
+          'Unread messages from %%s, %%s and %d others',
+          roomNames.length - 2,
+          roomNames[0],
+          roomNames[1]
+        );
       } else {
-        return i18n.__n("Unread messages in %%s, %%s and one other", "Unread messages in %%s, %%s and %d others", roomNames.length - 2, roomNames[0], roomNames[1]);
+        return i18n.__n(
+          'Unread messages in %%s, %%s and one other',
+          'Unread messages in %%s, %%s and %d others',
+          roomNames.length - 2,
+          roomNames[0],
+          roomNames[1]
+        );
       }
   }
 }
@@ -62,10 +75,11 @@ function calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts) {
 function sendInvite(invitingUser, invite, room, isReminder, template, eventName) {
   var email = invite.emailAddress;
 
-  var senderName = (invitingUser.displayName || invitingUser.username);
+  var senderName = invitingUser.displayName || invitingUser.username;
   var date = moment(mongoUtils.getTimestampFromObjectId(invite._id)).format('Do MMMM YYYY');
-  var emailBasePath = config.get("email:emailBasePath");
-  var inviteUrl = emailBasePath + '/settings/accept-invite/' + invite.secret + '?source=email-invite';
+  var emailBasePath = config.get('email:emailBasePath');
+  var inviteUrl =
+    emailBasePath + '/settings/accept-invite/' + invite.secret + '?source=email-invite';
   var roomUrl = emailBasePath + '/' + room.uri;
   var subject = senderName + ' invited you to join the ' + room.uri + ' chat on Gitter';
   if (isReminder) {
@@ -73,11 +87,11 @@ function sendInvite(invitingUser, invite, room, isReminder, template, eventName)
   }
 
   return mailerService.sendEmail({
-    templateFile:   template,
-    from:           senderName + ' <support@gitter.im>',
-    fromName:       senderName,
-    to:             email,
-    subject:        subject,
+    templateFile: template,
+    from: senderName + ' <support@gitter.im>',
+    fromName: senderName,
+    to: email,
+    subject: subject,
     tracking: {
       event: eventName,
       data: { email: email }
@@ -93,7 +107,6 @@ function sendInvite(invitingUser, invite, room, isReminder, template, eventName)
 }
 
 module.exports = {
-
   sendUnreadItemsNotification: Promise.method(function(user, troupesWithUnreadCounts) {
     var plaintext = user.id + ',' + 'unread_notifications';
     var cipher = crypto.createCipher('aes256', passphrase);
@@ -104,10 +117,16 @@ module.exports = {
       return;
     }
 
-    return Promise.join(emailAddressService(user), userSettingsService.getUserSettings(user.id, 'lang'),
+    return Promise.join(
+      emailAddressService(user),
+      userSettingsService.getUserSettings(user.id, 'lang'),
       function(email, lang) {
-        if(!email) {
-          logger.info('Skipping email notification for ' + user.username + ' as they have no primary confirmed email');
+        if (!email) {
+          logger.info(
+            'Skipping email notification for ' +
+              user.username +
+              ' as they have no primary confirmed email'
+          );
           return;
         }
 
@@ -117,20 +136,22 @@ module.exports = {
           i18n.setLocale(lang);
         }
 
-        var emailBasePath = config.get("email:emailBasePath");
+        var emailBasePath = config.get('email:emailBasePath');
         var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
-        var canChangeNotifySettings = troupesWithUnreadCounts.some(function(troupeWithUnreadCounts) {
+        var canChangeNotifySettings = troupesWithUnreadCounts.some(function(
+          troupeWithUnreadCounts
+        ) {
           return !troupeWithUnreadCounts.troupe.oneToOne;
         });
 
         troupesWithUnreadCounts.forEach(function(d) {
-            d.truncated = d.chats.length < d.unreadCount;
-          }
-        );
+          d.truncated = d.chats.length < d.unreadCount;
+        });
 
         var subject = calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts);
-        return mailerService.sendEmail({
-            templateFile: "unread_notification",
+        return mailerService
+          .sendEmail({
+            templateFile: 'unread_notification',
             from: 'Gitter Notifications <support@gitter.im>',
             to: email,
             unsubscribe: unsubscribeUrl,
@@ -151,14 +172,18 @@ module.exports = {
             }
           })
           .catch(function(err) {
-            logger.error('Email send failed: ' + err, { email: email, subject: subject, exception: err });
+            logger.error('Email send failed: ' + err, {
+              email: email,
+              subject: subject,
+              exception: err
+            });
             throw err;
           });
-      })
-      .catch(function(err) {
-        logger.error('Unable to send unread items notifications: ' + err, { exception: err });
-        throw err;
-      });
+      }
+    ).catch(function(err) {
+      logger.error('Unable to send unread items notifications: ' + err, { exception: err });
+      throw err;
+    });
   }),
 
   sendInvitation: function(invitingUser, invite, room) {
@@ -166,7 +191,14 @@ module.exports = {
   },
 
   sendInvitationReminder: Promise.method(function(invitedByUser, invite, room) {
-    return sendInvite(invitedByUser, invite, room, true, 'invitation-reminder-v2', 'invitation_reminder_sent');
+    return sendInvite(
+      invitedByUser,
+      invite,
+      room,
+      true,
+      'invitation-reminder-v2',
+      'invitation_reminder_sent'
+    );
   }),
 
   /**
@@ -175,36 +207,37 @@ module.exports = {
    * user     User - the room's owner
    * room     Room - the room
    */
-  createdRoomNotification: Promise.method(function (user, room) {
+  createdRoomNotification: Promise.method(function(user, room) {
     var plaintext = user.id + ',' + 'created_room';
     var cipher = crypto.createCipher('aes256', passphrase);
     var hash = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
-    var emailBasePath = config.get("email:emailBasePath");
+    var emailBasePath = config.get('email:emailBasePath');
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
     var isPublic = !!(room && securityDescriptorUtils.isPublic(room));
 
     var recipientName = (user.displayName || user.username).split(' ')[0];
-    var roomSecurityDescription = isPublic ? 'public': 'private';
+    var roomSecurityDescription = isPublic ? 'public' : 'private';
 
     return emailAddressService(user)
-      .then(function (email) {
-        var roomUrl = config.get("email:emailBasePath") + '/' + room.uri;
+      .then(function(email) {
+        var roomUrl = config.get('email:emailBasePath') + '/' + room.uri;
 
         // TODO move the generation of tweet links into it's own function?
-        var twitterURL = (isPublic)
-                          ? 'http://twitter.com/intent/tweet?url=' + roomUrl +
-                            '&text=' +
-                            encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') +
-                            '&via=gitchat'
-                          : undefined; // if the room is public we shall have a tweet link
+        var twitterURL = isPublic
+          ? 'http://twitter.com/intent/tweet?url=' +
+            roomUrl +
+            '&text=' +
+            encodeURIComponent('Join me in the ' + room.uri + ' chat room on Gitter') +
+            '&via=gitchat'
+          : undefined; // if the room is public we shall have a tweet link
 
         return mailerService.sendEmail({
-          templateFile: "created_room",
+          templateFile: 'created_room',
           from: 'Gitter Notifications <support@gitter.im>',
           to: email,
           unsubscribe: unsubscribeUrl,
-          subject: "Your new chat room on Gitter",
+          subject: 'Your new chat room on Gitter',
           tracking: {
             event: 'created_room_email_sent',
             data: {
@@ -235,47 +268,51 @@ module.exports = {
     var plaintext = toUser.id + ',' + 'unread_notifications';
     var cipher = crypto.createCipher('aes256', passphrase);
     var hash = cipher.update(plaintext, 'utf8', 'hex') + cipher.final('hex');
-    var emailBasePath = config.get("email:emailBasePath");
+    var emailBasePath = config.get('email:emailBasePath');
     var unsubscribeUrl = emailBasePath + '/settings/unsubscribe/' + hash;
 
     var senderName = (fromUser.displayName || fromUser.username).split(' ')[0];
     var recipientName = (toUser.displayName || toUser.username).split(' ')[0];
-    var fromName = (fromUser.displayName || fromUser.username);
+    var fromName = fromUser.displayName || fromUser.username;
 
-    return userSettingsService.getUserSettings(toUser.id, 'unread_notifications_optout')
+    return userSettingsService
+      .getUserSettings(toUser.id, 'unread_notifications_optout')
       .then(function(optout) {
         if (optout) {
           logger.info('Skipping email notification for ' + toUser.username + ' because opt-out');
           return;
         }
 
-        return emailAddressService(toUser, { attemptDiscovery: true })
-          .then(function(email) {
-            if (!email) {
-              logger.info('Skipping email notification for ' + toUser.username + ' as they have no primary confirmed email');
-              return;
-            }
+        return emailAddressService(toUser, { attemptDiscovery: true }).then(function(email) {
+          if (!email) {
+            logger.info(
+              'Skipping email notification for ' +
+                toUser.username +
+                ' as they have no primary confirmed email'
+            );
+            return;
+          }
 
-            return mailerService.sendEmail({
-              templateFile: "added_to_room",
-              from: senderName + ' <support@gitter.im>',
-              fromName: fromName,
-              to: email,
-              subject: '[' + room.uri + '] You\'ve been added to a new room on Gitter',
-              tracking: {
-                event: 'added_to_room_notification_sent',
-                data: { userId: toUser.id, email: email }
-              },
-              data: {
-                roomUri: room.uri,
-                roomUrl: config.get("email:emailBasePath") + '/' + room.uri,
-                senderName: senderName,
-                recipientName: recipientName,
-                unsubscribeUrl: unsubscribeUrl
-              }
-            });
+          return mailerService.sendEmail({
+            templateFile: 'added_to_room',
+            from: senderName + ' <support@gitter.im>',
+            fromName: fromName,
+            to: email,
+            subject: '[' + room.uri + "] You've been added to a new room on Gitter",
+            tracking: {
+              event: 'added_to_room_notification_sent',
+              data: { userId: toUser.id, email: email }
+            },
+            data: {
+              roomUri: room.uri,
+              roomUrl: config.get('email:emailBasePath') + '/' + room.uri,
+              senderName: senderName,
+              recipientName: recipientName,
+              unsubscribeUrl: unsubscribeUrl
+            }
+          });
         });
-    });
+      });
   })
 };
 

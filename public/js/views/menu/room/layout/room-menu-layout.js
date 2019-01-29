@@ -16,40 +16,43 @@ require('../../../behaviors/isomorphic');
 const MINIBAR_ITEM_HEIGHT = 65;
 
 var RoomMenuLayoutView = Marionette.LayoutView.extend({
-
   behaviors: {
     Isomorphic: {
       minibar: { el: '.minibar-inner', init: 'initMiniBar' },
-      panel: { el: '#room-menu__panel', init: 'initMenuPanel' },
-    },
+      panel: { el: '#room-menu__panel', init: 'initMenuPanel' }
+    }
   },
 
   initMiniBar: function(optionsForRegion) {
-    return new MiniBarView(optionsForRegion({
-      model:          this.model,
-      collection:     this.model.minibarCollection,
-      bus:            this.bus,
-      dndCtrl:        this.dndCtrl,
-      roomCollection: this.model._roomCollection,
-      keyboardControllerView: this.keyboardControllerView,
-      groupsCollection: this.model.groupsCollection,
-    }));
+    return new MiniBarView(
+      optionsForRegion({
+        model: this.model,
+        collection: this.model.minibarCollection,
+        bus: this.bus,
+        dndCtrl: this.dndCtrl,
+        roomCollection: this.model._roomCollection,
+        keyboardControllerView: this.keyboardControllerView,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
   initMenuPanel: function(optionsForRegion) {
-    return new PanelView(optionsForRegion({
-      model:   this.model,
-      bus:     this.bus,
-      dndCtrl: this.dndCtrl,
-      keyboardControllerView: this.keyboardControllerView
-    }));
+    return new PanelView(
+      optionsForRegion({
+        model: this.model,
+        bus: this.bus,
+        dndCtrl: this.dndCtrl,
+        keyboardControllerView: this.keyboardControllerView
+      })
+    );
   },
 
   ui: {
-    minibar:      '#minibar',
+    minibar: '#minibar',
     minibarInner: '.minibar-inner',
-    minibarList:  '#minibar-list',
-    panel:        '#panel',
+    minibarList: '#minibar-list',
+    panel: '#panel'
   },
 
   events: {
@@ -57,11 +60,10 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   },
 
   childEvents: {
-    render: 'onChildRender',
+    render: 'onChildRender'
   },
 
   initialize: function(attrs) {
-
     //Event Bus
     if (!attrs || !attrs.bus) {
       throw new Error('A valid event bus needs to be passed to a new instance of RoomMenuLayout');
@@ -69,7 +71,9 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
 
     //Room Collection
     if (!attrs || !attrs.roomCollection) {
-      throw new Error('A valid room collection needs to be passed to a new instance of RoomMenyLayout');
+      throw new Error(
+        'A valid room collection needs to be passed to a new instance of RoomMenyLayout'
+      );
     }
 
     this.bus = attrs.bus;
@@ -81,20 +85,22 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     //Make a new model
     this.dndCtrl = new DNDCtrl();
     var snapshot = context.getSnapshot('leftMenu');
-    this.model = new RoomMenuModel(_.extend({}, snapshot, {
-      bus: this.bus,
-      roomCollection: this.roomCollection,
-      orgCollection: this.orgCollection,
-      userModel: context.user(),
-      troupeModel: context.troupe(),
-      dndCtrl: this.dndCtrl,
-      groupsCollection: this.groupsCollection
-    }));
+    this.model = new RoomMenuModel(
+      _.extend({}, snapshot, {
+        bus: this.bus,
+        roomCollection: this.roomCollection,
+        orgCollection: this.orgCollection,
+        userModel: context.user(),
+        troupeModel: context.troupe(),
+        dndCtrl: this.dndCtrl,
+        groupsCollection: this.groupsCollection
+      })
+    );
 
     this.minibarCollection = this.model.minibarCollection;
 
     this.keyboardControls = new KeyboardControllerView({
-      model: this.model,
+      model: this.model
     });
 
     this.minibarCollection = this.model.minibarCollection;
@@ -123,7 +129,7 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.closePanel();
 
     // Clear out the active selected state
-    if(!this.model.get('roomMenuIsPinned')) {
+    if (!this.model.get('roomMenuIsPinned')) {
       var activeModel = this.minibarCollection.findWhere({ active: true });
       if (activeModel) {
         activeModel.set({ active: false, focus: false });
@@ -132,54 +138,65 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
   },
 
   openPanel: function() {
-    if (this.model.get('roomMenuIsPinned')) { return; }
+    if (this.model.get('roomMenuIsPinned')) {
+      return;
+    }
 
     this.model.set('panelOpenState', true);
-    if (this.timeout) { clearTimeout(this.timeout); }
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+    }
   },
 
   closePanel: function() {
-    if (this.model.get('roomMenuIsPinned')) { return; }
+    if (this.model.get('roomMenuIsPinned')) {
+      return;
+    }
 
     this.model.set('panelOpenState', false);
   },
 
-  onChildRender: function () {
+  onChildRender: function() {
     this._initNano();
   },
 
-  onPanelRender: function () {
+  onPanelRender: function() {
     this._initNano();
   },
 
-  _initNano: _.debounce(function () {
+  _initNano: _.debounce(function() {
     var params = {
       sliderMaxHeight: 100,
       iOSNativeScrolling: true,
       // We don't want the scroll container tabbable
       tabIndex: 'null'
     };
-    fastdom.mutate(function() {
+    fastdom.mutate(
+      function() {
+        // init minibar scrollers
+        this.ui.minibarInner.nanoScroller(params);
 
-      // init minibar scrollers
-      this.ui.minibarInner.nanoScroller(params);
-
-      //because of the margins nanoScroller will never show the scroller
-      //so here is some custom logic to work around it
-      var minibarItems = this.minibar.currentView.collection.length;
-      var minibarItemsHeight = (minibarItems * MINIBAR_ITEM_HEIGHT);
-      fastdom.measure(function() {
-        var minibarContainerHeight = this.ui.minibarList.height();
-        if (minibarItemsHeight > minibarContainerHeight) {
-          fastdom.mutate(function(){
-            //
-            //if the combined height of the minibar items is greater
-            //than the minibar container's height show the scrollbar
-            this.ui.minibar.find('.nano-pane').show();
-          }.bind(this));
-        }
-      }.bind(this));
-    }.bind(this));
+        //because of the margins nanoScroller will never show the scroller
+        //so here is some custom logic to work around it
+        var minibarItems = this.minibar.currentView.collection.length;
+        var minibarItemsHeight = minibarItems * MINIBAR_ITEM_HEIGHT;
+        fastdom.measure(
+          function() {
+            var minibarContainerHeight = this.ui.minibarList.height();
+            if (minibarItemsHeight > minibarContainerHeight) {
+              fastdom.mutate(
+                function() {
+                  //
+                  //if the combined height of the minibar items is greater
+                  //than the minibar container's height show the scrollbar
+                  this.ui.minibar.find('.nano-pane').show();
+                }.bind(this)
+              );
+            }
+          }.bind(this)
+        );
+      }.bind(this)
+    );
   }, 500),
 
   onDestroy: function() {
@@ -188,11 +205,9 @@ var RoomMenuLayoutView = Marionette.LayoutView.extend({
     this.stopListening(this.dndCtrl);
   },
 
-  getModel: function (){
+  getModel: function() {
     return this.model;
-  },
-
+  }
 });
-
 
 module.exports = RoomMenuLayoutView;

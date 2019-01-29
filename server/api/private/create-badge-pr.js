@@ -1,14 +1,15 @@
-"use strict";
+'use strict';
 
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
-module.exports = function (req, res, next) {
-  var uri = "" + req.body.uri;
+module.exports = function(req, res, next) {
+  var uri = '' + req.body.uri;
   var user = req.user;
 
-  return troupeService.findByUri(uri)
+  return troupeService
+    .findByUri(uri)
     .bind({
       troupe: null
     })

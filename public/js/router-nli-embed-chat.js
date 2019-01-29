@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var ChatLayout = require('./views/layouts/chat');
 var chatModels = require('./collections/chat');
@@ -19,7 +19,7 @@ require('./components/ping');
 require('./views/widgets/avatar');
 
 var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-chatCollection.on('add', function (item) {
+chatCollection.on('add', function(item) {
   setTimeout(item.set.bind(item, 'unread', false), 500);
 });
 
@@ -30,10 +30,13 @@ onready(function() {
   // FIXME: this is pretty shit but it's being rendered server side so...
   $('#login').click(function(evt) {
     evt.preventDefault();
-    window.open('/login?action=signup&source=embedded&returnTo=/login/embed', '', 'width=1100, height=600');
+    window.open(
+      '/login?action=signup&source=embedded&returnTo=/login/embed',
+      '',
+      'width=1100, height=600'
+    );
   });
 });
-
 
 // When the login is complete in the popup it'll post a message back
 window.addEventListener('message', function(event) {

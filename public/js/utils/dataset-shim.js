@@ -1,5 +1,4 @@
-"use strict";
-
+'use strict';
 
 function toAttribute(name) {
   var attribute = name.replace(/[A-Z]/g, function(a) {
@@ -9,7 +8,7 @@ function toAttribute(name) {
   return 'data-' + attribute.toLowerCase();
 }
 
-if(document.documentElement.dataset) {
+if (document.documentElement.dataset) {
   // Handle modern browsers
   module.exports = {
     get: function(element, name) {
@@ -19,7 +18,6 @@ if(document.documentElement.dataset) {
       element.dataset[name] = value;
     }
   };
-
 } else {
   // Handle old internet explorer versions
   module.exports = {
@@ -32,5 +30,3 @@ if(document.documentElement.dataset) {
     }
   };
 }
-
-

@@ -9,13 +9,14 @@ const debug = require('debug-proxy')('app:chat-messsage-reports');
 
 const context = require('./utils/context');
 
-
 function getAccountAgeString(user) {
-  if(user) {
+  if (user) {
     const createdDate = new Date(user.accountCreatedDate);
 
     return `
-      ${Math.floor((Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24))} days, ${createdDate.getFullYear()}-${createdDate.getMonth()}-${createdDate.getDay()}
+      ${Math.floor(
+        (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
+      )} days, ${createdDate.getFullYear()}-${createdDate.getMonth()}-${createdDate.getDay()}
     `;
   }
 
@@ -25,9 +26,10 @@ function getAccountAgeString(user) {
 const ReportView = Marionette.ItemView.extend({
   tagName: 'tr',
 
-  template: (data) => {
+  template: data => {
     return `
-      <td class="admin-chat-report-table-cell admin-chat-report-table-reporter-cell model-id-${data.reporterUser && data.reporterUser.id}">
+      <td class="admin-chat-report-table-cell admin-chat-report-table-reporter-cell model-id-${data.reporterUser &&
+        data.reporterUser.id}">
         <div class="admin-chat-report-table-reporter-cell-username">
           ${data.reporterUser ? data.reporterUser.username : 'Unknown'}
         </div>
@@ -38,7 +40,8 @@ const ReportView = Marionette.ItemView.extend({
           ${getAccountAgeString(data.reporterUser)}
         </div>
       </td>
-      <td class="admin-chat-report-table-cell admin-chat-report-table-message-author-cell model-id-${data.messageUser && data.messageUser.id}">
+      <td class="admin-chat-report-table-cell admin-chat-report-table-message-author-cell model-id-${data.messageUser &&
+        data.messageUser.id}">
         <div class="admin-chat-report-table-message-author-cell-username">
           ${data.messageUser ? data.messageUser.username : 'Unknown'}
         </div>
@@ -61,8 +64,8 @@ const ReportView = Marionette.ItemView.extend({
           ${_.escape(data.messageText)}
         </div>
       </td>
-    `
-  },
+    `;
+  }
 });
 
 const ReportCollectionView = Marionette.CompositeView.extend({
@@ -95,18 +98,19 @@ const ReportCollectionView = Marionette.CompositeView.extend({
   }
 });
 
-
 const DashboardView = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
-      reportTable: { el: '.js-report-table', init: 'initReportCollectionView' },
-    },
+      reportTable: { el: '.js-report-table', init: 'initReportCollectionView' }
+    }
   },
 
   initReportCollectionView: function(optionsForRegion) {
-    return new ReportCollectionView(optionsForRegion({
-      collection: new Backbone.Collection(this.model.get('reports'))
-    }));
+    return new ReportCollectionView(
+      optionsForRegion({
+        collection: new Backbone.Collection(this.model.get('reports'))
+      })
+    );
   },
 
   template: function(data) {
@@ -114,7 +118,7 @@ const DashboardView = Marionette.LayoutView.extend({
     const lastReport = reports && reports[reports.length - 1];
 
     let paginationLink = '';
-    if(lastReport) {
+    if (lastReport) {
       paginationLink = `
         <hr />
         <a href="?beforeId=${lastReport.id}">
@@ -133,12 +137,9 @@ const DashboardView = Marionette.LayoutView.extend({
         <br />
         <br />
       </div>
-    `
-  },
-
+    `;
+  }
 });
-
-
 
 const snapshot = context.getSnapshot('adminChatMessageReportDashboard');
 
@@ -146,5 +147,5 @@ debug('snapshot', snapshot);
 
 new DashboardView({
   el: $('.js-chat-message-report-dashboard-root'),
-  model: new Backbone.Model(snapshot),
+  model: new Backbone.Model(snapshot)
 }).render();

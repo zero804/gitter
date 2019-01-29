@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var Dropdown = require('./dropdown');
@@ -7,19 +7,19 @@ var liveSearch = require('./live-search');
 var TypeaheadView = Marionette.ItemView.extend({
   tagName: 'input',
   events: {
-    'keydown': 'keydown',
-    'keyup': 'keyup'
+    keydown: 'keydown',
+    keyup: 'keyup'
   },
   initialize: function(options) {
     this.disableListenToChange = options.disableListenToChange;
     this.longDebounce = options.longDebounce;
     this.shortDebounce = options.shortDebounce;
 
-    if(!this.collection) {
+    if (!this.collection) {
       this.collection = new Backbone.Collection();
     }
 
-    if(!options.disableShowOnAdd) {
+    if (!options.disableShowOnAdd) {
       // fix for first typeahead suggestion not triggering
       // the dropdown to show
       //
@@ -36,7 +36,7 @@ var TypeaheadView = Marionette.ItemView.extend({
     // May not exist
     this.autoSelector = options.autoSelector;
 
-    if(options.el) {
+    if (options.el) {
       this.attach();
     }
   },
@@ -49,7 +49,7 @@ var TypeaheadView = Marionette.ItemView.extend({
    * clear() clears the input element's value
    *
    */
-  clear: function () {
+  clear: function() {
     this.el.value = '';
   },
 
@@ -66,7 +66,7 @@ var TypeaheadView = Marionette.ItemView.extend({
   },
 
   attach: function() {
-    if(this.dropdown) return;
+    if (this.dropdown) return;
     liveSearch(this, this.$el, 'searchTextChanged', {
       immediate: 'autoSelect',
       disableListenToChange: this.disableListenToChange,
@@ -87,7 +87,7 @@ var TypeaheadView = Marionette.ItemView.extend({
   },
 
   onDestroy: function() {
-    if(this.dropdown) {
+    if (this.dropdown) {
       this.dropdown.destroy();
       this.dropdown = null;
     }
@@ -105,16 +105,16 @@ var TypeaheadView = Marionette.ItemView.extend({
   autoSelect: function() {
     var input = this.el.value;
 
-    if(!this.autoSelector) return;
-    if(!input) return;
+    if (!this.autoSelector) return;
+    if (!input) return;
 
     var model = this.dropdown.getActive();
 
     var predicate = this.autoSelector(input);
-    if(model && predicate(model)) return; // Existing model matches
+    if (model && predicate(model)) return; // Existing model matches
 
     var matches = this.collection.filter(predicate);
-    if(matches.length === 0) return;
+    if (matches.length === 0) return;
 
     this.dropdown.setActive(matches[0]);
   },
@@ -124,17 +124,20 @@ var TypeaheadView = Marionette.ItemView.extend({
     function fetchSuccess() {
       self.autoSelect();
     }
-    if(this.options.fetch) {
+    if (this.options.fetch) {
       this.options.fetch(input, this.collection, fetchSuccess);
     } else {
-      this.collection.fetch({ data: { q: input }}, { add: true, remove: true, merge: true, success: fetchSuccess });
+      this.collection.fetch(
+        { data: { q: input } },
+        { add: true, remove: true, merge: true, success: fetchSuccess }
+      );
     }
 
     this.show();
   },
 
   keydown: function(e) {
-    switch(e.keyCode) {
+    switch (e.keyCode) {
       case 13:
         this.dropdown.selectActive();
         break;
@@ -144,7 +147,7 @@ var TypeaheadView = Marionette.ItemView.extend({
         break;
 
       case 40:
-        if(this.dropdown.active()) {
+        if (this.dropdown.active()) {
           this.dropdown.selectNext();
         } else {
           this.show();
@@ -152,7 +155,7 @@ var TypeaheadView = Marionette.ItemView.extend({
         break;
 
       case 27:
-        if(!this.dropdown.active()) {
+        if (!this.dropdown.active()) {
           // Propogate
           return;
         }

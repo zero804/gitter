@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger.get('group-creation');
@@ -23,16 +23,15 @@ var sendInvitesForRoom = Promise.method(function(user, room, invites) {
   if (!invites || !invites.length) return [];
 
   // Invite all the users
-  return policyFactory.createPolicyForRoomId(user, room._id)
-    .then(function(userRoomPolicy) {
-      var roomWithPolicyService = new RoomWithPolicyService(room, user, userRoomPolicy);
+  return policyFactory.createPolicyForRoomId(user, room._id).then(function(userRoomPolicy) {
+    var roomWithPolicyService = new RoomWithPolicyService(room, user, userRoomPolicy);
 
-      debug('Sending invites: %j', invites);
+    debug('Sending invites: %j', invites);
 
-      // Some of these can fail, but the errors will be caught and added to
-      // the report that the promise resolves to.
-      return roomWithPolicyService.createRoomInvitations(invites);
-    })
+    // Some of these can fail, but the errors will be caught and added to
+    // the report that the promise resolves to.
+    return roomWithPolicyService.createRoomInvitations(invites);
+  });
 });
 
 /**
@@ -41,32 +40,33 @@ var sendInvitesForRoom = Promise.method(function(user, room, invites) {
 var sendTweetsForRoom = Promise.method(function(user, group, room, twitterHandles) {
   if (!twitterHandles.length) return;
 
-  return identityService.getIdentityForUser(user, 'twitter')
-    .then(function(identity) {
-      if (!identity) return;
+  return identityService.getIdentityForUser(user, 'twitter').then(function(identity) {
+    if (!identity) return;
 
-      user.twitterUsername = identity.username;
-      debug('Sending tweets to: %j', twitterHandles);
+    user.twitterUsername = identity.username;
+    debug('Sending tweets to: %j', twitterHandles);
 
-      var usersToTweet = twitterHandles.map(function(twitterUsername) {
-        return {
-          twitterUsername: twitterUsername
-        };
-      });
-
-      var roomUrl = room.lcUri ? (clientEnv['basePath'] + '/' + room.lcUri + '?source=twitter-badger') : undefined;
-
-      stats.event('new_group_tweets', {
-        userId: user.id,
-        username: user.username,
-        groupId: group._id,
-        groupUri: group.uri,
-        count: usersToTweet.length
-      });
-
-      var name = group.name || group.uri;
-      return twitterBadger.sendUserInviteTweets(user, usersToTweet, name, roomUrl);
+    var usersToTweet = twitterHandles.map(function(twitterUsername) {
+      return {
+        twitterUsername: twitterUsername
+      };
     });
+
+    var roomUrl = room.lcUri
+      ? clientEnv['basePath'] + '/' + room.lcUri + '?source=twitter-badger'
+      : undefined;
+
+    stats.event('new_group_tweets', {
+      userId: user.id,
+      username: user.username,
+      groupId: group._id,
+      groupUri: group.uri,
+      count: usersToTweet.length
+    });
+
+    var name = group.name || group.uri;
+    return twitterBadger.sendUserInviteTweets(user, usersToTweet, name, roomUrl);
+  });
 });
 
 /**
@@ -79,7 +79,7 @@ function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowT
       var invited = 0;
 
       invitesReport.forEach(function(report) {
-        switch(report.status) {
+        switch (report.status) {
           case 'added':
             added++;
             break;
@@ -101,32 +101,49 @@ function sendInvitesAndTweetsPostRoomCreation(user, group, room, invites, allowT
 
       var twitterHandles = invitesReport
         .filter(function(report) {
-          return report.status === 'error' &&
+          return (
+            report.status === 'error' &&
             report.inviteInfo.type === 'twitter' &&
-            report.inviteInfo.externalId;
+            report.inviteInfo.externalId
+          );
         })
         .map(function(report) {
           return report.inviteInfo.externalId;
         });
 
-
       if (!allowTweeting) return;
 
-      return sendTweetsForRoom(user, group, room, twitterHandles)
-        .catch(function(err) {
-          stats.event('group_tweets_failed', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
-          logger.error('Group tweet send failed', { exception: err });
-          errorReporter(err, { post_room_creation: "failed", step: "tweets" }, { module: 'group-creation' });
+      return sendTweetsForRoom(user, group, room, twitterHandles).catch(function(err) {
+        stats.event('group_tweets_failed', {
+          userId: user.id,
+          username: user.username,
+          groupId: group._id,
+          groupUri: group.uri
         });
+        logger.error('Group tweet send failed', { exception: err });
+        errorReporter(
+          err,
+          { post_room_creation: 'failed', step: 'tweets' },
+          { module: 'group-creation' }
+        );
+      });
     })
     .catch(function(err) {
-      stats.event('group_invites_failed', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
+      stats.event('group_invites_failed', {
+        userId: user.id,
+        username: user.username,
+        groupId: group._id,
+        groupUri: group.uri
+      });
 
       logger.error('Send invites failed', { exception: err });
-      errorReporter(err, { post_room_creation: "failed", step: "invites" }, { module: 'group-creation' });
+      errorReporter(
+        err,
+        { post_room_creation: 'failed', step: 'invites' },
+        { module: 'group-creation' }
+      );
       return []; // No invites report for you
     });
-
 }
 
 /**
@@ -144,7 +161,8 @@ function groupCreationService(user, options) {
   var defaultRoomOptions = options.defaultRoom;
   var allowTweeting = options.allowTweeting;
 
-  return groupService.createGroup(user, options)
+  return groupService
+    .createGroup(user, options)
     .bind({
       group: null,
       defaultRoom: null,
@@ -178,14 +196,26 @@ function groupCreationService(user, options) {
       });
     })
     .then(function(createRoomResult) {
-      this.hookCreationFailedDueToMissingScope = createRoomResult.hookCreationFailedDueToMissingScope;
-      var defaultRoom = this.defaultRoom = createRoomResult.troupe;
+      this.hookCreationFailedDueToMissingScope =
+        createRoomResult.hookCreationFailedDueToMissingScope;
+      var defaultRoom = (this.defaultRoom = createRoomResult.troupe);
 
-      return sendInvitesAndTweetsPostRoomCreation(user, this.group, defaultRoom, invites, allowTweeting);
+      return sendInvitesAndTweetsPostRoomCreation(
+        user,
+        this.group,
+        defaultRoom,
+        invites,
+        allowTweeting
+      );
     })
     .then(function(invitesReport) {
       var group = this.group;
-      stats.event('group_process_complete', { userId: user.id, username: user.username, groupId: group._id, groupUri: group.uri });
+      stats.event('group_process_complete', {
+        userId: user.id,
+        username: user.username,
+        groupId: group._id,
+        groupUri: group.uri
+      });
 
       this.invitesReport = invitesReport;
       return this;
@@ -196,9 +226,9 @@ function groupCreationService(user, options) {
         username: user && user.username,
         userId: user && user._id,
         options: options
-      })
+      });
       throw e;
-    })
+    });
 }
 
 module.exports = Promise.method(groupCreationService);

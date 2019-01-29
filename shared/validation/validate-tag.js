@@ -7,9 +7,8 @@ var getMaxTagLength = function(isStaff) {
   return isStaff ? MAX_STAFF_TAG_LENGTH : MAX_TAG_LENGTH;
 };
 
-
 var validateTag = function(tagName, isStaff) {
-  var reservedTagTestRegex = (/:/);
+  var reservedTagTestRegex = /:/;
   var isValid = true;
   var messageList = [];
 

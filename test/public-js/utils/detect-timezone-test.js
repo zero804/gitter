@@ -11,5 +11,4 @@ describe('timezone-detect', function() {
     assert.strictEqual(typeof result.offset, 'string');
     assert(result.offset.match(/^[+-]\d{4}$/));
   });
-
 });

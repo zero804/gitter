@@ -1,5 +1,4 @@
-"use strict";
-
+'use strict';
 
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
@@ -23,31 +22,33 @@ var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs'
  * Returns the rooms the user is in
  */
 function findRoomIdsForUser(userId) {
-  debug("findRoomIdsForUser(%s)", userId);
+  debug('findRoomIdsForUser(%s)', userId);
   assert(userId);
 
-  return TroupeUser.distinct("troupeId", { 'userId': userId })
-    .exec();
+  return TroupeUser.distinct('troupeId', { userId: userId }).exec();
 }
 
 /**
  * Returns the rooms the user is in, with lurk status
  */
 function findRoomIdsForUserWithLurk(userId) {
-  debug("findRoomIdsForUserWithLurk(%s)", userId);
+  debug('findRoomIdsForUserWithLurk(%s)', userId);
 
   assert(userId);
 
-  return TroupeUser.find({ 'userId': userId }, { _id: 0, troupeId: 1, flags: 1 }, { lean: true })
+  return TroupeUser.find({ userId: userId }, { _id: 0, troupeId: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
-      return _.reduce(results, function(memo, troupeUser) {
-        memo[troupeUser.troupeId] = roomMembershipFlags.getLurkForFlags(troupeUser.flags);
-        return memo;
-      }, {});
+      return _.reduce(
+        results,
+        function(memo, troupeUser) {
+          memo[troupeUser.troupeId] = roomMembershipFlags.getLurkForFlags(troupeUser.flags);
+          return memo;
+        },
+        {}
+      );
     });
 }
-
 
 /**
  * Returns the rooms the user is in, with lurk status
@@ -56,10 +57,9 @@ function findLurkingRoomIdsForUserId(userId) {
   assert(userId);
 
   return TroupeUser.distinct('troupeId', {
-      userId: userId,
-      flags: queryForToggles({ activity: true })
-    })
-    .exec();
+    userId: userId,
+    flags: queryForToggles({ activity: true })
+  }).exec();
 }
 
 /**
@@ -86,14 +86,15 @@ function findUserMembershipInRooms(userId, troupeIds) {
 
   if (troupeIds.length === 1) {
     // Optimise for single troupeIds, which happens a lot
-    return checkRoomMembership(troupeIds[0], userId)
-      .then(function(isMember) {
-        return isMember ? troupeIds : [];
-      });
+    return checkRoomMembership(troupeIds[0], userId).then(function(isMember) {
+      return isMember ? troupeIds : [];
+    });
   }
 
-  return TroupeUser.distinct("troupeId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }, userId: userId })
-    .exec();
+  return TroupeUser.distinct('troupeId', {
+    troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) },
+    userId: userId
+  }).exec();
 }
 
 /**
@@ -104,8 +105,10 @@ function findMembershipForUsersInRoom(troupeId, userIds) {
   assert(troupeId);
   if (!userIds.length) return Promise.resolve([]);
 
-  return TroupeUser.distinct("userId", { userId: { $in: mongoUtils.asObjectIDs(userIds) }, troupeId: troupeId })
-    .exec();
+  return TroupeUser.distinct('userId', {
+    userId: { $in: mongoUtils.asObjectIDs(userIds) },
+    troupeId: troupeId
+  }).exec();
 }
 
 /**
@@ -119,8 +122,7 @@ function findMembersForRoom(troupeId, options) {
 
   if (!skip && !limit) {
     // Short-cut if we don't want to use skip and limit
-    return TroupeUser.distinct("userId", { 'troupeId': troupeId })
-      .exec();
+    return TroupeUser.distinct('userId', { troupeId: troupeId }).exec();
   }
 
   var query = TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1 }, { lean: true });
@@ -132,10 +134,11 @@ function findMembersForRoom(troupeId, options) {
     query.limit(options.limit);
   }
 
-  return query.exec()
-    .then(function(results) {
-      return _.map(results, function(troupeUser) { return troupeUser.userId; });
+  return query.exec().then(function(results) {
+    return _.map(results, function(troupeUser) {
+      return troupeUser.userId;
     });
+  });
 }
 
 /**
@@ -156,10 +159,14 @@ function findMembersForRoomWithLurk(troupeId) {
   return TroupeUser.find({ troupeId: troupeId }, { _id: 0, userId: 1, flags: 1 }, { lean: true })
     .exec()
     .then(function(results) {
-      return _.reduce(results, function(memo, v) {
-        memo[v.userId] = roomMembershipFlags.getLurkForFlags(v.flags);
-        return memo;
-      }, {});
+      return _.reduce(
+        results,
+        function(memo, v) {
+          memo[v.userId] = roomMembershipFlags.getLurkForFlags(v.flags);
+          return memo;
+        },
+        {}
+      );
     });
 }
 
@@ -175,25 +182,31 @@ function addRoomMember(troupeId, userId, flags, groupId) {
   assert(userId, 'Expected userId parameter');
   assert(flags, 'Expected flags parameter');
 
-  return (groupId ? groupMembershipDeltaService.isUserInGroup(userId, groupId) : Promise.resolve(null))
+  return (groupId
+    ? groupMembershipDeltaService.isUserInGroup(userId, groupId)
+    : Promise.resolve(null)
+  )
     .bind({
       alreadyInGroup: null
     })
     .then(function(alreadyInGroup) {
       this.alreadyInGroup = alreadyInGroup;
-      debug("Is member %s already in group %s? %s", userId, groupId, alreadyInGroup);
+      debug('Is member %s already in group %s? %s', userId, groupId, alreadyInGroup);
 
-      return TroupeUser.findOneAndUpdate({
+      return TroupeUser.findOneAndUpdate(
+        {
           troupeId: troupeId,
           userId: userId
-        }, {
+        },
+        {
           $setOnInsert: {
             troupeId: troupeId,
             userId: userId,
             flags: flags
           }
-        }, { upsert: true, new: false })
-        .exec();
+        },
+        { upsert: true, new: false }
+      ).exec();
     })
     .then(function(previous) {
       var added = !previous;
@@ -204,20 +217,20 @@ function addRoomMember(troupeId, userId, flags, groupId) {
       }
 
       if (groupId && !this.alreadyInGroup) {
-        roomMembershipEvents.emit("group.members.added", groupId, [userId]);
+        roomMembershipEvents.emit('group.members.added', groupId, [userId]);
       }
 
       // Set the last access time for the user to now if the user
       // has just been added to the room
-      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
+      return recentRoomCore
+        .saveUserTroupeLastAccess(userId, troupeId)
         .then(function() {
-          roomMembershipEvents.emit("members.added", troupeId, [userId]);
+          roomMembershipEvents.emit('members.added', troupeId, [userId]);
 
           return incrementTroupeUserCount(troupeId, 1);
         })
         .thenReturn(added);
     });
-
 }
 
 /**
@@ -231,7 +244,10 @@ function removeRoomMember(troupeId, userId, groupId) {
   assert(troupeId);
   assert(userId);
 
-  return (groupId ? groupMembershipDeltaService.isUserInGroup(userId, groupId, troupeId) : Promise.resolve(false))
+  return (groupId
+    ? groupMembershipDeltaService.isUserInGroup(userId, groupId, troupeId)
+    : Promise.resolve(false)
+  )
     .bind({
       hasOtherMembershipsInGroup: null
     })
@@ -239,10 +255,9 @@ function removeRoomMember(troupeId, userId, groupId) {
       this.hasOtherMembershipsInGroup = hasOtherMembershipsInGroup;
 
       return TroupeUser.findOneAndRemove({
-          troupeId: troupeId,
-          userId: userId
-        })
-        .exec();
+        troupeId: troupeId,
+        userId: userId
+      }).exec();
     })
     .then(function(existing) {
       var removed = !!existing;
@@ -250,19 +265,21 @@ function removeRoomMember(troupeId, userId, groupId) {
       if (!removed) return false;
 
       if (groupId && !this.hasOtherMembershipsInGroup) {
-        roomMembershipEvents.emit("group.members.removed", groupId, [userId]);
+        roomMembershipEvents.emit('group.members.removed', groupId, [userId]);
       }
 
-      roomMembershipEvents.emit("members.removed", troupeId, [userId]);
+      roomMembershipEvents.emit('members.removed', troupeId, [userId]);
 
       // Async record the remove user
-      removedUsers.addRemovedUser(troupeId, userId)
-        .catch(function(err) {
-          errorReporter(err, { troupeId: troupeId, userId: userId }, { module: 'room-membership-service' });
-        });
+      removedUsers.addRemovedUser(troupeId, userId).catch(function(err) {
+        errorReporter(
+          err,
+          { troupeId: troupeId, userId: userId },
+          { module: 'room-membership-service' }
+        );
+      });
 
-      return incrementTroupeUserCount(troupeId, -1)
-        .thenReturn(true);
+      return incrementTroupeUserCount(troupeId, -1).thenReturn(true);
     });
 }
 
@@ -279,7 +296,10 @@ function removeRoomMembers(troupeId, userIds, groupId) {
     assert(userId);
   });
 
-  return (groupId ? groupMembershipDeltaService.checkUsersInGroup(groupId, userIds, troupeId) : Promise.resolve({ }))
+  return (groupId
+    ? groupMembershipDeltaService.checkUsersInGroup(groupId, userIds, troupeId)
+    : Promise.resolve({})
+  )
     .bind({
       groupMembership: null
     })
@@ -287,10 +307,9 @@ function removeRoomMembers(troupeId, userIds, groupId) {
       this.groupMembership = groupMembership;
 
       return TroupeUser.remove({
-          troupeId: troupeId,
-          userId: { $in: mongoUtils.asObjectIDs(userIds) }
-        })
-        .exec();
+        troupeId: troupeId,
+        userId: { $in: mongoUtils.asObjectIDs(userIds) }
+      }).exec();
     })
     .then(function() {
       // Unfortunately we have no way of knowing which of the users
@@ -298,7 +317,7 @@ function removeRoomMembers(troupeId, userIds, groupId) {
       // as we have no transactions.
       //
       // So we assume that ALL the users were actually removed
-      roomMembershipEvents.emit("members.removed", troupeId, userIds);
+      roomMembershipEvents.emit('members.removed', troupeId, userIds);
 
       if (groupId) {
         var groupMembership = this.groupMembership;
@@ -308,15 +327,18 @@ function removeRoomMembers(troupeId, userIds, groupId) {
         });
 
         if (usersNoLongerInGroup.length) {
-          roomMembershipEvents.emit("group.members.removed", groupId, usersNoLongerInGroup);
+          roomMembershipEvents.emit('group.members.removed', groupId, usersNoLongerInGroup);
         }
       }
 
       // Async record the remove user
-      removedUsers.addRemovedUsers(troupeId, userIds)
-        .catch(function(err) {
-          errorReporter(err, { troupeId: troupeId, userIds: userIds }, { module: 'room-membership-service' });
-        });
+      removedUsers.addRemovedUsers(troupeId, userIds).catch(function(err) {
+        errorReporter(
+          err,
+          { troupeId: troupeId, userIds: userIds },
+          { module: 'room-membership-service' }
+        );
+      });
 
       return resetTroupeUserCount(troupeId);
     });
@@ -326,13 +348,14 @@ function removeRoomMembers(troupeId, userIds, groupId) {
  * Returns a list of all room members for an array of rooms
  */
 function findAllMembersForRooms(troupeIds) {
-  if(!troupeIds.length) return Promise.resolve([]);
+  if (!troupeIds.length) return Promise.resolve([]);
   troupeIds.forEach(function(troupeIds) {
     assert(troupeIds);
   });
 
-  return TroupeUser.distinct("userId", { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } })
-    .exec();
+  return TroupeUser.distinct('userId', {
+    troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) }
+  }).exec();
 }
 
 /**
@@ -344,27 +367,34 @@ function findMembersForRoomMulti(troupeIds, options) {
   options = options || {};
   options.read = options.read || mongoReadPrefs.secondaryPreferred;
 
-  if(!troupeIds.length) return Promise.resolve({});
+  if (!troupeIds.length) return Promise.resolve({});
   troupeIds.forEach(function(troupeIds) {
     assert(troupeIds);
   });
 
-  return TroupeUser.find({ troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } }, { _id: 0, troupeId: 1, userId: 1 })
+  return TroupeUser.find(
+    { troupeId: { $in: mongoUtils.asObjectIDs(troupeIds) } },
+    { _id: 0, troupeId: 1, userId: 1 }
+  )
     .read(options.read)
     .exec()
     .then(function(troupeUsers) {
-      return _.reduce(troupeUsers, function(memo, troupeUser) {
-        var troupeId = troupeUser.troupeId;
-        var userId = troupeUser.userId;
+      return _.reduce(
+        troupeUsers,
+        function(memo, troupeUser) {
+          var troupeId = troupeUser.troupeId;
+          var userId = troupeUser.userId;
 
-        if (memo[troupeId]) {
-          memo[troupeId].push(userId);
-        } else {
-          memo[troupeId] = [userId];
-        }
+          if (memo[troupeId]) {
+            memo[troupeId].push(userId);
+          } else {
+            memo[troupeId] = [userId];
+          }
 
-        return memo;
-      }, {});
+          return memo;
+        },
+        {}
+      );
     });
 }
 
@@ -373,7 +403,11 @@ function findMembersForRoomMulti(troupeIds, options) {
  * Returns true when lurking, false when not, null when user is not found
  */
 function getMemberLurkStatus(troupeId, userId) {
-  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+  return TroupeUser.findOne(
+    { troupeId: troupeId, userId: userId },
+    { flags: 1, _id: 0 },
+    { lean: true }
+  )
     .exec()
     .then(function(troupeUser) {
       if (!troupeUser) return null;
@@ -385,108 +419,125 @@ function getMemberLurkStatus(troupeId, userId) {
  * Update the userCount value for a room
  */
 function incrementTroupeUserCount(troupeId, incrementValue) {
-  return Troupe.update({ _id: troupeId }, { $inc: { userCount: incrementValue } })
-    .exec();
+  return Troupe.update({ _id: troupeId }, { $inc: { userCount: incrementValue } }).exec();
 }
 
 function resetTroupeUserCount(troupeId) {
-  return countMembersInRoom(troupeId)
-    .then(function(count) {
-      return Troupe.update({ _id: troupeId }, { $set: { userCount: count } })
-        .exec();
-    });
+  return countMembersInRoom(troupeId).then(function(count) {
+    return Troupe.update({ _id: troupeId }, { $set: { userCount: count } }).exec();
+  });
 }
 
-var getMembershipMode = Promise.method(function (userId, troupeId, strict) {
-  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+var getMembershipMode = Promise.method(function(userId, troupeId, strict) {
+  return TroupeUser.findOne(
+    { troupeId: troupeId, userId: userId },
+    { flags: 1, _id: 0 },
+    { lean: true }
+  )
     .exec()
     .then(function(troupeUser) {
-       if (!troupeUser) return null;
+      if (!troupeUser) return null;
 
-       return roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
+      return roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
     });
 });
 
-var getMembershipDetails = Promise.method(function (userId, troupeId) {
-  return TroupeUser.findOne({ troupeId: troupeId, userId: userId }, { flags: 1, _id: 0 }, { lean: true })
+var getMembershipDetails = Promise.method(function(userId, troupeId) {
+  return TroupeUser.findOne(
+    { troupeId: troupeId, userId: userId },
+    { flags: 1, _id: 0 },
+    { lean: true }
+  )
     .exec()
     .then(function(troupeUser) {
-       if (!troupeUser) return null;
-       var flags = troupeUser.flags;
-       var mode = roomMembershipFlags.getModeFromFlags(flags);
-       var hash = roomMembershipFlags.flagsToHash(flags);
+      if (!troupeUser) return null;
+      var flags = troupeUser.flags;
+      var mode = roomMembershipFlags.getModeFromFlags(flags);
+      var hash = roomMembershipFlags.flagsToHash(flags);
 
-       return {
-         mode: mode,
-         lurk: roomMembershipFlags.getLurkForFlags(flags),
-         flags: flags,
+      return {
+        mode: mode,
+        lurk: roomMembershipFlags.getLurkForFlags(flags),
+        flags: flags,
 
-         unread: hash.unread,
-         activity: hash.activity,
-         mention: hash.mention,
-         announcement: hash.announcement,
-         desktop: hash.desktop,
-         mobile: hash.mobile,
-         default: hash.default
-       };
+        unread: hash.unread,
+        activity: hash.activity,
+        mention: hash.mention,
+        announcement: hash.announcement,
+        desktop: hash.desktop,
+        mobile: hash.mobile,
+        default: hash.default
+      };
     });
 });
 
-var setMembershipFlags = Promise.method(function (userId, troupeId, flags) {
+var setMembershipFlags = Promise.method(function(userId, troupeId, flags) {
   debug('setMembershipFlags userId=%s, troupeId=%s, flags=%s', flags);
-  return TroupeUser.findOneAndUpdate({
+  return TroupeUser.findOneAndUpdate(
+    {
       troupeId: troupeId,
       userId: userId
-    }, roomMembershipFlags.getUpdateForFlags(flags), {
+    },
+    roomMembershipFlags.getUpdateForFlags(flags),
+    {
       new: false
-    })
+    }
+  )
     .exec()
     .then(function(oldTroupeUser) {
-       if (!oldTroupeUser) return false;
+      if (!oldTroupeUser) return false;
 
-       var valueIsLurking = roomMembershipFlags.getLurkForFlags(flags);
-       var oldLurking = roomMembershipFlags.getLurkForFlags(oldTroupeUser.flags);
-       var changed = oldLurking !== valueIsLurking;
+      var valueIsLurking = roomMembershipFlags.getLurkForFlags(flags);
+      var oldLurking = roomMembershipFlags.getLurkForFlags(oldTroupeUser.flags);
+      var changed = oldLurking !== valueIsLurking;
 
-       if (changed) {
-         roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], valueIsLurking);
-       }
+      if (changed) {
+        roomMembershipEvents.emit('members.lurk.change', troupeId, [userId], valueIsLurking);
+      }
 
-       return changed;
+      return changed;
     });
 });
 
-var setMembershipMode = Promise.method(function (userId, troupeId, value, isDefault) {
+var setMembershipMode = Promise.method(function(userId, troupeId, value, isDefault) {
   debug('setMembershipMode userId=%s, troupeId=%s, value=%s', userId, troupeId, value);
-  return TroupeUser.findOneAndUpdate({
+  return TroupeUser.findOneAndUpdate(
+    {
       troupeId: troupeId,
       userId: userId
-    }, roomMembershipFlags.getUpdateForMode(value, isDefault), {
+    },
+    roomMembershipFlags.getUpdateForMode(value, isDefault),
+    {
       new: false
-    })
+    }
+  )
     .exec()
     .then(function(oldTroupeUser) {
-       if (!oldTroupeUser) return false;
+      if (!oldTroupeUser) return false;
 
-       var valueIsLurking = roomMembershipFlags.getLurkForMode(value);
-       var oldLurkValue = roomMembershipFlags.getLurkForFlags(oldTroupeUser.flags);
-       var changed = oldLurkValue !== valueIsLurking;
+      var valueIsLurking = roomMembershipFlags.getLurkForMode(value);
+      var oldLurkValue = roomMembershipFlags.getLurkForFlags(oldTroupeUser.flags);
+      var changed = oldLurkValue !== valueIsLurking;
 
-       if (changed) {
-         roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], valueIsLurking);
-       }
+      if (changed) {
+        roomMembershipEvents.emit('members.lurk.change', troupeId, [userId], valueIsLurking);
+      }
 
-       return changed;
+      return changed;
     });
 });
 
 var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, value, isDefault) {
-  return TroupeUser.update({
+  return TroupeUser.update(
+    {
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    }, roomMembershipFlags.getUpdateForMode(value, isDefault), {
+    },
+    roomMembershipFlags.getUpdateForMode(value, isDefault),
+    {
       multi: true
-    })
+    }
+  )
     .exec()
     .then(function() {
       var valueIsLurking = roomMembershipFlags.getLurkForMode(value);
@@ -495,27 +546,35 @@ var setMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds,
       // were actually removed and which were already out of the collection
       // as we have no transactions.
 
-      roomMembershipEvents.emit("members.lurk.change", troupeId, userIds, valueIsLurking);
+      roomMembershipEvents.emit('members.lurk.change', troupeId, userIds, valueIsLurking);
     });
 });
 
 var findMembershipModeForUsersInRoom = Promise.method(function(troupeId, userIds, strict) {
-  return TroupeUser.find({
+  return TroupeUser.find(
+    {
       troupeId: troupeId,
       userId: { $in: mongoUtils.asObjectIDs(userIds) }
-    }, {
+    },
+    {
       userId: 1,
       flags: 1,
       _id: 0
-    }, {
+    },
+    {
       lean: true
-    })
+    }
+  )
     .exec()
     .then(function(troupeUsers) {
-      return _.reduce(troupeUsers, function(memo, troupeUser) {
-        memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
-        return memo;
-      }, {});
+      return _.reduce(
+        troupeUsers,
+        function(memo, troupeUser) {
+          memo[troupeUser.userId] = roomMembershipFlags.getModeFromFlags(troupeUser.flags, strict);
+          return memo;
+        },
+        {}
+      );
     });
 });
 
@@ -532,7 +591,7 @@ function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, menti
       roomMembershipFlags.FLAG_POS_NOTIFY_ACTIVITY,
       roomMembershipFlags.FLAG_POS_NOTIFY_ANNOUNCEMENT,
       roomMembershipFlags.FLAG_POS_NOTIFY_DESKTOP,
-      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE,
+      roomMembershipFlags.FLAG_POS_NOTIFY_MOBILE
     ];
   } else {
     requiredBits = [
@@ -552,9 +611,9 @@ function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, menti
         { flags: { $bitsAnySet: requiredBits } },
         {
           userId: { $in: mongoUtils.asObjectIDs(mentionUserIds) },
-          flags: { $bitsAnySet: [roomMembershipFlags.FLAG_POS_NOTIFY_MENTION] },
+          flags: { $bitsAnySet: [roomMembershipFlags.FLAG_POS_NOTIFY_MENTION] }
         }
-      ],
+      ]
     };
   } else {
     /* No mentions? Just include the users for notify and possible also announcements */
@@ -562,19 +621,22 @@ function findMembersForRoomForNotify(troupeId, fromUserId, isAnnouncement, menti
       troupeId: troupeId,
       userId: { $ne: fromUserId },
       flags: {
-         $bitsAnySet: requiredBits
+        $bitsAnySet: requiredBits
       }
     };
   }
 
-  return TroupeUser.find(query, {
+  return TroupeUser.find(
+    query,
+    {
       userId: 1,
       flags: 1,
       _id: 0
-    }, {
+    },
+    {
       lean: true
-    })
-    .exec();
+    }
+  ).exec();
 }
 
 function queryForToggles(flagToggles) {
@@ -584,9 +646,9 @@ function queryForToggles(flagToggles) {
   function addToggle(field, bitPosition) {
     var value = flagToggles[field];
     if (value === false) {
-      clearBits = clearBits | 1 << bitPosition;
+      clearBits = clearBits | (1 << bitPosition);
     } else if (value === true) {
-      setBits = setBits | 1 << bitPosition;
+      setBits = setBits | (1 << bitPosition);
     }
   }
 
@@ -627,12 +689,10 @@ function queryForToggles(flagToggles) {
 
 function findMembersForRoomWithFlags(troupeId, flagToggles) {
   return TroupeUser.distinct('userId', {
-      troupeId: troupeId,
-      flags: queryForToggles(flagToggles)
-    })
-    .exec();
+    troupeId: troupeId,
+    flags: queryForToggles(flagToggles)
+  }).exec();
 }
-
 
 function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
   var query = {
@@ -661,32 +721,34 @@ function updateRoomMembershipFlagsForUser(userId, newFlags, overrideAll) {
           return troupeUser.troupeId;
         });
 
-      var troupeIdsForUpdate = troupeUsers
-        .map(function(troupeUser) {
-          return troupeUser.troupeId;
-        });
-
-      return TroupeUser.update({
-        userId: userId,
-        troupeId: { $in: troupeIdsForUpdate }
-      }, {
-        $set: {
-          flags: newFlags
-        }
-      }, {
-        multi: true
+      var troupeIdsForUpdate = troupeUsers.map(function(troupeUser) {
+        return troupeUser.troupeId;
       });
+
+      return TroupeUser.update(
+        {
+          userId: userId,
+          troupeId: { $in: troupeIdsForUpdate }
+        },
+        {
+          $set: {
+            flags: newFlags
+          }
+        },
+        {
+          multi: true
+        }
+      );
     })
     .then(function(result) {
       debug('Updated %s rooms to new default', result.nModified);
       this.roomsWithLurkChange.forEach(function(troupeId) {
-        roomMembershipEvents.emit("members.lurk.change", troupeId, [userId], newDefaultIsLurking);
+        roomMembershipEvents.emit('members.lurk.change', troupeId, [userId], newDefaultIsLurking);
       });
 
       return null;
     });
 }
-
 
 function findRoomIdsForUserMatchingQuery(userId, query) {
   var matchTerms = Object.keys(query).reduce(function(memo, key) {
@@ -695,35 +757,41 @@ function findRoomIdsForUserMatchingQuery(userId, query) {
     return memo;
   }, {});
 
-  return TroupeUser.aggregate([{
-    $match: {
-      userId: mongoUtils.asObjectID(userId)
-    }
-  }, {
-    $project: {
-      _id: "$troupeId"
-    }
-  }, {
-    $lookup: {
+  return TroupeUser.aggregate([
+    {
+      $match: {
+        userId: mongoUtils.asObjectID(userId)
+      }
+    },
+    {
+      $project: {
+        _id: '$troupeId'
+      }
+    },
+    {
+      $lookup: {
         from: 'troupes',
         localField: '_id',
         foreignField: '_id',
         as: 'troupe'
       }
-  }, {
-    $unwind: "$troupe"
-  }, {
-    $match: matchTerms
-  }, {
-    $project: {
-      '_id': 1
+    },
+    {
+      $unwind: '$troupe'
+    },
+    {
+      $match: matchTerms
+    },
+    {
+      $project: {
+        _id: 1
+      }
     }
-  }])
-  .then(function(docs) {
+  ]).then(function(docs) {
     return _.map(docs, function(doc) {
       return doc._id;
-    })
-  })
+    });
+  });
 }
 
 function findPrivateRoomIdsForUser(userId) {

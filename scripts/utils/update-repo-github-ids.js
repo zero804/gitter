@@ -13,11 +13,13 @@ function orgStream() {
   return persistence.Troupe.find(
     {
       githubType: 'REPO',
-      $or: [{ githubId: null}, { githubId: { $exists: false } } ]
-    }, {
+      $or: [{ githubId: null }, { githubId: { $exists: false } }]
+    },
+    {
       uri: 1,
       security: 1
-    })
+    }
+  )
     .lean()
     .stream();
 }
@@ -26,17 +28,16 @@ function updateOrgRoom(room) {
   if (room.uri.indexOf('_test_') === 0) return Promise.resolve();
 
   return Promise.try(function() {
-      if (room.security === 'PUBLIC') {
-        return null;
-      }
+    if (room.security === 'PUBLIC') {
+      return null;
+    }
 
-      return roomMembershipService.findMembersForRoom(room._id, { limit: 1 })
-        .then(function(userIds) {
-          if (userIds.length === 0) return null;
+    return roomMembershipService.findMembersForRoom(room._id, { limit: 1 }).then(function(userIds) {
+      if (userIds.length === 0) return null;
 
-          return userService.findById(userIds[0]);
-        });
-    })
+      return userService.findById(userIds[0]);
+    });
+  })
     .then(function(userId) {
       var repoService = new GitHubRepoService(userId);
       return repoService.getRepo(room.uri);
@@ -52,8 +53,8 @@ function performMigration() {
   return new Promise(function(resolve) {
     var count = 0;
     orgStream()
-      .pipe(through2Concurrent.obj({ maxConcurrency: 6 },
-        function (room, enc, callback) {
+      .pipe(
+        through2Concurrent.obj({ maxConcurrency: 6 }, function(room, enc, callback) {
           var self = this;
           return updateOrgRoom(room)
             .then(function() {
@@ -63,15 +64,15 @@ function performMigration() {
               console.log(err);
             })
             .nodeify(callback);
-
-      }))
+        })
+      )
       .on('data', function() {
         count++;
         if (count % 100 === 0) {
           console.log('Completed ', count);
         }
       })
-      .on('end', function () {
+      .on('end', function() {
         console.log('DONE');
         resolve();
       });
