@@ -13,7 +13,7 @@ var PermissionsViewModel = Backbone.Model.extend({
       linkPath: undefined,
       public: undefined,
       externalId: undefined,
-      internalId: undefined,
+      internalId: undefined
       //extraAdmins: see `adminCollection`
       //extraMembers: NA
     },
@@ -25,7 +25,9 @@ var PermissionsViewModel = Backbone.Model.extend({
     options = options || {};
 
     this.groupCollection = options.groupCollection || new Backbone.Collection([]);
-    this.adminCollection = new Backbone.Collection(options.adminCollection ? options.adminCollection.models : []);
+    this.adminCollection = new Backbone.Collection(
+      options.adminCollection ? options.adminCollection.models : []
+    );
     this.adminCollection.sync = SyncMixin.sync;
   },
 
@@ -35,7 +37,7 @@ var PermissionsViewModel = Backbone.Model.extend({
     var sd = this.get('securityDescriptor');
     var requestingSecurityDescriptorStatus = this.get('requestingSecurityDescriptorStatus');
 
-    if(sd && !sd.type && this.adminCollection.length === 0) {
+    if (sd && !sd.type && this.adminCollection.length === 0) {
       errors.push({
         key: 'extra-admins',
         message: 'At least one admin needs to be added when manual type set.'
@@ -43,7 +45,9 @@ var PermissionsViewModel = Backbone.Model.extend({
     }
 
     // If the original SD hasn't been spliced into our data, then it's a no-go
-    if(requestingSecurityDescriptorStatus !== requestingSecurityDescriptorStatusConstants.COMPLETE) {
+    if (
+      requestingSecurityDescriptorStatus !== requestingSecurityDescriptorStatusConstants.COMPLETE
+    ) {
       errors.push({
         key: 'security-descriptor',
         message: 'Security descriptor needs to sync before submission.'

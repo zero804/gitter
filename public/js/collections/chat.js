@@ -24,7 +24,6 @@ var ChatModel = Backbone.Model.extend({
     this.listenTo(this, 'remove', function() {
       this.stopListening(this);
     });
-
   },
 
   triggerSynced: function() {
@@ -84,7 +83,7 @@ var ChatModel = Backbone.Model.extend({
     return !!this._syncErrorTime;
   },
 
-  sync: SyncMixin.sync,
+  sync: SyncMixin.sync
 });
 
 var ChatCollection = LiveCollection.extend({
@@ -165,7 +164,7 @@ var ChatCollection = LiveCollection.extend({
 
   parse: function(collection) {
     if (collection.lookups) {
-      var chats = lookupParser.parseChats(collection)
+      var chats = lookupParser.parseChats(collection);
       return burstCalculator.parse(chats);
     } else {
       return burstCalculator.parse(collection);
@@ -192,12 +191,12 @@ var ChatCollection = LiveCollection.extend({
     }
   },
 
-  sync: SyncMixin.sync,
+  sync: SyncMixin.sync
 });
 cocktail.mixin(ChatCollection, InfiniteCollectionMixin);
 
 var ReadByModel = Backbone.Model.extend({
-  idAttribute: 'id',
+  idAttribute: 'id'
 });
 
 var ReadByCollection = LiveCollection.extend({
@@ -213,7 +212,8 @@ var ReadByCollection = LiveCollection.extend({
     return new Backbone.Model({ troupeId: context.getTroupeId(), chatId: this.chatMessageId });
   },
 
-  initialize: function(models, options) { // jshint unused:true
+  initialize: function(models, options) {
+    // jshint unused:true
     var userCollection = options.userCollection;
     if (userCollection) {
       this.transformModel = function(model) {
@@ -228,12 +228,12 @@ var ReadByCollection = LiveCollection.extend({
     this.chatMessageId = options.chatMessageId;
   },
 
-  sync: SyncMixin.sync,
+  sync: SyncMixin.sync
 });
 
 module.exports = {
   ReadByModel: ReadByModel,
   ReadByCollection: ReadByCollection,
   ChatModel: ChatModel,
-  ChatCollection: ChatCollection,
+  ChatCollection: ChatCollection
 };

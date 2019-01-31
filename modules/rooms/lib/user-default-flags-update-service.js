@@ -14,12 +14,15 @@ function updateDefaultModeForUser(user, mode, overrideExistingValues) {
   var userId = user._id;
 
   // First, update the user...
-  return userDefaultFlagsService.setDefaultFlagsForUserId(userId, newDefaultFlags)
-    .then(function() {
-      user.defaultFlags = newDefaultFlags;
-      // Now, update the rooms
-      return roomMembershipService.updateRoomMembershipFlagsForUser(userId, newDefaultFlags, overrideExistingValues);
-    });
+  return userDefaultFlagsService.setDefaultFlagsForUserId(userId, newDefaultFlags).then(function() {
+    user.defaultFlags = newDefaultFlags;
+    // Now, update the rooms
+    return roomMembershipService.updateRoomMembershipFlagsForUser(
+      userId,
+      newDefaultFlags,
+      overrideExistingValues
+    );
+  });
 }
 
 exports.updateDefaultModeForUser = Promise.method(updateDefaultModeForUser);

@@ -1,9 +1,7 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 
 module.exports = (function() {
-
-
   var hash = {};
 
   Marionette.Behaviors.behaviorsLookup = function() {
@@ -15,7 +13,4 @@ module.exports = (function() {
       hash[name] = behaviour;
     }
   };
-
-
 })();
-

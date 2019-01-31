@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../utils/context');
 var realtime = require('./realtime');
@@ -11,10 +11,10 @@ var templateSubscription = realtime.getClient().subscribeTemplate({
   urlTemplate: '/v1/rooms/:troupeId',
   contextModel: context.contextModel(),
   onMessage: function(message) {
-    if(message.notification === 'presence') {
-      if(message.status === 'in') {
+    if (message.notification === 'presence') {
+      if (message.status === 'in') {
         appEvents.trigger('userLoggedIntoTroupe', message);
-      } else if(message.status === 'out') {
+      } else if (message.status === 'out') {
         appEvents.trigger('userLoggedOutOfTroupe', message);
       }
     }

@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 var roomService = require('gitter-web-rooms');
-var restSerializer = require("../../../serializers/rest-serializer");
+var restSerializer = require('../../../serializers/rest-serializer');
 var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
 
@@ -9,11 +9,10 @@ module.exports = {
   id: 'troupeBan',
 
   index: function(req) {
-    return loadTroupeFromParam(req)
-      .then(function(troupe) {
-        var strategy = new restSerializer.TroupeBanStrategy({ });
-        return restSerializer.serialize(troupe.bans, strategy);
-      });
+    return loadTroupeFromParam(req).then(function(troupe) {
+      var strategy = new restSerializer.TroupeBanStrategy({});
+      return restSerializer.serialize(troupe.bans, strategy);
+    });
   },
 
   create: function(req, res) {
@@ -33,13 +32,13 @@ module.exports = {
           };
         }
 
-        var strategy = new restSerializer.TroupeBanStrategy({ });
+        var strategy = new restSerializer.TroupeBanStrategy({});
         return restSerializer.serializeObject(ban, strategy);
       });
   },
 
   show: function(req) {
-    var strategy = new restSerializer.TroupeBanStrategy({ });
+    var strategy = new restSerializer.TroupeBanStrategy({});
     return restSerializer.serializeObject(req.troupeBan, strategy);
   },
 
@@ -57,5 +56,4 @@ module.exports = {
   load: function(req, id) {
     return roomService.findBanByUsername(req.params.troupeId, id);
   }
-
 };

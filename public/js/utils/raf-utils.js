@@ -35,7 +35,7 @@ function intervalUntil(fn, ms) {
   function next() {
     fn();
 
-    if(Date.now() < until) {
+    if (Date.now() < until) {
       raf(next);
     }
   }

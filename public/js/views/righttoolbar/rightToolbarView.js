@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
@@ -19,27 +19,27 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       repo_info: { el: '#repo-info', init: 'initRepo_infoRegion' },
-      activity:  { el: '#activity-region', init: 'initActivityRegion' },
-      roster:    { el: '#people-roster', init: 'initRosterRegion' },
+      activity: { el: '#activity-region', init: 'initActivityRegion' },
+      roster: { el: '#people-roster', init: 'initRosterRegion' }
     }
   },
 
   ui: {
-    header:         '#toolbar-top-content',
-    footer:         '#zendesk-footer',
-    rosterHeader:   '#people-header',
+    header: '#toolbar-top-content',
+    footer: '#zendesk-footer',
+    rosterHeader: '#people-header',
     repoInfoHeader: '#info-header',
     toggleIcon: '.js-menu-toggle-icon'
   },
 
   events: {
-    'click #upgrade-auth':  'onUpgradeAuthClick',
+    'click #upgrade-auth': 'onUpgradeAuthClick',
     'click #people-header': 'showPeopleList',
-    'click #info-header':   'showRepoInfo',
-    'submit #upload-form':  'upload',
+    'click #info-header': 'showRepoInfo',
+    'submit #upload-form': 'upload',
     'click @ui.toggleIcon': 'toggleMenu',
     'mouseenter @ui.toggleIcon': 'toggleMenuEnter',
-    'mouseleave @ui.toggleIcon': 'toggleMenuLeave',
+    'mouseleave @ui.toggleIcon': 'toggleMenuLeave'
   },
 
   childEvents: {
@@ -54,35 +54,41 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     'change:isPinned': 'onPanelPinStateChange'
   },
 
-  constructor: function (){
+  constructor: function() {
     this.collection = itemCollections.roster;
     Marionette.LayoutView.prototype.constructor.apply(this, arguments);
   },
 
-  initialize: function (attrs) {
-    this.iconOpts = _.extend({}, this.defaults, (attrs.icon || {}));
+  initialize: function(attrs) {
+    this.iconOpts = _.extend({}, this.defaults, attrs.icon || {});
     this.iconHover = false;
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
   },
 
   initRepo_infoRegion: function(optionsForRegion) {
     // Repo info
-    return new RepoInfoView(optionsForRegion({
-      model: new RepoInfoModel(),
-      roomModel: context.troupe()
-    }));
+    return new RepoInfoView(
+      optionsForRegion({
+        model: new RepoInfoModel(),
+        roomModel: context.troupe()
+      })
+    );
   },
 
   initActivityRegion: function(optionsForRegion) {
-    return new ActivityCompositeView(optionsForRegion({
-      collection: itemCollections.events
-    }));
+    return new ActivityCompositeView(
+      optionsForRegion({
+        collection: itemCollections.events
+      })
+    );
   },
 
   initRosterRegion: function(optionsForRegion) {
-    return new PeopleCollectionView.ExpandableRosterView(optionsForRegion({
-      rosterCollection: itemCollections.roster
-    }));
+    return new PeopleCollectionView.ExpandableRosterView(
+      optionsForRegion({
+        rosterCollection: itemCollections.roster
+      })
+    );
   },
 
   onPanelPinStateChange: function() {
@@ -111,34 +117,33 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     this.ui.repoInfoHeader.toggleClass('hidden', !visible);
 
     //move back to the people list if we are showing repo info for a non repo room
-    if(this.ui.repoInfoHeader.hasClass('selected') && !visible) {
+    if (this.ui.repoInfoHeader.hasClass('selected') && !visible) {
       this.showPeopleList();
     }
   },
 
-  onCollectionUpdate: function (){
+  onCollectionUpdate: function() {
     var peopleList = this.$el.find('#people-list');
     peopleList.toggleClass('hidden', !this.collection.length);
   },
 
-  toggleMenu: function(){
+  toggleMenu: function() {
     this.model.set('isPinned', !this.model.get('isPinned'));
   },
 
-  getPinnedState: function(){
+  getPinnedState: function() {
     return !!this.model.get('isPinned');
   },
 
-  toggleMenuEnter: function(){
+  toggleMenuEnter: function() {
     this.iconHover = true;
     this.deflectArms();
   },
 
-  toggleMenuLeave: function(){
+  toggleMenuLeave: function() {
     this.iconHover = false;
     this.deflectArms();
   }
-
 });
 
 cocktail.mixin(RightToolbarLayout, closeViewMixin);

@@ -27,18 +27,15 @@ var opts = require('yargs')
     description: 'Output'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 let buildPath;
-if(opts.android) {
+if (opts.android) {
   buildPath = 'output/android/www/';
-}
-else if(opts.ios) {
+} else if (opts.ios) {
   buildPath = 'output/ios/www/';
-}
-else {
-  throw new Error('Please define the --android of --ios args when running the embedded build')
+} else {
+  throw new Error('Please define the --android of --ios args when running the embedded build');
 }
 
 /**
@@ -53,38 +50,45 @@ gulp.task('embedded:compile', [
 
 // We also copy files after the CSS is compiled in `embedded:post-compile:copy-linked-assets`
 gulp.task('clientapp:compile:copy-files', function() {
-  return gulp.src([
-      'public/images/emoji/*',
-      // 'public/sprites/**',
-      'public/repo/katex/**',
-    ], {
-      base: './public',
-      stat: true
-    })
+  return gulp
+    .src(
+      [
+        'public/images/emoji/*',
+        // 'public/sprites/**',
+        'public/repo/katex/**'
+      ],
+      {
+        base: './public',
+        stat: true
+      }
+    )
     .pipe(gulp.dest(buildPath));
 });
 
 gulp.task('embedded:compile:markup', function() {
   const args = [
     path.join(__dirname, './render-embedded-chat.js'),
-    '--output', path.join(buildPath, 'mobile/embedded-chat.html'),
+    '--output',
+    path.join(buildPath, 'mobile/embedded-chat.html')
   ];
-  if(opts.android) {
+  if (opts.android) {
     args.push('--android');
   }
-  if(opts.ios) {
+  if (opts.ios) {
     args.push('--ios');
   }
 
-  return childProcessPromise.spawn('node', args, Object.assign({}, process.env, {
-    // Default to prod config
-    NODE_ENV: process.env.NODE_ENV || 'prod'
-  }));
+  return childProcessPromise.spawn(
+    'node',
+    args,
+    Object.assign({}, process.env, {
+      // Default to prod config
+      NODE_ENV: process.env.NODE_ENV || 'prod'
+    })
+  );
 });
 
-const cssIosStyleBuilder = styleBuilder([
-  'public/less/mobile-native-chat.less'
-], {
+const cssIosStyleBuilder = styleBuilder(['public/less/mobile-native-chat.less'], {
   dest: path.join(buildPath, 'styles'),
   watchGlob: 'public/**/*.less',
   sourceMapOptions: getSourceMapOptions(),
@@ -95,15 +99,16 @@ const cssIosStyleBuilder = styleBuilder([
     }
   },
   streamTransform: function(stream) {
-    return stream
-      .pipe(postcss([
+    return stream.pipe(
+      postcss([
         autoprefixer({
           browsers: ['ios_saf >= 6'],
           cascade: false
         }),
         mqpacker,
         csswring
-      ]));
+      ])
+    );
   }
 });
 
@@ -113,7 +118,8 @@ gulp.task('embedded:compile:css', function() {
 
 /* Generate embedded native */
 gulp.task('embedded:compile:webpack', ['clientapp:compile:copy-files'], function() {
-  return gulp.src('./public/js/webpack-mobile-native.config')
+  return gulp
+    .src('./public/js/webpack-mobile-native.config')
     .pipe(webpack(require('../public/js/webpack-mobile-native.config')))
     .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
@@ -124,24 +130,25 @@ gulp.task('embedded:post-compile', [
 ]);
 
 gulp.task('embedded:post-compile:uglify', function() {
-  return gulp.src(path.join(buildPath, 'js/*.js'))
+  return gulp
+    .src(path.join(buildPath, 'js/*.js'))
     .pipe(uglify())
     .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 
 gulp.task('embedded:post-compile:copy-linked-assets', function() {
   return Promise.all([
-    extractUrls(path.join(buildPath, 'styles/mobile-native-chat.css'), buildPath),
-  ])
-    .then((resourceLists) => {
-      const resourceList = resourceLists.reduce((list, resultantList) => {
-        return resultantList.concat(list);
-      }, []);
+    extractUrls(path.join(buildPath, 'styles/mobile-native-chat.css'), buildPath)
+  ]).then(resourceLists => {
+    const resourceList = resourceLists.reduce((list, resultantList) => {
+      return resultantList.concat(list);
+    }, []);
 
-      return gulp.src(resourceList, {
-          base: './public',
-          stat: true
-        })
-        .pipe(gulp.dest(buildPath));
-    })
+    return gulp
+      .src(resourceList, {
+        base: './public',
+        stat: true
+      })
+      .pipe(gulp.dest(buildPath));
+  });
 });

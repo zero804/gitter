@@ -22,7 +22,7 @@ SecurityDescriptorService.prototype.findById = function(id, userId) {
     'sd.public': 1,
     'sd.linkPath': 1,
     'sd.externalId': 1,
-    'sd.internalId': 1,
+    'sd.internalId': 1
   };
 
   if (userId) {
@@ -54,8 +54,8 @@ SecurityDescriptorService.prototype.findById = function(id, userId) {
 SecurityDescriptorService.prototype.findByIdAll = function(id) {
   var projection = {
     _id: 0,
-    'sd': 1,
-    'bans': 1
+    sd: 1,
+    bans: 1
   };
 
   return this.Model.findById(id, projection, { lean: true })
@@ -74,15 +74,14 @@ SecurityDescriptorService.prototype.findByIdAll = function(id) {
 
 SecurityDescriptorService.prototype.findByIdsSelect = function(ids, select) {
   var projection = {
-    _id: 1,
+    _id: 1
   };
 
   Object.keys(select).forEach(function(key) {
     projection['sd.' + key] = select[key];
-  })
+  });
 
-  return this.Model.find({ _id: { $in: ids } }, projection, { lean: true })
-    .exec();
+  return this.Model.find({ _id: { $in: ids } }, projection, { lean: true }).exec();
 };
 
 SecurityDescriptorService.prototype.findExtraAdmins = function findExtraAdminsForModel(id) {
@@ -110,50 +109,58 @@ SecurityDescriptorService.prototype.addExtraAdmin = function(id, userId) {
   return checkUsersValid([userId])
     .bind(this)
     .then(function() {
-      return this.Model.update({ _id: id }, {
+      return this.Model.update(
+        { _id: id },
+        {
           $addToSet: {
             'sd.extraAdmins': userId
           }
-        }, {
+        },
+        {
           new: false,
           select: {
             _id: 0,
             'sd.extraAdmins': 1
           }
-        })
-        .exec();
+        }
+      ).exec();
     })
     .then(function(result) {
       return result && result.nModified === 1;
-    })
+    });
 };
 
 SecurityDescriptorService.prototype.removeExtraAdmin = function(id, userId) {
   assert(userId, 'userId required');
   userId = mongoUtils.asObjectID(userId);
 
-  return this.Model.update({ _id: id }, {
+  return this.Model.update(
+    { _id: id },
+    {
       $pullAll: {
         'sd.extraAdmins': [userId]
       }
-    }, {
+    },
+    {
       new: false,
       select: {
         _id: 0,
         'sd.extraAdmins': 1
       }
-    })
+    }
+  )
     .exec()
     .then(function(result) {
       return result && result.nModified === 1;
-    })
-}
-
+    });
+};
 
 SecurityDescriptorService.prototype.updateSecurityDescriptor = function(id, sd) {
   securityDescriptorWriteValidator(sd);
 
-  return this.Model.findByIdAndUpdate(id, {
+  return this.Model.findByIdAndUpdate(
+    id,
+    {
       $set: {
         'sd.type': sd.type,
         'sd.members': sd.members,
@@ -163,27 +170,28 @@ SecurityDescriptorService.prototype.updateSecurityDescriptor = function(id, sd) 
         'sd.externalId': sd.externalId,
         'sd.internalId': sd.internalId,
         'sd.extraMembers': sd.extraMembers,
-        'sd.extraAdmins': sd.extraAdmins,
+        'sd.extraAdmins': sd.extraAdmins
       }
-    }, {
+    },
+    {
       setDefaultsOnInsert: false,
       runValidators: false,
       upsert: false,
       new: true
-    })
+    }
+  )
     .exec()
     .then(function(doc) {
       return doc && doc.sd;
-    })
-}
+    });
+};
 
 function checkUsersValid(userIds) {
-  return User.count({ _id: { $in: userIds } })
-    .then(function(count) {
-      if (count !== userIds.length) {
-        throw new StatusError(400, 'Invalid user');
-      }
-    });
+  return User.count({ _id: { $in: userIds } }).then(function(count) {
+    if (count !== userIds.length) {
+      throw new StatusError(400, 'Invalid user');
+    }
+  });
 }
 
 function validateExtraAdmins(existingType, newType, extraAdmins) {
@@ -193,7 +201,7 @@ function validateExtraAdmins(existingType, newType, extraAdmins) {
     }
   } else {
     if (newType === null) {
-      if (!extraAdmins.length) throw new StatusError(400, 'Cannot have an empty extraAdmins list')
+      if (!extraAdmins.length) throw new StatusError(400, 'Cannot have an empty extraAdmins list');
     }
   }
 
@@ -230,9 +238,9 @@ SecurityDescriptorService.prototype.update = function(id, update, options) {
 
       return this.updateSecurityDescriptor(id, newSd);
     });
-}
+};
 
 module.exports = {
   room: new SecurityDescriptorService(persistence.Troupe),
-  group: new SecurityDescriptorService(persistence.Group),
-}
+  group: new SecurityDescriptorService(persistence.Group)
+};

@@ -3,7 +3,8 @@
 var store = require('../components/local-store');
 
 module.exports = {
-  sync: function(method, model, options) {//jshint unused: true
+  sync: function(method, model, options) {
+    //jshint unused: true
 
     var attrs;
 
@@ -15,12 +16,14 @@ module.exports = {
 
     //read
     attrs = store.get(this.cid);
-    if(!attrs) { return }
-    attrs = (attrs || '{}');
+    if (!attrs) {
+      return;
+    }
+    attrs = attrs || '{}';
     attrs = JSON.parse(attrs);
 
     model.set(attrs);
 
-    if(options.success) options.success();
-  },
+    if (options.success) options.success();
+  }
 };

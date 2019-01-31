@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
@@ -13,21 +13,21 @@ var roomService = require('../lib/room-service');
 describe('user-default-flags-update-service', function() {
   describe('#slow', function() {
     var fixture = fixtureLoader.setup({
-      user1: { },
-      user2: { },
-      user3: { },
+      user1: {},
+      user2: {},
+      user3: {},
       troupe1: {
         security: 'PUBLIC',
-        githubType: 'USER_CHANNEL',
+        githubType: 'USER_CHANNEL'
       },
       troupe2: {
         security: 'PUBLIC',
-        githubType: 'USER_CHANNEL',
+        githubType: 'USER_CHANNEL'
       },
       troupe3: {
         security: 'PUBLIC',
-        githubType: 'USER_CHANNEL',
-      },
+        githubType: 'USER_CHANNEL'
+      }
     });
 
     describe('updateDefaultModeForUser', function() {
@@ -37,7 +37,8 @@ describe('user-default-flags-update-service', function() {
         var userId1 = user1._id;
         var troupeId1 = troupe1._id;
 
-        return roomMembershipService.removeRoomMembers(troupeId1, [userId1])
+        return roomMembershipService
+          .removeRoomMembers(troupeId1, [userId1])
           .then(function() {
             return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'mute');
           })
@@ -48,7 +49,7 @@ describe('user-default-flags-update-service', function() {
             var mode = roomMembershipFlags.getModeFromFlags(flags);
             assert(mode, 'mute');
 
-            return roomService.joinRoom(troupe1, user1, { });
+            return roomService.joinRoom(troupe1, user1, {});
           })
           .then(function() {
             return roomMembershipService.getMembershipDetails(userId1, troupeId1);
@@ -66,14 +67,28 @@ describe('user-default-flags-update-service', function() {
         var troupeId3 = fixture.troupe3._id;
 
         return Promise.join(
-            roomMembershipService.removeRoomMembers(troupeId1, [userId1]),
-            roomMembershipService.removeRoomMembers(troupeId2, [userId1]),
-            roomMembershipService.removeRoomMembers(troupeId3, [userId1]))
+          roomMembershipService.removeRoomMembers(troupeId1, [userId1]),
+          roomMembershipService.removeRoomMembers(troupeId2, [userId1]),
+          roomMembershipService.removeRoomMembers(troupeId3, [userId1])
+        )
           .then(function() {
             return Promise.join(
-                roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.getFlagsForMode('all', true)),
-                roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.getFlagsForMode('announcement', true)),
-                roomMembershipService.addRoomMember(troupeId3, userId1, roomMembershipFlags.getFlagsForMode('mute', true)));
+              roomMembershipService.addRoomMember(
+                troupeId1,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('all', true)
+              ),
+              roomMembershipService.addRoomMember(
+                troupeId2,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('announcement', true)
+              ),
+              roomMembershipService.addRoomMember(
+                troupeId3,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('mute', true)
+              )
+            );
           })
           .then(function() {
             return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'mute', false); // Only override defaults
@@ -87,7 +102,8 @@ describe('user-default-flags-update-service', function() {
                 assert.strictEqual(d1.mode, 'mute');
                 assert.strictEqual(d2.mode, 'mute');
                 assert.strictEqual(d3.mode, 'mute');
-              });
+              }
+            );
           });
       });
 
@@ -99,14 +115,28 @@ describe('user-default-flags-update-service', function() {
         var troupeId3 = fixture.troupe3._id;
 
         return Promise.join(
-            roomMembershipService.removeRoomMembers(troupeId1, [userId1]),
-            roomMembershipService.removeRoomMembers(troupeId2, [userId1]),
-            roomMembershipService.removeRoomMembers(troupeId3, [userId1]))
+          roomMembershipService.removeRoomMembers(troupeId1, [userId1]),
+          roomMembershipService.removeRoomMembers(troupeId2, [userId1]),
+          roomMembershipService.removeRoomMembers(troupeId3, [userId1])
+        )
           .then(function() {
             return Promise.join(
-                roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.getFlagsForMode('all', false)),
-                roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.getFlagsForMode('announcement', false)),
-                roomMembershipService.addRoomMember(troupeId3, userId1, roomMembershipFlags.getFlagsForMode('mute', false)));
+              roomMembershipService.addRoomMember(
+                troupeId1,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('all', false)
+              ),
+              roomMembershipService.addRoomMember(
+                troupeId2,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('announcement', false)
+              ),
+              roomMembershipService.addRoomMember(
+                troupeId3,
+                userId1,
+                roomMembershipFlags.getFlagsForMode('mute', false)
+              )
+            );
           })
           .then(function() {
             return userDefaultFlagsUpdateService.updateDefaultModeForUser(user1, 'mute', false); // Only override defaults
@@ -120,12 +150,10 @@ describe('user-default-flags-update-service', function() {
                 assert.strictEqual(d1.mode, 'all');
                 assert.strictEqual(d2.mode, 'announcement');
                 assert.strictEqual(d3.mode, 'mute');
-              });
+              }
+            );
           });
       });
-
     });
-
   });
-
 });

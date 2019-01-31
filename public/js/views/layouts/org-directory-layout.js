@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 
@@ -17,9 +17,11 @@ var OrgDirectoryLayout = Marionette.LayoutView.extend({
   },
 
   initHeaderView: function(optionsForRegion) {
-    this.headerView = new HeaderView(optionsForRegion({
-      model: this.group
-    }));
+    this.headerView = new HeaderView(
+      optionsForRegion({
+        model: this.group
+      })
+    );
     return this.headerView;
   },
 
@@ -27,6 +29,5 @@ var OrgDirectoryLayout = Marionette.LayoutView.extend({
     this.group = options.group;
   }
 });
-
 
 module.exports = OrgDirectoryLayout;

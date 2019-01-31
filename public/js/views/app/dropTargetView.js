@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 
@@ -34,23 +34,25 @@ var DropTargetView = Marionette.ItemView.extend({
   },
 
   events: {
-    'paste': 'handlePaste',
-    'dragenter': 'onDragEnter',
-    'dragleave': 'onDragLeave',
-    'dragover': 'onDragOver',
-    'drop': 'onDrop'
+    paste: 'handlePaste',
+    dragenter: 'onDragEnter',
+    dragleave: 'onDragLeave',
+    dragover: 'onDragOver',
+    drop: 'onDrop'
   },
 
   /**
    * IMPORTANT: when dragging moving over child nodes will cause dragenter and dragleave, so we need to keep this count, if it's zero means that we should hide the overlay. WC.
    */
-   dragCounter: 0,
+  dragCounter: 0,
 
   updateProgressBar: function(spec) {
     var bar = this.ui.progressBar;
     var value = spec.value && spec.value.toFixed(0) + '%';
     var timeout = spec.timeout || 200;
-    setTimeout(function() { bar.css('width', value); }, timeout);
+    setTimeout(function() {
+      bar.css('width', value);
+    }, timeout);
   },
 
   resetProgressBar: function() {
@@ -62,7 +64,10 @@ var DropTargetView = Marionette.ItemView.extend({
   },
 
   handleUploadProgress: function(done, expected) {
-    this.updateProgressBar({ value: PROGRESS_THRESHOLD + (done/expected) * (100 - PROGRESS_THRESHOLD), timeout: 0 });
+    this.updateProgressBar({
+      value: PROGRESS_THRESHOLD + (done / expected) * (100 - PROGRESS_THRESHOLD),
+      timeout: 0
+    });
   },
 
   handleUploadStart: function() {
@@ -81,7 +86,7 @@ var DropTargetView = Marionette.ItemView.extend({
   handleUploadError: function(err) {
     appEvents.triggerParent('user_notification', {
       title: 'Error Uploading File',
-      text:  err.message
+      text: err.message
     });
     this.resetProgressBar();
   },
@@ -218,13 +223,16 @@ var DropTargetView = Marionette.ItemView.extend({
     }
 
     formData.append('numberOfFiles', files.length);
-    apiClient.priv.get('/generate-signature', {
-        room_uri: context.troupe().get('oneToOne') ? context.user().get('username') : context.troupe().get('uri'),
+    apiClient.priv
+      .get('/generate-signature', {
+        room_uri: context.troupe().get('oneToOne')
+          ? context.user().get('username')
+          : context.troupe().get('uri'),
         room_id: context.getTroupeId(),
         type: this.getFileType(files)
       })
       .then(function(res) {
-        formData.append("signature", res.sig);
+        formData.append('signature', res.sig);
 
         var form = self.ui.uploadForm;
         form.find('input[name="params"]').attr('value', res.params);

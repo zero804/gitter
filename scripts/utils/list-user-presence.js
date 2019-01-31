@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -13,15 +13,15 @@ var shutdown = require('shutdown');
 var opts = require('yargs')
   .option('username', {
     required: true,
-    description: "username of user to list presence for",
+    description: 'username of user to list presence for',
     string: true
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var sockets;
-userService.findByUsername(opts.username)
+userService
+  .findByUsername(opts.username)
   .then(function(user) {
     return presence.listAllSocketsForUser(user.id);
   })
@@ -32,7 +32,7 @@ userService.findByUsername(opts.username)
     //console.log(_sockets);
     sockets = _.sortBy(_.values(_sockets), 'createdTime');
     var troupeIds = _.pluck(sockets, 'troupeId');
-    return troupeService.findByIdsLean(troupeIds, {uri: 1});
+    return troupeService.findByIdsLean(troupeIds, { uri: 1 });
   })
   .then(function(troupes) {
     // just modify it in place

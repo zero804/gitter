@@ -12,11 +12,11 @@ require('../../../behaviors/highlight');
 
 module.exports = SecondaryCollectionItemView.extend({
   behaviors: {
-      Highlight: {},
+    Highlight: {}
   },
   className: 'room-item--search-message',
   triggers: {
-    click: 'item:activated',
+    click: 'item:activated'
   },
   template: searchTemplate,
   serializeData: function() {
@@ -31,13 +31,13 @@ module.exports = SecondaryCollectionItemView.extend({
       }
     }
 
-    return (!!data && data.fromUser) ?
-      _.extend({}, SecondaryCollectionItemView.prototype.serializeData.apply(this, arguments), {
-        userUrl:         urlJoin(clientEnv.basePath, data.fromUser.url),
-        userDisplayName: data.fromUser.displayName,
-        sent:            moment(data.sent).format('MMM Do LT'),
-        permalink:       permalink
-      }) :
-      data;
-  },
+    return !!data && data.fromUser
+      ? _.extend({}, SecondaryCollectionItemView.prototype.serializeData.apply(this, arguments), {
+          userUrl: urlJoin(clientEnv.basePath, data.fromUser.url),
+          userDisplayName: data.fromUser.displayName,
+          sent: moment(data.sent).format('MMM Do LT'),
+          permalink: permalink
+        })
+      : data;
+  }
 });

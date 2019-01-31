@@ -18,9 +18,9 @@ describe('create-github-room-api', function() {
   );
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -34,8 +34,7 @@ describe('create-github-room-api', function() {
     },
     user1: '#integrationUser1',
     user2: '#integrationCollabUser1',
-    group1: {
-    },
+    group1: {},
     troupe1: {
       security: 'PUBLIC',
       users: ['user1'],
@@ -62,8 +61,6 @@ describe('create-github-room-api', function() {
           })
           .set('x-access-token', fixture.user1.accessToken)
           .expect(200);
-      })
-  })
-
-
-})
+      });
+  });
+});

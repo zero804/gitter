@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -11,58 +11,61 @@ const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTim
 
 /* Magic way of figuring out the matching terms so that we can highlight */
 function extractHighlights(text) {
-  if(!text) return [];
+  if (!text) return [];
   var results = [];
   text.forEach(function(t) {
     var re = /<m(\d)>(.*?)<\/m\1>/g;
     var match;
-    while((match = re.exec(t)) !== null) {
+    while ((match = re.exec(t)) !== null) {
       results[match[1]] = match[2];
     }
   });
 
-  return results.filter(function(f) { return !!f; });
+  return results.filter(function(f) {
+    return !!f;
+  });
 }
 
 function getElasticSearchQuery(troupeId, parsedQuery) {
   var query = {
     bool: {
-      must: [{
-        term: { toTroupeId: String(troupeId) }
-      }],
+      must: [
+        {
+          term: { toTroupeId: String(troupeId) }
+        }
+      ],
       should: []
     }
   };
 
-  if(parsedQuery.fromUser) {
+  if (parsedQuery.fromUser) {
     query.bool.must.push({
       has_parent: {
-        parent_type: "user",
+        parent_type: 'user',
         query: {
           query_string: {
             query: parsedQuery.fromUser,
-            default_operator: "AND"
+            default_operator: 'AND'
           }
         }
       }
     });
   }
 
-  if(parsedQuery.queryString) {
+  if (parsedQuery.queryString) {
     parsedQuery.analyzers.forEach(function(analyzer) {
       query.bool.should.push({
         query_string: {
-          default_field: "text",
+          default_field: 'text',
           query: parsedQuery.queryString,
           analyzer: analyzer,
-          default_operator: "AND"
+          default_operator: 'AND'
         }
       });
     });
 
     query.bool.minimum_should_match = 1;
   }
-
 
   return query;
 }
@@ -77,29 +80,27 @@ function searchRoom(troupeId, parsedQuery, options) {
     index: 'gitter-primary',
     type: 'chat',
     body: {
-      fields: ["_id"],
+      fields: ['_id'],
       query: query,
       highlight: {
-        order: "score",
-        pre_tags: ["<m0>","<m1>","<m2>","<m3>","<m4>","<m5>"],
-        post_tags: ["</m0>","</m1>","</m2>","</m3>","</m4>","</m5>"],
+        order: 'score',
+        pre_tags: ['<m0>', '<m1>', '<m2>', '<m3>', '<m4>', '<m5>'],
+        post_tags: ['</m0>', '</m1>', '</m2>', '</m3>', '</m4>', '</m5>'],
         fields: {
           text: {
-            matched_fields: ["text"],
-            type: "fvh"
+            matched_fields: ['text'],
+            type: 'fvh'
           }
-        },
+        }
       },
-      sort: [
-        { _score: { order: "desc"} },
-        { sent: { order: "desc"} }
-      ],
+      sort: [{ _score: { order: 'desc' } }, { sent: { order: 'desc' } }]
     }
   };
 
   var startTime = Date.now();
   debug('Query: %j', queryRequest);
-  return client.search(queryRequest)
+  return client
+    .search(queryRequest)
     .then(function(response) {
       debug('Response: %j', response);
       stats.responseTime('chat.search.exec', Date.now() - startTime);
@@ -119,4 +120,4 @@ function searchRoom(troupeId, parsedQuery, options) {
 
 module.exports = {
   searchRoom: Promise.method(searchRoom)
-}
+};

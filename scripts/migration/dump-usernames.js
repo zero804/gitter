@@ -1,17 +1,14 @@
 #!/usr/bin/env node
-'use strict';
+'use strict' /* messy messy @lerouxb */;
 
-/* eslint-disable */ /* messy messy @lerouxb */
-
-var shutdown = require('shutdown');
+/* eslint-disable */ var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var es = require('event-stream');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
-
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 function getUsernames() {
-  return persistence.User.find({}, {username: 1})
+  return persistence.User.find({}, { username: 1 })
     .lean()
     .read(mongoReadPrefs.secondaryPreferred)
     .stream();
@@ -20,15 +17,17 @@ function getUsernames() {
 var usernameMap = {};
 function run(callback) {
   getUsernames()
-    .pipe(es.through(function(row) {
-      usernameMap[row.username] = true;
-    }))
+    .pipe(
+      es.through(function(row) {
+        usernameMap[row.username] = true;
+      })
+    )
     .on('end', function() {
       callback();
     })
     .on('error', function(error) {
       callback(error);
-    })
+    });
 }
 
 function done(error) {
@@ -41,12 +40,11 @@ function done(error) {
   }
 }
 
-onMongoConnect()
-  .then(function() {
-    run(function(err) {
-      if (!err) {
-        console.log(JSON.stringify(usernameMap));
-      }
-      done(err);
-    });
+onMongoConnect().then(function() {
+  run(function(err) {
+    if (!err) {
+      console.log(JSON.stringify(usernameMap));
+    }
+    done(err);
   });
+});

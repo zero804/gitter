@@ -14,12 +14,10 @@ function getFingerprint() {
     require.ensure(['fingerprintjs2'], function(require) {
       var Fingerprint2 = require('fingerprintjs2');
 
-      new Fingerprint2({ })
-        .get(function(result) {
-          resolve(result);
-        });
-
-    })
+      new Fingerprint2({}).get(function(result) {
+        resolve(result);
+      });
+    });
   });
 }
 
@@ -46,10 +44,14 @@ function captureFingerprint() {
 
   return getFingerprint()
     .tap(function(fingerprint) {
-      return apiClient.priv.post('/fp', { fp: fingerprint }, {
-        dataType: 'text',
-        global: false
-      });
+      return apiClient.priv.post(
+        '/fp',
+        { fp: fingerprint },
+        {
+          dataType: 'text',
+          global: false
+        }
+      );
     })
     .tap(function(fingerprint) {
       cookies.set('fp', '' + Date.now() + ':' + fingerprint);

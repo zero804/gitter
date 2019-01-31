@@ -11,6 +11,6 @@ module.exports = bayeuxExtension({
       return callback();
     }
 
-    return callback(new StatusError(403, "Push access denied"));
-  },
+    return callback(new StatusError(403, 'Push access denied'));
+  }
 });

@@ -13,15 +13,20 @@ router.use('/logout', preventClickjackingMiddleware, require('./logout'));
 router.use('/login', preventClickjackingMiddleware, require('./login'));
 
 // Double route mounting for explore onto /explore and /home/~explore
-router.use('/explore', preventClickjackingMiddleware, function(req, res, next) {
-  // If logged in and trying to go to `/explore`, redirect to `/home/explore`
-  if(req.user) {
-    var userHomeExploreUrl = urlJoin('/home/explore', req.url);
-    res.redirect(userHomeExploreUrl);
-  } else {
-    next();
-  }
-}, require('./explore'));
+router.use(
+  '/explore',
+  preventClickjackingMiddleware,
+  function(req, res, next) {
+    // If logged in and trying to go to `/explore`, redirect to `/home/explore`
+    if (req.user) {
+      var userHomeExploreUrl = urlJoin('/home/explore', req.url);
+      res.redirect(userHomeExploreUrl);
+    } else {
+      next();
+    }
+  },
+  require('./explore')
+);
 
 // The route for the inner frame
 router.use('/home/~explore', preventClickjackingOnlyGitterEmbedMiddleware, require('./explore'));

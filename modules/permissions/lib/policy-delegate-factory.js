@@ -11,7 +11,7 @@ function policyDelegateFactory(userId, userLoader, securityDescriptor) {
   assert(userLoader, 'userLoader required');
   assert(securityDescriptor, 'securityDescriptor required');
 
-  switch(securityDescriptor.type) {
+  switch (securityDescriptor.type) {
     case 'GROUP':
       return new GroupPolicyDelegate(userId, userLoader, securityDescriptor);
 

@@ -3,20 +3,19 @@
 var _ = require('underscore');
 
 var methodMap = {
-  'create': 'post',
-  'update': 'put',
-  'patch':  'patch',
-  'delete': 'delete',
-  'read':   'get'
+  create: 'post',
+  update: 'put',
+  patch: 'patch',
+  delete: 'delete',
+  read: 'get'
 };
 
 /**
  * Creates a sync-mixin using an api-client instance singleton
  */
 function syncMixinFactory(apiClient) {
-
   function performAction(m, url, model, options) {
-    switch(m) {
+    switch (m) {
       case 'get':
         return apiClient.get(url, options.data);
 
@@ -26,7 +25,7 @@ function syncMixinFactory(apiClient) {
         } else {
           return apiClient.patch(url, model);
         }
-        /* break; */
+      /* break; */
 
       default:
         return apiClient[m](url, model);
@@ -35,26 +34,30 @@ function syncMixinFactory(apiClient) {
 
   return {
     sync: function(method, model, options) {
-
       var url = options.url || _.result(model, 'url');
-      if(!url) throw new Error('URL required');
+      if (!url) throw new Error('URL required');
 
       var m = methodMap[method];
 
       var promise = performAction(m, url, model, options);
 
-      if(options.success) {
+      if (options.success) {
         promise = promise.tap(options.success);
       }
 
-      if(options.error) {
+      if (options.error) {
         // Backbone will trigger the 'error' event
         promise = promise.catch(options.error);
       }
 
-      model.trigger('request', model, null, _.extend({}, options, {
-        method: method
-      }));
+      model.trigger(
+        'request',
+        model,
+        null,
+        _.extend({}, options, {
+          method: method
+        })
+      );
 
       return promise;
     }

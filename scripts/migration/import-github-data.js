@@ -1,9 +1,7 @@
 #!/usr/bin/env node
-'use strict';
+'use strict' /* messy messy @lerouxb */;
 
-/* eslint-disable */ /* messy messy @lerouxb */
-
-var path = require('path');
+/* eslint-disable */ var path = require('path');
 var yargs = require('yargs');
 var fs = require('fs');
 var es = require('event-stream');
@@ -31,17 +29,16 @@ var opts = yargs
   })
   .number('since')
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function processBatch(lines, enc, cb) {
   var schema;
   if (opts.schema == 'users') {
-    console.log("importing users");
+    console.log('importing users');
     schema = migrationSchemas.GitHubUser;
   }
   if (opts.schema == 'orgs') {
-    console.log("importing orgs");
+    console.log('importing orgs');
     schema = migrationSchemas.GitHubOrg;
   }
 
@@ -56,7 +53,7 @@ function processBatch(lines, enc, cb) {
         uri: parts[0],
         lcUri: parts[0].toLowerCase(),
         githubId: githubId
-      })
+      });
     }
   });
   if (numOperations) {
@@ -82,18 +79,17 @@ function processOne(line, enc, cb) {
     processBatch(batchLines, enc, cb);
     batchLines = [];
   } else {
-    cb()
+    cb();
   }
 }
 
-
-
-console.log("connecting...");
+console.log('connecting...');
 onMongoConnect()
   .then(function() {
-    console.log("installing migration schemas");
+    console.log('installing migration schemas');
     migrationSchemas = installMigrationSchemas(mongoose.connection);
-    var s = fs.createReadStream(opts.filename)
+    var s = fs
+      .createReadStream(opts.filename)
       .pipe(es.split())
       .pipe(through2.obj(processOne))
       .on('error', function(err) {
@@ -103,7 +99,7 @@ onMongoConnect()
       })
       .on('end', function() {
         shutdown.shutdownGracefully();
-      })
+      });
   })
   .catch(function(err) {
     console.error(err);

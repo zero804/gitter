@@ -42,16 +42,18 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
 
     var responder = resource.respond || defaultRespond;
 
-    router[method](url,
-      identifyRoute(routeIdentifier + '-' + methodName),
-      function(req, res, next) {
-        return promiseImpl(req, res)
-          .then(function(response) {
-            responder(req, res, response);
-            return null;
-          })
-          .catch(next);
-      });
+    router[method](url, identifyRoute(routeIdentifier + '-' + methodName), function(
+      req,
+      res,
+      next
+    ) {
+      return promiseImpl(req, res)
+        .then(function(response) {
+          responder(req, res, response);
+          return null;
+        })
+        .catch(next);
+    });
   }
 
   mount('get', '/', 'index');
@@ -65,10 +67,12 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   if (resource.subresourcesRoot) {
     Object.keys(resource.subresourcesRoot).forEach(function(subresourceName) {
       var subresource = resource.subresourcesRoot[subresourceName];
-      router.use('/' + subresourceName, resourceRoute(routeIdentifier + '-' + subresourceName, subresource));
+      router.use(
+        '/' + subresourceName,
+        resourceRoute(routeIdentifier + '-' + subresourceName, subresource)
+      );
     });
   }
-
 
   mount('get', '/:' + idParam, 'show');
   mount('get', '/:' + idParam + '/edit', 'edit'); // TODO: remove this
@@ -79,7 +83,10 @@ module.exports = function resourceRoute(routeIdentifier, resource) {
   if (resource.subresources) {
     Object.keys(resource.subresources).forEach(function(subresourceName) {
       var subresource = resource.subresources[subresourceName];
-      router.use('/:' + idParam + '/' + subresourceName, resourceRoute(routeIdentifier + '-' + subresourceName, subresource));
+      router.use(
+        '/:' + idParam + '/' + subresourceName,
+        resourceRoute(routeIdentifier + '-' + subresourceName, subresource)
+      );
     });
   }
 

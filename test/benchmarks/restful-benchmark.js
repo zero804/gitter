@@ -17,7 +17,7 @@ makeBenchmark({
       troupe4: { users: ['userOnlyOne'] }
     };
 
-    for(var i = 0; i < 5000; i++) {
+    for (var i = 0; i < 5000; i++) {
       fixtureDescription['user' + i] = {};
       fixtureDescription.troupe1.users.push('user' + i);
       if (i % 2 === 0) {
@@ -33,8 +33,7 @@ makeBenchmark({
     }
     // userOnlyOne is in one room
     // user0...5000 are in two or three rooms
-    return fixtureLoader.manual(fixture, fixtureDescription, null)
-      .asCallback(done);
+    return fixtureLoader.manual(fixture, fixtureDescription, null).asCallback(done);
   },
 
   after: function(done) {
@@ -42,46 +41,42 @@ makeBenchmark({
   },
 
   tests: {
-    'serializeChatsForTroupe': function(done) {
-      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, {})
-        .nodeify(done);
+    serializeChatsForTroupe: function(done) {
+      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, {}).nodeify(done);
     },
 
     'serializeChatsForTroupe#lean1': function(done) {
-      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: true })
+      restful
+        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: true })
         .nodeify(done);
     },
 
     'serializeChatsForTroupe#lean2': function(done) {
-      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: 2 })
+      restful
+        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: 2 })
         .nodeify(done);
     },
 
     'serializeTroupesForUser#oneRoom': function(done) {
-      restful.serializeTroupesForUser(fixture.userOnlyOne.id)
-        .nodeify(done);
+      restful.serializeTroupesForUser(fixture.userOnlyOne.id).nodeify(done);
     },
 
     'serializeTroupesForUser#withLargeRooms': function(done) {
-      restful.serializeTroupesForUser(fixture.user0.id)
-        .nodeify(done);
+      restful.serializeTroupesForUser(fixture.user0.id).nodeify(done);
     },
 
     'serializeUsersForTroupe#smallRoom': function(done) {
-      restful.serializeUsersForTroupe(fixture.troupe4.id, fixture.userOnlyOne.id, {})
-        .nodeify(done);
+      restful.serializeUsersForTroupe(fixture.troupe4.id, fixture.userOnlyOne.id, {}).nodeify(done);
     },
 
     'serializeUsersForTroupe#largeRoom': function(done) {
-      restful.serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, {})
-        .nodeify(done);
+      restful.serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, {}).nodeify(done);
     },
 
     'serializeUsersForTroupe#largeRoomLimit': function(done) {
-      restful.serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, { limit: 25 })
+      restful
+        .serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, { limit: 25 })
         .nodeify(done);
-    },
-
+    }
   }
-
 });

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var BackendMuxer = require('gitter-web-backend-muxer');
@@ -18,15 +18,14 @@ function UserProfileStrategy(options) {
 
     user = users.first();
     var backendMuxer = new BackendMuxer(user);
-    return backendMuxer.findProfiles(profileResults)
-      .then(function(profiles) {
-        profileResults = profiles;
-        // cache the profiles so we can get them out later.
-        // (is this the best variable name?)
+    return backendMuxer.findProfiles(profileResults).then(function(profiles) {
+      profileResults = profiles;
+      // cache the profiles so we can get them out later.
+      // (is this the best variable name?)
 
-        // A hash would probably we better for this
-        user.profiles = profiles;
-      });
+      // A hash would probably we better for this
+      user.profiles = profiles;
+    });
   };
 
   this.map = function(_user) {

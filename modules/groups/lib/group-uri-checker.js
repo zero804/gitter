@@ -6,7 +6,7 @@ var Group = require('gitter-web-persistence').Group;
 var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var debug = require('debug')('gitter:app:groups:group-uri-checker');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory')
+var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 function checkLocalUri(uri) {
   /*
@@ -26,69 +26,77 @@ function checkLocalUri(uri) {
       }
     );
   */
-  return Group.findOne({ lcUri: uri.toLowerCase() }).exec()
+  return Group.findOne({ lcUri: uri.toLowerCase() })
+    .exec()
     .then(function(group) {
-      debug("group for %s: %s", uri.toLowerCase(), !!group);
+      debug('group for %s: %s', uri.toLowerCase(), !!group);
       return !!group;
     });
 }
 
 function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
   // check gh orgs and users
-  return validateGitHubUri(user, uri)
-    .then(function(githubInfo) {
-      var policy;
-      if (githubInfo && githubInfo.type === 'ORG') {
-        // also check if you can actually admin the org.
+  return validateGitHubUri(user, uri).then(function(githubInfo) {
+    var policy;
+    if (githubInfo && githubInfo.type === 'ORG') {
+      // also check if you can actually admin the org.
 
-        /*
+      /*
         NOTE: This checks the uri which might not be the same as the group's
         eventual linkPath. Once we drop the extra checks after we split from
         GitHub this canAdmin check will fall away and the only one left will
         be the one inside groupService.createGroup that will test if you're
         allowed to access linkPath.
         */
-        policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_ORG', uri, obtainAccessFromGitHubRepo);
-        return policy.canAdmin()
-          .then(function(access) {
-            return {
-              githubInfo: githubInfo,
-              canAdmin: access
-            }
-          });
-
-      } else if (githubInfo && githubInfo.type === 'USER') {
-        /*
+      policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(
+        user,
+        'GH_ORG',
+        uri,
+        obtainAccessFromGitHubRepo
+      );
+      return policy.canAdmin().then(function(access) {
+        return {
+          githubInfo: githubInfo,
+          canAdmin: access
+        };
+      });
+    } else if (githubInfo && githubInfo.type === 'USER') {
+      /*
         When adding a repo room we have to upsert the group for now. In that
         case you could be adding a repo under your own name, so we have to
         check for that and allow that too. At least for now.
         */
-        policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, 'GH_USER', uri, obtainAccessFromGitHubRepo)
-        return policy.canAdmin()
-          .then(function(access) {
-            return {
-              githubInfo: githubInfo,
-              canAdmin: access
-            }
-          })
-          .catch(StatusError, function(err) {
-            debug('StatusError', err.message);
-            // User and group do not match, and obtainAccessFromGitHubRepo
-            // not provided, denying access
-            return {
-              githubInfo: githubInfo,
-              canAdmin: false
-            }
-          });
-
-      } else {
-        // either not found or not an org, so no reason to check permission
-        return {
-          githubInfo: githubInfo,
-          canAdmin: false // more like N/A
-        }
-      }
-    });
+      policy = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(
+        user,
+        'GH_USER',
+        uri,
+        obtainAccessFromGitHubRepo
+      );
+      return policy
+        .canAdmin()
+        .then(function(access) {
+          return {
+            githubInfo: githubInfo,
+            canAdmin: access
+          };
+        })
+        .catch(StatusError, function(err) {
+          debug('StatusError', err.message);
+          // User and group do not match, and obtainAccessFromGitHubRepo
+          // not provided, denying access
+          return {
+            githubInfo: githubInfo,
+            canAdmin: false
+          };
+        });
+    } else {
+      // either not found or not an org, so no reason to check permission
+      return {
+        githubInfo: githubInfo,
+        canAdmin: false // more like N/A
+      };
+    }
+  });
 }
 
 function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
@@ -121,15 +129,15 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
         allowCreate = true;
       }
 
-
       return {
         // The future group will either be org-based or of type null which
         // is just the new types that aren't backed by GitHub.
-        type: (githubInfo && githubInfo.type === 'ORG') ? 'GH_ORG' : null,
+        type: githubInfo && githubInfo.type === 'ORG' ? 'GH_ORG' : null,
         allowCreate: allowCreate,
         localUriExists: localUriExists
       };
-    });
+    }
+  );
 }
 
 module.exports = Promise.method(checkIfGroupUriExists);

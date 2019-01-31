@@ -27,10 +27,6 @@ var extendDepMaps = function(/*n-number of depMaps*/) {
   return resultantDepMap;
 };
 
-
-
-
-
 var defaults = {
   // This is an option of less.js so we need to support it
   // It allows you to relatively resolve modules from paths defined here
@@ -43,7 +39,7 @@ var defaults = {
 // `require('less').render(data, opts).then(function(output) { output.imports; })`
 //
 // We memoize to cache any calls for the same file (ex. many files will want to check `colors.less`)
-var generateLessDependencyMap = memoize(function(rootFilePath, options, /*internal*/depMap) {
+var generateLessDependencyMap = memoize(function(rootFilePath, options, /*internal*/ depMap) {
   var opts = _.extend({}, defaults, options);
   depMap = depMap || {};
   //console.log('c', rootFilePath);
@@ -57,96 +53,103 @@ var generateLessDependencyMap = memoize(function(rootFilePath, options, /*intern
     return hash;
   })();
 
+  return (
+    readFile(rootFilePath, 'utf8')
+      // Find `@import`'s' in the file
+      .then(function(data) {
+        var importRe = /@import (?:\([^)]+\) )?["|'](.+?)["|']/g;
 
-  return readFile(rootFilePath, 'utf8')
-    // Find `@import`'s' in the file
-    .then(function(data) {
-      var importRe = /@import (?:\([^)]+\) )?["|'](.+?)["|']/g;
-
-      var matchedFilePaths = [];
-      data.replace(importRe, function(match, matchedFilePath) {
-        var parsedPath = pathUtils.parsePath(matchedFilePath);
-        if(!parsedPath.ext || parsedPath.ext.length === 0) {
-          parsedPath.ext = '.less';
-        }
-        matchedFilePaths.push(pathUtils.formatPath(parsedPath));
-      });
-
-      return matchedFilePaths;
-    })
-    .then(function(matchedFilePaths) {
-      //console.log('m', rootFilePath, matchedFilePaths);
-      var checkAllMatchedFilesModifiedPromises = matchedFilePaths.map(function(matchedFilePath) {
-        // Assemble a list of directories the `@import` can resolve from
-        var parentDirectoryPath = path.resolve(process.cwd(), path.dirname(rootFilePath));
-        var possibleDirs = Object.keys(_.extend({}, absolutePathsOptionHash, (function() {
-          var tempHash = {};
-          tempHash[parentDirectoryPath] = true;
-          return tempHash;
-        })()));
-
-        // `true` means we found a modification
-        // `false` means we didn't find a modification
-        // `undefined` means we couldn't find the file
-        var checkAllDirsFileModifiedPromises = possibleDirs.map(function(dir) {
-          var importFilePath = path.join(dir, matchedFilePath);
-
-          return stat(importFilePath)
-            .then(function(/*stats*/) {
-              //console.log('\ti', rootFilePath, importFilePath);
-
-              // Found a new dep
-              depMap[importFilePath] = depMap[importFilePath] || {};
-              depMap[importFilePath][rootFilePath] = true;
-
-              // Recursion: @import file has not been modified but, lets check the @import's of this file.
-              var recursiveResult = generateLessDependencyMap(importFilePath, options, depMap);
-              // Merge the recursive depMap result into our state
-              return recursiveResult.then(function(pDepMap) {
-                depMap = extendDepMaps(depMap, pDepMap);
-              });
-            })
-            .catch(function(/*err*/) {
-              // Swallow any errors
-              // We don't care about not finding it because
-              // there are multiple directories(`opts.paths`) to check
-            });
+        var matchedFilePaths = [];
+        data.replace(importRe, function(match, matchedFilePath) {
+          var parsedPath = pathUtils.parsePath(matchedFilePath);
+          if (!parsedPath.ext || parsedPath.ext.length === 0) {
+            parsedPath.ext = '.less';
+          }
+          matchedFilePaths.push(pathUtils.formatPath(parsedPath));
         });
 
+        return matchedFilePaths;
+      })
+      .then(function(matchedFilePaths) {
+        //console.log('m', rootFilePath, matchedFilePaths);
+        var checkAllMatchedFilesModifiedPromises = matchedFilePaths.map(function(matchedFilePath) {
+          // Assemble a list of directories the `@import` can resolve from
+          var parentDirectoryPath = path.resolve(process.cwd(), path.dirname(rootFilePath));
+          var possibleDirs = Object.keys(
+            _.extend(
+              {},
+              absolutePathsOptionHash,
+              (function() {
+                var tempHash = {};
+                tempHash[parentDirectoryPath] = true;
+                return tempHash;
+              })()
+            )
+          );
 
-        return Promise.all(checkAllDirsFileModifiedPromises)
-          .then(function(checkFileResults) {
-            if(opts.debug) {
+          // `true` means we found a modification
+          // `false` means we didn't find a modification
+          // `undefined` means we couldn't find the file
+          var checkAllDirsFileModifiedPromises = possibleDirs.map(function(dir) {
+            var importFilePath = path.join(dir, matchedFilePath);
+
+            return stat(importFilePath)
+              .then(function(/*stats*/) {
+                //console.log('\ti', rootFilePath, importFilePath);
+
+                // Found a new dep
+                depMap[importFilePath] = depMap[importFilePath] || {};
+                depMap[importFilePath][rootFilePath] = true;
+
+                // Recursion: @import file has not been modified but, lets check the @import's of this file.
+                var recursiveResult = generateLessDependencyMap(importFilePath, options, depMap);
+                // Merge the recursive depMap result into our state
+                return recursiveResult.then(function(pDepMap) {
+                  depMap = extendDepMaps(depMap, pDepMap);
+                });
+              })
+              .catch(function(/*err*/) {
+                // Swallow any errors
+                // We don't care about not finding it because
+                // there are multiple directories(`opts.paths`) to check
+              });
+          });
+
+          return Promise.all(checkAllDirsFileModifiedPromises).then(function(checkFileResults) {
+            if (opts.debug) {
               // `undefined` filled results means we weren't able to find the `@import` at all
               var fileNotFound = checkFileResults.reduce(function(prev, result) {
                 return prev && result === undefined;
               }, true);
 
-              if(fileNotFound) {
+              if (fileNotFound) {
                 console.log('`@import` was not found:', matchedFilePath);
               }
             }
           });
-      });
+        });
 
-      return Promise.all(checkAllMatchedFilesModifiedPromises);
-    })
-    .then(function() {
-      //console.log('dd', depMap);
-      return depMap;
-    });
+        return Promise.all(checkAllMatchedFilesModifiedPromises);
+      })
+      .then(function() {
+        //console.log('dd', depMap);
+        return depMap;
+      })
+  );
 });
 
-
-
-
-
-var getEntryPointsAffectedByFile = function(depMap, entryPoints, needleFile, /*internal*/touchedEntryPoints, /*internal*/isRecursiveRun) {
+var getEntryPointsAffectedByFile = function(
+  depMap,
+  entryPoints,
+  needleFile,
+  /*internal*/ touchedEntryPoints,
+  /*internal*/ isRecursiveRun
+) {
   touchedEntryPoints = touchedEntryPoints || {};
 
   var checkIfFileIsEntry = function(file) {
     entryPoints.some(function(entryPoint) {
-      if(file === entryPoint) {
+      if (file === entryPoint) {
         touchedEntryPoints[entryPoint] = true;
         // break
         return true;
@@ -163,19 +166,24 @@ var getEntryPointsAffectedByFile = function(depMap, entryPoints, needleFile, /*i
 
     // Recursion:
     var nextDeps = depMap[fileDep];
-    if(nextDeps) {
-      var recursiveResult = getEntryPointsAffectedByFile(depMap, entryPoints, fileDep, touchedEntryPoints, true);
+    if (nextDeps) {
+      var recursiveResult = getEntryPointsAffectedByFile(
+        depMap,
+        entryPoints,
+        fileDep,
+        touchedEntryPoints,
+        true
+      );
       _.extend(touchedEntryPoints, recursiveResult);
     }
   });
 
-  if(isRecursiveRun) {
+  if (isRecursiveRun) {
     return touchedEntryPoints;
   }
 
   return Object.keys(touchedEntryPoints);
 };
-
 
 module.exports = {
   generateLessDependencyMap: generateLessDependencyMap,

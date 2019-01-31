@@ -5,7 +5,7 @@ module.exports = {
     if (message.ext) {
       delete message.ext.password;
       delete message._private;
-  }
+    }
 
     callback(message);
   }

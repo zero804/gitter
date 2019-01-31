@@ -12,9 +12,9 @@ describe('room-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -35,8 +35,7 @@ describe('room-api', function() {
       text: 'HELLO',
       sent: new Date(),
       pub: 1
-    },
-
+    }
   });
 
   fixtureLoader.disableMongoTableScans();
@@ -56,5 +55,4 @@ describe('room-api', function() {
         assert(sampleChat.room);
       });
   });
-
-})
+});

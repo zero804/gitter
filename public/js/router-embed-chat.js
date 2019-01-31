@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var onready = require('./utils/onready');
 var context = require('./utils/context');
@@ -31,8 +31,6 @@ onready(function() {
   });
   appView.render();
 
-
-
   new Router({
     dialogRegion: appView.dialogRegion,
     routes: [
@@ -43,10 +41,9 @@ onready(function() {
         // https://github.com/troupe/gitter-webapp/issues/2211
         rooms: null,
         groups: null
-      }),
+      })
     ]
   });
 
   Backbone.history.start();
-
 });

@@ -12,7 +12,7 @@ try {
       supportsPassiveOption = true;
     }
   });
-  window.addEventListener("test", null, opts);
+  window.addEventListener('test', null, opts);
 } catch (e) {
   /* */
 }

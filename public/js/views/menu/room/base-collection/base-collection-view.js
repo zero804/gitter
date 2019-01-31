@@ -8,36 +8,35 @@ var context = require('../../../../utils/context');
 var toggleClass = require('../../../../utils/toggle-class');
 
 module.exports = Marionette.CompositeView.extend({
-
-  template:           template,
-  className:          'collection',
+  template: template,
+  className: 'collection',
   childViewContainer: '#collection-list',
 
   childViewOptions: function(model) {
     var index = this.collection.indexOf(model);
     return {
-      model:     model,
-      index:     index,
+      model: model,
+      index: index,
       menuState: this.roomMenuModel.get('state'),
-      roomMenuModel: this.roomMenuModel,
+      roomMenuModel: this.roomMenuModel
     };
   },
 
   childEvents: {
     'item:activated': 'onItemActivated',
-    'hide:complete':  'onHideLeaveRoom',
-    'leave:complete': 'onHideLeaveRoom',
+    'hide:complete': 'onHideLeaveRoom',
+    'leave:complete': 'onHideLeaveRoom'
   },
 
   ui: {
-    header:        '#collection-header',
+    header: '#collection-header',
     headerContent: '#collection-header-text',
     dismissButton: '#dismiss-suggestion',
-    showMore:      '#room-item-show-more',
+    showMore: '#room-item-show-more'
   },
 
   events: {
-    'click @ui.header':  'onHeaderClicked',
+    'click @ui.header': 'onHeaderClicked'
   },
 
   modelEvents: {
@@ -46,9 +45,8 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   collectionEvents: {
-    'add remove reset': 'onFilterComplete',
+    'add remove reset': 'onFilterComplete'
   },
-
 
   constructor: function(attrs) {
     this.bus = attrs.bus;
@@ -56,7 +54,12 @@ module.exports = Marionette.CompositeView.extend({
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
     this.groupsCollection = attrs.groupsCollection;
-    this.listenTo(this.roomMenuModel, 'change:hasDismissedSuggestions', this.onDismissSuggestionsUpdate, this);
+    this.listenTo(
+      this.roomMenuModel,
+      'change:hasDismissedSuggestions',
+      this.onDismissSuggestionsUpdate,
+      this
+    );
     this.listenTo(this.roomMenuModel, 'change:state', this.clearFocus, this);
     this.listenTo(context.troupe(), 'change:id', this.onRoomUpdate, this);
     Marionette.CompositeView.prototype.constructor.apply(this, arguments);
@@ -64,7 +67,9 @@ module.exports = Marionette.CompositeView.extend({
 
   initialize: function() {
     var activeModel = this.collection.get(context.troupe().get('id'));
-    if(!activeModel) { return; }
+    if (!activeModel) {
+      return;
+    }
     //On init we set focus on the active element because we can reliably assume that a minibar item is visible
     //which we can't for room-itmes as you can load the menu in an org state
     activeModel.set({ active: true, focus: true });
@@ -79,11 +84,11 @@ module.exports = Marionette.CompositeView.extend({
     //results come through with `exists: false` for rooms yet to be created
     //whereas on room models `exists: undefined` :( JP 10/3/16
     // org-items have `room`, not exists
-    if(this.roomMenuModel.get('state') === 'group') {
+    if (this.roomMenuModel.get('state') === 'group') {
       return this.roomMenuModel.set({
         state: 'org',
         groupId: model.get('id')
-      })
+      });
     }
 
     if (this.roomExistsForModel(model)) {
@@ -106,14 +111,16 @@ module.exports = Marionette.CompositeView.extend({
     this.setActive();
   },
 
-  serializeData: function (){
+  serializeData: function() {
     var data = this.model.toJSON();
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
     var selectedGroupName = '';
-    if(selectedGroup) { selectedGroupName = selectedGroup.get('name'); }
+    if (selectedGroup) {
+      selectedGroupName = selectedGroup.get('name');
+    }
     return _.extend({}, data, {
-      selectedGroupName: selectedGroupName,
+      selectedGroupName: selectedGroupName
     });
   },
 
@@ -122,92 +129,108 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   onRender: function() {
-    fastdom.mutate(function() {
-      this.setActive();
-      this.setLoaded();
-    }.bind(this));
+    fastdom.mutate(
+      function() {
+        this.setActive();
+        this.setLoaded();
+      }.bind(this)
+    );
   },
 
-  setActive: function () {
+  setActive: function() {
     toggleClass(this.el, 'active', this.model.get('active'));
   },
 
-  setLoaded: function (val) {
-    val = (val || true);
+  setLoaded: function(val) {
+    val = val || true;
     toggleClass(this.el, 'loaded', val);
   },
 
-  onHideLeaveRoom: function (view) {
+  onHideLeaveRoom: function(view) {
     //If we are hiding the current room, navigate to /home JP 11/3/16
-    if (this._isCurrentRoom(view.model)) { this._navigateToHome(); }
+    if (this._isCurrentRoom(view.model)) {
+      this._navigateToHome();
+    }
   },
 
-  onHeaderClicked: function (){
-    this.roomMenuModel.set('hasDismissedSuggestions', !this.roomMenuModel.get('hasDismissedSuggestions'));
+  onHeaderClicked: function() {
+    this.roomMenuModel.set(
+      'hasDismissedSuggestions',
+      !this.roomMenuModel.get('hasDismissedSuggestions')
+    );
   },
 
-  onDismissSuggestionsUpdate: function (model, val){ //jshint unused: true
+  onDismissSuggestionsUpdate: function(model, val) {
+    //jshint unused: true
     //Only opperate if we are displaying suggestions
-    if(!this.model.get('isSuggestion')) { return; }
+    if (!this.model.get('isSuggestion')) {
+      return;
+    }
     //If the suggestions have been dismissed hide the collection
-    if(val) { this.el.classList.remove('active'); }
+    if (val) {
+      this.el.classList.remove('active');
+    }
   },
 
   //We avoid re-rendering AT ALL TIMES so now we have to manually change content
-  onHeaderChange: function (model, val){ //jshint unused: true
+  onHeaderChange: function(model, val) {
+    //jshint unused: true
     this.ui.headerContent.html(val);
 
     //If this is a suggestion show the cancel button
-    if(this.model.get('isSuggestion')) {
+    if (this.model.get('isSuggestion')) {
       return this.ui.dismissButton[0].classList.remove('hidden');
     }
     return this.ui.dismissButton[0].classList.add('hidden');
   },
 
-  clearFocus: function (){
+  clearFocus: function() {
     var elementsInFocus = this.collection.where({ focus: true });
-    elementsInFocus.forEach(function(model){
+    elementsInFocus.forEach(function(model) {
       model.set('focus', false);
     });
   },
 
-  clearActive: function (){
+  clearActive: function() {
     var activeElements = this.collection.where({ active: true });
-    activeElements.forEach(function(model){
+    activeElements.forEach(function(model) {
       model.set('active', false);
     });
   },
 
-  focusActiveElement: function (){
+  focusActiveElement: function() {
     var activeElement = this.collection.findWhere({ active: true });
-    if(!activeElement) { return; }
+    if (!activeElement) {
+      return;
+    }
     activeElement.set('focus', true);
   },
 
-  onRoomUpdate: function (troupe, id){
+  onRoomUpdate: function(troupe, id) {
     this.clearFocus();
     this.clearActive();
     var model = this.collection.get(id);
-    if(!model) { return; }
+    if (!model) {
+      return;
+    }
     model.set({ active: true, focus: true });
   },
 
-  _triggerNavigation: function (url, type, name) {
+  _triggerNavigation: function(url, type, name) {
     this.clearFocus();
     this.bus.trigger('navigation', url, type, name);
     this.focusActiveElement();
   },
 
-  _navigateToHome: function () {
+  _navigateToHome: function() {
     this._triggerNavigation('/home', 'home', 'Home');
   },
 
-  _isCurrentRoom: function (model) {
-    return (context.troupe().get('id') === model.get('id'));
+  _isCurrentRoom: function(model) {
+    return context.troupe().get('id') === model.get('id');
   },
 
   _openCreateRoomDialog: function(name) {
     window.location.hash = '#confirm/' + name;
-  },
-
+  }
 });

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 // var $ = require('jquery');
 // var _ = require('underscore');
 var Marionette = require('backbone.marionette');
@@ -20,11 +20,27 @@ function triggerMouseoverForHover(el) {
     // Force a mouseover event to wake up the tooltip
     var evt;
     try {
-      evt = new MouseEvent("mouseover");
-    } catch(e) {
+      evt = new MouseEvent('mouseover');
+    } catch (e) {
       /* Internet Explorer, good times */
       evt = document.createEvent('MouseEvents');
-      evt.initMouseEvent("mouseover", true, true, window, 0, 0, 0, 80, 20, false, false, false, false, 0, null);
+      evt.initMouseEvent(
+        'mouseover',
+        true,
+        true,
+        window,
+        0,
+        0,
+        0,
+        80,
+        20,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
     }
     el.dispatchEvent(evt);
   });
@@ -79,8 +95,7 @@ var Behavior = Marionette.Behavior.extend({
     var title = tooltipOptions.title || el.getAttribute('title');
     if (typeof tooltipOptions.titleFn === 'function') {
       title = tooltipOptions.titleFn.bind(this.view)();
-    }
-    else if(tooltipOptions.titleFn) {
+    } else if (tooltipOptions.titleFn) {
       title = this.view[tooltipOptions.titleFn].bind(this.view);
     }
 
@@ -92,15 +107,13 @@ var Behavior = Marionette.Behavior.extend({
       container: tooltipOptions.container || 'body'
     });
 
-
     var customUpdateEventName = tooltipOptions.customUpdateEvent;
-    if(customUpdateEventName) {
+    if (customUpdateEventName) {
       this.view.on(customUpdateEventName, this.updateTooltip.bind(this, $el));
     }
 
     triggerMouseoverForHover(el);
   },
-
 
   onDestroy: function() {
     this.destroyHandlers();
@@ -139,9 +152,7 @@ var Behavior = Marionette.Behavior.extend({
     $el.tooltip('hide');
     $el.tooltip('show');
   }
-
 });
-
 
 behaviourLookup.register('Tooltip', Behavior);
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var suggestions = require('..');
@@ -11,10 +11,9 @@ describe('graph-suggestions', function() {
     */
     it('returns a blank array when given a blank array', function() {
       var rooms = [];
-      suggestions.getSuggestionsForRooms(rooms)
-        .then(function(roomIds) {
-          assert(Array.isArray(roomIds));
-        });
+      suggestions.getSuggestionsForRooms(rooms).then(function(roomIds) {
+        assert(Array.isArray(roomIds));
+      });
     });
   });
 });

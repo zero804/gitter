@@ -7,7 +7,6 @@ var groupCreationService = testRequire('./services/group-creation-service');
 
 describe('group-creation-service', function() {
   describe('#slow', function() {
-
     var fixture = fixtureLoader.setup({
       user1: {},
       user2: {}
@@ -19,10 +18,8 @@ describe('group-creation-service', function() {
       return groupCreationService(fixture.user1, {
         uri: uri,
         name: uri,
-        defaultRoom: {
-        }
-      })
-      .then(function(result) {
+        defaultRoom: {}
+      }).then(function(result) {
         var group = result.group;
         var defaultRoom = result.defaultRoom;
         assert.deepEqual(result.invitesReport, []);
@@ -54,17 +51,18 @@ describe('group-creation-service', function() {
       return groupCreationService(fixture.user1, {
         uri: uri,
         name: uri,
-        defaultRoom: {
-        },
-        invites: [{
-          type: 'gitter',
-          externalId: fixture.user2.username
-        }, {
-          type: 'github',
-          externalId: fixture.generateUsername()
-        }]
-      })
-      .then(function(result) {
+        defaultRoom: {},
+        invites: [
+          {
+            type: 'gitter',
+            externalId: fixture.user2.username
+          },
+          {
+            type: 'github',
+            externalId: fixture.generateUsername()
+          }
+        ]
+      }).then(function(result) {
         var group = result.group;
         var defaultRoom = result.defaultRoom;
         assert.strictEqual(result.invitesReport.length, 2);
@@ -94,6 +92,5 @@ describe('group-creation-service', function() {
         assert.deepEqual(defaultRoom.sd.extraMembers.map(String), []);
       });
     });
-
   });
 });

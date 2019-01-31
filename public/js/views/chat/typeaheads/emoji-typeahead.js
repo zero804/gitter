@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var isMobile = require('../../../utils/is-mobile');
 var emoji = require('../../../utils/emoji');
@@ -12,7 +12,7 @@ module.exports = function() {
     match: /(^|\s):([\-+\w]{2,})$/,
     maxCount: isMobile() ? 3 : 10,
     search: function(term, callback) {
-      if(term.length < 1) return callback(SUGGESTED_EMOJI);
+      if (term.length < 1) return callback(SUGGESTED_EMOJI);
 
       var matches = emoji.named.filter(function(emoji) {
         return emoji.indexOf(term) === 0;
@@ -25,7 +25,7 @@ module.exports = function() {
         emojiUrl: cdn('images/emoji/' + emoji + '.png')
       });
     },
-    replace: function (value) {
+    replace: function(value) {
       return '$1:' + value + ': ';
     }
   };

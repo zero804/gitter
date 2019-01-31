@@ -21,32 +21,38 @@ function isUserInGroup(userId, groupId, excludeRoomId) {
   }
 
   return TroupeUser.aggregate([
-      { $match: match },
-      { $project: { _id: 0, troupeId: 1 } },
-      { $lookup: {
-          from: 'troupes',
-          localField: 'troupeId',
-          foreignField: '_id',
-          as: 'troupe'
-        }
-      }, {
-        $unwind: '$troupe'
-      }, {
-        $match: {
-          'troupe.groupId': groupId
-        }
-      }, {
-        $limit: 1
-      }, {
-        $project: {
-          _id: 0,
-          exists: '$troupe.groupId'
-        }
-      }])
-      .exec()
-      .then(function(results) {
-        return results.length > 0;
-      });
+    { $match: match },
+    { $project: { _id: 0, troupeId: 1 } },
+    {
+      $lookup: {
+        from: 'troupes',
+        localField: 'troupeId',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+    },
+    {
+      $unwind: '$troupe'
+    },
+    {
+      $match: {
+        'troupe.groupId': groupId
+      }
+    },
+    {
+      $limit: 1
+    },
+    {
+      $project: {
+        _id: 0,
+        exists: '$troupe.groupId'
+      }
+    }
+  ])
+    .exec()
+    .then(function(results) {
+      return results.length > 0;
+    });
 }
 
 /**
@@ -64,35 +70,42 @@ function checkUsersInGroup(groupId, userIds, excludeRoomId) {
   }
 
   return TroupeUser.aggregate([
-      { $match: match },
-      { $project: { _id: 0, troupeId: 1, userId: 1 } },
-      { $lookup: {
-          from: 'troupes',
-          localField: 'troupeId',
-          foreignField: '_id',
-          as: 'troupe'
-        }
-      }, {
-        $unwind: '$troupe'
-      }, {
-        $match: {
-          'troupe.groupId': groupId
-        }
-      }, {
-        $group: {
-          _id: '$userId'
-        }
-      }])
-      .exec()
-      .then(function(results) {
-        return _.reduce(results, function(memo, result) {
+    { $match: match },
+    { $project: { _id: 0, troupeId: 1, userId: 1 } },
+    {
+      $lookup: {
+        from: 'troupes',
+        localField: 'troupeId',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+    },
+    {
+      $unwind: '$troupe'
+    },
+    {
+      $match: {
+        'troupe.groupId': groupId
+      }
+    },
+    {
+      $group: {
+        _id: '$userId'
+      }
+    }
+  ])
+    .exec()
+    .then(function(results) {
+      return _.reduce(
+        results,
+        function(memo, result) {
           memo[result._id] = true;
           return memo;
-        }, {});
-      });
+        },
+        {}
+      );
+    });
 }
-
-
 
 module.exports = {
   isUserInGroup: Promise.method(isUserInGroup),

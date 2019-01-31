@@ -29,31 +29,26 @@ var MinibarItemModel = require('../views/menu/room/minibar/minibar-item-model');
 var MinibarHomeModel = require('../views/menu/room/minibar/home-view/home-model');
 var MinibarPeopleModel = require('../views/menu/room/minibar/people-view/people-model');
 
-var states = [
-  'all',
-  'search',
-  'people',
-  'group',
-  'org',
-];
+var states = ['all', 'search', 'people', 'group', 'org'];
 
 var SEARCH_DEBOUNCE_INTERVAL = 1000;
 
 module.exports = Backbone.Model.extend({
-
   defaults: {
     state: '',
     searchTerm: '',
     roomMenuIsPinned: true,
     groupId: '',
-    hasDismissedSuggestions: false,
+    hasDismissedSuggestions: false
   },
 
-  constructor: function (attrs, options){
+  constructor: function(attrs, options) {
     //It is the case that some users will have `selectedOrgName` saved in the DB
     //Now we use groupId this will result in a totally broken app
     //In this case we want to redirect the user to the all state to prevent broken stuff
-    if(attrs.state === 'org' && !attrs.groupId) { attrs.state = 'all'; }
+    if (attrs.state === 'org' && !attrs.groupId) {
+      attrs.state = 'all';
+    }
     Backbone.Model.prototype.constructor.call(this, attrs, options);
   },
 
@@ -87,7 +82,7 @@ module.exports = Backbone.Model.extend({
 
     this._orgCollection = attrs.orgCollection;
 
-    this._detailCollection = (attrs.detailCollection || new Backbone.Collection());
+    this._detailCollection = attrs.detailCollection || new Backbone.Collection();
     delete attrs.detailCollection;
 
     this.userModel = attrs.userModel;
@@ -106,33 +101,56 @@ module.exports = Backbone.Model.extend({
     });
 
     this.searchMessageQueryModel = new Backbone.Model({ skip: 0 });
-    this.searchChatMessages = new SearchChatMessages(null, { roomMenuModel: this, roomModel: this._troupeModel, queryModel: this.searchMessageQueryModel });
+    this.searchChatMessages = new SearchChatMessages(null, {
+      roomMenuModel: this,
+      roomModel: this._troupeModel,
+      queryModel: this.searchMessageQueryModel
+    });
     this.suggestedOrgs = new SuggestedOrgCollection({
       contextModel: this,
       roomCollection: this._roomCollection
     });
     this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
-      roomMenuModel:           this,
-      troupeModel:             this._troupeModel,
-      roomCollection:          this._roomCollection,
-      suggestedOrgsCollection: this.suggestedOrgs,
+      roomMenuModel: this,
+      troupeModel: this._troupeModel,
+      roomCollection: this._roomCollection,
+      suggestedOrgsCollection: this.suggestedOrgs
     });
 
     var state = this.get('state');
-    this.minibarHomeModel = new MinibarHomeModel({ name: 'all', type: 'all', active: (state === 'all') }, { roomCollection: this._roomCollection });
-    this.minibarSearchModel = new MinibarItemModel({ name: 'search', type: 'search', active: (state === 'search') });
-    this.minibarPeopleModel = new MinibarPeopleModel({ name: 'people', type: 'people', active: (state === 'people')}, { roomCollection: this._roomCollection });
-    this.minibarGroupModel = new MinibarItemModel({ name: 'group', type: 'group', active: (state === 'group') });
-    this.minibarCommunityCreateModel = new MinibarItemModel({ name: 'Create Community', type: 'community-create' });
+    this.minibarHomeModel = new MinibarHomeModel(
+      { name: 'all', type: 'all', active: state === 'all' },
+      { roomCollection: this._roomCollection }
+    );
+    this.minibarSearchModel = new MinibarItemModel({
+      name: 'search',
+      type: 'search',
+      active: state === 'search'
+    });
+    this.minibarPeopleModel = new MinibarPeopleModel(
+      { name: 'people', type: 'people', active: state === 'people' },
+      { roomCollection: this._roomCollection }
+    );
+    this.minibarGroupModel = new MinibarItemModel({
+      name: 'group',
+      type: 'group',
+      active: state === 'group'
+    });
+    this.minibarCommunityCreateModel = new MinibarItemModel({
+      name: 'Create Community',
+      type: 'community-create'
+    });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
 
     //Setup an inital active group model
-    this.groupsCollection.forEach(function(model){
-      if(state === 'org' && model.id === this.get('groupId')) {
-        model.set('active', true);
-      }
-    }.bind(this));
+    this.groupsCollection.forEach(
+      function(model) {
+        if (state === 'org' && model.id === this.get('groupId')) {
+          model.set('active', true);
+        }
+      }.bind(this)
+    );
 
     this.minibarCollection = new FilteredMinibarGroupCollection(null, {
       collection: this.groupsCollection,
@@ -141,18 +159,17 @@ module.exports = Backbone.Model.extend({
       roomCollection: this._roomCollection
     });
 
-
     this.activeRoomCollection = new FilteredRoomCollection(null, {
       autoResort: true,
-      roomModel:  this,
-      collection: this._roomCollection,
+      roomModel: this,
+      collection: this._roomCollection
     });
 
     var favModels = this._roomCollection.filter(favouriteCollectionFilter);
     this.favouriteCollection = new FilteredFavouriteRoomCollection(favModels, {
       collection: this._roomCollection,
-      roomModel:  this,
-      dndCtrl:    this.dndCtrl,
+      roomModel: this,
+      dndCtrl: this.dndCtrl
     });
 
     this.favouriteCollectionModel = new FavouriteCollectionModel(null, {
@@ -167,23 +184,32 @@ module.exports = Backbone.Model.extend({
     });
 
     this.secondaryCollection = new ProxyCollection({ collection: this.searchTerms });
-    this.secondaryCollectionModel = new SecondaryCollectionModel({}, {
-      collection: this.secondaryCollection,
-      roomMenuModel: this
-    });
+    this.secondaryCollectionModel = new SecondaryCollectionModel(
+      {},
+      {
+        collection: this.secondaryCollection,
+        roomMenuModel: this
+      }
+    );
 
     this.tertiaryCollection = new ProxyCollection({ collection: this._orgCollection });
-    this.tertiaryCollectionModel = new TertiaryCollectionModel({}, {
-      collection: this.tertiaryCollection,
-      roomMenuModel: this
-    });
+    this.tertiaryCollectionModel = new TertiaryCollectionModel(
+      {},
+      {
+        collection: this.tertiaryCollection,
+        roomMenuModel: this
+      }
+    );
 
     this.searchFocusModel = new Backbone.Model({ focus: false });
 
     this.listenTo(this.primaryCollection, 'snapshot', this.onPrimaryCollectionSnapshot, this);
-    this.snapshotTimeout = setTimeout(function(){
-      this.onPrimaryCollectionSnapshot();
-    }.bind(this), 1000);
+    this.snapshotTimeout = setTimeout(
+      function() {
+        this.onPrimaryCollectionSnapshot();
+      }.bind(this),
+      1000
+    );
 
     //TODO have added setState so this can be removed
     //tests must be migrated
@@ -200,12 +226,16 @@ module.exports = Backbone.Model.extend({
   },
 
   //custom set to limit states that can be assigned
-  set: function (key, val){
-    var isChangingState = (key === 'state') || (_.isObject(key) && !!key.state);
-    if(!isChangingState) { return Backbone.Model.prototype.set.apply(this, arguments); }
+  set: function(key, val) {
+    var isChangingState = key === 'state' || (_.isObject(key) && !!key.state);
+    if (!isChangingState) {
+      return Backbone.Model.prototype.set.apply(this, arguments);
+    }
     var newState = _.isObject(key) ? key.state : val;
     //If we are changing the models state value
-    if(states.indexOf(newState) === -1) { return; }
+    if (states.indexOf(newState) === -1) {
+      return;
+    }
     return Backbone.Model.prototype.set.apply(this, arguments);
   },
 
@@ -236,7 +266,6 @@ module.exports = Backbone.Model.extend({
         this.tertiaryCollection.switchCollection(new Backbone.Collection(null));
         break;
 
-
       default:
         this.primaryCollection.switchCollection(this.activeRoomCollection);
         this.secondaryCollection.switchCollection(new Backbone.Collection(null));
@@ -262,7 +291,7 @@ module.exports = Backbone.Model.extend({
 
     return {
       roomMenuIsPinned: attrs.roomMenuIsPinned,
-      hasDismissedSuggestions: attrs.hasDismissedSuggestions,
+      hasDismissedSuggestions: attrs.hasDismissedSuggestions
     };
   },
 
@@ -276,13 +305,19 @@ module.exports = Backbone.Model.extend({
     });
   },
 
-  onRoomChange: function (){
+  onRoomChange: function() {
     var activeModel = this._getModel('active', true);
     var newlyActiveModel = this._getModel('id', context.troupe().get('id'));
 
-    if(activeModel) { activeModel.set('active', false); }
-    if(newlyActiveModel) { newlyActiveModel.set('active', true); }
-    if(!this.get('roomMenuIsPinned')) { this.set('panelOpenState', false); }
+    if (activeModel) {
+      activeModel.set('active', false);
+    }
+    if (newlyActiveModel) {
+      newlyActiveModel.set('active', true);
+    }
+    if (!this.get('roomMenuIsPinned')) {
+      this.set('panelOpenState', false);
+    }
   },
 
   onMenuBarActivateRequest: function(data) {
@@ -290,21 +325,25 @@ module.exports = Backbone.Model.extend({
     this.set({
       panelOpenState: true,
       state: data.state,
-      groupId: data.groupId,
+      groupId: data.groupId
     });
   },
 
-  getCurrentGroup: function (){
-    if(this.get('state') !== 'org') { return false; }
+  getCurrentGroup: function() {
+    if (this.get('state') !== 'org') {
+      return false;
+    }
     return this.groupsCollection.get(this.get('groupId'));
   },
 
-  _getModel: function (prop, val){
-    var query = {}; query[prop] = val;
-    return this.primaryCollection.findWhere(query) ||
+  _getModel: function(prop, val) {
+    var query = {};
+    query[prop] = val;
+    return (
+      this.primaryCollection.findWhere(query) ||
       this.secondaryCollection.findWhere(query) ||
-        this.tertiaryCollection.findWhere(query) ||
-          this._roomCollection.findWhere(query);
-  },
-
+      this.tertiaryCollection.findWhere(query) ||
+      this._roomCollection.findWhere(query)
+    );
+  }
 });

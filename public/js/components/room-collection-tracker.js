@@ -11,16 +11,18 @@ function RoomCollectionTracker(collection) {
   appEvents.on('context.troupeId', this.onContextChange, this);
   appEvents.on('navigation', this.onNavigate, this);
 
-  collection.on("add", this.onAdd, this);
-  collection.on("reset", this.onReset, this);
+  collection.on('add', this.onAdd, this);
+  collection.on('reset', this.onReset, this);
 
   var parsed = urlParser.parse(window.location.href);
   this.setSelectedRoom({ url: parsed.pathname });
 }
 
 RoomCollectionTracker.prototype = {
-  setSelectedRoom: function (selector) {
-    var selectedRoomModel = selector.url ? this.collection.findWhere({ url: selector.url }) : this.collection.get(selector.id);
+  setSelectedRoom: function(selector) {
+    var selectedRoomModel = selector.url
+      ? this.collection.findWhere({ url: selector.url })
+      : this.collection.get(selector.id);
 
     if (selectedRoomModel && this.current === selectedRoomModel) return;
     if (this.current) {
@@ -37,8 +39,10 @@ RoomCollectionTracker.prototype = {
 
   onAdd: function(model) {
     if (!this.currentSelector) return;
-    if (this.currentSelector.url && model.get('url') === this.currentSelector.url ||
-    this.currentSelector.id && model.id === this.currentSelector.id) {
+    if (
+      (this.currentSelector.url && model.get('url') === this.currentSelector.url) ||
+      (this.currentSelector.id && model.id === this.currentSelector.id)
+    ) {
       this.current = model;
       model.set('currentRoom', true);
     }

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var troupeService = require("gitter-web-rooms/lib/troupe-service");
-var restful = require("../../../services/restful");
-var restSerializer = require("../../../serializers/rest-serializer");
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var restful = require('../../../services/restful');
+var restSerializer = require('../../../serializers/rest-serializer');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var userRoomModeUpdateService = require('gitter-web-rooms/lib/user-room-mode-update-service');
 var roomService = require('gitter-web-rooms');
@@ -25,17 +25,17 @@ function performUpdateToUserRoom(req) {
   var troupeId = req.params.userTroupeId;
   var policy = req.userRoomPolicy;
 
-  return troupeService.findByIdLeanWithMembership(troupeId, userId)
+  return troupeService
+    .findByIdLeanWithMembership(troupeId, userId)
     .spread(function(troupe, isMember) {
-
       var updatedTroupe = req.body;
 
       var promises = [];
 
-      if('favourite' in updatedTroupe) {
+      if ('favourite' in updatedTroupe) {
         var fav = updatedTroupe.favourite;
 
-        if(!fav || isMember) {
+        if (!fav || isMember) {
           promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
         } else {
           // The user has added a favourite that they don't belong to
@@ -43,27 +43,28 @@ function performUpdateToUserRoom(req) {
           if (!troupe.oneToOne) {
             /* Ignore one-to-one rooms */
             promises.push(
-              joinRoom(user, troupe, policy)
-                .then(function() {
-                  return recentRoomService.updateFavourite(userId, troupeId, fav);
-                })
-              );
+              joinRoom(user, troupe, policy).then(function() {
+                return recentRoomService.updateFavourite(userId, troupeId, fav);
+              })
+            );
           }
         }
       }
 
-      if('updateLastAccess' in updatedTroupe) {
+      if ('updateLastAccess' in updatedTroupe) {
         promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
       }
 
-      if('mode' in updatedTroupe) {
-        promises.push(userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode));
+      if ('mode' in updatedTroupe) {
+        promises.push(
+          userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode)
+        );
       }
 
       return Promise.all(promises);
     })
     .then(function() {
-      if(req.accepts(['text', 'json']) === 'text') return;
+      if (req.accepts(['text', 'json']) === 'text') return;
 
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
@@ -75,14 +76,13 @@ function performUpdateToUserRoom(req) {
 
       return restSerializer.serializeObject(req.params.userTroupeId, strategy);
     });
-
 }
 
 module.exports = {
   id: 'userTroupeId',
 
   index: function(req) {
-    if(!req.user) throw new StatusError(401);
+    if (!req.user) throw new StatusError(401);
 
     return restful.serializeTroupesForUser(req.resourceUser.id);
   },
@@ -97,10 +97,11 @@ module.exports = {
       source = req.body.source;
     }
 
-    var troupeId = req.body && req.body.id && "" + req.body.id;
-    if(!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
+    var troupeId = req.body && req.body.id && '' + req.body.id;
+    if (!troupeId || !mongoUtils.isLikeObjectId(troupeId)) throw new StatusError(400);
 
-    return troupeService.findById(troupeId)
+    return troupeService
+      .findById(troupeId)
       .then(function(room) {
         return [room, policyFactory.createPolicyForRoom(req.user, room)];
       })
@@ -144,35 +145,33 @@ module.exports = {
    * DELETE /users/:userId/rooms/:roomId
    */
   destroy: function(req) {
-    return troupeService.findById(req.params.userTroupeId)
-      .then(function(troupe) {
-        if (!troupe) throw new StatusError(404);
+    return troupeService.findById(req.params.userTroupeId).then(function(troupe) {
+      if (!troupe) throw new StatusError(404);
 
-        return roomService.hideRoomFromUser(troupe, req.user._id);
-      });
-
+      return roomService.hideRoomFromUser(troupe, req.user._id);
+    });
   },
 
   load: function(req, id) {
-    if(!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
+    if (!mongoUtils.isLikeObjectId(id)) throw new StatusError(400);
 
-    return troupeService.checkIdExists(id)
+    return troupeService
+      .checkIdExists(id)
       .then(function(exists) {
         if (!exists) throw new StatusError(404);
 
         return id;
       })
       .tap(function(id) {
-        return policyFactory.createPolicyForRoomId(req.user, id)
-          .then(function(policy) {
-            // TODO: middleware?
-            req.userRoomPolicy = policy;
-          });
-      })
+        return policyFactory.createPolicyForRoomId(req.user, id).then(function(policy) {
+          // TODO: middleware?
+          req.userRoomPolicy = policy;
+        });
+      });
   },
 
   subresources: {
-    'settings': require('./troupe-settings'),
-    'unreadItems': require('./unread-items')
+    settings: require('./troupe-settings'),
+    unreadItems: require('./unread-items')
   }
 };

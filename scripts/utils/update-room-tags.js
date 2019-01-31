@@ -23,27 +23,26 @@ var running;
 
 var batch = new BatchStream({ size: BATCH_SIZE });
 
-var stream = persistence.Troupe
-  .find({
-    users: { $not: { $size: 0 } },
-    tags: { $exists: false },
-    security: 'PUBLIC'
-  })
+var stream = persistence.Troupe.find({
+  users: { $not: { $size: 0 } },
+  tags: { $exists: false },
+  security: 'PUBLIC'
+})
   .limit(QUERY_LIMIT)
   .stream();
 
 stream.pipe(batch);
 
-stream.on('error', function (err) {
+stream.on('error', function(err) {
   console.log('err.stack:', err.stack);
 });
 
-batch.on('data', function (rooms) {
+batch.on('data', function(rooms) {
   running = true;
   this.pause(); // pause the stream
   run(rooms)
     .then(this.resume.bind(this)) // resume the stream on done
-    .then(function () {
+    .then(function() {
       running = false;
       if (batchComplete) {
         s();
@@ -60,23 +59,23 @@ function s() {
   }, 1000);
 }
 
-batch.on('end', function () {
-  if(!running) s();
+batch.on('end', function() {
+  if (!running) s();
   batchComplete = true;
 });
 
-var fetchGithubInfo = function (uri, user) {
+var fetchGithubInfo = function(uri, user) {
   var github = new GitHubService(user);
   return github.getRepo(uri);
 };
 
-var attachRepoInfoForRepoRoom = function (room) {
+var attachRepoInfoForRepoRoom = function(room) {
   return persistence.User.findById(room.users[0].id)
     .exec()
-    .then(function (user) {
+    .then(function(user) {
       return fetchGithubInfo(room.uri, user);
     })
-    .then(function (repo) {
+    .then(function(repo) {
       if (!repo) {
         return null;
       }
@@ -85,7 +84,7 @@ var attachRepoInfoForRepoRoom = function (room) {
         repo: repo
       };
     })
-    .catch(function (err) {
+    .catch(function(err) {
       if (err.statusCode !== 404) {
         console.error(err.stack);
       }
@@ -93,9 +92,9 @@ var attachRepoInfoForRepoRoom = function (room) {
     });
 };
 
-var attachRepoInfoToRooms = function (rooms) {
+var attachRepoInfoToRooms = function(rooms) {
   return Promise.all(
-    rooms.map(function (room) {
+    rooms.map(function(room) {
       if (room.githubType === 'REPO') {
         return attachRepoInfoForRepoRoom(room);
       } else {
@@ -105,21 +104,21 @@ var attachRepoInfoToRooms = function (rooms) {
   );
 };
 
-var filterFailedRooms = function (roomContainers) {
+var filterFailedRooms = function(roomContainers) {
   var newRoomContainers = roomContainers.filter(function(roomContainer) {
     return !!roomContainer;
   });
 
   var failedGithubFetch = roomContainers.length - newRoomContainers.length;
-  if (failedGithubFetch > 0) console.log('rooms that failed to get github data:', failedGithubFetch);
+  if (failedGithubFetch > 0)
+    console.log('rooms that failed to get github data:', failedGithubFetch);
 
   return newRoomContainers;
 };
 
 // deals with { room: room, repo:repo } returning an array of rooms with the added tags
-var tagRooms = function (roomContainers) {
-
-  return roomContainers.map(function (roomContainer) {
+var tagRooms = function(roomContainers) {
+  return roomContainers.map(function(roomContainer) {
     var room = roomContainer.room;
     var repo = roomContainer.repo;
     room.tags = roomTagger(room, repo); // tagging
@@ -128,15 +127,15 @@ var tagRooms = function (roomContainers) {
 };
 
 // iterates to the now tagged rooms and saves them
-var saveRooms = function (rooms) {
-
+var saveRooms = function(rooms) {
   return Promise.all(
-    rooms.map(function (room) {
-      return room.save()
-        .then(function () {
+    rooms.map(function(room) {
+      return room
+        .save()
+        .then(function() {
           TAGGED += 1;
         })
-        .catch(function (err) {
+        .catch(function(err) {
           return null;
         });
     })
@@ -145,11 +144,7 @@ var saveRooms = function (rooms) {
 
 // purely for logging
 function logProgress() {
-  console.log(
-    '[PROGRESS]',
-    '\tprocessed:', PROCESSED,
-    '\ttagged:', TAGGED
-  );
+  console.log('[PROGRESS]', '\tprocessed:', PROCESSED, '\ttagged:', TAGGED);
 }
 
 // reponsible for running the procedure
@@ -164,7 +159,7 @@ function run(rooms) {
     .then(filterFailedRooms)
     .then(tagRooms)
     .then(saveRooms)
-    .catch(function (err) {
+    .catch(function(err) {
       if (err.statusCode !== 404) console.error(err.stack);
     });
 }

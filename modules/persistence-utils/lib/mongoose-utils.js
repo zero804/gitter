@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var Promise = require('bluebird');
@@ -10,7 +10,9 @@ var mongoReadPrefs = require('./mongo-read-prefs');
 var Schema = mongoose.Schema;
 
 function idsIn(ids) {
-  return uniqueIds(ids).filter(function(id) { return !!id; });
+  return uniqueIds(ids).filter(function(id) {
+    return !!id;
+  });
 }
 
 function cloneSchema(schema) {
@@ -25,7 +27,7 @@ function cloneSchema(schema) {
 }
 
 function hashList(list) {
-  if(!list) return null;
+  if (!list) return null;
 
   return list.reduce(function(memo, item) {
     memo[item] = true;
@@ -37,8 +39,10 @@ function attachNotificationListenersToSchema(schema, options) {
   var blacklistHash = hashList(options.ignoredPaths);
   var whitelistHash = hashList(options.listenPaths);
 
-  if(blacklistHash && whitelistHash) {
-    throw new Error('Please specify either ignoredPaths (blacklist) or listenPaths (whitelist) or neither, not both');
+  if (blacklistHash && whitelistHash) {
+    throw new Error(
+      'Please specify either ignoredPaths (blacklist) or listenPaths (whitelist) or neither, not both'
+    );
   }
 
   function canIgnore(model) {
@@ -48,7 +52,9 @@ function attachNotificationListenersToSchema(schema, options) {
     }
 
     if (blacklistHash) {
-      var allBlacklisted = modified.every(function(path) { return blacklistHash[path]; });
+      var allBlacklisted = modified.every(function(path) {
+        return blacklistHash[path];
+      });
       if (allBlacklisted) {
         return true; // All modified paths can be ignored
       }
@@ -56,7 +62,9 @@ function attachNotificationListenersToSchema(schema, options) {
     }
 
     if (whitelistHash) {
-      var someWhitelisted = modified.some(function(path) { return whitelistHash[path]; });
+      var someWhitelisted = modified.some(function(path) {
+        return whitelistHash[path];
+      });
       if (someWhitelisted) {
         return false; // Things on the whitelist - handle this modification
       } else {
@@ -67,15 +75,15 @@ function attachNotificationListenersToSchema(schema, options) {
     return false;
   }
 
-  if(options.onCreate || options.onUpdate) {
-    schema.pre('save', function (next) {
+  if (options.onCreate || options.onUpdate) {
+    schema.pre('save', function(next) {
       if (canIgnore(this)) {
         return next();
       }
 
       var isNewInstance = this.isNew;
 
-      if(this._skipTroupeMiddleware) {
+      if (this._skipTroupeMiddleware) {
         delete this._skipTroupeMiddleware;
         return next();
       }
@@ -87,23 +95,21 @@ function attachNotificationListenersToSchema(schema, options) {
     schema.post('save', function(doc, postNext) {
       var isNewInstance = doc._gIsNew;
       delete doc._gIsNew;
-      if(isNewInstance) {
-        if(options.onCreate) return options.onCreate(doc, postNext);
+      if (isNewInstance) {
+        if (options.onCreate) return options.onCreate(doc, postNext);
       } else {
-        if(options.onUpdate) return options.onUpdate(doc, postNext);
+        if (options.onUpdate) return options.onUpdate(doc, postNext);
       }
       return postNext();
     });
-
   }
 
-  if(options.onRemove) {
+  if (options.onRemove) {
     schema.post('remove', function(model, next) {
       options.onRemove(model);
       next();
     });
   }
-
 }
 
 var MAX_UPSERT_ATTEMPTS = 2;
@@ -121,7 +127,8 @@ function leanUpsert(schema, query, setOperation) {
 
   function performUpdate() {
     attempts++;
-    return schema.findOneAndUpdate(query, setOperation, { upsert: true, new: false })
+    return schema
+      .findOneAndUpdate(query, setOperation, { upsert: true, new: false })
       .exec()
       .catch(function(err) {
         if (attempts >= MAX_UPSERT_ATTEMPTS) throw err;
@@ -132,10 +139,9 @@ function leanUpsert(schema, query, setOperation) {
       });
   }
 
-  return performUpdate()
-    .then(function(doc) {
-      return !!doc;
-    });
+  return performUpdate().then(function(doc) {
+    return !!doc;
+  });
 }
 
 /**
@@ -147,7 +153,8 @@ function safeUpsertUpdate(schema, query, setOperation) {
 
   function performUpdate() {
     attempts++;
-    return schema.update(query, setOperation, { upsert: true })
+    return schema
+      .update(query, setOperation, { upsert: true })
       .exec()
       .catch(function(err) {
         if (attempts >= MAX_UPSERT_ATTEMPTS) throw err;
@@ -168,11 +175,10 @@ function safeUpsertUpdate(schema, query, setOperation) {
  * insert, this function will retry
  */
 function upsert(schema, query, setOperation) {
-  return leanUpsert(schema, query, setOperation)
-    .then(function(existing) {
-      // If doc is null then an insert occurred
-      return Promise.all([schema.findOne(query).exec(), existing]);
-    });
+  return leanUpsert(schema, query, setOperation).then(function(existing) {
+    // If doc is null then an insert occurred
+    return Promise.all([schema.findOne(query).exec(), existing]);
+  });
 }
 
 /**
@@ -193,7 +199,9 @@ function findByIds(Model, ids, callback) {
     }
 
     /* Usual case */
-    return Model.where('_id')['in'](mongoUtils.asObjectIDs(idsIn(ids))).exec();
+    return Model.where('_id')
+      ['in'](mongoUtils.asObjectIDs(idsIn(ids)))
+      .exec();
   }).nodeify(callback);
 }
 
@@ -221,19 +229,22 @@ function findByIdsLean(Model, ids, select) {
       .lean()
       .exec()
       .then(mongoUtils.setIds);
-
   });
 }
 
 function addIdToLean(object) {
-  if (object && object._id) { object.id = object._id.toString(); }
+  if (object && object._id) {
+    object.id = object._id.toString();
+  }
   return object;
 }
 
 function addIdToLeanArray(objects) {
   if (objects) {
     objects.forEach(function(f) {
-      if (f && f._id) { f.id = f._id.toString(); }
+      if (f && f._id) {
+        f.id = f._id.toString();
+      }
     });
   }
   return objects;
@@ -258,33 +269,39 @@ function getEstimatedCountForIds(Model, field, ids, options) {
 
   if (ids.length === 1) {
     var singleId = ids[0];
-    return getEstimatedCountForId(Model, field, singleId)
-      .then(function(count) {
-        var hash = {};
-        hash[singleId] = count;
-        return hash;
-      });
+    return getEstimatedCountForId(Model, field, singleId).then(function(count) {
+      var hash = {};
+      hash[singleId] = count;
+      return hash;
+    });
   }
 
   var query = {};
-  query[field] = { $in: ids }
-  return Model.aggregate([{
+  query[field] = { $in: ids };
+  return Model.aggregate([
+    {
       $match: query
-    }, {
+    },
+    {
       $group: {
         _id: '$' + field,
         count: { $sum: 1 }
       }
-    }])
+    }
+  ])
     .read(options.read)
     .exec()
     .then(function(results) {
       if (!results || !results.length) return {};
 
-      return _.reduce(results, function(memo, result) {
-        memo[result._id] = result.count;
-        return memo;
-      }, {});
+      return _.reduce(
+        results,
+        function(memo, result) {
+          memo[result._id] = result.count;
+          return memo;
+        },
+        {}
+      );
     });
 }
 
@@ -298,8 +315,7 @@ function makeLastModifiedUpdater(Model) {
         lastModified: lastModified
       }
     };
-    return Model.update(query, update)
-      .exec();
+    return Model.update(query, update).exec();
   };
 }
 

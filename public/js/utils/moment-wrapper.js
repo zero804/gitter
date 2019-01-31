@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* This require looks HORRIBLE, but it's a way to use the non-aliased moment */
 /* Webpack config will alias all usages of moment to this module */

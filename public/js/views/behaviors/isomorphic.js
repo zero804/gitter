@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
@@ -26,12 +26,11 @@ var Behavior = Marionette.Behavior.extend({
       var region = view.addRegion(regionName, el);
       var initMethod = isoRegionDefn.init;
 
-      if(!initMethod) return;
+      if (!initMethod) return;
 
       function optionsForRegion(options, config) {
         var regionEl = region.$el[0];
-        if (!regionEl)
-          throw new Error('Region ' + regionName + ' does not exist.');
+        if (!regionEl) throw new Error('Region ' + regionName + ' does not exist.');
 
         var regionElChildLen = regionEl.children.length;
 
@@ -45,10 +44,16 @@ var Behavior = Marionette.Behavior.extend({
             baseOptions = { template: false, el: regionEl.children[0] };
           }
         } else {
-          throw new Error('Region can have zero or one elements, but not more. Region ' + regionName + " has " + regionElChildLen + ". Are you sure you wrapped the region with a parent?");
+          throw new Error(
+            'Region can have zero or one elements, but not more. Region ' +
+              regionName +
+              ' has ' +
+              regionElChildLen +
+              '. Are you sure you wrapped the region with a parent?'
+          );
         }
 
-        if(!options) return baseOptions;
+        if (!options) return baseOptions;
         return _.extend(baseOptions, options);
       }
 
@@ -58,11 +63,10 @@ var Behavior = Marionette.Behavior.extend({
       }
 
       var childView = initMethod.call(view, optionsForRegion, region);
-      if(childView) {
+      if (childView) {
         view.showChildView(regionName, childView);
       }
     });
-
   }
 });
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -17,14 +17,13 @@ var AVATAR_SIZE_SMALL = 30;
 var FALLBACK_IMAGE_URL = avatars.getDefault();
 
 module.exports = (function() {
-
   var AvatarWidget = Marionette.ItemView.extend({
     tagName: 'div',
     className: 'avatar',
     template: template,
     events: {
-      'mouseover': 'showDetailIntent',
-      'click':     'showDetail',
+      mouseover: 'showDetailIntent',
+      click: 'showDetail',
       'error img': 'onImageError'
     },
     ui: {
@@ -41,12 +40,15 @@ module.exports = (function() {
       if (options.showTooltip !== false) {
         return {
           Tooltip: {
-            ':first-child': { titleFn: 'getTooltip', placement: options.tooltipPlacement || 'vertical' },
+            ':first-child': {
+              titleFn: 'getTooltip',
+              placement: options.tooltipPlacement || 'vertical'
+            }
           }
         };
       }
     },
-    initialize: function (options) {
+    initialize: function(options) {
       if (options.user) {
         this.model = new Backbone.Model(options.user);
       }
@@ -71,9 +73,13 @@ module.exports = (function() {
     },
 
     showDetailIntent: function(e) {
-      UserPopoverView.hoverTimeout(e, function() {
-        this.showDetail(e);
-      }, this);
+      UserPopoverView.hoverTimeout(
+        e,
+        function() {
+          this.showDetail(e);
+        },
+        this
+      );
     },
 
     showDetail: function(e) {
@@ -95,7 +101,7 @@ module.exports = (function() {
       UserPopoverView.singleton(this, popover);
     },
 
-    update: function () {
+    update: function() {
       var data = this.serializeData();
       this.updatePresence(data);
       this.updateAvatar(data);
@@ -140,7 +146,6 @@ module.exports = (function() {
     },
 
     attachElContent: FastAttachMixin.attachElContent
-
   });
 
   function serializeData(user, options) {
@@ -166,14 +171,14 @@ module.exports = (function() {
     if (options.showStatus) {
       presenceClass = online ? 'online' : 'offline';
     } else {
-      presenceClass = "";
+      presenceClass = '';
     }
 
     return {
       id: user.id,
       showStatus: options.showStatus,
       userDisplayName: user.displayName,
-      alt: options.screenReadUsername ? user.username: '',
+      alt: options.screenReadUsername ? user.username : '',
       avatarSrcSet: avatarSrcSet,
       avatarSize: avatarSize || 's',
       imgSize: imgSize,
@@ -188,10 +193,15 @@ module.exports = (function() {
   }
 
   AvatarWidget.getPrerendered = function(model, id) {
-    return "<span class='widget' data-widget-id='" + id + "'>" + template(serializeData(null, model)) + "</span>";
+    return (
+      "<span class='widget' data-widget-id='" +
+      id +
+      "'>" +
+      template(serializeData(null, model)) +
+      '</span>'
+    );
   };
 
   widgets.register({ avatar: AvatarWidget });
   return AvatarWidget;
-
 })();

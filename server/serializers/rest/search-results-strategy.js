@@ -1,16 +1,20 @@
-"use strict";
+'use strict';
 
 function SearchResultsStrategy(options) {
   var resultItemStrategy = options.resultItemStrategy;
 
   this.preload = function(searchResults) {
-    var items = searchResults.map(function(i) { return i.results; }).flatten();
+    var items = searchResults
+      .map(function(i) {
+        return i.results;
+      })
+      .flatten();
     return resultItemStrategy.preload(items);
   };
 
   this.map = function(item) {
     var results = item.results;
-    if(item.results === undefined || item.results === null) {
+    if (item.results === undefined || item.results === null) {
       results = [].concat(item);
     }
 
@@ -23,12 +27,10 @@ function SearchResultsStrategy(options) {
       })
     };
   };
-
 }
 
 SearchResultsStrategy.prototype = {
   name: 'SearchResultsStrategy'
 };
-
 
 module.exports = SearchResultsStrategy;

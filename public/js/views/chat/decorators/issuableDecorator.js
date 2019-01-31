@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var Backbone = require('backbone');
@@ -14,18 +14,20 @@ var titleTemplate = require('./tmpl/issuePopoverTitle.hbs');
 var footerTemplate = require('./tmpl/commitPopoverFooter.hbs');
 var SyncMixin = require('../../../collections/sync-mixin');
 
-
 function isGitHubUser(user) {
   // Handle Backbone model or pojo
-  return user && (user.providers || user.get('providers')).some(function(provider) {
-    return provider === 'github';
-  });
+  return (
+    user &&
+    (user.providers || user.get('providers')).some(function(provider) {
+      return provider === 'github';
+    })
+  );
 }
 
 // This is used for the legacy <span> references
 function convertToIssueAnchor(element, issueUrl) {
   var resultantElement = element;
-  if(
+  if (
     element.tagName !== 'a' &&
     // Protect against Safari-backed desktop app somehow isolating the node and removing the parent
     element.parentNode
@@ -36,10 +38,10 @@ function convertToIssueAnchor(element, issueUrl) {
 
     if (element.hasAttributes()) {
       var attributes = element.attributes;
-      for(var i = attributes.length - 1; i >= 0; i--) {
+      for (var i = attributes.length - 1; i >= 0; i--) {
         var attr = attributes[i];
         newElement.setAttribute(attr.name, attr.value);
-       }
+      }
     }
 
     newElement.setAttribute('href', issueUrl || '');
@@ -52,7 +54,8 @@ function convertToIssueAnchor(element, issueUrl) {
 }
 
 function getIssuableState(type, provider, repo, issueNumber) {
-  return apiClient.priv.get('/issue-state', {
+  return apiClient.priv
+    .get('/issue-state', {
       t: type,
       p: provider,
       r: repo,
@@ -95,13 +98,14 @@ var FooterView = Marionette.ItemView.extend({
   },
   onMentionClick: function() {
     getRoomRepo()
-      .then((roomRepo) => {
+      .then(roomRepo => {
         var modelRepo = this.model.get('repo');
         var modelNumber = this.model.get('number');
-        var mentionText = (modelRepo === roomRepo) ? '#' + modelNumber : modelRepo + '#' + modelNumber;
+        var mentionText =
+          modelRepo === roomRepo ? '#' + modelNumber : modelRepo + '#' + modelNumber;
         appEvents.trigger('input.append', mentionText);
       })
-      .catch((err) => {
+      .catch(err => {
         log.error(`Problem getting room repo`, { exception: err });
       });
 
@@ -120,7 +124,7 @@ context.troupe().on('change:id', function() {
 
 function getRoomRepo() {
   var room = context.troupe();
-  if(!room) {
+  if (!room) {
     return Promise.reject('No current room');
   }
 
@@ -134,7 +138,7 @@ function getRoomRepo() {
     // Check if the snapshot already came in
     var associatedRepo = room.get('associatedRepo');
 
-    if(associatedRepo || associatedRepo === false) {
+    if (associatedRepo || associatedRepo === false) {
       return resolve(associatedRepo || null);
     }
 
@@ -143,24 +147,23 @@ function getRoomRepo() {
       var updatedRoomId = room.get('id');
 
       // The room could have changed since the request came back in
-      if(roomId !== updatedRoomId) {
+      if (roomId !== updatedRoomId) {
         return reject(new Error('Expired'));
       }
 
       var associatedRepo = room.get('associatedRepo');
 
-      if(associatedRepo || associatedRepo === false) {
+      if (associatedRepo || associatedRepo === false) {
         return resolve(associatedRepo || null);
       }
     }
 
     unlisten = function() {
       room.off('change', onChange);
-    }
+    };
 
     room.on('change', onChange);
-  })
-  .finally(function() {
+  }).finally(function() {
     if (unlisten) {
       unlisten();
     }
@@ -192,28 +195,38 @@ function getAnchorUrl(githubRepo, issueNumber) {
   var currentGroup = context.group();
   var backedBy = currentGroup && currentGroup.get('backedBy');
 
-  if(githubRepo) {
+  if (githubRepo) {
     return 'https://github.com/' + githubRepo + '/issues/' + issueNumber;
   }
 
   var currentUser = context.user();
 
   // One-to-ones
-  if(!githubRepo && currentRoom.get('oneToOne')) {
+  if (!githubRepo && currentRoom.get('oneToOne')) {
     var otherUser = currentRoom.get('user');
 
-    if(currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
-      return 'https://github.com/issues?q=' + issueNumber + '+%28involves%3A' + currentUser.get('username') + '+OR+involves%3A' + otherUser.username + '+%29';
+    if (currentUser && isGitHubUser(currentUser) && otherUser && isGitHubUser(otherUser)) {
+      return (
+        'https://github.com/issues?q=' +
+        issueNumber +
+        '+%28involves%3A' +
+        currentUser.get('username') +
+        '+OR+involves%3A' +
+        otherUser.username +
+        '+%29'
+      );
     }
   }
 
   // We don't know the REPO, but we know the org?
-  if(backedBy && backedBy.type === 'GH_ORG') {
+  if (backedBy && backedBy.type === 'GH_ORG') {
     return 'https://github.com/issues?q=' + issueNumber + '+user%3A' + backedBy.linkPath;
   }
 
   if (currentUser && isGitHubUser(currentUser)) {
-    return 'https://github.com/issues?q=' + issueNumber + '+involves:' + currentUser.get('username');
+    return (
+      'https://github.com/issues?q=' + issueNumber + '+involves:' + currentUser.get('username')
+    );
   }
 
   return 'https://github.com/issues?q=' + issueNumber;
@@ -246,7 +259,7 @@ function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber
   }
 
   function showPopover(e, model) {
-    if(!model) model = getModel();
+    if (!model) model = getModel();
 
     var popover = createPopover(model, e.target);
     popover.show();
@@ -271,52 +284,68 @@ function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber
 
 var decorator = {
   decorate: function(view) {
-    Array.prototype.forEach.call(view.el.querySelectorAll('*[data-link-type="issue"], *[data-link-type="mr"], *[data-link-type="pr"]'), function(issueElement) {
-      return Promise.try(function() {
-        var repoFromElement = issueElement.dataset.issueRepo;
+    Array.prototype.forEach.call(
+      view.el.querySelectorAll(
+        '*[data-link-type="issue"], *[data-link-type="mr"], *[data-link-type="pr"]'
+      ),
+      function(issueElement) {
+        return Promise.try(function() {
+          var repoFromElement = issueElement.dataset.issueRepo;
 
-        if(repoFromElement) {
-          return repoFromElement;
-        }
+          if (repoFromElement) {
+            return repoFromElement;
+          }
 
-        return getRoomRepo();
-      })
-      .then(function(repo) {
-        var type = issueElement.dataset.linkType || 'issue';
-        var issueNumber = issueElement.dataset.issue;
-        var anchorUrl = issueElement.getAttribute('href') || getAnchorUrl(repo, issueNumber);
-        if(anchorUrl) {
-          // This is used for the legacy <span> references
-          issueElement = convertToIssueAnchor(issueElement, anchorUrl);
-        }
-        var provider = issueElement.dataset.provider || 'github';
+          return getRoomRepo();
+        })
+          .then(function(repo) {
+            var type = issueElement.dataset.linkType || 'issue';
+            var issueNumber = issueElement.dataset.issue;
+            var anchorUrl = issueElement.getAttribute('href') || getAnchorUrl(repo, issueNumber);
+            if (anchorUrl) {
+              // This is used for the legacy <span> references
+              issueElement = convertToIssueAnchor(issueElement, anchorUrl);
+            }
+            var provider = issueElement.dataset.provider || 'github';
 
+            if (repo && issueNumber) {
+              getIssuableState(type, provider, repo, issueNumber)
+                .then(function(state) {
+                  if (!state) return;
 
-        if (repo && issueNumber) {
-          getIssuableState(type, provider, repo, issueNumber)
-            .then(function(state) {
-              if(!state) return;
+                  // We depend on this to style the issue after making sure it is an issue
+                  issueElement.classList.add('is-existent');
 
-              // We depend on this to style the issue after making sure it is an issue
-              issueElement.classList.add('is-existent');
+                  // dont change the issue state colouring for the activity feed
+                  if (
+                    !issueElement.classList.contains('open') &&
+                    !issueElement.classList.contains('closed')
+                  ) {
+                    issueElement.classList.add(state);
+                  }
 
-              // dont change the issue state colouring for the activity feed
-              if(!issueElement.classList.contains('open') && !issueElement.classList.contains('closed')) {
-                issueElement.classList.add(state);
-              }
-
-              bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber, anchorUrl);
-            })
-            .catch((err) => {
-              log.error(`Problem fetching issuable state ${repo}#${issueNumber}`, { exception: err });
-            });
-        }
-
-      })
-      .catch((err) => {
-        log.error(`Problem getting repo for room`, { exception: err });
-      });
-    });
+                  bindAnchorToIssue(
+                    view,
+                    issueElement,
+                    type,
+                    provider,
+                    repo,
+                    issueNumber,
+                    anchorUrl
+                  );
+                })
+                .catch(err => {
+                  log.error(`Problem fetching issuable state ${repo}#${issueNumber}`, {
+                    exception: err
+                  });
+                });
+            }
+          })
+          .catch(err => {
+            log.error(`Problem getting repo for room`, { exception: err });
+          });
+      }
+    );
   }
 };
 

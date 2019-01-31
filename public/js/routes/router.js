@@ -20,7 +20,7 @@ var Router = Backbone.Router.extend({
 
   hideModal: function() {
     this.dialogRegion.destroy();
-  },
+  }
 });
 
 module.exports = Router;

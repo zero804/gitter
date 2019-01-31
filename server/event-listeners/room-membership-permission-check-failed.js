@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -13,7 +13,8 @@ exports.install = function() {
 
   appEvents.onRoomMemberPermCheckFailed(function(roomId, userId) {
     // This person no longer actually has access. Remove them!
-    return roomService.removeRoomMemberById(roomId, userId)
+    return roomService
+      .removeRoomMemberById(roomId, userId)
       .then(function() {
         stats.event('membership_perm_check_failed', { roomId: roomId, userId: userId });
       })
@@ -21,6 +22,5 @@ exports.install = function() {
         errorReporter(err, { unreadItemsFailed: true }, { module: 'room-membership-events' });
       })
       .done();
-
   });
 };

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
@@ -8,7 +8,7 @@ var ObjectId = Schema.ObjectId;
 // Settings for a user for a troupe
 //
 var UserSettingsSchema = new Schema({
-  userId:   ObjectId,
+  userId: ObjectId,
   settings: Schema.Types.Mixed
 });
 UserSettingsSchema.index({ userId: 1 }, { unique: true });

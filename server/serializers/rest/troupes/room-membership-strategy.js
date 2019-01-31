@@ -1,11 +1,12 @@
-"use strict";
+'use strict';
 
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var collections = require('gitter-web-utils/lib/collections');
 
 function RoomMembershipStrategy(options) {
   this.userId = options.userId || options.currentUserId;
-  this.nonMemberTroupeIds = options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
+  this.nonMemberTroupeIds =
+    options.nonMemberTroupeIds && collections.hashArray(options.nonMemberTroupeIds);
   this.predefinedValue = options.isRoomMember !== undefined;
   this.isRoomMember = options.isRoomMember;
   this.memberships = null;
@@ -18,7 +19,8 @@ RoomMembershipStrategy.prototype = {
       return;
     }
 
-    return roomMembershipService.findUserMembershipInRooms(this.userId, troupeIds.toArray())
+    return roomMembershipService
+      .findUserMembershipInRooms(this.userId, troupeIds.toArray())
       .bind(this)
       .then(function(memberTroupeIds) {
         this.memberships = collections.hashArray(memberTroupeIds);
@@ -39,6 +41,5 @@ RoomMembershipStrategy.prototype = {
 
   name: 'AllUnreadItemCountStrategy'
 };
-
 
 module.exports = RoomMembershipStrategy;

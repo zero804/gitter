@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -15,7 +15,7 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
 
   var linkedinUser = {
-    username: profile.id+'_linkedin',
+    username: profile.id + '_linkedin',
     displayName: profile.displayName,
     gravatarImageUrl: avatar
   };
@@ -32,7 +32,8 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     avatar: avatar
   };
 
-  return userService.findOrCreateUserForProvider(linkedinUser, linkedinIdentity)
+  return userService
+    .findOrCreateUserForProvider(linkedinUser, linkedinIdentity)
     .spread(function(user, isNewUser) {
       trackSignupOrLogin(req, user, isNewUser, 'linkedin');
       updateUserLocale(req, user);
@@ -42,7 +43,8 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
     .asCallback(done);
 }
 
-var linkedInStrategy = new LinkedInStrategy({
+var linkedInStrategy = new LinkedInStrategy(
+  {
     clientID: config.get('linkedinoauth2:client_id'),
     clientSecret: config.get('linkedinoauth2:client_secret'),
     callbackURL: callbackUrlBuilder('linkedin'),
@@ -50,7 +52,9 @@ var linkedInStrategy = new LinkedInStrategy({
     // (scope only works here and not when calling passport.authorize)
     scope: ['r_basicprofile', 'r_emailaddress'],
     passReqToCallback: true
-  }, linkedinOauth2Callback);
+  },
+  linkedinOauth2Callback
+);
 
 linkedInStrategy.name = 'linkedin';
 

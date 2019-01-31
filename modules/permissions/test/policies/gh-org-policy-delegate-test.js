@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var proxyquireNoCallThru = require('proxyquire').noCallThru();
 
 describe('gh-org-policy-delegate', function() {
-
   var ORG1_USER = { _id: 1, username: 'x', githubToken: '1' };
   var NOT_ORG1_USER = { _id: 2, username: 'y', githubToken: '1' };
   var NON_GITHUB_USER = { _id: 2, username: 'y' };
@@ -13,12 +12,42 @@ describe('gh-org-policy-delegate', function() {
   var ORG1 = 'org1';
 
   var FIXTURES = [
-    { name: 'is org member', org: ORG1, user: ORG1_USER, policy: 'GH_ORG_MEMBER', expectedResult: true },
-    { name: 'is not org member', org: ORG1, user: NOT_ORG1_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
-    { name: 'is not a github user', org: ORG1, user: NON_GITHUB_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
+    {
+      name: 'is org member',
+      org: ORG1,
+      user: ORG1_USER,
+      policy: 'GH_ORG_MEMBER',
+      expectedResult: true
+    },
+    {
+      name: 'is not org member',
+      org: ORG1,
+      user: NOT_ORG1_USER,
+      policy: 'GH_ORG_MEMBER',
+      expectedResult: false
+    },
+    {
+      name: 'is not a github user',
+      org: ORG1,
+      user: NON_GITHUB_USER,
+      policy: 'GH_ORG_MEMBER',
+      expectedResult: false
+    },
     { name: 'anonymous', org: ORG1, user: null, policy: 'GH_ORG_MEMBER', expectedResult: false },
-    { name: 'user sans username', org: ORG1, user: INVALID_USER, policy: 'GH_ORG_MEMBER', expectedResult: false },
-    { name: 'invalid policy', org: ORG1, user: INVALID_USER, policy: 'INVALID', expectedResult: false },
+    {
+      name: 'user sans username',
+      org: ORG1,
+      user: INVALID_USER,
+      policy: 'GH_ORG_MEMBER',
+      expectedResult: false
+    },
+    {
+      name: 'invalid policy',
+      org: ORG1,
+      user: INVALID_USER,
+      policy: 'INVALID',
+      expectedResult: false
+    }
   ];
 
   var GhOrgPolicyDelegate;
@@ -46,7 +75,7 @@ describe('gh-org-policy-delegate', function() {
     it(meta.name, function() {
       var securityDescriptor = {
         linkPath: meta.org
-      }
+      };
 
       var user = meta.user;
       var userId = user && user._id;
@@ -57,17 +86,19 @@ describe('gh-org-policy-delegate', function() {
 
       var delegate = new GhOrgPolicyDelegate(userId, userLoader, securityDescriptor);
 
-      return delegate.hasPolicy(meta.policy)
-        .then(function(result) {
-          if(meta.expectedResult === 'throw') {
+      return delegate.hasPolicy(meta.policy).then(
+        function(result) {
+          if (meta.expectedResult === 'throw') {
             assert.ok(false, 'Expected exception');
           }
           assert.strictEqual(result, meta.expectedResult);
-        }, function(err) {
-          if(meta.expectedResult !== 'throw') {
-            throw err
+        },
+        function(err) {
+          if (meta.expectedResult !== 'throw') {
+            throw err;
           }
-        })
+        }
+      );
     });
-  })
+  });
 });

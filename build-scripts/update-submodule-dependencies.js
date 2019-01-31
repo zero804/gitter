@@ -15,7 +15,6 @@ function die(err) {
 
 var basePackage = require(path.join(__dirname, '..', 'package.json'));
 
-
 function stat(baseDirectory, files, callback) {
   if (!files.length) return callback(null, {});
   var stats = {};
@@ -30,8 +29,8 @@ function stat(baseDirectory, files, callback) {
       if (count === files.length) {
         callback(null, stats);
       }
-    })
-  })
+    });
+  });
 }
 
 function checkDirectory(baseDirectory, callback) {
@@ -42,14 +41,14 @@ function checkDirectory(baseDirectory, callback) {
       if (filesStat['package.json']) {
         return callback(null, path.join(baseDirectory, 'package.json'));
       } else {
-
-        var directories = files.filter(function(f) {
-          if (f === 'node_modules') return false;
-          return filesStat[f].isDirectory();
-        })
-        .map(function(f) {
-          return path.join(baseDirectory, f);
-        });
+        var directories = files
+          .filter(function(f) {
+            if (f === 'node_modules') return false;
+            return filesStat[f].isDirectory();
+          })
+          .map(function(f) {
+            return path.join(baseDirectory, f);
+          });
 
         return callback(null, null, directories);
       }
@@ -72,7 +71,7 @@ function searchNext(queue, results, callback) {
     } else {
       callback(null, results);
     }
-  })
+  });
 }
 
 function findChildModulePackages(queue, callback) {
@@ -106,7 +105,11 @@ function processDepsHash(hash, packageFile) {
 
     var baseVersionNormalised = normalise(baseVersion, packageFile);
     if (baseVersionNormalised !== hash[dependency]) {
-      results.push({ name: dependency, correctVersion: baseVersionNormalised, currentVersion: hash[dependency] })
+      results.push({
+        name: dependency,
+        correctVersion: baseVersionNormalised,
+        currentVersion: hash[dependency]
+      });
     }
   });
 
@@ -118,15 +121,24 @@ function installUpdates(packageFile, isDev, changes) {
 
   if (!changes || !changes.length) return;
 
-  var versions = changes.map(function(c) {
-    var correctVersion = c.correctVersion;
-    if (correctVersion.charAt(0) === '^') {
-      correctVersion = correctVersion.substring(1);
-    }
-    return c.name + '@' + correctVersion;
-  }).join(' ');
+  var versions = changes
+    .map(function(c) {
+      var correctVersion = c.correctVersion;
+      if (correctVersion.charAt(0) === '^') {
+        correctVersion = correctVersion.substring(1);
+      }
+      return c.name + '@' + correctVersion;
+    })
+    .join(' ');
 
-  console.log('(cd ' + wd + '; npm i ' + versions + (isDev ? ' --save-dev' : ' --save') + '; rm -rf node_modules)')
+  console.log(
+    '(cd ' +
+      wd +
+      '; npm i ' +
+      versions +
+      (isDev ? ' --save-dev' : ' --save') +
+      '; rm -rf node_modules)'
+  );
 }
 
 function updateDependenciesForPackage(packageFile) {
@@ -138,14 +150,13 @@ function updateDependenciesForPackage(packageFile) {
   installUpdates(packageFile, true, devChanges);
 }
 
+findChildModulePackages(
+  [path.join(__dirname, '..', 'shared'), path.join(__dirname, '..', 'modules')],
+  function(err, results) {
+    if (err) return die(err);
 
-findChildModulePackages([
-  path.join(__dirname, '..', 'shared'),
-  path.join(__dirname, '..', 'modules')
-], function(err, results) {
-  if (err) return die(err);
-
-  results.forEach(function(packageFile) {
-    updateDependenciesForPackage(packageFile);
-  });
-});
+    results.forEach(function(packageFile) {
+      updateDependenciesForPackage(packageFile);
+    });
+  }
+);

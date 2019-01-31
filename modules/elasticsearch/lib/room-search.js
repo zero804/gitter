@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var config = require('gitter-web-env').config;
 var Promise = require('bluebird');
@@ -8,23 +8,23 @@ var _ = require('lodash');
 const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 var PUBLIC_ROOMS_QUERY = {
-    "nested": {
-      "path": "sd",
-      "query": {
-        "term": {
-          "sd.public": true
-        }
+  nested: {
+    path: 'sd',
+    query: {
+      term: {
+        'sd.public': true
       }
     }
+  }
 };
 
 function privateRooms(privateRoomIds) {
   return {
     ids: {
-      type: "room",
+      type: 'room',
       values: privateRoomIds
     }
-  }
+  };
 }
 
 function or() {
@@ -34,7 +34,7 @@ function or() {
       should: terms,
       minimum_should_match: 1
     }
-  }
+  };
 }
 
 function and() {
@@ -43,27 +43,30 @@ function and() {
     bool: {
       must: terms
     }
-  }
+  };
 }
 
 function searchRooms(queryText, userId, privateRoomIds, options) {
   options = _.defaults(options, { limit: 5 });
 
-  var queryTextEscaped = queryText.replace(/([^\s]+\/([^\s]+(\/[^\s]+)?)?)/g,'"$1"');
+  var queryTextEscaped = queryText.replace(/([^\s]+\/([^\s]+(\/[^\s]+)?)?)/g, '"$1"');
 
-  var queryTerms = or({
-    prefix: {
-      uri: {
-        value: queryText
+  var queryTerms = or(
+    {
+      prefix: {
+        uri: {
+          value: queryText
+        }
+      }
+    },
+    {
+      query_string: {
+        query: queryTextEscaped,
+        default_operator: 'AND',
+        lenient: true
       }
     }
-  },{
-    query_string: {
-      query: queryTextEscaped,
-      default_operator: 'AND',
-      lenient: true
-    }
-  });
+  );
 
   var roomRestrictionTerms = or(PUBLIC_ROOMS_QUERY, privateRooms(privateRoomIds));
 
@@ -74,33 +77,32 @@ function searchRooms(queryText, userId, privateRoomIds, options) {
     index: 'gitter-primary',
     type: 'room',
     body: {
-      fields: ["_id"],
+      fields: ['_id'],
       query: {
         function_score: {
           query: and(queryTerms, roomRestrictionTerms),
-          functions: [{
-            field_value_factor: {
-              field: "userCount",
-              factor: 1.2,
-              modifier: "sqrt"
+          functions: [
+            {
+              field_value_factor: {
+                field: 'userCount',
+                factor: 1.2,
+                modifier: 'sqrt'
+              }
             }
-          }]
+          ]
         }
       },
-      sort: [
-        { _score: { order: "desc"} }
-      ],
+      sort: [{ _score: { order: 'desc' } }]
     }
   };
 
-  return client.search(queryRequest)
-    .then(function(response) {
-      return response.hits.hits.map(function(hit) {
-        return hit._id;
-      });
+  return client.search(queryRequest).then(function(response) {
+    return response.hits.hits.map(function(hit) {
+      return hit._id;
     });
+  });
 }
 
 module.exports = {
   searchRooms: Promise.method(searchRooms)
-}
+};

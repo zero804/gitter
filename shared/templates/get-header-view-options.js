@@ -3,13 +3,13 @@
 function getGithubLinkUrl(serializedTroupe) {
   var backend = serializedTroupe.backend;
   if (!backend) return;
-  switch(backend.type) {
+  switch (backend.type) {
     case 'GH_REPO':
     case 'GH_ORG':
       return 'https://github.com/' + backend.linkPath;
   }
 
-  return
+  return;
 }
 
 function isTroupeAdmin(serializedTroupe) {

@@ -27,6 +27,10 @@ validate:
   script:
     - "echo 'TODO: Skip validation for now because we have new eslint failures'"
     - make validate
+    # TODO: This should be part of `make validate` -> `gulpfile-linter`
+    # but the prettier API doesn't easily allow glob checking and I want
+    # to re-use the scripts that GitLab has, https://gitlab.com/gitlab-org/gitlab-ce/issues/57010
+    - npm run prettier -- --check "**/*.js"
 
 
 test:

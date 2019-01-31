@@ -9,7 +9,8 @@ function Controller() {
   function MockRedisBatcher(name) {
     this.queues = {};
     this.name = name;
-    if (mocks[name]) throw new Error('Mock batcher with name ' + name + ' already exists. Did you call destroy?');
+    if (mocks[name])
+      throw new Error('Mock batcher with name ' + name + ' already exists. Did you call destroy?');
     mocks[name] = this;
   }
 

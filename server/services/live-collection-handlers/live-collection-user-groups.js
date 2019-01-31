@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var appEvents = require('gitter-web-appevents');
 var _ = require('lodash');
@@ -11,5 +11,4 @@ module.exports = {
 
     appEvents.dataChange2('/user/' + userId + '/groups', 'patch', patchMessage, 'group');
   }
-
 };

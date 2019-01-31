@@ -17,32 +17,34 @@ var opts = require('yargs')
     string: true
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
-
+  .alias('help', 'h').argv;
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
 
-groupService.findByUri(opts.uri)
-  .then((group) => {
+groupService
+  .findByUri(opts.uri)
+  .then(group => {
     if (!group) {
       throw new Error(`Group with URI ${opts.uri} does not exist`);
     }
 
     return new Promise(function(resolve, reject) {
-      rl.question(`Are you sure you want to delete the ${group.uri} group and the rooms in it? (yes/no)`, function(answer) {
-        rl.close();
-        console.log(`Answered: ${answer}`);
+      rl.question(
+        `Are you sure you want to delete the ${group.uri} group and the rooms in it? (yes/no)`,
+        function(answer) {
+          rl.close();
+          console.log(`Answered: ${answer}`);
 
-        if(answer === 'yes') {
-          resolve(group);
-        } else {
-          reject(new Error('Answered no'));
+          if (answer === 'yes') {
+            resolve(group);
+          } else {
+            reject(new Error('Answered no'));
+          }
         }
-      });
+      );
     });
   })
   .then(function(group) {

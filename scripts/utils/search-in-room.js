@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
@@ -17,20 +17,17 @@ var opts = require('yargs')
     description: 'Query'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function findRoom(uri) {
-  return persistence.Troupe.findOne({ lcUri: uri.toLowerCase() })
-    .exec();
+  return persistence.Troupe.findOne({ lcUri: uri.toLowerCase() }).exec();
 }
-
 
 function execute(opts) {
   return findRoom(opts.uri)
     .then(function(room) {
       var options = {
-        lang: 'en',
+        lang: 'en'
       };
 
       return chatService.searchChatMessagesForRoom(room._id, opts.q, options);

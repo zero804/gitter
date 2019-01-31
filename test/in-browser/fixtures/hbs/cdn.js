@@ -1,3 +1,5 @@
 'use strict';
 
-module.exports = function cdn() { return '';};
+module.exports = function cdn() {
+  return '';
+};

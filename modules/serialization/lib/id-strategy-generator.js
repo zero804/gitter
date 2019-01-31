@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var collections = require('gitter-web-utils/lib/collections');
 var Promise = require('bluebird');
@@ -29,12 +29,12 @@ BaseIdStrategy.prototype = {
     return this.loaderFunction(idArray)
       .bind({
         time: time,
-        self: this,
+        self: this
       })
       .then(function(fullObjects) {
         var self = this.self;
         var duration = debug.enabled && Date.now() - this.time;
-        debug("%s loaded %s items from ids in %sms", self.stategyName, idArray.length, duration);
+        debug('%s loaded %s items from ids in %sms', self.stategyName, idArray.length, duration);
 
         self.objectHash = collections.indexById(fullObjects);
 
@@ -46,15 +46,13 @@ BaseIdStrategy.prototype = {
     if (!this.objectHash) return undefined;
     var fullObject = this.objectHash[id];
 
-    if(!fullObject) {
+    if (!fullObject) {
       return undefined;
     }
 
     return this.strategy.map(fullObject);
-  },
-
-
-}
+  }
+};
 
 function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   function IdStrategy(options, providedStrategy) {
@@ -65,7 +63,7 @@ function idStrategyGenerator(name, FullObjectStrategy, loaderFunction) {
   // Inject the strategy
   IdStrategy.withStrategy = function(providedStrategy) {
     return new IdStrategy(null, providedStrategy);
-  }
+  };
 
   util.inherits(IdStrategy, BaseIdStrategy);
 

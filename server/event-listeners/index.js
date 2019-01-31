@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var EVENT_LISTENERS = [
   './mongoose-events',
@@ -10,7 +10,7 @@ var EVENT_LISTENERS = [
   './room-membership-events',
   './destroy-user-tokens-listener',
   './room-membership-permission-check-failed',
-  './apn-feedback-listener',
+  './apn-feedback-listener'
 ];
 
 var installed = false;

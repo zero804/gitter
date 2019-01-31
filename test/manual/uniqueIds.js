@@ -1,6 +1,6 @@
 'use strict';
 
-var speedy = require("speedy");
+var speedy = require('speedy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
 
@@ -34,18 +34,16 @@ var sets = {
 
   largeUniqueStrings: _.range(10000).map(function() {
     return mongoUtils.createIdForTimestamp(Math.floor(Math.random() * 1000000000)).toString();
-  }),
+  })
   //
   // huge:_.range(100000).map(function() {
   //   return mongoUtils.createIdForTimestamp(Math.floor(Math.random() * 1000000000));
   // }),
-
 };
 
 speedy.samples(2);
 
 var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
-
   memo[key + 'WithUniq'] = function() {
     _.uniq(sets[key]);
   };
@@ -55,7 +53,7 @@ var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
   // };
 
   memo[key + 'WithUniqueIds'] = function() {
-      mongoUtils.uniqueIds(sets[key]);
+    mongoUtils.uniqueIds(sets[key]);
   };
 
   // memo[key + 'Interlude2'] = function(done) {
@@ -63,10 +61,9 @@ var benchmarkSuite = Object.keys(sets).reduce(function(memo, key) {
   // };
 
   return memo;
-
 }, {});
 speedy
-  .on("progress", function() {
+  .on('progress', function() {
     global.gc();
   })
   .run(benchmarkSuite);

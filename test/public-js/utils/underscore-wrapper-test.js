@@ -19,7 +19,6 @@ describe('underscore-wrapper', function() {
     assert.strictEqual(underscoreWrapper.isEqual(m, n), true);
   });
 
-
   it('should return equal on equal objects with moment dates with different languages', function() {
     var m = moment();
     m.locale('fr');
@@ -35,6 +34,4 @@ describe('underscore-wrapper', function() {
 
     assert.strictEqual(underscoreWrapper.isEqual(o1, o2), true);
   });
-
-
-})
+});

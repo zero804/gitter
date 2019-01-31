@@ -24,15 +24,16 @@ function deduplicate(collaborators) {
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
 
-  return users.filter(function(u) { return u.login !== user.username; });
+  return users.filter(function(u) {
+    return u.login !== user.username;
+  });
 }
 
 function allowFail(promise) {
-  return promise
-    .catch(function(e) {
-      logger.error('collaborators service soft fail: ' + e.message, { exception: e });
-      return null;
-    });
+  return promise.catch(function(e) {
+    logger.error('collaborators service soft fail: ' + e.message, { exception: e });
+    return null;
+  });
 }
 
 function GitHubRepoCollaboratorService(user, repoUri) {
@@ -63,9 +64,10 @@ GitHubRepoCollaboratorService.prototype.findCollaborators = function() {
           externalId: member.login,
           avatarUrl: avatars.getForGitHubUsername(member.login),
           type: identityService.GITHUB_IDENTITY_PROVIDER
-        }
+        };
       });
-    });
-}
+    }
+  );
+};
 
 module.exports = GitHubRepoCollaboratorService;

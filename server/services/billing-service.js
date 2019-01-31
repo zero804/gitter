@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -9,7 +9,7 @@ function toLowerCase(value) {
 }
 
 exports.findActiveOrgPlans = function(orgUris) {
-  if(!orgUris || !orgUris.length) return Promise.resolve([]);
+  if (!orgUris || !orgUris.length) return Promise.resolve([]);
 
   var query = mongoUtils.fieldInPredicate('lcUri', orgUris.map(toLowerCase), {
     subscriptionType: 'ORG',
@@ -23,15 +23,13 @@ exports.findActivePlan = function(uri) {
   var lcUri = toLowerCase(uri);
 
   return persistence.Subscription.findOne({
-      lcUri: lcUri,
-      status: 'CURRENT'
-    })
-    .exec();
-
+    lcUri: lcUri,
+    status: 'CURRENT'
+  }).exec();
 };
 
 exports.findActivePlans = function(uris) {
-  if(!uris || !uris.length) return Promise.resolve([]);
+  if (!uris || !uris.length) return Promise.resolve([]);
 
   var query = mongoUtils.fieldInPredicate('lcUri', uris.map(toLowerCase), {
     status: 'CURRENT'

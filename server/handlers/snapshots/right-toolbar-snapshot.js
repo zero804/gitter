@@ -4,7 +4,8 @@ var userSettingsService = require('gitter-web-user-settings');
 
 function getSnapshotsForPageContext(req) {
   if (!req.user) return {};
-  return userSettingsService.getUserSettings(req.user._id, 'rightToolbar')
+  return userSettingsService
+    .getUserSettings(req.user._id, 'rightToolbar')
     .then(function(rightToolbarUserSettings) {
       var isPinned;
 

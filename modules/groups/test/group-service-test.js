@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
-var proxyquireNoCallThru = require("proxyquire").noCallThru();
+var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var StatusError = require('statuserror');
 
 // stub out this check because otherwise we end up with a the tests all
@@ -27,16 +27,14 @@ function compareSets(a, b) {
 }
 
 describe('group-service', function() {
-
   describe('integration tests #slow', function() {
-
     fixtureLoader.ensureIntegrationEnvironment(
       '#integrationUser1',
       'GITTER_INTEGRATION_ORG',
-      'GITTER_INTEGRATION_USERNAME');
+      'GITTER_INTEGRATION_USERNAME'
+    );
 
     describe('createGroup', function() {
-
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           Group: [
@@ -45,7 +43,7 @@ describe('group-service', function() {
             { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
             { lcUri: 'bob' }
-          ],
+          ]
         },
         user1: '#integrationUser1'
       });
@@ -53,7 +51,8 @@ describe('group-service', function() {
       it('should create a group for a GitHub org', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
         var user = fixture.user1;
-        return groupService.createGroup(user, {
+        return groupService
+          .createGroup(user, {
             type: 'GH_ORG',
             name: 'Bob',
             uri: groupUri,
@@ -73,15 +72,16 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_ORG'
-            })
-          })
+            });
+          });
       });
 
       it('should create a group for a GitHub repo', function() {
         var groupUri = fixtureLoader.GITTER_INTEGRATION_REPO;
         var linkPath = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
         var user = fixture.user1;
-        return groupService.createGroup(user, {
+        return groupService
+          .createGroup(user, {
             type: 'GH_REPO',
             name: 'Bob',
             uri: groupUri,
@@ -101,13 +101,14 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_REPO'
-            })
-          })
+            });
+          });
       });
 
       it('should create a group for an unknown GitHub owner', function() {
         var user = fixture.user1;
-        return groupService.createGroup(user, {
+        return groupService
+          .createGroup(user, {
             type: 'GH_GUESS',
             name: 'Bob',
             // This also tests that you can have a group with an arbitrary uri
@@ -130,20 +131,24 @@ describe('group-service', function() {
               members: 'PUBLIC',
               public: true,
               type: 'GH_USER'
-            })
-          })
+            });
+          });
       });
 
       it('should create a group for a new style community', function() {
         var user = fixture.user1;
-        return groupService.createGroup(user, {
+        return groupService
+          .createGroup(user, {
             name: 'Bob',
             uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY
           })
           .then(function(group) {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
-            assert.strictEqual(group.lcUri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase());
+            assert.strictEqual(
+              group.lcUri,
+              fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase()
+            );
             return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
@@ -152,8 +157,8 @@ describe('group-service', function() {
               admins: 'MANUAL',
               public: true,
               members: 'PUBLIC'
-            })
-          })
+            });
+          });
       });
 
       it('should throw a 409 if a URL is not available', function() {
@@ -165,7 +170,8 @@ describe('group-service', function() {
             });
           }
         });
-        groupService.createGroup(user, {
+        groupService
+          .createGroup(user, {
             name: 'Bob',
             uri: 'bob'
           })
@@ -180,68 +186,72 @@ describe('group-service', function() {
 
     describe('findById #slow', function() {
       var fixture = fixtureLoader.setup({
-        group1: {},
+        group1: {}
       });
 
       it('should find a group', function() {
-        return groupService.findById(fixture.group1._id, { lean: true })
-          .then(function(group) {
-            assert.strictEqual(group.name, fixture.group1.name);
-            assert.strictEqual(group.uri, fixture.group1.uri);
-            assert.strictEqual(group.lcUri, fixture.group1.lcUri);
-          });
-
+        return groupService.findById(fixture.group1._id, { lean: true }).then(function(group) {
+          assert.strictEqual(group.name, fixture.group1.name);
+          assert.strictEqual(group.uri, fixture.group1.uri);
+          assert.strictEqual(group.lcUri, fixture.group1.lcUri);
+        });
       });
     });
 
     describe('ensureGroupForGitHubRoomCreation', function() {
-
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }],
+          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }]
         },
         user1: '#integrationUser1'
       });
 
       it('should create a room for a repo', function() {
-        return groupService.migration.ensureGroupForGitHubRoomCreation(fixture.user1, {
-          uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-          name: 'BOB',
-          obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-        })
-        .then(function(group) {
-          return securityDescriptorService.group.findById(group._id, fixture.user1._id);
-        })
-        .then(function(securityDescriptor) {
-          assert.deepEqual({
-            admins: "GH_ORG_MEMBER",
-            externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
-            linkPath: "gitter-integration-tests-organisation",
-            members: "PUBLIC",
-            public: true,
-            type: "GH_ORG",
-          }, securityDescriptor);
-        })
-
+        return groupService.migration
+          .ensureGroupForGitHubRoomCreation(fixture.user1, {
+            uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+            name: 'BOB',
+            obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
+          })
+          .then(function(group) {
+            return securityDescriptorService.group.findById(group._id, fixture.user1._id);
+          })
+          .then(function(securityDescriptor) {
+            assert.deepEqual(
+              {
+                admins: 'GH_ORG_MEMBER',
+                externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
+                linkPath: 'gitter-integration-tests-organisation',
+                members: 'PUBLIC',
+                public: true,
+                type: 'GH_ORG'
+              },
+              securityDescriptor
+            );
+          });
       });
 
       it('should create a room for a user', function() {
-        return groupService.migration.ensureGroupForGitHubRoomCreation(fixture.user1, {
-          uri: fixture.user1.username,
-          name: 'BOB'
-        })
-        .then(function(group) {
-          return securityDescriptorService.group.findById(group._id, fixture.user1._id);
-        })
-        .then(function(securityDescriptor) {
-          assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
-          assert.strictEqual(securityDescriptor.externalId, fixtureLoader.GITTER_INTEGRATION_USER_ID);
-          assert.deepEqual(securityDescriptor.extraAdmins, []);
-          assert.equal(securityDescriptor.public, true);
-          assert.equal(securityDescriptor.members, 'PUBLIC');
-          assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
-          assert.equal(securityDescriptor.type, 'GH_USER');
-        });
+        return groupService.migration
+          .ensureGroupForGitHubRoomCreation(fixture.user1, {
+            uri: fixture.user1.username,
+            name: 'BOB'
+          })
+          .then(function(group) {
+            return securityDescriptorService.group.findById(group._id, fixture.user1._id);
+          })
+          .then(function(securityDescriptor) {
+            assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
+            assert.strictEqual(
+              securityDescriptor.externalId,
+              fixtureLoader.GITTER_INTEGRATION_USER_ID
+            );
+            assert.deepEqual(securityDescriptor.extraAdmins, []);
+            assert.equal(securityDescriptor.public, true);
+            assert.equal(securityDescriptor.members, 'PUBLIC');
+            assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
+            assert.equal(securityDescriptor.type, 'GH_USER');
+          });
       });
     });
 
@@ -253,27 +263,24 @@ describe('group-service', function() {
         troupe1: { group: 'group1', security: 'PUBLIC' },
         troupe2: { group: 'group1', security: 'PUBLIC' },
         troupe3: { group: 'group1', security: 'PRIVATE', users: ['user1'] },
-        troupe4: { group: 'group1', security: 'PRIVATE' },
+        troupe4: { group: 'group1', security: 'PRIVATE' }
       });
 
       it('should find the roomIds for group for an anonymous user', function() {
-        return groupService.findRoomsIdForGroup(fixture.group1._id)
-          .then(function(roomIds) {
-            var roomStrings = roomIds.map(String);
-            roomStrings.sort();
+        return groupService.findRoomsIdForGroup(fixture.group1._id).then(function(roomIds) {
+          var roomStrings = roomIds.map(String);
+          roomStrings.sort();
 
-            var expectedStrings = [
-              fixture.troupe1.id,
-              fixture.troupe2.id,
-            ];
-            expectedStrings.sort();
+          var expectedStrings = [fixture.troupe1.id, fixture.troupe2.id];
+          expectedStrings.sort();
 
-            assert.deepEqual(roomStrings, expectedStrings);
-          });
+          assert.deepEqual(roomStrings, expectedStrings);
+        });
       });
 
       it('should find the roomIds for group and user with troupes', function() {
-        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
+        return groupService
+          .findRoomsIdForGroup(fixture.group1._id, fixture.user1._id)
           .then(function(roomIds) {
             compareSets(roomIds.map(String), [
               fixture.troupe1.id,
@@ -284,12 +291,10 @@ describe('group-service', function() {
       });
 
       it('should find the roomIds for group and user without troupes', function() {
-        return groupService.findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
+        return groupService
+          .findRoomsIdForGroup(fixture.group1._id, fixture.user2._id)
           .then(function(roomIds) {
-            compareSets(roomIds.map(String), [
-              fixture.troupe1.id,
-              fixture.troupe2.id,
-            ]);
+            compareSets(roomIds.map(String), [fixture.troupe1.id, fixture.troupe2.id]);
           });
       });
     });
@@ -301,14 +306,13 @@ describe('group-service', function() {
       troupe1: { group: 'group1', security: 'PUBLIC' },
       troupe2: { group: 'group1', security: 'PUBLIC' },
       troupe3: { group: 'group1', security: 'PRIVATE' },
-      troupe4: { group: 'group1', security: 'PRIVATE' },
+      troupe4: { group: 'group1', security: 'PRIVATE' }
     });
 
     it('should find rooms in group', () => {
-      return groupService.findRoomsInGroup(fixture.group1.get('id'))
-        .then(function(results) {
-          assert.strictEqual(results.length, 4);
-        });
+      return groupService.findRoomsInGroup(fixture.group1.get('id')).then(function(results) {
+        assert.strictEqual(results.length, 4);
+      });
     });
   });
 
@@ -318,13 +322,14 @@ describe('group-service', function() {
     });
 
     it('should delete group', () => {
-      return groupService.deleteGroup(fixture.group1)
+      return groupService
+        .deleteGroup(fixture.group1)
         .then(function() {
           return groupService.findById(fixture.group1.get('id'));
         })
-        .then((groupResult) => {
+        .then(groupResult => {
           assert.strictEqual(groupResult, null);
         });
     });
   });
-})
+});

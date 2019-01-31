@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var apiClient = require('../components/api-client');
 var Backbone = require('backbone');
@@ -10,7 +10,7 @@ var CollabModel = Backbone.Model.extend({
 
 var CollabCollection = Backbone.Collection.extend({
   model: CollabModel,
-  url: apiClient.room.channelGenerator("/collaborators"),
+  url: apiClient.room.channelGenerator('/collaborators'),
   sync: SyncMixin.sync
 });
 

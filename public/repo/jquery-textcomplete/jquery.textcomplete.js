@@ -8,14 +8,13 @@ var $ = require('jquery');
  * Author:      Yuku Takahashi
  */
 
-(function ($) {
-
+(function($) {
   'use strict';
 
   /**
    * Convert arguments into a real array.
    */
-  var toArray = function (args) {
+  var toArray = function(args) {
     var result;
     result = Array.prototype.slice.call(args);
     return result;
@@ -24,12 +23,12 @@ var $ = require('jquery');
   /**
    * Bind the func to the context.
    */
-  var bind = function (func, context) {
+  var bind = function(func, context) {
     if (func.bind) {
       // Use native Function#bind if it's available.
       return func.bind(context);
     } else {
-      return function () {
+      return function() {
         func.apply(context, arguments);
       };
     }
@@ -38,21 +37,22 @@ var $ = require('jquery');
   /**
    * Get the styles of any element from property names.
    */
-  var getStyles = (function () {
+  var getStyles = (function() {
     var color;
     color = $('<div></div>').css(['color']).color;
     if (typeof color !== 'undefined') {
-      return function ($el, properties) {
+      return function($el, properties) {
         return $el.css(properties);
       };
-    } else {  // for jQuery 1.8 or below
-      return function ($el, properties) {
+    } else {
+      // for jQuery 1.8 or below
+      return function($el, properties) {
         var styles;
         styles = {};
-        $.each(properties, function (i, property) {
+        $.each(properties, function(i, property) {
           styles[property] = $el.css(property);
         });
-        return styles
+        return styles;
       };
     }
   })();
@@ -60,18 +60,20 @@ var $ = require('jquery');
   /**
    * Default template function.
    */
-  var identity = function (obj) { return obj; };
+  var identity = function(obj) {
+    return obj;
+  };
 
   /**
    * Memoize a search function.
    */
-  var memoize = function (func) {
+  var memoize = function(func) {
     var memo = {};
-    return function (term, callback) {
+    return function(term, callback) {
       if (memo[term]) {
         callback(memo[term]);
       } else {
-        func.call(this, term, function (data) {
+        func.call(this, term, function(data) {
           memo[term] = (memo[term] || []).concat(data);
           callback.apply(null, arguments);
         });
@@ -82,7 +84,7 @@ var $ = require('jquery');
   /**
    * Determine if the array contains a given value.
    */
-  var include = function (array, value) {
+  var include = function(array, value) {
     var i, l;
     if (array.indexOf) return array.indexOf(value) != -1;
     for (i = 0, l = array.length; i < l; i++) {
@@ -94,7 +96,7 @@ var $ = require('jquery');
   /**
    * Textarea manager class.
    */
-  var Completer = (function () {
+  var Completer = (function() {
     var html, css, $baseWrapper, $baseList;
 
     html = {
@@ -119,14 +121,16 @@ var $ = require('jquery');
     function Completer($el, strategies) {
       var $wrapper, $list, focused;
       $list = $baseList.clone();
-      this.el = $el.get(0);  // textarea element
+      this.el = $el.get(0); // textarea element
       this.$el = $el;
       $wrapper = prepareWrapper(this.$el);
 
       // Refocus the textarea if it is being focused
       focused = this.el === document.activeElement;
       this.$el.wrap($wrapper).before($list);
-      if (focused) { this.el.focus(); }
+      if (focused) {
+        this.el.focus();
+      }
 
       this.listView = new ListView($list, this);
       this.strategies = strategies;
@@ -134,22 +138,24 @@ var $ = require('jquery');
       this.$el.on('keydown', bind(this.listView.onKeydown, this.listView));
 
       // Global click event handler
-      $(document).on('click', bind(function (e) {
-        if (e.originalEvent && !e.originalEvent.keepTextCompleteDropdown) {
-          this.listView.deactivate();
-        }
-      }, this));
+      $(document).on(
+        'click',
+        bind(function(e) {
+          if (e.originalEvent && !e.originalEvent.keepTextCompleteDropdown) {
+            this.listView.deactivate();
+          }
+        }, this)
+      );
     }
 
     /**
      * Completer's public methods
      */
     $.extend(Completer.prototype, {
-
       /**
        * Show autocomplete list next to the caret.
        */
-      renderList: function (data) {
+      renderList: function(data) {
         if (this.clearAtNext) {
           this.listView.clear();
           this.clearAtNext = false;
@@ -157,9 +163,9 @@ var $ = require('jquery');
         if (data.length) {
           if (!this.listView.shown) {
             this.listView
-                .setPosition(this.getCaretPosition())
-                .clear()
-                .activate();
+              .setPosition(this.getCaretPosition())
+              .clear()
+              .activate();
             this.listView.strategy = this.strategy;
           }
           data = data.slice(0, this.strategy.maxCount);
@@ -171,11 +177,11 @@ var $ = require('jquery');
         }
       },
 
-      searchCallbackFactory: function (term) {
+      searchCallbackFactory: function(term) {
         var self = this;
-        return function (data, keep) {
+        return function(data, keep) {
           // ignore old calbacks
-          if(term != self.term) return;
+          if (term != self.term) return;
 
           self.renderList(data);
           if (!keep) {
@@ -188,7 +194,7 @@ var $ = require('jquery');
       /**
        * Keyup event handler.
        */
-      onKeyup: function (e) {
+      onKeyup: function(e) {
         var searchQuery, term;
 
         searchQuery = this.extractSearchQuery(this.getTextFromHeadToCaret());
@@ -203,7 +209,7 @@ var $ = require('jquery');
         }
       },
 
-      onSelect: function (value) {
+      onSelect: function(value) {
         var pre, post, newSubStr;
         pre = this.getTextFromHeadToCaret();
         post = this.el.value.substring(this.el.selectionEnd);
@@ -225,7 +231,7 @@ var $ = require('jquery');
       /**
        * Returns caret's relative coordinates from textarea's left top corner.
        */
-      getCaretPosition: function () {
+      getCaretPosition: function() {
         // Browser native API does not provide the way to know the position of
         // caret in pixels, so that here we use a kind of hack to accomplish
         // the aim. First of all it puts a div element and completely copies
@@ -236,22 +242,46 @@ var $ = require('jquery');
         if (this.el.selectionEnd === 0) return;
         var properties, css, $div, $span, position;
 
-        properties = ['border-width', 'font-family', 'font-size', 'font-style',
-          'font-variant', 'font-weight', 'height', 'letter-spacing',
-          'word-spacing', 'line-height', 'text-decoration', 'text-align', 'width',
-          'padding-top', 'padding-right', 'padding-bottom', 'padding-left',
-          'margin-top', 'margin-right', 'margin-bottom', 'margin-left'
+        properties = [
+          'border-width',
+          'font-family',
+          'font-size',
+          'font-style',
+          'font-variant',
+          'font-weight',
+          'height',
+          'letter-spacing',
+          'word-spacing',
+          'line-height',
+          'text-decoration',
+          'text-align',
+          'width',
+          'padding-top',
+          'padding-right',
+          'padding-bottom',
+          'padding-left',
+          'margin-top',
+          'margin-right',
+          'margin-bottom',
+          'margin-left'
         ];
-        css = $.extend({
-          position: 'absolute',
-          overflow: 'auto',
-          'white-space': 'pre-wrap',
-          top: 0,
-          left: -9999
-        }, getStyles(this.$el, properties));
+        css = $.extend(
+          {
+            position: 'absolute',
+            overflow: 'auto',
+            'white-space': 'pre-wrap',
+            top: 0,
+            left: -9999
+          },
+          getStyles(this.$el, properties)
+        );
 
-        $div = $('<div></div>').css(css).text(this.getTextFromHeadToCaret());
-        $span = $('<span></span>').text('&nbsp;').appendTo($div);
+        $div = $('<div></div>')
+          .css(css)
+          .text(this.getTextFromHeadToCaret());
+        $span = $('<span></span>')
+          .text('&nbsp;')
+          .appendTo($div);
         this.$el.before($div);
         position = $span.position();
         position.bottom = $div.height() - position.top;
@@ -259,7 +289,7 @@ var $ = require('jquery');
         return position;
       },
 
-      getTextFromHeadToCaret: function () {
+      getTextFromHeadToCaret: function() {
         var text, selectionEnd, range;
         selectionEnd = this.el.selectionEnd;
         if (typeof selectionEnd === 'number') {
@@ -276,7 +306,7 @@ var $ = require('jquery');
       /**
        * Parse the value of textarea and extract search query.
        */
-      extractSearchQuery: function (text) {
+      extractSearchQuery: function(text) {
         // If a search query found, it returns used strategy and the query
         // term. If the caret is currently in a code block or search query does
         // not found, it returns an empty array.
@@ -285,12 +315,14 @@ var $ = require('jquery');
         for (i = 0, l = this.strategies.length; i < l; i++) {
           strategy = this.strategies[i];
           match = text.match(strategy.match);
-          if (match) { return [strategy, match[strategy.index]]; }
+          if (match) {
+            return [strategy, match[strategy.index]];
+          }
         }
         return [];
       },
 
-      search: function (searchQuery) {
+      search: function(searchQuery) {
         var term, strategy;
         this.strategy = searchQuery[0];
         term = searchQuery[1];
@@ -301,7 +333,7 @@ var $ = require('jquery');
     /**
      * Completer's private functions
      */
-    var prepareWrapper = function ($el) {
+    var prepareWrapper = function($el) {
       return $baseWrapper.clone().css('display', $el.css('display'));
     };
 
@@ -311,8 +343,7 @@ var $ = require('jquery');
   /**
    * Dropdown menu manager class.
    */
-  var ListView = (function () {
-
+  var ListView = (function() {
     function ListView($el, completer) {
       this.data = [];
       this.$el = $el;
@@ -325,7 +356,7 @@ var $ = require('jquery');
     $.extend(ListView.prototype, {
       shown: false,
 
-      render: function (data) {
+      render: function(data) {
         var html, i, l, index, val;
 
         html = '';
@@ -335,11 +366,11 @@ var $ = require('jquery');
           index = this.data.length;
           this.data.push(val);
           html += '<li class="textcomplete-item" data-index="' + index + '"><a>';
-          html +=   this.strategy.template(val);
+          html += this.strategy.template(val);
           html += '</a></li>';
           if (this.data.length === this.strategy.maxCount) break;
         }
-        this.$el.append(html)
+        this.$el.append(html);
         if (!this.data.length) {
           this.deactivate();
         } else {
@@ -347,24 +378,24 @@ var $ = require('jquery');
         }
       },
 
-      clear: function () {
+      clear: function() {
         this.data = [];
         this.$el.html('');
         this.index = 0;
         return this;
       },
 
-      activateIndexedItem: function () {
+      activateIndexedItem: function() {
         var $item;
         this.$el.find('.active').removeClass('active');
         this.getActiveItem().addClass('active');
       },
 
-      getActiveItem: function () {
+      getActiveItem: function() {
         return $(this.$el.children().get(this.index));
       },
 
-      activate: function () {
+      activate: function() {
         if (!this.shown) {
           this.$el.show();
           this.completer.$el.trigger('textComplete:show');
@@ -373,7 +404,7 @@ var $ = require('jquery');
         return this;
       },
 
-      deactivate: function () {
+      deactivate: function() {
         if (this.shown) {
           this.$el.hide();
           this.completer.$el.trigger('textComplete:hide');
@@ -383,7 +414,7 @@ var $ = require('jquery');
         return this;
       },
 
-      setPosition: function (position) {
+      setPosition: function(position) {
         this.$el.css({
           left: position.left,
           top: 'initial',
@@ -392,25 +423,28 @@ var $ = require('jquery');
         return this;
       },
 
-      select: function (index) {
+      select: function(index) {
         this.completer.onSelect(this.data[index]);
         this.deactivate();
       },
 
-      onKeydown: function (e) {
+      onKeydown: function(e) {
         var $item;
         if (!this.shown) return;
-        if (e.keyCode === 27) {         // ESC
-            this.deactivate();
-        } else if (e.keyCode === 38) {         // UP
+        if (e.keyCode === 27) {
+          // ESC
+          this.deactivate();
+        } else if (e.keyCode === 38) {
+          // UP
           e.preventDefault();
           if (this.index === 0) {
-            this.index = this.data.length-1;
+            this.index = this.data.length - 1;
           } else {
             this.index -= 1;
           }
           this.activateIndexedItem();
-        } else if (e.keyCode === 40) {  // DOWN
+        } else if (e.keyCode === 40) {
+          // DOWN
           e.preventDefault();
           if (this.index === this.data.length - 1) {
             this.index = 0;
@@ -418,13 +452,14 @@ var $ = require('jquery');
             this.index += 1;
           }
           this.activateIndexedItem();
-        } else if (e.keyCode === 13 || e.keyCode === 9) {  // ENTER or TAB
+        } else if (e.keyCode === 13 || e.keyCode === 9) {
+          // ENTER or TAB
           e.preventDefault();
           this.select(parseInt(this.getActiveItem().data('index')));
         }
       },
 
-      onClick: function (e) {
+      onClick: function(e) {
         var $e = $(e.target);
         e.originalEvent.keepTextCompleteDropdown = true;
         if (!$e.hasClass('textcomplete-item')) {
@@ -437,7 +472,7 @@ var $ = require('jquery');
     return ListView;
   })();
 
-  $.fn.textcomplete = function (strategies) {
+  $.fn.textcomplete = function(strategies) {
     var i, l, strategy;
     for (i = 0, l = strategies.length; i < l; i++) {
       strategy = strategies[i];
@@ -456,7 +491,6 @@ var $ = require('jquery');
 
     return this;
   };
-
 })($);
 
 module.exports = $;

@@ -18,14 +18,18 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
 
   initialize: function(models, options) {
     if (!options || !options.roomMenuModel) {
-      throw new Error('A valid instance of a RoomMenuModel must be passed to a new instance of LeftMenuSuggestionsCollection');
+      throw new Error(
+        'A valid instance of a RoomMenuModel must be passed to a new instance of LeftMenuSuggestionsCollection'
+      );
     }
 
     this.roomMenuModel = options.roomMenuModel;
     this.listenTo(this.roomMenuModel, 'change:state', this.onDataUpdate, this);
 
     if (!options || !options.troupeModel) {
-      throw new Error('A valid instance of a TroupeModel must be passed to a new instance of LeftMenuSuggestionsCollection');
+      throw new Error(
+        'A valid instance of a TroupeModel must be passed to a new instance of LeftMenuSuggestionsCollection'
+      );
     }
 
     this.troupeModel = options.troupeModel;
@@ -33,40 +37,47 @@ var SuggestedCollection = SuggestedRoomsByRoomCollection.extend({
 
     this.contextModel = new SuggestionsContextModel(null, {
       roomMenuModel: this.roomMenuModel,
-      troupeModel:   this.troupeModel,
+      troupeModel: this.troupeModel
     });
 
-    options.contextModel = (options.contextModel || this.contextModel);
+    options.contextModel = options.contextModel || this.contextModel;
     SuggestedRoomsByRoomCollection.prototype.initialize.call(this, models, options);
-
   },
 
-  onDataUpdate: function () {
+  onDataUpdate: function() {
     //check the menu state
     var currentMenuState = this.roomMenuModel.get('state');
-    if(currentMenuState !== 'all' &&
-       currentMenuState !== 'favourite' &&
-       currentMenuState !== 'org') { return }
+    if (
+      currentMenuState !== 'all' &&
+      currentMenuState !== 'favourite' &&
+      currentMenuState !== 'org'
+    ) {
+      return;
+    }
 
     //check the current state of the room
     var currentRoomId = this.troupeModel.get('id');
-    if(!currentRoomId) { return }
+    if (!currentRoomId) {
+      return;
+    }
 
     //update url and get data
     this.contextModel.set('roomId', currentRoomId);
 
     //If we have not changed room dont fetch
-    if(!this.contextModel.changed.roomId) { return }
+    if (!this.contextModel.changed.roomId) {
+      return;
+    }
 
     //If a user has previously dismissed suggestions never fetch()
-    if(this.roomMenuModel.get('hasDismissedSuggestions')) {
+    if (this.roomMenuModel.get('hasDismissedSuggestions')) {
       return;
     }
 
     this.fetch();
   },
 
-  sync: SyncMixin.sync,
+  sync: SyncMixin.sync
 });
 
 var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
@@ -84,8 +95,7 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
     this.listenTo(roomCollection, 'update', function() {
       this.setFilter();
     });
-  },
-
+  }
 });
 
 module.exports = FilteredSuggestionsCollection;

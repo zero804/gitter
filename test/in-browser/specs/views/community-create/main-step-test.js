@@ -12,7 +12,6 @@ var MainView = require('public/js/views/community-create/main-step/community-cre
 var slugAvailabilityStatusConstants = require('public/js/views/community-create/slug-availability-status-constants');
 
 describe('community-creation-main-view', function() {
-
   var communityCreateModel;
   var viewModel;
   var el;
@@ -20,7 +19,7 @@ describe('community-creation-main-view', function() {
 
   var generateBeforeEachCb = function(newTroupeContext) {
     return function() {
-      if(newTroupeContext) {
+      if (newTroupeContext) {
         context.testOnly.resetTroupeContext(newTroupeContext);
       }
 
@@ -42,11 +41,10 @@ describe('community-creation-main-view', function() {
         repoCollection: new Backbone.Collection()
       });
       view.render();
-    }
+    };
   };
 
   beforeEach(generateBeforeEachCb());
-
 
   it('should update slug when typing in the name input', function() {
     view.ui.communityNameInput.val('foo');
@@ -74,7 +72,6 @@ describe('community-creation-main-view', function() {
     assert.strictEqual(communityCreateModel.get('communitySlug'), 'bar');
   });
 
-
   it('should not move to the invite step if name/slug is not filled in', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.MAIN);
     view.ui.nextStep.trigger('click');
@@ -86,7 +83,10 @@ describe('community-creation-main-view', function() {
     var viewValidateCb = viewModel.validate;
     viewModel.validate = function() {
       // Override any async responses
-      communityCreateModel.set('communitySlugAvailabilityStatus', slugAvailabilityStatusConstants.AVAILABLE);
+      communityCreateModel.set(
+        'communitySlugAvailabilityStatus',
+        slugAvailabilityStatusConstants.AVAILABLE
+      );
       return viewValidateCb.apply(this, arguments);
     };
 
@@ -99,15 +99,14 @@ describe('community-creation-main-view', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.INVITE);
   });
 
-
   describe('with GitHub user', function() {
-    beforeEach(generateBeforeEachCb({
-      user: {
-        providers: [
-          'github'
-        ]
-      }
-    }));
+    beforeEach(
+      generateBeforeEachCb({
+        user: {
+          providers: ['github']
+        }
+      })
+    );
 
     it('should show the associated project area', function() {
       assert.ok(view.ui.githubProjectLink.length > 0);
@@ -115,13 +114,13 @@ describe('community-creation-main-view', function() {
   });
 
   describe('with Twitter user', function() {
-    beforeEach(generateBeforeEachCb({
-      user: {
-        providers: [
-          'twitter'
-        ]
-      }
-    }));
+    beforeEach(
+      generateBeforeEachCb({
+        user: {
+          providers: ['twitter']
+        }
+      })
+    );
 
     it('should not show the associated project area', function() {
       assert.strictEqual(view.ui.githubProjectLink.length, 0);
@@ -129,17 +128,16 @@ describe('community-creation-main-view', function() {
   });
 
   describe('with GitLab user', function() {
-    beforeEach(generateBeforeEachCb({
-      user: {
-        providers: [
-          'gitlab'
-        ]
-      }
-    }));
+    beforeEach(
+      generateBeforeEachCb({
+        user: {
+          providers: ['gitlab']
+        }
+      })
+    );
 
     it('should not show the associated project area', function() {
       assert.strictEqual(view.ui.githubProjectLink.length, 0);
     });
   });
-
 });

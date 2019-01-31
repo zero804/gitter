@@ -4,7 +4,6 @@ var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('admin-filter', function() {
-
   describe('integration tests #slow', function() {
     fixtureLoader.disableMongoTableScans();
 
@@ -60,15 +59,15 @@ describe('admin-filter', function() {
             extraMembers: [],
             extraAdmins: ['user2']
           }
-        },
-
+        }
       });
 
       it('should return extra admin results', function() {
-        return adminFilter(fixture.group1, [fixture.user1.id, fixture.user2._id])
-          .then(function(filtered) {
-            assert.deepEqual(filtered.map(String), [fixture.user1.id]);
-          })
+        return adminFilter(fixture.group1, [fixture.user1.id, fixture.user2._id]).then(function(
+          filtered
+        ) {
+          assert.deepEqual(filtered.map(String), [fixture.user1.id]);
+        });
       });
 
       it('should return known positive values', function() {
@@ -76,7 +75,8 @@ describe('admin-filter', function() {
         var userId2 = fixture.user2._id;
         var userId3 = fixture.user3._id;
 
-        return recorder.testOnly.handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', true)
+        return recorder.testOnly
+          .handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', true)
           .delay(100) // Give mongo time to write to secondary...
           .then(function() {
             return adminFilter(fixture.group1, [userId1, userId2, userId3]);
@@ -92,10 +92,18 @@ describe('admin-filter', function() {
         var userId3 = fixture.user3._id;
 
         // Positive first
-        return recorder.testOnly.handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', true)
+        return recorder.testOnly
+          .handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', true)
           .then(function() {
             // Negative
-            return recorder.testOnly.handle(userId2, 'GH_ORG', 'GH_ORG_MEMBER', URI, 'external3', false);
+            return recorder.testOnly.handle(
+              userId2,
+              'GH_ORG',
+              'GH_ORG_MEMBER',
+              URI,
+              'external3',
+              false
+            );
           })
           .delay(100) // Give mongo time to write to secondary...
           .then(function() {
@@ -111,10 +119,9 @@ describe('admin-filter', function() {
         var userId2 = fixture.user2._id;
         var userId3 = fixture.user3._id;
 
-        return adminFilter(fixture.group2, [userId1, userId2, userId3])
-          .then(function(filtered) {
-            assert.deepEqual(filtered.map(String), [userId2].map(String));
-          })
+        return adminFilter(fixture.group2, [userId1, userId2, userId3]).then(function(filtered) {
+          assert.deepEqual(filtered.map(String), [userId2].map(String));
+        });
       });
 
       it('should work with GH_REPO security descriptors', function() {
@@ -124,14 +131,15 @@ describe('admin-filter', function() {
 
         // This also tests objecss with no extraAdmins....
 
-        return recorder.testOnly.handle(userId2, 'GH_REPO', 'GH_REPO_PUSH', URI2, 'external_xx', true)
+        return recorder.testOnly
+          .handle(userId2, 'GH_REPO', 'GH_REPO_PUSH', URI2, 'external_xx', true)
           .delay(100) // Mongodb slave wait
           .then(function() {
             return adminFilter(fixture.group3, [userId1, userId2, userId3]);
           })
           .then(function(filtered) {
             assert.deepEqual(filtered.map(String), [userId2].map(String));
-          })
+          });
       });
     });
 
@@ -167,8 +175,7 @@ describe('admin-filter', function() {
             extraMembers: [],
             extraAdmins: ['user2']
           }
-        },
-
+        }
       });
 
       it('should work with GROUP security type on extraAdmins', function() {
@@ -179,13 +186,12 @@ describe('admin-filter', function() {
         // userId1 is an extraAdmin in the group
         // userId2 is an extraAdmin in the room
         // userId3 is neither
-        return adminFilter(fixture.troupe1, [userId1, userId2, userId3])
-          .then(function(filtered) {
-            var filteredString = filtered.map(String);
-            filteredString.sort();
+        return adminFilter(fixture.troupe1, [userId1, userId2, userId3]).then(function(filtered) {
+          var filteredString = filtered.map(String);
+          filteredString.sort();
 
-            assert.deepEqual(filteredString, [userId1, userId2].map(String));
-          });
+          assert.deepEqual(filteredString, [userId1, userId2].map(String));
+        });
       });
 
       it('should return known positive values', function() {
@@ -193,7 +199,8 @@ describe('admin-filter', function() {
         var userId2 = fixture.user2._id;
         var userId4 = fixture.user4._id;
 
-        return recorder.testOnly.handle(userId4, 'GH_ORG', 'GH_ORG_MEMBER', URI, null, true)
+        return recorder.testOnly
+          .handle(userId4, 'GH_ORG', 'GH_ORG_MEMBER', URI, null, true)
           .delay(100) // Mongodb slave wait
           .then(function() {
             return adminFilter(fixture.troupe1, [userId1, userId2, userId4]);
@@ -205,8 +212,6 @@ describe('admin-filter', function() {
             assert.deepEqual(filteredString, [userId1, userId2, userId4].map(String));
           });
       });
-
     });
   });
-
 });

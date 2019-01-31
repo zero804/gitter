@@ -5,53 +5,59 @@
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
-
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 function getNumActiveRoomsForRange(objIdMin, objIdMax) {
   return persistence.ChatMessage.aggregate([
-      {
-        // match only in a specific date range
-        $match: {
-          _id: {
-            $gt: objIdMin,
-            $lt: objIdMax
-          }
-        }
-      }, {
-        $group: {
-          _id: "$toTroupeId"
-        }
-      }, {
-        $lookup: {
-          from: "troupes",
-          localField: "_id",
-          foreignField: "_id",
-          as: "troupe"
-        }
-      }, {
-        $unwind: "$troupe"
-      }, {
-        // match only normal rooms
-        $match: {
-          "troupe.githubType": { $ne: 'ONETOONE' }
-        }
-      }, {
-        $project: {
-          troupeId: "$troupe._id"
-        }
-      }, {
-        $group: {
-          _id: "$troupeId",
-        }
-      },{
-        // separate group so we can get the total count
-        $group: {
-          _id: null,
-          count: { $sum: 1 }
+    {
+      // match only in a specific date range
+      $match: {
+        _id: {
+          $gt: objIdMin,
+          $lt: objIdMax
         }
       }
-    ])
+    },
+    {
+      $group: {
+        _id: '$toTroupeId'
+      }
+    },
+    {
+      $lookup: {
+        from: 'troupes',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+    },
+    {
+      $unwind: '$troupe'
+    },
+    {
+      // match only normal rooms
+      $match: {
+        'troupe.githubType': { $ne: 'ONETOONE' }
+      }
+    },
+    {
+      $project: {
+        troupeId: '$troupe._id'
+      }
+    },
+    {
+      $group: {
+        _id: '$troupeId'
+      }
+    },
+    {
+      // separate group so we can get the total count
+      $group: {
+        _id: null,
+        count: { $sum: 1 }
+      }
+    }
+  ])
 
     .read(mongoReadPrefs.secondaryPreferred)
     .exec();
@@ -69,11 +75,10 @@ var opts = require('yargs')
     description: 'yyyy-mm-dd'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-var objIdMin = mongoUtils.createIdForTimestamp(new Date(opts.afterDate+'T00:00:00Z').valueOf());
-var objIdMax = mongoUtils.createIdForTimestamp(new Date(opts.beforeDate+'T00:00:00Z').valueOf());
+var objIdMin = mongoUtils.createIdForTimestamp(new Date(opts.afterDate + 'T00:00:00Z').valueOf());
+var objIdMax = mongoUtils.createIdForTimestamp(new Date(opts.beforeDate + 'T00:00:00Z').valueOf());
 
 getNumActiveRoomsForRange(objIdMin, objIdMax)
   .then(function(result) {

@@ -5,15 +5,17 @@ var Promise = require('bluebird');
 var log = require('./log');
 
 function createThrottledSave(model, saveFn) {
-  return _.throttle(function() {
-    return Promise.try(function() {
-      return saveFn.call(model);
-    })
-    .catch(function(err) {
-      log.error('Auto model save failed: ' + err);
-    });
-
-  }, 1500, { leading: false });
+  return _.throttle(
+    function() {
+      return Promise.try(function() {
+        return saveFn.call(model);
+      }).catch(function(err) {
+        log.error('Auto model save failed: ' + err);
+      });
+    },
+    1500,
+    { leading: false }
+  );
 }
 
 function autoModelSave(model, persistentProperties, saveFn) {
@@ -38,7 +40,7 @@ function autoModelSave(model, persistentProperties, saveFn) {
     }
 
     throttledSave();
-  })
+  });
 }
 
 module.exports = autoModelSave;

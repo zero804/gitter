@@ -36,8 +36,13 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   initialize: function(options) {
     this.communityCreateModel = options.communityCreateModel;
 
-    if(this.communityCreateModel) {
-      this.listenTo(this.communityCreateModel, 'change:allowTweetBadger', this.onAllowTweetBadgerChange, this);
+    if (this.communityCreateModel) {
+      this.listenTo(
+        this.communityCreateModel,
+        'change:allowTweetBadger',
+        this.onAllowTweetBadgerChange,
+        this
+      );
     }
   },
 
@@ -75,11 +80,23 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 
     this.ui.emailInput.val(this.model.get('emailAddress'));
 
-    toggleClass(this.el, 'pending', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.PENDING);
+    toggleClass(
+      this.el,
+      'pending',
+      !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.PENDING
+    );
     // We don't use this state to differentiate
     //toggleClass(this.el, 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
-    toggleClass(this.el, 'needs-email', !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
-    toggleClass(this.el, 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
+    toggleClass(
+      this.el,
+      'needs-email',
+      !willUseTwitterInvite && inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL
+    );
+    toggleClass(
+      this.el,
+      'ready-valid-email',
+      inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL
+    );
   },
 
   onLinkClick: function(e) {
@@ -93,7 +110,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 });
 
 var CommunityCreationPeopleListEmptyView = Marionette.ItemView.extend({
-  template: CommunityCreationPeopleListEmptyTemplate,
+  template: CommunityCreationPeopleListEmptyTemplate
 });
 
 var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
@@ -105,7 +122,7 @@ var CommunityCreationPeopleListView = Marionette.CompositeView.extend({
   childViewOptions: function() {
     return {
       communityCreateModel: this.communityCreateModel,
-      allowRemove: this.options.allowRemove,
+      allowRemove: this.options.allowRemove
     };
   },
 

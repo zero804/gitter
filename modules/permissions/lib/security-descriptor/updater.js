@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Troupe = require('gitter-web-persistence').Troupe;
 var Group = require('gitter-web-persistence').Group;
@@ -23,11 +23,12 @@ function updatePublicFlagForRepo(linkPath, isPublic) {
 
   return Promise.join(
     Troupe.update(query, update, { multi: true }).exec(),
-    Group.update(query, update, { multi: true }).exec());
+    Group.update(query, update, { multi: true }).exec()
+  );
 
   // TODO: consider sending live-collection updates
 }
 
 module.exports = {
-  updatePublicFlagForRepo: updatePublicFlagForRepo,
+  updatePublicFlagForRepo: updatePublicFlagForRepo
 };

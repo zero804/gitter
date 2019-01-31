@@ -14,5 +14,5 @@ module.exports = {
   GitHubUriValidator: require('./github-uri-validator'),
   GitHubUserService: require('./github-user-service'),
   GitHubUserEmailAddressService: require('./github-user-email-address-service'),
-  obfuscateToken: require('./obfuscate-token'),
+  obfuscateToken: require('./obfuscate-token')
 };

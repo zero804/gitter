@@ -46,12 +46,11 @@ function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
 function createPolicyForRoomId(user, roomId) {
   var userId = user && user._id;
 
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      return createPolicyFromDescriptor(userId, user, securityDescriptor, roomId);
-    });
+    return createPolicyFromDescriptor(userId, user, securityDescriptor, roomId);
+  });
 }
 
 function createPolicyForRoom(user, room) {
@@ -60,18 +59,18 @@ function createPolicyForRoom(user, room) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      return createPolicyFromDescriptor(userId, user, securityDescriptor, roomId);
-    });
+    return createPolicyFromDescriptor(userId, user, securityDescriptor, roomId);
+  });
 }
 
 function createPolicyForGroupId(user, groupId) {
   var userId = user && user._id;
 
-  return securityDescriptorService.group.findById(groupId, userId)
+  return securityDescriptorService.group
+    .findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -83,7 +82,8 @@ function createPolicyForGroupId(user, groupId) {
 }
 
 function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
-  return securityDescriptorService.group.findById(groupId, userId)
+  return securityDescriptorService.group
+    .findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
@@ -98,14 +98,20 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
   debug('Create policy factory with repo fallback: repo=%s', repoUri);
   var userId = user && user._id;
 
-  return securityDescriptorService.group.findById(groupId, userId)
+  return securityDescriptorService.group
+    .findById(groupId, userId)
     .then(function(securityDescriptor) {
       if (!securityDescriptor) throw new StatusError(404);
 
       var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      var primary = new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+      var primary = new PolicyEvaluator(
+        userId,
+        securityDescriptor,
+        policyDelegate,
+        contextDelegate
+      );
       var secondary = new PreCreationGhRepoPolicyEvaluator(user, repoUri);
 
       return new FallbackPolicyEvaluator(primary, secondary);
@@ -113,23 +119,21 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
 }
 
 function createPolicyForUserIdInRoomId(userId, roomId) {
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      return createPolicyFromDescriptor(userId, null, securityDescriptor, roomId);
-    });
+    return createPolicyFromDescriptor(userId, null, securityDescriptor, roomId);
+  });
 }
 
 function createPolicyForUserIdInRoom(userId, room) {
   var roomId = room._id;
 
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      return createPolicyFromDescriptor(userId, null, securityDescriptor, roomId);
-    });
+    return createPolicyFromDescriptor(userId, null, securityDescriptor, roomId);
+  });
 }
 
 function createPolicyForOneToOne(user, toUser) {
@@ -153,7 +157,6 @@ function getPreCreationPolicyEvaluator(user, type, uri) {
     default:
       throw new StatusError(400, 'type is not known: ' + type);
   }
-
 }
 
 function getPreCreationPolicyEvaluatorWithRepoFallback(user, type, uri, fallbackRepoUri) {
@@ -169,7 +172,6 @@ function getPreCreationPolicyEvaluatorWithRepoFallback(user, type, uri, fallback
   return new FallbackPolicyEvaluator(primary, secondary);
 }
 
-
 module.exports = {
   createPolicyForRoomId: Promise.method(createPolicyForRoomId),
   createPolicyForRoom: Promise.method(createPolicyForRoom),
@@ -183,5 +185,4 @@ module.exports = {
   // For things that have not yet been created
   getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluator,
   getPreCreationPolicyEvaluatorWithRepoFallback: getPreCreationPolicyEvaluatorWithRepoFallback
-
 };

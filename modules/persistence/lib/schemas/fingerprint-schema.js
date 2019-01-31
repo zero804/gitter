@@ -3,13 +3,18 @@
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 
-var FingerprintSchema = new Schema({
-  userId: { type: String, required: true },
-  fingerprints: [{
-    fingerprint: { type: String, required: true },
-    ipAddress: { type: String, required: false }
-  }],
-}, { strict: 'throw' });
+var FingerprintSchema = new Schema(
+  {
+    userId: { type: String, required: true },
+    fingerprints: [
+      {
+        fingerprint: { type: String, required: true },
+        ipAddress: { type: String, required: false }
+      }
+    ]
+  },
+  { strict: 'throw' }
+);
 
 FingerprintSchema.schemaTypeName = 'FingerprintSchema';
 FingerprintSchema.index({ userId: 1 }, { unique: true, background: true });

@@ -21,7 +21,9 @@ var reloadCountdownTimer;
 var reloadListener;
 
 function getRandomReloadPeriod() {
-  return Math.round((RELOAD_MIN_MINUTES + Math.random() * (RELOAD_MAX_MINUTES - RELOAD_MIN_MINUTES)) * 60 * 1000);
+  return Math.round(
+    (RELOAD_MIN_MINUTES + Math.random() * (RELOAD_MAX_MINUTES - RELOAD_MIN_MINUTES)) * 60 * 1000
+  );
 }
 
 /**
@@ -88,8 +90,7 @@ ReloadListener.prototype = {
 
     eyeballsDetector.events.off('change', this.eyeballsChangeBound);
   }
-}
-
+};
 
 /**
  * Wait for a timeout before forcing the user to upgrade
@@ -135,4 +136,4 @@ function reportServerVersion(version) {
 
 module.exports = {
   reportServerVersion: reportServerVersion
-}
+};

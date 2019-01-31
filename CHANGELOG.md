@@ -3,6 +3,10 @@
  - Update `@gitterhq/translations@1.8.2` dependency for Chinese(`zh`) translation update
     - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/66
 
+Developer facing:
+
+ - Add Prettier automatic formatting for simple lint compliance, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1292
+
 
 # 19.34.0 - 2018-1-25
 

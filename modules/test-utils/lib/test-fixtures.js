@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -19,7 +19,7 @@ var fixtureSteps = [
   require('./create-groups'),
   require('./create-troupes'),
   require('./create-messages'),
-  require('./create-message-reports'),
+  require('./create-message-reports')
 ];
 
 function createBaseFixture() {
@@ -37,13 +37,15 @@ function createBaseFixture() {
 
       var count = 0;
 
-      return Promise.all(Object.keys(this).map(function(key) {
+      return Promise.all(
+        Object.keys(this).map(function(key) {
           var o = self[key];
           if (typeof o.remove === 'function') {
             count++;
             return o.remove();
           }
-        }))
+        })
+      )
         .timeout(10000)
         .then(function() {
           debug('Removed %s items', count);
@@ -54,28 +56,25 @@ function createBaseFixture() {
 }
 
 function createExpectedFixtures(expected) {
-  if (!expected) throw new Error('Please provide a fixture')
+  if (!expected) throw new Error('Please provide a fixture');
 
-  return Promise.try(createBaseFixture)
-    .then(function(fixture) {
-      return Promise.mapSeries(fixtureSteps, function(step) {
-        return step(expected, fixture);
-      })
-      .return(fixture);
-    })
+  return Promise.try(createBaseFixture).then(function(fixture) {
+    return Promise.mapSeries(fixtureSteps, function(step) {
+      return step(expected, fixture);
+    }).return(fixture);
+  });
 }
 
 function fixtureLoaderManual(fixture, expected) {
-  debug("Creating fixtures %j", expected);
+  debug('Creating fixtures %j', expected);
   return function() {
     if (this && this._skipFixtureSetup) return;
-    return createExpectedFixtures(expected)
-      .then(function(data) {
-         Object.keys(data).forEach(function(key) {
-          fixture[key] = data[key];
-         });
-       });
-   };
+    return createExpectedFixtures(expected).then(function(data) {
+      Object.keys(data).forEach(function(key) {
+        fixture[key] = data[key];
+      });
+    });
+  };
 }
 
 var fixtureLoader = {};
@@ -98,7 +97,7 @@ fixtureLoader.setupEach = function(expected) {
   var fixture = {};
 
   beforeEach(function() {
-    return fixtureLoaderManual(fixture, _.cloneDeep(expected))()
+    return fixtureLoaderManual(fixture, _.cloneDeep(expected))();
   });
 
   afterEach(function() {
@@ -150,22 +149,19 @@ fixtureLoader.disableMongoTableScans = function() {
       .then(function(isDisabled) {
         if (isDisabled) return;
 
-        return mongoTableScans.disable()
-          .then(function() {
-            return didDisable = true;
-          });
+        return mongoTableScans.disable().then(function() {
+          return (didDisable = true);
+        });
       });
   });
 
   after(function() {
     if (didDisable) {
-      return mongoTableScans.enable()
-        .then(function() {
-          didDisable = false;
-        })
+      return mongoTableScans.enable().then(function() {
+        didDisable = false;
+      });
     }
   });
-
 };
 
 fixtureLoader.createExpectedFixtures = createExpectedFixtures;

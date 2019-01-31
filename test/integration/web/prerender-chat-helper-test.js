@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../test-require');
 
@@ -6,7 +6,6 @@ var prerenderChatHelper = testRequire('./web/prerender-chat-helper');
 var assert = require('assert');
 
 describe('prerenderChatHelper', function() {
-
   it('should prerender chat items, with burstStart', function() {
     var chat = {
       text: '**Moo**',
@@ -18,7 +17,7 @@ describe('prerenderChatHelper', function() {
       burstStart: true
     };
 
-    var result = prerenderChatHelper(chat, { data: { root: { } }});
+    var result = prerenderChatHelper(chat, { data: { root: {} } });
     assert(result.indexOf(' burstStart ') >= 0);
   });
 
@@ -32,7 +31,7 @@ describe('prerenderChatHelper', function() {
       }
     };
 
-    var result = prerenderChatHelper(chat, { data: { root: { } }});
+    var result = prerenderChatHelper(chat, { data: { root: {} } });
     assert(result.indexOf(' burstStart ') < 0);
   });
 });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
@@ -30,8 +30,7 @@ var opts = require('yargs')
     description: 'Just show the users who will be affected'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 require('../../server/event-listeners').install();
 
@@ -39,18 +38,28 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
   var context = {};
 
   /* Find the old user and the new org */
-  return Promise.all([userService.findByUsername(usernameForConversion), userService.findByUsername(firstUserUsername)])
+  return Promise.all([
+    userService.findByUsername(usernameForConversion),
+    userService.findByUsername(firstUserUsername)
+  ])
     .spread(function(userForConversion, firstUser) {
       if (!firstUser) throw new Error('Not found: ' + firstUserUsername);
       context.userForConversion = userForConversion;
       context.firstUser = firstUser;
-      return [validateUri(firstUser, usernameForConversion), permissionsModel(firstUser, 'create', usernameForConversion, 'ORG', null)];
+      return [
+        validateUri(firstUser, usernameForConversion),
+        permissionsModel(firstUser, 'create', usernameForConversion, 'ORG', null)
+      ];
     })
     .spread(function(githubInfo, hasAccess) {
       /* Remove the user */
       if (!githubInfo) throw new Error('Not found: github uri: ' + usernameForConversion);
-      if (githubInfo.type !== 'ORG') throw new Error('Github uri is not an ORG: ' + usernameForConversion);
-      if (!hasAccess) throw new Error('User ' + firstUserUsername + ' does not have access to ' + usernameForConversion);
+      if (githubInfo.type !== 'ORG')
+        throw new Error('Github uri is not an ORG: ' + usernameForConversion);
+      if (!hasAccess)
+        throw new Error(
+          'User ' + firstUserUsername + ' does not have access to ' + usernameForConversion
+        );
 
       if (dryRun) return;
       return userRemovalService.removeByUsername(usernameForConversion, { deleteUser: true });
@@ -73,10 +82,12 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
         if (!dryRun) throw new Error('Unable to create room');
       }
 
-      var orQuery = [{
-        lcOwner: usernameForConversion.toLowerCase(),
-        githubType: 'USER_CHANNEL'
-      }];
+      var orQuery = [
+        {
+          lcOwner: usernameForConversion.toLowerCase(),
+          githubType: 'USER_CHANNEL'
+        }
+      ];
 
       if (context.userForConversion) {
         orQuery.push({ ownerUserId: context.userForConversion._id });
@@ -92,18 +103,19 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
         }
       });
 
-      return Promise.all(troupesForUpdate.map(function(t) {
-        t.githubType = 'ORG_CHANNEL';
-        console.log(t.uri);
+      return Promise.all(
+        troupesForUpdate.map(function(t) {
+          t.githubType = 'ORG_CHANNEL';
+          console.log(t.uri);
 
-        if (dryRun) return;
-        delete t.ownerUserId;
-        t.parentId = context.newOrgRoom._id;
+          if (dryRun) return;
+          delete t.ownerUserId;
+          t.parentId = context.newOrgRoom._id;
 
-        return t.save();
-      }));
+          return t.save();
+        })
+      );
     });
-
 }
 
 performUserToOrgTransition(opts.username, opts['first-user'], opts['dry-run'])

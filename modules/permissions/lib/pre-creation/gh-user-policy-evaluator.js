@@ -1,4 +1,3 @@
-
 'use strict';
 
 var Promise = require('bluebird');
@@ -37,8 +36,7 @@ GitHubRepoPolicyEvaluator.prototype = {
   canAddUser: Promise.method(function() {
     // You can never add a user to a room which has not yet been created
     return false;
-  }),
-
+  })
 };
 
 module.exports = GitHubRepoPolicyEvaluator;

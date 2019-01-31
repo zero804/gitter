@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -6,7 +6,7 @@ var stats = env.stats;
 
 var presenceService = require('gitter-web-presence');
 var restful = require('../../services/restful');
-var restSerializer = require("../../serializers/rest-serializer");
+var restSerializer = require('../../serializers/rest-serializer');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
 var bayeuxExtension = require('./extension');
@@ -19,51 +19,59 @@ var tokenProvider = require('../../services/tokens');
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
 if (survivalMode) {
-  logger.error("WARNING: Running in survival mode");
+  logger.error('WARNING: Running in survival mode');
 }
 
 // TODO: use a lightweight routing library for this....
 // Strategies for authenticating that a user can subscribe to the given URL
-var routes = [{
+var routes = [
+  {
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateTroupe
-  }, {
+  },
+  {
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubTroupeCollection
-  }, {
+  },
+  {
     re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
-  }, {
+  },
+  {
     re: /^\/api\/v1\/user\/(\w+)\/(\w+)$/,
     validator: validateUserForUserSubscription,
     populator: populateSubUserCollection
-  }, {
+  },
+  {
     re: /^\/api\/v1\/user\/(\w+)\/(?:troupes|rooms)\/(\w+)\/unreadItems$/,
     validator: validateUserForUserSubscription,
     populator: populateUserUnreadItemsCollection
-  }, {
+  },
+  {
     re: /^\/api\/v1\/user\/(\w+)$/,
     validator: validateUserForUserSubscription
-  }, {
+  },
+  {
     re: /^\/api\/v1\/token\/(\w+)$/,
     validator: validateTokenForTokenSubscription
-  }, {
+  },
+  {
     re: /^\/api\/v1\/ping(\/\w+)?$/,
     validator: validateUserForPingSubscription
-  }, {
+  },
+  {
     re: /^\/api\/private\/diagnostics$/,
     validator: validateUserForPingSubscription
   }
 ];
 
 function permissionToRead(userId, troupeId) {
-  return policyFactory.createPolicyForUserIdInRoomId(userId, troupeId)
-    .then(function(policy) {
-      return policy.canRead();
-    });
+  return policyFactory.createPolicyForUserIdInRoomId(userId, troupeId).then(function(policy) {
+    return policy.canRead();
+  });
 }
 
 // This strategy ensures that a user can access a URL under a troupe URL
@@ -74,7 +82,7 @@ function validateUserForSubTroupeSubscription(options) {
 
   var troupeId = match[1];
 
-  if(!mongoUtils.isLikeObjectId(troupeId)) {
+  if (!mongoUtils.isLikeObjectId(troupeId)) {
     return Promise.reject(new StatusError(400, 'Invalid ID: ' + troupeId));
   }
 
@@ -88,15 +96,20 @@ function validateUserForSubTroupeSubscription(options) {
   return promise.tap(function(access) {
     if (!access) return;
 
-    return presenceService.socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+    return presenceService
+      .socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
       .then(function() {
         // Update the lastAccessTime for the room
-        if(userId) {
+        if (userId) {
           return recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
         }
       })
       .catch(function(err) {
-        logger.error('Unable to reassociate connection or update last access: ', { exception: err, userId: userId, troupeId: troupeId });
+        logger.error('Unable to reassociate connection or update last access: ', {
+          exception: err,
+          userId: userId,
+          troupeId: troupeId
+        });
       });
   });
 }
@@ -114,9 +127,9 @@ function validateUserForUserSubscription(options) {
   var subscribeUserId = match[1];
 
   // All /user/ subscriptions need to be authenticated
-  if(!userId) return Promise.resolve(false);
+  if (!userId) return Promise.resolve(false);
 
-  if(!mongoUtils.isLikeObjectId(userId)) {
+  if (!mongoUtils.isLikeObjectId(userId)) {
     return Promise.reject(new StatusError(400, 'Invalid ID: ' + userId));
   }
 
@@ -132,17 +145,16 @@ function validateTokenForTokenSubscription(options) {
   var subscribedToken = match[1];
 
   // All /token/ subscriptions need to be authenticated
-  if(!userId) return Promise.resolve(false);
+  if (!userId) return Promise.resolve(false);
 
-  return tokenProvider.validateToken(subscribedToken)
-    .then((result) => {
-      const tokenUserId = result && result[0];
-      return tokenUserId && mongoUtils.objectIDsEqual(userId, tokenUserId);
-    });
+  return tokenProvider.validateToken(subscribedToken).then(result => {
+    const tokenUserId = result && result[0];
+    return tokenUserId && mongoUtils.objectIDsEqual(userId, tokenUserId);
+  });
 }
 
 function dataToSnapshot(type) {
-  return function (data) {
+  return function(data) {
     return { type: type, data: data };
   };
 }
@@ -153,23 +165,20 @@ function populateSubUserCollection(options) {
   var subscribeUserId = match[1];
   var collection = match[2];
 
-  if(!userId || userId !== subscribeUserId) {
+  if (!userId || userId !== subscribeUserId) {
     return Promise.resolve();
   }
 
-  switch(collection) {
-    case "groups":
-      return restful.serializeGroupsForUserId(userId)
-        .then(dataToSnapshot('user.groups'));
+  switch (collection) {
+    case 'groups':
+      return restful.serializeGroupsForUserId(userId).then(dataToSnapshot('user.groups'));
 
-    case "rooms":
-    case "troupes":
-      return restful.serializeTroupesForUser(userId)
-        .then(dataToSnapshot('user.rooms'));
+    case 'rooms':
+    case 'troupes':
+      return restful.serializeTroupesForUser(userId).then(dataToSnapshot('user.rooms'));
 
-    case "orgs":
-      return restful.serializeOrgsForUserId(userId)
-        .then(dataToSnapshot('user.orgs'));
+    case 'orgs':
+      return restful.serializeOrgsForUserId(userId).then(dataToSnapshot('user.orgs'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -200,8 +209,7 @@ function populateTroupe(options) {
     includeBackend: true,
     includeAssociatedRepo: true
   });
-  return restSerializer.serializeObject(troupeId, strategy)
-    .then(dataToSnapshot('room'));
+  return restSerializer.serializeObject(troupeId, strategy).then(dataToSnapshot('room'));
 }
 
 function populateSubTroupeCollection(options) {
@@ -211,30 +219,31 @@ function populateSubTroupeCollection(options) {
   var troupeId = match[1];
   var collection = match[2];
 
-  switch(collection) {
-    case "chatMessages":
+  switch (collection) {
+    case 'chatMessages':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
-      return restful.serializeChatsForTroupe(troupeId, userId, snapshotOptions)
+      return restful
+        .serializeChatsForTroupe(troupeId, userId, snapshotOptions)
         .then(dataToSnapshot('room.chatMessages'));
 
-    case "users":
+    case 'users':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
-      return restful.serializeUsersForTroupe(troupeId, userId, snapshotOptions)
-      .then(dataToSnapshot('room.users'));
+      return restful
+        .serializeUsersForTroupe(troupeId, userId, snapshotOptions)
+        .then(dataToSnapshot('room.users'));
 
-    case "events":
+    case 'events':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
-      return restful.serializeEventsForTroupe(troupeId, userId)
-        .then(dataToSnapshot('room.events'));
+      return restful.serializeEventsForTroupe(troupeId, userId).then(dataToSnapshot('room.events'));
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -250,11 +259,11 @@ function populateSubSubTroupeCollection(options) {
   var subId = match[3];
   var subCollection = match[4];
 
-  switch(collection + '-' + subCollection) {
-    case "chatMessages-readBy":
-      return restful.serializeReadBysForChat(troupeId, subId)
+  switch (collection + '-' + subCollection) {
+    case 'chatMessages-readBy':
+      return restful
+        .serializeReadBysForChat(troupeId, subId)
         .then(dataToSnapshot('room.chatMessages.readBy'));
-
 
     default:
       logger.error('Unable to provide snapshot for ' + collection);
@@ -269,11 +278,12 @@ function populateUserUnreadItemsCollection(options) {
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
-  if(!userId || userId !== subscriptionUserId) {
+  if (!userId || userId !== subscriptionUserId) {
     return Promise.resolve();
   }
 
-  return restful.serializeUnreadItemsForTroupe(troupeId, userId)
+  return restful
+    .serializeUnreadItemsForTroupe(troupeId, userId)
     .then(dataToSnapshot('user.room.unreadItems'));
 }
 
@@ -281,10 +291,11 @@ function populateUserUnreadItemsCollection(options) {
 function authorizeSubscribe(message, callback) {
   var clientId = message.clientId;
 
-  return presenceService.lookupUserIdForSocket(clientId)
+  return presenceService
+    .lookupUserIdForSocket(clientId)
     .spread(function(userId, exists) {
-      if(!exists) {
-        debug("Client %s does not exist. userId=%s", clientId, userId);
+      if (!exists) {
+        debug('Client %s does not exist. userId=%s', clientId, userId);
         throw new StatusError(401, 'Client ' + clientId + ' not authenticated');
       }
 
@@ -292,23 +303,24 @@ function authorizeSubscribe(message, callback) {
 
       var hasMatch = routes.some(function(route) {
         var m = route.re.exec(message.subscription);
-        if(m) {
+        if (m) {
           match = { route: route, match: m };
         }
         return m;
       });
 
-      if(!hasMatch) {
-        throw new StatusError(404, "Unknown subscription " + message.subscription);
+      if (!hasMatch) {
+        throw new StatusError(404, 'Unknown subscription ' + message.subscription);
       }
 
       var validator = match.route.validator;
       var m = match.match;
 
-      return validator({ userId: userId, match: m, message: message, clientId: clientId })
-        .then(function(allowed) {
+      return validator({ userId: userId, match: m, message: message, clientId: clientId }).then(
+        function(allowed) {
           return [userId, allowed];
-        });
+        }
+      );
     })
     .nodeify(callback);
 }
@@ -328,9 +340,8 @@ module.exports = bayeuxExtension({
     // Do we allow this user to connect to the requested channel?
     return authorizeSubscribe(message)
       .spread(function(userId, allowed) {
-
-        if(!allowed) {
-          throw new StatusError(403, "Authorisation denied.");
+        if (!allowed) {
+          throw new StatusError(403, 'Authorisation denied.');
         }
 
         message._private.authorisor = {
@@ -354,19 +365,19 @@ module.exports = bayeuxExtension({
 
     var hasMatch = routes.some(function(route) {
       var m = route.re.exec(message.subscription);
-      if(m) {
+      if (m) {
         match = { route: route, match: m };
       }
       return m;
     });
 
-    if(!hasMatch) return callback(null, message);
+    if (!hasMatch) return callback(null, message);
 
     var populator = match.route.populator;
     var m = match.match;
 
     /* The populator is all about generating the snapshot for the client */
-    if(!clientId || !populator || snapshot === false) return callback(null, message);
+    if (!clientId || !populator || snapshot === false) return callback(null, message);
 
     var startTime = Date.now();
 
@@ -379,13 +390,12 @@ module.exports = bayeuxExtension({
 
         if (snapshot.data === undefined && snapshot.meta === undefined) return message;
 
-        if(!message.ext) message.ext = {};
+        if (!message.ext) message.ext = {};
         message.ext.snapshot = snapshot.data;
         message.ext.snapshot_meta = snapshot.meta;
 
         return message;
       })
       .nodeify(callback);
-
   }
 });

@@ -12,9 +12,9 @@ describe('room-security-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -32,10 +32,9 @@ describe('room-security-api', function() {
         admins: 'MANUAL',
         extraAdmins: ['user1']
       },
-      users: ['user1'],
+      users: ['user1']
     },
-    group1: {
-    },
+    group1: {},
     troupe2: {
       securityDescriptor: {
         type: null,
@@ -55,8 +54,7 @@ describe('room-security-api', function() {
       },
       users: ['user1'],
       group: 'group1'
-    },
-
+    }
   });
 
   it('GET /v1/rooms/:roomId/security', function() {
@@ -70,7 +68,7 @@ describe('room-security-api', function() {
           type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
-        })
+        });
       });
   });
 
@@ -84,7 +82,7 @@ describe('room-security-api', function() {
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(res) {
-        assert.deepEqual(res.body, { type: 'GROUP', admins: 'GROUP_ADMIN', members: 'PUBLIC' })
+        assert.deepEqual(res.body, { type: 'GROUP', admins: 'GROUP_ADMIN', members: 'PUBLIC' });
       });
   });
 
@@ -103,7 +101,7 @@ describe('room-security-api', function() {
           type: null,
           admins: 'MANUAL',
           members: 'PUBLIC'
-        })
+        });
       });
   });
 
@@ -155,9 +153,6 @@ describe('room-security-api', function() {
       .del('/v1/rooms/' + roomId + '/security/extraAdmins/' + userId)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(204)
-      .then(function() {
-
-      })
+      .then(function() {});
   });
-
-})
+});

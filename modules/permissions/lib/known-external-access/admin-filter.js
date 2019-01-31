@@ -7,13 +7,17 @@ var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
 var _ = require('lodash');
 var assert = require('assert');
 var debug = require('debug')('gitter:app:permissions:admin-filter');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 function createHashFor(userIds) {
-  return _.reduce(userIds, function(memo, userId) {
-    memo[userId] = true;
-    return memo;
-  }, {});
+  return _.reduce(
+    userIds,
+    function(memo, userId) {
+      memo[userId] = true;
+      return memo;
+    },
+    {}
+  );
 }
 
 /**
@@ -48,9 +52,9 @@ function getQueryForGhOrg(securityDescriptor) {
  * Build a query for KnownExternalAccess given a security descriptor
  */
 function getQueryForDescriptor(securityDescriptor) {
-  switch(securityDescriptor.type) {
+  switch (securityDescriptor.type) {
     case 'GH_REPO':
-      return getQueryForGhRepo(securityDescriptor)
+      return getQueryForGhRepo(securityDescriptor);
 
     case 'GH_ORG':
       return getQueryForGhOrg(securityDescriptor);
@@ -122,7 +126,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
   }
 
   if (usersNotInExtraAdmins.isEmpty()) {
-    debug('All users matched in extraAdmins')
+    debug('All users matched in extraAdmins');
     return usersInExtraAdmins;
   }
 
@@ -158,14 +162,13 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
     if (query) {
       debug('Searching for users matching %j', query);
 
-      return findUsersForQuery(query, usersNotInExtraAdmins.toArray())
-        .then(function(adminUserIds) {
-          if (!adminUserIds || !adminUserIds.length) {
-            return usersInExtraAdmins;
-          }
+      return findUsersForQuery(query, usersNotInExtraAdmins.toArray()).then(function(adminUserIds) {
+        if (!adminUserIds || !adminUserIds.length) {
+          return usersInExtraAdmins;
+        }
 
-          return usersInExtraAdmins.concat(lazy(adminUserIds));
-        });
+        return usersInExtraAdmins.concat(lazy(adminUserIds));
+      });
     } else {
       return usersInExtraAdmins;
     }
@@ -187,10 +190,9 @@ function adminFilter(objectWithSd, userIds) {
   if (!objectWithSd.sd) return [];
   if (objectWithSd.sd.type === 'ONE_TO_ONE') return []; // No admins in one-to-one rooms
 
-  return adminFilterInternal(objectWithSd.sd, lazy(userIds), false)
-    .then(function(userIds) {
-      return userIds.toArray();
-    });
+  return adminFilterInternal(objectWithSd.sd, lazy(userIds), false).then(function(userIds) {
+    return userIds.toArray();
+  });
 }
 
 module.exports = Promise.method(adminFilter);

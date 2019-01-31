@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var testRequire = require('../test-require');
@@ -8,18 +8,21 @@ var useragent = require('useragent');
 function makeRequest(userAgent) {
   return {
     headers: {
-      "user-agent": userAgent
+      'user-agent': userAgent
     },
     getParsedUserAgent: function() {
       return useragent.parse(userAgent);
     }
-  }
+  };
 }
 
 describe('user agent tags', function() {
-
   it('should parse gitter beta ios app', function() {
-    var tags = userAgentTagger(makeRequest('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 GitterBeta/1.2.1 (4659610624)'));
+    var tags = userAgentTagger(
+      makeRequest(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 GitterBeta/1.2.1 (4659610624)'
+      )
+    );
 
     assert.equal(tags['agent:type'], 'mobile');
     assert.equal(tags['agent:family'], 'GitterBeta');
@@ -31,13 +34,21 @@ describe('user agent tags', function() {
   });
 
   it('should map the gitter ios app version without buildnumber/versionnumber fix', function() {
-    var tags = userAgentTagger(makeRequest('Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 Gitter/598 (5736412944)'));
+    var tags = userAgentTagger(
+      makeRequest(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 7_1 like Mac OS X) AppleWebKit/537.51.2 (KHTML, like Gecko) Mobile/11D167 Gitter/598 (5736412944)'
+      )
+    );
 
     assert.equal(tags['agent:version'], '1.1.1');
   });
 
   it('shouldnt mess with unmodified Chrome', function() {
-    var tags = userAgentTagger(makeRequest('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'));
+    var tags = userAgentTagger(
+      makeRequest(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36'
+      )
+    );
 
     assert.equal(tags['agent:type'], 'desktop');
     assert.equal(tags['agent:family'], 'Chrome');
@@ -59,5 +70,4 @@ describe('user agent tags', function() {
     assert.equal(tags['agent:os:family'], undefined);
     assert.equal(tags['agent:os:version'], undefined);
   });
-
 });

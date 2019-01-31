@@ -36,7 +36,7 @@ function newChatPushHandler(event, payload) {
       icon: chat.fromUser && chat.fromUser.avatarUrl,
       tag: tag,
       renotify: false,
-      data: payload,
+      data: payload
       /*
       actions: [{
         action: 'mute',
@@ -53,7 +53,8 @@ function newChatPushHandler(event, payload) {
       notificationOptions.vibrate = [100, 90, 80];
     }
 
-    return self.registration.showNotification(title, notificationOptions)
+    return self.registration
+      .showNotification(title, notificationOptions)
       .then(function(result) {
         if (result) return;
 
@@ -61,18 +62,15 @@ function newChatPushHandler(event, payload) {
       })
       .then(function() {
         return next();
-      })
+      });
   }
 
-  return self.registration.getNotifications({ tag: tag })
-    .then(function(notifications) {
-      // Already notifying for this room? Skip
-      if (notifications && notifications.length) return;
+  return self.registration.getNotifications({ tag: tag }).then(function(notifications) {
+    // Already notifying for this room? Skip
+    if (notifications && notifications.length) return;
 
-      return next();
-    });
-
-
+    return next();
+  });
 }
 
 function newChatClickHandler(event, payload) {
@@ -84,7 +82,7 @@ function newChatClickHandler(event, payload) {
 }
 
 function onPush(event, payload) {
-  switch(payload.type) {
+  switch (payload.type) {
     case 'new_chat':
       return newChatPushHandler(event, payload);
   }
@@ -95,11 +93,10 @@ function onNotificationClick(event) {
   notification.close();
 
   var payload = notification.data;
-  switch(payload.type) {
+  switch (payload.type) {
     case 'new_chat':
       return newChatClickHandler(event, payload);
   }
-
 }
 
 module.exports = {

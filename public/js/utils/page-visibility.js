@@ -9,16 +9,17 @@ _.extend(events, Backbone.Events);
 var PREFIXES = ['moz', 'ms', 'webkit'];
 
 function findPrefix() {
-  if (typeof document.hidden !== "undefined") { // Opera 12.10 and Firefox 18 and later support
+  if (typeof document.hidden !== 'undefined') {
+    // Opera 12.10 and Firefox 18 and later support
     return {
       prop: 'hidden',
       eventName: 'visibilitychange'
     };
   }
 
-  for(var i = 0; i < PREFIXES.length; i++) {
+  for (var i = 0; i < PREFIXES.length; i++) {
     var prefix = PREFIXES[i];
-    if (typeof document[prefix + 'Hidden'] !== "undefined") {
+    if (typeof document[prefix + 'Hidden'] !== 'undefined') {
       return {
         prop: prefix + 'Hidden',
         eventName: prefix + 'visibilitychange'
@@ -32,7 +33,7 @@ var prop = prefix && prefix.prop;
 var eventName = prefix && prefix.eventName;
 
 function handleVisibilityChange() {
-  events.trigger("change");
+  events.trigger('change');
 }
 
 function isHidden() {
@@ -47,4 +48,4 @@ if (eventName) {
 module.exports = {
   events: events,
   isHidden: isHidden
-}
+};

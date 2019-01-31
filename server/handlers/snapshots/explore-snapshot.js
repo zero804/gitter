@@ -16,21 +16,22 @@ module.exports = function getSnapshotsForPageContext(options) {
   var opts = _.extend({}, defaults, options);
 
   var tagMap = exploreTagUtils.generateTagMap(opts.fauxTagMap);
-  if(!opts.isLoggedIn) {
-    tagMap[exploreTagUtils.tagConstants.FAUX_KEY_TAG_MAP_KEY_PREFIX + ':suggested'].needsAuthentication = true;
+  if (!opts.isLoggedIn) {
+    tagMap[
+      exploreTagUtils.tagConstants.FAUX_KEY_TAG_MAP_KEY_PREFIX + ':suggested'
+    ].needsAuthentication = true;
   }
   var selectedTagMap = exploreTagUtils.generateSelectedTagMap(tagMap, opts.selectedTags);
 
   var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
-  return restSerializer.serialize(opts.rooms, strategy)
-    .then(function(rooms) {
-      var resultantRooms = rooms.map(function(roomObj) {
-        return generateRoomCardContext(roomObj);
-      });
-
-      return {
-        tagMap: selectedTagMap,
-        rooms: resultantRooms
-      };
+  return restSerializer.serialize(opts.rooms, strategy).then(function(rooms) {
+    var resultantRooms = rooms.map(function(roomObj) {
+      return generateRoomCardContext(roomObj);
     });
+
+    return {
+      tagMap: selectedTagMap,
+      rooms: resultantRooms
+    };
+  });
 };

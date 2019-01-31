@@ -1,6 +1,6 @@
 'use strict';
 
-var LRU = require("lru-cache");
+var LRU = require('lru-cache');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var _ = require('underscore');
@@ -15,12 +15,13 @@ function MongooseCachedLookup(options) {
   this.get = function(id) {
     /* Ensure the ID is a string */
     id = mongoUtils.serializeObjectId(id);
-    if(!id) return Promise.resolve();
+    if (!id) return Promise.resolve();
 
     var cached = cache.get(id);
     if (cached) return Promise.resolve(_.clone(cached)); // Shallow clone only!
 
-    return model.findById(id, undefined, { lean: true })
+    return model
+      .findById(id, undefined, { lean: true })
       .exec()
       .then(function(doc) {
         if (!doc) return;
@@ -30,6 +31,5 @@ function MongooseCachedLookup(options) {
       });
   };
 }
-
 
 module.exports = MongooseCachedLookup;

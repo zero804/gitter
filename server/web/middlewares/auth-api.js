@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var passport = require("passport");
+var passport = require('passport');
 var rateLimiter = require('./rate-limiter');
 var logoutDestroyTokens = require('./logout-destroy-tokens');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
@@ -11,7 +11,7 @@ function ensureLoggedIn(req, res, next) {
     req.user = null;
   }
 
-  if(req.user && userScopes.isMissingTokens(req.user)) {
+  if (req.user && userScopes.isMissingTokens(req.user)) {
     return logoutDestroyTokens(req, res, next);
   }
 

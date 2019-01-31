@@ -13,9 +13,9 @@ describe('one-to-one-rooms', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -28,7 +28,7 @@ describe('one-to-one-rooms', function() {
     },
     user3: {
       accessToken: 'web-internal'
-    },
+    }
   });
 
   it('One-to-one between two users with default notification settings', function() {
@@ -47,13 +47,13 @@ describe('one-to-one-rooms', function() {
         chatId: null
       })
       .then(function(res) {
-        var roomId = this.roomId = res.body.id;
+        var roomId = (this.roomId = res.body.id);
         assert(roomId);
 
         return request(app)
           .get('/v1/user/me/rooms/' + roomId + '/settings/notifications')
           .set('x-access-token', fixture.user1.accessToken)
-          .expect(200)
+          .expect(200);
       })
       .then(function(res) {
         var body = res.body;
@@ -79,7 +79,7 @@ describe('one-to-one-rooms', function() {
 
         // User2 will be notified of the new chat in the one-to-one
         assert.deepEqual(result[fixture.user2.id][this.roomId], [this.chatId]);
-      })
+      });
   });
 
   it('One-to-one between two users with where one user has default notification settings of mute', function() {
@@ -105,7 +105,7 @@ describe('one-to-one-rooms', function() {
         roomId: null
       })
       .then(function(res) {
-        var roomId = this.roomId = res.body.id;
+        var roomId = (this.roomId = res.body.id);
         assert(roomId);
 
         return request(app)
@@ -127,5 +127,4 @@ describe('one-to-one-rooms', function() {
         assert.strictEqual(body.mode, 'all');
       });
   });
-
-})
+});

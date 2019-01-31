@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -28,13 +28,13 @@ function generateResponse(userId, troupeId) {
         default: details.default,
         defaultSettings: defaults
       };
-    });
-
+    }
+  );
 }
 /**
  * TODO: REMOVE THIS WHOLE RESOURCE AND UPDATE THIS VIA THE USER TROUPE
  * with { mode: x }
-*/
+ */
 module.exports = {
   id: 'setting',
 
@@ -59,10 +59,10 @@ module.exports = {
     var mode = settings && (settings.mode || settings.push);
 
     if (!mode) throw new StatusError(400, 'Illegal notifications mode');
-    return userRoomModeUpdateService.setModeForUserInRoom(req.resourceUser, troupeId, mode)
+    return userRoomModeUpdateService
+      .setModeForUserInRoom(req.resourceUser, troupeId, mode)
       .then(function() {
         return generateResponse(userId, troupeId);
       });
   }
-
 };

@@ -6,11 +6,10 @@ var clientEnv = require('gitter-client-env');
 var apiClient = require('../components/api-client');
 var presentPermissionsDialog = require('../ensured/present-permissions-dialog');
 
-
 function showWelcomeMessage() {
   var dialogRegion = this.dialogRegion;
 
-  require.ensure(['../views/modals/welcome-message'], function(require){
+  require.ensure(['../views/modals/welcome-message'], function(require) {
     var WelcomeMessageView = require('../views/modals/welcome-message');
     dialogRegion.show(new WelcomeMessageView.Modal());
   });
@@ -20,7 +19,7 @@ function createRoutes(options) {
   var rosterCollection = options.rosterCollection;
 
   return {
-    'autojoin': function() {
+    autojoin: function() {
       if (context.roomHasWelcomeMessage()) {
         showWelcomeMessage.call(this);
         return;
@@ -34,18 +33,20 @@ function createRoutes(options) {
         });
     },
 
-    'people': function() {
+    people: function() {
       var dialogRegion = this.dialogRegion;
       require.ensure(['../views/modals/people-modal'], function(require) {
         var PeopleModal = require('../views/modals/people-modal');
 
-        dialogRegion.show(new PeopleModal({
-          rosterCollection: rosterCollection
-        }));
+        dialogRegion.show(
+          new PeopleModal({
+            rosterCollection: rosterCollection
+          })
+        );
       });
     },
 
-    'notifications': function() {
+    notifications: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/notification-settings-view'], function(require) {
@@ -54,7 +55,7 @@ function createRoutes(options) {
       });
     },
 
-    'markdown': function() {
+    markdown: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/markdown-view'], function(require) {
@@ -63,7 +64,7 @@ function createRoutes(options) {
       });
     },
 
-    'keys': function() {
+    keys: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/keyboard-view'], function(require) {
@@ -72,17 +73,16 @@ function createRoutes(options) {
       });
     },
 
-    'add': function() {
+    add: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/app/addPeopleView'], function(require) {
         var AddPeopleViewModal = require('../views/app/addPeopleView');
         dialogRegion.show(new AddPeopleViewModal({}));
       });
-
     },
 
-    'settings': function() {
+    settings: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/room-settings-view'], function(require) {
@@ -91,22 +91,22 @@ function createRoutes(options) {
       });
     },
 
-    'permissions': function() {
+    permissions: function() {
       presentPermissionsDialog({
         dialogRegion: this.dialogRegion
       });
     },
 
-    'tags': function() {
+    tags: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/edit-tags-view'], function(require) {
         var EditTagsView = require('../views/modals/edit-tags-view');
-        dialogRegion.show(new EditTagsView({roomId: context.troupe().get('id')}));
+        dialogRegion.show(new EditTagsView({ roomId: context.troupe().get('id') }));
       });
     },
 
-    'integrations': function() {
+    integrations: function() {
       var dialogRegion = this.dialogRegion;
 
       if (context.isTroupeAdmin()) {
@@ -120,7 +120,7 @@ function createRoutes(options) {
       }
     },
 
-    'share': function() {
+    share: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/share-view'], function(require) {
@@ -130,7 +130,7 @@ function createRoutes(options) {
       });
     },
 
-    'delete': function() {
+    delete: function() {
       var dialogRegion = this.dialogRegion;
 
       require.ensure(['../views/modals/delete-room-view'], function(require) {
@@ -146,15 +146,16 @@ function createRoutes(options) {
       require.ensure(['../views/modals/notification-defaults-view'], function(require) {
         var NotificationDefaultsView = require('../views/modals/notification-defaults-view');
 
-        dialogRegion.show(new NotificationDefaultsView({
-          model: new Backbone.Model()
-        }));
-
+        dialogRegion.show(
+          new NotificationDefaultsView({
+            model: new Backbone.Model()
+          })
+        );
       });
     },
 
-    'welcome-message': showWelcomeMessage,
-  }
+    'welcome-message': showWelcomeMessage
+  };
 }
 
 module.exports = createRoutes;

@@ -7,9 +7,9 @@ function formatDate(d) {
 }
 
 function EventStrategy(options) {
-  if(!options) options = {};
+  if (!options) options = {};
 
-  this.preload = function() { };
+  this.preload = function() {};
 
   this.map = function(item) {
     var prerendered = item.meta && item.meta.prerendered;
@@ -24,7 +24,6 @@ function EventStrategy(options) {
       payload: prerendered ? undefined : item.payload,
       v: getVersion(item)
     };
-
   };
 }
 

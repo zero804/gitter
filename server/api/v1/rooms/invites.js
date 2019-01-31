@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
-var restSerializer = require("../../../serializers/rest-serializer");
+var restSerializer = require('../../../serializers/rest-serializer');
 var loadTroupeFromParam = require('./load-troupe-param');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
-
 
 module.exports = {
   id: 'roomInvite',
@@ -15,10 +14,18 @@ module.exports = {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
-        return roomWithPolicyService.createRoomInvitation(input.type, input.externalId, input.emailAddress);
+        return roomWithPolicyService.createRoomInvitation(
+          input.type,
+          input.externalId,
+          input.emailAddress
+        );
       })
       .then(function(result) {
-        var avatarUrl = inviteValidation.getAvatar(input.type, input.externalId, result.emailAddress);
+        var avatarUrl = inviteValidation.getAvatar(
+          input.type,
+          input.externalId,
+          result.emailAddress
+        );
 
         if (!input.emailAddress && result.emailAddress) {
           result.emailAddress = inviteValidation.maskEmail(result.emailAddress);
@@ -29,19 +36,18 @@ module.exports = {
             status: result.status,
             email: result.emailAddress,
             avatarUrl: avatarUrl
-          }
+          };
         }
 
         var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serializeObject(result.user, strategy)
-          .then(function(serializedUser) {
-            return {
-              status: result.status,
-              email: result.emailAddress,
-              user: serializedUser,
-              avatarUrl: avatarUrl
-            }
-          });
-      })
-  },
+        return restSerializer.serializeObject(result.user, strategy).then(function(serializedUser) {
+          return {
+            status: result.status,
+            email: result.emailAddress,
+            user: serializedUser,
+            avatarUrl: avatarUrl
+          };
+        });
+      });
+  }
 };

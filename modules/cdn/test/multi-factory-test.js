@@ -10,41 +10,47 @@ describe('multi-factory', function() {
     cdnPrefix: '/_s/moo'
   });
 
-  var FIXTURES = [{
-    name: 'should handle defaults',
-    mappings: {
-      'xyz123': '//cdn02.gitter.test/_s/moo/xyz123',
-      'abc123': '//cdn03.gitter.test/_s/moo/abc123',
+  var FIXTURES = [
+    {
+      name: 'should handle defaults',
+      mappings: {
+        xyz123: '//cdn02.gitter.test/_s/moo/xyz123',
+        abc123: '//cdn03.gitter.test/_s/moo/abc123'
+      }
+    },
+    {
+      name: 'should handle emails',
+      email: true,
+      mappings: {
+        xyz123: 'https://gitter.test/_s/l/xyz123',
+        abc123: 'https://gitter.test/_s/l/abc123'
+      }
+    },
+    {
+      name: 'should handle nonrelative',
+      nonrelative: true,
+      mappings: {
+        xyz123: 'https://cdn02.gitter.test/_s/moo/xyz123',
+        abc123: 'https://cdn03.gitter.test/_s/moo/abc123'
+      }
+    },
+    {
+      name: 'should handle notStatic',
+      notStatic: true,
+      mappings: {
+        xyz123: '//cdn02.gitter.test/xyz123',
+        abc123: '//cdn03.gitter.test/abc123'
+      }
+    },
+    {
+      name: 'should handle longTermCache',
+      longTermCache: '1',
+      mappings: {
+        xyz123: '//cdn02.gitter.test/_s/lt/1/xyz123',
+        abc123: '//cdn03.gitter.test/_s/lt/1/abc123'
+      }
     }
-  }, {
-    name: 'should handle emails',
-    email: true,
-    mappings: {
-      'xyz123': 'https://gitter.test/_s/l/xyz123',
-      'abc123': 'https://gitter.test/_s/l/abc123',
-    }
-  }, {
-    name: 'should handle nonrelative',
-    nonrelative: true,
-    mappings: {
-      'xyz123': 'https://cdn02.gitter.test/_s/moo/xyz123',
-      'abc123': 'https://cdn03.gitter.test/_s/moo/abc123',
-    }
-  }, {
-    name: 'should handle notStatic',
-    notStatic: true,
-    mappings: {
-      'xyz123': '//cdn02.gitter.test/xyz123',
-      'abc123': '//cdn03.gitter.test/abc123',
-    }
-  }, {
-    name: 'should handle longTermCache',
-    longTermCache: '1',
-    mappings: {
-      'xyz123': '//cdn02.gitter.test/_s/lt/1/xyz123',
-      'abc123': '//cdn03.gitter.test/_s/lt/1/abc123',
-    }
-  }];
+  ];
 
   FIXTURES.forEach(function(meta) {
     Object.keys(meta.mappings).forEach(function(uri) {
@@ -58,9 +64,7 @@ describe('multi-factory', function() {
           longTermCache: meta.longTermCache
         });
         assert.strictEqual(actual, expected);
-      })
+      });
     });
-
-
-  })
-})
+  });
+});

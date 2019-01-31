@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
@@ -8,7 +8,7 @@ var View = Marionette.CollectionView.extend({
   tagName: 'ul',
   childView: Marionette.ItemView.extend({
     tagName: 'li',
-    template: _.template("<%= text %>")
+    template: _.template('<%= text %>')
   }),
   initialize: function() {
     this.collection = new Backbone.Collection([]);
@@ -28,7 +28,7 @@ var View = Marionette.CollectionView.extend({
     }
 
     if (notificationFeaturesHash.mention) {
-      features.push({ id: 3, text: 'Notify when you\'re mentioned' });
+      features.push({ id: 3, text: "Notify when you're mentioned" });
     }
 
     if (notificationFeaturesHash.announcement) {
@@ -58,7 +58,7 @@ var View = Marionette.CollectionView.extend({
       features.push({ id: 5, text: 'Notify for all chats' });
     }
 
-    features.push({ id: 3, text: 'Notify when you\'re mentioned' });
+    features.push({ id: 3, text: "Notify when you're mentioned" });
 
     if (mode === 'all' || mode === 'announcement') {
       features.push({ id: 4, text: 'Notify on @/all announcements' });
@@ -67,7 +67,6 @@ var View = Marionette.CollectionView.extend({
     this.collection.reset(features);
     return features.length;
   }
-
 });
 
 module.exports = View;

@@ -6,9 +6,14 @@ var Promise = require('bluebird');
 module.exports = {
   user: {
     delete: sinon.spy(),
-    put: function(){
+    put: function() {
       //TODO find a better way of mocking this
-      return { then: function(){ return { catch: function(){} }; }, catch: function(){} };
+      return {
+        then: function() {
+          return { catch: function() {} };
+        },
+        catch: function() {}
+      };
     }
   },
   priv: {

@@ -26,7 +26,7 @@ function compareInvites(a, b) {
 }
 
 // it is worth noticing that we want to sort in a descindencing order, thus the negative results
-module.exports = function (a, b) {
+module.exports = function(a, b) {
   // normalizing Backbone.Model to POJO
   a = ensurePojo(a);
   b = ensurePojo(b);
@@ -34,11 +34,15 @@ module.exports = function (a, b) {
   var rankDifference = compareRank(a, b); // checks if there is rank difference
 
   // attempts to sort by rank
-  if (rankDifference) { return - rankDifference; }
+  if (rankDifference) {
+    return -rankDifference;
+  }
 
   // attempts to sort by invite status
-  if (inviteStatusDiffer(a, b)) { return - compareInvites(a, b); }
+  if (inviteStatusDiffer(a, b)) {
+    return -compareInvites(a, b);
+  }
 
   // default sort
-  return - compareNames(a, b);
+  return -compareNames(a, b);
 };

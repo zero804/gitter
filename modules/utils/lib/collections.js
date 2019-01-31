@@ -1,17 +1,18 @@
-"use strict";
+'use strict';
 
 exports.keys = function(object) {
-    var k = [];
-    for (var i in object) if (object.hasOwnProperty(i)) {
+  var k = [];
+  for (var i in object)
+    if (object.hasOwnProperty(i)) {
       k.push(i);
     }
-    return k;
+  return k;
 };
 
 exports.extract = function(propertyName) {
-    return function(item) {
-      return item[propertyName];
-    };
+  return function(item) {
+    return item[propertyName];
+  };
 };
 
 /** Take an array and hash it by it's ID */
@@ -22,7 +23,7 @@ exports.indexById = function(array) {
   var a = {};
   for (var i = 0; i < len; i++) {
     var item = array[i];
-    if(item) {
+    if (item) {
       a[item.id || item._id] = item;
     }
   }
@@ -38,7 +39,7 @@ exports.indexByProperty = function(array, propertyName) {
   var a = {};
   for (var i = 0; i < len; i++) {
     var item = array[i];
-    if(item) {
+    if (item) {
       a[item[propertyName]] = item;
     }
   }
@@ -66,7 +67,8 @@ exports.hashArray = function(array) {
  */
 exports.maintainIdOrder = function(ids, results) {
   var resultsIndexed = exports.indexById(results);
-  return ids.map(function(id) {
+  return ids
+    .map(function(id) {
       return resultsIndexed[id];
     })
     .filter(function(f) {
@@ -76,6 +78,6 @@ exports.maintainIdOrder = function(ids, results) {
 
 exports.predicates = {
   notNull: function(v) {
-    return (v !== null) && (v !== undefined);
+    return v !== null && v !== undefined;
   }
 };

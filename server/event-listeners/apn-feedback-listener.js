@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
@@ -14,9 +14,8 @@ exports.install = function() {
   var feedbackEmitter = iosGateway.createFeedbackEmitter();
 
   feedbackEmitter.on('deregister', function(deviceTokens) {
-    return pushNotificationService.deregisterIosDevices(deviceTokens)
-      .catch(function(err) {
-        errorReporter(err, { }, { module: 'apn-feedback-listener' });
-      });
-  })
+    return pushNotificationService.deregisterIosDevices(deviceTokens).catch(function(err) {
+      errorReporter(err, {}, { module: 'apn-feedback-listener' });
+    });
+  });
 };

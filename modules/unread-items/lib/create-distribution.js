@@ -29,21 +29,25 @@ function findNonMembersWithAccess(troupe, userIds) {
 
   var result = [];
   return Promise.map(userIds, function(userId) {
-      return policyFactory.createPolicyForUserIdInRoom(userId, troupe)
-        .then(function(policy) {
-          return policy.canJoin();
-        })
-        .then(function(userCanJoin) {
-          if(userCanJoin) {
-            result.push(String(userId));
-          }
-        })
-        .catch(function(e) {
-          // Swallow errors here. If the call fails, the chat should not fail
-          errorReporter(e, { userId: userId, operation: 'findNonMembersWithAccess' }, { module: 'unread-items' });
-        })
-    })
-    .return(result);
+    return policyFactory
+      .createPolicyForUserIdInRoom(userId, troupe)
+      .then(function(policy) {
+        return policy.canJoin();
+      })
+      .then(function(userCanJoin) {
+        if (userCanJoin) {
+          result.push(String(userId));
+        }
+      })
+      .catch(function(e) {
+        // Swallow errors here. If the call fails, the chat should not fail
+        errorReporter(
+          e,
+          { userId: userId, operation: 'findNonMembersWithAccess' },
+          { module: 'unread-items' }
+        );
+      });
+  }).return(result);
 }
 
 /**
@@ -63,32 +67,36 @@ function extractMentionInfo(fromUserId, mentions) {
 
   var announcement = false;
 
-  var uniqueUserIds = _.reduce(mentions, function(memo, mention) {
-    if(mention.group) {
-      if (mention.announcement) {
-        announcement = true;
+  var uniqueUserIds = _.reduce(
+    mentions,
+    function(memo, mention) {
+      if (mention.group) {
+        if (mention.announcement) {
+          announcement = true;
+        } else {
+          // Note: in future, annoucements won't have userIds for
+          // the `all` group
+          if (mention.userIds) {
+            _.each(mention.userIds, function(userId) {
+              if (!userId) return;
+              var userIdString = String(userId);
+              if (fromUserIdString === userIdString) return;
+              memo[userId] = true;
+            });
+          }
+        }
       } else {
-        // Note: in future, annoucements won't have userIds for
-        // the `all` group
-        if (mention.userIds) {
-          _.each(mention.userIds, function(userId) {
-            if (!userId) return;
-            var userIdString = String(userId);
-            if (fromUserIdString === userIdString) return;
-            memo[userId] = true;
-          });
+        if (mention.userId) {
+          var userIdString = String(mention.userId);
+          if (fromUserIdString !== userIdString) {
+            memo[userIdString] = true;
+          }
         }
       }
-    } else {
-      if(mention.userId) {
-        var userIdString = String(mention.userId);
-        if (fromUserIdString !== userIdString) {
-          memo[userIdString] = true;
-        }
-      }
-    }
-    return memo;
-  }, {});
+      return memo;
+    },
+    {}
+  );
 
   var userIds = Object.keys(uniqueUserIds);
 
@@ -96,21 +104,24 @@ function extractMentionInfo(fromUserId, mentions) {
     announcement: announcement,
     userIds: userIds
   };
-
 }
 
 function parseMentions(fromUserId, troupe, membersWithFlags, mentionUserIds, options) {
-  var memberHash = _.reduce(membersWithFlags, function(memo, member) {
-    memo[member.userId] = true;
-    return memo;
-  }, {});
+  var memberHash = _.reduce(
+    membersWithFlags,
+    function(memo, member) {
+      memo[member.userId] = true;
+      return memo;
+    },
+    {}
+  );
 
   var nonMemberUserIds = _.filter(mentionUserIds, function(userId) {
     return !memberHash[userId];
   });
 
   /* Shortcut if we don't need to check for non-members */
-  if(!nonMemberUserIds.length) {
+  if (!nonMemberUserIds.length) {
     return Promise.resolve({
       membersWithFlags: membersWithFlags,
       mentions: mentionUserIds,
@@ -120,32 +131,33 @@ function parseMentions(fromUserId, troupe, membersWithFlags, mentionUserIds, opt
 
   var delta = options && options.delta;
 
-
   /* Lookup the non-members and check if they can access the room */
-  return (delta ?
-            Promise.resolve(nonMemberUserIds) :
-            findNonMembersWithAccess(troupe, nonMemberUserIds))
-    .then(function(nonMemberUserIdsFiltered) {
-
-      var memberMentionUserIds = _.filter(mentionUserIds, function(userId) {
-        return memberHash[userId];
-      });
-
-      return {
-        membersWithFlags: membersWithFlags.concat(nonMemberUserIdsFiltered.map(function(userId) {
-          return { userId: userId, flags: null }; // Flags: null means the user is not in the room
-        })),
-        mentions: memberMentionUserIds.concat(nonMemberUserIdsFiltered),
-        nonMemberMentions: nonMemberUserIdsFiltered
-      };
+  return (delta
+    ? Promise.resolve(nonMemberUserIds)
+    : findNonMembersWithAccess(troupe, nonMemberUserIds)
+  ).then(function(nonMemberUserIdsFiltered) {
+    var memberMentionUserIds = _.filter(mentionUserIds, function(userId) {
+      return memberHash[userId];
     });
+
+    return {
+      membersWithFlags: membersWithFlags.concat(
+        nonMemberUserIdsFiltered.map(function(userId) {
+          return { userId: userId, flags: null }; // Flags: null means the user is not in the room
+        })
+      ),
+      mentions: memberMentionUserIds.concat(nonMemberUserIdsFiltered),
+      nonMemberMentions: nonMemberUserIdsFiltered
+    };
+  });
 }
 
 function createDistribution(fromUserId, troupe, mentions, options) {
   var troupeId = troupe._id;
   var mentionInfo = extractMentionInfo(fromUserId, mentions);
 
-  return roomMembershipService.findMembersForRoomForNotify(troupeId, fromUserId, mentionInfo.annoucement, mentionInfo.userIds)
+  return roomMembershipService
+    .findMembersForRoomForNotify(troupeId, fromUserId, mentionInfo.annoucement, mentionInfo.userIds)
     .then(function(membersWithFlags) {
       if (!mentionInfo.userIds.length) {
         return {
@@ -155,17 +167,16 @@ function createDistribution(fromUserId, troupe, mentions, options) {
       }
 
       /* Add the mentions into the mix */
-      return parseMentions(fromUserId, troupe, membersWithFlags, mentionInfo.userIds, options)
-        .then(function(parsedMentions) {
-
+      return parseMentions(fromUserId, troupe, membersWithFlags, mentionInfo.userIds, options).then(
+        function(parsedMentions) {
           return {
             membersWithFlags: parsedMentions.membersWithFlags,
             mentions: parsedMentions.mentions,
             nonMemberMentions: parsedMentions.nonMemberMentions,
             announcement: mentionInfo.announcement
           };
-        });
-
+        }
+      );
     })
     .then(function(options) {
       // No need for presence for deltas
@@ -173,14 +184,15 @@ function createDistribution(fromUserId, troupe, mentions, options) {
         return new Distribution(options);
       }
 
-      var allUserIds = options.membersWithFlags.map(function(member) { return member.userId; });
+      var allUserIds = options.membersWithFlags.map(function(member) {
+        return member.userId;
+      });
 
       // In future, this should take into account announcements
-      return categoriseUserInRoom(troupeId, allUserIds)
-        .then(function(presenceStatus) {
-          options.presence = presenceStatus;
-          return new Distribution(options);
-        });
+      return categoriseUserInRoom(troupeId, allUserIds).then(function(presenceStatus) {
+        options.presence = presenceStatus;
+        return new Distribution(options);
+      });
     });
 }
 

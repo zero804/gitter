@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -23,25 +23,29 @@ function newUser(options) {
   var hellbanned = undefined;
 
   // Deal with spammer situation of 25 Sep 2016
-  if (/^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/.test(options.username)) {
+  if (
+    /^[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/.test(
+      options.username
+    )
+  ) {
     winston.info('Auto-hellbanning account', {
       username: options.username
-    })
+    });
     hellbanned = true;
   }
 
   var insertFields = {
-    githubId:           githubId,
-    githubUserToken:    options.githubUserToken,
-    githubToken:        options.githubToken,
-    githubScopes:       options.githubScopes,
-    gravatarImageUrl:   options.gravatarImageUrl,
-    gravatarVersion:    options.gravatarVersion,
-    username:           options.username,
-    invitedByUser:      options.invitedByUser,
-    displayName:        options.displayName,
-    state:              options.state,
-    hellbanned:         hellbanned
+    githubId: githubId,
+    githubUserToken: options.githubUserToken,
+    githubToken: options.githubToken,
+    githubScopes: options.githubScopes,
+    gravatarImageUrl: options.gravatarImageUrl,
+    gravatarVersion: options.gravatarVersion,
+    username: options.username,
+    invitedByUser: options.invitedByUser,
+    displayName: options.displayName,
+    state: options.state,
+    hellbanned: hellbanned
   };
 
   if (options.emails && options.emails.length) {
@@ -50,15 +54,20 @@ function newUser(options) {
 
   // Remove undefined fields
   Object.keys(insertFields).forEach(function(k) {
-    if(insertFields[k] === undefined) {
+    if (insertFields[k] === undefined) {
       delete insertFields[k];
     }
   });
 
-  return mongooseUtils.upsert(persistence.User, { githubId: githubId }, {
-      $setOnInsert: insertFields
-    })
-    .spread(function(user/*, updateExisting*/) {
+  return mongooseUtils
+    .upsert(
+      persistence.User,
+      { githubId: githubId },
+      {
+        $setOnInsert: insertFields
+      }
+    )
+    .spread(function(user /*, updateExisting*/) {
       //if(raw.updatedExisting) return user;
 
       // New record was inserted
@@ -73,32 +82,33 @@ function newUser(options) {
     .then(function(user) {
       // Reserve the URI for the user so that we don't need to figure it out
       // manually later (which will involve dodgy calls to github)
-      return uriLookupService.reserveUriForUsername(user._id, user.username)
-        .thenReturn(user);
+      return uriLookupService.reserveUriForUsername(user._id, user.username).thenReturn(user);
     });
 }
 
 function sanitiseUserSearchTerm(term) {
   // remove non username chars
-  return term.replace(/[^0-9a-z\-]/ig, '')
-    // escape dashes
-    .replace(/\-/ig, '\\-');
+  return (
+    term
+      .replace(/[^0-9a-z\-]/gi, '')
+      // escape dashes
+      .replace(/\-/gi, '\\-')
+  );
 }
 
 var userService = {
-
   findOrCreateUserForGithubId: function(options, callback) {
-    winston.info("Locating or creating user", options);
+    winston.info('Locating or creating user', options);
 
-    return userService.findByGithubId(options.githubId)
+    return userService
+      .findByGithubId(options.githubId)
       .then(function(user) {
-        if(user) return user;
+        if (user) return user;
 
         return newUser(options);
       })
       .nodeify(callback);
   },
-
 
   /**
    * Add the user if one doesn't exist for this identity and set the data for
@@ -106,7 +116,7 @@ var userService = {
    * @return promise of [user, isNewIdentity]
    */
   findOrCreateUserForProvider: function(userData, identityData) {
-    winston.info("Locating or creating user", {
+    winston.info('Locating or creating user', {
       userData: userData,
       identityData: identityData
     });
@@ -129,19 +139,28 @@ var userService = {
     var user;
     var isNewUser;
 
-    var userInsertData = _.extend({
-      identities: [{
-          provider: identityData.provider,
-          providerKey: identityData.providerKey
-        }]
-    }, userData);
+    var userInsertData = _.extend(
+      {
+        identities: [
+          {
+            provider: identityData.provider,
+            providerKey: identityData.providerKey
+          }
+        ]
+      },
+      userData
+    );
 
-    return mongooseUtils.upsert(persistence.User, userQuery, {
+    return mongooseUtils
+      .upsert(persistence.User, userQuery, {
         $setOnInsert: userInsertData
       })
       .spread(function(_user, _isExistingUser) {
         if (_user && _user.state === 'DISABLED') {
-          throw new StatusError(403, 'Account temporarily disabled. Please contact support@gitter.im');
+          throw new StatusError(
+            403,
+            'Account temporarily disabled. Please contact support@gitter.im'
+          );
         }
 
         user = _user;
@@ -151,9 +170,12 @@ var userService = {
           userId: user._id
         };
 
-        var identitySetData = _.extend({
-          userId: user._id
-        }, identityData);
+        var identitySetData = _.extend(
+          {
+            userId: user._id
+          },
+          identityData
+        );
 
         return mongooseUtils.upsert(persistence.Identity, identityQuery, {
           // NOTE: set the identity fields regardless, because the tokens and
@@ -180,32 +202,36 @@ var userService = {
    * Returns a hash of booleans if the given usernames exist in gitter
    */
   githubUsersExists: function(usernames, callback) {
-    return persistence.User.find({ username: { $in: usernames } }, { username: 1, _id: 0 }, { lean: true })
+    return persistence.User.find(
+      { username: { $in: usernames } },
+      { username: 1, _id: 0 },
+      { lean: true }
+    )
       .exec()
       .then(function(results) {
         return results.reduce(function(memo, index) {
           memo[index.username] = true;
           return memo;
-        }, { });
+        }, {});
       })
       .nodeify(callback);
   },
 
   findByGithubId: function(githubId, callback) {
     return persistence.User.findOne({ githubId: githubId })
-           .exec()
-           .nodeify(callback);
+      .exec()
+      .nodeify(callback);
   },
 
   findByGithubIdOrUsername: function(githubId, username, callback) {
-    return persistence.User.findOne({ $or: [{ githubId: githubId }, { username: username } ]})
+    return persistence.User.findOne({ $or: [{ githubId: githubId }, { username: username }] })
       .exec()
       .nodeify(callback);
   },
 
   findByEmail: function(email, callback) {
     return this.findAllByEmail(email)
-      .then((users) => {
+      .then(users => {
         return users[0];
       })
       .nodeify(callback);
@@ -214,10 +240,10 @@ var userService = {
   findAllByEmail: function(email) {
     return persistence.Identity.findOne({ email: email })
       .exec()
-      .then((identity) => {
+      .then(identity => {
         var userByIdentityPromise = Promise.resolve();
         if (identity) {
-           userByIdentityPromise = persistence.User.findOne({
+          userByIdentityPromise = persistence.User.findOne({
             identities: {
               $elemMatch: {
                 provider: identity.provider,
@@ -230,26 +256,23 @@ var userService = {
         return Promise.all([
           userByIdentityPromise,
           persistence.User.findOne({
-              $or: [{ email: email.toLowerCase()}, { emails: email.toLowerCase() }]
-            })
-            .exec()
+            $or: [{ email: email.toLowerCase() }, { emails: email.toLowerCase() }]
+          }).exec()
         ]);
       })
-      .filter((user) => {
+      .filter(user => {
         return !!user;
       });
   },
 
   findByEmailsIndexed: function(emails, callback) {
-    emails = emails.map(function(email) { return email.toLowerCase(); });
+    emails = emails.map(function(email) {
+      return email.toLowerCase();
+    });
 
-    return persistence.User.find({ $or: [
-              { email: { $in: emails } },
-              { emails: { $in: emails } }
-              ]})
+    return persistence.User.find({ $or: [{ email: { $in: emails } }, { emails: { $in: emails } }] })
       .exec()
       .then(function(users) {
-
         return users.reduce(function(memo, user) {
           memo[user.email] = user;
 
@@ -265,8 +288,8 @@ var userService = {
 
   findByUsername: function(username, callback) {
     return persistence.User.findOne({ username: username })
-            .exec()
-            .nodeify(callback);
+      .exec()
+      .nodeify(callback);
   },
 
   findByIds: function(ids, callback) {
@@ -278,7 +301,7 @@ var userService = {
   },
 
   findByIdsAndSearchTerm: function(ids, searchTerm, limit, callback) {
-    if(!ids || !ids.length || !searchTerm || !searchTerm.length) {
+    if (!ids || !ids.length || !searchTerm || !searchTerm.length) {
       return Promise.resolve([]).nodeify(callback);
     }
 
@@ -289,28 +312,30 @@ var userService = {
         { username: { $regex: searchPattern, $options: 'i' } },
         { displayName: { $regex: searchPattern, $options: 'i' } }
       ]
-    }).limit(limit)
+    })
+      .limit(limit)
       .exec()
       .nodeify(callback);
   },
 
   findByUsernames: function(usernames, callback) {
-    if(!usernames || !usernames.length) return Promise.resolve([]).nodeify(callback);
+    if (!usernames || !usernames.length) return Promise.resolve([]).nodeify(callback);
 
-    return persistence.User.where('username')['in'](usernames)
+    return persistence.User.where('username')
+      ['in'](usernames)
       .exec()
       .nodeify(callback);
   },
 
   findByLogin: function(login, callback) {
     var byEmail = login.indexOf('@') >= 0;
-    var find = byEmail ? userService.findByEmail(login)
-                       : userService.findByUsername(login);
+    var find = byEmail ? userService.findByEmail(login) : userService.findByUsername(login);
 
     return find
       .then(function(user) {
         return user;
-      }).nodeify(callback);
+      })
+      .nodeify(callback);
   },
 
   /**
@@ -326,12 +351,14 @@ var userService = {
   },
 
   deleteAllUsedInvitesForUser: function(user) {
-    persistence.Invite.remove({ userId: user.id, status: "USED" });
+    persistence.Invite.remove({ userId: user.id, status: 'USED' });
   },
 
   destroyTokensForUserId: function(userId) {
-    return persistence.User.update({ _id: userId }, { $set: { githubToken: null, githubScopes: { }, githubUserToken: null } })
-      .exec();
+    return persistence.User.update(
+      { _id: userId },
+      { $set: { githubToken: null, githubScopes: {}, githubUserToken: null } }
+    ).exec();
   },
 
   /* Update the timezone information for a user */
@@ -356,14 +383,15 @@ var userService = {
   },
 
   hellbanUser: function(userId) {
-    return persistence.User.update({ _id: userId }, {
+    return persistence.User.update(
+      { _id: userId },
+      {
         $set: {
           hellbanned: true
         }
-      })
-      .exec();
-  },
-
+      }
+    ).exec();
+  }
 };
 
 module.exports = userService;

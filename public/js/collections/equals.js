@@ -1,10 +1,8 @@
 /* eslint complexity: ["error", 31], max-depth: ["error", 5] */
-"use strict";
+'use strict';
 var _ = require('underscore');
 
 module.exports = (function() {
-
-
   var ObjProto = Object.prototype;
   var toString = ObjProto.toString;
 
@@ -55,18 +53,26 @@ module.exports = (function() {
     }
     // Objects with different constructors are not equivalent, but `Object`s
     // from different frames are.
-    var aCtor = a.constructor, bCtor = b.constructor;
+    var aCtor = a.constructor,
+      bCtor = b.constructor;
     if (
-      aCtor !== bCtor && 'constructor' in a && 'constructor' in b &&
-      !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-        _.isFunction(bCtor) && bCtor instanceof bCtor)
+      aCtor !== bCtor &&
+      'constructor' in a &&
+      'constructor' in b &&
+      !(
+        _.isFunction(aCtor) &&
+        aCtor instanceof aCtor &&
+        _.isFunction(bCtor) &&
+        bCtor instanceof bCtor
+      )
     ) {
       return false;
     }
     // Add the first object to the stack of traversed objects.
     aStack.push(a);
     bStack.push(b);
-    var size = 0, result = true;
+    var size = 0,
+      result = true;
     // Recursively compare objects and arrays.
     if (className === '[object Array]') {
       // Compare array lengths to determine if a deep comparison is necessary.
@@ -79,7 +85,7 @@ module.exports = (function() {
         }
       }
     } else {
-      if(_.isFunction(a.valueOf) && _.isFunction(b.valueOf)) {
+      if (_.isFunction(a.valueOf) && _.isFunction(b.valueOf)) {
         var vA = a.valueOf();
         var vB = b.valueOf();
 
@@ -97,7 +103,7 @@ module.exports = (function() {
         // Ensure that both objects contain the same number of properties.
         if (result) {
           for (key in b) {
-            if (_.has(b, key) && !(size--)) break;
+            if (_.has(b, key) && !size--) break;
           }
           result = !size;
         }
@@ -113,5 +119,4 @@ module.exports = (function() {
   return function(a, b) {
     return eq(a, b, [], []);
   };
-
 })();

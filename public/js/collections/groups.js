@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
@@ -35,7 +35,6 @@ var GroupCollection = LiveCollection.extend({
     this.listenTo(this, 'change:favourite', this.reorderFavs);
   },
 
-
   reorderFavs: function(model) {
     /**
      * We need to do some special reordering in the model of a favourite being positioned
@@ -44,7 +43,7 @@ var GroupCollection = LiveCollection.extend({
      */
 
     /* This only applies when a fav has been set */
-    if(!model.changed || !model.changed.favourite || this.reordering) {
+    if (!model.changed || !model.changed.favourite || this.reordering) {
       return;
     }
 
@@ -52,23 +51,21 @@ var GroupCollection = LiveCollection.extend({
 
     var favourite = model.changed.favourite;
 
-    var forUpdate = this
-                      .map(function(room) {
-                        return { id: room.id, favourite: room.get('favourite') };
-                      })
-                      .filter(function(room) {
-                        return room.favourite >= favourite && room.id !== model.id;
-                      });
+    var forUpdate = this.map(function(room) {
+      return { id: room.id, favourite: room.get('favourite') };
+    }).filter(function(room) {
+      return room.favourite >= favourite && room.id !== model.id;
+    });
 
     forUpdate.sort(function(a, b) {
       return a.favourite - b.favourite;
     });
 
     var next = favourite;
-    for(var i = 0; i < forUpdate.length; i++) {
+    for (var i = 0; i < forUpdate.length; i++) {
       var item = forUpdate[i];
 
-      if(item.favourite > next) {
+      if (item.favourite > next) {
         forUpdate.splice(i, forUpdate.length);
         break;
       }
@@ -78,7 +75,7 @@ var GroupCollection = LiveCollection.extend({
     }
 
     var self = this;
-    for(var j = forUpdate.length - 1; j >= 0; j--) {
+    for (var j = forUpdate.length - 1; j >= 0; j--) {
       var r = forUpdate[j];
       var id = r.id;
       var value = r.favourite;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var log = require('../../utils/log');
@@ -20,7 +20,7 @@ var View = Marionette.ItemView.extend({
     'input @ui.ghostUserCheckbox': 'onGhostCheckboxChanged'
   },
   modelEvents: {
-    'change': 'render'
+    change: 'render'
   },
   initialize: function() {
     this.model.set('ghostUsername', `ghost~${context.getUserId()}`);
@@ -36,12 +36,14 @@ var Modal = ModalView.extend({
     options = options || {};
     options.title = 'Careful Now...';
     var username = context.user().get('username');
-    options.menuItems = [{
-      disabled: true,
-      action: 'delete',
-      text: `Delete ${username}`,
-      className: 'modal--default__footer__btn--negative'
-    }];
+    options.menuItems = [
+      {
+        disabled: true,
+        action: 'delete',
+        text: `Delete ${username}`,
+        className: 'modal--default__footer__btn--negative'
+      }
+    ];
 
     this.lockModel = new DelayLock();
 
@@ -57,18 +59,19 @@ var Modal = ModalView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'delete':
         // Notify others, that they shouldn't redirect while we are trying to logout
         appEvents.trigger('account.delete-start');
 
-        apiClient.user.delete('/', {
-          ghost: this.lockModel.get('ghost') || false
-        })
+        apiClient.user
+          .delete('/', {
+            ghost: this.lockModel.get('ghost') || false
+          })
           .then(() => {
             return logout();
           })
-          .catch((err) => {
+          .catch(err => {
             log.error('Error while deleting account', { exception: err });
             this.model.set('error', `Error while deleting account: ${err} (status: ${err.status})`);
           });
@@ -78,7 +81,7 @@ var Modal = ModalView.extend({
         this.dialog.hide();
         break;
     }
-  },
+  }
 });
 
 module.exports = Modal;

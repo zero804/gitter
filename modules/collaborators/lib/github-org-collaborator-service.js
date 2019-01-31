@@ -8,7 +8,9 @@ var identityService = require('gitter-web-identity');
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
 
-  return users.filter(function(u) { return u.login !== user.username; });
+  return users.filter(function(u) {
+    return u.login !== user.username;
+  });
 }
 
 function GitHubOrgCollaboratorService(user, orgName) {
@@ -19,7 +21,8 @@ function GitHubOrgCollaboratorService(user, orgName) {
 GitHubOrgCollaboratorService.prototype.findCollaborators = function() {
   var ghOrg = new OrgService(this.user);
 
-  return ghOrg.someMembers(this.orgName, { firstPageOnly: true })
+  return ghOrg
+    .someMembers(this.orgName, { firstPageOnly: true })
     .bind(this)
     .then(function(orgMembers) {
       var candidates = withoutCurrentUser(orgMembers, this.user);
@@ -30,9 +33,9 @@ GitHubOrgCollaboratorService.prototype.findCollaborators = function() {
           externalId: member.login,
           avatarUrl: avatars.getForGitHubUsername(member.login),
           type: identityService.GITHUB_IDENTITY_PROVIDER
-        }
+        };
       });
     });
-}
+};
 
 module.exports = GitHubOrgCollaboratorService;

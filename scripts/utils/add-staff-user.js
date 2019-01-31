@@ -20,10 +20,10 @@ var opts = require('yargs')
     type: 'boolean'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-userService.findByUsername(opts.username)
+userService
+  .findByUsername(opts.username)
   .then(function(user) {
     if (!user) {
       console.log('not found');
@@ -32,11 +32,9 @@ userService.findByUsername(opts.username)
 
     var staffStatus = !opts.remove;
     user.staff = staffStatus;
-    return user
-      .save()
-      .then(function() {
-        return staffStatus;
-      });
+    return user.save().then(function() {
+      return staffStatus;
+    });
   })
   .then(function(staffStatus) {
     console.log(opts.username + ' staff status:', staffStatus);

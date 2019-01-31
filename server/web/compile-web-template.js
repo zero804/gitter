@@ -18,7 +18,7 @@ registerPartials(hbsInstance);
 /**
  * compiles templates for other modules given a path
  */
-module.exports = function (templatePath) {
+module.exports = function(templatePath) {
   if (!templatePath) throw new Error('You must provide a path to the template.');
 
   if (path.extname(templatePath) === '') {

@@ -15,7 +15,7 @@ describe('validate-tags', function() {
 
   it('should check max length', function() {
     var tags = [];
-    for (var i=0; i<101; i++) {
+    for (var i = 0; i < 101; i++) {
       tags.push(i.toString());
     }
     assert.strictEqual(validateTags(tags), false);
@@ -47,4 +47,3 @@ describe('validate-tags', function() {
     assert.strictEqual(validateTags(tags), false);
   });
 });
-

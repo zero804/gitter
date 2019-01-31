@@ -10,7 +10,6 @@ function restoreTimestamps() {
   return through.obj(function(file, enc, done) {
     utimes(file.path, file.stat.atime, file.stat.mtime, done);
   });
-
 }
 
 module.exports = restoreTimestamps;

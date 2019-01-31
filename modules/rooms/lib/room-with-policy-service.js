@@ -53,7 +53,6 @@ function allowAddUser() {
   return this.policy.canAddUser();
 }
 
-
 /**
  * Allow staff or admins to update the tags for a room
  * @return {Promise} Promise of room
@@ -62,11 +61,14 @@ RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmi
   // null will ruin your day.
   tags = tags || '';
 
-  var reservedTagTestRegex = (/:/);
+  var reservedTagTestRegex = /:/;
   var isStaff = this.user.staff;
   var room = this.room;
 
-  var cleanTags = tags.trim().slice(0, MAX_RAW_TAGS_LENGTH).split(',')
+  var cleanTags = tags
+    .trim()
+    .slice(0, MAX_RAW_TAGS_LENGTH)
+    .split(',')
     .filter(function(tag) {
       return !!tag; //
     })
@@ -75,11 +77,11 @@ RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmi
     })
     .filter(function(tag) {
       // staff can do anything
-      if(isStaff) {
+      if (isStaff) {
         return true;
       }
       // Users can only save, non-reserved tags
-      if(!reservedTagTestRegex.test(tag)) {
+      if (!reservedTagTestRegex.test(tag)) {
         return true;
       }
 
@@ -88,11 +90,10 @@ RoomWithPolicyService.prototype.updateTags = secureMethod([allowStaff, allowAdmi
 
   // Make sure a normal user doesn't clear out our already existing reserved-word(with colons) tags
   var reservedTags = [];
-  if(!isStaff) {
-    reservedTags = room.tags
-      .filter(function(tag) {
-        return reservedTagTestRegex.test(tag);
-      });
+  if (!isStaff) {
+    reservedTags = room.tags.filter(function(tag) {
+      return reservedTagTestRegex.test(tag);
+    });
   }
 
   room.tags = [].concat(cleanTags, reservedTags);
@@ -111,13 +112,15 @@ RoomWithPolicyService.prototype.updateTopic = secureMethod(allowAdmin, function(
 /**
  * Allow admins and staff to change the providers for a room
  */
-RoomWithPolicyService.prototype.updateProviders = secureMethod([allowStaff, allowAdmin], function(providers) {
+RoomWithPolicyService.prototype.updateProviders = secureMethod([allowStaff, allowAdmin], function(
+  providers
+) {
   var room = this.room;
 
   providers = providers || [];
 
   if (!validateProviders(providers)) {
-    throw new StatusError(400, 'Invalid providers '+providers.toString());
+    throw new StatusError(400, 'Invalid providers ' + providers.toString());
   }
 
   room.providers = providers;
@@ -138,7 +141,10 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
 /**
  * Ban a user from the room. Caller should ensure admin permissions
  */
-RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allowAdmin], function(username, options) {
+RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allowAdmin], function(
+  username,
+  options
+) {
   var currentUser = this.user;
   var room = this.room;
 
@@ -149,10 +155,11 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
     throw new StatusError(400, 'Cannot ban in a oneToOne room');
   }
 
-  return userService.findByUsername(username)
+  return userService
+    .findByUsername(username)
     .bind(this)
     .then(function(bannedUser) {
-      if(!bannedUser) throw new StatusError(404, 'User ' + username + ' not found.');
+      if (!bannedUser) throw new StatusError(404, 'User ' + username + ' not found.');
 
       var existingBan = _.find(room.bans, function(ban) {
         return mongoUtils.objectIDsEqual(ban.userId, bannedUser._id);
@@ -163,18 +170,17 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
       // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
       // Just ensure that the user is removed from the room
       if (existingBan) {
-        return this.removeUserFromRoom(bannedUser)
-          .return(existingBan)
+        return this.removeUserFromRoom(bannedUser).return(existingBan);
       }
 
       // Can only ban people from public rooms
       if (!securityDescriptorUtils.isPublic(room)) {
-        return this.removeUserFromRoom(bannedUser)
-          .return(null); // Signals that the user was removed from room, but not banned
+        return this.removeUserFromRoom(bannedUser).return(null); // Signals that the user was removed from room, but not banned
       }
 
       // Don't allow admins to be banned!
-      return policyFactory.createPolicyForRoom(bannedUser, room)
+      return policyFactory
+        .createPolicyForRoom(bannedUser, room)
         .then(function(bannedUserPolicy) {
           return bannedUserPolicy.canAdmin();
         })
@@ -186,10 +192,9 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
           });
 
           return Promise.all([
-              room.save(),
-              roomMembershipService.removeRoomMember(room._id, bannedUser._id, room.groupId)
-            ])
-            .return(ban);
+            room.save(),
+            roomMembershipService.removeRoomMember(room._id, bannedUser._id, room.groupId)
+          ]).return(ban);
         })
         .tap(function() {
           if (options && options.removeMessages) {
@@ -197,58 +202,72 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
           }
         })
         .tap(function() {
-          return eventService.newEventToTroupe(room, currentUser,
-            "@" + currentUser.username + " banned @" + bannedUser.username,
-            {
-              service: 'bans',
-              event: 'banned',
-              bannedUser: bannedUser.username,
-              prerendered: true,
-              performingUser: currentUser.username
-            }, {})
+          return eventService
+            .newEventToTroupe(
+              room,
+              currentUser,
+              '@' + currentUser.username + ' banned @' + bannedUser.username,
+              {
+                service: 'bans',
+                event: 'banned',
+                bannedUser: bannedUser.username,
+                prerendered: true,
+                performingUser: currentUser.username
+              },
+              {}
+            )
             .catch(function(err) {
-              logger.error("Unable to create an event in troupe: " + err, { exception: err });
+              logger.error('Unable to create an event in troupe: ' + err, { exception: err });
             });
-          });
         });
+    });
 });
 
-RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, allowAdmin], function(bannedUserId) {
-    var currentUser = this.user;
-    var room = this.room;
+RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, allowAdmin], function(
+  bannedUserId
+) {
+  var currentUser = this.user;
+  var room = this.room;
 
-    if (!bannedUserId) throw new StatusError(400, 'bannedUserId required');
+  if (!bannedUserId) throw new StatusError(400, 'bannedUserId required');
 
-    return userService.findById(bannedUserId)
-      .then(function(bannedUser) {
-        if (!bannedUser) throw new StatusError(404);
+  return userService.findById(bannedUserId).then(function(bannedUser) {
+    if (!bannedUser) throw new StatusError(404);
 
-        /* Does the requesting user have admin rights to this room? */
-        return persistence.Troupe.update({
-            _id: mongoUtils.asObjectID(room._id)
-          }, {
-            $pull: {
-              bans: {
-                userId: bannedUserId
-              }
-            }
-          })
-        .exec()
-        .tap(function() {
-          return eventService.newEventToTroupe(room, currentUser,
-            "User @" + currentUser.username + " unbanned @" + bannedUser.username,
+    /* Does the requesting user have admin rights to this room? */
+    return persistence.Troupe.update(
+      {
+        _id: mongoUtils.asObjectID(room._id)
+      },
+      {
+        $pull: {
+          bans: {
+            userId: bannedUserId
+          }
+        }
+      }
+    )
+      .exec()
+      .tap(function() {
+        return eventService
+          .newEventToTroupe(
+            room,
+            currentUser,
+            'User @' + currentUser.username + ' unbanned @' + bannedUser.username,
             {
               service: 'bans',
               event: 'unbanned',
               bannedUser: bannedUser.username,
               prerendered: true,
               performingUser: currentUser.username
-            }, {})
-            .catch(function(err) {
-              logger.error("Unable to create an event in troupe: " + err, { exception: err });
-            });
-        });
-      })
+            },
+            {}
+          )
+          .catch(function(err) {
+            logger.error('Unable to create an event in troupe: ' + err, { exception: err });
+          });
+      });
+  });
 });
 
 /**
@@ -261,24 +280,26 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
 /**
  *  GET room meta/welcome-message
  */
-RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function(){
-  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage')
-    .then(function(result){
-      result = (result || { text: '', html: ''});
-      return result;
-    });
+RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function() {
+  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage').then(function(result) {
+    result = result || { text: '', html: '' };
+    return result;
+  });
 });
 
 /**
  * Update the welcome message for a room
  */
-RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(data){
-  if (!data || !data.welcomeMessage && data.welcomeMessage !== '') throw new StatusError(400);
+RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(
+  data
+) {
+  if (!data || (!data.welcomeMessage && data.welcomeMessage !== '')) throw new StatusError(400);
 
   return processText(data.welcomeMessage)
     .bind(this)
-    .then(function(welcomeMessage){
-      return roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
+    .then(function(welcomeMessage) {
+      return roomMetaService
+        .upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
         .return({ welcomeMessage: welcomeMessage });
     });
 });
@@ -289,14 +310,23 @@ RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAd
 RoomWithPolicyService.prototype.deleteRoom = secureMethod([allowAdmin], function() {
   if (this.room.oneToOne) throw new StatusError(400, 'cannot delete one to one rooms');
 
-  logger.warn('User deleting room ', { roomId: this.room._id, roomLcUri: this.room.lcUri, username: this.user.username, userId: this.user._id });
+  logger.warn('User deleting room ', {
+    roomId: this.room._id,
+    roomLcUri: this.room.lcUri,
+    username: this.user.username,
+    userId: this.user._id
+  });
   return roomService.deleteRoom(this.room);
 });
 
 /**
  * Invite a non-gitter user to a room
  */
-RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUser], function(type, externalId, emailAddress) {
+RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUser], function(
+  type,
+  externalId,
+  emailAddress
+) {
   return roomInviteService.createInvite(this.room, this.user, {
     type: type,
     externalId: externalId,
@@ -304,7 +334,9 @@ RoomWithPolicyService.prototype.createRoomInvitation = secureMethod([allowAddUse
   });
 });
 
-RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(invites) {
+RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUser], function(
+  invites
+) {
   var room = this.room;
   var user = this.user;
 
@@ -319,9 +351,8 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
       emailAddress: emailAddress
     };
 
-    return roomInviteService.createInvite(room, user, inviteInfo)
-      .catch(StatusError, function(err) {
-        /*
+    return roomInviteService.createInvite(room, user, inviteInfo).catch(StatusError, function(err) {
+      /*
         NOTE: We intercept some errors so that one failed invite doesn't fail
         everything and then pass information on about that error so it can
         ultimately  be returned to the client. Are there are kinds of errors we
@@ -330,19 +361,19 @@ RoomWithPolicyService.prototype.createRoomInvitations = secureMethod([allowAddUs
         Many (most?) of these would have been caught if the frontend used the
         check avatar API like it should, so it shouldn't be too likely anyway.
         */
-        logger.error("Unable to create an invite: " + err, {
-          exception: err,
-          invitingUserId: user._id.toString(),
-          roomId: room._id.toString(),
-          inviteInfo: inviteInfo
-        });
-
-        return {
-          status: 'error', // as opposed to 'invited' or 'added'
-          statusCode: err.status,
-          inviteInfo: inviteInfo
-        }
+      logger.error('Unable to create an invite: ' + err, {
+        exception: err,
+        invitingUserId: user._id.toString(),
+        roomId: room._id.toString(),
+        inviteInfo: inviteInfo
       });
+
+      return {
+        status: 'error', // as opposed to 'invited' or 'added'
+        statusCode: err.status,
+        inviteInfo: inviteInfo
+      };
+    });
   });
 });
 
@@ -358,21 +389,29 @@ RoomWithPolicyService.prototype.addUserToRoom = secureMethod([allowAddUser], fun
  */
 function removeUserFromRoomAllowCurrentUser(userForRemove) {
   if (!this.user || !userForRemove) return false;
-  return mongoUtils.objectIDsEqual(userForRemove._id, this.user._id)
+  return mongoUtils.objectIDsEqual(userForRemove._id, this.user._id);
 }
 
 /**
  * Remove a user from a room
  */
-RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod([removeUserFromRoomAllowCurrentUser, allowAdmin], function(userForRemove) {
-  return roomService.removeUserFromRoom(this.room, userForRemove);
-});
+RoomWithPolicyService.prototype.removeUserFromRoom = secureMethod(
+  [removeUserFromRoomAllowCurrentUser, allowAdmin],
+  function(userForRemove) {
+    return roomService.removeUserFromRoom(this.room, userForRemove);
+  }
+);
 
 /**
  * Send a pull request badger post room creation
  */
-RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(repoUri) {
-  return (repoUri ? Promise.resolve(repoUri) : roomRepoService.findAssociatedGithubRepoForRoom(this.room))
+RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin], function(
+  repoUri
+) {
+  return (repoUri
+    ? Promise.resolve(repoUri)
+    : roomRepoService.findAssociatedGithubRepoForRoom(this.room)
+  )
     .bind(this)
     .then(function(repoUri) {
       if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
@@ -385,7 +424,8 @@ RoomWithPolicyService.prototype.sendBadgePullRequest = secureMethod([allowAdmin]
  * configure room/repo hooks post room creation
  */
 RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], function() {
-  return roomRepoService.findAssociatedGithubRepoForRoom(this.room)
+  return roomRepoService
+    .findAssociatedGithubRepoForRoom(this.room)
     .bind(this)
     .then(function(repoUri) {
       if (!repoUri) throw new StatusError(400, 'Room not associated with repo');
@@ -393,7 +433,6 @@ RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], 
       return roomRepoService.autoConfigureHooksForRoom(this.user, this.room, repoUri);
     });
 });
-
 
 function deleteMessageFromRoomEnsureRoomMatch(chatMessage) {
   if (!chatMessage || !mongoUtils.objectIDsEqual(chatMessage.toTroupeId, this.room._id)) {
@@ -409,8 +448,11 @@ function deleteMessageFromRoomAllowSender(chatMessage) {
 /**
  * Delete a message, if it's your own or you're a room admin
  */
-RoomWithPolicyService.prototype.deleteMessageFromRoom = secureMethod([deleteMessageFromRoomEnsureRoomMatch, allowAdmin, deleteMessageFromRoomAllowSender], function(chatMessage) {
-  return chatService.deleteMessageFromRoom(this.room, chatMessage);
-});
+RoomWithPolicyService.prototype.deleteMessageFromRoom = secureMethod(
+  [deleteMessageFromRoomEnsureRoomMatch, allowAdmin, deleteMessageFromRoomAllowSender],
+  function(chatMessage) {
+    return chatService.deleteMessageFromRoom(this.room, chatMessage);
+  }
+);
 
 module.exports = RoomWithPolicyService;

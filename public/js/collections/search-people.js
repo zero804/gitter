@@ -14,12 +14,11 @@ module.exports = BaseResolverCollection.extend({
     this.set(res.results, { merge: true });
   },
 
-  fetch: function (query){
+  fetch: function(query) {
     //check for search query
-    if(!query || !query.data || !query.data.q) {
+    if (!query || !query.data || !query.data.q) {
       throw new Error('Search People fetch() called with no { query: { q: "huh?" }}');
     }
     BaseResolverCollection.prototype.fetch.apply(this, arguments);
-  },
-
+  }
 });

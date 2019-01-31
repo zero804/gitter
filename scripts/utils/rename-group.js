@@ -24,8 +24,7 @@ var opts = require('yargs')
     description: 'New uri for the organisation'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var lcOld = opts.old.toLowerCase();
 var lcNew = opts.new.toLowerCase();
@@ -39,8 +38,7 @@ function checkForClashes(newUris) {
   var lcNewUris = newUris.map(function(u) {
     return u.toLowerCase();
   });
-  return persistence.Troupe.find({ lcUri: { $in: lcNewUris } })
-    .exec();
+  return persistence.Troupe.find({ lcUri: { $in: lcNewUris } }).exec();
 }
 
 function confirm() {
@@ -64,7 +62,7 @@ onMongoConnect()
     return persistence.Group.findOne({ lcUri: lcOld }).exec();
   })
   .then(function(group) {
-    if(!group) {
+    if (!group) {
       throw new Error('Group not found');
     }
 
@@ -78,7 +76,14 @@ onMongoConnect()
         return checkForClashes(newUris)
           .then(function(clashRooms) {
             if (clashRooms.length) {
-              throw new Error('URI Clash: ' + clashRooms.map(function(t) { return t.uri; }).join(','));
+              throw new Error(
+                'URI Clash: ' +
+                  clashRooms
+                    .map(function(t) {
+                      return t.uri;
+                    })
+                    .join(',')
+              );
             }
 
             rooms.forEach(function(room) {
@@ -96,54 +101,55 @@ onMongoConnect()
             group.homeUri = `${lcNew}/home`;
             group.lcHomeUri = group.homeUri.toLowerCase();
             // Assumes the new name is also the org name
-            if(group.sd.type === 'GH_ORG') {
+            if (group.sd.type === 'GH_ORG') {
               group.sd.linkPath = opts.new;
             }
 
             return group.save();
           })
           .then(function() {
-            return Promise.map(rooms, function(room) {
-              var newName = mapUri(room.uri, opts.old, opts.new);
-              var lcNewName = newName.toLowerCase();
-              var oldName = room.uri;
-              var lcOldName = oldName.toLowerCase();
-              room.uri = newName;
-              room.lcUri = lcNewName;
+            return Promise.map(
+              rooms,
+              function(room) {
+                var newName = mapUri(room.uri, opts.old, opts.new);
+                var lcNewName = newName.toLowerCase();
+                var oldName = room.uri;
+                var lcOldName = oldName.toLowerCase();
+                room.uri = newName;
+                room.lcUri = lcNewName;
 
-              /* Only add if it's not a case change */
-              if (lcOldName !== lcNewName) {
-                room.renamedLcUris.addToSet(lcOldName);
-              }
+                /* Only add if it's not a case change */
+                if (lcOldName !== lcNewName) {
+                  room.renamedLcUris.addToSet(lcOldName);
+                }
 
-              // Update the legacy field if it exists
-              if(room.lcOwner) {
-                room.lcOwner = opts.new;
-              }
+                // Update the legacy field if it exists
+                if (room.lcOwner) {
+                  room.lcOwner = opts.new;
+                }
 
-              if(room.sd.type === 'GH_ORG') {
-                room.sd.linkPath = opts.new;
-              }
-              else if(room.sd.type === 'GH_REPO') {
-                var linkpathPieces = room.sd.linkPath.split('/');
-                var repoName = linkpathPieces[1];
-                room.sd.linkPath = opts.new + '/' + repoName;
-              }
+                if (room.sd.type === 'GH_ORG') {
+                  room.sd.linkPath = opts.new;
+                } else if (room.sd.type === 'GH_REPO') {
+                  var linkpathPieces = room.sd.linkPath.split('/');
+                  var repoName = linkpathPieces[1];
+                  room.sd.linkPath = opts.new + '/' + repoName;
+                }
 
+                console.log('Updating ', oldName, ' to ', newName);
 
-              console.log('Updating ', oldName, ' to ', newName);
-
-              return room.save()
-                .then(function() {
-                  return uriLookupService.removeBadUri(lcOldName);
-                })
-                .then(function() {
-                  return uriLookupService.reserveUriForTroupeId(room.id, lcNewName);
-                });
-
-            }, { concurrency: 1 })
+                return room
+                  .save()
+                  .then(function() {
+                    return uriLookupService.removeBadUri(lcOldName);
+                  })
+                  .then(function() {
+                    return uriLookupService.reserveUriForTroupeId(room.id, lcNewName);
+                  });
+              },
+              { concurrency: 1 }
+            );
           });
-
       });
   })
 

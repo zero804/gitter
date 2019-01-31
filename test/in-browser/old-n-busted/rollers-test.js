@@ -1,11 +1,7 @@
 /*jshint unused:true, browser:true*/
-define([
-  'jquery',
-  'utils/rollers'
-], function($, Rollers) {
-
+define(['jquery', 'utils/rollers'], function($, Rollers) {
   // to ensure that our test environment is working properly
-  describe("Rollers", function() {
+  describe('Rollers', function() {
     before(function() {
       $(document.body).append("<div id='rollers' style='height:300px; overflow-y: scroll'></div>");
     });
@@ -14,14 +10,14 @@ define([
       $('rollers').remove();
     });
 
-    it("should handle the situation of more than a single page of content arrives at once", function(done) {
+    it('should handle the situation of more than a single page of content arrives at once', function(done) {
       var rollers = new Rollers(document.querySelector('#rollers'));
 
       var scrollPane = $('#rollers');
       var element;
-      for(var i = 0; i < 40; i++) {
+      for (var i = 0; i < 40; i++) {
         scrollPane.append('<p>Hello' + i + '</p>');
-        if(i == 10) {
+        if (i == 10) {
           element = $('#rollers p').last()[0];
           rollers.trackUntil(element);
         }
@@ -34,8 +30,6 @@ define([
         assert(scrollTop <= expectedTop + 5);
         done();
       }, 100);
-
     });
   });
-
 });

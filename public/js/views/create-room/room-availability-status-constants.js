@@ -11,5 +11,4 @@ var roomAvailabilityStatusConstants = {
   GROUP_REQUIRED: 'group_required'
 };
 
-
 module.exports = roomAvailabilityStatusConstants;

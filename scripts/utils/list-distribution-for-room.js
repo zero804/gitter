@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -12,24 +12,21 @@ var Promise = require('bluebird');
 
 var shutdown = require('shutdown');
 
-
 var opts = require('yargs')
   .option('uri', {
-    description: "uri of room to list presence for"
+    description: 'uri of room to list presence for'
   })
   .option('fromUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
   })
   .option('toUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function getTroupe() {
-  if (opts.uri)
-    return troupeService.findByUri(opts.uri);
+  if (opts.uri) return troupeService.findByUri(opts.uri);
 
   if (!opts.fromUser || !opts.toUser) {
     return Promise.reject('Please specify either a uri or a fromUser and toUser');
@@ -37,15 +34,13 @@ function getTroupe() {
 
   return Promise.all([
     userService.findByUsername(opts.fromUser),
-    userService.findByUsername(opts.toUser),
-  ])
-  .spread(function(fromUser, toUser) {
+    userService.findByUsername(opts.toUser)
+  ]).spread(function(fromUser, toUser) {
     if (!fromUser) throw new Error('User ' + opts.fromUser + ' not found');
     if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
 
     return oneToOneRoomService.findOneToOneRoom(fromUser._id, toUser._id);
   });
-
 }
 
 getTroupe()
@@ -88,14 +83,16 @@ getTroupe()
 
     console.log(m);
 
-    console.log(Object.keys(categorised).reduce(function(memo, userId) {
-      var user = usersHash[userId];
-      if (user) {
-        memo[user.username] = categorised[userId];
-      }
+    console.log(
+      Object.keys(categorised).reduce(function(memo, userId) {
+        var user = usersHash[userId];
+        if (user) {
+          memo[user.username] = categorised[userId];
+        }
 
-      return memo;
-    }, {}));
+        return memo;
+      }, {})
+    );
   })
   .catch(function(err) {
     console.error(err.stack);

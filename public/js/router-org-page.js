@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/font-setup');
 
@@ -15,14 +15,12 @@ var modalRegion = require('./components/modal-region');
 
 var OrgDirectoryLayout = require('./views/layouts/org-directory-layout');
 
-
 require('@gitterhq/styleguide/css/components/buttons.css');
 require('@gitterhq/styleguide/css/components/headings.css');
 
 require('./utils/tracking');
 
-onReady(function(){
-
+onReady(function() {
   require('./components/link-handler').installLinkHandler();
 
   //We are always within an iFrame to we can
@@ -32,45 +30,40 @@ onReady(function(){
   });
 
   //listen for postMessageCalls
-  window.addEventListener('message', function onWindowMessage(message/*, targetOrigin*/){
+  window.addEventListener('message', function onWindowMessage(message /*, targetOrigin*/) {
     if (message.origin !== clientEnv['basePath']) return;
 
     var data;
-    if(_.isString(message.data)) {
+    if (_.isString(message.data)) {
       try {
         data = JSON.parse(message.data);
-      }
-      catch(e){
+      } catch (e) {
         //TODO: JP 8/9/15 Should so something with this error
         data = message.data;
       }
-    }
-    else {
+    } else {
       data = message.data;
     }
-    if(data.type !== 'change:room') return;
+    if (data.type !== 'change:room') return;
     window.location.replace(data.url);
   });
 
   var Router = Backbone.Router.extend({
-
     routes: {
       '': 'index'
     },
 
-    index: function(){
-        modalRegion.destroy();
-        //FIXME: ugly hack to refresh the server rendered page once
-        //a user has added tags to a room
-        //jp 3/9/15
-        window.location.reload();
+    index: function() {
+      modalRegion.destroy();
+      //FIXME: ugly hack to refresh the server rendered page once
+      //a user has added tags to a room
+      //jp 3/9/15
+      window.location.reload();
     }
   });
 
   new Router();
   Backbone.history.start({ silent: true });
-
-
 
   var group = context.group();
   var user = context.user();
@@ -91,6 +84,4 @@ onReady(function(){
     group: new GroupModel(group.attributes)
   });
   orgDirectoryLayout.render();
-
-
 });

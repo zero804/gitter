@@ -1,5 +1,5 @@
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 env.installUncaughtExceptionHandler();

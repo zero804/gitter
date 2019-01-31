@@ -1,8 +1,7 @@
-"use strict";
+'use strict';
 
 var StatusError = require('statuserror');
 var securityDescriptorValidator = require('./security-descriptor-validator');
-
 
 function hasZeroExtraAdmins(descriptor) {
   if (!descriptor) return true;

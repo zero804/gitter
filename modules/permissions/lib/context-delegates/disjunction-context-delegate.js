@@ -13,8 +13,7 @@ DisjunctionContextDelegate.prototype = {
   isMember: function() {
     return Promise.map(this.contextDelegates, function(delegate) {
       return delegate.isMember();
-    })
-    .then(function(results) {
+    }).then(function(results) {
       // If any of the results are true, the result is true (OR)
       return results.some(function(result) {
         return !!result;

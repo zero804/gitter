@@ -14,7 +14,8 @@ var CreateCommunityModel = require('../community-create-model');
 // Consider all constraints except a customError because we use
 // this to add a custom message on what to do to satisfy
 function isFormElementInvalid(el, useCustomError) {
-  return el.validity.badInput ||
+  return (
+    el.validity.badInput ||
     (useCustomError ? el.validity.customError : false) ||
     el.validity.patternMismatch ||
     el.validity.rangeOverflow ||
@@ -23,7 +24,8 @@ function isFormElementInvalid(el, useCustomError) {
     el.validity.tooLong ||
     el.validity.typeMismatch ||
     //el.validity.valid ||
-    el.validity.valueMissing;
+    el.validity.valueMissing
+  );
 }
 
 function getStatusClassStates(type, inviteStatus, allowTweetBadger) {
@@ -47,7 +49,8 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     link: '.community-create-expanded-people-list-item-link',
     emailInput: '.js-community-create-expanded-people-list-item-email-input',
     twitterStatusIcon: '.js-community-create-expanded-people-list-item-status-twitter',
-    needsAttentionStatusIcon: '.js-community-create-expanded-people-list-item-status-needs-attention',
+    needsAttentionStatusIcon:
+      '.js-community-create-expanded-people-list-item-status-needs-attention',
     isValidStatusIcon: '.js-community-create-expanded-people-list-item-status-is-valid'
   },
 
@@ -60,15 +63,18 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     'change:inviteStatus': 'onInviteStatusChange'
   },
 
-  triggers: {
-
-  },
+  triggers: {},
 
   initialize: function(options) {
     this.communityCreateModel = options.communityCreateModel;
 
-    if(this.communityCreateModel) {
-      this.listenTo(this.communityCreateModel, 'change:allowTweetBadger', this.onAllowTweetBadgerChange, this);
+    if (this.communityCreateModel) {
+      this.listenTo(
+        this.communityCreateModel,
+        'change:allowTweetBadger',
+        this.onAllowTweetBadgerChange,
+        this
+      );
     }
   },
 
@@ -81,7 +87,11 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     var username = githubUsername || gitlabUsername || twitterUsername || data.username;
     data.vendorUsername = username;
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
-    var statusStates = getStatusClassStates(data.type, data.inviteStatus, this.communityCreateModel.get('allowTweetBadger'));
+    var statusStates = getStatusClassStates(
+      data.type,
+      data.inviteStatus,
+      this.communityCreateModel.get('allowTweetBadger')
+    );
     data = _.extend({}, data, statusStates);
 
     data.isTwitter = data.type === 'twitter';
@@ -104,8 +114,16 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
     toggleClass(this.$el[0], 'pending', inviteStatus === peopleToInviteStatusConstants.PENDING);
     // We don't use this state to differentiate
     //toggleClass(this.$el[0], 'ready', inviteStatus === peopleToInviteStatusConstants.READY);
-    toggleClass(this.$el[0], 'needs-email', inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL);
-    toggleClass(this.$el[0], 'ready-valid-email', inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL);
+    toggleClass(
+      this.$el[0],
+      'needs-email',
+      inviteStatus === peopleToInviteStatusConstants.NEEDS_EMAIL
+    );
+    toggleClass(
+      this.$el[0],
+      'ready-valid-email',
+      inviteStatus === peopleToInviteStatusConstants.READY_VALID_EMAIL
+    );
 
     this.updateStatusIcons();
   },
@@ -118,10 +136,9 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   onEmailInputChange: function() {
     var emailInputText = this.ui.emailInput.val();
     var isEmailValid = !isFormElementInvalid(this.ui.emailInput[0]);
-    if(isEmailValid) {
+    if (isEmailValid) {
       this.model.set('inviteStatus', peopleToInviteStatusConstants.READY_VALID_EMAIL);
-    }
-    else {
+    } else {
       this.model.set('inviteStatus', peopleToInviteStatusConstants.NEEDS_EMAIL);
     }
 
@@ -133,7 +150,11 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
   },
 
   updateStatusIcons: function() {
-    var statusStates = getStatusClassStates(this.model.get('type'), this.model.get('inviteStatus'), this.communityCreateModel.get('allowTweetBadger'));
+    var statusStates = getStatusClassStates(
+      this.model.get('type'),
+      this.model.get('inviteStatus'),
+      this.communityCreateModel.get('allowTweetBadger')
+    );
 
     toggleClass(this.ui.emailInput[0], 'should-show-on-hover', statusStates.usingTweetBadger);
     toggleClass(this.ui.twitterStatusIcon[0], 'hidden', !statusStates.usingTweetBadger);
@@ -143,7 +164,7 @@ var CommunityCreationPeopleListItemView = Marionette.ItemView.extend({
 });
 
 var CommunityCreationPeopleListEmptyView = Marionette.ItemView.extend({
-  template: CommunityCreationPeopleListEmptyTemplate,
+  template: CommunityCreationPeopleListEmptyTemplate
 });
 
 var ExpandedPeopleListView = Marionette.CompositeView.extend({

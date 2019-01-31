@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var _ = require('underscore');
@@ -33,73 +33,64 @@ var processTagInput = function(input) {
   return selectedTagsInput;
 };
 
-
-
 var FAUX_TAG_MAP = {};
-FAUX_TAG_MAP[exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL] = [exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG];
+FAUX_TAG_MAP[exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL] = [
+  exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG
+];
 _.extend(FAUX_TAG_MAP, {
-  'Frontend': [],
-  'Mobile': [
-    'curated:ios',
-    'curated:android',
-    'objective-c'
-  ],
-  'iOS': [],
-  'Android': [],
+  Frontend: [],
+  Mobile: ['curated:ios', 'curated:android', 'objective-c'],
+  iOS: [],
+  Android: [],
   'Data Science': [],
-  'Devops': ['devops'],
+  Devops: ['devops'],
   'Game Dev': ['game'],
-  'Frameworks': ['frameworks'],
-  'JavaScript': ['javascript'],
-  'Scala': ['scala'],
-  'Ruby': ['ruby'],
-  'CSS': ['css'],
+  Frameworks: ['frameworks'],
+  JavaScript: ['javascript'],
+  Scala: ['scala'],
+  Ruby: ['ruby'],
+  CSS: ['css'],
   'Material Design': [],
-  'React': ['react'],
-  'Java': ['java'],
-  'PHP': ['php'],
-  'Swift': ['swift'],
-  'Go': ['go'],
-  'Node': ['node', 'nodejs'],
-  'Meteor': ['meteor'],
-  'Django': ['django'],
+  React: ['react'],
+  Java: ['java'],
+  PHP: ['php'],
+  Swift: ['swift'],
+  Go: ['go'],
+  Node: ['node', 'nodejs'],
+  Meteor: ['meteor'],
+  Django: ['django'],
   '.NET': ['dotnet'],
-  'Angular': ['angular'],
-  'Rails': ['rails'],
-  'Haskell': ['haskell']
+  Angular: ['angular'],
+  Rails: ['rails'],
+  Haskell: ['haskell']
 });
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-
-
 // This will redirect `/explore` to `/explore/DEFAULT_TAGS`
 var exploreRedirectStaticTagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
 var firstTag = exploreRedirectStaticTagMap[Object.keys(exploreRedirectStaticTagMap)[1]];
-router.get('/:tags?',
-  identifyRoute('explore-tags-redirect'),
-  featureToggles,
-  function (req, res) {
-    var inputTags = processTagInput(req.query.search);
+router.get('/:tags?', identifyRoute('explore-tags-redirect'), featureToggles, function(req, res) {
+  var inputTags = processTagInput(req.query.search);
 
-    var defaultTags = firstTag.tags;
-    // Default to suggested if logged in
-    if(req.user) {
-      defaultTags = [exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL.toLowerCase()];
-    }
+  var defaultTags = firstTag.tags;
+  // Default to suggested if logged in
+  if (req.user) {
+    defaultTags = [exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL.toLowerCase()];
+  }
 
-    var tagsToUse = [].concat((inputTags.length > 0 ? inputTags : defaultTags));
-    var exploreTargetRedirectUrl = urlJoin(req.baseUrl, '/tags/' + tagsToUse.join(','));
-    res.redirect(exploreTargetRedirectUrl);
-  });
+  var tagsToUse = [].concat(inputTags.length > 0 ? inputTags : defaultTags);
+  var exploreTargetRedirectUrl = urlJoin(req.baseUrl, '/tags/' + tagsToUse.join(','));
+  res.redirect(exploreTargetRedirectUrl);
+});
 
-router.get('/tags/:tags',
+router.get(
+  '/tags/:tags',
   identifyRoute('explore-tags'),
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-    contextGenerator.generateBasicContext(req)
-    .then(function(troupeContext) {
+    contextGenerator.generateBasicContext(req).then(function(troupeContext) {
       var user = troupeContext.user;
       var isLoggedIn = !!user;
 
@@ -121,7 +112,7 @@ router.get('/tags/:tags',
       var selectedBackendTags = Object.keys(selectedTagMap).reduce(function(prev, key) {
         // Check for the selected tag for easy reference later
         selectedTagMap[key].tags.forEach(function(tag) {
-          if(tag === exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG) {
+          if (tag === exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG) {
             hasSuggestedTag = true;
           }
         });
@@ -130,19 +121,18 @@ router.get('/tags/:tags',
       }, []);
 
       return Promise.try(function() {
-          if(!hasSuggestedTag || !isLoggedIn) return;
+        if (!hasSuggestedTag || !isLoggedIn) return;
 
-          return suggestionsService.findSuggestionsForUserId(user.id)
-            .then(function(suggestedRooms) {
-              if (!suggestedRooms || !suggestedRooms.length) return;
+        return suggestionsService.findSuggestionsForUserId(user.id).then(function(suggestedRooms) {
+          if (!suggestedRooms || !suggestedRooms.length) return;
 
-              return suggestedRooms.map(function(room) {
-                room.tags = room.tags || [];
-                room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
-                return room;
-              });
-            });
-        })
+          return suggestedRooms.map(function(room) {
+            room.tags = room.tags || [];
+            room.tags.push(exploreTagUtils.tagConstants.SUGGESTED_BACKEND_TAG);
+            return room;
+          });
+        });
+      })
         .then(function(userSuggestions) {
           if (userSuggestions && userSuggestions.length) {
             return userSuggestions;
@@ -161,17 +151,16 @@ router.get('/tags/:tags',
           return snapshots;
         })
         .then(function(snapshots) {
-
           //Not 100% sure this is the best thing to do here
           //but I dont really want to refactor this whole thing
-          return generateUserThemeSnapshot(req)
-            .then(function(userThemeSnapshot){
+          return generateUserThemeSnapshot(req).then(function(userThemeSnapshot) {
+            // Anyone know why we're putting this on the
+            // context? Probably not.
+            troupeContext.snapshots = snapshots;
 
-              // Anyone know why we're putting this on the
-              // context? Probably not.
-              troupeContext.snapshots = snapshots;
-
-              return res.render('explore', _.extend({}, snapshots, {
+            return res.render(
+              'explore',
+              _.extend({}, snapshots, {
                 hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
                 isMobile: isMobile(req),
                 exploreBaseUrl: req.baseUrl,
@@ -179,14 +168,14 @@ router.get('/tags/:tags',
                 isLoggedIn: isLoggedIn,
                 createRoomUrl: urlJoin(clientEnv.basePath, '#createroom'),
                 fonts: fonts.getFonts(),
-                hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-              }));
-            });
-
-
+                hasCachedFonts: fonts.hasCachedFonts(req.cookies)
+              })
+            );
+          });
         })
         .catch(next);
     });
-  });
+  }
+);
 
 module.exports = router;

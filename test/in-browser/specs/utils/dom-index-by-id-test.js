@@ -3,13 +3,12 @@
 var assert = require('assert');
 var domIndexerById = require('public/js/utils/dom-index-by-id');
 
-describe('DomIndexerById', function(){
-
+describe('DomIndexerById', function() {
   var el;
   var el1;
   var el2;
 
-  beforeEach(function(){
+  beforeEach(function() {
     el = document.createElement('div');
     el1 = document.createElement('div');
     el2 = document.createElement('div');
@@ -19,13 +18,12 @@ describe('DomIndexerById', function(){
     el.appendChild(el2);
   });
 
-  it('should index dom elements by id', function(){
+  it('should index dom elements by id', function() {
     var expected = {
-      'test1': el1,
-      'test2': el2
+      test1: el1,
+      test2: el2
     };
     var result = domIndexerById(el);
     assert.deepEqual(expected, result);
   });
-
 });

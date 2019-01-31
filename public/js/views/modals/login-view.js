@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var ModalView = require('./modal');
 var template = require('./tmpl/login-view.hbs');
 
 require('@gitterhq/styleguide/css/components/buttons.css');
-
 
 var View = Marionette.ItemView.extend({
   template: template,
@@ -18,7 +17,7 @@ var View = Marionette.ItemView.extend({
     this.action = options.action || '';
     this.source = options.source || '';
     this.returnTo = options.returnTo || '';
-    if(options.returnTo === 'CURRENT') {
+    if (options.returnTo === 'CURRENT') {
       this.returnTo = window.location.pathname;
     }
 
@@ -37,8 +36,8 @@ var View = Marionette.ItemView.extend({
     return {
       action: this.action,
       source: this.source,
-      returnTo: this.returnTo,
-    }
+      returnTo: this.returnTo
+    };
   }
 });
 

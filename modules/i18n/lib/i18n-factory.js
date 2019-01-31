@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -12,17 +12,19 @@ var devMode = config.runtimeEnvironment === 'dev';
 function getLocales(localeDir) {
   var files = fs.readdirSync(localeDir);
   /* EN must always appear first */
-  return ['en'].concat(files
-    .filter(function(file) {
-      var fullName = path.join(localeDir, file);
-      return fs.statSync(fullName).isFile() && path.extname(file) === '.js';
-    })
-    .map(function(file) {
-      return path.basename(file, '.js');
-    })
-    .filter(function(lang) {
-      return lang !== 'en';
-    }));
+  return ['en'].concat(
+    files
+      .filter(function(file) {
+        var fullName = path.join(localeDir, file);
+        return fs.statSync(fullName).isFile() && path.extname(file) === '.js';
+      })
+      .map(function(file) {
+        return path.basename(file, '.js');
+      })
+      .filter(function(lang) {
+        return lang !== 'en';
+      })
+  );
 }
 
 var messagesPath = translations.getMessagesPath();

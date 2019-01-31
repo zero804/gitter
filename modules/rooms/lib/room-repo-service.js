@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -17,7 +17,6 @@ var securityDescriptorService = require('gitter-web-permissions/lib/security-des
 
 var badgerEnabled = nconf.get('autoPullRequest:enabled');
 
-
 /**
  * Setup webhooks from a repo to a room
  */
@@ -26,24 +25,26 @@ var autoConfigureHooksForRoom = Promise.method(function(user, troupe, repoUri) {
   assert(troupe, 'troupe required');
   assert(repoUri, 'repoUri required');
 
-  logger.info("Requesting autoconfigured integrations");
+  logger.info('Requesting autoconfigured integrations');
 
   return new Promise(function(resolve, reject) {
-    request.post({
-      url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
-      json: {
-        service: 'github',
-        endpoint: 'gitter',
-        githubToken: user.githubToken || user.githubUserToken,
-        autoconfigure: 1,
-        repo: repoUri
+    request.post(
+      {
+        url: nconf.get('webhooks:basepath') + '/troupes/' + troupe.id + '/hooks',
+        json: {
+          service: 'github',
+          endpoint: 'gitter',
+          githubToken: user.githubToken || user.githubUserToken,
+          autoconfigure: 1,
+          repo: repoUri
+        }
+      },
+      function(err, resp, body) {
+        if (err) return reject(err);
+        resolve(body);
       }
-    }, function(err, resp, body) {
-      if(err) return reject(err);
-      resolve(body);
-    });
+    );
   });
-
 });
 
 function associateRoomToRepo(room, user, options) {
@@ -57,17 +58,20 @@ function associateRoomToRepo(room, user, options) {
 
   /* Created here */
   /* TODO: Later we'll need to handle private repos too */
-  var hasScope = userScopes.hasGitHubScope(user, "public_repo");
+  var hasScope = userScopes.hasGitHubScope(user, 'public_repo');
   var hookCreationFailedDueToMissingScope;
   if (hasScope) {
     debug('User has public_repo scope. Will attempt to setup webhooks for this room');
 
     /* Do this asynchronously */
-    autoConfigureHooksForRoom(user, room, repoUri)
-      .catch(function(err) {
-        logger.error("Unable to apply hooks for new room", { exception: err });
-        errorReporter(err, { uri: roomUri, repoUri: repoUri, user: user.username }, { module: 'room-repo-service' });
-      });
+    autoConfigureHooksForRoom(user, room, repoUri).catch(function(err) {
+      logger.error('Unable to apply hooks for new room', { exception: err });
+      errorReporter(
+        err,
+        { uri: roomUri, repoUri: repoUri, user: user.username },
+        { module: 'room-repo-service' }
+      );
+    });
   } else {
     debug('User lacks public_repo scope.');
     hookCreationFailedDueToMissingScope = true;
@@ -75,7 +79,8 @@ function associateRoomToRepo(room, user, options) {
 
   if (securityDescriptorUtils.isPublic(room) && addBadge) {
     /* Do this asynchronously (don't chain the promise) */
-    userSettingsService.getUserSettings(user.id, 'badger_optout')
+    userSettingsService
+      .getUserSettings(user.id, 'badger_optout')
       .then(function(badgerOptOut) {
         // If the user has opted out never send the pull request
         if (badgerOptOut) {
@@ -87,19 +92,26 @@ function associateRoomToRepo(room, user, options) {
       })
       .catch(function(err) {
         logger.error('Unable to send pull request for new room', { exception: err });
-        errorReporter(err, { roomUri: roomUri, repoUri: repoUri, user: user.username }, { module: 'room-repo-service' });
+        errorReporter(
+          err,
+          { roomUri: roomUri, repoUri: repoUri, user: user.username },
+          { module: 'room-repo-service' }
+        );
       });
   } else {
-    debug('Not adding a badger PR. Public %s, addBadge: %s', securityDescriptorUtils.isPublic(room), addBadge);
+    debug(
+      'Not adding a badger PR. Public %s, addBadge: %s',
+      securityDescriptorUtils.isPublic(room),
+      addBadge
+    );
   }
 
   return {
     hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
   };
-
 }
 
-var findAssociatedGithubRepoForRoom = Promise.method(function (room) {
+var findAssociatedGithubRepoForRoom = Promise.method(function(room) {
   if (!room) return null;
 
   var linkPath = securityDescriptorUtils.getLinkPathIfType('GH_REPO', room);
@@ -107,19 +119,18 @@ var findAssociatedGithubRepoForRoom = Promise.method(function (room) {
 
   if (!room.groupId) return null;
 
-  return securityDescriptorService.group.findById(room.groupId, null)
-    .then(function(sd) {
-      if (sd && sd.type === 'GH_REPO') return sd.linkPath;
+  return securityDescriptorService.group.findById(room.groupId, null).then(function(sd) {
+    if (sd && sd.type === 'GH_REPO') return sd.linkPath;
 
-      return null;
-    });
+    return null;
+  });
 });
 
-var findAssociatedGithubObjectForRoom = Promise.method(function (room) {
+var findAssociatedGithubObjectForRoom = Promise.method(function(room) {
   if (!room) return null;
   var sd = room.sd;
   if (!sd) return null;
-  switch(sd.type) {
+  switch (sd.type) {
     case 'GH_REPO':
     case 'GH_ORG':
       return {
@@ -130,19 +141,18 @@ var findAssociatedGithubObjectForRoom = Promise.method(function (room) {
 
   if (!room.groupId) return null;
 
-  return securityDescriptorService.group.findById(room.groupId, null)
-    .then(function(sd) {
-      switch(sd.type) {
-        case 'GH_REPO':
-        case 'GH_ORG':
-          return {
-            type: sd.type,
-            linkPath: sd.linkPath
-          };
-      }
+  return securityDescriptorService.group.findById(room.groupId, null).then(function(sd) {
+    switch (sd.type) {
+      case 'GH_REPO':
+      case 'GH_ORG':
+        return {
+          type: sd.type,
+          linkPath: sd.linkPath
+        };
+    }
 
-      return null;
-    });
+    return null;
+  });
 });
 
 /**
@@ -158,13 +168,12 @@ function findAssociatedGithubRepoForRooms(rooms) {
   if (rooms.length === 1) {
     var singleRoom = rooms[0];
 
-    return findAssociatedGithubRepoForRoom(singleRoom)
-      .then(function(repoUri) {
-        if (repoUri) {
-          result[singleRoom.id || singleRoom._id] = repoUri;
-        }
-        return result;
-      });
+    return findAssociatedGithubRepoForRoom(singleRoom).then(function(repoUri) {
+      if (repoUri) {
+        result[singleRoom.id || singleRoom._id] = repoUri;
+      }
+      return result;
+    });
   }
 
   rooms.forEach(function(room) {
@@ -198,7 +207,8 @@ function findAssociatedGithubRepoForRooms(rooms) {
 
   // Lookup the security descriptors for the given groupIds
   var groupIds = Object.keys(groupSet);
-  return securityDescriptorService.group.findByIdsSelect(groupIds, { type: 1, linkPath: 1 })
+  return securityDescriptorService.group
+    .findByIdsSelect(groupIds, { type: 1, linkPath: 1 })
     .then(function(groups) {
       groups.forEach(function(group) {
         var groupId = group._id || group.id;
@@ -210,7 +220,7 @@ function findAssociatedGithubRepoForRooms(rooms) {
           if (roomIds) {
             roomIds.forEach(function(roomId) {
               result[roomId] = linkPath;
-            })
+            });
           }
         }
       });
@@ -233,7 +243,11 @@ function sendBadgePullRequestForRepo(room, user, repoUri) {
   if (badgerEnabled) {
     return badger.sendBadgePullRequest(repoUri, roomUri, user);
   } else {
-    debug('Badger is disabled in this environment. Would have sent a badge request to repo %s for room %s', repoUri, roomUri);
+    debug(
+      'Badger is disabled in this environment. Would have sent a badge request to repo %s for room %s',
+      repoUri,
+      roomUri
+    );
   }
 }
 
@@ -243,5 +257,5 @@ module.exports = {
   findAssociatedGithubRepoForRoom: findAssociatedGithubRepoForRoom,
   findAssociatedGithubRepoForRooms: Promise.method(findAssociatedGithubRepoForRooms),
   findAssociatedGithubObjectForRoom: findAssociatedGithubObjectForRoom,
-  sendBadgePullRequestForRepo: Promise.method(sendBadgePullRequestForRepo),
+  sendBadgePullRequestForRepo: Promise.method(sendBadgePullRequestForRepo)
 };

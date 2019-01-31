@@ -15,7 +15,7 @@ var FLAG_POS_NOTIFY_DESKTOP = 5; // Send desktop notifications
 var FLAG_POS_NOTIFY_MOBILE = 6; // Send mobile notifications
 
 /* -----8<---- */
-var BITMASK_INVERT = 0x0FFFFFFF;
+var BITMASK_INVERT = 0x0fffffff;
 
 var BITMASK_NOTIFY_UNREAD = 1 << FLAG_POS_NOTIFY_UNREAD;
 var BITMASK_NO_NOTIFY_UNREAD = BITMASK_INVERT & ~BITMASK_NOTIFY_UNREAD;
@@ -30,40 +30,39 @@ var BITMASK_NO_NOTIFY_DESKTOP = BITMASK_INVERT & ~BITMASK_NOTIFY_DESKTOP;
 var BITMASK_NOTIFY_MOBILE = 1 << FLAG_POS_NOTIFY_MOBILE;
 var BITMASK_NO_NOTIFY_MOBILE = BITMASK_INVERT & ~BITMASK_NOTIFY_MOBILE;
 
-var BITMASK_MODE = BITMASK_NOTIFY_UNREAD |
-                   BITMASK_NOTIFY_ACTIVITY |
-                   BITMASK_NOTIFY_MENTION |
-                   BITMASK_NOTIFY_ANNOUNCEMENT |
-                   BITMASK_NOTIFY_DESKTOP |
-                   BITMASK_NOTIFY_MOBILE;
+var BITMASK_MODE =
+  BITMASK_NOTIFY_UNREAD |
+  BITMASK_NOTIFY_ACTIVITY |
+  BITMASK_NOTIFY_MENTION |
+  BITMASK_NOTIFY_ANNOUNCEMENT |
+  BITMASK_NOTIFY_DESKTOP |
+  BITMASK_NOTIFY_MOBILE;
 
 /** Like BITMASK_MODE but ignores DESKTOP & MOBILE bits */
-var BITMASK_MODE_LEGACY = BITMASK_NOTIFY_UNREAD |
-                          BITMASK_NOTIFY_ACTIVITY |
-                          BITMASK_NOTIFY_MENTION |
-                          BITMASK_NOTIFY_ANNOUNCEMENT;
+var BITMASK_MODE_LEGACY =
+  BITMASK_NOTIFY_UNREAD |
+  BITMASK_NOTIFY_ACTIVITY |
+  BITMASK_NOTIFY_MENTION |
+  BITMASK_NOTIFY_ANNOUNCEMENT;
 
-var BITMASK_MODE_DEFAULT = BITMASK_MODE |
-                           BITMASK_NOTIFY_DEFAULT;
+var BITMASK_MODE_DEFAULT = BITMASK_MODE | BITMASK_NOTIFY_DEFAULT;
 
 var BITMASK_INVERT_MODE_DEFAULT = BITMASK_INVERT & ~BITMASK_MODE_DEFAULT;
 
 var MODES = {
   /* Mode: all: unread + no activity + mentions + announcements */
-  all: BITMASK_NOTIFY_UNREAD |
-       BITMASK_NOTIFY_MENTION |
-       BITMASK_NOTIFY_ANNOUNCEMENT |
-       BITMASK_NOTIFY_DESKTOP |
-       BITMASK_NOTIFY_MOBILE,
+  all:
+    BITMASK_NOTIFY_UNREAD |
+    BITMASK_NOTIFY_MENTION |
+    BITMASK_NOTIFY_ANNOUNCEMENT |
+    BITMASK_NOTIFY_DESKTOP |
+    BITMASK_NOTIFY_MOBILE,
 
   /* Mode: announcement: unread + no activity + mentions + announcements */
-  announcement: BITMASK_NOTIFY_UNREAD |
-                BITMASK_NOTIFY_MENTION |
-                BITMASK_NOTIFY_ANNOUNCEMENT,
+  announcement: BITMASK_NOTIFY_UNREAD | BITMASK_NOTIFY_MENTION | BITMASK_NOTIFY_ANNOUNCEMENT,
 
   /* Mode: mute: no unread + activity + mentions + no announcements */
-  mute: BITMASK_NOTIFY_ACTIVITY |
-        BITMASK_NOTIFY_MENTION,
+  mute: BITMASK_NOTIFY_ACTIVITY | BITMASK_NOTIFY_MENTION
 };
 
 /* eslint-enable no-multi-spaces */
@@ -75,7 +74,7 @@ var DEFAULT_USER_FLAGS = MODES.all | BITMASK_NOTIFY_DEFAULT;
 var DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE = MODES.announcement;
 
 function getModeFromFlags(flags, strict) {
-  switch(flags & BITMASK_MODE) {
+  switch (flags & BITMASK_MODE) {
     case MODES.all:
       return 'all';
     case MODES.announcement:
@@ -87,7 +86,7 @@ function getModeFromFlags(flags, strict) {
   if (strict) return null;
 
   // Ignoring the mobile and desktop notification settings..
-  switch(flags & BITMASK_MODE_LEGACY) {
+  switch (flags & BITMASK_MODE_LEGACY) {
     case MODES.all & BITMASK_MODE_LEGACY:
       return 'all';
     case MODES.announcement & BITMASK_MODE_LEGACY:
@@ -109,7 +108,7 @@ function getUpdateForMode(mode, isDefault) {
 
   /* Set the 'default setting' bit if this is a default */
   if (isDefault) {
-    setBits = (setBits | BITMASK_NOTIFY_DEFAULT);
+    setBits = setBits | BITMASK_NOTIFY_DEFAULT;
   }
 
   var clearBits = BITMASK_INVERT_MODE_DEFAULT | setBits;
@@ -148,14 +147,16 @@ function toggleLegacyLurkMode(flags, isLurk) {
   }
 
   if (isLurk) {
-    return flags & BITMASK_NO_NOTIFY_UNREAD
-            & BITMASK_NO_NOTIFY_DESKTOP // Legacy lurk mode, no desktop notifications
-            & BITMASK_NO_NOTIFY_MOBILE  // Legacy lurk mode, no mobile notifications
-            | BITMASK_NOTIFY_ACTIVITY;
+    return (
+      (flags &
+      BITMASK_NO_NOTIFY_UNREAD &
+      BITMASK_NO_NOTIFY_DESKTOP & // Legacy lurk mode, no desktop notifications
+        BITMASK_NO_NOTIFY_MOBILE) | // Legacy lurk mode, no mobile notifications
+      BITMASK_NOTIFY_ACTIVITY
+    );
   } else {
-    return flags & BITMASK_NO_NOTIFY_ACTIVITY | BITMASK_NOTIFY_UNREAD;
+    return (flags & BITMASK_NO_NOTIFY_ACTIVITY) | BITMASK_NOTIFY_UNREAD;
   }
-
 }
 
 function getLurkForFlags(flags) {
@@ -169,7 +170,6 @@ function getLurkForMode(mode) {
 
   return getLurkForFlags(MODES[mode]);
 }
-
 
 function hasNotifyUnread(flags) {
   return flags & BITMASK_NOTIFY_UNREAD;
@@ -208,13 +208,15 @@ function flagsToHash(flags) {
 }
 
 function hashToFlags(hash) {
-  return (hash.unread ? BITMASK_NOTIFY_UNREAD : 0) |
+  return (
+    (hash.unread ? BITMASK_NOTIFY_UNREAD : 0) |
     (hash.activity ? BITMASK_NOTIFY_ACTIVITY : 0) |
     (hash.mention ? BITMASK_NOTIFY_MENTION : 0) |
     (hash.announcement ? BITMASK_NOTIFY_ANNOUNCEMENT : 0) |
     (hash.default ? BITMASK_NOTIFY_DEFAULT : 0) |
     (hash.desktop ? BITMASK_NOTIFY_DESKTOP : 0) |
-    (hash.mobile ? BITMASK_NOTIFY_MOBILE : 0);
+    (hash.mobile ? BITMASK_NOTIFY_MOBILE : 0)
+  );
 }
 
 function addDefaultFlag(flags) {

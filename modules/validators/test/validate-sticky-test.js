@@ -14,7 +14,7 @@ describe('validate-sticky', function() {
     [1, true],
     [-1, false],
     [{}, false],
-    [[], false],
+    [[], false]
   ];
 
   FIXTURES.forEach(function(fixture) {
@@ -26,7 +26,5 @@ describe('validate-sticky', function() {
     it(name + ' ' + input, function() {
       assert.strictEqual(validateSticky(input), result);
     });
-  })
+  });
 });
-
-

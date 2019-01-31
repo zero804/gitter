@@ -22,16 +22,15 @@ GitHubRepoPolicyEvaluator.prototype = {
 
     debug('Will perform canRead');
 
-    this._canRead = this._fetch()
-      .then(function(repo) {
-        // If you can see the repo, you can read it
-        return !!repo;
-      });
+    this._canRead = this._fetch().then(function(repo) {
+      // If you can see the repo, you can read it
+      return !!repo;
+    });
 
     if (debug.enabled) {
       this._canRead.tap(function(result) {
         debug('canRead? %s', result);
-      })
+      });
     }
 
     return this._canRead;
@@ -56,19 +55,17 @@ GitHubRepoPolicyEvaluator.prototype = {
 
     debug('Will perform canAdmin');
 
-
-    this._canAdmin = this._fetch()
-      .then(function(repo) {
-        if (!repo) return false;
-        var perms = repo.permissions;
-        var result = perms && (perms.push || perms.admin);
-        return !!result;
-      });
+    this._canAdmin = this._fetch().then(function(repo) {
+      if (!repo) return false;
+      var perms = repo.permissions;
+      var result = perms && (perms.push || perms.admin);
+      return !!result;
+    });
 
     if (debug.enabled) {
       this._canAdmin.tap(function(result) {
         debug('canAdmin? %s', result);
-      })
+      });
     }
 
     return this._canAdmin;
@@ -87,21 +84,19 @@ GitHubRepoPolicyEvaluator.prototype = {
     debug('Fetching repo %s from github', this.uri);
 
     var repoService = new GitHubRepoService(this.user);
-    this._fetchPromise = repoService.getRepo(this.uri)
-      .catch(function(err) {
-        debug('Exeception while fetching repo')
+    this._fetchPromise = repoService.getRepo(this.uri).catch(function(err) {
+      debug('Exeception while fetching repo');
 
-        if(err.errno && err.syscall || err.statusCode >= 500) {
-          // GitHub call failed and may be down.
-          throw new PolicyDelegateTransportError(err.message);
-        }
+      if ((err.errno && err.syscall) || err.statusCode >= 500) {
+        // GitHub call failed and may be down.
+        throw new PolicyDelegateTransportError(err.message);
+      }
 
-        throw err;
-      });
+      throw err;
+    });
 
     return this._fetchPromise;
   }
-
 };
 
 module.exports = GitHubRepoPolicyEvaluator;

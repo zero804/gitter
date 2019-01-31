@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -8,9 +8,9 @@ var stagingText, stagingLink;
 
 /* App tag */
 var staging = nconf.get('STAGING');
-switch(nconf.get('NODE_ENV')) {
+switch (nconf.get('NODE_ENV')) {
   case 'prod':
-    if(staging) {
+    if (staging) {
       stagingText = 'NEXT';
       stagingLink = 'http://next.gitter.im';
     }
@@ -29,4 +29,4 @@ switch(nconf.get('NODE_ENV')) {
 module.exports = {
   text: stagingText,
   link: stagingLink
-}
+};

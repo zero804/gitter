@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var TroupeRemovedUser = require('gitter-web-persistence').TroupeRemovedUser;
@@ -27,4 +27,4 @@ function addRemovedUsers(roomId, userIds) {
 module.exports = {
   addRemovedUser: Promise.method(addRemovedUser),
   addRemovedUsers: Promise.method(addRemovedUsers)
-}
+};

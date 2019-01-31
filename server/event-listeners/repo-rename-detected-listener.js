@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -12,5 +12,4 @@ exports.install = function() {
   appEvents.onRepoRenameDetected(function(oldFullName, newFullName) {
     logger.warn('Manual repo rename required', { oldName: oldFullName, newName: newFullName });
   });
-
 };

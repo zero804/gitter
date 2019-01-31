@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
 module.exports = (function() {
-
-
   /**
    * processHeaders() creates the optional headers string for the mailto protocol
    *
    * args       Object - object in which the "search for headers" happens
    * returns    String - the final (but optional) headers string
    */
-  var processHeaders = function (args) {
+  var processHeaders = function(args) {
     /* mailto protocol optional headers */
     return ['subject', 'body', 'CC', 'BCC']
-      .map(function (header) { return header + '=' + (args[header] || ''); }) // composes the string as `key=value`
+      .map(function(header) {
+        return header + '=' + (args[header] || '');
+      }) // composes the string as `key=value`
       .join('&'); // joins all headers with an &, as required by the mailto protocol
   };
 
@@ -24,8 +24,8 @@ module.exports = (function() {
    *
    * return     String - composed mailto protocol string `x`,  for use in <a href='{x}'>
    */
-  var composeLink = function (target, headers) {
-    return "mailto:" + target + '?' + headers;
+  var composeLink = function(target, headers) {
+    return 'mailto:' + target + '?' + headers;
   };
 
   /**
@@ -41,7 +41,7 @@ module.exports = (function() {
    *
    * returns    DOM Element <a>
    */
-  var createAnchorElement = function (args) {
+  var createAnchorElement = function(args) {
     var a = document.createElement('a');
     var target = args.target || '';
 
@@ -57,7 +57,7 @@ module.exports = (function() {
    * args       Object - See createAnchorElement()
    * returns    String - <a> as a string
    */
-  var createAnchorString = function (args) {
+  var createAnchorString = function(args) {
     return createAnchorElement.call(this, args).outerHTML;
   };
 
@@ -66,7 +66,4 @@ module.exports = (function() {
     el: createAnchorElement,
     str: createAnchorString
   };
-
-
 })();
-

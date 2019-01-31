@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var GitHubUserSchema = new Schema({
   uri: { type: String },
   lcUri: { type: String },
-  githubId: { type: Number },
+  githubId: { type: Number }
 });
 
 GitHubUserSchema.schemaTypeName = 'GitHubUserSchema';
@@ -17,14 +17,13 @@ GitHubUserSchema.index({ githubId: 1 }, { unique: true });
 var GitHubOrgSchema = new Schema({
   uri: { type: String },
   lcUri: { type: String },
-  githubId: { type: Number },
+  githubId: { type: Number }
 });
 
 GitHubOrgSchema.schemaTypeName = 'GitHubOrgSchema';
 GitHubOrgSchema.index({ uri: 1 }, { unique: true });
 GitHubOrgSchema.index({ lcUri: 1 }, { unique: true });
 GitHubOrgSchema.index({ githubId: 1 }, { unique: true });
-
 
 module.exports = {
   install: function(mongooseConnection) {

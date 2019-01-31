@@ -1,5 +1,5 @@
 /* eslint complexity: ["error", 24] */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:troupe');
@@ -23,14 +23,11 @@ var AssociatedRepoStrategy = require('./troupes/associated-repo-strategy');
 function getAvatarUrlForTroupe(serializedTroupe, options) {
   if (serializedTroupe.oneToOne && options && options.user) {
     return avatars.getForUser(options.user);
-  }
-  else if(serializedTroupe.oneToOne && (!options || !options.user)) {
+  } else if (serializedTroupe.oneToOne && (!options || !options.user)) {
     return avatars.getForRoomUri(options.name);
-  }
-  else if (options && options.group) {
+  } else if (options && options.group) {
     return options.group.avatarUrl || avatars.getForGroup(options.group);
-  }
-  else {
+  } else {
     return avatars.getForRoomUri(serializedTroupe.uri);
   }
 }
@@ -40,7 +37,8 @@ function getAvatarUrlForTroupe(serializedTroupe, options) {
  * returns the 'other' userId for all one to one rooms
  */
 function oneToOneOtherUserSequence(currentUserId, troupes) {
-  return troupes.filter(function(troupe) {
+  return troupes
+    .filter(function(troupe) {
       return troupe.oneToOne;
     })
     .map(function(troupe) {
@@ -69,14 +67,14 @@ function guessLegacyGitHubType(item) {
 
   var linkPath = item.sd.linkPath;
 
-  switch(item.sd.type) {
+  switch (item.sd.type) {
     case 'GH_REPO':
       if (item.uri === linkPath) {
         return 'REPO';
       } else {
         return 'REPO_CHANNEL';
       }
-      /* break */
+    /* break */
 
     case 'GH_ORG':
       if (item.uri === linkPath) {
@@ -84,7 +82,7 @@ function guessLegacyGitHubType(item) {
       } else {
         return 'REPO_CHANNEL';
       }
-      /* break */
+    /* break */
 
     case 'GH_USER':
       return 'USER_CHANNEL';
@@ -136,7 +134,8 @@ function TroupeStrategy(options) {
   var securityDescriptorStrategy;
   var associatedRepoStrategy;
 
-  this.preload = function(items) { // eslint-disable-line max-statements
+  this.preload = function(items) {
+    // eslint-disable-line max-statements
     if (items.isEmpty()) return;
 
     var troupeIds = items.map(function(troupe) {
@@ -197,7 +196,8 @@ function TroupeStrategy(options) {
     }
 
     groupIdStrategy = new GroupIdStrategy(options);
-    var groupIds = items.map(function(troupe) {
+    var groupIds = items
+      .map(function(troupe) {
         return troupe.groupId;
       })
       .filter(function(f) {
@@ -206,18 +206,17 @@ function TroupeStrategy(options) {
 
     strategies.push(groupIdStrategy.preload(groupIds));
 
-
     if (options.includeBackend) {
       securityDescriptorStrategy = SecurityDescriptorStrategy.slim();
       // Backend strategy needs no mapping stage
     }
 
-    if(options.includeAssociatedRepo) {
+    if (options.includeAssociatedRepo) {
       associatedRepoStrategy = new AssociatedRepoStrategy();
       strategies.push(associatedRepoStrategy.preload(items));
     }
 
-    return Promise.all(strategies)
+    return Promise.all(strategies);
   };
 
   function mapOtherUser(users) {
@@ -235,14 +234,16 @@ function TroupeStrategy(options) {
 
   function resolveOneToOneOtherUser(item) {
     if (!currentUserId) {
-      debug('TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!');
+      debug(
+        'TroupeStrategy initiated without currentUserId, but generating oneToOne troupes. This can be a problem!'
+      );
       return null;
     }
 
     var otherUser = mapOtherUser(item.oneToOneUsers);
 
     if (!otherUser) {
-      debug("Troupe %s appears to contain bad users", item._id);
+      debug('Troupe %s appears to contain bad users', item._id);
       return null;
     }
 
@@ -262,7 +263,7 @@ function TroupeStrategy(options) {
 
   // eslint-disable-next-line complexity
   this.map = function(item) {
-    var id = item.id || item._id
+    var id = item.id || item._id;
     var uri = item.uri;
 
     var isPro = proOrgStrategy ? proOrgStrategy.map(item) : undefined;
@@ -273,18 +274,18 @@ function TroupeStrategy(options) {
       var otherUser = resolveOneToOneOtherUser(item);
       if (otherUser) {
         troupeName = otherUser.displayName;
-        troupeUrl = "/" + otherUser.username;
+        troupeUrl = '/' + otherUser.username;
       } else {
         return null;
       }
     } else {
       var roomName = getRoomNameFromTroupeName(uri);
       troupeName = group ? group.name + '/' + getRoomNameFromTroupeName(uri) : uri;
-      if(roomName === uri) {
+      if (roomName === uri) {
         troupeName = group ? group.name : uri;
       }
 
-      troupeUrl = "/" + uri;
+      troupeUrl = '/' + uri;
     }
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(id);
@@ -368,9 +369,9 @@ TroupeStrategy.createSuggestionStrategy = function() {
     currentUser: null,
     currentUserId: null
   });
-}
+};
 
 module.exports = TroupeStrategy;
 module.exports.testOnly = {
   oneToOneOtherUserSequence: oneToOneOtherUserSequence
-}
+};

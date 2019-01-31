@@ -1,9 +1,8 @@
-"use strict";
+'use strict';
 
 var liveCollections = require('gitter-web-live-collection-events');
 
 exports.install = function(persistenceService) {
-
   var schemas = persistenceService.schemas;
   var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 
@@ -14,7 +13,7 @@ exports.install = function(persistenceService) {
     listenPaths: ['displayName', 'username', 'gravatarVersion', 'gravatarImageUrl', 'state'],
     // ignoredPaths: ['lastTroupe','confirmationCode','status','passwordHash','passwordResetCode'],
     onUpdate: function onUserUpdate(model, next) {
-      liveCollections.users.emit("update", model);
+      liveCollections.users.emit('update', model);
       next();
     }
 
@@ -26,17 +25,17 @@ exports.install = function(persistenceService) {
    */
   mongooseUtils.attachNotificationListenersToSchema(schemas.ChatMessageSchema, {
     onCreate: function(model, next) {
-      liveCollections.chats.emit("create", model);
+      liveCollections.chats.emit('create', model);
       next();
     },
 
     onUpdate: function(model, next) {
-      liveCollections.chats.emit("update", model);
+      liveCollections.chats.emit('update', model);
       next();
     },
 
     onRemove: function(model) {
-      liveCollections.chats.emit("remove", model);
+      liveCollections.chats.emit('remove', model);
     }
   });
 

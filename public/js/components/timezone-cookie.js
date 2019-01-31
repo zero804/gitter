@@ -38,10 +38,11 @@ if (!timezoneInfo.iana) {
   }
 }
 
-if (!existing ||
+if (
+  !existing ||
   existing.offset !== timezoneInfo.offset ||
   existing.abbr !== timezoneInfo.abbr ||
-  existing.iana !== timezoneInfo.iana) {
-
+  existing.iana !== timezoneInfo.iana
+) {
   cookies.set('gitter_tz', serialize(timezoneInfo));
 }

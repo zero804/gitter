@@ -1,5 +1,4 @@
-"use strict";
-
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -9,10 +8,10 @@ module.exports = {
   install: function(server, app) {
     var gracefullyClosing = false;
     app.use(function(req, res, next) {
-      if(!gracefullyClosing) return next();
+      if (!gracefullyClosing) return next();
 
-      res.setHeader("Connection", "close");
-      res.status(502).send("Server is in the process of restarting");
+      res.setHeader('Connection', 'close');
+      res.status(502).send('Server is in the process of restarting');
     });
 
     shutdown.addHandler('web', 20, function(callback) {

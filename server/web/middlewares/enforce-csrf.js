@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -9,13 +9,13 @@ var StatusError = require('statuserror');
 var escapeRegExp = require('../../utils/escape-regexp');
 
 var WHITELIST = [
-'/api/private/hook/',
-'/api/private/transloadit/',
-'/api/private/statsc',
-'/api/v1/apn',
-'/login/oauth/token',
-'/login/oauth/authorize/decision',
-'/api/private/subscription/'
+  '/api/private/hook/',
+  '/api/private/transloadit/',
+  '/api/private/statsc',
+  '/api/v1/apn',
+  '/login/oauth/token',
+  '/login/oauth/authorize/decision',
+  '/api/private/subscription/'
 ];
 
 if (env.config.get('ws:startFayeInPrimaryApp')) {
@@ -27,38 +27,54 @@ var WHITELIST_REGEXP = new RegExp('^(' + WHITELIST.map(escapeRegExp).join('|') +
 
 module.exports = function(req, res, next) {
   // ignore these methods, they shouldnt alter state
-  if(req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return next();
 
   /* OAuth clients have req.authInfo. Aways let them through */
-  if(req.authInfo) return next();
+  if (req.authInfo) return next();
 
-  if(isInWhitelist(req)) {
+  if (isInWhitelist(req)) {
     debug('skipping csrf check for %s', req.path);
     return next();
   }
 
   var clientToken = getClientToken(req);
-  if(!clientToken) {
+  if (!clientToken) {
     stats.event('token.rejected.notpresented');
-    logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token');
+    logger.warn(
+      'csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented no token'
+    );
     return next(new StatusError(403));
   }
 
-  if(req.accessToken !== clientToken) {
+  if (req.accessToken !== clientToken) {
     stats.event('token.rejected.mismatch');
 
-    if(req.user) {
-      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they presented an illegal token', {
-        serverAccessToken: req.accessToken,
-        clientToken: clientToken,
-        username: req.user.username,
-        userId: req.user.id
-      });
+    if (req.user) {
+      logger.warn(
+        'csrf: Rejecting client ' +
+          req.ip +
+          ' request to ' +
+          req.path +
+          ' as they presented an illegal token',
+        {
+          serverAccessToken: req.accessToken,
+          clientToken: clientToken,
+          username: req.user.username,
+          userId: req.user.id
+        }
+      );
     } else {
-      logger.warn('csrf: Rejecting client ' + req.ip + ' request to ' + req.path + ' as they are probably logged out', {
-        serverAccessToken: req.accessToken,
-        clientToken: clientToken,
-      });
+      logger.warn(
+        'csrf: Rejecting client ' +
+          req.ip +
+          ' request to ' +
+          req.path +
+          ' as they are probably logged out',
+        {
+          serverAccessToken: req.accessToken,
+          clientToken: clientToken
+        }
+      );
     }
 
     return next(new StatusError(403));
@@ -72,9 +88,11 @@ function isInWhitelist(req) {
 }
 
 function getClientToken(req) {
-  return (req.body && req.body.accessToken) ||
-         (req.query && req.query.accessToken) ||
-         (req.headers['x-access-token']) ||
-         (req.headers['x-csrf-token']) ||
-         (req.headers['x-xsrf-token']);
+  return (
+    (req.body && req.body.accessToken) ||
+    (req.query && req.query.accessToken) ||
+    req.headers['x-access-token'] ||
+    req.headers['x-csrf-token'] ||
+    req.headers['x-xsrf-token']
+  );
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true, unused:true */
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var roomService = require('gitter-web-rooms');
@@ -16,8 +16,7 @@ var opts = require('yargs')
     description: 'Uri of the room to delete'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var readline = require('readline');
 
@@ -26,20 +25,27 @@ var rl = readline.createInterface({
   output: process.stdout
 });
 
-troupeService.findByUri(opts.uri)
+troupeService
+  .findByUri(opts.uri)
   .then(function(room) {
     return new Promise(function(resolve, reject) {
-      rl.question("Are you sure you want to delete " + room.uri + " with " + room.userCount + " users in it? (yes/no)", function(answer) {
-        rl.close();
-        console.log(answer);
+      rl.question(
+        'Are you sure you want to delete ' +
+          room.uri +
+          ' with ' +
+          room.userCount +
+          ' users in it? (yes/no)',
+        function(answer) {
+          rl.close();
+          console.log(answer);
 
-        if(answer === 'yes') {
-          resolve(room);
-        } else {
-          reject(new Error("Answered no"));
+          if (answer === 'yes') {
+            resolve(room);
+          } else {
+            reject(new Error('Answered no'));
+          }
         }
-      });
-
+      );
     });
   })
   .then(function(room) {

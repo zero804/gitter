@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var persistence = require('gitter-web-persistence');
 var checkRepoPrivacy = require('../server/services/check-repo-privacy');
@@ -15,9 +15,7 @@ var opts = require('yargs')
     description: 'Maximum count'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
-
+  .alias('help', 'h').argv;
 
 function die(error) {
   console.error(error);
@@ -25,15 +23,16 @@ function die(error) {
   process.exit(1);
 }
 
-persistence.Troupe
-  .where('githubType', 'REPO')
+persistence.Troupe.where('githubType', 'REPO')
   .sort({ dateLastSecurityCheck: 1 })
   .limit(opts.max)
   .exec()
   .then(function(repos) {
-    return Promise.all(repos.map(function(repo) {
-      return checkRepoPrivacy(repo.uri);
-    }));
+    return Promise.all(
+      repos.map(function(repo) {
+        return checkRepoPrivacy(repo.uri);
+      })
+    );
   })
   .then(function() {
     process.exit(0);

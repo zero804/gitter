@@ -6,13 +6,12 @@ var Backbone = require('backbone');
 var SuggestedRoomsByRoomCollection = require('public/js/collections/room-suggested-rooms');
 
 describe('SuggestedRoomsByRoomCollection()', function() {
-
   var suggestedCollection;
   var model;
   beforeEach(function() {
     model = new Backbone.Model({ roomId: 'test' });
     suggestedCollection = new SuggestedRoomsByRoomCollection(null, {
-      contextModel: model,
+      contextModel: model
     });
   });
 
@@ -25,5 +24,4 @@ describe('SuggestedRoomsByRoomCollection()', function() {
     model.set('roomId', 'thisisatest');
     assert.equal('/v1/rooms/thisisatest/suggestedRooms', suggestedCollection.url());
   });
-
 });

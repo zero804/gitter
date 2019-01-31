@@ -11,13 +11,11 @@ var UNREAD_INDICATOR_STATE_CLASSES = {
 var updateUnreadIndicatorClassState = function(roomModel, indicatorElements) {
   var stateClassKey = null;
 
-  if(roomModel.get('mentions') > 0) {
+  if (roomModel.get('mentions') > 0) {
     stateClassKey = 'mentions';
-  }
-  else if(roomModel.get('unreadItems') > 0) {
+  } else if (roomModel.get('unreadItems') > 0) {
     stateClassKey = 'unreads';
-  }
-  else if(roomModel.get('activity') > 0) {
+  } else if (roomModel.get('activity') > 0) {
     stateClassKey = 'activity';
   }
 
@@ -33,7 +31,5 @@ var updateUnreadIndicatorClassState = function(roomModel, indicatorElements) {
 };
 
 updateUnreadIndicatorClassState.UNREAD_INDICATOR_STATE_CLASSES = UNREAD_INDICATOR_STATE_CLASSES;
-
-
 
 module.exports = updateUnreadIndicatorClassState;

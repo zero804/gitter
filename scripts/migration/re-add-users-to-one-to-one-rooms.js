@@ -8,44 +8,53 @@ var userService = require('gitter-web-users');
 var collections = require('gitter-web-utils/lib/collections');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var Promise = require('bluebird');
 
 function getMissingUsers() {
-  return persistence.Troupe.aggregate([{
+  return persistence.Troupe.aggregate([
+    {
       $match: {
         oneToOne: true
       }
-    }, {
+    },
+    {
       $project: {
         _id: 1,
         userId1: { $arrayElemAt: ['$oneToOneUsers.userId', 0] },
-        userId2: { $arrayElemAt: ['$oneToOneUsers.userId', 1] },
+        userId2: { $arrayElemAt: ['$oneToOneUsers.userId', 1] }
       }
-    }, {
+    },
+    {
       $lookup: {
-        from: "troupeusers",
-        localField: "_id",
-        foreignField: "troupeId",
-        as: "users"
+        from: 'troupeusers',
+        localField: '_id',
+        foreignField: 'troupeId',
+        as: 'users'
       }
-    }, {
+    },
+    {
       $match: {
-        $or: [{
-          users: { $size: 0 }
-        }, {
-          users: { $size: 1 }
-        }]
+        $or: [
+          {
+            users: { $size: 0 }
+          },
+          {
+            users: { $size: 1 }
+          }
+        ]
       }
-    }, {
+    },
+    {
       $project: {
         _id: 1,
         userId1: 1,
         userId2: 1,
         troupeUserId1: { $arrayElemAt: ['$users.userId', 0] }
       }
-    }])
+    }
+  ])
     .read(mongoReadPrefs.secondaryPreferred)
     .exec()
     .then(function(results) {
@@ -77,41 +86,47 @@ function getMissingUsers() {
 }
 
 function dryRun() {
-  return getMissingUsers()
-    .then(function(results) {
-      var userIds = _.uniq(results.map(function(result) {
+  return getMissingUsers().then(function(results) {
+    var userIds = _.uniq(
+      results.map(function(result) {
         return result.userId;
-      }));
+      })
+    );
 
-      return userService.findByIds(userIds)
-        .then(function(users) {
-          var userHash = collections.indexById(users);
-          results.forEach(function(result) {
-            var user = userHash[result.userId];
-            var username = user && user.username;
+    return userService.findByIds(userIds).then(function(users) {
+      var userHash = collections.indexById(users);
+      results.forEach(function(result) {
+        var user = userHash[result.userId];
+        var username = user && user.username;
 
-            console.log({
-              troupeId: result.troupeId,
-              username: username
-            })
-          });
+        console.log({
+          troupeId: result.troupeId,
+          username: username
         });
+      });
     });
+  });
 }
 
 function execute() {
-  return getMissingUsers()
-    .then(function(results) {
-      return Promise.map(results, function(result) {
-        return roomMembershipService.addRoomMember(result.troupeId,
-          result.userId, roomMembershipFlags.MODES.announcement, null);
-      }, { concurrency: 1 });
-    });
+  return getMissingUsers().then(function(results) {
+    return Promise.map(
+      results,
+      function(result) {
+        return roomMembershipService.addRoomMember(
+          result.troupeId,
+          result.userId,
+          roomMembershipFlags.MODES.announcement,
+          null
+        );
+      },
+      { concurrency: 1 }
+    );
+  });
 }
 
-
 require('yargs')
-  .command('dry-run', 'Dry run', { }, function() {
+  .command('dry-run', 'Dry run', {}, function() {
     return dryRun()
       .then(function(results) {
         console.log(results);
@@ -119,10 +134,9 @@ require('yargs')
       })
       .done();
   })
-  .command('execute', 'Execute', { }, function() {
+  .command('execute', 'Execute', {}, function() {
     return execute()
       .then(function(results) {
-
         console.log(results);
         process.exit();
       })
@@ -131,5 +145,4 @@ require('yargs')
   .demand(1)
   .strict()
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;

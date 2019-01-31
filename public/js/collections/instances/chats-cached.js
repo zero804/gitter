@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var chatModels = require('../chat');
 var context = require('../../utils/context');
@@ -21,7 +21,7 @@ function invokeChatPreload(pool, rooms) {
 }
 
 function create() {
-  var pool = new Pool(chatModels.ChatCollection, { idAttribute: "troupeId" });
+  var pool = new Pool(chatModels.ChatCollection, { idAttribute: 'troupeId' });
 
   var currentRoomId = context.getTroupeId();
   var initialPromise = pool.preload(currentRoomId, Date.now());
@@ -44,9 +44,9 @@ function create() {
 
   // Keep the unread items up to date on the model
   // This allows the unread items client to mark model items as read
-  if(context.isLoggedIn()) {
+  if (context.isLoggedIn()) {
     unreadItemsClient.syncCollections({
-      'chat': chatCollection
+      chat: chatCollection
     });
   }
 
@@ -59,11 +59,10 @@ function create() {
     });
   });
 
-
   return chatCollection;
 }
 
-if(!context.hasFeature('chat-cache') || !frameUtils.hasParentFrameSameOrigin()) {
+if (!context.hasFeature('chat-cache') || !frameUtils.hasParentFrameSameOrigin()) {
   /* If the feature is not turned on, fallback to non-cached chats */
   module.exports = require('./chats');
 } else {

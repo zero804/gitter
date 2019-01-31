@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const env = require('gitter-web-env');
 var express = require('express');
@@ -21,7 +21,7 @@ function saveRoom(req) {
   var userId = req.user && req.user.id;
   var troupeId = req.uriContext && req.uriContext.troupe && req.uriContext.troupe.id;
 
-  if(userId && troupeId) {
+  if (userId && troupeId) {
     recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId);
   }
 }
@@ -33,7 +33,7 @@ var mainFrameMiddlewarePipeline = [
   uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     var uriContext = req.uriContext;
 
     var renderer = selectRenderer(req);
@@ -58,13 +58,12 @@ var frameMiddlewarePipeline = [
   uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     saveRoom(req);
 
     return desktopRenderer.renderSecondaryView(req, res, next, {
       uriContext: req.uriContext
     });
-
   },
   redirectErrorMiddleware
 ];
@@ -75,10 +74,10 @@ var embedMiddlewarePipeline = [
   uriContextResolverMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     return embedRenderer.renderSecondaryView(req, res, next, {
       uriContext: req.uriContext
-    })
+    });
   },
   redirectErrorMiddleware
 ];
@@ -87,7 +86,7 @@ var cardMiddlewarePipeline = [
   identifyRoute('app-card-frame'),
   uriContextResolverMiddleware,
   timezoneMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     return cardRenderer.renderSecondaryView(req, res, next, {
       uriContext: req.uriContext
     });
@@ -97,11 +96,9 @@ var cardMiddlewarePipeline = [
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-[
-  '/:roomPart1',
-  '/:roomPart1/:roomPart2',
-  '/:roomPart1/:roomPart2/:roomPart3',
-].forEach(function(path) {
+['/:roomPart1', '/:roomPart1/:roomPart2', '/:roomPart1/:roomPart2/:roomPart3'].forEach(function(
+  path
+) {
   router.get(path + '/archives', archive.linksList);
   router.get(path + '/archives/all', archive.datesList);
   router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
@@ -118,6 +115,5 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   // Primary View
   router.get(path, mainFrameMiddlewarePipeline);
 });
-
 
 module.exports = router;

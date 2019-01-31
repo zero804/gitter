@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -15,10 +15,10 @@ var View = Marionette.ItemView.extend({
   },
 
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'showMarkdownHelp':
         this.dialog.hide();
-        window.location.hash = "#markdown";
+        window.location.hash = '#markdown';
         break;
 
       case 'cancel':
@@ -32,23 +32,23 @@ var View = Marionette.ItemView.extend({
       cmdKey: platformKeys.cmd,
       gitterKey: platformKeys.gitter
     };
-  },
+  }
 });
 
 module.exports = ModalView.extend({
-    initialize: function(options) {
-      options.title = "Keyboard Shortcuts";
-      ModalView.prototype.initialize.apply(this, arguments);
-      this.view = new View({ });
-      this.listenTo(this, 'hide', function() {
-        appEvents.trigger('help.close');
-      });
-    },
-    menuItems: [
-      {
-        action: "showMarkdownHelp",
-        text: "Markdown Help ("+ platformKeys.cmd +" + "+ platformKeys.gitter +" + m)",
-        className: "modal--default__footer__btn"
-      }
-    ]
-  });
+  initialize: function(options) {
+    options.title = 'Keyboard Shortcuts';
+    ModalView.prototype.initialize.apply(this, arguments);
+    this.view = new View({});
+    this.listenTo(this, 'hide', function() {
+      appEvents.trigger('help.close');
+    });
+  },
+  menuItems: [
+    {
+      action: 'showMarkdownHelp',
+      text: 'Markdown Help (' + platformKeys.cmd + ' + ' + platformKeys.gitter + ' + m)',
+      className: 'modal--default__footer__btn'
+    }
+  ]
+});

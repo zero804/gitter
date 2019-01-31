@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var apiClient = require('../components/api-client');
 var Backbone = require('backbone');
@@ -17,7 +17,7 @@ var ReposCollection = Backbone.Collection.extend({
   url: apiClient.user.channelGenerator('/repos'),
   comparator: function(a, b) {
     function compare(a, b) {
-      if(a === b) return 0;
+      if (a === b) return 0;
       return a < b ? -1 : +1;
     }
 
@@ -28,5 +28,5 @@ var ReposCollection = Backbone.Collection.extend({
 
 module.exports = {
   ReposCollection: ReposCollection,
-  RepoModel:       RepoModel
+  RepoModel: RepoModel
 };

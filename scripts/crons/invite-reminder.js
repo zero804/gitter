@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-"use strict";
+'use strict';
 
 var emailNotificationService = require('gitter-web-email-notifications');
 var Promise = require('bluebird');
@@ -15,27 +15,33 @@ function die(err) {
   process.exit(1);
 }
 
-invitesService.findInvitesForReminder(REMINDER_DAYS)
+invitesService
+  .findInvitesForReminder(REMINDER_DAYS)
   .tap(function(inviteReminders) {
-    return Promise.map(inviteReminders, function(inviteReminder) {
-      var troupe = inviteReminder.troupe;
-      var invite = inviteReminder.invite;
-      var invitedByUser = inviteReminder.invitedByUser;
+    return Promise.map(
+      inviteReminders,
+      function(inviteReminder) {
+        var troupe = inviteReminder.troupe;
+        var invite = inviteReminder.invite;
+        var invitedByUser = inviteReminder.invitedByUser;
 
-      if (!troupe || !invitedByUser) {
-        return invitesService.markInviteReminded(invite._id);
-      } else {
-        return emailNotificationService.sendInvitationReminder(invitedByUser, invite, troupe)
-          .catch(function (err) {
-            logger.error('Couldn\'t notify invite: ', { id: invite._id, exception: err });
-          })
-          .then(function() {
-            return invitesService.markInviteReminded(invite._id);
-          })
-      }
-    }, { concurrency: 10 });
+        if (!troupe || !invitedByUser) {
+          return invitesService.markInviteReminded(invite._id);
+        } else {
+          return emailNotificationService
+            .sendInvitationReminder(invitedByUser, invite, troupe)
+            .catch(function(err) {
+              logger.error("Couldn't notify invite: ", { id: invite._id, exception: err });
+            })
+            .then(function() {
+              return invitesService.markInviteReminded(invite._id);
+            });
+        }
+      },
+      { concurrency: 10 }
+    );
   })
-  .then(function (inviteReminders) {
+  .then(function(inviteReminders) {
     logger.info('invitation reminder sent for ' + inviteReminders.length + ' invites(s)');
     process.exit();
   })

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -9,22 +9,22 @@ var _ = require('underscore');
 var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
-var restSerializer = require("../serializers/rest-serializer");
+var restSerializer = require('../serializers/rest-serializer');
 var unreadItemService = require('gitter-web-unread-items');
 var chatService = require('gitter-web-chats');
-var userService = require("gitter-web-users");
+var userService = require('gitter-web-users');
 var userTypeahead = require('./typeaheads/user-typeahead');
 var eventService = require('gitter-web-events');
 var roomService = require('gitter-web-rooms');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
-var orgService = require("./org-service");
-var repoService = require("./repo-service");
+var orgService = require('./org-service');
+var repoService = require('./repo-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
 if (survivalMode) {
-  logger.error("WARNING: Running in survival mode");
+  logger.error('WARNING: Running in survival mode');
 }
 
 var DEFAULT_CHAT_COUNT_LIMIT = 30;
@@ -32,9 +32,10 @@ var DEFAULT_USERS_LIMIT = 30;
 var MAX_USERS_LIMIT = 100;
 
 function serializeTroupesForUser(userId, callback) {
-  if(!userId) return Promise.resolve([]);
+  if (!userId) return Promise.resolve([]);
 
-  return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
+  return roomService
+    .findAllRoomsIdsForUserIncludingMentions(userId)
     .spread(function(allTroupeIds, nonMemberTroupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
@@ -50,15 +51,20 @@ function serializeTroupesForUser(userId, callback) {
 }
 
 function serializeChatsForTroupe(troupeId, userId, options, callback) {
-  options = _.extend({}, {
-    skip: 0,
-    limit: DEFAULT_CHAT_COUNT_LIMIT,
-    userId: userId // This may also be appearing through in options
-  }, options);
+  options = _.extend(
+    {},
+    {
+      skip: 0,
+      limit: DEFAULT_CHAT_COUNT_LIMIT,
+      userId: userId // This may also be appearing through in options
+    },
+    options
+  );
 
   var initialId = options.aroundId;
 
-  return chatService.findChatMessagesForTroupe(troupeId, options)
+  return chatService
+    .findChatMessagesForTroupe(troupeId, options)
     .then(function(chatMessages) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
@@ -92,20 +98,19 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     limit = MAX_USERS_LIMIT;
   }
 
-  if(typeof searchTerm === 'string') {
+  if (typeof searchTerm === 'string') {
     if (survivalMode || searchTerm.length < 1) {
       return Promise.resolve([]);
     }
 
-    return userTypeahead.query(searchTerm, { roomId: troupeId })
-      .then(function(users) {
-        var strategy = new restSerializer.UserStrategy();
-        return restSerializer.serialize(users, strategy);
-      });
-
+    return userTypeahead.query(searchTerm, { roomId: troupeId }).then(function(users) {
+      var strategy = new restSerializer.UserStrategy();
+      return restSerializer.serialize(users, strategy);
+    });
   }
 
-  return roomMembershipService.findMembersForRoom(troupeId, { limit: limit, skip: skip })
+  return roomMembershipService
+    .findMembersForRoom(troupeId, { limit: limit, skip: skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
@@ -120,11 +125,11 @@ function serializeUsersForTroupe(troupeId, userId, options) {
 
 function serializeUnreadItemsForTroupe(troupeId, userId, callback) {
   return Promise.all([
-      roomMembershipService.getMemberLurkStatus(troupeId, userId),
-      unreadItemService.getUnreadItemsForUser(userId, troupeId)
-    ])
+    roomMembershipService.getMemberLurkStatus(troupeId, userId),
+    unreadItemService.getUnreadItemsForUser(userId, troupeId)
+  ])
     .spread(function(isLurking, items) {
-      if(isLurking) {
+      if (isLurking) {
         items._meta = { lurk: true };
       }
       return items;
@@ -134,7 +139,8 @@ function serializeUnreadItemsForTroupe(troupeId, userId, callback) {
 
 function serializeReadBysForChat(troupeId, chatId, callback) {
   // TODO: assert that troupeId=chat.troupeId....
-  return chatService.findById(chatId)
+  return chatService
+    .findById(chatId)
     .then(function(chatMessage) {
       var strategy = new restSerializer.UserIdStrategy({});
 
@@ -144,138 +150,129 @@ function serializeReadBysForChat(troupeId, chatId, callback) {
 }
 
 function serializeEventsForTroupe(troupeId, userId, callback) {
-  return eventService.findEventsForTroupe(troupeId, {})
+  return eventService
+    .findEventsForTroupe(troupeId, {})
     .then(function(events) {
-      var strategy = new restSerializer.EventStrategy({ currentUserId: userId, troupeId: troupeId });
+      var strategy = new restSerializer.EventStrategy({
+        currentUserId: userId,
+        troupeId: troupeId
+      });
       return restSerializer.serialize(events, strategy);
     })
     .nodeify(callback);
 }
 
 function serializeOrgsForUser(user) {
-  return orgService.getOrgsForUser(user)
-    .then(function(orgs) {
-      // TODO: not all organisations are going to be github ones in future!
-      var strategy = new restSerializer.GithubOrgStrategy({
-        currentUserId: user && user._id
-      });
-
-      return restSerializer.serialize(orgs, strategy);
+  return orgService.getOrgsForUser(user).then(function(orgs) {
+    // TODO: not all organisations are going to be github ones in future!
+    var strategy = new restSerializer.GithubOrgStrategy({
+      currentUserId: user && user._id
     });
+
+    return restSerializer.serialize(orgs, strategy);
+  });
 }
 
 function serializeOrgsForUserId(userId, options) {
-  return userService.findById(userId)
-    .then(function(user) {
-      if(!user) return [];
+  return userService.findById(userId).then(function(user) {
+    if (!user) return [];
 
-      return serializeOrgsForUser(user, options);
-    });
+    return serializeOrgsForUser(user, options);
+  });
 }
 
 function serializeUnusedOrgsForUser(user) {
-  return orgService.getUnusedOrgsForUser(user)
-    .then(function(orgs) {
-      var strategy = new restSerializer.GithubOrgStrategy({
-        currentUserId: user && user._id
-      });
-      return restSerializer.serialize(orgs, strategy);
+  return orgService.getUnusedOrgsForUser(user).then(function(orgs) {
+    var strategy = new restSerializer.GithubOrgStrategy({
+      currentUserId: user && user._id
     });
-
+    return restSerializer.serialize(orgs, strategy);
+  });
 }
 
 function serializeReposForUser(user) {
-  return repoService.getReposForUser(user)
-    .then(function(repos) {
-      var strategy = new restSerializer.GithubRepoStrategy({
-        currentUserId: user && user._id
-      });
-      return restSerializer.serialize(repos, strategy);
+  return repoService.getReposForUser(user).then(function(repos) {
+    var strategy = new restSerializer.GithubRepoStrategy({
+      currentUserId: user && user._id
     });
+    return restSerializer.serialize(repos, strategy);
+  });
 }
 
 function serializeUnusedReposForUser(user) {
-  return repoService.getUnusedReposForUser(user)
-    .then(function(repos) {
-      var strategy = new restSerializer.GithubRepoStrategy({
-        currentUserId: user && user._id
-      });
-      return restSerializer.serialize(repos, strategy);
+  return repoService.getUnusedReposForUser(user).then(function(repos) {
+    var strategy = new restSerializer.GithubRepoStrategy({
+      currentUserId: user && user._id
     });
+    return restSerializer.serialize(repos, strategy);
+  });
 }
 
 function serializeAdminReposForUser(user) {
-  return repoService.getAdminReposForUser(user)
-    .then(function(repos) {
-      var strategy = new restSerializer.GithubRepoStrategy({
-        currentUserId: user && user._id
-      });
-      return restSerializer.serialize(repos, strategy);
+  return repoService.getAdminReposForUser(user).then(function(repos) {
+    var strategy = new restSerializer.GithubRepoStrategy({
+      currentUserId: user && user._id
     });
+    return restSerializer.serialize(repos, strategy);
+  });
 }
 
 function serializeProfileForUsername(username) {
-  return userService.findByUsername(username)
-    .then(function(user) {
-      if (user) {
-        var strategy = new restSerializer.UserProfileStrategy();
-        return restSerializer.serializeObject(user, strategy);
+  return userService.findByUsername(username).then(function(user) {
+    if (user) {
+      var strategy = new restSerializer.UserProfileStrategy();
+      return restSerializer.serializeObject(user, strategy);
+    } else {
+      var gitHubUser = { username: username };
 
-      } else {
-        var gitHubUser = {username: username};
-
-        if (!userScopes.isGitHubUser(gitHubUser)) {
-          throw new StatusError(404);
-        }
-
-        return gitHubProfileService(gitHubUser, {includeCore: true});
+      if (!userScopes.isGitHubUser(gitHubUser)) {
+        throw new StatusError(404);
       }
-    });
-}
 
+      return gitHubProfileService(gitHubUser, { includeCore: true });
+    }
+  });
+}
 
 function serializeGroupsForUserId(userId, options) {
   if (!userId) return [];
 
-  return groupMembershipService.findGroupsForUser(userId)
-    .then(function(groups) {
-      if (!groups || !groups.length) return [];
+  return groupMembershipService.findGroupsForUser(userId).then(function(groups) {
+    if (!groups || !groups.length) return [];
 
-      var strategy = new restSerializer.GroupStrategy({
-        currentUserId: userId,
-        lean: options && options.lean
-      });
-
-      return restSerializer.serialize(groups, strategy);
+    var strategy = new restSerializer.GroupStrategy({
+      currentUserId: userId,
+      lean: options && options.lean
     });
+
+    return restSerializer.serialize(groups, strategy);
+  });
 }
 
 function serializeAdminGroupsForUser(user, options) {
   if (!user) return [];
 
-  return groupMembershipService.findAdminGroupsForUser(user)
-    .then(function(groups) {
-      if (!groups || !groups.length) return [];
+  return groupMembershipService.findAdminGroupsForUser(user).then(function(groups) {
+    if (!groups || !groups.length) return [];
 
-      var strategy = new restSerializer.GroupStrategy({
-        currentUserId: user._id,
-        currentUser: user,
-        lean: options && options.lean
-      });
-
-      return restSerializer.serialize(groups, strategy);
+    var strategy = new restSerializer.GroupStrategy({
+      currentUserId: user._id,
+      currentUser: user,
+      lean: options && options.lean
     });
+
+    return restSerializer.serialize(groups, strategy);
+  });
 }
 
 function serializeRoomsForGroupId(groupId, userId) {
-  return groupService.findRoomsIdForGroup(groupId, userId)
-    .then(function(allTroupeIds) {
-      var strategy = new restSerializer.TroupeIdStrategy({
-        currentUserId: userId
-      });
-
-      return restSerializer.serialize(allTroupeIds, strategy);
+  return groupService.findRoomsIdForGroup(groupId, userId).then(function(allTroupeIds) {
+    var strategy = new restSerializer.TroupeIdStrategy({
+      currentUserId: userId
     });
+
+    return restSerializer.serialize(allTroupeIds, strategy);
+  });
 }
 
 module.exports = {
@@ -294,5 +291,5 @@ module.exports = {
   serializeProfileForUsername: serializeProfileForUsername,
   serializeGroupsForUserId: Promise.method(serializeGroupsForUserId),
   serializeAdminGroupsForUser: Promise.method(serializeAdminGroupsForUser),
-  serializeRoomsForGroupId: serializeRoomsForGroupId,
-}
+  serializeRoomsForGroupId: serializeRoomsForGroupId
+};

@@ -12,9 +12,9 @@ describe('user-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -55,7 +55,10 @@ describe('user-api', function() {
           assert(suggestion.hasOwnProperty('tags'));
           assert(suggestion.hasOwnProperty('description'));
           assert(suggestion.hasOwnProperty('exists'));
-          assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
+          assert(
+            (suggestion.exists === true && suggestion.id) ||
+              (suggestion.exists === false && !suggestion.id)
+          );
         });
       });
   });

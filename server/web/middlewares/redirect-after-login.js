@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var userScopes = require('gitter-web-identity/lib/user-scopes');
 
@@ -8,7 +8,7 @@ function redirectAfterLogin(req, res) {
 
     res.render('github-upgrade-complete', {
       oAuthCompletePostMessage: JSON.stringify({
-        type: "oauth_upgrade_complete",
+        type: 'oauth_upgrade_complete',
         scopes: userScopes.getScopesHash(req.user)
       })
     });

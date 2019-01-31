@@ -7,7 +7,6 @@ var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
 var gitHubProfileService = require('./github-profile-service');
 
-
 function GitHubBackend(user, identity) {
   this.user = user;
   this.identity = identity;
@@ -23,21 +22,19 @@ GitHubBackend.prototype.findOrgs = Promise.method(function() {
 
   if (!ghUser.accessToken) return [];
 
-  return ghUser.getOrgs()
-    .then(function(ghOrgs) {
-      // TODO: change these to be in a standard internal format
-      return ghOrgs;
-    });
+  return ghUser.getOrgs().then(function(ghOrgs) {
+    // TODO: change these to be in a standard internal format
+    return ghOrgs;
+  });
 });
 
 GitHubBackend.prototype.getProfile = function() {
   // the minimum response
-  var profile = {provider: 'github'};
-  return gitHubProfileService(this.user)
-    .then(function(gitHubProfile) {
-      _.extend(profile, gitHubProfile);
-      return profile;
-    });
+  var profile = { provider: 'github' };
+  return gitHubProfileService(this.user).then(function(gitHubProfile) {
+    _.extend(profile, gitHubProfile);
+    return profile;
+  });
 };
 
 module.exports = GitHubBackend;

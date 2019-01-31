@@ -1,4 +1,3 @@
-
 'use strict';
 
 var Promise = require('bluebird');
@@ -49,11 +48,12 @@ GitHubRepoPolicyEvaluator.prototype = {
     debug('Fetching org %s from github', this.uri);
 
     var ghOrg = new GitHubOrgService(this.user);
-    this._canAccessPromise = ghOrg.member(this.uri, this.user.username)
+    this._canAccessPromise = ghOrg
+      .member(this.uri, this.user.username)
       .catch(function(err) {
-        debug('Exeception while fetching org')
+        debug('Exeception while fetching org');
 
-        if(err.errno && err.syscall || err.statusCode >= 500) {
+        if ((err.errno && err.syscall) || err.statusCode >= 500) {
           // GitHub call failed and may be down.
           throw new PolicyDelegateTransportError(err.message);
         }

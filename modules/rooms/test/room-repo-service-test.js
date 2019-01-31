@@ -1,10 +1,10 @@
-"use strict";
+'use strict';
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var roomRepoService = require('../lib/room-repo-service');
 
-describe('room-repo-service #slow', function(){
+describe('room-repo-service #slow', function() {
   var fixture = fixtureLoader.setup({
     troupe1: {},
     troupe2: {},
@@ -37,29 +37,29 @@ describe('room-repo-service #slow', function(){
     troupe7: {
       group: 'group2'
     },
-    group2: {
-
-    }
-
+    group2: {}
   });
 
   describe('findAssociatedGithubObjectForRoom', function() {
     it('should deal with rooms with no backing object', function() {
-      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe1)
+      return roomRepoService
+        .findAssociatedGithubObjectForRoom(fixture.troupe1)
         .then(function(result) {
           assert.deepEqual(result, null);
         });
     });
 
     it('should deal with groups with no backing object', function() {
-      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe7)
+      return roomRepoService
+        .findAssociatedGithubObjectForRoom(fixture.troupe7)
         .then(function(result) {
           assert.deepEqual(result, null);
         });
     });
 
     it('should deal with rooms backed by a repo', function() {
-      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe5)
+      return roomRepoService
+        .findAssociatedGithubObjectForRoom(fixture.troupe5)
         .then(function(result) {
           assert.deepEqual(result, {
             type: 'GH_REPO',
@@ -68,7 +68,8 @@ describe('room-repo-service #slow', function(){
         });
     });
     it('should deal with groups backed by a repo', function() {
-      return roomRepoService.findAssociatedGithubObjectForRoom(fixture.troupe4)
+      return roomRepoService
+        .findAssociatedGithubObjectForRoom(fixture.troupe4)
         .then(function(result) {
           assert.deepEqual(result, {
             type: 'GH_REPO',
@@ -76,25 +77,26 @@ describe('room-repo-service #slow', function(){
           });
         });
     });
-  })
+  });
 
   describe('findAssociatedGithubRepoForRooms', function() {
     it('should deal with no rooms', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([])
-        .then(function(result) {
-          assert.deepEqual(result, {});
-        });
+      return roomRepoService.findAssociatedGithubRepoForRooms([]).then(function(result) {
+        assert.deepEqual(result, {});
+      });
     });
 
     it('should deal with one room, not successful', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([fixture.troupe1])
+      return roomRepoService
+        .findAssociatedGithubRepoForRooms([fixture.troupe1])
         .then(function(result) {
           assert.deepEqual(result, {});
         });
     });
 
     it('should deal with one room, successful', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([fixture.troupe4])
+      return roomRepoService
+        .findAssociatedGithubRepoForRooms([fixture.troupe4])
         .then(function(result) {
           var expected = [];
           expected[fixture.troupe4.id] = 'x/y';
@@ -103,14 +105,16 @@ describe('room-repo-service #slow', function(){
     });
 
     it('should deal with many rooms', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([fixture.troupe1, fixture.troupe2, fixture.troupe3])
+      return roomRepoService
+        .findAssociatedGithubRepoForRooms([fixture.troupe1, fixture.troupe2, fixture.troupe3])
         .then(function(result) {
           assert.deepEqual(result, {});
         });
     });
 
     it('should deal with mixed rooms', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([fixture.troupe1, fixture.troupe4])
+      return roomRepoService
+        .findAssociatedGithubRepoForRooms([fixture.troupe1, fixture.troupe4])
         .then(function(result) {
           var expected = [];
           expected[fixture.troupe4.id] = 'x/y';
@@ -119,7 +123,13 @@ describe('room-repo-service #slow', function(){
     });
 
     it('should deal with mixed rooms, 2', function() {
-      return roomRepoService.findAssociatedGithubRepoForRooms([fixture.troupe1, fixture.troupe4, fixture.troupe5, fixture.troupe6])
+      return roomRepoService
+        .findAssociatedGithubRepoForRooms([
+          fixture.troupe1,
+          fixture.troupe4,
+          fixture.troupe5,
+          fixture.troupe6
+        ])
         .then(function(result) {
           var expected = [];
           expected[fixture.troupe4.id] = 'x/y';
@@ -129,5 +139,4 @@ describe('room-repo-service #slow', function(){
         });
     });
   });
-
 });

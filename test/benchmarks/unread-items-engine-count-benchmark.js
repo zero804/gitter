@@ -16,7 +16,7 @@ var smallUserSetSingleMention = [];
 var smallUserSetManyMentions = [];
 
 for (var i = 0; i < 10000; i++) {
-  var id = mongoUtils.getNewObjectIdString() + "";
+  var id = mongoUtils.getNewObjectIdString() + '';
   largeUserSet.push(id);
 
   if (i % 2 === 0) {
@@ -42,25 +42,31 @@ var userIdWithSortedSet = mongoUtils.getNewObjectIdString();
 
 makeBenchmark({
   before: function(done) {
-    unreadItemsServiceEngine.newItemWithMentions(troupeId, mongoUtils.getNewObjectIdString(), [userIdWithSet], [])
+    unreadItemsServiceEngine
+      .newItemWithMentions(troupeId, mongoUtils.getNewObjectIdString(), [userIdWithSet], [])
       .then(function() {
-        return Promise.all(_.range(120).map(function() {
-          unreadItemsServiceEngine.newItemWithMentions(troupeId, mongoUtils.getNewObjectIdString(), [userIdWithSortedSet], []);
-        }));
+        return Promise.all(
+          _.range(120).map(function() {
+            unreadItemsServiceEngine.newItemWithMentions(
+              troupeId,
+              mongoUtils.getNewObjectIdString(),
+              [userIdWithSortedSet],
+              []
+            );
+          })
+        );
       })
       .nodeify(done);
   },
   tests: {
     'count with set': function(done) {
-      unreadItemsServiceEngine.getUserUnreadCountsForRooms(userIdWithSet, [troupeId])
-        .nodeify(done);
+      unreadItemsServiceEngine.getUserUnreadCountsForRooms(userIdWithSet, [troupeId]).nodeify(done);
     },
 
     'count with sorted set': function(done) {
-      unreadItemsServiceEngine.getUserUnreadCountsForRooms(userIdWithSortedSet, [troupeId])
+      unreadItemsServiceEngine
+        .getUserUnreadCountsForRooms(userIdWithSortedSet, [troupeId])
         .nodeify(done);
-    },
-
+    }
   }
-
 });

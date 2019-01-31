@@ -30,8 +30,8 @@ function performDeletion() {
     var count = 0;
     anonymousTokenStream()
       .pipe(new BatchStream({ size: 1000 }))
-      .pipe(through2Concurrent.obj({ maxConcurrency: 1 },
-        function (docs, enc, callback) {
+      .pipe(
+        through2Concurrent.obj({ maxConcurrency: 1 }, function(docs, enc, callback) {
           var ids = docs.map(function(d) {
             return d._id;
           });
@@ -46,14 +46,15 @@ function performDeletion() {
             })
             .delay(1000)
             .nodeify(callback);
-      }))
+        })
+      )
       .on('data', function() {
         count++;
         if (count % 100 === 0) {
           console.log('Completed ', count);
         }
       })
-      .on('end', function () {
+      .on('end', function() {
         console.log('DONE');
         resolve();
       });

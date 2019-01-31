@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var oauthService = require('../../services/oauth-service');
 var restSerializer = require('../../serializers/rest-serializer');
@@ -12,8 +12,6 @@ module.exports = function(req, res, next) {
     oauthService.findOrGenerateIRCToken(req.user.id),
     function(serialized, token) {
       res.send({ token: token, user: serialized });
-    })
-    .catch(next);
-
-
+    }
+  ).catch(next);
 };

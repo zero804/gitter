@@ -6,18 +6,24 @@ var Backbone = require('backbone');
 var BaseResolverCollection = require('public/js/collections/base-resolver-collection');
 
 describe('BaseResolverCollection', function() {
-
   var collection;
   var model;
-  beforeEach(function(){
+  beforeEach(function() {
     model = new Backbone.Model({ val: 'test' });
-    collection = new BaseResolverCollection(null, { contextModel: model, template: '/this/is/a/:val/template' });
+    collection = new BaseResolverCollection(null, {
+      contextModel: model,
+      template: '/this/is/a/:val/template'
+    });
   });
 
   it('should throw an error if no ContextModel is passed', function() {
-    try { new BaseResolverCollection(); }
-    catch (e) {
-      assert.equal(e.message, 'A valid context model must be passed to a new instance of BaseResolverCollection');
+    try {
+      new BaseResolverCollection();
+    } catch (e) {
+      assert.equal(
+        e.message,
+        'A valid context model must be passed to a new instance of BaseResolverCollection'
+      );
     }
   });
 
@@ -30,6 +36,4 @@ describe('BaseResolverCollection', function() {
     model.set('val', 'thisisatest');
     assert.equal('/this/is/a/thisisatest/template', collection.url());
   });
-
-
 });

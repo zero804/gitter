@@ -2,7 +2,6 @@
 var $ = require('jquery');
 
 module.exports = (function() {
-
   $.prototype.notify = function(options) {
     var container = this;
     var content = options.content;
@@ -24,45 +23,60 @@ module.exports = (function() {
     function get() {
       // lookup or create the notification element
       if (options.id) {
-        n = container.find('#'+options.id);
+        n = container.find('#' + options.id);
       }
 
       if (!options.id || n.length <= 0) {
-        n = $('<div class="notification"'+((options.id) ? ' id="'+options.id+'"':'')+'></div>');
+        n = $(
+          '<div class="notification"' + (options.id ? ' id="' + options.id + '"' : '') + '></div>'
+        );
         n.prependTo(container);
         // add the hide timeout for this notification
-        n.data('notification-hide-timeout', new Timeout(function() {
-          hide();
-        }, timeout));
-     }
-
+        n.data(
+          'notification-hide-timeout',
+          new Timeout(function() {
+            hide();
+          }, timeout)
+        );
+      }
     }
 
     get();
 
     // attach handlers on the notification-center container
-    this.on('mouseenter', /* '.notification',*/ function(e) {
-
-      if (container.data('notification-hide-running') === true && e.currentTarget === container[0]) {
-        // log.info('cancelling timeouts', e);
-        // cancel all hide timeouts
-        container.data('notification-hide-running', false);
-        container.find('.notification').each(function(n) {
-          n.data('notification-hide-timeout').pause();
-        });
+    this.on(
+      'mouseenter',
+      /* '.notification',*/ function(e) {
+        if (
+          container.data('notification-hide-running') === true &&
+          e.currentTarget === container[0]
+        ) {
+          // log.info('cancelling timeouts', e);
+          // cancel all hide timeouts
+          container.data('notification-hide-running', false);
+          container.find('.notification').each(function(n) {
+            n.data('notification-hide-timeout').pause();
+          });
+        }
       }
-    });
+    );
 
-    this.on('mouseleave', /* '.notification',*/ function(e) {
-      if (container.data('notification-hide-running') === false && e.currentTarget === container[0]) {
-        // log.info('resuming timeouts', e);
-        // restart all the hide timeouts
-        container.data('notification-hide-running', true);
-        container.find('.notification').each(function(n) {
-          n.data('notification-hide-timeout').resume(1000);
-        });
+    this.on(
+      'mouseleave',
+      /* '.notification',*/ function(e) {
+        if (
+          container.data('notification-hide-running') === false &&
+          e.currentTarget === container[0]
+        ) {
+          // log.info('resuming timeouts', e);
+          // restart all the hide timeouts
+          container.data('notification-hide-running', true);
+          container.find('.notification').each(function(n) {
+            n.data('notification-hide-timeout').resume(1000);
+          });
+        }
       }
-    });
+    );
 
     function set() {
       if (content) {
@@ -87,8 +101,7 @@ module.exports = (function() {
     function setDisplay() {
       if (action === 'show') {
         show(n);
-      }
-      else if (action === 'hide') {
+      } else if (action === 'hide') {
         hide(n);
       }
     }
@@ -100,7 +113,9 @@ module.exports = (function() {
 
   // Timeout util
   function Timeout(callback, delay) {
-    var timerId, start, remaining = delay;
+    var timerId,
+      start,
+      remaining = delay;
 
     function timeout() {
       if (remaining !== Infinity) {
@@ -117,7 +132,7 @@ module.exports = (function() {
 
     this.resume = function(add) {
       start = new Date();
-      remaining += (add) ? add : 0;
+      remaining += add ? add : 0;
       timerId = timeout();
     };
 
@@ -130,7 +145,4 @@ module.exports = (function() {
 
     this.resume();
   }
-
-
-
 })();

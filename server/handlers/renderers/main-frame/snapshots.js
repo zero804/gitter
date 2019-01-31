@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Snapshots are data that will be sent to the client on page load

@@ -18,8 +18,6 @@ appEvents.on('route', function(hash) {
 });
 
 onready(function() {
-
-
   new ExploreView({
     el: '.explore-page-wrap'
   });
@@ -30,7 +28,6 @@ onready(function() {
   var showMoreElemnts = document.querySelectorAll('.js-explore-show-more-tag-pills');
   var tagPillListElements = document.querySelectorAll('.js-explore-tag-pills-list');
 
-
   Array.prototype.forEach.call(roomCardElements, function(roomItemElement) {
     roomItemElement.addEventListener('click', function() {
       // Tracking
@@ -38,21 +35,20 @@ onready(function() {
     });
   });
 
-
-
   var activeClass = 'is-active';
 
   var updateRoomCardListVisibility = function() {
     // Grab the active tags
     var activeTags = {};
-    Array.prototype.filter.call(tagPillElements, function(tagPillElement) {
-      return tagPillElement.classList.contains(activeClass);
-    })
-    .forEach(function(tagPillElement) {
-      (tagPillElement.getAttribute('data-tags') || '').split(',').forEach(function(tag) {
-        activeTags[tag] = true;
+    Array.prototype.filter
+      .call(tagPillElements, function(tagPillElement) {
+        return tagPillElement.classList.contains(activeClass);
+      })
+      .forEach(function(tagPillElement) {
+        (tagPillElement.getAttribute('data-tags') || '').split(',').forEach(function(tag) {
+          activeTags[tag] = true;
+        });
       });
-    });
 
     Array.prototype.forEach.call(roomCardElements, function(roomItemElement) {
       (roomItemElement.getAttribute('data-tags') || '').split(',').some(function(roomTag) {
@@ -64,7 +60,6 @@ onready(function() {
   };
   // Initially call it
   updateRoomCardListVisibility();
-
 
   /* * /
   // Hook up our pills to update the card list
@@ -95,7 +90,6 @@ onready(function() {
   });
   /* */
 
-
   // Expand/Collapse tag pill list
   Array.prototype.forEach.call(showMoreElemnts, function(showMoreElement) {
     showMoreElement.addEventListener('click', function() {
@@ -107,6 +101,4 @@ onready(function() {
       });
     });
   });
-
-
 });

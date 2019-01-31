@@ -14,11 +14,12 @@ var _ = require('underscore');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var roomsSnapshot = context.getSnapshot('allRooms') || [];
-var existingRooms = roomsSnapshot.map(function(data){
-  return data.lastAccessTime ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) }) : data;
+var existingRooms = roomsSnapshot.map(function(data) {
+  return data.lastAccessTime
+    ? _.extend(data, { lastAccessTime: moment(data.lastAccessTime) })
+    : data;
 });
 var troupeCollection = new troupeModels.TroupeCollection(existingRooms, { listen: true });
-
 
 var groupsSnapshot = context.getSnapshot('groups') || [];
 var groupCollection;
@@ -48,18 +49,21 @@ function filterTroupeCollection(filter, comparator) {
 var favourites = filterTroupeCollection(roomSort.favourites.filter, roomSort.favourites.sort);
 
 // collection of recent troupes exc. favourites
-var recentRoomsNonFavourites = filterTroupeCollection(roomSort.recents.filter, roomSort.recents.sort);
+var recentRoomsNonFavourites = filterTroupeCollection(
+  roomSort.recents.filter,
+  roomSort.recents.sort
+);
 
 appEvents.on('activity', function(message) {
   /* Lurk mode... */
 
   var troupeId = message.troupeId;
   var model = troupeCollection.get(troupeId);
-  if(!model) return;
+  if (!model) return;
 
-  if(!model.get('lurk')) return;
+  if (!model.get('lurk')) return;
   var a = model.get('activity');
-  if(a) {
+  if (a) {
     model.set('activity', a + 1);
   } else {
     model.set('activity', 1);
@@ -70,9 +74,10 @@ appEvents.on('activity', function(message) {
 //reset lurk activity for the current room JP 4/2/16
 context.troupe().on('change:id', function(troupe, val) {
   var activeRoom = troupeCollection.get(val);
-  if(activeRoom) { activeRoom.set('activity', false); }
+  if (activeRoom) {
+    activeRoom.set('activity', false);
+  }
 });
-
 
 var collections = {
   /* All rooms */

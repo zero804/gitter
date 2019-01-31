@@ -12,11 +12,10 @@ var toggleClass = require('../../../../utils/toggle-class');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 
 module.exports = BaseCollectionItemView.extend({
-
   template: itemTemplate,
 
   modelEvents: _.extend({}, BaseCollectionItemView.prototype.modelEvents, {
-    'change:favourite': 'onFavouriteChange',
+    'change:favourite': 'onFavouriteChange'
   }),
 
   ui: _.extend({}, BaseCollectionItemView.prototype.ui, {
@@ -26,10 +25,10 @@ module.exports = BaseCollectionItemView.extend({
 
   events: {
     'click #room-item-options-toggle': 'onOptionsClicked',
-    'click #room-item-hide':           'onHideClicked',
-    'click #room-item-leave':          'onLeaveClicked',
-    'click @ui.favouriteButton':       'onFavouriteClicked',
-    mouseleave:                        'onMouseOut',
+    'click #room-item-hide': 'onHideClicked',
+    'click #room-item-leave': 'onLeaveClicked',
+    'click @ui.favouriteButton': 'onFavouriteClicked',
+    mouseleave: 'onMouseOut',
 
     // Note this probably won't get triggered because we listen to clicks on
     // the wrapper but better safe than sorry
@@ -42,10 +41,9 @@ module.exports = BaseCollectionItemView.extend({
     var type = this.model.get('type');
 
     var className = 'room-item';
-    if(this.model.get('githubType') === 'ONETOONE') {
+    if (this.model.get('githubType') === 'ONETOONE') {
       className = 'room-item--one2one';
-    }
-    else if(type === 'org') {
+    } else if (type === 'org') {
       className = 'room-item--group';
     }
 
@@ -71,7 +69,7 @@ module.exports = BaseCollectionItemView.extend({
     //When the user is viewing a room he is lurking in and activity occurs
     //we explicitly, in this case, cancel the lurk activity
     //this would be a lot easier (as with a lot of things) if we persisted activity on the server JP 17/3/16
-    if (data.lurkActivity && (data.id === context.troupe().get('id'))) {
+    if (data.lurkActivity && data.id === context.troupe().get('id')) {
       data.lurkActivity = false;
     }
 
@@ -80,31 +78,39 @@ module.exports = BaseCollectionItemView.extend({
 
   render: function() {
     //TODO Figure out why there is soooo much rendering JP 5/2/16
-    if (!Object.keys(this.model.changed)) { return; }
+    if (!Object.keys(this.model.changed)) {
+      return;
+    }
 
     // Using call since render never has any arguments and `.call` is much faster
     BaseCollectionItemView.prototype.render.call(this);
   },
 
-  onRender: function (){
+  onRender: function() {
     BaseCollectionItemView.prototype.onRender.apply(this, arguments);
     this.onFavouriteChange();
-
   },
 
   onDestroy: function() {
     this.stopListening(this.uiModel);
   },
 
-  onMenuChangeState: function () {
+  onMenuChangeState: function() {
     var data = parseForTemplate(this.model.toJSON(), this.roomMenuModel.get('state'));
 
-    if(data.namePieces) {
+    if (data.namePieces) {
       // If we don't want to re-render, then we need to duplicate this template logic
-      this.ui.title.html(data.namePieces.reduce(function(html, piece) { return html + '<span class="room-item__title-piece">' + _.escape(piece) + '</span>'; }, ''));
-    }
-    else {
-      this.ui.title.html('<span class="room-item__title-piece">' + _.escape(data.displayName || data.name) + '</span>');
+      this.ui.title.html(
+        data.namePieces.reduce(function(html, piece) {
+          return html + '<span class="room-item__title-piece">' + _.escape(piece) + '</span>';
+        }, '')
+      );
+    } else {
+      this.ui.title.html(
+        '<span class="room-item__title-piece">' +
+          _.escape(data.displayName || data.name) +
+          '</span>'
+      );
     }
   },
 
@@ -141,12 +147,15 @@ module.exports = BaseCollectionItemView.extend({
 
     //stop this view from triggering a click on the anchor
     e.preventDefault();
-    if (this.roomMenuModel.get('state') === 'search') { return; }
+    if (this.roomMenuModel.get('state') === 'search') {
+      return;
+    }
 
     this.uiModel.set('menuIsOpen', !this.uiModel.get('menuIsOpen'));
   },
 
-  onModelToggleMenu: function(model, val) {// jshint unused: true
+  onModelToggleMenu: function(model, val) {
+    // jshint unused: true
     toggleClass(this.el, 'active', val);
   },
 
@@ -167,7 +176,8 @@ module.exports = BaseCollectionItemView.extend({
     //TODO figure out why this throws an error.
     //implementation is exactly the same as on develop?
     //JP 13/1/16
-    apiClient.user.delete('/rooms/' + this.model.id)
+    apiClient.user
+      .delete('/rooms/' + this.model.id)
       .then(this.onHideComplete.bind(this))
 
       //TODO should this so some kind of visual error? JP
@@ -184,10 +194,11 @@ module.exports = BaseCollectionItemView.extend({
       appEvents.trigger('about.to.leave.current.room');
     }
 
-    apiClient.delete('/v1/rooms/' + this.model.get('id') + '/users/' + context.getUserId())
-      .then(function() {
+    apiClient.delete('/v1/rooms/' + this.model.get('id') + '/users/' + context.getUserId()).then(
+      function() {
         this.trigger('leave:complete');
-      }.bind(this));
+      }.bind(this)
+    );
   },
 
   onFavouriteClicked: function(e) {
@@ -195,12 +206,14 @@ module.exports = BaseCollectionItemView.extend({
     e.stopPropagation();
 
     var isFavourited = !!this.model.get('favourite');
-    this.model.save({
-      favourite: !isFavourited
-    }, {
-      wait: true,
-      patch: true
-    });
-  },
-
+    this.model.save(
+      {
+        favourite: !isFavourited
+      },
+      {
+        wait: true,
+        patch: true
+      }
+    );
+  }
 });

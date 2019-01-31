@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var _ = require('underscore');
@@ -35,9 +35,11 @@ var Behavior = Marionette.Behavior.extend({
 
   // Trigger an event on the child of it's currently on screen
   decorateIfVisible: function() {
-    this.view.children.each(function(child) {
-      if (this.isElementVisible(child.el)) child.trigger('messageInViewport');
-    }.bind(this));
+    this.view.children.each(
+      function(child) {
+        if (this.isElementVisible(child.el)) child.trigger('messageInViewport');
+      }.bind(this)
+    );
   },
 
   onAddChild: function(child) {
@@ -57,7 +59,9 @@ var Behavior = Marionette.Behavior.extend({
   // Give an element tells you if it's on screen or above/below the fold
   isElementVisible: function(el) {
     var rect = el.getBoundingClientRect();
-    return rect.bottom >= 0 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
+    return (
+      rect.bottom >= 0 && rect.top <= (window.innerHeight || document.documentElement.clientHeight)
+    );
   },
 
   // Trigger an event on the view after scrolling to keep track of the most centered element on screen
@@ -72,8 +76,7 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   enablePointerEvents: function() {
-    if (this.wrapper)
-      this.wrapper.classList.remove('disable-hover');
+    if (this.wrapper) this.wrapper.classList.remove('disable-hover');
   },
 
   smoothScroll: function() {

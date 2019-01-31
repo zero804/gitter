@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -25,7 +25,7 @@ function getIssueInfoFromQuery(query) {
       provider: provider,
       repo: repo,
       iid: iid
-    }
+    };
   }
 
   return null;
@@ -38,13 +38,11 @@ module.exports = function(req, res, next) {
     return next(new StatusError(400));
   }
 
-
   var getIssueInfoFromQueryPromise;
-  if(issueQueryInfo.provider === 'gitlab') {
+  if (issueQueryInfo.provider === 'gitlab') {
     var glService = new GitLabIssuableService(req.user, issueQueryInfo.type);
     getIssueInfoFromQueryPromise = glService.getIssue(issueQueryInfo.repo, issueQueryInfo.iid);
-  }
-  else {
+  } else {
     var ghService = new GithubIssueService(req.user);
     getIssueInfoFromQueryPromise = ghService.getIssue(issueQueryInfo.repo, issueQueryInfo.iid);
   }
@@ -54,17 +52,24 @@ module.exports = function(req, res, next) {
       res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
 
-      if(req.query.renderMarkdown && issueInfo.body) {
-        return processText(issueInfo.body)
-          .then(function(result) {
-            issueInfo.bodyHtml = result.html;
-            return issueInfo;
-          });
+      if (req.query.renderMarkdown && issueInfo.body) {
+        return processText(issueInfo.body).then(function(result) {
+          issueInfo.bodyHtml = result.html;
+          return issueInfo;
+        });
       }
 
       // TODO: handle async processing of diffs
-      if(req.query.renderPatchIfSingle && issueInfo.files && issueInfo.files.length === 1 && issueInfo.files[0].patch) {
-        issueInfo.files[0].patch_html = util.format('<pre><code>%s</code></pre>', highlight.highlight('diff', issueInfo.files[0].patch).value);
+      if (
+        req.query.renderPatchIfSingle &&
+        issueInfo.files &&
+        issueInfo.files.length === 1 &&
+        issueInfo.files[0].patch
+      ) {
+        issueInfo.files[0].patch_html = util.format(
+          '<pre><code>%s</code></pre>',
+          highlight.highlight('diff', issueInfo.files[0].patch).value
+        );
       }
 
       return issueInfo;
@@ -75,11 +80,18 @@ module.exports = function(req, res, next) {
     .catch(function(e) {
       stats.eventHF('issue.state.query.fail', 1, 1);
 
-      logger.warn('Unable to obtain issue state for ' + issueQueryInfo.provider + ' ' + issueQueryInfo.repo + '/' + issueQueryInfo.iid + ': ' + e,
-          { exception: e });
+      logger.warn(
+        'Unable to obtain issue state for ' +
+          issueQueryInfo.provider +
+          ' ' +
+          issueQueryInfo.repo +
+          '/' +
+          issueQueryInfo.iid +
+          ': ' +
+          e,
+        { exception: e }
+      );
       throw e;
     })
     .catch(next);
-
-
 };

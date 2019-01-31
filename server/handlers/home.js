@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var express = require('express');
 var urlJoin = require('url-join');
@@ -14,13 +14,14 @@ var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/p
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.get('/',
+router.get(
+  '/',
   identifyRoute('home-main'),
   featureToggles,
   preventClickjackingMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     if (req.isPhone) {
       userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
     } else {
@@ -30,10 +31,11 @@ router.get('/',
         suggestedMenuState: 'search'
       });
     }
-  });
+  }
+);
 
-
-router.get('/~home',
+router.get(
+  '/~home',
   identifyRoute('home-frame'),
   ensureLoggedIn,
   preventClickjackingOnlyGitterEmbedMiddleware,
@@ -41,33 +43,36 @@ router.get('/~home',
   isPhoneMiddleware,
   function(req, res, next) {
     userHomeRenderer.renderHomePage(req, res, next);
-  });
-
+  }
+);
 
 // Used for the create button on `/home`
-router.get('/createroom',
+router.get(
+  '/createroom',
   identifyRoute('create-room-redirect'),
   ensureLoggedIn,
   preventClickjackingMiddleware,
   featureToggles,
-  function (req, res) {
+  function(req, res) {
     res.redirect('/home#createroom');
-  });
+  }
+);
 
-router.get(new RegExp('/explore(.*)?'),
+router.get(
+  new RegExp('/explore(.*)?'),
   identifyRoute('home-explore'),
   preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
-  function (req, res, next) {
-    if(!req.user) {
+  function(req, res, next) {
+    if (!req.user) {
       return res.redirect('/explore');
     }
 
     var exploreParam = req.params[0] || '';
     var subFrameLocation = urlJoin('/home/~explore', exploreParam);
 
-    var renderer = mainFrameRenderer.renderMainFrame
+    var renderer = mainFrameRenderer.renderMainFrame;
     if (req.isPhone) {
       renderer = mainFrameRenderer.renderMobileMainFrame;
     }
@@ -77,16 +82,18 @@ router.get(new RegExp('/explore(.*)?'),
       title: 'Explore',
       suggestedMenuState: 'search'
     });
-  });
+  }
+);
 
-router.get('/learn',
+router.get(
+  '/learn',
   identifyRoute('home-learn-main'),
   ensureLoggedIn,
   preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
-  function (req, res, next) {
-    var renderer = mainFrameRenderer.renderMainFrame
+  function(req, res, next) {
+    var renderer = mainFrameRenderer.renderMainFrame;
     if (req.isPhone) {
       renderer = mainFrameRenderer.renderMobileMainFrame;
     }
@@ -96,6 +103,7 @@ router.get('/learn',
       title: 'Learn',
       suggestedMenuState: 'search'
     });
-  });
+  }
+);
 
 module.exports = router;

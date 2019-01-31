@@ -1,15 +1,14 @@
-"use strict";
+'use strict';
 
 var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
 var Marionette = require('backbone.marionette');
 var backendUtils = require('../../utils/backend-utils');
 
 module.exports = Marionette.ItemView.extend({
-
   template: repoInfoTemplate,
 
   modelEvents: {
-    "change": "render"
+    change: 'render'
   },
 
   initialize: function(options) {
@@ -34,5 +33,4 @@ module.exports = Marionette.ItemView.extend({
       }
     });
   }
-
 });

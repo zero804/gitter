@@ -1,6 +1,6 @@
 /*jslint node: true, unused:true */
 /*global describe:true, it: true */
-"use strict";
+'use strict';
 
 var testRequire = require('../../test-require');
 var Promise = require('bluebird');
@@ -12,10 +12,18 @@ var times = mockito.Verifiers.times;
 var once = times(1);
 
 var SERIALIZED_ROOM = { id: 'serializedId', name: 'serializedName', url: 'serializedUrl' };
-var SERIALIZED_CHATS = [{id: 'serializedChatId', text: 'serializedText', fromUser: {displayName: 'serializedFromUser'}}];
+var SERIALIZED_CHATS = [
+  {
+    id: 'serializedChatId',
+    text: 'serializedText',
+    fromUser: { displayName: 'serializedFromUser' }
+  }
+];
 
 var pushNotificationFilterStub = {
-  canUnlockForNotification: function() { return Promise.resolve(Date.now()); }
+  canUnlockForNotification: function() {
+    return Promise.resolve(Date.now());
+  }
 };
 
 var unreadItemServiceStub = {
@@ -25,8 +33,12 @@ var unreadItemServiceStub = {
 };
 
 var notificationSerializerStub = {
-  TroupeIdStrategy: function() { this.name = 'troupeId'; },
-  ChatIdStrategy: function() { this.name = 'chatId'; },
+  TroupeIdStrategy: function() {
+    this.name = 'troupeId';
+  },
+  ChatIdStrategy: function() {
+    this.name = 'chatId';
+  },
   serialize: function(item, strategy) {
     assert.strictEqual(strategy.name, 'chatId');
     return Promise.resolve(SERIALIZED_CHATS);
@@ -38,10 +50,13 @@ var notificationSerializerStub = {
 };
 
 describe('push notification generator service', function() {
-
   it('should send a notification', function() {
     var mockSendUserNotification = mockito.mockFunction();
-    mockito.when(mockSendUserNotification)().then(function() { return Promise.resolve(); });
+    mockito
+      .when(mockSendUserNotification)()
+      .then(function() {
+        return Promise.resolve();
+      });
 
     var service = testRequire.withProxies('./services/notifications/push-notification-generator', {
       'gitter-web-push-notification-filter': pushNotificationFilterStub,
@@ -52,10 +67,9 @@ describe('push notification generator service', function() {
       '../../serializers/notification-serializer': notificationSerializerStub
     });
 
-    return service.sendUserTroupeNotification('userId1234', '1234567890', 1)
-      .then(function() {
-        mockito.verify(mockSendUserNotification, once)();
-      });
+    return service.sendUserTroupeNotification('userId1234', '1234567890', 1).then(function() {
+      mockito.verify(mockSendUserNotification, once)();
+    });
   });
 
   it('should serialize troupes and chats correctly', function() {
@@ -95,27 +109,39 @@ describe('push notification generator service', function() {
     });
 
     it('should select the first three messages when there are four messages', function() {
-      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4'], []), ['1', '2', '3']);
+      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4'], []), [
+        '1',
+        '2',
+        '3'
+      ]);
     });
 
     it('should select the first three messages when the first message is a mention', function() {
-      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['1']), ['1', '2', '3']);
+      assert.deepEqual(
+        service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['1']),
+        ['1', '2', '3']
+      );
     });
 
     it('should select the last three messages when the last message is a mention', function() {
-      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['5']), ['3', '4', '5']);
+      assert.deepEqual(
+        service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['5']),
+        ['3', '4', '5']
+      );
     });
 
     it('should select the two closest messages when the mention is in the middle', function() {
-      assert.deepEqual(service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['3']), ['2', '3', '4']);
+      assert.deepEqual(
+        service.testOnly.selectChatsForNotification(['1', '2', '3', '4', '5'], ['3']),
+        ['2', '3', '4']
+      );
     });
-
   });
 
   describe('serializeItems #slow', function() {
     var fixture = fixtureLoader.setup({
       user1: {},
-      troupe1: {users: ['user1']},
+      troupe1: { users: ['user1'] },
       message1: {
         user: 'user1',
         troupe: 'troupe1',
@@ -139,7 +165,8 @@ describe('push notification generator service', function() {
 
       // bring in a fresh service so we don't get the stubbed serializer
       var service = testRequire('./services/notifications/push-notification-generator');
-      return service.testOnly.serializeItems(troupeId, recipientUserId, chatIds)
+      return service.testOnly
+        .serializeItems(troupeId, recipientUserId, chatIds)
         .spread(function(troupe, chats) {
           assert.equal(troupe.id, troupeId);
           assert.equal(chats[0].text, 'foo');
@@ -147,5 +174,4 @@ describe('push notification generator service', function() {
         });
     });
   });
-
 });

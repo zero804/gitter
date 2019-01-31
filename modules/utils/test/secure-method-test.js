@@ -4,8 +4,7 @@ var secureMethod = require('../lib/secure-method');
 var assert = require('assert');
 var StatusError = require('statuserror');
 
-describe('secure-method', function () {
-
+describe('secure-method', function() {
   function validatorAccept(a, b, c) {
     assert.strictEqual(a, 1);
     assert.strictEqual(b, 2);
@@ -42,15 +41,14 @@ describe('secure-method', function () {
       });
 
       var t = new TestClass(4);
-      return t.testMethod(1, 2, 3)
-        .then(function(result) {
-          assert.strictEqual(result, 4);
-        });
+      return t.testMethod(1, 2, 3).then(function(result) {
+        assert.strictEqual(result, 4);
+      });
     });
   });
 
   describe('no arrays', function() {
-    it('should handle validator accept', function () {
+    it('should handle validator accept', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod(validatorAccept, function(a, b, c) {
@@ -63,13 +61,12 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
-        .then(function(result) {
-          assert.strictEqual(result, 4);
-        });
+      return obj.testMethod(1, 2, 3).then(function(result) {
+        assert.strictEqual(result, 4);
+      });
     });
 
-    it('should handle validator decline', function () {
+    it('should handle validator decline', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod(validatorDecline, function() {
@@ -77,7 +74,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -86,7 +84,7 @@ describe('secure-method', function () {
         });
     });
 
-    it('should handle validator reject', function () {
+    it('should handle validator reject', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod(validatorReject, function() {
@@ -94,7 +92,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -102,11 +101,10 @@ describe('secure-method', function () {
           assert.strictEqual(err.status, 419);
         });
     });
-
   });
 
   describe('single arrays', function() {
-    it('should handle validator accept', function () {
+    it('should handle validator accept', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorAccept], function(a, b, c) {
@@ -119,13 +117,12 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
-        .then(function(result) {
-          assert.strictEqual(result, 4);
-        });
+      return obj.testMethod(1, 2, 3).then(function(result) {
+        assert.strictEqual(result, 4);
+      });
     });
 
-    it('should handle validator decline', function () {
+    it('should handle validator decline', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorDecline], function() {
@@ -133,7 +130,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -142,7 +140,7 @@ describe('secure-method', function () {
         });
     });
 
-    it('should handle validator reject', function () {
+    it('should handle validator reject', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorReject], function() {
@@ -150,7 +148,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -161,7 +160,7 @@ describe('secure-method', function () {
   });
 
   describe('multi arrays', function() {
-    it('should handle validator accept', function () {
+    it('should handle validator accept', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorDecline, validatorAccept], function(a, b, c) {
@@ -174,13 +173,12 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
-        .then(function(result) {
-          assert.strictEqual(result, 4);
-        });
+      return obj.testMethod(1, 2, 3).then(function(result) {
+        assert.strictEqual(result, 4);
+      });
     });
 
-    it('should handle validator decline', function () {
+    it('should handle validator decline', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorDecline, validatorDecline], function() {
@@ -188,7 +186,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -197,7 +196,7 @@ describe('secure-method', function () {
         });
     });
 
-    it('should handle validator reject', function () {
+    it('should handle validator reject', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([validatorDecline, validatorReject], function() {
@@ -205,7 +204,8 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
@@ -216,7 +216,7 @@ describe('secure-method', function () {
   });
 
   describe('empty arrays', function() {
-    it('should always throw a 403', function () {
+    it('should always throw a 403', function() {
       var obj = {
         x: 4,
         testMethod: secureMethod([], function() {
@@ -224,16 +224,14 @@ describe('secure-method', function () {
         })
       };
 
-      return obj.testMethod(1, 2, 3)
+      return obj
+        .testMethod(1, 2, 3)
         .then(function() {
           assert.ok(false);
         })
         .catch(StatusError, function(err) {
           assert.strictEqual(err.status, 403);
         });
-
     });
-
   });
-
 });

@@ -5,7 +5,7 @@ var config = env.config;
 var Promise = require('bluebird');
 
 var redisClient = env.ioredis.createClient(config.get('redis_caching'), {
-  keyPrefix: "perm:cache:"
+  keyPrefix: 'perm:cache:'
 });
 
 function recordSuccessfulCheck(rateLimitKey, expiry) {
@@ -16,10 +16,9 @@ function recordSuccessfulCheck(rateLimitKey, expiry) {
 function checkForRecentSuccess(rateLimitKey) {
   if (!rateLimitKey) return Promise.resolve(false);
 
-  return redisClient.exists(rateLimitKey)
-    .then(function(result) {
-      return result === 1;
-    });
+  return redisClient.exists(rateLimitKey).then(function(result) {
+    return result === 1;
+  });
 }
 
 module.exports = {

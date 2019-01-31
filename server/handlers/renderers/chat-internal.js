@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -30,34 +30,57 @@ function renderChat(req, res, next, options) {
   var userId = user && user.id;
 
   // It's ok if there's no user (logged out), unreadItems will be 0
-  return unreadItemService.getUnreadItemsForUser(userId, troupe.id)
-  .then(function(unreadItems) {
-    var limit = unreadItems.chat.length > INITIAL_CHAT_COUNT ? unreadItems.chat.length + 20 : INITIAL_CHAT_COUNT;
+  return unreadItemService
+    .getUnreadItemsForUser(userId, troupe.id)
+    .then(function(unreadItems) {
+      var limit =
+        unreadItems.chat.length > INITIAL_CHAT_COUNT
+          ? unreadItems.chat.length + 20
+          : INITIAL_CHAT_COUNT;
 
-    var snapshotOptions = {
-      limit: limit,
-      aroundId: aroundId,
-      unread: options.unread // Unread can be true, false or undefined
-    };
+      var snapshotOptions = {
+        limit: limit,
+        aroundId: aroundId,
+        unread: options.unread // Unread can be true, false or undefined
+      };
 
-    var chatSerializerOptions = _.defaults({ }, snapshotOptions);
+      var chatSerializerOptions = _.defaults({}, snapshotOptions);
 
-    var userSerializerOptions = _.defaults({
-      lean: true,
-      limit: ROSTER_SIZE
-    }, snapshotOptions);
+      var userSerializerOptions = _.defaults(
+        {
+          lean: true,
+          limit: ROSTER_SIZE
+        },
+        snapshotOptions
+      );
 
-    return Promise.all([
-        options.generateContext === false ? { } : contextGenerator.generateTroupeContext(req, { snapshots: { chat: snapshotOptions }, permalinkChatId: aroundId }),
+      return Promise.all([
+        options.generateContext === false
+          ? {}
+          : contextGenerator.generateTroupeContext(req, {
+              snapshots: { chat: snapshotOptions },
+              permalinkChatId: aroundId
+            }),
         restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
         options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-        options.fetchUsers === false ? null : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+        options.fetchUsers === false
+          ? null
+          : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
         generateRightToolbarSnapshot(req),
-        generateUserThemeSnapshot(req),
+        generateUserThemeSnapshot(req)
 
-      // eslint-disable-next-line complexity
-      ]).spread(function (troupeContext, chats, activityEvents, users, rightToolbarSnapshot, userThemeSnapshot) {
-        var initialChat = _.find(chats, function(chat) { return chat.initial; });
+        // eslint-disable-next-line complexity
+      ]).spread(function(
+        troupeContext,
+        chats,
+        activityEvents,
+        users,
+        rightToolbarSnapshot,
+        userThemeSnapshot
+      ) {
+        var initialChat = _.find(chats, function(chat) {
+          return chat.initial;
+        });
         var initialBottom = !initialChat;
         var classNames = options.classNames || [];
         var isStaff = req.user && req.user.staff;
@@ -65,17 +88,20 @@ function renderChat(req, res, next, options) {
         var snapshots = rightToolbarSnapshot;
         troupeContext.snapshots = snapshots;
 
-        if (!user) classNames.push("logged-out");
+        if (!user) classNames.push('logged-out');
 
         var integrationsUrl;
 
         if (troupeContext && troupeContext.isNativeDesktopApp) {
-           integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+          integrationsUrl =
+            nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
         } else {
           integrationsUrl = '#integrations';
         }
 
-        var cssFileName = options.stylesheet ? "styles/" + options.stylesheet + ".css" : "styles/" + script + ".css"; // css filename matches bootscript
+        var cssFileName = options.stylesheet
+          ? 'styles/' + options.stylesheet + '.css'
+          : 'styles/' + script + '.css'; // css filename matches bootscript
 
         var chatsWithBurst = burstCalculator(chats);
         if (options.filterChats) {
@@ -83,14 +109,19 @@ function renderChat(req, res, next, options) {
         }
 
         /* This is less than ideal way of checking if the user is the admin */
-        var isAdmin = troupeContext.troupe && troupeContext.troupe.permissions && troupeContext.troupe.permissions.admin;
+        var isAdmin =
+          troupeContext.troupe &&
+          troupeContext.troupe.permissions &&
+          troupeContext.troupe.permissions.admin;
 
-        var isRightToolbarPinned = snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
-        if(isRightToolbarPinned === undefined) {
+        var isRightToolbarPinned =
+          snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
+        if (isRightToolbarPinned === undefined) {
           isRightToolbarPinned = true;
         }
 
-        var renderOptions = _.extend({
+        var renderOptions = _.extend(
+          {
             hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
             hasCachedFonts: fonts.hasCachedFonts(req.cookies),
             fonts: fonts.getFonts(),
@@ -122,10 +153,12 @@ function renderChat(req, res, next, options) {
             canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
             isAdmin: isAdmin,
             isNativeDesktopApp: troupeContext.isNativeDesktopApp
-          }, options.extras);
+          },
+          options.extras
+        );
 
-          res.render(options.template, renderOptions);
-        });
+        res.render(options.template, renderOptions);
+      });
     })
     .catch(next);
 }

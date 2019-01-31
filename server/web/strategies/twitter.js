@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -16,7 +16,7 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
   var avatar = profile.photos[0].value; // is this always set?
 
   var twitterUser = {
-    username: profile.username+'_twitter',
+    username: profile.username + '_twitter',
     displayName: profile.displayName,
     gravatarImageUrl: avatar
   };
@@ -33,9 +33,9 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     avatar: avatar
   };
 
-  return userService.findOrCreateUserForProvider(twitterUser, twitterIdentity)
+  return userService
+    .findOrCreateUserForProvider(twitterUser, twitterIdentity)
     .spread(function(user, isNewUser) {
-
       trackSignupOrLogin(req, user, isNewUser, 'twitter');
       updateUserLocale(req, user);
 
@@ -44,13 +44,17 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
     .asCallback(done);
 }
 
-var twitterStrategy = new TwitterStrategy({
+var twitterStrategy = new TwitterStrategy(
+  {
     consumerKey: config.get('twitteroauth:consumer_key'),
     consumerSecret: config.get('twitteroauth:consumer_secret'),
-    userProfileURL: "https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true",
+    userProfileURL:
+      'https://api.twitter.com/1.1/account/verify_credentials.json?include_email=true',
     callbackURL: callbackUrlBuilder('twitter'),
     passReqToCallback: true
-  }, twitterOauthCallback);
+  },
+  twitterOauthCallback
+);
 
 twitterStrategy.name = 'twitter';
 

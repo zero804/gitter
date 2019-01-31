@@ -18,7 +18,7 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
   className: 'community-create-invite-user-result-list-item',
 
   triggers: {
-    'click': 'item:activated'
+    click: 'item:activated'
   },
 
   modelEvents: {
@@ -31,14 +31,15 @@ var InviteUserResultListItemView = Marionette.ItemView.extend({
     var githubUsername = this.model.get('githubUsername');
     var gitlabUsername = this.model.get('gitlabUsername');
     var twitterUsername = this.model.get('twitterUsername');
-    var username = githubUsername || gitlabUsername || twitterUsername || this.model.get('username');
+    var username =
+      githubUsername || gitlabUsername || twitterUsername || this.model.get('username');
     data.vendorUsername = username;
     var emailAddress = data.emailAddress;
 
     data.absoluteUri = urlJoin(clientEnv.basePath, username);
 
     data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.username }, AVATAR_SIZE);
-    if(emailAddress) {
+    if (emailAddress) {
       data.avatarUrl = avatars.getForGravatarEmail(emailAddress);
     }
 

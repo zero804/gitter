@@ -7,12 +7,11 @@ var BaseCollectionView = require('../base-collection/base-collection-view');
 var ItemView = require('./favourite-collection-item-view');
 
 var FavouriteCollection = PrimaryCollectionView.extend({
-
   childView: ItemView,
 
   events: {
-    'mouseenter': 'onMouseEnter',
-    'mouseout':   'onMouseLeave'
+    mouseenter: 'onMouseEnter',
+    mouseout: 'onMouseLeave'
   },
 
   initialize: function() {
@@ -22,7 +21,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
     this.listenTo(this.dndCtrl, 'room-menu:add-favourite', this.onFavouriteAdded, this);
   },
 
-  getChildContainerToBeIndexed: function () {
+  getChildContainerToBeIndexed: function() {
     //For the favourite collection we use the first child because there
     //is no search header unlike the primary collection
     return this.el.children[0];
@@ -34,8 +33,8 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   //down to the base class. Not ideal but I don't want to introduce another layer of inheritance
   //between this and the primary collection at this point.
   //If the complexity around this rises I may consider it
-  setActive: function () {
-    if(!this.collection.length) {
+  setActive: function() {
+    if (!this.collection.length) {
       return this.el.classList.remove('active');
     }
     BaseCollectionView.prototype.setActive.apply(this, arguments);
@@ -48,24 +47,24 @@ var FavouriteCollection = PrimaryCollectionView.extend({
     }
   },
 
-
   onFavouritesSorted: function(targetID, siblingID, position) {
-
     var target = this.roomCollection.get(targetID);
     var sibling = this.roomCollection.get(siblingID);
-    var index = !!sibling ? sibling.get('favourite') : (this.getHighestFavourite() + 1);
+    var index = !!sibling ? sibling.get('favourite') : this.getHighestFavourite() + 1;
     var max = this.roomCollection.max('favourite');
     var min = this.roomCollection.min('favourite');
 
     //If we have a sibling and that sibling has the highest favourite value
     //then we have dropped the item in the second to last position
     //so we need to account for that
-    if ((!!sibling && !!max && (sibling.get('id') === max.get('id'))) ||
-        !!max && position === 'last') {
+    if (
+      (!!sibling && !!max && sibling.get('id') === max.get('id')) ||
+      (!!max && position === 'last')
+    ) {
       index = max.get('favourite');
     }
 
-    if(position === 'first' && !!min) {
+    if (position === 'first' && !!min) {
       index = min.get('favourite');
     }
 
@@ -77,20 +76,26 @@ var FavouriteCollection = PrimaryCollectionView.extend({
 
   //TODO TEST THIS YOU FOOL JP 10/2/16
   getHighestFavourite: function() {
-    return (this.roomCollection.pluck('favourite')
-      .filter(function(num) { return !!num; })
-      .sort(function(a, b) { return a < b ? -1 : 1; })
-      .slice(-1)[0] || 0);
+    return (
+      this.roomCollection
+        .pluck('favourite')
+        .filter(function(num) {
+          return !!num;
+        })
+        .sort(function(a, b) {
+          return a < b ? -1 : 1;
+        })
+        .slice(-1)[0] || 0
+    );
   },
 
   //TODO The filter should be reused within the view filter method?
   onFavouriteAdded: function(id) {
     var newFavModel = this.roomCollection.get(id);
     var max = this.roomCollection.max('favourite');
-    var favIndex = !!max.get ? (max.get('favourite') + 1) : true;
+    var favIndex = !!max.get ? max.get('favourite') + 1 : true;
     newFavModel.save({ favourite: favIndex }, { patch: true });
-  },
-
+  }
 });
 
 module.exports = FavouriteCollection;

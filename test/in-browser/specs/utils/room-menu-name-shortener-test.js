@@ -5,7 +5,6 @@ var assert = require('assert');
 var roomNameShortener = require('../../../../shared/room-name-shortener');
 
 describe('roomNameShortener()', function() {
-
   it('it should shorten strings longer than 19 characters', function() {
     var result = roomNameShortener('thisisareally/reallylongroomname');
     var expected = 'reallylongroomname';
@@ -18,16 +17,15 @@ describe('roomNameShortener()', function() {
     assert.equal(expected, result);
   });
 
-  it('should treat strings with extra /\'s differently ', function() {
+  it("should treat strings with extra /'s differently ", function() {
     var result = roomNameShortener('gitterHQ/repo/channel');
     var expected = 'repo/channel';
     assert.equal(expected, result);
   });
 
-  it('should return a value for names with spaces', function(){
+  it('should return a value for names with spaces', function() {
     var result = roomNameShortener('Anand Babu (AB) Periasamy');
     var expected = 'Anand Babu (AB) Periasamy';
     assert.equal(expected, result);
   });
-
 });

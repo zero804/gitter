@@ -28,8 +28,8 @@ var DEFAULT_POOL_SIZE = 5;
  *              are available.
  */
 function Pool(Collection, options) {
-  this.idAttribute = options && options.idAttribute || "id";
-  var size = this.size = options && options.size || DEFAULT_POOL_SIZE;
+  this.idAttribute = (options && options.idAttribute) || 'id';
+  var size = (this.size = (options && options.size) || DEFAULT_POOL_SIZE);
 
   // Initialize the pool with a fixed number of entries which will never change
   this.lookup = {};
@@ -41,7 +41,6 @@ function Pool(Collection, options) {
       return { model: model, collection: collection, access: null };
     })
     .value();
-
 }
 
 Pool.prototype = {
@@ -124,7 +123,6 @@ Pool.prototype = {
         resolve();
       });
     });
-
   },
 
   /**
@@ -147,8 +145,6 @@ Pool.prototype = {
       return slot.access;
     });
   }
-
-
 };
 
 module.exports = Pool;

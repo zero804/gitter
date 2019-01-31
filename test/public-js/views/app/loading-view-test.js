@@ -1,15 +1,17 @@
 /*jslint node:true, unused:true*/
 /*global describe:true, it:true */
 
-"use strict";
+'use strict';
 
 var assert = require('assert');
-var LoadingView = require('proxyquire').noCallThru()('../../../../public/js/views/app/loading-view', {
-  '../../utils/appevents': { on: function() {}},
-});
+var LoadingView = require('proxyquire').noCallThru()(
+  '../../../../public/js/views/app/loading-view',
+  {
+    '../../utils/appevents': { on: function() {} }
+  }
+);
 
 describe('loading-view', function() {
-
   it('hides when page is already loaded', function(done) {
     var iframe = {
       contentDocument: {
@@ -33,5 +35,4 @@ describe('loading-view', function() {
 
     new LoadingView(iframe, loadingEl);
   });
-
 });

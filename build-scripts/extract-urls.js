@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var postcss = require('postcss');
 var fs = require('fs');
@@ -11,11 +11,11 @@ function extractUrls(input, basePath) {
 
   function getFileName(value) {
     var u = url.parse(value);
-    if(u.protocol || u.hostname) return value;
+    if (u.protocol || u.hostname) return value;
 
     value = u.pathname;
 
-    if(value.indexOf('.') === 0) {
+    if (value.indexOf('.') === 0) {
       var inputRelativeDir = path.dirname(path.relative(basePath, input));
       var relativeToPublicFilePath = path.join(inputRelativeDir, value);
       return path.join('public', relativeToPublicFilePath);
@@ -29,7 +29,7 @@ function extractUrls(input, basePath) {
   css.eachDecl(function(decl) {
     if (!decl.value) return;
 
-    if(decl.prop !== 'src' || decl.parent.name !== 'font-face') return;
+    if (decl.prop !== 'src' || decl.parent.name !== 'font-face') return;
 
     if (!decl.parent.decls) return;
 
@@ -37,7 +37,7 @@ function extractUrls(input, basePath) {
       return d.prop === 'src' && d.parent.name === 'font-face';
     });
 
-    if(!d.length) return;
+    if (!d.length) return;
 
     // var hasTtf = d.filter(function(x) {
     //   return x.value.indexOf('.ttf') >= 0;
@@ -46,7 +46,6 @@ function extractUrls(input, basePath) {
     // if(hasTtf.length) {
     //   decl.parent.decls = hasTtf;
     // }
-
   });
 
   css.eachDecl(function(decl) {
@@ -54,22 +53,22 @@ function extractUrls(input, basePath) {
 
     var urls = [];
 
-    reduceFunctionCall(decl.value, "url", function(value) {
+    reduceFunctionCall(decl.value, 'url', function(value) {
       var m = /^['"]([^'"]*)['"]$/.exec(value);
-      if(m) value = m[1];
+      if (m) value = m[1];
 
       value = getFileName(value);
 
       urls.push(value);
     });
 
-    if(decl.prop === 'src' && decl.parent.name === 'font-face') {
+    if (decl.prop === 'src' && decl.parent.name === 'font-face') {
       // If there are multiple fonts, choose the ttf
       var ttfs = urls.filter(function(v) {
-        return (/\.ttf/).test(v);
+        return /\.ttf/.test(v);
       });
 
-      if(ttfs.length > 0) {
+      if (ttfs.length > 0) {
         urls = ttfs;
       }
     }
@@ -77,7 +76,6 @@ function extractUrls(input, basePath) {
     urls.forEach(function(value) {
       resources[value] = true;
     });
-
   });
 
   return Object.keys(resources);

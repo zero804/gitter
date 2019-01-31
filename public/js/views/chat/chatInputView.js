@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
@@ -10,7 +10,6 @@ var ChatInputButtons = require('./chat-input-buttons');
 require('../behaviors/isomorphic');
 
 var ChatInputView = Marionette.LayoutView.extend({
-
   template: template,
 
   behaviors: {
@@ -41,18 +40,21 @@ var ChatInputView = Marionette.LayoutView.extend({
   },
 
   initChatInputBoxRegion: function(optionsForRegion) {
-    return new ChatInputBoxView(optionsForRegion({
-      composeMode: this.composeMode,
-      collection: this.collection
-    }));
+    return new ChatInputBoxView(
+      optionsForRegion({
+        composeMode: this.composeMode,
+        collection: this.collection
+      })
+    );
   },
 
   initChatInputButtonsRegion: function(optionsForRegion) {
-    return new ChatInputButtons(optionsForRegion({
-      model: this.composeMode
-    }));
+    return new ChatInputButtons(
+      optionsForRegion({
+        model: this.composeMode
+      })
+    );
   }
-
 });
 
 module.exports = ChatInputView;

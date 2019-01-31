@@ -14,26 +14,30 @@ module.exports = {
       return obj.userId;
     });
 
-    return userService.findByIds(userIds)
-      .then(function(users) {
-        return users.filter(function(user) {
-          return getNames(user).some(function(name) {
-            return name.indexOf(lcText) === 0;
-          });
+    return userService.findByIds(userIds).then(function(users) {
+      return users.filter(function(user) {
+        return getNames(user).some(function(name) {
+          return name.indexOf(lcText) === 0;
         });
       });
+    });
   }
 };
 
 function getNames(user) {
   // elastic normally does this analysis, but we're faking it
   var nonWhitespaceAlternatives = [];
-  return inputsForUser(user).map(function(input) {
-    var lcInput = input.toLowerCase();
-    var nonWhitespace = lcInput.split(/\s/).filter(Boolean).join('');
-    if (lcInput !== nonWhitespace) {
-      nonWhitespaceAlternatives.push(nonWhitespace)
-    }
-    return lcInput;
-  }).concat(nonWhitespaceAlternatives);
+  return inputsForUser(user)
+    .map(function(input) {
+      var lcInput = input.toLowerCase();
+      var nonWhitespace = lcInput
+        .split(/\s/)
+        .filter(Boolean)
+        .join('');
+      if (lcInput !== nonWhitespace) {
+        nonWhitespaceAlternatives.push(nonWhitespace);
+      }
+      return lcInput;
+    })
+    .concat(nonWhitespaceAlternatives);
 }

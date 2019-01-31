@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var appEvents = require('../utils/appevents');
 var apiClient = require('./api-client');
@@ -7,8 +7,6 @@ var context = require('../utils/context');
 var debug = require('debug-proxy')('app:stats');
 
 module.exports = (function() {
-
-
   var statQueue = [];
   var counters = {};
 
@@ -18,34 +16,34 @@ module.exports = (function() {
     var sendQueue = statQueue;
     statQueue = [];
 
-    sendQueue = sendQueue.concat(Object.keys(sendCounters).map(function(stat) {
-      var result = { stat: stat };
-      if(sendCounters[stat] > 0) {
-        result.count = sendCounters[stat];
-      }
+    sendQueue = sendQueue.concat(
+      Object.keys(sendCounters).map(function(stat) {
+        var result = { stat: stat };
+        if (sendCounters[stat] > 0) {
+          result.count = sendCounters[stat];
+        }
 
-      return result;
-    }));
+        return result;
+      })
+    );
 
-    if(!sendQueue.length) return;
+    if (!sendQueue.length) return;
 
     var body = {
       stats: sendQueue,
       features: context.getFeatures()
     };
 
-    apiClient.priv.post('/statsc', body, { dataType: 'text' })
-      .catch(function() {
-        log.info('An error occurred while communicating stats');
-      });
-
+    apiClient.priv.post('/statsc', body, { dataType: 'text' }).catch(function() {
+      log.info('An error occurred while communicating stats');
+    });
   }
 
   var throttledSend = _.throttle(send, 1000, { leading: false });
 
   appEvents.on('stats.event', function(stat) {
     debug('event: %s', stat);
-    if(counters[stat]) {
+    if (counters[stat]) {
       counters[stat]++;
     } else {
       counters[stat] = 1;
@@ -64,10 +62,4 @@ module.exports = (function() {
     statQueue.push({ stat: stat, time: time });
     throttledSend();
   });
-
-
-
-
-
-
 })();

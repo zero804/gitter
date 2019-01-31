@@ -13,55 +13,63 @@ var shimPositionOption = require('../yargs-shim-position-option');
 
 var argv = yargs.argv;
 var opts = yargs
-  .option('username', shimPositionOption({
-    position: 0,
-    required: true,
-    description: 'username to look up e.g trevorah',
-    string: true
-  }))
+  .option(
+    'username',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'username to look up e.g trevorah',
+      string: true
+    })
+  )
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function findRoomsForUser(userId) {
   userId = mongoUtils.asObjectID(userId);
   return TroupeUser.aggregate([
-      { $match: { userId: userId } },
-      { $project: { troupeId: 1 } },
-      {
-        /* Join the troupes onto TroupeUser */
-        $lookup: {
-          from: 'troupes',
-          localField: 'troupeId',
-          foreignField: '_id',
-          as: 'troupe'
-        }
-      }, {
-        $unwind: '$troupe'
-      }, {
-        $project: {
-          _id: '$troupe._id',
-          uri: '$troupe.uri',
-          groupId: '$troupe.groupId',
-          lcOwner: '$troupe.lcOwner',
-          oneToOne: '$troupe.oneToOne',
-        }
-      }])
-      .read('primaryPreferred')
-      .exec()
-      .then(function(results) {
-        return results;
-      });
+    { $match: { userId: userId } },
+    { $project: { troupeId: 1 } },
+    {
+      /* Join the troupes onto TroupeUser */
+      $lookup: {
+        from: 'troupes',
+        localField: 'troupeId',
+        foreignField: '_id',
+        as: 'troupe'
+      }
+    },
+    {
+      $unwind: '$troupe'
+    },
+    {
+      $project: {
+        _id: '$troupe._id',
+        uri: '$troupe.uri',
+        groupId: '$troupe.groupId',
+        lcOwner: '$troupe.lcOwner',
+        oneToOne: '$troupe.oneToOne'
+      }
+    }
+  ])
+    .read('primaryPreferred')
+    .exec()
+    .then(function(results) {
+      return results;
+    });
 }
 
 function run() {
-  return userService.findByUsername(opts.username)
+  return userService
+    .findByUsername(opts.username)
     .then(function(user) {
       return findRoomsForUser(user._id);
     })
     .then(function(results) {
       var sorted = _.sortBy(results, 'uri');
-      console.log(cliff.stringifyObjectRows(sorted, ['_id', 'uri', 'groupId', 'lcOwner', 'oneToOne']));
+      console.log(
+        cliff.stringifyObjectRows(sorted, ['_id', 'uri', 'groupId', 'lcOwner', 'oneToOne'])
+      );
     });
 }
 

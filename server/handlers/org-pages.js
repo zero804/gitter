@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var express = require('express');
 var isPhoneMiddleware = require('../web/middlewares/is-phone');
@@ -13,7 +13,8 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 /**
  * These routes are deprecated. Use `group.homeUri` instead.
  */
-router.get('/:groupUri/rooms',
+router.get(
+  '/:groupUri/rooms',
   identifyRoute('group-rooms-mainframe'),
   preventClickjackingMiddleware,
   featureToggles,
@@ -30,9 +31,11 @@ router.get('/:groupUri/rooms',
       return next('route');
     }
   },
-  redirectErrorMiddleware);
+  redirectErrorMiddleware
+);
 
-router.get('/:groupUri/rooms/~iframe',
+router.get(
+  '/:groupUri/rooms/~iframe',
   identifyRoute('group-rooms-frame'),
   preventClickjackingOnlyGitterEmbedMiddleware,
   featureToggles,
@@ -49,6 +52,7 @@ router.get('/:groupUri/rooms/~iframe',
       return next('route');
     }
   },
-  redirectErrorMiddleware);
+  redirectErrorMiddleware
+);
 
 module.exports = router;

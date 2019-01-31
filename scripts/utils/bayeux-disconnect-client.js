@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -14,12 +14,10 @@ var opts = require('yargs')
     description: 'Socket to destroy'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 bayeux.destroyClient(opts.socketId, function(err) {
-  if(err) winston.error('Error disconnecting socket' + err, { exception: err });
+  if (err) winston.error('Error disconnecting socket' + err, { exception: err });
 
   shutdown.shutdownGracefully();
-
 });

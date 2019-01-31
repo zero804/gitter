@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var assert = require('assert');
 var KnownExternalAccess = require('gitter-web-persistence').KnownExternalAccess;
@@ -11,17 +11,20 @@ function generateQuery(userId, type, policyName, linkPath, externalId) {
   if (linkPath && externalId) {
     // Or the whole query to allow mongodb to optimise
     query = {
-      $or: [{
-        userId: userId,
-        type: type,
-        policyName: policyName,
-        linkPath: linkPath
-      }, {
-        userId: userId,
-        type: type,
-        policyName: policyName,
-        externalId: externalId
-      }]
+      $or: [
+        {
+          userId: userId,
+          type: type,
+          policyName: policyName,
+          linkPath: linkPath
+        },
+        {
+          userId: userId,
+          type: type,
+          policyName: policyName,
+          externalId: externalId
+        }
+      ]
     };
 
     return query;
@@ -66,11 +69,15 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
       setFields.externalId = externalId;
     }
 
-    return KnownExternalAccess.update(query, {
+    return KnownExternalAccess.update(
+      query,
+      {
         $set: setFields
-      }, {
+      },
+      {
         upsert: true
-      })
+      }
+    )
       .exec()
       .then(function(response) {
         return !!(response && response.upserted && response.upserted.length === 1);
@@ -82,20 +89,24 @@ function handle(userId, type, policyName, linkPath, externalId, access) {
           return KnownExternalAccess.remove(query)
             .exec()
             .then(function() {
-              return KnownExternalAccess.update(query, {
+              return KnownExternalAccess.update(
+                query,
+                {
                   $set: setFields
-                }, {
+                },
+                {
                   upsert: true
-                })
+                }
+              )
                 .exec()
                 .then(function(response) {
                   return !!(response && response.upserted && response.upserted.length === 1);
-                })
-            })
+                });
+            });
         }
 
         throw err;
-      })
+      });
   } else {
     // User does not have access? Remove
     return KnownExternalAccess.remove(query)
@@ -117,7 +128,7 @@ function knownAccessRecorder(userId, type, policyName, linkPath, externalId, acc
 
   return handle(userId, type, policyName, linkPath, externalId, access)
     .catch(function(err) {
-      errorReporter(err, { }, { module: 'known-access-recorder' });
+      errorReporter(err, {}, { module: 'known-access-recorder' });
     })
     .done();
 }
@@ -126,4 +137,4 @@ module.exports = knownAccessRecorder;
 module.exports.testOnly = {
   generateQuery: generateQuery,
   handle: handle
-}
+};

@@ -8,7 +8,7 @@ function defaultAvatarForSize(size) {
   return {
     src: DEFAULT_AVATAR_URL + '?s=' + size,
     size: size,
-    srcset: DEFAULT_AVATAR_URL + '?s=' + (size*2) + ' 2x'
+    srcset: DEFAULT_AVATAR_URL + '?s=' + size * 2 + ' 2x'
   };
 }
 
@@ -57,8 +57,8 @@ function getSrcSetForTwitterUrl(url, options) {
   return {
     src: getTwitterUrlForSize(url, options.srcSize),
     size: options.size,
-    srcset: getTwitterUrlForSize(url, options.size*2) + ' 2x'
-  }
+    srcset: getTwitterUrlForSize(url, options.size * 2) + ' 2x'
+  };
 }
 
 function getSrcSetForLinkedInUrl(url, options) {
@@ -68,7 +68,7 @@ function getSrcSetForLinkedInUrl(url, options) {
     src: url.toString(),
     size: options.size,
     srcset: url + ' 2x'
-  }
+  };
 }
 
 function getSrcSetForDefaultUrl(url, options) {
@@ -77,7 +77,7 @@ function getSrcSetForDefaultUrl(url, options) {
   url.query[attr] = options.srcSize;
   var src = url.toString();
 
-  url.query[attr] = options.size*2;
+  url.query[attr] = options.size * 2;
   var srcset = url.toString() + ' 2x';
 
   return {
@@ -117,10 +117,8 @@ function srcSetForUser(user, size) {
 
   if (url.hostname === 'pbs.twimg.com') {
     return getSrcSetForTwitterUrl(url, options);
-
   } else if (url.hostname === 'media.licdn.com') {
     return getSrcSetForLinkedInUrl(url, options);
-
   } else {
     return getSrcSetForDefaultUrl(url, options);
   }
@@ -131,10 +129,19 @@ function buildAvatarUrlForUsername(username, version, size) {
 
   if (username.indexOf('_') === -1) {
     // github namespace
-    return 'https://avatars' + hash(username) + '.githubusercontent.com/' + username + '?' + (version ? 'v=' + version : '') + '&s=' + size;
+    return (
+      'https://avatars' +
+      hash(username) +
+      '.githubusercontent.com/' +
+      username +
+      '?' +
+      (version ? 'v=' + version : '') +
+      '&s=' +
+      size
+    );
   } else {
     // not github, send to resolver
-    return '/api/private/user-avatar/'+username+'?s='+size;
+    return '/api/private/user-avatar/' + username + '?s=' + size;
   }
 }
 
@@ -149,22 +156,20 @@ module.exports = function resolveUserAvatarSrcSet(user, size) {
       // that avatarUrlSmall is just a single value, not srcset, so we gotta
       // hack it a bit.
       return {
-        src: user.avatarUrlSmall.replace('=60', '='+size),
+        src: user.avatarUrlSmall.replace('=60', '=' + size),
         size: size,
-        srcset: user.avatarUrlSmall.replace('=60', '='+(size*2))+' 2x'
+        srcset: user.avatarUrlSmall.replace('=60', '=' + size * 2) + ' 2x'
       };
-
     } else if (user.gravatarImageUrl) {
       // straight outta the db, so figure out what parameter to add
       return srcSetForUser(user, size);
-
     } else if (user.username) {
       // fall back to the username method
       var version = user.gravatarVersion || user.gv; // or undefined
       return {
         src: buildAvatarUrlForUsername(user.username, version, size),
         size: size,
-        srcset: buildAvatarUrlForUsername(user.username, version, size*2) + ' 2x'
+        srcset: buildAvatarUrlForUsername(user.username, version, size * 2) + ' 2x'
       };
     }
   }

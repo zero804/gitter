@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var avatars = require('gitter-web-avatars');
@@ -32,11 +32,15 @@ function GroupStrategy(options) {
 
   this.map = function(group) {
     var options = this.options;
-    var id = group.id || group._id && group._id.toHexString();
+    var id = group.id || (group._id && group._id.toHexString());
 
     var hasAvatarSet = undefined;
-    if(options.includeHasAvatarSet) {
-      hasAvatarSet = group.avatarVersion > 0 || group.sd.type === 'GH_ORG' || group.sd.type === 'GH_REPO' || group.sd.type === 'GH_USER';
+    if (options.includeHasAvatarSet) {
+      hasAvatarSet =
+        group.avatarVersion > 0 ||
+        group.sd.type === 'GH_ORG' ||
+        group.sd.type === 'GH_REPO' ||
+        group.sd.type === 'GH_USER';
     }
 
     return {
@@ -49,7 +53,6 @@ function GroupStrategy(options) {
       avatarUrl: avatars.getForGroup(group),
       hasAvatarSet: hasAvatarSet
     };
-
   };
 }
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var _ = require('underscore');
@@ -9,7 +9,6 @@ var userAgentTagger = require('../../../web/user-agent-tagger');
 var loadTroupeFromParam = require('./load-troupe-param');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
-
 
 function parseLookups(lookups) {
   // string of comma-delimited attributes passed in via req.query
@@ -37,11 +36,11 @@ module.exports = {
     var userId = req.user && req.user.id;
     var troupeId = req.params.troupeId;
     var lean = !!req.query.lean;
-    var lookups = parseLookups(req.query.lookups)
+    var lookups = parseLookups(req.query.lookups);
     var options;
 
     var query;
-    if(q) {
+    if (q) {
       options = {
         skip: parseInt(skip, 10) || 0,
         limit: parseInt(limit, 10) || 50,
@@ -49,33 +48,32 @@ module.exports = {
         userId: userId
       };
 
-      query = chatService.searchChatMessagesForRoom(troupeId, "" + q, options);
+      query = chatService.searchChatMessagesForRoom(troupeId, '' + q, options);
     } else {
       options = {
         skip: parseInt(skip, 10) || 0,
         limit: parseInt(limit, 10) || 50,
-        beforeId: beforeId && "" + beforeId || undefined,
-        afterId: afterId && "" + afterId || undefined,
-        aroundId: aroundId && "" + aroundId || undefined,
-        marker: marker && "" + marker || undefined,
+        beforeId: (beforeId && '' + beforeId) || undefined,
+        afterId: (afterId && '' + afterId) || undefined,
+        aroundId: (aroundId && '' + aroundId) || undefined,
+        marker: (marker && '' + marker) || undefined,
         userId: userId
       };
       query = chatService.findChatMessagesForTroupe(troupeId, options);
     }
 
-    return query
-      .then(function(chatMessages) {
-        var userId = req.user && req.user.id;
-        var strategy = new restSerializer.ChatStrategy({
-          currentUserId: userId,
-          troupeId: troupeId,
-          initialId: aroundId,
-          lean: lean,
-          lookups: lookups
-        });
-
-        return restSerializer.serialize(chatMessages, strategy);
+    return query.then(function(chatMessages) {
+      var userId = req.user && req.user.id;
+      var strategy = new restSerializer.ChatStrategy({
+        currentUserId: userId,
+        troupeId: troupeId,
+        initialId: aroundId,
+        lean: lean,
+        lookups: lookups
       });
+
+      return restSerializer.serialize(chatMessages, strategy);
+    });
   },
 
   create: function(req) {
@@ -87,32 +85,42 @@ module.exports = {
         return chatService.newChatMessageToTroupe(troupe, req.user, data);
       })
       .then(function(chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+        var strategy = new restSerializer.ChatStrategy({
+          currentUserId: req.user.id,
+          troupeId: req.params.troupeId
+        });
         return restSerializer.serializeObject(chatMessage, strategy);
       });
   },
 
   show: function(req) {
-    return chatService.findById(req.params.chatMessageId)
-      .then(function(chatMessage) {
-        if (!chatMessage) throw new StatusError(404);
-        if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId)) throw new StatusError(404);
+    return chatService.findById(req.params.chatMessageId).then(function(chatMessage) {
+      if (!chatMessage) throw new StatusError(404);
+      if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId))
+        throw new StatusError(404);
 
-        var strategy = new restSerializer.ChatIdStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-        return restSerializer.serializeObject(req.params.chatMessageId, strategy);
+      var strategy = new restSerializer.ChatIdStrategy({
+        currentUserId: req.user.id,
+        troupeId: req.params.troupeId
       });
+      return restSerializer.serializeObject(req.params.chatMessageId, strategy);
+    });
   },
 
   update: function(req) {
     return Promise.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
       .spread(function(troupe, chatMessage) {
         if (!chatMessage) throw new StatusError(404);
-        if(!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId)) throw new StatusError(404);
+        if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId))
+          throw new StatusError(404);
 
         return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);
       })
       .then(function(chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
+        var strategy = new restSerializer.ChatStrategy({
+          currentUserId: req.user.id,
+          troupeId: req.params.troupeId
+        });
         return restSerializer.serializeObject(chatMessage, strategy);
       });
   },
@@ -126,16 +134,15 @@ module.exports = {
 
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
         return roomWithPolicyService.deleteMessageFromRoom(chatMessage);
-      })
-      .then(function() {
-         res.status(204);
-         return null;
-      })
+      }
+    ).then(function() {
+      res.status(204);
+      return null;
+    });
   },
 
   subresources: {
-    'readBy': require('./chat-read-by'),
-    'report': require('./chat-message-report')
+    readBy: require('./chat-read-by'),
+    report: require('./chat-message-report')
   }
-
 };

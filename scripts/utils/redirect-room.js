@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
@@ -24,8 +24,7 @@ var opts = require('yargs')
     description: 'New uri for the room'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var fromRoomInput = opts.from;
 var toRoomInput = opts.to;
@@ -37,32 +36,39 @@ function confirm() {
   });
 
   return new Promise(function(resolve, reject) {
-    rl.question('Are you sure you want to perform these redirects? ' + fromRoomInput + ' -> ' + toRoomInput + '\nType "yes"?', function(answer) {
-      rl.close();
+    rl.question(
+      'Are you sure you want to perform these redirects? ' +
+        fromRoomInput +
+        ' -> ' +
+        toRoomInput +
+        '\nType "yes"?',
+      function(answer) {
+        rl.close();
 
-      if (answer === 'yes') return resolve();
-      reject(new Error('no'));
-    });
+        if (answer === 'yes') return resolve();
+        reject(new Error('no'));
+      }
+    );
   });
 }
 
-
 var getMessageFromRoomResult = function(roomName, test) {
-  if(!test) {
+  if (!test) {
     return roomName + ' does not exist.';
   }
 
   return '';
 };
 
-Promise.all([
-    troupeService.findByUri(fromRoomInput),
-    troupeService.findByUri(toRoomInput),
-  ])
+Promise.all([troupeService.findByUri(fromRoomInput), troupeService.findByUri(toRoomInput)])
   .spread(function(fromRoom, toRoom) {
     //console.log('asdf', fromRoom, toRoom);
-    if(!fromRoom || !toRoom) {
-      throw new Error(getMessageFromRoomResult(fromRoomInput, fromRoom) + ' ' + getMessageFromRoomResult(toRoomInput, toRoom));
+    if (!fromRoom || !toRoom) {
+      throw new Error(
+        getMessageFromRoomResult(fromRoomInput, fromRoom) +
+          ' ' +
+          getMessageFromRoomResult(toRoomInput, toRoom)
+      );
     }
 
     return confirm()

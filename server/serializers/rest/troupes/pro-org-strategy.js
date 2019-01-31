@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var billingService = require('../../../services/billing-service');
 
@@ -12,7 +12,8 @@ function ProOrgStrategy() {
 
 ProOrgStrategy.prototype = {
   preload: function(troupes) {
-    var uris = troupes.map(function(troupe) {
+    var uris = troupes
+      .map(function(troupe) {
         if (!troupe.uri) return; // one-to-one
         return getOwner(troupe.uri);
       })
@@ -21,12 +22,13 @@ ProOrgStrategy.prototype = {
       })
       .uniq();
 
-    return billingService.findActiveOrgPlans(uris.toArray())
+    return billingService
+      .findActiveOrgPlans(uris.toArray())
       .bind(this)
       .then(function(subscriptions) {
         var proOrgs = {};
         subscriptions.forEach(function(subscription) {
-          var uri = subscription.uri || "";
+          var uri = subscription.uri || '';
           proOrgs[uri.toLowerCase()] = !!subscription;
         });
 

@@ -22,25 +22,24 @@ var running;
 
 var batch = new BatchStream({ size: BATCH_SIZE });
 
-var stream = persistence.Troupe
-  .find({
-    $or: [{lcOwner: {$exists: false}}, {lcOwner: ""}, {lcOwner: null}]
-  })
+var stream = persistence.Troupe.find({
+  $or: [{ lcOwner: { $exists: false } }, { lcOwner: '' }, { lcOwner: null }]
+})
   .limit(QUERY_LIMIT)
   .stream();
 
 stream.pipe(batch);
 
-stream.on('error', function (err) {
+stream.on('error', function(err) {
   console.log('err.stack:', err.stack);
 });
 
-batch.on('data', function (rooms) {
+batch.on('data', function(rooms) {
   running = true;
   this.pause(); // pause the stream
   run(rooms)
     .then(this.resume.bind(this)) // resume the stream on done
-    .then(function () {
+    .then(function() {
       running = false;
       if (batchComplete) {
         s();
@@ -57,12 +56,12 @@ function s() {
   }, 1000);
 }
 
-batch.on('end', function () {
-  if(!running) s();
+batch.on('end', function() {
+  if (!running) s();
   batchComplete = true;
 });
 
-var updateOwner = function (rooms) {
+var updateOwner = function(rooms) {
   return Promise.all(
     rooms.map(function(room) {
       console.log('room: ', room.uri, room.githubType);
@@ -73,15 +72,15 @@ var updateOwner = function (rooms) {
 };
 
 // iterates to the rooms and saves them
-var saveRooms = function (rooms) {
-
+var saveRooms = function(rooms) {
   return Promise.all(
-    rooms.map(function (room) {
-      return room.save()
-        .then(function () {
+    rooms.map(function(room) {
+      return room
+        .save()
+        .then(function() {
           UPDATED += 1;
         })
-        .catch(function (err) {
+        .catch(function(err) {
           return null;
         });
     })
@@ -90,11 +89,7 @@ var saveRooms = function (rooms) {
 
 // purely for logging
 function logProgress() {
-  console.log(
-    '[PROGRESS]',
-    '\tprocessed:', PROCESSED,
-    '\tupdated:', UPDATED
-  );
+  console.log('[PROGRESS]', '\tprocessed:', PROCESSED, '\tupdated:', UPDATED);
 }
 
 // reponsible for running the procedure
@@ -107,7 +102,7 @@ function run(rooms) {
 
   return updateOwner(rooms)
     .then(saveRooms)
-    .catch(function (err) {
+    .catch(function(err) {
       if (err.statusCode !== 404) console.error(err.stack);
     });
 }

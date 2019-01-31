@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // Implements EventListener
 function OnceEventListener(target, type, callback, context) {

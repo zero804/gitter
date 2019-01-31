@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var appEvents = require('../utils/appevents');
 var platformKeys = require('../utils/platform-keys');
@@ -6,7 +6,6 @@ var _ = require('underscore');
 var key = require('keymaster');
 
 module.exports = (function() {
-
   function getScope(element) {
     if (element.id === 'chat-input-textarea') {
       return 'input.chat';
@@ -32,11 +31,11 @@ module.exports = (function() {
       return 'button.profile-menu';
     }
 
-    if(element.classList.contains('room-menu-options__item-button')) {
+    if (element.classList.contains('room-menu-options__item-button')) {
       return 'minibar.item';
     }
 
-    if(element.classList.contains('room-item__container')) {
+    if (element.classList.contains('room-item__container')) {
       return 'room-list.item';
     }
 
@@ -55,7 +54,7 @@ module.exports = (function() {
   // - 'input.search' for the search input
   // - 'input.other' for other inputs (including textarea and select)
   // - 'other' for the rest
-  key.filter = function (event) {
+  key.filter = function(event) {
     var tag = event.target || event.srcElement;
 
     if (tag.getAttribute('data-prevent-keys') === 'on') {
@@ -72,126 +71,169 @@ module.exports = (function() {
   // Set to a scope: 'key': {name, scope}, scope can be an Array
   // Multiple names/scopes: 'key': ['event name', {name, scope}, ...]
   var keyEvents = {
-    'backspace': {
+    backspace: {
       name: 'backspace',
       scope: 'other'
     },
-    'esc': [{
-      name: 'chat.escape',
-      scope: 'input.chat'
-      },{
-      name: 'chat.edit.escape',
-      scope: 'input.chat.edit'
-      },{
-      name: 'search.escape',
-      scope: 'input.search'
-      },{
-      name: 'maininput.escape',
-      scope: ['input.chat', 'input.search']
-      },{
-      name: 'input.escape',
-      scope: 'input.other'
-      },{
-      name: 'document.escape',
-      scope: 'other'
-    }],
-    'space': [{
-      name: 'room-topic.edit',
-      scope: 'button.room-topic-edit'
-      },{
-      name: 'profile-menu.toggle',
-      scope: 'button.profile-menu'
-      }],
-    'enter': [{
-      name: 'search.go',
-      scope: 'input.search'
-    },{
-      name: 'chat.compose.auto',
-      scope: 'input.chat'
-    },{
-      name: 'room-topic.edit',
-      scope: 'button.room-topic-edit'
-    },{
-      name: 'profile-menu.toggle',
-      scope: 'button.profile-menu'
-    }],
-    'shift+enter': [{
-      name: 'chat.compose.auto',
-      scope: 'input.chat'
-    }],
-    'up': [{
-      name: 'room.up',
-      scope: 'minibar.item'
-      },{
-      name: 'room.up',
-      scope: 'room-list.item'
-      },{
-      name: 'chat.edit.openLast',
-      scope: 'input.chat'
-      },{
-      name: 'search.prev',
-      scope: 'input.search'
-      }],
-    'down': [{
-      name: 'room.down',
-      scope: 'minibar.item'
-      },{
-      name: 'room.down',
-      scope: 'room-list.item'
-      },{
-      name: 'search.next',
-      scope: 'input.search'
-      }],
-    'right': [{
-      name: 'room.next',
-      scope: 'minibar.item'
-      },{
-      name: 'room.next',
-      scope: 'room-list.item'
-    }],
-    'left': [{
-      name: 'room.prev',
-      scope: 'minibar.item'
-      },{
-      name: 'room.prev',
-      scope: 'room-list.item'
-    }],
+    esc: [
+      {
+        name: 'chat.escape',
+        scope: 'input.chat'
+      },
+      {
+        name: 'chat.edit.escape',
+        scope: 'input.chat.edit'
+      },
+      {
+        name: 'search.escape',
+        scope: 'input.search'
+      },
+      {
+        name: 'maininput.escape',
+        scope: ['input.chat', 'input.search']
+      },
+      {
+        name: 'input.escape',
+        scope: 'input.other'
+      },
+      {
+        name: 'document.escape',
+        scope: 'other'
+      }
+    ],
+    space: [
+      {
+        name: 'room-topic.edit',
+        scope: 'button.room-topic-edit'
+      },
+      {
+        name: 'profile-menu.toggle',
+        scope: 'button.profile-menu'
+      }
+    ],
+    enter: [
+      {
+        name: 'search.go',
+        scope: 'input.search'
+      },
+      {
+        name: 'chat.compose.auto',
+        scope: 'input.chat'
+      },
+      {
+        name: 'room-topic.edit',
+        scope: 'button.room-topic-edit'
+      },
+      {
+        name: 'profile-menu.toggle',
+        scope: 'button.profile-menu'
+      }
+    ],
+    'shift+enter': [
+      {
+        name: 'chat.compose.auto',
+        scope: 'input.chat'
+      }
+    ],
+    up: [
+      {
+        name: 'room.up',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.up',
+        scope: 'room-list.item'
+      },
+      {
+        name: 'chat.edit.openLast',
+        scope: 'input.chat'
+      },
+      {
+        name: 'search.prev',
+        scope: 'input.search'
+      }
+    ],
+    down: [
+      {
+        name: 'room.down',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.down',
+        scope: 'room-list.item'
+      },
+      {
+        name: 'search.next',
+        scope: 'input.search'
+      }
+    ],
+    right: [
+      {
+        name: 'room.next',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.next',
+        scope: 'room-list.item'
+      }
+    ],
+    left: [
+      {
+        name: 'room.prev',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.prev',
+        scope: 'room-list.item'
+      }
+    ],
     /* */
-    'tab': [{
-      name: 'room.tab',
-      scope: 'minibar.item'
-      },{
-      name: 'room.tab',
-      scope: 'room-list.item'
-    }],
-    '⇧+tab': [{
-      name: 'room.prev.tab',
-      scope: 'minibar.item'
-      },{
-      name: 'room.prev.tab',
-      scope: 'room-list.item'
-    }],
+    tab: [
+      {
+        name: 'room.tab',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.tab',
+        scope: 'room-list.item'
+      }
+    ],
+    '⇧+tab': [
+      {
+        name: 'room.prev.tab',
+        scope: 'minibar.item'
+      },
+      {
+        name: 'room.prev.tab',
+        scope: 'room-list.item'
+      }
+    ],
     /* */
-    'pageup': 'pageUp',
-    'pagedown': 'pageDown',
+    pageup: 'pageUp',
+    pagedown: 'pageDown',
     'q, r': {
       name: 'quote',
       scope: 'other'
     },
-    'shift+/,?': [{
-      name: 'help.keyboard',
-      scope: 'other'
-    }],
+    'shift+/,?': [
+      {
+        name: 'help.keyboard',
+        scope: 'other'
+      }
+    ]
   };
 
   // OS-specific modifier key
-  keyEvents['enter, ' + cmdKey + '+enter'] = [{
-    name: 'chat.send',
-    scope: 'input.chat'
-    },{
-    name: 'chat.edit.send',
-    scope: 'input.chat.edit'
-  }];
+  keyEvents['enter, ' + cmdKey + '+enter'] = [
+    {
+      name: 'chat.send',
+      scope: 'input.chat'
+    },
+    {
+      name: 'chat.edit.send',
+      scope: 'input.chat.edit'
+    }
+  ];
 
   keyEvents[cmdKey + '+/, ' + cmdKey + '+' + gitterKey + '+/'] = { name: 'chat.toggle' };
   keyEvents[cmdKey + '+' + '+s'] = 'focus.search';
@@ -205,7 +247,7 @@ module.exports = (function() {
   keyEvents[cmdKey + '+' + gitterKey + '+enter'] = { name: 'room.enter', scope: 'other' };
 
   // Go to a conversation by index in list
-  _.each('123456789'.split(''), function (n) {
+  _.each('123456789'.split(''), function(n) {
     keyEvents[cmdKey + '+' + gitterKey + '+' + n] = 'room.' + n;
   });
   keyEvents[cmdKey + '+' + gitterKey + '+0'] = 'room.10';
@@ -226,24 +268,22 @@ module.exports = (function() {
       });
     };
 
-    if (_.isArray(scope)) { // multiple scopes
+    if (_.isArray(scope)) {
+      // multiple scopes
       _.each(scope, _assign);
-    }
-    else {
+    } else {
       _assign(scope);
     }
   };
 
   _.each(keyEvents, function(name, k) {
-    if (_.isArray(name)) { // multiple mappings
+    if (_.isArray(name)) {
+      // multiple mappings
       _.each(name, function(n) {
         assign(k, n);
       });
-    }
-    else {
+    } else {
       assign(k, name);
     }
   });
-
-
 })();

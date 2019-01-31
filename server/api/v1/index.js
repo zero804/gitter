@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var express = require('express');
 var resourceRoute = require('../../web/resource-route-generator');
@@ -27,34 +27,28 @@ router.use('/groups', groupsResources);
 
 // APN has no auth requirement as user may not have authenticated
 // and this is used for devices without users
-router.post('/apn',
-  identifyRoute('apn-registration'),
-  require('./apn'));
+router.post('/apn', identifyRoute('apn-registration'), require('./apn'));
 
 // userapn ties together devices from /v1/apn and actual users.
 // this definitely requires auth
-router.post('/userapn',
+router.post(
+  '/userapn',
   authMiddleware,
   identifyRoute('user-apn-registration'),
-  require('./userapn'));
+  require('./userapn')
+);
 
-router.post('/eyeballs',
-  authMiddleware,
-  identifyRoute('eyeballs'),
-  require('./eyeballs'));
+router.post('/eyeballs', authMiddleware, identifyRoute('eyeballs'), require('./eyeballs'));
 
-router.delete('/sockets/:socketId',
-  identifyRoute('remove-socket'),
-  require('./sockets'));
+router.delete('/sockets/:socketId', identifyRoute('remove-socket'), require('./sockets'));
 
-router.get('/repo-info',
-  authMiddleware,
-  identifyRoute('repo-info'),
-  require('./repo-info'));
+router.get('/repo-info', authMiddleware, identifyRoute('repo-info'), require('./repo-info'));
 
-router.post('/private/gcm',
+router.post(
+  '/private/gcm',
   authMiddleware,
   identifyRoute('gcm-registration'),
-  require('./private/gcm'));
+  require('./private/gcm')
+);
 
 module.exports = router;

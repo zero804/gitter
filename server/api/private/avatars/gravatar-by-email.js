@@ -7,4 +7,4 @@ module.exports = function(email, size) {
     url: gravatar.forEmail(email, size),
     longTermCachable: true
   };
-}
+};

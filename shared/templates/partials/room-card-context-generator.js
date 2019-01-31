@@ -23,7 +23,6 @@ var formatNumberWithSiPrefix = function(n) {
   return n.toString();
 };
 
-
 var defaults = {
   isStaff: false
 };
@@ -33,18 +32,19 @@ module.exports = function(room, options) {
   var opts = _.extend({}, defaults, options);
   var result = _.extend({}, room);
 
-  result.isPrivate = result.security !== 'PUBLIC' && result.security !== null && result.security !== undefined;
+  result.isPrivate =
+    result.security !== 'PUBLIC' && result.security !== null && result.security !== undefined;
   result.canEditTags = opts.isStaff;
 
   var roomName = room.name;
-  if(opts.stripGroupName) {
+  if (opts.stripGroupName) {
     roomName = getRoomNameFromTroupeName(room.name);
   }
   result.name = roomName;
   result.roomNameParts = roomName.split('/');
 
   result.topic = room.topic || room.description;
-  if(room.messageCount) {
+  if (room.messageCount) {
     result.messageCountSiPrefixed = formatNumberWithSiPrefix(room.messageCount);
   }
   result.displayTags = (result.tags || []).filter(function(tag) {

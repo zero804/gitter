@@ -7,7 +7,6 @@ var Promise = require('bluebird');
 
 describe('group-resolver', function() {
   describe('#slow', function() {
-
     var groupResolver;
     var adminPermission;
 
@@ -37,10 +36,9 @@ describe('group-resolver', function() {
       var user1 = fixture.user1;
       adminPermission = true;
 
-      return groupResolver(troupe, user1, ['all'])
-        .then(function(result) {
-          assert.strictEqual(result.all.announcement, true);
-        });
+      return groupResolver(troupe, user1, ['all']).then(function(result) {
+        assert.strictEqual(result.all.announcement, true);
+      });
     });
 
     it('should resolve not resolve mentions for non-admins', function() {
@@ -48,11 +46,9 @@ describe('group-resolver', function() {
       var user1 = fixture.user1;
       adminPermission = false;
 
-      return groupResolver(troupe, user1, ['all'])
-        .then(function(result) {
-          assert(!result.all);
-        });
+      return groupResolver(troupe, user1, ['all']).then(function(result) {
+        assert(!result.all);
+      });
     });
-
   });
 });

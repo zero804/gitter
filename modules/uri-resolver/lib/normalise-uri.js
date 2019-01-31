@@ -6,7 +6,7 @@ function toParts(uri) {
   var parts = uri.split('/');
 
   var i;
-  for(i = parts.length; i >= 1 && !parts[i - 1]; i--);
+  for (i = parts.length; i >= 1 && !parts[i - 1]; i--);
   parts.length = i;
 
   return parts;
@@ -19,4 +19,4 @@ function toPath(uri) {
 module.exports = {
   toParts: toParts,
   toPath: toPath
-}
+};

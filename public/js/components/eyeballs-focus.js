@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var passiveEventListener = require('../utils/passive-event-listener');
 var rafUtils = require('../utils/raf-utils');
@@ -19,20 +19,19 @@ function EyeballsFocus(callback) {
     }
   });
 
-
   /* Focus and blur */
   function makeFocusHandler(index) {
     return function() {
       focusFrames[index] = true;
       evaluateFocusBlur();
-    }
+    };
   }
 
   function makeBlurHandler(index) {
     return function() {
       focusFrames[index] = false;
       evaluateFocusBlur();
-    }
+    };
   }
 
   // Add listeners to the base window
@@ -86,7 +85,6 @@ function EyeballsFocus(callback) {
 
     evaluateFocusBlur();
   });
-
 }
 
 module.exports = EyeballsFocus;

@@ -21,16 +21,13 @@ var frameUtils = require('gitter-web-frame-utils');
 require('@gitterhq/styleguide/css/components/dropdowns.css');
 
 function getProfileCollection() {
-
-  var result = new Backbone.Collection([
-    { name: 'Home', stub: '/home' },
-  ]);
+  var result = new Backbone.Collection([{ name: 'Home', stub: '/home' }]);
 
   var isWebApp = !isNative();
   var isMobileApp = isMobile();
 
-  if(isWebApp && !isMobileApp) {
-    result.add({ name: 'Get Gitter Apps', stub: '/apps'});
+  if (isWebApp && !isMobileApp) {
+    result.add({ name: 'Get Gitter Apps', stub: '/apps' });
   }
 
   var user = context.user();
@@ -38,7 +35,9 @@ function getProfileCollection() {
   // This is more fragile than i'd like it to be
   function showHideRepoAccess() {
     var scopes = user.get('scopes');
-    var existing = result.find(function(f) { return f.get('upgradeItem') });
+    var existing = result.find(function(f) {
+      return f.get('upgradeItem');
+    });
 
     if (!user.id || !scopes || scopes.private_repo) {
       // Hide the scope
@@ -47,11 +46,20 @@ function getProfileCollection() {
     } else {
       // Show the scope
       if (existing) return;
-      var appsItem = result.find(function(f) { return f.get('stub') === '/apps' });
-
-      result.add({ name: 'Allow Private Repo Access', stub: '/login/upgrade?scopes=repo', upgradeItem: true }, {
-        at: result.indexOf(appsItem) + 1
+      var appsItem = result.find(function(f) {
+        return f.get('stub') === '/apps';
       });
+
+      result.add(
+        {
+          name: 'Allow Private Repo Access',
+          stub: '/login/upgrade?scopes=repo',
+          upgradeItem: true
+        },
+        {
+          at: result.indexOf(appsItem) + 1
+        }
+      );
     }
   }
 
@@ -66,46 +74,57 @@ function getProfileCollection() {
     onClick(e) {
       e.preventDefault();
 
-      var newTheme = (currentTheme === 'gitter-dark') ? '' : 'gitter-dark';
+      var newTheme = currentTheme === 'gitter-dark' ? '' : 'gitter-dark';
 
       toggleDarkTheme(!!newTheme.length);
 
-      if(frameUtils.hasParentFrameSameOrigin()) {
+      if (frameUtils.hasParentFrameSameOrigin()) {
         frameUtils.postMessage({ type: 'toggle-dark-theme', theme: newTheme });
       }
 
-      apiClient.user.put('/settings/userTheme', { theme: newTheme })
-        .catch((err) => {
-          showDesktopNotification({
-            title: 'Problem persisting /settings/userTheme',
-            text: '(see devtools console for details)'
-          });
-          log.error('Problem persisting /settings/userTheme', { exception: err });
+      apiClient.user.put('/settings/userTheme', { theme: newTheme }).catch(err => {
+        showDesktopNotification({
+          title: 'Problem persisting /settings/userTheme',
+          text: '(see devtools console for details)'
         });
+        log.error('Problem persisting /settings/userTheme', { exception: err });
+      });
 
       currentTheme = newTheme;
     }
   });
 
-  result.add({ name: 'Terms of Service', stub: 'https://about.gitlab.com/terms/', target: '_blank' });
+  result.add({
+    name: 'Terms of Service',
+    stub: 'https://about.gitlab.com/terms/',
+    target: '_blank'
+  });
 
-  result.add({ name: 'Contribute to Gitter', stub: 'https://gitlab.com/gitlab-org/gitter/webapp', target: '_blank' });
+  result.add({
+    name: 'Contribute to Gitter',
+    stub: 'https://gitlab.com/gitlab-org/gitter/webapp',
+    target: '_blank'
+  });
 
-  result.add({ name: 'What\'s new?', stub: 'https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/CHANGELOG.md', target: '_blank' });
+  result.add({
+    name: "What's new?",
+    stub: 'https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/CHANGELOG.md',
+    target: '_blank'
+  });
 
   result.add({
     name: 'Delete Account',
-    onClick: (e) => {
+    onClick: e => {
       e.preventDefault();
       appEvents.trigger('route', 'delete-account');
     }
   });
 
-  if(isWebApp) {
+  if (isWebApp) {
     result.add({
       name: 'Sign Out',
       stub: '/logout',
-      onClick: (e) => {
+      onClick: e => {
         e.preventDefault();
         logout();
       }
@@ -115,7 +134,7 @@ function getProfileCollection() {
   return result;
 }
 
-function hasDarkTheme(){
+function hasDarkTheme() {
   var r = document.getElementById('gitter-dark');
   return !!r;
 }
@@ -123,7 +142,7 @@ function hasDarkTheme(){
 var ProfileMenuModel = Backbone.Model.extend({
   initialize: function() {
     autoModelSave(this, ['theme'], this.autoPersist);
-  },
+  }
 });
 
 var ItemView = Marionette.ItemView.extend({
@@ -169,7 +188,7 @@ module.exports = Marionette.CompositeView.extend({
     'change:active': 'onActiveStateChange'
   },
 
-  serializeData: function(){
+  serializeData: function() {
     var data = this.model.toJSON();
     var user = context.user();
     return _.extend({}, data, {
@@ -178,18 +197,17 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
-  onMouseLeave: function (){
+  onMouseLeave: function() {
     this.model.set('active', false);
   },
 
-  onAvatarClicked: function(e){
+  onAvatarClicked: function(e) {
     e.preventDefault();
     this.model.set({ active: true });
   },
 
-  onActiveStateChange: function(){
+  onActiveStateChange: function() {
     var state = this.model.get('active');
     toggleClass(this.ui.menu[0], 'hidden', !state);
-  },
-
+  }
 });

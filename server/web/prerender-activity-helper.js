@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var compileTemplate = require('./compile-web-template');
@@ -14,25 +14,25 @@ var compositeTemplate = compile('activity-composite');
 var prerenderedTemplate = compile('activity-item-prerendered');
 
 var serviceTemplates = {
-  bitbucket:  compile('bitbucket'),
-  huboard:    compile('huboard'),
-  jenkins:    compile('jenkins'),
-  travis:     compile('travis'),
-  sprintly:   compile('sprintly'),
-  trello:     compile('trello'),
+  bitbucket: compile('bitbucket'),
+  huboard: compile('huboard'),
+  jenkins: compile('jenkins'),
+  travis: compile('travis'),
+  sprintly: compile('sprintly'),
+  trello: compile('trello')
 };
 
 var githubTemplates = {
-  push:           compile('githubPush'),
-  issues:         compile('githubIssues'),
-  issue_comment:  compile('githubIssueComment'),
+  push: compile('githubPush'),
+  issues: compile('githubIssues'),
+  issue_comment: compile('githubIssueComment'),
   commit_comment: compile('githubCommitComment'),
-  pull_request:   compile('githubPullRequest'),
-  gollum:         compile('githubGollum'),
-  fork:           compile('githubFork'),
-  member:         compile('githubMember'),
-  public:         compile('githubPublic'),
-  watch:          compile('githubWatch')
+  pull_request: compile('githubPullRequest'),
+  gollum: compile('githubGollum'),
+  fork: compile('githubFork'),
+  member: compile('githubMember'),
+  public: compile('githubPublic'),
+  watch: compile('githubWatch')
 };
 
 function renderItem(model, lang, tzOffset) {
@@ -70,8 +70,8 @@ function renderItem(model, lang, tzOffset) {
   var inner = template(templateData);
 
   return prerenderWrapper({
-    className: "activity-item model-id-" + model.id,
-    wrap: "li",
+    className: 'activity-item model-id-' + model.id,
+    wrap: 'li',
     inner: inner
   });
 }
@@ -99,11 +99,18 @@ module.exports = function renderCollection(collection, params) {
   var lang = root.lang;
   var tzOffset = root.tzOffset;
 
-  var innerContent = collection ? collection.map(function(item) {
-    return renderItem(item, lang, tzOffset);
-  }).join('') : '';
+  var innerContent = collection
+    ? collection
+        .map(function(item) {
+          return renderItem(item, lang, tzOffset);
+        })
+        .join('')
+    : '';
 
-  return wrapContent(compositeTemplate({
-    _prerender_inner: innerContent
-  }), params);
+  return wrapContent(
+    compositeTemplate({
+      _prerender_inner: innerContent
+    }),
+    params
+  );
 };

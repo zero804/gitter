@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var presenceService = require('gitter-web-presence');
 
@@ -7,8 +7,8 @@ module.exports = function(req, res, next) {
   var userId = req.user && req.user.id;
 
   presenceService.socketDisconnectionRequested(userId, socketId, function(err) {
-    if(err) {
-      if(err.invalidSocketId) {
+    if (err) {
+      if (err.invalidSocketId) {
         return res.sendStatus(400);
       }
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger.get('persistence');
@@ -26,14 +26,13 @@ mongoDebug.install(mongoose.mongo, {
 });
 
 connection.on('error', function(err) {
-  logger.info("MongoDB connection error", { exception: err });
+  logger.info('MongoDB connection error', { exception: err });
   errorReporter(err, { connection_error: true }, { module: 'persistence' });
 });
 
 function createExports(schemas) {
   var ex = {
-    schemas: {
-    }
+    schemas: {}
   };
 
   var models = [];
@@ -43,7 +42,7 @@ function createExports(schemas) {
     var m = module.install(mongoose);
     var model = m.model;
     ex[key] = model;
-    models.push(model)
+    models.push(model);
     ex.schemas[key + 'Schema'] = m.schema;
   });
 
@@ -51,12 +50,13 @@ function createExports(schemas) {
     logger.info('Skipping auto indexing');
   } else {
     // Automatically do this at startup, for now
-    indexManager.ensureIndices(models)
+    indexManager
+      .ensureIndices(models)
       .then(function() {
-        logger.info("Indices configured");
+        logger.info('Indices configured');
       })
       .catch(function(err) {
-        logger.info("Index failure", { exception: err });
+        logger.info('Index failure', { exception: err });
         errorReporter(err, { index_error: true }, { module: 'persistence' });
       });
   }
@@ -89,7 +89,7 @@ var schemas = {
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
   KnownExternalAccess: require('./schemas/known-external-access-schema'),
-  Fingerprint: require('./schemas/fingerprint-schema'),
+  Fingerprint: require('./schemas/fingerprint-schema')
 };
 
 module.exports = createExports(schemas);

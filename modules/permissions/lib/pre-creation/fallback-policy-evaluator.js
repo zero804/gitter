@@ -7,7 +7,8 @@ function FallbackPolicyEvaluator(primary, secondary) {
 
 FallbackPolicyEvaluator.prototype = {
   canRead: function() {
-    return this.primary.canRead()
+    return this.primary
+      .canRead()
       .bind(this)
       .then(function(access) {
         if (access) return true;
@@ -16,7 +17,8 @@ FallbackPolicyEvaluator.prototype = {
   },
 
   canWrite: function() {
-    return this.primary.canWrite()
+    return this.primary
+      .canWrite()
       .bind(this)
       .then(function(access) {
         if (access) return true;
@@ -25,7 +27,8 @@ FallbackPolicyEvaluator.prototype = {
   },
 
   canJoin: function() {
-    return this.primary.canJoin()
+    return this.primary
+      .canJoin()
       .bind(this)
       .then(function(access) {
         if (access) return true;
@@ -34,7 +37,8 @@ FallbackPolicyEvaluator.prototype = {
   },
 
   canAdmin: function() {
-    return this.primary.canAdmin()
+    return this.primary
+      .canAdmin()
       .bind(this)
       .then(function(access) {
         if (access) return true;
@@ -43,14 +47,14 @@ FallbackPolicyEvaluator.prototype = {
   },
 
   canAddUser: function() {
-    return this.primary.canAddUser()
+    return this.primary
+      .canAddUser()
       .bind(this)
       .then(function(access) {
         if (access) return true;
         return this.secondary.canAddUser();
       });
-  },
-
+  }
 };
 
 module.exports = FallbackPolicyEvaluator;

@@ -81,6 +81,5 @@ module.exports = {
   getForGroup: getForGroup,
   getForRoomUri: getForRoomUri,
   getForUser: getForUser,
-  getDefault: getDefault,
-
-}
+  getDefault: getDefault
+};

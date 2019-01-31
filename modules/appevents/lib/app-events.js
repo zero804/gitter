@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var events = require('events');
 var _ = require('lodash');
 var debug = require('debug')('gitter:app:events');
-
 
 // make sure that the promises returned by addListener time out, otherwise it
 // might never clean up after itself even when your test times out
@@ -16,7 +15,7 @@ function makeEmitter() {
   return {
     /* This is only good for testing */
     removeAllListeners: function() {
-      localEventEmitter.removeAllListeners()
+      localEventEmitter.removeAllListeners();
     },
 
     // this is really useful for testing
@@ -32,18 +31,16 @@ function makeEmitter() {
             debug('match!: %j', res);
             resolve(res);
           } else {
-            debug("No match: %j against %j", res, expected);
+            debug('No match: %j against %j', res, expected);
           }
         };
         localEventEmitter.on(eventName, eventMatcher);
       });
 
       return function() {
-        return promise
-          .timeout(LISTENER_TIMEOUT)
-          .finally(function() {
-            localEventEmitter.removeListener(eventName, eventMatcher);
-          });
+        return promise.timeout(LISTENER_TIMEOUT).finally(function() {
+          localEventEmitter.removeListener(eventName, eventMatcher);
+        });
       };
     },
 
@@ -128,7 +125,7 @@ function makeEmitter() {
     },
 
     userNotification: function(options) {
-      localEventEmitter.emit('userNotification',options);
+      localEventEmitter.emit('userNotification', options);
     },
 
     // Deprecated
@@ -231,7 +228,6 @@ function makeEmitter() {
     onRoomMemberPermCheckFailed: function(callback) {
       localEventEmitter.on('room_membership_perm_check_failed', callback);
     }
-
   };
 }
 

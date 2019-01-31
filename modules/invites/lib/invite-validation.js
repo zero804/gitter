@@ -10,7 +10,7 @@ var avatars = require('gitter-web-avatars');
 function maskEmail(email) {
   return email
     .split('@')
-    .map(function (item, index) {
+    .map(function(item, index) {
       if (index === 0) {
         var gmailMagic = item.split('+')[0];
         return gmailMagic.slice(0, -8) + '****';
@@ -33,7 +33,7 @@ function parseAndValidateInput(input) {
   if (input.type) {
     if (!input.externalId) throw new StatusError(400);
 
-    switch(input.type) {
+    switch (input.type) {
       case 'email':
         return {
           type: input.type,
@@ -100,7 +100,7 @@ function parseAndValidateInput(input) {
     type: type,
     externalId: externalId,
     emailAddress: emailAddress
-  }
+  };
 }
 
 function getAvatar(type, externalId, resolvedEmailAddress) {

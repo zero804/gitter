@@ -1,6 +1,6 @@
 'use strict';
 
-var cdn = require("gitter-web-cdn");
+var cdn = require('gitter-web-cdn');
 
 function cdnSubResources(resources, jsRoot) {
   var resourceList = ['vendor'];
@@ -8,7 +8,8 @@ function cdnSubResources(resources, jsRoot) {
     resourceList = resourceList.concat(resources);
   }
 
-  return resourceList.map(function(f) {
+  return resourceList
+    .map(function(f) {
       return cdn(jsRoot + '/' + f + '.js');
     })
     .concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
@@ -18,7 +19,7 @@ var SUBRESOURCE_MAPPINGS = {
   'router-app': ['router-app', 'router-chat'],
   'mobile-nli-chat': ['mobile-nli-chat', 'router-nli-chat'],
   'mobile-userhome': ['mobile-userhome'],
-  'userhome': ['userhome'],
+  userhome: ['userhome'],
   'router-chat': ['router-chat'],
   'router-nli-chat': ['router-nli-chat'],
   'mobile-chat': ['mobile-chat'],

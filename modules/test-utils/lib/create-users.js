@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var uuid = require('node-uuid');
@@ -14,31 +14,29 @@ var userCounter = 0;
 function getIntegrationConfig(f) {
   if (f === '#integrationUser1') {
     return {
-        doc: {
-          username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME,
-          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
-          accessToken: 'web-internal'
-        },
-        deleteQuery: {
-           username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME
-        }
+      doc: {
+        username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME,
+        githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+        accessToken: 'web-internal'
+      },
+      deleteQuery: {
+        username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME
       }
+    };
   }
 
   if (f === '#integrationCollabUser1') {
     return {
-        doc: {
-          username: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USERNAME,
-          githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
-          accessToken: 'web-internal'
-        },
-        deleteQuery: {
-           username: integrationFixtures.GITTER_INTEGRATION_COLLAB_USERNAME
-        }
+      doc: {
+        username: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USERNAME,
+        githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
+        accessToken: 'web-internal'
+      },
+      deleteQuery: {
+        username: integrationFixtures.GITTER_INTEGRATION_COLLAB_USERNAME
       }
+    };
   }
-
-
 }
 function createUser(fixtureName, f) {
   debug('Creating %s', fixtureName);
@@ -51,7 +49,7 @@ function createUser(fixtureName, f) {
     if (integrationConfig.deleteQuery) {
       preremove = function() {
         return User.remove(integrationConfig.deleteQuery);
-      }
+      };
     }
   }
 
@@ -68,7 +66,7 @@ function createUser(fixtureName, f) {
       }
     } else {
       if (fn) {
-        return fn()
+        return fn();
       } else {
         return null;
       }
@@ -86,40 +84,37 @@ function createUser(fixtureName, f) {
     staff: f.staff || false
   };
 
-  if(f._id) {
+  if (f._id) {
     doc._id = f._id;
   }
 
   debug('Creating user %s with %j', fixtureName, doc);
 
   var promise = Promise.try(function() {
-      if (preremove) {
-        return preremove();
-      }
-    })
-    .then(function() {
-      return User.create(doc);
-    })
+    if (preremove) {
+      return preremove();
+    }
+  }).then(function() {
+    return User.create(doc);
+  });
 
   if (f.accessToken) {
     promise = promise.tap(function(user) {
-      return OAuthClient.findOne({ clientKey: f.accessToken })
-        .then(function(client) {
-          if (!client) throw new Error('Client not found clientKey=' + f.accessToken);
+      return OAuthClient.findOne({ clientKey: f.accessToken }).then(function(client) {
+        if (!client) throw new Error('Client not found clientKey=' + f.accessToken);
 
-          var token = '_test_' + uuid.v4();
-          var doc = {
-            token: token,
-            userId: user._id,
-            clientId: client._id,
-            expires: new Date(Date.now() + 60 * 60 * 1000)
-          };
-          debug('Creating access token for %s with %j', fixtureName, doc);
-          return OAuthAccessToken.create(doc)
-            .then(function() {
-              user.accessToken = token;
-            });
+        var token = '_test_' + uuid.v4();
+        var doc = {
+          token: token,
+          userId: user._id,
+          clientId: client._id,
+          expires: new Date(Date.now() + 60 * 60 * 1000)
+        };
+        debug('Creating access token for %s with %j', fixtureName, doc);
+        return OAuthAccessToken.create(doc).then(function() {
+          user.accessToken = token;
         });
+      });
     });
   }
 
@@ -161,54 +156,49 @@ function createExtraUsers(expected, fixture, key) {
   }
 
   return Promise.map(users, function(user, index) {
-      if (typeof user === 'string') {
-        if (expected[user]) return; // Already specified at the top level
+    if (typeof user === 'string') {
+      if (expected[user]) return; // Already specified at the top level
 
-        expected[user] = {};
-        return createUser(user, {}).then(function(createdUser) {
-          fixture[user] = createdUser;
-        });
-      }
+      expected[user] = {};
+      return createUser(user, {}).then(function(createdUser) {
+        fixture[user] = createdUser;
+      });
+    }
 
-      var fixtureName = 'user' + (++userCounter);
-      obj.users[index] = fixtureName;
-      expected[fixtureName] = user;
+    var fixtureName = 'user' + ++userCounter;
+    obj.users[index] = fixtureName;
+    expected[fixtureName] = user;
 
-      debug('creating extra user %s', fixtureName);
+    debug('creating extra user %s', fixtureName);
 
-      return createUser(fixtureName, user)
-        .then(function(user) {
-          fixture[fixtureName] = user;
-        });
-
-    })
-    .then(function() {
-      // now try and fill in the ones specified at the top level
-
-      var obj = expected[key];
-      var user = obj.user;
-
-      if (!user) return;
-
-      if (typeof user === 'string' && fixture[user]) {
-        // Already specified at the top level, so copy it
-        obj.user = fixture[user];
-      }
+    return createUser(fixtureName, user).then(function(user) {
+      fixture[fixtureName] = user;
     });
+  }).then(function() {
+    // now try and fill in the ones specified at the top level
+
+    var obj = expected[key];
+    var user = obj.user;
+
+    if (!user) return;
+
+    if (typeof user === 'string' && fixture[user]) {
+      // Already specified at the top level, so copy it
+      obj.user = fixture[user];
+    }
+  });
 }
 
 function createUsers(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
     if (key.match(/^user/)) {
-      return createUser(key, expected[key])
-        .then(function(user) {
-          fixture[key] = user;
-        });
+      return createUser(key, expected[key]).then(function(user) {
+        fixture[key] = user;
+      });
     }
 
     return null;
-  })
-  .then(function() {
+  }).then(function() {
     // only create the extra ones afterwards, otherwise we'll create
     // duplicate users before the ones above got saved and then they won't
     // link back to the same objects.

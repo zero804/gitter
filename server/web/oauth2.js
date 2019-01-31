@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * Module dependencies.
@@ -52,18 +52,24 @@ server.deserializeClient(function(id, done) {
 // the application.  The application issues a code, which is bound to these
 // values, and will be exchanged for an access token.
 
-server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, done) {
-  logger.info("Granted access to "+ client.name + " for " + user.displayName);
+server.grant(
+  oauth2orize.grant.code(function(client, redirectUri, user, ares, done) {
+    logger.info('Granted access to ' + client.name + ' for ' + user.displayName);
 
-  random.generateToken(function(err, token) {
-    if (err) { return done(err); }
+    random.generateToken(function(err, token) {
+      if (err) {
+        return done(err);
+      }
 
-    oauthService.saveAuthorizationCode(token, client, redirectUri, user, function(err) {
-      if (err) { return done(err); }
-      done(null, token);
+      oauthService.saveAuthorizationCode(token, client, redirectUri, user, function(err) {
+        if (err) {
+          return done(err);
+        }
+        done(null, token);
+      });
     });
-  });
-}));
+  })
+);
 
 // Exchange authorization codes for access tokens.  The callback accepts the
 // `client`, which is exchanging `code` and any `redirectUri` from the
@@ -71,25 +77,29 @@ server.grant(oauth2orize.grant.code(function(client, redirectUri, user, ares, do
 // application issues an access token on behalf of the user who authorized the
 // code.
 
-server.exchange(oauth2orize.exchange.code(async function(client, code, redirectUri, done) {
-  try {
-    const authCode = await oauthService.findAuthorizationCode(code);
-    if (!authCode) return done();
+server.exchange(
+  oauth2orize.exchange.code(async function(client, code, redirectUri, done) {
+    try {
+      const authCode = await oauthService.findAuthorizationCode(code);
+      if (!authCode) return done();
 
-    if (!client._id.equals(authCode.clientId)) { return done(); }
-    if (redirectUri !== authCode.redirectUri) { return done(); }
+      if (!client._id.equals(authCode.clientId)) {
+        return done();
+      }
+      if (redirectUri !== authCode.redirectUri) {
+        return done();
+      }
 
-    const token = await oauthService.findOrCreateToken(authCode.userId, authCode.clientId);
-    // > The client MUST NOT use the authorization code more than once.
-    // > https://tools.ietf.org/html/rfc6749#section-4.1.2
-    await oauthService.deleteAuthorizationCode(code);
-    done(null, token);
-  } catch(err) {
-    if (err) return done(err);
-  }
-}));
-
-
+      const token = await oauthService.findOrCreateToken(authCode.userId, authCode.clientId);
+      // > The client MUST NOT use the authorization code more than once.
+      // > https://tools.ietf.org/html/rfc6749#section-4.1.2
+      await oauthService.deleteAuthorizationCode(code);
+      done(null, token);
+    } catch (err) {
+      if (err) return done(err);
+    }
+  })
+);
 
 // user authorization endpoint
 //
@@ -112,21 +122,24 @@ exports.authorization = [
   server.authorization(function(clientKey, redirectUri, done) {
     stats.event('oauth.authorize');
     oauthService.findClientByClientKey(clientKey, function(err, client) {
-      if (err) { return done(err); }
+      if (err) {
+        return done(err);
+      }
 
-      if(!client) {
-        var e1 = new Error("Invalid clientKey");
+      if (!client) {
+        var e1 = new Error('Invalid clientKey');
         e1.clientMismatch = true;
         return done(e1);
       }
 
-      if(client.registeredRedirectUri !== redirectUri) {
-        logger.warn("Provided redirectUri does not match registered URI for clientKey ", {
+      if (client.registeredRedirectUri !== redirectUri) {
+        logger.warn('Provided redirectUri does not match registered URI for clientKey ', {
           redirectUri: redirectUri,
           registeredUri: client.registeredRedirectUri,
-          clientKey: clientKey});
+          clientKey: clientKey
+        });
 
-        var e2 = new Error("URI mismatch");
+        var e2 = new Error('URI mismatch');
         e2.clientMismatch = true;
         return done(e2);
       }
@@ -135,7 +148,7 @@ exports.authorization = [
   }),
   function(req, res, next) {
     /* Is this client allowed to skip the authorization page? */
-    if(req.oauth2.client.canSkipAuthorization) {
+    if (req.oauth2.client.canSkipAuthorization) {
       return server.decision({ loadTransaction: false })(req, res, next);
     }
 
@@ -145,31 +158,29 @@ exports.authorization = [
     res.render('oauth_authorize_dialog', {
       transactionId: req.oauth2.transactionID,
       user: req.user,
-      client: req.oauth2.client,
+      client: req.oauth2.client
     });
   },
   function(err, req, res, next) {
     stats.event('oauth.authorize.failed');
-    errorReporter(err, { oauthAuthorizationDialog: "failed" }, { module: 'oauth2' });
+    errorReporter(err, { oauthAuthorizationDialog: 'failed' }, { module: 'oauth2' });
 
-    var missingParams = ['response_type', 'redirect_uri', 'client_id']
-          .filter(function(param) {
-            return !req.query[param];
-          });
+    var missingParams = ['response_type', 'redirect_uri', 'client_id'].filter(function(param) {
+      return !req.query[param];
+    });
 
     var incorrectResponseType = req.query.response_type && req.query.response_type !== 'code';
 
-    if(err.clientMismatch || missingParams.length || incorrectResponseType) {
+    if (err.clientMismatch || missingParams.length || incorrectResponseType) {
       res.render('oauth_authorize_failed', {
         clientMismatch: !!err.clientMismatch,
         missingParams: missingParams.length && missingParams,
-        incorrectResponseType: incorrectResponseType,
+        incorrectResponseType: incorrectResponseType
       });
     } else {
       /* Let the main error handler deal with this */
       next();
     }
-
   }
 ];
 
@@ -180,11 +191,7 @@ exports.authorization = [
 // client, the above grant middleware configured above will be invoked to send
 // a response.
 
-exports.decision = [
-  ensureLoggedIn,
-  server.decision()
-];
-
+exports.decision = [ensureLoggedIn, server.decision()];
 
 // token endpoint
 //
@@ -198,7 +205,10 @@ exports.token = [
     stats.event('oauth.exchange');
     next();
   },
-  passport.authenticate([/*'basic', */'oauth2-client-password'], { session: false, failWithError: true }),
+  passport.authenticate([/*'basic', */ 'oauth2-client-password'], {
+    session: false,
+    failWithError: true
+  }),
   server.token(),
   server.errorHandler()
 ];

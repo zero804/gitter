@@ -12,9 +12,9 @@ describe('chat-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -32,12 +32,12 @@ describe('chat-api', function() {
       security: 'PUBLIC',
       users: ['user1'],
       securityDescriptor: {
-        extraAdmins: ['user3'],
+        extraAdmins: ['user3']
       }
     },
     troupe2: {
       security: 'PUBLIC',
-      users: ['user1', 'user2', 'user3'],
+      users: ['user1', 'user2', 'user3']
     },
     message1: {
       user: 'user1',
@@ -80,7 +80,7 @@ describe('chat-api', function() {
       text: 'HELLO1',
       sent: new Date(),
       pub: 1
-    },
+    }
   });
 
   it('POST /v1/rooms/:roomId/chatMessages', function() {
@@ -94,7 +94,7 @@ describe('chat-api', function() {
       .then(function(result) {
         var body = result.body;
         assert.strictEqual(body.text, 'Hello there');
-      })
+      });
   });
 
   it('DELETE /v1/rooms/:roomId/chatMessages/:chatMessageId - own message', function() {
@@ -163,8 +163,8 @@ describe('chat-api', function() {
         assert.deepEqual(unreadItems, {
           chat: [],
           mention: []
-        })
-      })
+        });
+      });
   });
 
   it('POST/DELETE/unread-items mentions', function() {
@@ -212,20 +212,24 @@ describe('chat-api', function() {
         assert.deepEqual(unreadItems, {
           chat: [],
           mention: []
-        })
-      })
+        });
+      });
   });
 
   it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - own message', function() {
     return request(app)
-      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad3.id + '/report')
+      .post(
+        '/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad3.id + '/report'
+      )
       .set('x-access-token', fixture.user1.accessToken)
       .expect(403);
   });
 
   it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - some elses message', function() {
     return request(app)
-      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report')
+      .post(
+        '/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report'
+      )
       .set('x-access-token', fixture.user2.accessToken)
       .expect(200)
       .then(function(result) {
@@ -237,7 +241,9 @@ describe('chat-api', function() {
 
   it('POST /v1/rooms/:roomId/chatMessages/:chatMessageId/report - as admin', function() {
     return request(app)
-      .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report')
+      .post(
+        '/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.messageBad2.id + '/report'
+      )
       .set('x-access-token', fixture.user3.accessToken)
       .expect(200)
       .then(function(result) {

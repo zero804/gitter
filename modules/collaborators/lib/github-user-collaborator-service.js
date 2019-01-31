@@ -22,7 +22,9 @@ function deduplicate(collaborators) {
 function withoutCurrentUser(users, user) {
   if (!users || !users.length) return [];
 
-  return users.filter(function(u) { return u.login !== user.username; });
+  return users.filter(function(u) {
+    return u.login !== user.username;
+  });
 }
 
 function GitHubUserCollaboratorService(user) {
@@ -32,27 +34,26 @@ function GitHubUserCollaboratorService(user) {
 GitHubUserCollaboratorService.prototype.findCollaborators = function() {
   var user = this.user;
 
-  return Promise.join(
-    this.findOrgCollaborators(),
-    this.findUserFollowers(),
-    function(followers, orgsMembers) {
-      var results = [];
-      if (followers) results = results.concat(followers);
-      if (orgsMembers) results = results.concat(orgsMembers);
+  return Promise.join(this.findOrgCollaborators(), this.findUserFollowers(), function(
+    followers,
+    orgsMembers
+  ) {
+    var results = [];
+    if (followers) results = results.concat(followers);
+    if (orgsMembers) results = results.concat(orgsMembers);
 
-      var filtered = withoutCurrentUser(results, user);
-      filtered = deduplicate(filtered);
-      return _.map(filtered, function(member) {
-        return {
-          displayName: member.login,
-          externalId: member.login,
-          avatarUrl: avatars.getForGitHubUsername(member.login),
-          type: identityService.GITHUB_IDENTITY_PROVIDER
-        }
-      });
+    var filtered = withoutCurrentUser(results, user);
+    filtered = deduplicate(filtered);
+    return _.map(filtered, function(member) {
+      return {
+        displayName: member.login,
+        externalId: member.login,
+        avatarUrl: avatars.getForGitHubUsername(member.login),
+        type: identityService.GITHUB_IDENTITY_PROVIDER
+      };
     });
-}
-
+  });
+};
 
 GitHubUserCollaboratorService.prototype.findOrgCollaborators = function() {
   var user = this.user;
@@ -60,7 +61,8 @@ GitHubUserCollaboratorService.prototype.findOrgCollaborators = function() {
   var ghOrg = new OrgService(user);
   var ghMe = new MeService(user);
 
-  return ghMe.getOrgs()
+  return ghMe
+    .getOrgs()
     .then(function(orgs) {
       return Promise.map(orgs, function(org) {
         return ghOrg.someMembers(org.login, { firstPageOnly: true }).reflect();
@@ -77,16 +79,14 @@ GitHubUserCollaboratorService.prototype.findOrgCollaborators = function() {
             memo = memo.concat();
           }
           return memo;
-        },[]);
+        }, []);
     });
-}
+};
 
 GitHubUserCollaboratorService.prototype.findUserFollowers = function() {
   var ghMe = new MeService(this.user);
 
-  return ghMe.getFollowers({ firstPageOnly: true })
-}
-
-
+  return ghMe.getFollowers({ firstPageOnly: true });
+};
 
 module.exports = GitHubUserCollaboratorService;

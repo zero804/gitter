@@ -1,18 +1,17 @@
-"use strict";
+'use strict';
 
-var assert = require("assert");
+var assert = require('assert');
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var userService = require('../lib/user-service');
 var persistence = require('gitter-web-persistence');
 
-describe("User Service", function() {
-
+describe('User Service', function() {
   var fixture2 = fixtureLoader.setup({
     user1: { username: true },
-    user2: { },
-    user3: { }
+    user2: {},
+    user3: {}
   });
 
   describe('duplicate account creation', function() {
@@ -22,31 +21,42 @@ describe("User Service", function() {
       var githubId = fixture2.generateGithubId();
 
       return Promise.all([
-        userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN }),
-        userService.findOrCreateUserForGithubId({ githubId: githubId, username: fixture2.generateUsername(), githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN})
-        ])
+        userService.findOrCreateUserForGithubId({
+          githubId: githubId,
+          username: fixture2.generateUsername(),
+          githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+        }),
+        userService.findOrCreateUserForGithubId({
+          githubId: githubId,
+          username: fixture2.generateUsername(),
+          githubToken: fixture2.GITTER_INTEGRATION_USER_SCOPE_TOKEN
+        })
+      ])
         .spread(function(user1, user2) {
           assert.strictEqual(user1.id, user2.id);
         })
         .catch(mongoUtils.mongoErrorWithCode(11000), function() {
           // It looks like mongo is just incapable of guaranteeing this. Up to
           // 50% of the time this test runs it throws this error.
-          console.log("Duplicate user."); // eslint-disable-line no-console
+          console.log('Duplicate user.'); // eslint-disable-line no-console
         });
     });
-
   });
 
   it('should create new users', function() {
-    return persistence.User.findOneAndRemove({ githubId: - 1})
+    return persistence.User.findOneAndRemove({ githubId: -1 })
       .exec()
       .then(function() {
-        return userService.findOrCreateUserForGithubId({ githubId: -1, username: '__test__gitter_007' });
+        return userService.findOrCreateUserForGithubId({
+          githubId: -1,
+          username: '__test__gitter_007'
+        });
       });
   });
 
   it('should destroy tokens for users', function() {
-    return userService.findOrCreateUserForGithubId({
+    return userService
+      .findOrCreateUserForGithubId({
         githubId: -Date.now(),
         username: fixture2.generateUsername(),
         githubToken: 'x',
@@ -68,11 +78,11 @@ describe("User Service", function() {
         assert(!user.githubUserToken);
         assert.deepEqual(user.githubScopes, {});
       });
-
   });
 
   it('should allow timezone information to be updated', function() {
-    return userService.updateTzInfo(fixture2.user1.id, { offset: 60, abbr: 'CST', iana: 'Europe/Paris' })
+    return userService
+      .updateTzInfo(fixture2.user1.id, { offset: 60, abbr: 'CST', iana: 'Europe/Paris' })
       .then(function() {
         return userService.findById(fixture2.user1.id);
       })
@@ -83,7 +93,7 @@ describe("User Service", function() {
         assert.strictEqual(tz.abbr, 'CST');
         assert.strictEqual(tz.iana, 'Europe/Paris');
 
-        return userService.updateTzInfo(fixture2.user1.id, { });
+        return userService.updateTzInfo(fixture2.user1.id, {});
       })
       .then(function() {
         return userService.findById(fixture2.user1.id);
@@ -95,7 +105,5 @@ describe("User Service", function() {
         assert(!tz || !tz.abbr);
         assert(!tz || !tz.iana);
       });
-
   });
-
 });

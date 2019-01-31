@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -18,16 +18,20 @@ var redis = require('gitter-web-utils/lib/redis');
 var redisClient = redis.getClient();
 
 function fixUrl(url) {
-  return url.replace(nconf.get('transloadit:bucket') + '.s3.amazonaws.com', nconf.get('transloadit:cname'));
+  return url.replace(
+    nconf.get('transloadit:bucket') + '.s3.amazonaws.com',
+    nconf.get('transloadit:cname')
+  );
 }
 
 function handleUploadToRoom(transloadit, metadata) {
   return Promise.join(
     troupeService.findById(metadata.room_id),
-    userService.findById(metadata.user_id))
+    userService.findById(metadata.user_id)
+  )
     .bind({
       room: null,
-      user: null,
+      user: null
     })
     .spread(function(room, user) {
       if (!room) throw new StatusError(404, 'Unable to find room ' + metadata.room_id);
@@ -42,44 +46,53 @@ function handleUploadToRoom(transloadit, metadata) {
       return policy.canWrite();
     })
     .then(function(writeAccess) {
-      if(!writeAccess) throw new StatusError(403);
+      if (!writeAccess) throw new StatusError(403);
       var room = this.room;
       var user = this.user;
 
       if (!transloadit.results[':original'] || !transloadit.results[':original'].length) {
-        throw new StatusError(500, 'Transloadit upload failed' + transloadit.message ? ': ' + transloadit.message : '. AssemblyID: ' + transloadit.assembly_id);
+        throw new StatusError(
+          500,
+          'Transloadit upload failed' + transloadit.message
+            ? ': ' + transloadit.message
+            : '. AssemblyID: ' + transloadit.assembly_id
+        );
       }
 
       var thumbs = {};
 
       if (transloadit.results['doc_thumbs']) {
-        transloadit.results['doc_thumbs'].forEach(function (thumb) {
+        transloadit.results['doc_thumbs'].forEach(function(thumb) {
           thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
         });
       }
 
       if (transloadit.results['img_thumbs']) {
-        transloadit.results['img_thumbs'].forEach(function (thumb) {
+        transloadit.results['img_thumbs'].forEach(function(thumb) {
           thumbs[thumb.original_id] = fixUrl(thumb.ssl_url);
         });
       }
 
       // Generate a message for each uploaded file.
-      return Promise.map(transloadit.results[':original'], function (upload) {
-        var name = upload.name;
-        var url = fixUrl(upload.ssl_url);
-        var thumb = thumbs[upload.id];
+      return Promise.map(
+        transloadit.results[':original'],
+        function(upload) {
+          var name = upload.name;
+          var url = fixUrl(upload.ssl_url);
+          var thumb = thumbs[upload.id];
 
-        var text;
-        if (thumb) {
-          text = "[![" + name + "](" + thumb + ")](" + url + ")";
-        } else {
-          text = "[" + name + "](" + url + ")";
-        }
+          var text;
+          if (thumb) {
+            text = '[![' + name + '](' + thumb + ')](' + url + ')';
+          } else {
+            text = '[' + name + '](' + url + ')';
+          }
 
-        stats.event('file.upload');
-        return chatService.newChatMessageToTroupe(room, user, { text: text });
-      }, { concurrency: 1 });
+          stats.event('file.upload');
+          return chatService.newChatMessageToTroupe(room, user, { text: text });
+        },
+        { concurrency: 1 }
+      );
     });
 }
 
@@ -87,8 +100,9 @@ function handleUploadToGroup(transloadit, metadata) {
   var group, user, policy;
 
   return Promise.join(
-      groupService.findById(metadata.group_id, { lean: true }),
-      userService.findById(metadata.user_id))
+    groupService.findById(metadata.group_id, { lean: true }),
+    userService.findById(metadata.user_id)
+  )
     .spread(function(_group, _user) {
       group = _group;
       user = _user;
@@ -99,7 +113,7 @@ function handleUploadToGroup(transloadit, metadata) {
       return policyFactory.createPolicyForGroupId(user, group._id);
     })
     .then(function(_policy) {
-      policy = _policy
+      policy = _policy;
       return policy.canWrite();
     })
     .then(function(writeAccess) {
@@ -108,7 +122,12 @@ function handleUploadToGroup(transloadit, metadata) {
       var groupWithPolicyService = new GroupWithPolicyService(group, user, policy);
 
       if (!transloadit.results[':original'] || !transloadit.results[':original'].length) {
-        throw new StatusError(500, 'Transloadit upload failed' + transloadit.message ? ': ' + transloadit.message : '. AssemblyID: ' + transloadit.assembly_id);
+        throw new StatusError(
+          500,
+          'Transloadit upload failed' + transloadit.message
+            ? ': ' + transloadit.message
+            : '. AssemblyID: ' + transloadit.assembly_id
+        );
       }
 
       var upload = transloadit.results[':original'][0];
@@ -125,10 +144,8 @@ function handleUploadToGroup(transloadit, metadata) {
 function _handleUpload(transloadit, metadata) {
   if (metadata.room_id) {
     return handleUploadToRoom(transloadit, metadata);
-
   } else if (metadata.group_id) {
     return handleUploadToGroup(transloadit, metadata);
-
   } else {
     throw new StatusError(400, 'Unknown upload type.');
   }
@@ -139,7 +156,7 @@ var handleUpload = Promise.method(_handleUpload);
 function transloaditRoute(req, res, next) {
   var token = req.params.token;
 
-  redisClient.get('transloadit:' + token, function (err, data) {
+  redisClient.get('transloadit:' + token, function(err, data) {
     if (err) return next(err);
 
     if (!data) return next(new StatusError(404));
@@ -147,7 +164,7 @@ function transloaditRoute(req, res, next) {
     var metadata;
     try {
       metadata = JSON.parse(data);
-    } catch(e) {
+    } catch (e) {
       logger.info('Unable to parse redis data', { data: data });
       return next(new Error('JSON parse error: ' + e.message));
     }
@@ -168,7 +185,16 @@ function transloaditRoute(req, res, next) {
     }
 
     if (transloadit.ok !== 'ASSEMBLY_COMPLETED') {
-      return next(new Error('Transload did not return ASSEMBLY_COMPLETED: ok=' + transloadit.ok + ', error=' + transloadit.error + ', message=' + transloadit.message));
+      return next(
+        new Error(
+          'Transload did not return ASSEMBLY_COMPLETED: ok=' +
+            transloadit.ok +
+            ', error=' +
+            transloadit.error +
+            ', message=' +
+            transloadit.message
+        )
+      );
     }
 
     return handleUpload(transloadit, metadata)
@@ -180,7 +206,6 @@ function transloaditRoute(req, res, next) {
         next(err);
       });
   });
-
 }
 
 module.exports = transloaditRoute;

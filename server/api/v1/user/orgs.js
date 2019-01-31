@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var restful = require('../../../services/restful');
 var StatusError = require('statuserror');

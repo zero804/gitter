@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 function isNative(req) {
   var userAgentString = req.headers['user-agent'];

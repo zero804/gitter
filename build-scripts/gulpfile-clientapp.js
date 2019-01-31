@@ -19,21 +19,22 @@ gulp.task('clientapp:compile', ['clientapp:compile:copy-files', 'clientapp:compi
 gulp.task('clientapp:post-compile', ['clientapp:post-compile:uglify']);
 
 gulp.task('clientapp:compile:copy-files', function() {
-  return gulp.src([
-      'public/fonts/**',
-      'public/images/**',
-      'public/sprites/**',
-      'public/repo/**'
-    ], { base: "./public", stat: true })
+  return gulp
+    .src(['public/fonts/**', 'public/images/**', 'public/sprites/**', 'public/repo/**'], {
+      base: './public',
+      stat: true
+    })
     .pipe(gulp.dest('output/assets'))
     .pipe(restoreTimestamps());
 });
 
 gulp.task('clientapp:compile:webpack', ['clientapp:compile:copy-files'], function() {
-  return gulp.src('./public/js/webpack.config')
-    .pipe(webpack(require('../public/js/webpack.config'), null, function(err, stats) {
-      if (!stats) return;
-      /*
+  return gulp
+    .src('./public/js/webpack.config')
+    .pipe(
+      webpack(require('../public/js/webpack.config'), null, function(err, stats) {
+        if (!stats) return;
+        /*
       Removed as webpack-bundle-size-analyzer is broken
       var webpackBundleSizeAnalyzer = require('webpack-bundle-size-analyzer');
 
@@ -48,7 +49,8 @@ gulp.task('clientapp:compile:webpack', ['clientapp:compile:copy-files'], functio
       });
       gutil.log('-----------------------------------------------');
       */
-    }))
+      })
+    )
     .pipe(gulp.dest('output/assets/js'));
 });
 
@@ -64,8 +66,13 @@ function getUglifyOptions() {
 
 gulp.task('clientapp:post-compile:uglify', function() {
   var sourceMapOpts = getSourceMapOptions();
-  return gulp.src('output/assets/js/*.js')
-    .pipe(sourcemaps.init({ /* loadMaps: true */ }))
+  return gulp
+    .src('output/assets/js/*.js')
+    .pipe(
+      sourcemaps.init({
+        /* loadMaps: true */
+      })
+    )
     .pipe(uglify(getUglifyOptions()))
     .pipe(sourcemaps.write(sourceMapOpts.dest, sourceMapOpts.options))
     .pipe(gulp.dest('output/assets/js'));

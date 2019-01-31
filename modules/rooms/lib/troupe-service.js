@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 var persistence = require('gitter-web-persistence');
-var assert = require("assert");
+var assert = require('assert');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
@@ -17,7 +17,9 @@ function findByUri(uri, callback) {
 
 function findByUris(uris) {
   if (!uris.length) return [];
-  var lcUris = uris.map(function(f) { return f.toLowerCase(); });
+  var lcUris = uris.map(function(f) {
+    return f.toLowerCase();
+  });
 
   return persistence.Troupe.find({ lcUri: { $in: lcUris } })
     .lean()
@@ -55,7 +57,6 @@ function checkIdExists(id) {
     .then(function(count) {
       return count > 0;
     });
-
 }
 
 /**
@@ -65,17 +66,18 @@ function findByIdLeanWithMembership(troupeId, userId) {
   troupeId = mongoUtils.asObjectID(troupeId);
   if (userId) {
     return Promise.join(
-      persistence.Troupe.findOne({ _id: troupeId }, { }, { lean: true }).exec(),
+      persistence.Troupe.findOne({ _id: troupeId }, {}, { lean: true }).exec(),
       roomMembershipService.checkRoomMembership(troupeId, userId),
       function(leanTroupe, access) {
         if (!leanTroupe) return [null, false];
         leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
         return [leanTroupe, access];
-      });
+      }
+    );
   }
 
   // Query without userId
-  return persistence.Troupe.findOne({ _id: troupeId }, { }, { lean: true })
+  return persistence.Troupe.findOne({ _id: troupeId }, {}, { lean: true })
     .exec()
     .then(function(result) {
       if (!result) return [null, false];
@@ -107,7 +109,7 @@ function findPublicRoomsByTypeAndLinkPaths(type, linkPaths) {
 
   return persistence.Troupe.find(query)
     .lean()
-    .exec()
+    .exec();
 }
 
 module.exports = {

@@ -6,11 +6,11 @@ var lazy = require('lazy.js');
 var Promise = require('bluebird');
 
 function updatePerPage(options) {
-  if(options.method !== 'GET' && options.method !== undefined) return;
+  if (options.method !== 'GET' && options.method !== undefined) return;
 
   /* Only GET requests thanks */
   var uri = options.uri || options.url;
-  if(typeof uri !== 'object') {
+  if (typeof uri !== 'object') {
     uri = url.parse(uri, true);
   }
 
@@ -18,9 +18,9 @@ function updatePerPage(options) {
   delete uri.search;
   uri = url.format(uri);
 
-  if(options.uri) {
+  if (options.uri) {
     options.uri = uri;
-  } else if(options.url) {
+  } else if (options.url) {
     options.url = uri;
   }
 
@@ -29,26 +29,23 @@ function updatePerPage(options) {
 
 module.exports = exports = function(options, callback, request) {
   function subrequest(options) {
-
     return new Promise(function(resolve, reject) {
-      request(options, function (error, response, body) {
-        if(error) return reject(error);
+      request(options, function(error, response, body) {
+        if (error) return reject(error);
 
         // Reject bad responses
-        if(response.statusCode >= 400) return reject(new Error('HTTP ' + response.statusCode));
+        if (response.statusCode >= 400) return reject(new Error('HTTP ' + response.statusCode));
 
         var bodyJson;
         try {
           bodyJson = JSON.parse(body);
-        } catch(e) {
+        } catch (e) {
           return reject(e);
         }
 
         resolve(bodyJson);
       });
-
     });
-
   }
 
   /* Allow clients to disable this */
@@ -60,31 +57,33 @@ module.exports = exports = function(options, callback, request) {
   /* Always fetch 100 items per page */
   options = updatePerPage(options);
 
-  request(options, function (error, response, body) {
-    if(error) return callback(error, response, body);
-    if(response.statusCode >= 400) return callback(error, response, body);
+  request(options, function(error, response, body) {
+    if (error) return callback(error, response, body);
+    if (response.statusCode >= 400) return callback(error, response, body);
 
-    if(!response.headers.link) {
+    if (!response.headers.link) {
       return callback(error, response, body);
     }
 
     var firstPage;
     try {
       firstPage = JSON.parse(body);
-    } catch(e) {
+    } catch (e) {
       return callback(e, response, body);
     }
 
     var links = parseLinks(response.headers.link);
-    if(links.next && links.last) {
+    if (links.next && links.last) {
       var lastParsed = url.parse(links.last, true);
       var lastPage = parseInt(lastParsed.query.page, 10);
 
-      if(lastPage > 1) {
+      if (lastPage > 1) {
         lastPage - 1;
 
-        var promises = lazy.range(1, lastPage + 1).map(function(i) {
-            if(i === 1) return firstPage;
+        var promises = lazy
+          .range(1, lastPage + 1)
+          .map(function(i) {
+            if (i === 1) return firstPage;
 
             var uri = url.parse(links.last, true);
             delete uri.search;
@@ -92,14 +91,19 @@ module.exports = exports = function(options, callback, request) {
 
             var pageUrl = url.format(uri);
 
-            var clonedOptions = lazy(options).assign({ uri: pageUrl }).toObject();
+            var clonedOptions = lazy(options)
+              .assign({ uri: pageUrl })
+              .toObject();
 
             return subrequest(clonedOptions);
-          }).toArray();
+          })
+          .toArray();
 
         return Promise.all(promises)
           .then(function(results) {
-            var all = lazy(results).flatten().toArray();
+            var all = lazy(results)
+              .flatten()
+              .toArray();
 
             callback(null, response, all);
           })

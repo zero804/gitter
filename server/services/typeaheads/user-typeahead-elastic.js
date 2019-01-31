@@ -12,7 +12,7 @@ var userService = require('gitter-web-users');
 var collections = require('gitter-web-utils/lib/collections');
 var uuid = require('node-uuid');
 var debug = require('debug')('gitter:app:user-typeahead');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var INDEX_PREFIX = 'typeahead_';
 var READ_INDEX_ALIAS = 'typeahead-read';
@@ -23,30 +23,31 @@ var MEMBERSHIP_LIMIT = 600;
 function query(text, options) {
   var roomId = (options || {}).roomId || '*';
 
-  return elasticClient.suggest({
-    size: 10,
-    index: READ_INDEX_ALIAS,
-    type: 'user',
-    body: {
-      suggest: {
-        text: text,
-        completion: {
-          field: "suggest",
-          context: { rooms: roomId },
-          payload: ["_uid"]
+  return elasticClient
+    .suggest({
+      size: 10,
+      index: READ_INDEX_ALIAS,
+      type: 'user',
+      body: {
+        suggest: {
+          text: text,
+          completion: {
+            field: 'suggest',
+            context: { rooms: roomId },
+            payload: ['_uid']
+          }
         }
       }
-    }
-  }).then(function(res) {
-    var options = res.suggest[0].options
-    var userIds = options.map(function(option) {
-      return option.payload._uid[0].split('#')[1];
-    });
-    return userService.findByIds(userIds)
-      .then(function(users) {
+    })
+    .then(function(res) {
+      var options = res.suggest[0].options;
+      var userIds = options.map(function(option) {
+        return option.payload._uid[0].split('#')[1];
+      });
+      return userService.findByIds(userIds).then(function(users) {
         return collections.maintainIdOrder(userIds, users);
       });
-  });
+    });
 }
 
 function reindex() {
@@ -54,16 +55,13 @@ function reindex() {
 
   return createIndex(newIndex)
     .then(function() {
-      return setWriteAlias(newIndex)
+      return setWriteAlias(newIndex);
     })
     .then(function() {
-      return Promise.all([
-        reindexUsers(),
-        reindexMemberships()
-      ]);
+      return Promise.all([reindexUsers(), reindexMemberships()]);
     })
     .then(function() {
-      return setReadAlias(newIndex)
+      return setReadAlias(newIndex);
     })
     .then(function() {
       return removeUnusedIndicies();
@@ -75,11 +73,10 @@ function addUsersToGroupRoom(userIds, roomId) {
     return createAddMembershipUpdate(userId, [roomId]);
   });
   var req = bulkTools.createBulkUpdate(updates);
-  return elasticClient.bulk(req)
-    .then(function(res) {
-      var err = bulkTools.findErrors(req, res);
-      if (err) throw err;
-    });
+  return elasticClient.bulk(req).then(function(res) {
+    var err = bulkTools.findErrors(req, res);
+    if (err) throw err;
+  });
 }
 
 function removeUsersFromRoom(userIds, roomId) {
@@ -87,15 +84,14 @@ function removeUsersFromRoom(userIds, roomId) {
     return createRemoveMembershipUpdate(userId, roomId);
   });
   var req = bulkTools.createBulkUpdate(updates);
-  return elasticClient.bulk(req)
-    .then(function(res) {
-      var err = bulkTools.findErrors(req, res);
-      if (err) throw err;
-    });
+  return elasticClient.bulk(req).then(function(res) {
+    var err = bulkTools.findErrors(req, res);
+    if (err) throw err;
+  });
 }
 
 function upsertUser(user) {
-  return elasticClient.update(createUserUpdate(user))
+  return elasticClient.update(createUserUpdate(user));
 }
 
 function createIndex(name) {
@@ -112,14 +108,14 @@ function createIndex(name) {
       },
       mappings: {
         user: {
-          dynamic: "strict",
+          dynamic: 'strict',
           properties: {
             suggest: {
-              type: "completion",
-              analyzer: "simple",
-              search_analyzer: "simple",
+              type: 'completion',
+              analyzer: 'simple',
+              search_analyzer: 'simple',
               preserve_separators: false,
-              contexts: [{ name: "rooms", type: "category" }]
+              contexts: [{ name: 'rooms', type: 'category' }]
             }
           }
         }
@@ -129,7 +125,7 @@ function createIndex(name) {
 }
 
 function setWriteAlias(index) {
-  debug("setting %s as sole write alias (%s)", index, WRITE_INDEX_ALIAS);
+  debug('setting %s as sole write alias (%s)', index, WRITE_INDEX_ALIAS);
   return elasticClient.indices.updateAliases({
     body: {
       actions: [
@@ -141,7 +137,7 @@ function setWriteAlias(index) {
 }
 
 function setReadAlias(index) {
-  debug("setting %s as sole read alias (%s)", index, READ_INDEX_ALIAS);
+  debug('setting %s as sole read alias (%s)', index, READ_INDEX_ALIAS);
   return elasticClient.indices.updateAliases({
     body: {
       actions: [
@@ -153,18 +149,17 @@ function setReadAlias(index) {
 }
 
 function removeUnusedIndicies() {
-  return elasticClient.indices.getAliases()
-    .then(function(resp) {
-      var unused = Object.keys(resp).filter(function(index) {
-        var aliases = Object.keys(resp[index].aliases)
-        return index.indexOf(INDEX_PREFIX) === 0 && aliases.length === 0;
-      });
-
-      if (!unused.length) return;
-
-      debug("removing indices %j", unused);
-      return elasticClient.indices.delete({ index: unused });
+  return elasticClient.indices.getAliases().then(function(resp) {
+    var unused = Object.keys(resp).filter(function(index) {
+      var aliases = Object.keys(resp[index].aliases);
+      return index.indexOf(INDEX_PREFIX) === 0 && aliases.length === 0;
     });
+
+    if (!unused.length) return;
+
+    debug('removing indices %j', unused);
+    return elasticClient.indices.delete({ index: unused });
+  });
 }
 
 function reindexUsers() {
@@ -235,11 +230,11 @@ function reindexMemberships() {
         }
       }
     ])
-    .allowDiskUse(true)
-    .read(mongoReadPrefs.secondaryPreferred)
-    .cursor({ batchSize: BATCH_SIZE })
-    .exec()
-    .stream();
+      .allowDiskUse(true)
+      .read(mongoReadPrefs.secondaryPreferred)
+      .cursor({ batchSize: BATCH_SIZE })
+      .exec()
+      .stream();
 
     var memberships2elastic = through2.obj(function(memberships, encoding, callback) {
       this.push(createAddMembershipUpdate(memberships._id, memberships.troupeIds));
@@ -280,13 +275,13 @@ function createUserUpdate(user) {
         suggest: {
           input: input,
           contexts: {
-            rooms: ["*"]
+            rooms: ['*']
           }
         }
       }
     },
     _retry_on_conflict: 3
-  }
+  };
 }
 
 function createAddMembershipUpdate(userId, roomIds) {
@@ -298,7 +293,12 @@ function createAddMembershipUpdate(userId, roomIds) {
   if (newRooms.length > MEMBERSHIP_LIMIT) {
     // going over the limit can cause a too_complex_to_determinize_exception
     // from elastic as the automaton has a total limit of 10000 states.
-    debug('%s is in %d rooms which is over the limit of %d. probably troll; ignoring update', userId, newRooms.length, MEMBERSHIP_LIMIT);
+    debug(
+      '%s is in %d rooms which is over the limit of %d. probably troll; ignoring update',
+      userId,
+      newRooms.length,
+      MEMBERSHIP_LIMIT
+    );
     newRooms = [];
   }
 
@@ -308,7 +308,10 @@ function createAddMembershipUpdate(userId, roomIds) {
     id: id,
     body: {
       // ensures roomIds are unique and that the update doenst go over the membership limit
-      script: 'ctx._source.suggest.contexts.rooms = (ctx._source.suggest.contexts.rooms + new_rooms).unique(false).take(' + MEMBERSHIP_LIMIT + ')',
+      script:
+        'ctx._source.suggest.contexts.rooms = (ctx._source.suggest.contexts.rooms + new_rooms).unique(false).take(' +
+        MEMBERSHIP_LIMIT +
+        ')',
       params: {
         new_rooms: newRooms
       },
@@ -321,7 +324,7 @@ function createAddMembershipUpdate(userId, roomIds) {
       }
     },
     _retry_on_conflict: 3
-  }
+  };
 }
 
 function createRemoveMembershipUpdate(userId, roomId) {
@@ -329,23 +332,22 @@ function createRemoveMembershipUpdate(userId, roomId) {
     index: WRITE_INDEX_ALIAS,
     type: 'user',
     id: userId.toString(),
-      body: {
-      script: "ctx._source.suggest.contexts.rooms = ctx._source.suggest.contexts.rooms -= roomId",
+    body: {
+      script: 'ctx._source.suggest.contexts.rooms = ctx._source.suggest.contexts.rooms -= roomId',
       params: {
         roomId: roomId.toString()
       },
       upsert: {
         suggest: {
           contexts: {
-            rooms: ["*"]
+            rooms: ['*']
           }
         }
       }
     },
     _retry_on_conflict: 3
-  }
+  };
 }
-
 
 module.exports = {
   query: query,

@@ -1,6 +1,6 @@
 /*jslint node: true */
 /*global describe:true, it: true, before:true, after:true */
-"use strict";
+'use strict';
 
 var workerQueue = require('../lib/worker-queue-redis');
 var uuid = require('node-uuid');
@@ -21,7 +21,7 @@ describe('worker-queue-redis', function() {
         queuedone();
 
         // there might me some old data, so we wait for ours
-        if(result === data) {
+        if (result === data) {
           done();
         }
       };
@@ -43,11 +43,9 @@ describe('worker-queue-redis', function() {
     queue.invoke(data, { delay: 0 }, function() {
       done();
     });
-
   });
 
   after(function(done) {
     workerQueue.stopScheduler(done);
   });
-
 });

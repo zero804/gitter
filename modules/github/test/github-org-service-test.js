@@ -1,17 +1,17 @@
 /*global describe:true, it:true */
-"use strict";
+'use strict';
 
-var assert = require("assert");
+var assert = require('assert');
 var GithubOrgService = require('..').GitHubOrgService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-org-service #slow #github', function() {
-
   fixtureLoader.ensureIntegrationEnvironment(
-      'GITTER_INTEGRATION_USERNAME',
-      'GITTER_INTEGRATION_USER_SCOPE_TOKEN',
-      'GITTER_INTEGRATION_ORG',
-      'GITTER_INTEGRATION_COLLAB_USERNAME');
+    'GITTER_INTEGRATION_USERNAME',
+    'GITTER_INTEGRATION_USER_SCOPE_TOKEN',
+    'GITTER_INTEGRATION_ORG',
+    'GITTER_INTEGRATION_COLLAB_USERNAME'
+  );
 
   var GITTER_TEST_BOT = {
     username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
@@ -19,7 +19,6 @@ describe('github-org-service #slow #github', function() {
   };
 
   describe('members', function() {
-
     it('should fetch members', function(done) {
       var gh = new GithubOrgService(GITTER_TEST_BOT);
 
@@ -43,7 +42,10 @@ describe('github-org-service #slow #github', function() {
     it('should return true if a user checks that another member is in an org', function(done) {
       var gh = new GithubOrgService(GITTER_TEST_BOT);
 
-      gh.member(fixtureLoader.GITTER_INTEGRATION_ORG, fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME)
+      gh.member(
+        fixtureLoader.GITTER_INTEGRATION_ORG,
+        fixtureLoader.GITTER_INTEGRATION_COLLAB_USERNAME
+      )
         .then(function(isMember) {
           assert(isMember);
         })
@@ -73,15 +75,15 @@ describe('github-org-service #slow #github', function() {
     it('should return membership information for an org', function(done) {
       var gh = new GithubOrgService(GITTER_TEST_BOT);
 
-      gh.getMembership(fixtureLoader.GITTER_INTEGRATION_ORG, fixtureLoader.GITTER_INTEGRATION_USERNAME)
+      gh.getMembership(
+        fixtureLoader.GITTER_INTEGRATION_ORG,
+        fixtureLoader.GITTER_INTEGRATION_USERNAME
+      )
         .then(function(membership) {
           assert.strictEqual(membership.organization.login, fixtureLoader.GITTER_INTEGRATION_ORG);
-          assert.strictEqual(membership.user.login,fixtureLoader.GITTER_INTEGRATION_USERNAME);
+          assert.strictEqual(membership.user.login, fixtureLoader.GITTER_INTEGRATION_USERNAME);
         })
         .nodeify(done);
     });
-
-
   });
-
 });

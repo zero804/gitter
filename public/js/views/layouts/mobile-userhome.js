@@ -21,23 +21,23 @@ module.exports = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       menu: { el: '#menu-region', init: 'initMenuRegion' },
-      userhome: { el: '#userhome-region', init: 'initUserhomeRegion' },
+      userhome: { el: '#userhome-region', init: 'initUserhomeRegion' }
 
       //Left Menu
       //roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
-    },
+    }
   },
 
   //TODO REMOVE WITH LEFT MENU
   // -------------------------------------------------
   ui: {
     mainPage: '#mainPage',
-    showTroupesButton: '#showTroupesButton',
+    showTroupesButton: '#showTroupesButton'
   },
 
   events: {
     'click @ui.mainPage': 'hideTroupes',
-    'click @ui.showTroupesButton': 'showHideTroupes',
+    'click @ui.showTroupesButton': 'showHideTroupes'
   },
 
   initialize: function() {
@@ -70,10 +70,9 @@ module.exports = Marionette.LayoutView.extend({
 
   initUserhomeRegion: function(optionsForRegion) {
     return new UserhomeView(optionsForRegion());
-  },
+  }
 
   //initMenuRegion: function(optionsForRegion) {
   //  return new RoomMenuLayout(optionsForRegion({ bus: appEvents, roomCollection: troupes }));
   //},
-
 });

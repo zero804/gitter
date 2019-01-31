@@ -4,7 +4,7 @@ var _ = require('underscore');
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
-var autolink = require('autolink');  // eslint-disable-line node/no-missing-require
+var autolink = require('autolink'); // eslint-disable-line node/no-missing-require
 var clientEnv = require('gitter-client-env');
 var context = require('../../utils/context');
 var toggleClass = require('../../utils/toggle-class');
@@ -21,7 +21,6 @@ var ProfileMenu = require('../profile-menu/profile-menu-view');
 require('../behaviors/tooltip');
 require('transloadit');
 
-
 var TRANSLOADIT_DEFAULT_OPTIONS = {
   wait: true,
   modal: false,
@@ -29,13 +28,11 @@ var TRANSLOADIT_DEFAULT_OPTIONS = {
   debug: false
 };
 
-
-
 var HeaderView = Marionette.ItemView.extend({
   template: headerViewTemplate,
 
   modelEvents: {
-    change: 'renderIfRequired',
+    change: 'renderIfRequired'
   },
 
   ui: {
@@ -45,31 +42,31 @@ var HeaderView = Marionette.ItemView.extend({
     groupAvatarSignatureInput: '.js-chat-header-group-avatar-upload-signature',
     groupAvatarParamsInput: '.js-chat-header-group-avatar-upload-params',
     groupAvatarProgress: '.js-chat-header-group-avatar-upload-progress',
-    cog:            '.js-chat-settings',
-    dropdownMenu:   '#cog-dropdown',
-    topic:          '.js-room-topic',
-    topicWrapper:   '.js-room-topic-wrapper',
+    cog: '.js-chat-settings',
+    dropdownMenu: '#cog-dropdown',
+    topic: '.js-room-topic',
+    topicWrapper: '.js-room-topic-wrapper',
     topicActivator: '.js-room-topic-edit-activator',
-    name:           '.js-chat-name',
-    favourite:      '.js-favourite-button',
-    orgrooms:       '.js-chat-header-org-page-action',
-    toggleRightToolbarButton: '.js-right-toolbar-toggle-button',
+    name: '.js-chat-name',
+    favourite: '.js-favourite-button',
+    orgrooms: '.js-chat-header-org-page-action',
+    toggleRightToolbarButton: '.js-right-toolbar-toggle-button'
   },
 
   events: {
     'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
-    'click @ui.cog':               'showDropdown',
-    'click #leave-room':           'leaveRoom',
-    'click @ui.favourite':         'toggleFavourite',
+    'click @ui.cog': 'showDropdown',
+    'click #leave-room': 'leaveRoom',
+    'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topicActivator': 'showInput',
-    'keydown textarea':            'detectKeys',
-    'click @ui.orgrooms':          'goToOrgRooms',
+    'keydown textarea': 'detectKeys',
+    'click @ui.orgrooms': 'goToOrgRooms',
     'click @ui.toggleRightToolbarButton': 'toggleRightToolbar'
   },
 
   keyboardEvents: {
-     'room-topic.edit': 'showInput'
-   },
+    'room-topic.edit': 'showInput'
+  },
 
   behaviors: {
     Tooltip: {
@@ -78,14 +75,13 @@ var HeaderView = Marionette.ItemView.extend({
       '.js-chat-header-org-page-action': { placement: 'left' },
       '.js-favourite-button': { placement: 'left' },
       '.js-chat-settings': { placement: 'left' }
-    },
+    }
   },
 
   initialize: function(options) {
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
-
 
     this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
@@ -112,7 +108,7 @@ var HeaderView = Marionette.ItemView.extend({
       this.dropdown = new Dropdown({
         allowClickPropagation: true,
         collection: this.menuItemsCollection,
-        placement: 'right',
+        placement: 'right'
 
         // Do not set the target element for now as it's re-rendered on room
         // change. We'll set it dynamically before showing the dropdown
@@ -131,8 +127,12 @@ var HeaderView = Marionette.ItemView.extend({
 
   onPanelPinStateChange: function() {
     // Archives don't have certain actions
-    if(this.ui.toggleRightToolbarButton.length > 0) {
-      toggleClass(this.ui.toggleRightToolbarButton[0], 'pinned', this.rightToolbarModel.get('isPinned'));
+    if (this.ui.toggleRightToolbarButton.length > 0) {
+      toggleClass(
+        this.ui.toggleRightToolbarButton[0],
+        'pinned',
+        this.rightToolbarModel.get('isPinned')
+      );
     }
   },
 
@@ -158,8 +158,6 @@ var HeaderView = Marionette.ItemView.extend({
       default:
         return 'Only invited users can join';
     }
-
-
   },
 
   onRender: function() {
@@ -187,9 +185,11 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   setupProfileMenu: function() {
-    if(context.isLoggedIn()) {
+    if (context.isLoggedIn()) {
       //If an instance of the profile menu exists destory it to remove listeners etc
-      if(this.profileMenu) { this.profileMenu.destroy(); }
+      if (this.profileMenu) {
+        this.profileMenu.destroy();
+      }
       //Make a new profile menu
       this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
       //Render it
@@ -217,9 +217,14 @@ var HeaderView = Marionette.ItemView.extend({
     menuBuilder.addConditional(isRoomMember, { title: 'Notifications', href: '#notifications' });
 
     if (!isOneToOne) {
-      var settingMenuItem = c.isNativeDesktopApp ?
-          { title: 'Integrations', href: clientEnv['basePath'] + url + '#integrations', target: '_blank', dataset: { disableRouting: 1 } } :
-          { title: 'Integrations', href: '#integrations' };
+      var settingMenuItem = c.isNativeDesktopApp
+        ? {
+            title: 'Integrations',
+            href: clientEnv['basePath'] + url + '#integrations',
+            target: '_blank',
+            dataset: { disableRouting: 1 }
+          }
+        : { title: 'Integrations', href: '#integrations' };
 
       menuBuilder.addConditional(isAdmin, settingMenuItem);
 
@@ -228,8 +233,12 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.addConditional(staffOrAdmin, { title: 'Permissions', href: '#permissions' });
       menuBuilder.addDivider();
 
-      menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank'});
-      menuBuilder.addConditional(isGitHubObject, { title: 'Open in GitHub', href: 'https://www.github.com' + url, target: '_blank' });
+      menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank' });
+      menuBuilder.addConditional(isGitHubObject, {
+        title: 'Open in GitHub',
+        href: 'https://www.github.com' + url,
+        target: '_blank'
+      });
 
       menuBuilder.addDivider();
 
@@ -243,11 +252,10 @@ var HeaderView = Marionette.ItemView.extend({
   leaveRoom: function() {
     if (!context.isLoggedIn()) return;
 
-    apiClient.room.delete('/users/' + context.getUserId(), { })
-      .then(function() {
-        appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
-        //context.troupe().set('roomMember', false);
-      });
+    apiClient.room.delete('/users/' + context.getUserId(), {}).then(function() {
+      appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
+      //context.troupe().set('roomMember', false);
+    });
   },
 
   goToOrgRooms: function(e) {
@@ -269,7 +277,6 @@ var HeaderView = Marionette.ItemView.extend({
     this.ui.favourite.toggleClass('favourite', isFavourite);
 
     apiClient.userRoom.put('', { favourite: isFavourite });
-
   },
 
   toggleRightToolbar: function() {
@@ -333,7 +340,6 @@ var HeaderView = Marionette.ItemView.extend({
     setTimeout(function() {
       textarea.select();
     }, 10);
-
   },
 
   requestBrowserNotificationsPermission: function() {
@@ -353,12 +359,24 @@ var HeaderView = Marionette.ItemView.extend({
       }
     }
 
-    if (changedContains(['uri', 'name', 'id', 'favourite', 'topic', 'avatarUrl', 'group', 'roomMember', 'backend', 'public'])) {
+    if (
+      changedContains([
+        'uri',
+        'name',
+        'id',
+        'favourite',
+        'topic',
+        'avatarUrl',
+        'group',
+        'roomMember',
+        'backend',
+        'public'
+      ])
+    ) {
       // The template may have been set to false
       // by the Isomorphic layout
       this.options.template = headerViewTemplate;
       this.render();
-
 
       // If it is a new chat header, we can edit the topic again
       this.editingTopic = false;
@@ -371,7 +389,7 @@ var HeaderView = Marionette.ItemView.extend({
 
   updateProgressBar: function(spec) {
     var bar = this.ui.groupAvatarProgress;
-    var value = spec.value && (spec.value * 100) + '%';
+    var value = spec.value && spec.value * 100 + '%';
     bar.css('width', value);
   },
 
@@ -386,7 +404,7 @@ var HeaderView = Marionette.ItemView.extend({
     this.ui.groupAvatarProgress.removeClass('hidden');
     this.updateProgressBar({
       // Just show some progress
-      value: .2
+      value: 0.2
     });
   },
 
@@ -405,11 +423,14 @@ var HeaderView = Marionette.ItemView.extend({
 
     // TODO: Make this work not on refresh
     // See snippet below
-    setTimeout(function() {
-      appEvents.triggerParent('navigation', null, null, null, {
-        refresh: true
-      });
-    }.bind(this), 1000);
+    setTimeout(
+      function() {
+        appEvents.triggerParent('navigation', null, null, null, {
+          refresh: true
+        });
+      }.bind(this),
+      1000
+    );
     /* * /
     var urlParse = require('url-parse');
     var urlJoin = require('url-join');
@@ -439,14 +460,14 @@ var HeaderView = Marionette.ItemView.extend({
   handleUploadError: function(err) {
     appEvents.triggerParent('user_notification', {
       title: 'Error Uploading File',
-      text:  err.message
+      text: err.message
     });
     this.resetProgressBar();
   },
 
   uploadGroupAvatar: function() {
     var currentRoom = context.troupe();
-    if(!currentRoom) {
+    if (!currentRoom) {
       return;
     }
 
@@ -455,27 +476,32 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.handleUploadStart();
 
-    apiClient.priv.get('/generate-signature', {
-      type: 'avatar',
+    apiClient.priv
+      .get('/generate-signature', {
+        type: 'avatar',
         group_id: groupId
       })
-      .then(function(res) {
-        this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);
-        this.ui.groupAvatarSignatureInput[0].setAttribute('value', res.sig);
+      .then(
+        function(res) {
+          this.ui.groupAvatarParamsInput[0].setAttribute('value', res.params);
+          this.ui.groupAvatarSignatureInput[0].setAttribute('value', res.sig);
 
-        var formData = new FormData(this.ui.groupAvatarUploadForm[0]);
+          var formData = new FormData(this.ui.groupAvatarUploadForm[0]);
 
-        this.ui.groupAvatarUploadForm.unbind('submit.transloadit');
-        this.ui.groupAvatarUploadForm.transloadit(_.extend(TRANSLOADIT_DEFAULT_OPTIONS, {
-          formData: formData,
-          onStart: this.handleUploadStart.bind(this),
-          onProgress: this.handleUploadProgress.bind(this),
-          onSuccess: this.handleUploadSuccess.bind(this),
-          onError: this.handleUploadError.bind(this)
-        }));
+          this.ui.groupAvatarUploadForm.unbind('submit.transloadit');
+          this.ui.groupAvatarUploadForm.transloadit(
+            _.extend(TRANSLOADIT_DEFAULT_OPTIONS, {
+              formData: formData,
+              onStart: this.handleUploadStart.bind(this),
+              onProgress: this.handleUploadProgress.bind(this),
+              onSuccess: this.handleUploadSuccess.bind(this),
+              onError: this.handleUploadError.bind(this)
+            })
+          );
 
-        this.ui.groupAvatarUploadForm.trigger('submit.transloadit');
-      }.bind(this));
+          this.ui.groupAvatarUploadForm.trigger('submit.transloadit');
+        }.bind(this)
+      );
   }
 });
 

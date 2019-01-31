@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var TroupeUriStrategy = require('./troupe-uri-strategy');
@@ -10,15 +10,14 @@ function OrgPlanStrategy() {
   this.preload = function(orgUris) {
     if (orgUris.isEmpty()) return;
 
-    return billingService.findActiveOrgPlans(orgUris.toArray())
-      .then(function(subscriptions) {
-        orgsWithPlans = subscriptions.reduce(function(memo, s) {
-          memo[s.uri.toLowerCase()] = s.plan;
-          return memo;
-        }, {});
+    return billingService.findActiveOrgPlans(orgUris.toArray()).then(function(subscriptions) {
+      orgsWithPlans = subscriptions.reduce(function(memo, s) {
+        memo[s.uri.toLowerCase()] = s.plan;
+        return memo;
+      }, {});
 
-        return true;
-      });
+      return true;
+    });
   };
 
   this.map = function(orgUri) {
@@ -30,17 +29,16 @@ OrgPlanStrategy.prototype = {
   name: 'OrgPlanStrategy'
 };
 
-
 function GitHubOrgStrategy(options) {
   var troupeUriStrategy = new TroupeUriStrategy(options);
   var planStrategy = new OrgPlanStrategy();
 
   this.preload = function(orgs) {
-    var orgUris = orgs.map(function(org) { return org.login; });
+    var orgUris = orgs.map(function(org) {
+      return org.login;
+    });
 
-    return Promise.join(
-      troupeUriStrategy.preload(orgUris),
-      planStrategy.preload(orgUris));
+    return Promise.join(troupeUriStrategy.preload(orgUris), planStrategy.preload(orgUris));
   };
 
   this.map = function(item) {
@@ -50,7 +48,7 @@ function GitHubOrgStrategy(options) {
       name: item.login,
       avatar_url: item.avatar_url,
       room: troupeUriStrategy.map(item.login),
-      premium: !!plan,
+      premium: !!plan
     };
   };
 }

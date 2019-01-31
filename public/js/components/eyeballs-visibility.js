@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var pageVisibility = require('../utils/page-visibility');
 var passiveEventListener = require('../utils/passive-event-listener');

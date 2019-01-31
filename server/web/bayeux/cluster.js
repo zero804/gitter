@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var env = require('gitter-web-env');
@@ -36,7 +36,7 @@ function makeServer(options) {
   var server = new faye.NodeAdapter({
     mount: endpoint,
     timeout: timeout, // Time before an inactive client is timed out
-    ping: nconf.get('ws:fayePing'),       // Time between pings from the server to the client
+    ping: nconf.get('ws:fayePing'), // Time between pings from the server to the client
     engine: {
       type: fayeRedis,
       client: redisClient,
@@ -50,7 +50,7 @@ function makeServer(options) {
     }
   });
 
-  if(nconf.get('ws:fayePerMessageDeflate')) {
+  if (nconf.get('ws:fayePerMessageDeflate')) {
     /* Add permessage-deflate extension to Faye */
     deflate = deflate.configure({
       level: zlib.Z_BEST_SPEED
@@ -86,25 +86,27 @@ function makeServer(options) {
   if (debug.enabled) {
     ['connection:open', 'connection:close'].forEach(function(event) {
       server._server._engine.bind(event, function(clientId) {
-        debug("faye-engine: Client %s: %s", clientId, event);
+        debug('faye-engine: Client %s: %s', clientId, event);
       });
     });
 
     /** Some logging */
     ['handshake', 'disconnect'].forEach(function(event) {
       server.bind(event, function(clientId) {
-        debug("faye-server: Client %s: %s", clientId, event);
+        debug('faye-server: Client %s: %s', clientId, event);
       });
     });
-
   }
 
   server.bind('disconnect', function(clientId) {
     // Warning, this event may be called on a different Faye engine from
     // where the socket is residing
     presenceService.socketDisconnected(clientId, function(err) {
-      if(err && err.status !== 404) {
-        logger.error("bayeux: Error while attempting disconnection of socket " + clientId + ": " + err, { exception: err });
+      if (err && err.status !== 404) {
+        logger.error(
+          'bayeux: Error while attempting disconnection of socket ' + clientId + ': ' + err,
+          { exception: err }
+        );
       }
     });
   });
@@ -134,17 +136,16 @@ function makeServer(options) {
   return server;
 }
 
-
 /* This function is used a lot, this version excludes try-catch so that it can be optimised */
 function stringifyInternal(object) {
-  if(typeof object !== 'object') return JSON.stringify(object);
+  if (typeof object !== 'object') return JSON.stringify(object);
 
   var string = JSON.stringify(object);
 
   // Over cautious
   stats.eventHF('bayeux.message.count', 1, STATS_FREQUENCY);
 
-  if(string) {
+  if (string) {
     stats.gaugeHF('bayeux.message.size', string.length, STATS_FREQUENCY);
   } else {
     stats.gaugeHF('bayeux.message.size', 0, STATS_FREQUENCY);
@@ -156,7 +157,7 @@ function stringifyInternal(object) {
 faye.stringify = function(object) {
   try {
     return stringifyInternal(object);
-  } catch(e) {
+  } catch (e) {
     stats.event('bayeux.message.serialization_error');
 
     logger.error('Error while serializing JSON message', { exception: e });
@@ -183,13 +184,13 @@ faye.logger = {
   warn: logger.warn
 };
 
-if(fayeLoggingLevel === 'info' || fayeLoggingLevel === 'debug') {
+if (fayeLoggingLevel === 'info' || fayeLoggingLevel === 'debug') {
   faye.logger.info = logger.info;
 }
 
-if(fayeLoggingLevel === 'debug') {
-  faye.logger.debug = (msg) => {
-    debug("bayeux-cluster-faye: %s", msg);
+if (fayeLoggingLevel === 'debug') {
+  faye.logger.debug = msg => {
+    debug('bayeux-cluster-faye: %s', msg);
   };
 }
 
@@ -199,29 +200,29 @@ function BayeuxCluster(lightweight) {
   /**
    * Create the servers
    */
-  var serverNew = this.serverNew = makeServer({
+  var serverNew = (this.serverNew = makeServer({
     endpoint: '/bayeux',
-    redisClient: env.redis.createClient(nconf.get("redis_faye")),
-    redisSubscribeClient: env.redis.createClient(nconf.get("redis_faye")),
+    redisClient: env.redis.createClient(nconf.get('redis_faye')),
+    redisSubscribeClient: env.redis.createClient(nconf.get('redis_faye')),
     timeout: nconf.get('ws:fayeTimeout'),
     lightweight: lightweight
-  });
+  }));
 
-  var serverLegacy = this.serverLegacy = makeServer({
+  var serverLegacy = (this.serverLegacy = makeServer({
     endpoint: '/faye',
     redisClient: env.redis.createClient(),
     redisSubscribeClient: env.redis.createClient(),
     timeout: nconf.get('ws:fayeTimeoutOLD'),
     lightweight: lightweight
-  });
+  }));
 
   /**
    * Create the clients
    */
-  var clientNew = this.clientNew = serverNew.getClient();
+  var clientNew = (this.clientNew = serverNew.getClient());
   clientNew.addExtension(superClientExtension);
 
-  var clientLegacy = this.clientLegacy = serverLegacy.getClient();
+  var clientLegacy = (this.clientLegacy = serverLegacy.getClient());
   clientLegacy.addExtension(superClientExtension);
 }
 
@@ -289,21 +290,20 @@ function BayeuxSingleton(lightweight) {
   /**
    * Create the servers
    */
-  var server = this.server = makeServer({
+  var server = (this.server = makeServer({
     endpoint: '/bayeux',
-    redisClient: env.redis.createClient(nconf.get("redis_faye")),
-    redisSubscribeClient: env.redis.createClient(nconf.get("redis_faye")),
+    redisClient: env.redis.createClient(nconf.get('redis_faye')),
+    redisSubscribeClient: env.redis.createClient(nconf.get('redis_faye')),
     timeout: nconf.get('ws:fayeTimeout'),
     lightweight: lightweight
-  });
+  }));
 
   /**
    * Create the clients
    */
-  var client = this.client = server.getClient();
+  var client = (this.client = server.getClient());
   client.addExtension(superClientExtension);
 }
-
 
 /** Returns callback(exists) to match faye */
 BayeuxSingleton.prototype.clientExists = function(clientId, callback) {

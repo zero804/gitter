@@ -1,12 +1,16 @@
 /*global describe:true, it:true */
-"use strict";
+'use strict';
 
-var assert = require("assert");
+var assert = require('assert');
 var GithubMeService = require('..').GitHubMeService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-me-service #slow #github', function() {
-  fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USERNAME', 'GITTER_INTEGRATION_USER_SCOPE_TOKEN', 'GITTER_INTEGRATION_ORG');
+  fixtureLoader.ensureIntegrationEnvironment(
+    'GITTER_INTEGRATION_USERNAME',
+    'GITTER_INTEGRATION_USER_SCOPE_TOKEN',
+    'GITTER_INTEGRATION_ORG'
+  );
 
   var FAKE_USER = {
     username: fixtureLoader.GITTER_INTEGRATION_USERNAME,
@@ -24,7 +28,6 @@ describe('github-me-service #slow #github', function() {
   });
 
   describe('test org admin status', function() {
-
     it('should return true if the user is an admin', function(done) {
       var gh = new GithubMeService(FAKE_USER);
 
@@ -54,9 +57,7 @@ describe('github-me-service #slow #github', function() {
         })
         .nodeify(done);
     });
-
   });
-
 
   it('should return that you are and org admin when you are', function(done) {
     var gh = new GithubMeService(FAKE_USER);
@@ -66,7 +67,6 @@ describe('github-me-service #slow #github', function() {
         assert(isOrgMember);
       })
       .nodeify(done);
-
   });
 
   it('should return that you are and org member when you are', function(done) {
@@ -77,7 +77,6 @@ describe('github-me-service #slow #github', function() {
         assert(isOrgMember);
       })
       .nodeify(done);
-
   });
 
   it('should return org membership', function(done) {
@@ -89,7 +88,6 @@ describe('github-me-service #slow #github', function() {
         assert('gittertestbot', membership.user.login);
       })
       .nodeify(done);
-
   });
 
   it('should list all orgs the user is a member of', function(done) {
@@ -101,10 +99,5 @@ describe('github-me-service #slow #github', function() {
         assert(membership.length >= 1);
       })
       .nodeify(done);
-
   });
-
-
-
-
 });

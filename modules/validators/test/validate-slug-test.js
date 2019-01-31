@@ -9,7 +9,7 @@ describe('validate-slug', function() {
     'I love cats': false,
     'I-Love-Cats': false,
     '': false,
-    ' ': false,
+    ' ': false
   };
 
   Object.keys(FIXTURES).forEach(function(key) {
@@ -20,16 +20,13 @@ describe('validate-slug', function() {
     it(name + ' ' + key, function() {
       assert.strictEqual(validateSlug(key), result);
     });
-  })
+  });
 
   it('should not validate things that are not strings', function() {
-    assert.strictEqual(validateSlug({foo: 'bar'}), false);
+    assert.strictEqual(validateSlug({ foo: 'bar' }), false);
     assert.strictEqual(validateSlug([]), false);
     assert.strictEqual(validateSlug(100), false);
     assert.strictEqual(validateSlug(undefined), false);
     assert.strictEqual(validateSlug(null), false);
   });
-
 });
-
-

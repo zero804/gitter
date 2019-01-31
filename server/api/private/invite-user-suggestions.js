@@ -8,7 +8,8 @@ function resolveInviteUserSuggestions(req, res, next) {
   var type = req.query.type;
   var linkPath = req.query.linkPath;
 
-  return collaboratorsService.findCollaborators(req.user, type, linkPath)
+  return collaboratorsService
+    .findCollaborators(req.user, type, linkPath)
     .then(function(suggestions) {
       debug('suggestions', suggestions);
       res.send(suggestions);

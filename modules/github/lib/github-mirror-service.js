@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var url = require('url');
 var StatusError = require('statuserror');
@@ -9,18 +9,22 @@ var badCredentialsCheck = require('./bad-credentials-check');
 var request = require('./request-wrapper');
 
 function repoTokenFirst(user) {
-  return user && (user.githubToken || user.githubUserToken) || '';
+  return (user && (user.githubToken || user.githubUserToken)) || '';
 }
 
 function userTokenFirst(user) {
-  return user && (user.githubUserToken || user.githubToken) || '';
+  return (user && (user.githubUserToken || user.githubToken)) || '';
 }
 
 module.exports = function(tokenPriority) {
   var tokenStrategy;
-  switch(tokenPriority) {
-    case 'repo': tokenStrategy = repoTokenFirst; break;
-    case 'user': tokenStrategy = userTokenFirst; break;
+  switch (tokenPriority) {
+    case 'repo':
+      tokenStrategy = repoTokenFirst;
+      break;
+    case 'user':
+      tokenStrategy = userTokenFirst;
+      break;
     default:
       throw new Error('Unknown token priority ' + tokenPriority);
   }
@@ -29,7 +33,6 @@ module.exports = function(tokenPriority) {
     var token = tokenStrategy(user);
     this.token = token;
   }
-
 
   Mirror.prototype.get = function(uri) {
     var u = url.parse(uri, true);
@@ -65,8 +68,7 @@ module.exports = function(tokenPriority) {
           return resolve(response.statusCode);
         }
       });
-    })
-    .catch(badCredentialsCheck);
+    }).catch(badCredentialsCheck);
   };
 
   // return Mirror;

@@ -9,14 +9,15 @@ var Group = require('gitter-web-persistence').Group;
 var LOCK_TIMEOUT_SECONDS = 10;
 
 var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
-  keyPrefix: "avatar-check:"
+  keyPrefix: 'avatar-check:'
 });
 
 /**
  * Returns true iff the avatar was updated
  */
 function groupAvatarUpdater(groupId, githubUsername) {
-  return redisClient.set('group:' + groupId, '1', 'EX', LOCK_TIMEOUT_SECONDS, 'NX')
+  return redisClient
+    .set('group:' + groupId, '1', 'EX', LOCK_TIMEOUT_SECONDS, 'NX')
     .bind({
       groupId: groupId,
       githubUsername: githubUsername
@@ -32,25 +33,30 @@ function groupAvatarUpdater(groupId, githubUsername) {
       var avatarVersion = extractGravatarVersion(githubUser.avatar_url);
       if (!avatarVersion) return false;
 
-      return Group.update({
-        _id: this.groupId,
-        $or: [{
-          avatarVersion: { $lt: avatarVersion }
-        }, {
-          avatarVersion: null
-        }]
-      }, {
-        $max: {
-          avatarVersion: avatarVersion,
-          avatarCheckedDate: new Date()
+      return Group.update(
+        {
+          _id: this.groupId,
+          $or: [
+            {
+              avatarVersion: { $lt: avatarVersion }
+            },
+            {
+              avatarVersion: null
+            }
+          ]
+        },
+        {
+          $max: {
+            avatarVersion: avatarVersion,
+            avatarCheckedDate: new Date()
+          }
         }
-      })
-      .exec()
-      .then(function(result) {
-        return result.nModified >= 1;
-      });
-    })
+      )
+        .exec()
+        .then(function(result) {
+          return result.nModified >= 1;
+        });
+    });
 }
-
 
 module.exports = groupAvatarUpdater;

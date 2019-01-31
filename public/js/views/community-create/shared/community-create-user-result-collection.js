@@ -9,17 +9,23 @@ var _super = ProxyCollection.prototype;
 
 var UserResultCollection = function(models, attrs, options) {
   if (!attrs || !attrs.stepViewModel) {
-    throw new Error('A valid instance of CommunityCreateStepViewModel should be passed to a new UserResultCollection');
+    throw new Error(
+      'A valid instance of CommunityCreateStepViewModel should be passed to a new UserResultCollection'
+    );
   }
   this.stepViewModel = attrs.stepViewModel;
 
   if (!attrs || !attrs.searchModel) {
-    throw new Error('A valid instance of SearchModel should be passed to a new UserResultCollection');
+    throw new Error(
+      'A valid instance of SearchModel should be passed to a new UserResultCollection'
+    );
   }
   this.searchModel = attrs.searchModel;
 
   if (!attrs || !attrs.communityCreateModel) {
-    throw new Error('A valid instance of CommunityCreateModel should be passed to a new UserResultCollection');
+    throw new Error(
+      'A valid instance of CommunityCreateModel should be passed to a new UserResultCollection'
+    );
   }
 
   this.communityCreateModel = attrs.communityCreateModel;
@@ -32,26 +38,28 @@ var UserResultCollection = function(models, attrs, options) {
 
   this.listenTo(this.stepViewModel, 'change:active', this.onActiveChange, this);
   this.listenTo(this.searchModel, 'change:searchInput', this.getResults, this);
-  this.listenTo(this.communityCreateModel, 'change:communityName change:communitySlug change:githubOrgId', this.getResults, this);
+  this.listenTo(
+    this.communityCreateModel,
+    'change:communityName change:communitySlug change:githubOrgId',
+    this.getResults,
+    this
+  );
 };
 
-
 _.extend(UserResultCollection.prototype, _super, {
-
   onActiveChange: function() {
-    if(this.stepViewModel.get('active')) {
+    if (this.stepViewModel.get('active')) {
       this.fetchSuggestions();
     }
   },
 
   getResults: function() {
-    if(this.stepViewModel.get('active')) {
+    if (this.stepViewModel.get('active')) {
       var searchInput = this.searchModel.get('searchInput');
-      if(searchInput.length) {
+      if (searchInput.length) {
         this.switchCollection(this.userSearchCollection);
         this.fetchUsers();
-      }
-      else {
+      } else {
         this.switchCollection(this.userSuggestionCollection);
       }
     }
@@ -59,8 +67,9 @@ _.extend(UserResultCollection.prototype, _super, {
 
   fetchUsers: _.throttle(function() {
     var searchInput = this.searchModel.get('searchInput');
-    this.userSearchCollection.fetch({
-      data: {
+    this.userSearchCollection.fetch(
+      {
+        data: {
           q: searchInput,
           limit: 12
         }
@@ -73,7 +82,6 @@ _.extend(UserResultCollection.prototype, _super, {
     );
   }, 300),
 
-
   fetchSuggestions: function() {
     var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
 
@@ -83,8 +91,7 @@ _.extend(UserResultCollection.prototype, _super, {
         linkPath: githubProjectInfo.name || undefined
       }
     });
-  },
-
+  }
 });
 
 module.exports = UserResultCollection;

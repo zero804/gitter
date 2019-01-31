@@ -10,16 +10,15 @@ function printCSV(array, columns) {
     });
 
     print(row.join(','));
-  })
+  });
 }
 
-
 function createIdForTimestampString(timestamp) {
-  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+  var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 
-  while(hexSeconds.length < 8) {
-    hexSeconds = "0" + hexSeconds;
+  while (hexSeconds.length < 8) {
+    hexSeconds = '0' + hexSeconds;
   }
 
-  return ObjectId(hexSeconds + "0000000000000000");
+  return ObjectId(hexSeconds + '0000000000000000');
 }

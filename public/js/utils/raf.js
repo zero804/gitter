@@ -1,10 +1,12 @@
 'use strict';
 
-var nativeRaf = window.requestAnimationFrame ||
+var nativeRaf =
+  window.requestAnimationFrame ||
   window.webkitRequestAnimationFrame ||
   window.mozRequestAnimationFrame;
 
-var nativeCancel = window.cancelAnimationFrame ||
+var nativeCancel =
+  window.cancelAnimationFrame ||
   window.webkitCancelAnimationFrame ||
   window.mozCancelAnimationFrame;
 
@@ -16,5 +18,5 @@ function shimCancel(timeoutId) {
   window.clearTimeout(timeoutId);
 }
 
-module.exports = nativeRaf && nativeRaf.bind(window) || shim;
-module.exports.cancel = nativeCancel && nativeCancel.bind(window) || shimCancel;
+module.exports = (nativeRaf && nativeRaf.bind(window)) || shim;
+module.exports.cancel = (nativeCancel && nativeCancel.bind(window)) || shimCancel;

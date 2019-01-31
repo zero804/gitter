@@ -4,13 +4,12 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 
 module.exports = function(underTest) {
-
   describe('non-anonymous', function() {
     var userId, clientId;
 
     beforeEach(function() {
-      userId = mongoUtils.getNewObjectIdString() + "";
-      clientId = mongoUtils.getNewObjectIdString() + "";
+      userId = mongoUtils.getNewObjectIdString() + '';
+      clientId = mongoUtils.getNewObjectIdString() + '';
     });
 
     it('should create tokens for user-clients that do not exist', function(done) {
@@ -22,7 +21,7 @@ module.exports = function(underTest) {
     });
 
     it('should not validate tokens that do not exist', function(done) {
-      underTest.validateToken("test" + Math.random(), function(err, userClient) {
+      underTest.validateToken('test' + Math.random(), function(err, userClient) {
         if (err) return done(err);
         assert(!userClient);
         done();
@@ -38,11 +37,10 @@ module.exports = function(underTest) {
 
           assert(Array.isArray(userClient));
           // Deep equals freaks out with mongo ids
-          assert.strictEqual(userId, "" + userClient[0]);
-          assert.strictEqual(clientId, "" + userClient[1]);
+          assert.strictEqual(userId, '' + userClient[0]);
+          assert.strictEqual(clientId, '' + userClient[1]);
           done();
         });
-
       });
     });
 
@@ -55,9 +53,7 @@ module.exports = function(underTest) {
           assert.strictEqual(token2, token3);
           done();
         });
-
       });
-
     });
 
     it('should not find tokens that have been deleted', function(done) {
@@ -65,7 +61,7 @@ module.exports = function(underTest) {
         if (err) return done(err);
 
         underTest.deleteToken(token2, function(err) {
-          if(err) return done(err);
+          if (err) return done(err);
 
           underTest.getToken(userId, clientId, function(err, token3) {
             if (err) return done(err);
@@ -80,19 +76,15 @@ module.exports = function(underTest) {
 
                 assert(Array.isArray(userClient));
                 // Deep equals freaks out with mongo ids
-                assert.strictEqual(userId, "" + userClient[0]);
-                assert.strictEqual(clientId, "" + userClient[1]);
+                assert.strictEqual(userId, '' + userClient[0]);
+                assert.strictEqual(clientId, '' + userClient[1]);
 
                 done();
               });
             });
           });
         });
-
       });
-
     });
-
   });
-
 };

@@ -7,7 +7,7 @@ function validateAdminOnly(adminOnly) {
   }
 
   // empty, true or false and nothing else
-  return (adminOnly === true || adminOnly === false);
+  return adminOnly === true || adminOnly === false;
 }
 
 module.exports = validateAdminOnly;

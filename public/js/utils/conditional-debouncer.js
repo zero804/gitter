@@ -26,7 +26,7 @@ ConditionalDebouncer.prototype.set = function(field, value) {
   this.conditions[field] = value;
   debug('set: %s=%s', field, value);
   this.checkConditions();
-}
+};
 
 ConditionalDebouncer.prototype.checkConditions = function() {
   debug('check conditions: %j', this.conditions);
@@ -50,18 +50,17 @@ ConditionalDebouncer.prototype.checkConditions = function() {
       this.timer = null;
     }
   }
-}
+};
 
 ConditionalDebouncer.prototype.fire = function() {
   this.timer = null;
   debug('Debounced timeout, firing debounced function');
   this.fn();
-}
+};
 
 ConditionalDebouncer.prototype.cancel = function() {
   clearTimeout(this.timer);
   this.timer = null;
-}
+};
 
-
-module.exports = ConditionalDebouncer
+module.exports = ConditionalDebouncer;

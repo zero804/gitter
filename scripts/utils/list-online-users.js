@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -15,11 +15,10 @@ var opts = require('yargs')
     description: 'Display names'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 presenceService.listOnlineUsers(function(err, userIds) {
-  if(opts.name) {
+  if (opts.name) {
     userService.findByIds(userIds, function(err, users) {
       users.forEach(function(user) {
         console.log(user.displayName);
@@ -35,5 +34,4 @@ presenceService.listOnlineUsers(function(err, userIds) {
     console.log(userId);
   });
   shutdown.shutdownGracefully();
-
 });

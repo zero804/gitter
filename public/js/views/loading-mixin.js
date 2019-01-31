@@ -16,10 +16,10 @@ module.exports = {
     this.showEmptyView = this.showLoadingView;
   },
   showLoadingView: function() {
-    if(this.collection.loading) {
-      var LoadingView = Marionette.getOption(this, "loadingView");
+    if (this.collection.loading) {
+      var LoadingView = Marionette.getOption(this, 'loadingView');
 
-      if(!this.loadingModel) {
+      if (!this.loadingModel) {
         this.loadingModel = new Backbone.Model();
       }
 
@@ -30,7 +30,7 @@ module.exports = {
         this.listenToOnce(this.collection, 'loaded', function() {
           this.removeChildView(this.loadingModel);
 
-          if(this.collection.length === 0) {
+          if (this.collection.length === 0) {
             this.constructor.prototype.showEmptyView.call(this);
             return true;
           }

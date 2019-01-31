@@ -11,7 +11,8 @@ module.exports = {
 
     var userId = req.user._id;
 
-    return groupRoomSuggestions.findUnjoinedRoomsInGroup(req.group._id, userId)
+    return groupRoomSuggestions
+      .findUnjoinedRoomsInGroup(req.group._id, userId)
       .then(function(suggestions) {
         var strategy = restSerializer.TroupeStrategy.createSuggestionStrategy();
         return restSerializer.serialize(suggestions, strategy);

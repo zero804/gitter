@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var groupService = require('gitter-web-groups/lib/group-service');
 var GroupStrategy = require('./group-strategy');

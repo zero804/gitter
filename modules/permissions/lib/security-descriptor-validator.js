@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -37,7 +37,7 @@ function validateExtraUserIds(descriptor) {
 }
 
 function validateGroupDescriptor(descriptor) {
-  switch(descriptor.members) {
+  switch (descriptor.members) {
     case 'PUBLIC':
       if (!descriptor.public) {
         throw new StatusError(403, 'Invalid public attribute: ' + descriptor.public);
@@ -55,7 +55,7 @@ function validateGroupDescriptor(descriptor) {
       throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
-  switch(descriptor.admins) {
+  switch (descriptor.admins) {
     case 'MANUAL': // Not sure why you would want this, but it's valid
     case 'GROUP_ADMIN':
       break;
@@ -75,17 +75,18 @@ function validateGroupDescriptor(descriptor) {
     throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
   }
 
-  if(!mongoUtils.isLikeObjectId(descriptor.internalId)) {
+  if (!mongoUtils.isLikeObjectId(descriptor.internalId)) {
     throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
   }
 
   validateExtraUserIds(descriptor);
 }
 
-function validateGhRepoDescriptor(descriptor) { // eslint-disable-line complexity
+// eslint-disable-next-line complexity
+function validateGhRepoDescriptor(descriptor) {
   var usesGH = false;
 
-  switch(descriptor.members) {
+  switch (descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
     case 'INVITE_OR_ADMIN':
@@ -98,7 +99,7 @@ function validateGhRepoDescriptor(descriptor) { // eslint-disable-line complexit
       throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
-  switch(descriptor.admins) {
+  switch (descriptor.admins) {
     case 'MANUAL':
       break;
     case 'GH_REPO_PUSH':
@@ -113,7 +114,7 @@ function validateGhRepoDescriptor(descriptor) { // eslint-disable-line complexit
   }
 
   if (descriptor.public) {
-    switch(descriptor.members) {
+    switch (descriptor.members) {
       case 'PUBLIC':
       case 'GH_REPO_ACCESS':
         break;
@@ -143,7 +144,7 @@ function validateGhOrgLinkPath(linkPath) {
 
 function validateGhOrgDescriptor(descriptor) {
   var usesGH = false;
-  switch(descriptor.members) {
+  switch (descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
     case 'INVITE_OR_ADMIN':
@@ -155,7 +156,7 @@ function validateGhOrgDescriptor(descriptor) {
       throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
-  switch(descriptor.admins) {
+  switch (descriptor.admins) {
     case 'MANUAL':
       break;
     case 'GH_ORG_MEMBER':
@@ -183,7 +184,6 @@ function validateGhOrgDescriptor(descriptor) {
   validateExtraUserIds(descriptor);
 }
 
-
 function validateGhUserLinkPath(linkPath) {
   if (!linkPath) {
     throw new StatusError(403, 'Invalid empty linkPath attribute for org');
@@ -197,7 +197,7 @@ function validateGhUserLinkPath(linkPath) {
 
 function validateGhUserDescriptor(descriptor) {
   var usesGH = false;
-  switch(descriptor.members) {
+  switch (descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
     case 'INVITE_OR_ADMIN':
@@ -206,7 +206,7 @@ function validateGhUserDescriptor(descriptor) {
       throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
-  switch(descriptor.admins) {
+  switch (descriptor.admins) {
     case 'MANUAL':
       break;
     case 'GH_USER_SAME':
@@ -266,11 +266,10 @@ function validateOneToOneDescriptor(descriptor) {
   if (descriptor.extraAdmins && descriptor.extraAdmins.length) {
     throw new StatusError(403, 'Invalid extraAdmins attribute');
   }
-
 }
 
 function validateBasicDescriptor(descriptor) {
-  switch(descriptor.members) {
+  switch (descriptor.members) {
     case 'PUBLIC':
     case 'INVITE':
     case 'INVITE_OR_ADMIN':
@@ -302,13 +301,12 @@ function validateBasicDescriptor(descriptor) {
   }
 
   validateExtraUserIds(descriptor);
-
 }
 
 function validate(descriptor) {
   if (!descriptor) throw new StatusError(403, 'Invalid descriptor');
 
-  switch(descriptor.type) {
+  switch (descriptor.type) {
     case 'GROUP':
       return validateGroupDescriptor(descriptor);
 
@@ -331,7 +329,6 @@ function validate(descriptor) {
 
       throw new StatusError(403, 'Invalid descriptor type: ' + descriptor.type);
   }
-
 }
 
 module.exports = validate;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 
@@ -15,20 +15,17 @@ var changeElementType = function($el, newType) {
   var attrs = {};
 
   $.each($el[0].attributes, function(idx, attr) {
-      attrs[attr.name] = attr.value;
+    attrs[attr.name] = attr.value;
   });
 
   $el.replaceWith(function() {
-      return $("<" + newType + "/>", attrs).append($el.contents());
+    return $('<' + newType + '/>', attrs).append($el.contents());
   });
 };
-
-
 
 var today = new Date();
 var elevenFullMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 11, 1);
 var gitterLaunchDate = new Date(2013, 10, 1); // 1 November 2013
-
 
 // Not sure what mangleHeatmap does but it was there before
 var mangleHeatmap = function() {
@@ -45,8 +42,8 @@ var calHeatmapDefaults = {
   maxDate: today,
   minDate: gitterLaunchDate,
   range: 12,
-  domain: "month",
-  subDomain: "day",
+  domain: 'month',
+  subDomain: 'day',
   considerMissingDataAsZero: false,
   displayLegend: false,
   data: {},
@@ -67,22 +64,23 @@ var calHeatmapDefaults = {
     }
   },
   onClick: function(date, value) {
-    if(!value) return;
+    if (!value) return;
 
     var yyyy = date.getFullYear();
     var mm = date.getMonth() + 1;
-    if(mm < 10) mm = "0" + mm;
+    if (mm < 10) mm = '0' + mm;
 
     var dd = date.getDate();
-    if(dd < 10) dd = "0" + dd;
+    if (dd < 10) dd = '0' + dd;
 
-    window.location.assign('/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd);
+    window.location.assign(
+      '/' + context.troupe().get('uri') + '/archives/' + yyyy + '/' + mm + '/' + dd
+    );
   },
   onComplete: function() {
     mangleHeatmap();
   }
 };
-
 
 var troupeId = context.getTroupeId();
 var tz = getTimezoneInfo().iso;
@@ -91,10 +89,15 @@ var getHeatMapDataPromise = apiClient.priv.get('/chat-heatmap/' + troupeId, { tz
 var createHeatMap = function(el, options) {
   var $heatMap = $(el);
 
-  var opts = $.extend({}, calHeatmapDefaults, {
-    // Where we insert the calendar
-    itemSelector: $heatMap[0]
-  }, options);
+  var opts = $.extend(
+    {},
+    calHeatmapDefaults,
+    {
+      // Where we insert the calendar
+      itemSelector: $heatMap[0]
+    },
+    options
+  );
 
   // There might be something previously generated in here
   $heatMap.empty();
@@ -102,14 +105,12 @@ var createHeatMap = function(el, options) {
   var cal = new CalHeatMap();
   cal.init(opts);
 
-
   // Populate with data
   getHeatMapDataPromise.then(function(heatMapData) {
     cal.update(heatMapData);
 
     mangleHeatmap();
     setTimeout(mangleHeatmap, 0);
-
 
     // Because `cal-heatmap` uses nested SVG's and x/y attributes this makes it
     // impossible to position via CSS so we change those SVG parents into divs so
@@ -136,19 +137,20 @@ var createHeatMap = function(el, options) {
     dateItemElements.attr('tabindex', 0);
     // Make them accessible to keyboard shortcuts
     dateItemElements.on('keydown', function(e) {
-      if(e.keyCode === SPACEBAR_KEY || e.keyCode === ENTER_KEY) {
-        var titleText = $(this).siblings('title').text();
+      if (e.keyCode === SPACEBAR_KEY || e.keyCode === ENTER_KEY) {
+        var titleText = $(this)
+          .siblings('title')
+          .text();
         var numItems = parseInt(titleText.replace(/\sitems.*/, ''), 10);
         var dateString = titleText.replace(/.*on\s/, '');
         // Simulate the click callback
         opts.onClick(new Date(dateString), numItems);
       }
-    })
+    });
   });
 
   return cal;
 };
-
 
 var createResponsiveHeatMap = function(el, options) {
   var $el = $(el);
@@ -158,10 +160,16 @@ var createResponsiveHeatMap = function(el, options) {
       // See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
       maxWidth: 960,
       success: function() {
-        createHeatMap($el, $.extend({
-          cellPadding: 10,
-          cellSize: 25
-        }, options));
+        createHeatMap(
+          $el,
+          $.extend(
+            {
+              cellPadding: 10,
+              cellSize: 25
+            },
+            options
+          )
+        );
       }
     },
     // default
@@ -178,10 +186,9 @@ var createResponsiveHeatMap = function(el, options) {
     var viewportWidth = $(window).width();
 
     breakpointList.some(function(breakpoint, index) {
-      if((viewportWidth < breakpoint.maxWidth || breakpoint.maxWidth === 'default')) {
-
-        if(index !== currentBreakpointIndex) {
-          if(breakpoint.success) {
+      if (viewportWidth < breakpoint.maxWidth || breakpoint.maxWidth === 'default') {
+        if (index !== currentBreakpointIndex) {
+          if (breakpoint.success) {
             breakpoint.success();
           }
           currentBreakpointIndex = index;
@@ -192,15 +199,13 @@ var createResponsiveHeatMap = function(el, options) {
       }
 
       return false;
-    })
+    });
   };
   resizeHeatmapCallback();
   $(window).on('resize', resizeHeatmapCallback);
 };
 
-
-
 module.exports = {
   createHeatMap: createHeatMap,
   createResponsiveHeatMap: createResponsiveHeatMap
-}
+};

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var underTest = require('../lib/mongo-utils');
@@ -6,28 +6,25 @@ var ObjectID = require('mongodb').ObjectID;
 var Promise = require('bluebird');
 
 describe('mongo-utils', function() {
-
   // The millisecond value seems to float around in some instances, so this test
   // is designed to be spread out over several milliseconds to test this theory
   it('should return the right time, no matter what the current time #slow', function(done) {
-
     function doLater(i) {
-      return Promise.delay(i * 10)
-        .then(function() {
-          var t = underTest.getDateFromObjectId('51adcd412aefe1576f000005');
-          assert.equal(t.getTime(), 1370344769000);
-        });
+      return Promise.delay(i * 10).then(function() {
+        var t = underTest.getDateFromObjectId('51adcd412aefe1576f000005');
+        assert.equal(t.getTime(), 1370344769000);
+      });
     }
 
     var promises = [];
-    for(var i = 0; i < 10; i++) {
+    for (var i = 0; i < 10; i++) {
       promises.push(doLater(i));
     }
 
-    Promise.all(promises).then(function() { done(); }, done);
-
+    Promise.all(promises).then(function() {
+      done();
+    }, done);
   });
-
 
   // The millisecond value seems to float around in some instances, so this test
   // is designed to be spread out over several milliseconds to test this theory
@@ -36,20 +33,19 @@ describe('mongo-utils', function() {
     var t = id.getTimestamp().getTime();
 
     function doLater(i) {
-      return Promise.delay(i * 10)
-        .then(function() {
-          assert.equal(id.getTimestamp().getTime(), t);
-
-        });
+      return Promise.delay(i * 10).then(function() {
+        assert.equal(id.getTimestamp().getTime(), t);
+      });
     }
 
     var promises = [];
-    for(var i = 0; i < 10; i++) {
+    for (var i = 0; i < 10; i++) {
       promises.push(doLater(i));
     }
 
-    Promise.all(promises).then(function() { done(); }, done);
-
+    Promise.all(promises).then(function() {
+      done();
+    }, done);
   });
 
   it('should handle ObjectIDs', function() {
@@ -83,7 +79,11 @@ describe('mongo-utils', function() {
       // ObjectIDS
       { a: '571f97883f33e1a227b8ab85', b: new ObjectID('571f97883f33e1a227b8ab85'), result: true },
       { a: new ObjectID('571f97883f33e1a227b8ab85'), b: '571f97883f33e1a227b8ab85', result: true },
-      { a: new ObjectID('571f97883f33e1a227b8ab85'), b: new ObjectID('571f97883f33e1a227b8ab86'), result: false },
+      {
+        a: new ObjectID('571f97883f33e1a227b8ab85'),
+        b: new ObjectID('571f97883f33e1a227b8ab86'),
+        result: false
+      }
     ];
 
     FIXTURES.forEach(function(fixture, index) {
@@ -97,17 +97,17 @@ describe('mongo-utils', function() {
       var PackageDetails = {
         ObjectID: require('mongodb').ObjectID,
         version: 'local'
-      }
+      };
 
       var BaseDetails = {
         ObjectID: require('../../../node_modules/mongodb').ObjectID,
         version: require('../../../node_modules/mongodb/package.json').version
-      }
+      };
 
       var MongooseDetails = {
         ObjectID: require('mongoose').mongo.ObjectID,
         version: 'mongoose'
-      }
+      };
 
       var FIXTURES = [
         { A: PackageDetails, B: PackageDetails },
@@ -119,11 +119,10 @@ describe('mongo-utils', function() {
         { A: MongooseDetails, B: PackageDetails },
         { A: MongooseDetails, B: PackageDetails },
         { A: BaseDetails, B: MongooseDetails },
-        { A: MongooseDetails, B: BaseDetails },
+        { A: MongooseDetails, B: BaseDetails }
       ];
 
       FIXTURES.forEach(function(fixture, index) {
-
         /****************************************************
          * Note to the reader:
          * If you are here because of a broken test, please
@@ -145,12 +144,16 @@ describe('mongo-utils', function() {
           var a = new fixture.A.ObjectID('571f97883f33e1a227b8ab85');
           var b = new fixture.B.ObjectID('571f97883f33e1a227b8ab85');
           var nativeResult = a.equals(b);
-          assert.strictEqual(nativeResult, true, 'Fail from ' + fixture.A.version + ' vs. ' + fixture.B.version);
+          assert.strictEqual(
+            nativeResult,
+            true,
+            'Fail from ' + fixture.A.version + ' vs. ' + fixture.B.version
+          );
           var result = underTest.objectIDsEqual(a, b);
           assert.strictEqual(result, true);
         });
       });
-    })
+    });
   });
 
   describe('isLikeObjectId', function() {
@@ -178,7 +181,6 @@ describe('mongo-utils', function() {
       var id = { problems_i_have: 99 };
       assert(!underTest.isLikeObjectId(id));
     });
-
   });
 
   describe('serializeObjectId', function() {
@@ -196,7 +198,6 @@ describe('mongo-utils', function() {
       var id = null;
       assert.equal(null, underTest.serializeObjectId(id));
     });
-
   });
 
   describe('conjunctionIds', function() {
@@ -219,15 +220,20 @@ describe('mongo-utils', function() {
     it('should deal with sets where the first item is unique', function() {
       var result;
       for (var i = 0; i < 100000; i++) {
-        result = underTest.conjunctionIds([{ x: id1, y: id2 }, { x: id1, y: id3 }, { x: id1, y: id4 }, { x: id1, y: id5 }], ['x', 'y']);
+        result = underTest.conjunctionIds(
+          [{ x: id1, y: id2 }, { x: id1, y: id3 }, { x: id1, y: id4 }, { x: id1, y: id5 }],
+          ['x', 'y']
+        );
       }
-      assert.deepEqual(result, { $and: [{ x: id1 }, { y: { $in: [id2, id3, id4, id5 ] } }] });
-
+      assert.deepEqual(result, { $and: [{ x: id1 }, { y: { $in: [id2, id3, id4, id5] } }] });
     });
 
     it('should deal with sets where the second item is unique', function() {
-      var result = underTest.conjunctionIds([{ x: id2, y: id1 }, { x: id3, y: id1 }, { x: id4, y: id1 }, { x: id5, y: id1 }], ['x', 'y']);
-      assert.deepEqual(result, { $and: [{ y: id1 }, { x: { $in: [id2, id3, id4, id5 ] } }] });
+      var result = underTest.conjunctionIds(
+        [{ x: id2, y: id1 }, { x: id3, y: id1 }, { x: id4, y: id1 }, { x: id5, y: id1 }],
+        ['x', 'y']
+      );
+      assert.deepEqual(result, { $and: [{ y: id1 }, { x: { $in: [id2, id3, id4, id5] } }] });
     });
 
     it('should deal with sets with no unique items', function() {
@@ -235,38 +241,36 @@ describe('mongo-utils', function() {
       var result = underTest.conjunctionIds(terms, ['x', 'y']);
       assert.deepEqual(result, { $or: terms });
     });
-
   });
 
   describe('unionModelsById', function() {
     it('should union nothing', function() {
-      var result = underTest.unionModelsById([[],[],[]]);
+      var result = underTest.unionModelsById([[], [], []]);
       assert.deepEqual(result, []);
     });
 
     it('should union disjoint items', function() {
-      var result = underTest.unionModelsById([[{ id: 1 }],[{ id: 2 }],[{ id: 3 }]]);
+      var result = underTest.unionModelsById([[{ id: 1 }], [{ id: 2 }], [{ id: 3 }]]);
       assert.deepEqual(result, [{ id: 1 }, { id: 2 }, { id: 3 }]);
     });
 
     it('should union overlapping items', function() {
-      var result = underTest.unionModelsById([[{ id: 1 }],[{ _id: 1 }],[{ _id: 1 }]]);
-      assert.deepEqual(result, [{ id: 1 } ]);
+      var result = underTest.unionModelsById([[{ id: 1 }], [{ _id: 1 }], [{ _id: 1 }]]);
+      assert.deepEqual(result, [{ id: 1 }]);
     });
 
     it('should union partially overlapping items - 1', function() {
-      var result = underTest.unionModelsById([[{ id: 1 }],[{ _id: 2 }],[{ _id: 1 }]]);
-      assert.deepEqual(result, [ { id: 1 }, { _id: 2} ]);
+      var result = underTest.unionModelsById([[{ id: 1 }], [{ _id: 2 }], [{ _id: 1 }]]);
+      assert.deepEqual(result, [{ id: 1 }, { _id: 2 }]);
     });
     it('should union partially overlapping items - 2', function() {
-      var result = underTest.unionModelsById([[{ id: 2 }],[{ _id: 2 }],[{ _id: 1 }]]);
-      assert.deepEqual(result, [ { id: 2 }, { _id: 1} ]);
+      var result = underTest.unionModelsById([[{ id: 2 }], [{ _id: 2 }], [{ _id: 1 }]]);
+      assert.deepEqual(result, [{ id: 2 }, { _id: 1 }]);
     });
 
     it('should union items with nulls', function() {
-      var result = underTest.unionModelsById([[{ id: 1 }], null ,[{ _id: 1 }]]);
-      assert.deepEqual(result, [ { id: 1 }]);
+      var result = underTest.unionModelsById([[{ id: 1 }], null, [{ _id: 1 }]]);
+      assert.deepEqual(result, [{ id: 1 }]);
     });
-  })
-
+  });
 });

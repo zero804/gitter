@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -15,28 +15,26 @@ var shutdown = require('shutdown');
 function pad(string, length) {
   if (!string) string = '';
 
-  while(string.length < length) {
+  while (string.length < length) {
     string = string + ' ';
   }
   return string;
 }
 var opts = require('yargs')
   .option('uri', {
-    description: "uri of room to list presence for"
+    description: 'uri of room to list presence for'
   })
   .option('fromUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
   })
   .option('toUser', {
-    description: "id of room to list presence for"
+    description: 'id of room to list presence for'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function getTroupe() {
-  if (opts.uri)
-    return troupeService.findByUri(opts.uri);
+  if (opts.uri) return troupeService.findByUri(opts.uri);
 
   if (!opts.fromUser || !opts.toUser) {
     return Promise.reject('Please specify either a uri or a fromUser and toUser');
@@ -44,15 +42,13 @@ function getTroupe() {
 
   return Promise.all([
     userService.findByUsername(opts.fromUser),
-    userService.findByUsername(opts.toUser),
-  ])
-  .spread(function(fromUser, toUser) {
+    userService.findByUsername(opts.toUser)
+  ]).spread(function(fromUser, toUser) {
     if (!fromUser) throw new Error('User ' + opts.fromUser + ' not found');
     if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
 
     return oneToOneRoomService.findOneToOneRoom(fromUser._id, toUser._id);
   });
-
 }
 
 getTroupe()

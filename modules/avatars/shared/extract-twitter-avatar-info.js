@@ -19,11 +19,11 @@ function extractTwitterAvatarInfo(twitterUrl) {
   }
   var rest = twitterUrl.slice(TWITTER_AVATAR_PREFIX.length);
   var id = rest.slice(0, rest.indexOf('/'));
-  var filename = rest.slice(rest.indexOf('/')+1);
+  var filename = rest.slice(rest.indexOf('/') + 1);
   return {
     id: id,
     filename: filename
-  }
+  };
 }
 
 module.exports = extractTwitterAvatarInfo;

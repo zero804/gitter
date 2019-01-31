@@ -13,12 +13,13 @@ function resolveBinary(moduleName) {
 
 function serializeCompilers(compilers) {
   if (!compilers) return;
-  return Object.keys(compilers).map(function(extension) {
-    var m = compilers[extension];
-    return extension + ':' + m;
-  }).join(',');
+  return Object.keys(compilers)
+    .map(function(extension) {
+      var m = compilers[extension];
+      return extension + ':' + m;
+    })
+    .join(',');
 }
-
 
 function testRunner(options, files) {
   var executable;
@@ -38,18 +39,17 @@ function testRunner(options, files) {
     }
   }
 
-
   function addMultiArgs(argName, extensions) {
     if (!extensions) return;
     extensions.forEach(function(ext) {
-      args.push(argName)
+      args.push(argName);
       args.push(ext);
     });
   }
 
   function addOptional(options, argName, keyName) {
     if (options.hasOwnProperty(keyName)) {
-      args.push(argName)
+      args.push(argName);
       args.push(options[keyName]);
     }
   }
@@ -82,27 +82,29 @@ function testRunner(options, files) {
 
   args = args.concat(files);
 
-  gutil.log('Spawning ', executable, args.join(' '))
+  gutil.log('Spawning ', executable, args.join(' '));
   return childProcessPromise.spawn(executable, args, options.env);
 }
 
 function pipe(options) {
   var files = [];
-  return es.through(function(data) {
-    files.push(data.path);
-    // console.log(data);
-    this.emit('data', data);
-  },
-  function() {
-    testRunner(options, files)
-      .bind(this)
-      .then(function() {
-        this.emit('end')
-      })
-      .catch(function(err) {
-        this.emit('error', err);
-      });
-  })
+  return es.through(
+    function(data) {
+      files.push(data.path);
+      // console.log(data);
+      this.emit('data', data);
+    },
+    function() {
+      testRunner(options, files)
+        .bind(this)
+        .then(function() {
+          this.emit('end');
+        })
+        .catch(function(err) {
+          this.emit('error', err);
+        });
+    }
+  );
 }
 
 module.exports = pipe;

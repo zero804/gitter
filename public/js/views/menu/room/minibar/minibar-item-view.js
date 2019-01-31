@@ -6,8 +6,6 @@ var itemTemplate = require('./minibar-item-view.hbs');
 var updateUnreadIndicatorClassState = require('../../../../components/menu/update-unread-indicator-class-state');
 var toggleClass = require('../../../../utils/toggle-class');
 
-
-
 module.exports = BaseItemView.extend({
   tagName: 'li',
   template: itemTemplate,
@@ -29,7 +27,7 @@ module.exports = BaseItemView.extend({
     'change:allHidden': 'onAllRoomsHiddenUpdate'
   },
   events: {
-    'click': 'onItemClicked',
+    click: 'onItemClicked'
   },
   attributes: function() {
     var id = this.model.get('id');
@@ -37,13 +35,15 @@ module.exports = BaseItemView.extend({
 
     //account for initial render
     var className = 'room-menu-options__item--' + type;
-    if (this.model.get('active')) { className = className += ' active'; }
+    if (this.model.get('active')) {
+      className = className += ' active';
+    }
 
-    var idString = 'minibar-' + ((type === 'org') ? id : type);
+    var idString = 'minibar-' + (type === 'org' ? id : type);
 
     return {
       id: idString,
-      'class': className,
+      class: className,
       'data-id': id,
       'data-type': type === 'org' ? 'minibar-group' : '',
       'data-state-change': type
@@ -54,17 +54,16 @@ module.exports = BaseItemView.extend({
     this.roomMenuModel = options.roomMenuModel;
   },
 
-
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, data, {
-      isHome:            (data.type === 'all'),
-      isSearch:          (data.type === 'search'),
-      isFavourite:       (data.type === 'favourite'),
-      isPeople:          (data.type === 'people'),
-      isOrg:             (data.type === 'org'),
-      isCommunityCreate: (data.type === 'community-create'),
-      hasUnreadIndicators: (data.type === 'people' || data.type === 'org'),
+      isHome: data.type === 'all',
+      isSearch: data.type === 'search',
+      isFavourite: data.type === 'favourite',
+      isPeople: data.type === 'people',
+      isOrg: data.type === 'org',
+      isCommunityCreate: data.type === 'community-create',
+      hasUnreadIndicators: data.type === 'people' || data.type === 'org'
     });
   },
 
@@ -72,13 +71,12 @@ module.exports = BaseItemView.extend({
     // Re-trigger the pulse animation
     // 16ms is a good 60-fps number to trigger on which Firefox needs (requestAnimationFrame doesn't work for this)
     Array.prototype.forEach.call(this.ui.unreadIndicator, function(unreadIndicatorElement) {
-    unreadIndicatorElement.classList.remove('pulse-animation');
+      unreadIndicatorElement.classList.remove('pulse-animation');
       setTimeout(function() {
-          unreadIndicatorElement.classList.add('pulse-animation');
+        unreadIndicatorElement.classList.add('pulse-animation');
       }, 16);
     });
   },
-
 
   onItemClicked: function() {
     this.trigger('minibar-item:activated', this.model);
@@ -98,7 +96,7 @@ module.exports = BaseItemView.extend({
 
   onRender: function() {
     this.onAllRoomsHiddenUpdate();
-    if(this.roomMenuModel.get('roomMenuIsPinned')) {
+    if (this.roomMenuModel.get('roomMenuIsPinned')) {
       this.onActiveStateUpdate();
     }
   },

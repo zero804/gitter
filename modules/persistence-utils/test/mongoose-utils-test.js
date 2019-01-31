@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var mongooseUtils = require('../lib/mongoose-utils');
@@ -8,13 +8,12 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 
 describe('mongoose-utils', function() {
-
   var username, x, y;
 
   beforeEach(function() {
-     username = '_test_' + Date.now();
-     x = 'Bob ' + Date.now();
-     y = 'Bob ' + (Date.now() + 1000);
+    username = '_test_' + Date.now();
+    x = 'Bob ' + Date.now();
+    y = 'Bob ' + (Date.now() + 1000);
   });
 
   afterEach(function(done) {
@@ -22,7 +21,8 @@ describe('mongoose-utils', function() {
   });
 
   it('should create a new document', function(done) {
-    mongooseUtils.upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
+    mongooseUtils
+      .upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
       .spread(function(doc, updatedExisting) {
         assert.strictEqual(updatedExisting, false);
         assert.strictEqual(doc.username, username);
@@ -32,7 +32,8 @@ describe('mongoose-utils', function() {
   });
 
   it('should leanUpsertRaw', function() {
-    return mongooseUtils.safeUpsertUpdate(persistence.User, { username: username }, { $set: { displayName: y } })
+    return mongooseUtils
+      .safeUpsertUpdate(persistence.User, { username: username }, { $set: { displayName: y } })
       .then(function(result) {
         assert.strictEqual(result.nModified, 0);
         assert.strictEqual(result.upserted.length, 1);
@@ -40,9 +41,14 @@ describe('mongoose-utils', function() {
   });
 
   it('should create a new document', function(done) {
-    mongooseUtils.upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
+    mongooseUtils
+      .upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
       .then(function() {
-        return mongooseUtils.upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: y } });
+        return mongooseUtils.upsert(
+          persistence.User,
+          { username: username },
+          { $setOnInsert: { displayName: y } }
+        );
       })
       .spread(function(doc, updatedExisting) {
         assert.strictEqual(updatedExisting, true);
@@ -50,7 +56,11 @@ describe('mongoose-utils', function() {
         assert.strictEqual(doc.displayName, x);
       })
       .then(function() {
-        return mongooseUtils.upsert(persistence.User, { username: username }, { $set: { displayName: y } });
+        return mongooseUtils.upsert(
+          persistence.User,
+          { username: username },
+          { $set: { displayName: y } }
+        );
       })
       .spread(function(doc, updatedExisting) {
         assert.strictEqual(updatedExisting, true);
@@ -65,17 +75,21 @@ describe('mongoose-utils', function() {
     var fakeTroupeId = mongoUtils.getNewObjectIdString();
 
     function contentiousOperation() {
-      return mongooseUtils.upsert(persistence.TroupeUser, {
-        userId: fakeUserId, troupeId: fakeTroupeId
-      }, {
-        $set: {
-        },
-        $setOnInsert: {
+      return mongooseUtils.upsert(
+        persistence.TroupeUser,
+        {
           userId: fakeUserId,
-          troupeId: fakeTroupeId,
-          flags: 1
+          troupeId: fakeTroupeId
+        },
+        {
+          $set: {},
+          $setOnInsert: {
+            userId: fakeUserId,
+            troupeId: fakeTroupeId,
+            flags: 1
+          }
         }
-      });
+      );
     }
 
     function iter() {
@@ -88,14 +102,15 @@ describe('mongoose-utils', function() {
             contentiousOperation(),
             contentiousOperation(),
             contentiousOperation(),
-            contentiousOperation(),
+            contentiousOperation()
           ]);
         })
         .then(function(results) {
-
-          assert(results.every(function(result) {
-            return !!result[0];
-          }));
+          assert(
+            results.every(function(result) {
+              return !!result[0];
+            })
+          );
 
           var insertOps = results.filter(function(result) {
             return !result[1];
@@ -121,10 +136,10 @@ describe('mongoose-utils', function() {
             resolve(model);
           }
         });
-
       });
 
-      return mongooseUtils.upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
+      return mongooseUtils
+        .upsert(persistence.User, { username: username }, { $setOnInsert: { displayName: x } })
         .spread(function() {
           return persistence.User.findOne({ username: username }).exec();
         })
@@ -136,8 +151,7 @@ describe('mongoose-utils', function() {
         })
         .then(function(user) {
           assert.strictEqual(user.username, username);
-        })
-
+        });
     });
   });
 });
