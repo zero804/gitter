@@ -7,6 +7,7 @@ var MobileLoginButton = require('../mobile/mobileLoginButton');
 
 /* Decorators */
 var emojiDecorator = require('../chat/decorators/emojiDecorator');
+var issuableDecorator = require('../chat/decorators/issuableDecorator');
 var mobileDecorator = require('../chat/decorators/mobileDecorator');
 
 require('../behaviors/isomorphic');
@@ -31,7 +32,7 @@ module.exports = Marionette.LayoutView.extend({
     return new ChatContainerView(
       optionsForRegion({
         collection: this.options.chatCollection,
-        decorators: [emojiDecorator, mobileDecorator]
+        decorators: [mobileDecorator, issuableDecorator, emojiDecorator]
       })
     );
   },
