@@ -1,3 +1,8 @@
+# 19.36.0 - *upcoming*
+
+ - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
+
+
 # 19.35.0 - 2019-1-31
 
  - Update `@gitterhq/translations@1.8.2` dependency for Chinese(`zh`) translation update
