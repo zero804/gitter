@@ -3,9 +3,9 @@
 var cdn = require('gitter-web-cdn');
 
 function cdnSubResources(resources, jsRoot) {
-  var resourceList = ['vendor'];
+  var resourceList = ['runtime', 'default.chunk', 'vendor.chunk'];
   if (resources) {
-    resourceList = resourceList.concat(resources);
+    resourceList = resourceList.concat(resources.map(resource => `${resource}.chunk`));
   }
 
   return resourceList

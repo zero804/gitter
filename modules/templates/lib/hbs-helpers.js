@@ -25,14 +25,20 @@ exports.bootScript = function(url, parameters) {
   var jsRoot = (options && options.jsRoot) || 'js';
 
   var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
-  var vendorScriptUrl = cdnUrlGenerator(jsRoot + '/vendor.js', options);
-  var bootScriptUrl = cdnUrlGenerator(jsRoot + '/' + url + '.js', options);
+  var webpackRuntimeScriptUrl = cdnUrlGenerator(jsRoot + '/runtime.js', options);
+  var defaultScriptUrl = cdnUrlGenerator(jsRoot + '/default.chunk.js', options);
+  var vendorScriptUrl = cdnUrlGenerator(jsRoot + '/vendor.chunk.js', options);
+  var bootScriptUrl = cdnUrlGenerator(jsRoot + '/' + url + '.chunk.js', options);
 
   return util.format(
     "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
       "<script type='text/javascript' src='%s'></script>" +
+      "<script type='text/javascript' src='%s'></script>" +
+      "<script type='text/javascript' src='%s'></script>" +
       "<script type='text/javascript' src='%s'></script>",
     baseUrl,
+    webpackRuntimeScriptUrl,
+    defaultScriptUrl,
     vendorScriptUrl,
     bootScriptUrl
   );

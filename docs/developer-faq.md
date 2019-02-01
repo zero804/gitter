@@ -58,3 +58,20 @@ which will just 404 on a separate device when you try to sign in.
 Recreate your secrets using your local network IP, see https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets
 
 Restart the server. You should now be able to access Gitter over your local IP from other devices
+
+
+## View `webpack` bundle visualization (webpack report)
+
+Run the webapp with the `WEBPACK_REPORT` environment variable set to generate the HTML report
+
+macOS/Linux:
+```
+WEBPACK_REPORT=1 npm start
+```
+
+Windows:
+```
+set WEBPACK_REPORT=1&&npm start
+```
+
+Open `webpack-report/index.html` in your browser

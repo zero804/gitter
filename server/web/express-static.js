@@ -12,8 +12,7 @@ exports.install = function(app) {
 
   app.use(
     webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
-      noInfo: false,
-      quiet: true,
+      logLevel: 'warn',
       lazy: false,
       watchOptions: {
         aggregateTimeout: 400

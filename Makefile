@@ -28,6 +28,9 @@ upload-to-s3:
 
 ci-test:
 	mkdir -p output/
+	# Create the `output/assets/js/webpack-manifest.json` so
+	# we know which chunks to serve in `boot-script-utils.js`
+	gulp clientapp:compile:webpack
 	gulp test --test-coverage --test-suite docker --test-xunit-reports --test-bail
 
 test: clean

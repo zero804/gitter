@@ -1,16 +1,28 @@
 'use strict';
 
-var path = require('path');
-var ProvidePlugin = require('webpack/lib/ProvidePlugin');
-var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
-var ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
+const path = require('path');
+const webpack = require('webpack');
+const ProvidePlugin = require('webpack/lib/ProvidePlugin');
+const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
+const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin;
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-var getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
+const getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
 
-var devMode = process.env.WEBPACK_DEV_MODE === '1';
+// Default to production unless we know for sure we are in dev
+const IS_PRODUCTION = process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'dev';
+const WEBPACK_DEV_MODE = process.env.WEBPACK_DEV_MODE === '1';
+const WEBPACK_REPORT = process.env.WEBPACK_REPORT;
 
-var webpackConfig = {
+const ROOT_PATH = path.resolve(__dirname, '../../');
+
+const webpackConfig = {
+  mode: IS_PRODUCTION ? 'production' : 'development',
+  target: 'web',
+
   entry: {
+    default: [path.resolve(path.join(__dirname, './default'))],
+
     'router-nli-app': path.resolve(path.join(__dirname, './router-nli-app.js')),
     'router-nli-chat': path.resolve(path.join(__dirname, './router-nli-chat.js')),
     'router-app': path.resolve(path.join(__dirname, './router-app.js')),
@@ -35,28 +47,7 @@ var webpackConfig = {
     'chat-message-reports': path.resolve(path.join(__dirname, './chat-message-reports.js')),
 
     'mobile-native-userhome': path.resolve(path.join(__dirname, './mobile-native-userhome')),
-    'router-home-learn': path.resolve(path.join(__dirname, './router-home-learn')),
-
-    vendor: [
-      require.resolve('./utils/webpack'),
-      require.resolve('./utils/context'),
-      'underscore',
-      'jquery',
-      'backbone',
-      'backbone.marionette',
-      'loglevel',
-      require.resolve('./utils/log'),
-      require.resolve('./components/api-client'),
-      'handlebars/runtime',
-      'gitter-realtime-client',
-      'raven-js',
-      'keymaster',
-      'moment',
-      'bluebird',
-      'fuzzysearch',
-      'url-join',
-      path.resolve(path.join(__dirname, './commons.js'))
-    ]
+    'router-home-learn': path.resolve(path.join(__dirname, './router-home-learn'))
   },
   output: {
     path: path.resolve(__dirname, '../../output/assets/js/'),
@@ -67,17 +58,14 @@ var webpackConfig = {
     devtoolFallbackModuleFilenameTemplate: '[resource-path]?[hash]'
   },
   module: {
-    //JP 12/1/16 If you add a loader remember to add it to /test/in-browser/webpack.config.js
-    loaders: [
+    strictExportPresence: true,
+    rules: [
       {
-        test: /\.js?$/,
-        loader: 'babel',
+        test: /\.js$/,
+        loader: 'babel-loader',
         exclude: [/node_modules/],
-        query: {
-          presets: [
-            // https://github.com/babel/babel-loader/issues/149
-            require.resolve('babel-preset-es2015')
-          ]
+        options: {
+          presets: ['@babel/preset-env']
         }
       },
       {
@@ -93,7 +81,11 @@ var webpackConfig = {
       },
       {
         test: /.css$/,
-        loader: 'style-loader?insertAt=top!css-loader!postcss-loader'
+        use: [
+          { loader: 'style-loader', options: { insertAt: 'top' } },
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          { loader: 'postcss-loader', options: { plugins: getPostcssStack(webpack) } }
+        ]
       }
     ]
   },
@@ -122,21 +114,63 @@ var webpackConfig = {
       bluebird: path.resolve(path.join(__dirname, 'utils/bluebird-wrapper'))
     }
   },
+  optimization: {
+    runtimeChunk: 'single',
+    splitChunks: {
+      maxInitialRequests: 4,
+      cacheGroups: {
+        default: false,
+        vendor: {
+          name: 'vendor',
+          chunks: 'all',
+          // Minimum number of chunks that must share a module before splitting
+          minChunks: 2,
+          // `d3` is only used by `@gitterhq/cal-heatmap` so let's put it in the specific archive chunk
+          test: /[\\/]node_modules[\\/](?!d3)/
+        }
+      }
+    }
+  },
   plugins: [
+    // TODO: Use this in the future to for the bootScript in `hbs-helpers.js`
+    // and `sub-resources.js`. See how GitLab does it
+    // https://gitlab.com/gitlab-org/gitlab-ce/blob/dd26a9addc5dd654e3c8eecb58216f1f4449cfc1/lib/gitlab/webpack/manifest.rb
+    // https://gitlab.com/gitlab-org/gitlab-ce/blob/dd26a9addc5dd654e3c8eecb58216f1f4449cfc1/app/helpers/webpack_helper.rb
+    new StatsWriterPlugin({
+      filename: 'webpack-manifest.json',
+      transform: function(data, opts) {
+        const stats = opts.compiler.getStats().toJson({
+          chunkModules: false,
+          source: false,
+          chunks: false,
+          modules: false,
+          assets: true
+        });
+        return JSON.stringify(stats, null, 2);
+      }
+    }),
+
     new ProvidePlugin({ Promise: 'bluebird' }),
-    new CommonsChunkPlugin('vendor', '[name].js'),
+
     new ContextReplacementPlugin(
-      /moment\/locale$/,
+      /moment[/\\]locale$/,
       /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/
-    )
-  ],
-  bail: true,
-  postcss: function(webpack) {
-    return getPostcssStack(webpack);
-  }
+    ),
+
+    // optionally generate webpack bundle analysis
+    WEBPACK_REPORT &&
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        generateStatsFile: true,
+        openAnalyzer: false,
+        reportFilename: path.join(ROOT_PATH, 'webpack-report/index.html'),
+        statsFilename: path.join(ROOT_PATH, 'webpack-report/stats.json')
+      })
+  ].filter(Boolean),
+  bail: true
 };
 
-if (devMode) {
+if (WEBPACK_DEV_MODE) {
   // See http://webpack.github.io/docs/configuration.html#devtool
   webpackConfig.devtool = 'cheap-source-map';
   webpackConfig.cache = true;
@@ -147,16 +181,6 @@ if (devMode) {
 if (process.env.WEBPACK_VISUALIZER) {
   var Visualizer = require('webpack-visualizer-plugin');
   webpackConfig.plugins.push(new Visualizer({ filename: '../../webpack.stats.html' }));
-}
-
-if (process.env.WEBPACK_STATS) {
-  var StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin;
-  webpackConfig.plugins.push(
-    new StatsWriterPlugin({
-      filename: '../../webpack.stats.json',
-      fields: null
-    })
-  );
 }
 
 module.exports = webpackConfig;
