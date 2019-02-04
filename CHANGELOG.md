@@ -1,6 +1,8 @@
 # 19.36.0 - *upcoming*
 
  - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
+  - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
+     - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
 
 
 # 19.35.0 - 2019-1-31
