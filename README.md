@@ -185,7 +185,7 @@ and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infra
 
 #### Getting the GitLab CI tests green :white\_check\_mark:
 
-Just add all of the variables from your `.env` file to your forked projects **Settings** -> **CI/CD** -> **Environment variables** section
+Just add all of the variables from your `.env` file to your forked projects [**Settings** -> **CI/CD** -> **Environment variables**](https://docs.gitlab.com/ee/ci/variables/#variables) section
 
 After adding the variables, just retry the pipeline.
 
