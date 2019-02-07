@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var repoPremiumStatusNotifier = require('../../services/repo-premium-status-notifier');
 

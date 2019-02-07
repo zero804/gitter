@@ -6,7 +6,7 @@ var normalizeRedirect = testRequire('./handlers/uri-context/normalise-redirect')
 
 describe('normalise-redirect', function() {
   it('deals with chinese characters', function() {
-    var input = "/Luzifer1984/路";
+    var input = '/Luzifer1984/路';
     var output = normalizeRedirect(input, {
       path: '/Luzifer1984/路/~chat',
       query: {
@@ -19,15 +19,15 @@ describe('normalise-redirect', function() {
   });
 
   it('handle the normal case', function() {
-    var input = "/a/b";
+    var input = '/a/b';
     var output = normalizeRedirect(input, {
-      path: '/gitterHQ',
+      path: '/gitterHQ'
     });
     assert.strictEqual(output, '/a/b');
   });
 
   it('deals with query strings', function() {
-    var input = "/a/b";
+    var input = '/a/b';
     var output = normalizeRedirect(input, {
       path: '/gitterHQ/~chat',
       query: {

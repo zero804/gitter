@@ -25,9 +25,9 @@ function getRouteTag(req) {
   }
 
   path = path
-          .replace(/(\.:format\?|\([^\)]*\))/g, '')
-          .replace(/:/g, '_')
-          .replace(/[^\w\-\/]/g, '');
+    .replace(/(\.:format\?|\([^\)]*\))/g, '')
+    .replace(/:/g, '_')
+    .replace(/[^\w\-\/]/g, '');
 
   return path;
 }
@@ -46,7 +46,6 @@ function getClientId(req) {
   if (!client) return;
   return client.id || client._id;
 }
-
 
 module.exports = function(req, res, next) {
   var timeout;

@@ -7,9 +7,9 @@ module.exports = exports = function badCredentialsCheck(err) {
   if (err.statusCode === 401 || err.statusCode === 403) {
     var logout = true;
 
-    logger.info('Tentacles '+err.statusCode+' error.', {
-     exception: err,
-     headersIncluded: !!err.headers
+    logger.info('Tentacles ' + err.statusCode + ' error.', {
+      exception: err,
+      headersIncluded: !!err.headers
     });
 
     if (err.headers) {

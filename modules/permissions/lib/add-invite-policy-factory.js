@@ -20,7 +20,7 @@ var assert = require('assert');
 function getDelegateForSecurityDescriptor(userId, user, securityDescriptor) {
   var userLoader = userLoaderFactory(userId, user);
 
-  switch(securityDescriptor.type) {
+  switch (securityDescriptor.type) {
     case 'GH_REPO':
       return new GhRepoPolicyDelegate(userId, userLoader, securityDescriptor);
 
@@ -48,25 +48,24 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      if (securityDescriptor.type === 'ONE_TO_ONE') {
-        // This shouldn't happen
-        assert.ok(false, 'Invites for one-to-one rooms are not yet implemented');
-      }
+    if (securityDescriptor.type === 'ONE_TO_ONE') {
+      // This shouldn't happen
+      assert.ok(false, 'Invites for one-to-one rooms are not yet implemented');
+    }
 
-      var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
+    var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
 
-      // Either the user is in the room already, or the secret matches
-      var contextDelegate = new DisjunctionContextDelegate([
-        new RoomContextDelegate(userId, roomId),
-        new RoomInviteContextDelegate(userId, roomId, inviteSecret)
-      ]);
+    // Either the user is in the room already, or the secret matches
+    var contextDelegate = new DisjunctionContextDelegate([
+      new RoomContextDelegate(userId, roomId),
+      new RoomInviteContextDelegate(userId, roomId, inviteSecret)
+    ]);
 
-      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
-    });
+    return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+  });
 }
 
 /**
@@ -84,22 +83,21 @@ function createPolicyForRoomAdd(user, room) {
 
   // TODO: optimise this as we may already have the information we need on the room...
   // in which case we shouldn't have to refetch it from mongo
-  return securityDescriptorService.room.findById(roomId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
+  return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
+    if (!securityDescriptor) throw new StatusError(404);
 
-      if (securityDescriptor.type === 'ONE_TO_ONE') {
-        // This shouldn't happen
-        assert.ok(false, 'Invites for one-to-one rooms are not yet implemented');
-      }
+    if (securityDescriptor.type === 'ONE_TO_ONE') {
+      // This shouldn't happen
+      assert.ok(false, 'Invites for one-to-one rooms are not yet implemented');
+    }
 
-      var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
+    var policyDelegate = getDelegateForSecurityDescriptor(userId, user, securityDescriptor);
 
-      // For 'add' we treat the user as already being in the room
-      var contextDelegate = new StaticContextDelegate(true);
+    // For 'add' we treat the user as already being in the room
+    var contextDelegate = new StaticContextDelegate(true);
 
-      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
-    });
+    return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+  });
 }
 
 module.exports = {

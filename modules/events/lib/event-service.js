@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var persistence = require('gitter-web-persistence');
 var processText = require('gitter-web-text-processor');
@@ -7,14 +7,14 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 
 exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
-  text = text ? "" + text : "";
+  text = text ? '' + text : '';
 
   return Promise.try(function() {
-      if(!troupe) throw new StatusError(500, "Invalid troupe");
-      if(!text) throw new StatusError(400, "Text required");
+    if (!troupe) throw new StatusError(500, 'Invalid troupe');
+    if (!text) throw new StatusError(400, 'Text required');
 
-      return processText(text);
-    })
+    return processText(text);
+  })
     .then(function(parsed) {
       var event = new persistence.Event();
 
@@ -32,20 +32,20 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
 };
 
 exports.findEventsForTroupe = function(troupeId, options, callback) {
-  var q = persistence.Event
-    .where('toTroupeId', troupeId);
+  var q = persistence.Event.where('toTroupeId', troupeId);
 
-  if(options.startId) {
+  if (options.startId) {
     var startId = new ObjectID(options.startId);
     q = q.where('_id').gte(startId);
   }
 
-  if(options.beforeId) {
+  if (options.beforeId) {
     var beforeId = new ObjectID(options.beforeId);
     q = q.where('_id').lt(beforeId);
   }
 
-  return q.sort(options.sort || { sent: 'desc' })
+  return q
+    .sort(options.sort || { sent: 'desc' })
     .limit(options.limit || 20)
     .skip(options.skip || 0)
     .exec()

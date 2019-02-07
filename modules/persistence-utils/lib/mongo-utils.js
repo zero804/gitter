@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var ObjectID = require('mongodb').ObjectID;
 var _ = require('lodash');
@@ -33,17 +33,17 @@ function objectIDsEqual(a, b) {
 function stringToObjectID(string) {
   try {
     return new ObjectID(string);
-  } catch(e) {
+  } catch (e) {
     throw new Error('Invalid ObjectID ' + string);
   }
 }
 
 function asObjectID(id) {
-  if(!id) {
+  if (!id) {
     return null;
   }
 
-  if(typeof id === 'string') {
+  if (typeof id === 'string') {
     return stringToObjectID(id);
   }
 
@@ -57,11 +57,11 @@ function asObjectIDs(ids) {
 }
 
 function getDateFromObjectId(id) {
-  if(!id) {
+  if (!id) {
     return null;
   }
 
-  if(typeof id === 'string') {
+  if (typeof id === 'string') {
     var objectId = stringToObjectID(id);
     return objectId.getTimestamp();
   }
@@ -71,7 +71,7 @@ function getDateFromObjectId(id) {
 
 function getTimestampFromObjectId(id) {
   var d = getDateFromObjectId(id);
-  if(d) return d.getTime();
+  if (d) return d.getTime();
 
   return null;
 }
@@ -86,26 +86,27 @@ function getNewObjectIdString() {
  */
 function isLikeObjectId(value) {
   // value instanceof Object doesn't always work, so we'll do something a bit more hacky
-  if(!value) return false;
+  if (!value) return false;
 
-  if(value && value._bsontype === 'ObjectID' || value instanceof ObjectID) {
+  if ((value && value._bsontype === 'ObjectID') || value instanceof ObjectID) {
     return true;
   }
 
-  if(typeof value === 'string' || value instanceof String) {
+  if (typeof value === 'string' || value instanceof String) {
     // Avoid an expensive try-catch if possible
-    if(value.length !== 24) return false;
+    if (value.length !== 24) return false;
 
-    return (/^[0-9a-fA-F]{24}$/).test(value);
+    return /^[0-9a-fA-F]{24}$/.test(value);
   }
 
   return false;
 }
 
-
 function serializeObjectId(id) {
-  if(!id) return id;
-  if(typeof id === 'string') { return id; }
+  if (!id) return id;
+  if (typeof id === 'string') {
+    return id;
+  }
   return id.toString();
 }
 
@@ -116,12 +117,12 @@ function serializeObjectIds(ids) {
 }
 
 function createIdForTimestampString(timestamp) {
-  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+  var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 
-  while(hexSeconds.length < 8) {
-    hexSeconds = "0" + hexSeconds;
+  while (hexSeconds.length < 8) {
+    hexSeconds = '0' + hexSeconds;
   }
-  return hexSeconds + "0000000000000000";
+  return hexSeconds + '0000000000000000';
 }
 
 function createIdForTimestamp(timestamp) {
@@ -130,10 +131,10 @@ function createIdForTimestamp(timestamp) {
 
 let currentIncrement = 0;
 function createTestIdForTimestampString(timestamp) {
-  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+  var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 
-  while(hexSeconds.length < 8) {
-    hexSeconds = "0" + hexSeconds;
+  while (hexSeconds.length < 8) {
+    hexSeconds = '0' + hexSeconds;
   }
   currentIncrement++;
   return hexSeconds + _.padLeft(currentIncrement.toString(16), 16, '0');
@@ -232,11 +233,11 @@ function conjunctionIds(terms, termIdentifiers) {
     var t2MultiQuery = {};
     t2MultiQuery[t2Identifier] = {
       $in: _.map(terms, function(term) {
-              return term[t2Identifier];
-            })
+        return term[t2Identifier];
+      })
     };
 
-    return { $and: [ t1CommonQuery, t2MultiQuery] };
+    return { $and: [t1CommonQuery, t2MultiQuery] };
   }
 
   // If the second term is common for all conjunction terms...
@@ -247,11 +248,11 @@ function conjunctionIds(terms, termIdentifiers) {
     var t1MultiQuery = {};
     t1MultiQuery[t1Identifier] = {
       $in: _.map(terms, function(term) {
-              return term[t1Identifier];
-            })
+        return term[t1Identifier];
+      })
     };
 
-    return { $and: [ t2CommonQuery, t1MultiQuery] };
+    return { $and: [t2CommonQuery, t1MultiQuery] };
   }
 
   return { $or: terms };
@@ -266,7 +267,7 @@ function isMongoError(err) {
 function mongoErrorWithCode(code) {
   return function(err) {
     return isMongoError(err) && err.code === code;
-  }
+  };
 }
 
 /**
@@ -276,22 +277,29 @@ function mongoErrorWithCode(code) {
 function unionModelsById(arrayOfModels) {
   var idHash = {};
 
-  return _.reduce(arrayOfModels, function(result, models) {
-    if (!models) return result;
+  return _.reduce(
+    arrayOfModels,
+    function(result, models) {
+      if (!models) return result;
 
-    return _.reduce(models, function(result, model) {
-      var id = model.id || model._id;
+      return _.reduce(
+        models,
+        function(result, model) {
+          var id = model.id || model._id;
 
-      // Already added? Then skip it
-      if (idHash[id]) return result;
+          // Already added? Then skip it
+          if (idHash[id]) return result;
 
-      // Add to the hash and push to the result
-      idHash[id] = true;
-      result.push(model);
-      return result;
-    }, result);
-
-  }, []);
+          // Add to the hash and push to the result
+          idHash[id] = true;
+          result.push(model);
+          return result;
+        },
+        result
+      );
+    },
+    []
+  );
 }
 
 module.exports = {
@@ -314,4 +322,4 @@ module.exports = {
   conjunctionIds: conjunctionIds,
   mongoErrorWithCode: mongoErrorWithCode,
   unionModelsById: unionModelsById
-}
+};

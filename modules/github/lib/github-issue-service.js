@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var StatusError = require('statuserror');
 var wrap = require('./github-cache-wrapper');
@@ -32,23 +32,22 @@ function standardizeResponse(response) {
   };
 }
 
-
 function GitHubIssueService(user) {
   this.user = user;
   this.accessToken = userTokenSelector(user);
 }
 
- GitHubIssueService.prototype.getIssue = function(repo, issueNumber) {
-  return tentacles.issue.get(repo, issueNumber, { accessToken: this.accessToken })
-    .then((response) => {
-      if(response) {
+GitHubIssueService.prototype.getIssue = function(repo, issueNumber) {
+  return tentacles.issue
+    .get(repo, issueNumber, { accessToken: this.accessToken })
+    .then(response => {
+      if (response) {
         return standardizeResponse(response);
       }
 
       throw new StatusError(404, `Unable to fetch GitHub issue ${repo}#${issueNumber}`);
     });
 };
-
 
 module.exports = wrap(GitHubIssueService, function() {
   return [this.accessToken || ''];

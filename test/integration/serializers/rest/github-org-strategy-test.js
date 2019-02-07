@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils');
@@ -7,7 +7,6 @@ var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = require('gitter-web-serialization/lib/serialize');
 var GithubOrgStrategy = testRequire('./serializers/rest/github-org-strategy');
-
 
 describe('GithubOrgStrategy', function() {
   var blockTimer = require('gitter-web-test-utils/lib/block-timer');
@@ -30,17 +29,18 @@ describe('GithubOrgStrategy', function() {
       avatar_url: 'https://github.com/images/error/octocat_happy.gif'
     };
 
-    var strategy = new GithubOrgStrategy({ });
-    return serialize([org], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    var strategy = new GithubOrgStrategy({});
+    return serialize([org], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: org.id,
           name: org.login,
           avatar_url: org.avatar_url,
           room: null,
           premium: false
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should serialize an org with a room', function() {
@@ -52,10 +52,10 @@ describe('GithubOrgStrategy', function() {
 
     var t = fixture.troupe1;
 
-    var strategy = new GithubOrgStrategy({ });
-    return serialize([org], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    var strategy = new GithubOrgStrategy({});
+    return serialize([org], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: org.id,
           name: org.login,
           avatar_url: org.avatar_url,
@@ -63,7 +63,7 @@ describe('GithubOrgStrategy', function() {
             id: t.id,
             name: t.uri,
             topic: '',
-            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
+            avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
             uri: t.uri,
             oneToOne: false,
             userCount: 1,
@@ -75,7 +75,8 @@ describe('GithubOrgStrategy', function() {
             v: 1
           },
           premium: false
-        }]);
-      });
+        }
+      ]);
+    });
   });
 });

@@ -1,13 +1,12 @@
-
 rs.slaveOk();
 
 function createIdForTimestampString(timestamp) {
-  var hexSeconds = Math.floor(timestamp/1000).toString(16);
+  var hexSeconds = Math.floor(timestamp / 1000).toString(16);
 
-  while(hexSeconds.length < 8) {
-    hexSeconds = "0" + hexSeconds;
+  while (hexSeconds.length < 8) {
+    hexSeconds = '0' + hexSeconds;
   }
-  return hexSeconds + "0000000000000000";
+  return hexSeconds + '0000000000000000';
 }
 
 function createIdForTimestamp(timestamp) {
@@ -24,17 +23,19 @@ firstRooms.forEach(function(fr) {
   roomSet[fr.roomId] = true;
 });
 
-var roomIds = Object.keys(roomSet).map(function(i) {
-  try {
-    return ObjectId(i);
-  } catch(e) {
-    return null;
-  }
-}).filter(Boolean);
-
+var roomIds = Object.keys(roomSet)
+  .map(function(i) {
+    try {
+      return ObjectId(i);
+    } catch (e) {
+      return null;
+    }
+  })
+  .filter(Boolean);
 
 var roomSizes = {};
-db.troupes.find({ _id: { $in: roomIds } }, { _id: 1, uri: 1, userCount: 1 })
+db.troupes
+  .find({ _id: { $in: roomIds } }, { _id: 1, uri: 1, userCount: 1 })
   .forEach(function(room) {
     roomSizes[room.uri] = room.userCount;
     roomSizes[room._id] = room.userCount;
@@ -42,7 +43,10 @@ db.troupes.find({ _id: { $in: roomIds } }, { _id: 1, uri: 1, userCount: 1 })
 
 var buckets = {};
 firstRooms.forEach(function(fr) {
-  var signupDate = ObjectId(fr.userId).getTimestamp().toISOString().split('T')[0];
+  var signupDate = ObjectId(fr.userId)
+    .getTimestamp()
+    .toISOString()
+    .split('T')[0];
   if (fr.roomUri.toLowerCase().indexOf('freecodecamp') >= 0) return;
   var roomSize = roomSizes[fr.roomId] || roomSizes[fr.roomUri];
   if (!roomSize) return;
@@ -56,15 +60,18 @@ firstRooms.forEach(function(fr) {
 
 function median(numbers) {
   // median of [3, 5, 4, 4, 1, 1, 2, 3] = 3
-  var median = 0, numsLen = numbers.length;
+  var median = 0,
+    numsLen = numbers.length;
   numbers.sort();
 
-  if (numsLen % 2 === 0) { // is even
-      // average of two middle numbers
-      median = (numbers[numsLen / 2 - 1] + numbers[numsLen / 2]) / 2;
-  } else { // is odd
-      // middle number only
-      median = numbers[(numsLen - 1) / 2];
+  if (numsLen % 2 === 0) {
+    // is even
+    // average of two middle numbers
+    median = (numbers[numsLen / 2 - 1] + numbers[numsLen / 2]) / 2;
+  } else {
+    // is odd
+    // middle number only
+    median = numbers[(numsLen - 1) / 2];
   }
   return median;
 }
@@ -77,8 +84,8 @@ dates.forEach(function(date) {
   var m = median(f);
   var total = f.reduce(function(memo, v) {
     return memo + v;
-  },0);
-  print(date + ',' + (total/f.length) + ',' + m);
+  }, 0);
+  print(date + ',' + total / f.length + ',' + m);
 });
 
 function cubeFirstRooms(start, end) {
@@ -88,36 +95,42 @@ function cubeFirstRooms(start, end) {
   m.setSlaveOk(true);
   var cubeDb = m.getDB('cube');
 
-  return cubeDb.gitter_join_room_events.aggregate([{
-    $match: {
-      _id: {
-        $gt: createIdForTimestamp(start),
-        $lt: createIdForTimestamp(end),
-      },
-      'd.userId': {
-        $gt: createIdForTimestampString(start),
-        $lt: createIdForTimestampString(end),
+  return cubeDb.gitter_join_room_events.aggregate([
+    {
+      $match: {
+        _id: {
+          $gt: createIdForTimestamp(start),
+          $lt: createIdForTimestamp(end)
+        },
+        'd.userId': {
+          $gt: createIdForTimestampString(start),
+          $lt: createIdForTimestampString(end)
+        }
+      }
+    },
+    {
+      $group: {
+        _id: '$d.userId',
+        first: { $min: '$_id' }
+      }
+    },
+    {
+      $lookup: {
+        from: 'gitter_join_room_events',
+        localField: 'first',
+        foreignField: '_id',
+        as: 'firstEvent'
+      }
+    },
+    {
+      $unwind: '$firstEvent'
+    },
+    {
+      $project: {
+        _id: 0,
+        userId: '$_id',
+        roomUri: '$firstEvent.d.room_uri'
       }
     }
-  }, {
-    $group: {
-      _id: '$d.userId',
-      first: { $min: '$_id' }
-    }
-  }, {
-    $lookup: {
-      from: "gitter_join_room_events",
-      localField: "first",
-      foreignField: "_id",
-      as: "firstEvent"
-    },
-  }, {
-    $unwind: '$firstEvent'
-  }, {
-    $project: {
-      _id: 0,
-      userId: '$_id',
-      roomUri: '$firstEvent.d.room_uri',
-    }
-  }]);
+  ]);
 }

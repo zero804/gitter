@@ -22,13 +22,13 @@ var troupeLurkersUserHash;
 
 makeBenchmark({
   before: function() {
-    troupeId = mongoUtils.getNewObjectIdString() + "";
-    chatId = mongoUtils.getNewObjectIdString() + "";
-    fromUserId = mongoUtils.getNewObjectIdString() + "";
+    troupeId = mongoUtils.getNewObjectIdString() + '';
+    chatId = mongoUtils.getNewObjectIdString() + '';
+    fromUserId = mongoUtils.getNewObjectIdString() + '';
     userIds = [];
     troupeLurkersUserHash = {};
     for (var i = 0; i < TOTAL_USERS; i++) {
-      var id = mongoUtils.getNewObjectIdString() + "";
+      var id = mongoUtils.getNewObjectIdString() + '';
       userIds.push(id);
       troupeLurkersUserHash[id] = false; // Not lurking
     }
@@ -40,18 +40,21 @@ makeBenchmark({
 
     troupe = {
       id: troupeId,
-      _id: troupeId,
+      _id: troupeId
     };
 
     userService = mockito.mock(testRequire('gitter-web-users'));
     appEvents = mockito.mock(testRequire('gitter-web-appevents'));
 
-    mockito.when(roomMembershipService).findMembersForRoomWithLurk(troupeId).thenReturn(Promise.resolve(troupeLurkersUserHash));
+    mockito
+      .when(roomMembershipService)
+      .findMembersForRoomWithLurk(troupeId)
+      .thenReturn(Promise.resolve(troupeLurkersUserHash));
 
-    unreadItemService = testRequire.withProxies("gitter-web-unread-items", {
+    unreadItemService = testRequire.withProxies('gitter-web-unread-items', {
       'gitter-web-rooms/lib/room-membership-service': roomMembershipService,
       'gitter-web-users': userService,
-      '../app-events': appEvents,
+      '../app-events': appEvents
     });
     unreadItemService.testOnly.setSendBadgeUpdates(false);
   },
@@ -60,16 +63,12 @@ makeBenchmark({
     if (process.env.DISABLE_EMAIL_NOTIFY_CLEAR_AFTER_TEST) return done();
 
     var unreadItemServiceEngine = testRequire('gitter-web-unread-items/lib/engine');
-    unreadItemServiceEngine.testOnly.removeAllEmailNotifications()
-      .nodeify(done);
+    unreadItemServiceEngine.testOnly.removeAllEmailNotifications().nodeify(done);
   },
 
   tests: {
     'createChatUnreadItems#largeRoom': function(done) {
-      unreadItemService.createChatUnreadItems(fromUserId, troupe, chatWithNoMentions)
-        .nodeify(done);
+      unreadItemService.createChatUnreadItems(fromUserId, troupe, chatWithNoMentions).nodeify(done);
     }
-
   }
-
 });

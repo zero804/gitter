@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-var pushNotificationFilter = require("gitter-web-push-notification-filter");
-var pushNotificationGateway = require("../../gateways/push-notification-gateway");
-var serializer = require("../../serializers/notification-serializer");
+var pushNotificationFilter = require('gitter-web-push-notification-filter');
+var pushNotificationGateway = require('../../gateways/push-notification-gateway');
+var serializer = require('../../serializers/notification-serializer');
 var unreadItemService = require('gitter-web-unread-items');
 var debug = require('debug')('gitter:app:push-notification-generator');
 var Promise = require('bluebird');
@@ -16,7 +16,7 @@ function serializeItems(troupeId, recipientUserId, chatIds) {
 
   return Promise.all([
     serializer.serializeObject(troupeId, troupeStrategy),
-    serializer.serialize(chatIds, chatStrategy),
+    serializer.serialize(chatIds, chatStrategy)
   ]);
 }
 
@@ -44,20 +44,27 @@ function selectChatsForNotification(unreadItems, mentions) {
     return unreadItems.slice(0, MAX_MESSAGES_FOR_NOTIFICATION);
   }
 
-  if (indexOfFirstMention === (unreadItems.length - 1)) {
+  if (indexOfFirstMention === unreadItems.length - 1) {
     /* Mention is the last message */
     return unreadItems.slice(-MAX_MESSAGES_FOR_NOTIFICATION);
   }
 
   return unreadItems
-    .slice(indexOfFirstMention - Math.floor(MAX_MESSAGES_FOR_NOTIFICATION/2))
+    .slice(indexOfFirstMention - Math.floor(MAX_MESSAGES_FOR_NOTIFICATION / 2))
     .slice(0, MAX_MESSAGES_FOR_NOTIFICATION);
 }
 
 function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) {
-  debug('notifyUserOfActivitySince userId=%s, troupeId=%s, since=%s, notificationNumber=%s', userId, troupeId, since, notificationNumber);
+  debug(
+    'notifyUserOfActivitySince userId=%s, troupeId=%s, since=%s, notificationNumber=%s',
+    userId,
+    troupeId,
+    since,
+    notificationNumber
+  );
 
-  return unreadItemService.getUnreadItemsForUserTroupeSince(userId, troupeId, since)
+  return unreadItemService
+    .getUnreadItemsForUserTroupeSince(userId, troupeId, since)
     .spread(function(unreadItems, mentions) {
       // mentions should always be a subset of unreadItems
       if (!unreadItems.length) {
@@ -67,36 +74,53 @@ function notifyUserOfActivitySince(userId, troupeId, since, notificationNumber) 
 
       var chatIdsForNotification = selectChatsForNotification(unreadItems, mentions);
 
-      return serializeItems(troupeId, userId, chatIdsForNotification)
-        .spread(function(troupe, chats) {
-          if (!troupe || !chats || !chats.length) return;
+      return serializeItems(troupeId, userId, chatIdsForNotification).spread(function(
+        troupe,
+        chats
+      ) {
+        if (!troupe || !chats || !chats.length) return;
 
-          return pushNotificationGateway.sendUserNotification('new_chat', userId, {
-            room: troupe,
-            chats: chats,
-            hasMentions: !!(mentions && mentions.length)
-          });
+        return pushNotificationGateway.sendUserNotification('new_chat', userId, {
+          room: troupe,
+          chats: chats,
+          hasMentions: !!(mentions && mentions.length)
         });
-
-  });
-
+      });
+    });
 }
 
-function sendUserTroupeNotification(userId, troupeId, notificationNumber, userNotifySetting/*, mentioned*/) {
-  return pushNotificationFilter.canUnlockForNotification(userId, troupeId, notificationNumber)
+function sendUserTroupeNotification(
+  userId,
+  troupeId,
+  notificationNumber,
+  userNotifySetting /*, mentioned*/
+) {
+  return pushNotificationFilter
+    .canUnlockForNotification(userId, troupeId, notificationNumber)
     .then(function(startTime) {
-      if(!startTime) {
-        debug('Unable to obtain lock to notify %s for user %s troupe %s. Skipping', notificationNumber, userId, troupeId);
+      if (!startTime) {
+        debug(
+          'Unable to obtain lock to notify %s for user %s troupe %s. Skipping',
+          notificationNumber,
+          userId,
+          troupeId
+        );
         return;
       }
 
       // TODO: remove this....
-      if(userNotifySetting === 'mute') {
+      if (userNotifySetting === 'mute') {
         /* Mute this troupe for this user */
         return;
       }
 
-      return notifyUserOfActivitySince(userId, troupeId, startTime, notificationNumber, userNotifySetting);
+      return notifyUserOfActivitySince(
+        userId,
+        troupeId,
+        startTime,
+        notificationNumber,
+        userNotifySetting
+      );
     });
 }
 
@@ -104,4 +128,4 @@ module.exports.sendUserTroupeNotification = sendUserTroupeNotification;
 module.exports.testOnly = {
   selectChatsForNotification: selectChatsForNotification,
   serializeItems: serializeItems
-}
+};

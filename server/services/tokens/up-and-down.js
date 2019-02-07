@@ -14,16 +14,14 @@ function UpAndDown(array) {
   this.array = array;
 }
 
-
 UpAndDown.prototype.iterate = function(downstream, upstream, callback) {
   return iterateDown(this.array, 0, downstream, upstream, callback);
 };
 
-
 /* Iterative function used internally by iterateProviders */
 /* This function uses callbacks for speed */
 function iterateDown(array, position, downstream, upstream, callback) {
-  if(position >= array.length) {
+  if (position >= array.length) {
     return callback();
   }
 
@@ -44,22 +42,25 @@ function iterateDown(array, position, downstream, upstream, callback) {
 
     /* Perform the upstream on all the providers at once */
     var upstreamProviders = array.slice(0, position);
-    async.each(upstreamProviders, function(provider, callback) {
-      return upstream(result, provider, function(err) {
+    async.each(
+      upstreamProviders,
+      function(provider, callback) {
+        return upstream(result, provider, function(err) {
+          if (err) {
+            logger.warn('up-down: Upstream operation failed: ' + err, { exception: err });
+          }
+
+          callback();
+        });
+      },
+      function(err) {
         if (err) {
-          logger.warn('up-down: Upstream operation failed: ' + err, { exception: err });
+          logger.warn('up-down: Upstream operation failed #2: ' + err, { exception: err });
         }
 
-        callback();
-      });
-    }, function(err) {
-      if (err) {
-        logger.warn('up-down: Upstream operation failed #2: ' + err, { exception: err });
+        return callback(null, result);
       }
-
-      return callback(null, result);
-    });
-
+    );
   });
 }
 

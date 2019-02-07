@@ -1,13 +1,13 @@
 #!/usr/bin/env node
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');
 
-var stream = getIntercomStream({ client: intercom.client, key: 'segments'}, function() {
-  return intercom.client.segments.list()
+var stream = getIntercomStream({ client: intercom.client, key: 'segments' }, function() {
+  return intercom.client.segments.list();
 });
 
 stream
@@ -22,6 +22,3 @@ stream
     console.error(error.stack);
     shutdown.shutdownGracefully();
   });
-
-
-

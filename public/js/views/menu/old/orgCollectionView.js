@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var avatars = require('gitter-web-avatars');
@@ -6,10 +6,7 @@ var orgListItemTemplate = require('./tmpl/org-list-item.hbs');
 var appEvents = require('../../../utils/appevents');
 var troupesCollections = require('../../../collections/instances/troupes');
 
-
 module.exports = (function() {
-
-
   var OrgItemView = Marionette.ItemView.extend({
     tagName: 'li',
 
@@ -18,7 +15,7 @@ module.exports = (function() {
     template: orgListItemTemplate,
 
     modelEvents: {
-      change: 'render',
+      change: 'render'
     },
 
     events: {
@@ -35,16 +32,28 @@ module.exports = (function() {
       e.preventDefault();
 
       if (this.model.get('room')) {
-        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+        appEvents.trigger(
+          'navigation',
+          '/' + this.model.get('name'),
+          'chat',
+          this.model.get('name'),
+          null
+        );
         return;
       }
 
       // An org could not have a 'room' at render time but someone else could have meanwhile created the org
       // room and added you. So we'll look it up in the live collection of troupes and navigate if exists.
-      var exists = troupesCollections.troupes.findWhere({uri: this.model.get('name')});
+      var exists = troupesCollections.troupes.findWhere({ uri: this.model.get('name') });
 
       if (exists) {
-        appEvents.trigger('navigation', '/' + this.model.get('name'), 'chat', this.model.get('name'), null);
+        appEvents.trigger(
+          'navigation',
+          '/' + this.model.get('name'),
+          'chat',
+          this.model.get('name'),
+          null
+        );
       } else {
         window.location.hash = '#confirm/' + this.model.get('name');
       }
@@ -55,16 +64,13 @@ module.exports = (function() {
     tagName: 'ul',
     className: 'room-list',
     childView: OrgItemView,
-    childViewOptions: function (item) {
+    childViewOptions: function(item) {
       var options = {};
       if (item) {
         var id = item.get('id'); // NB ID attribute is not the id!
         options.el = this.$el.find('.room-list-item[data-id="' + id + '"]')[0];
       }
       return options;
-    },
-
+    }
   });
-
-
 })();

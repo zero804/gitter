@@ -16,10 +16,9 @@ function toString(f) {
  * previously.
  */
 function generateMentionDeltaSet(newNotifies, originalMentions) {
-  var newNotifyUserIds = newNotifies
-    .map(function(memberWithMention) {
-      return toString(memberWithMention.userId);
-    });
+  var newNotifyUserIds = newNotifies.map(function(memberWithMention) {
+    return toString(memberWithMention.userId);
+  });
 
   var newMentionUserIds = newNotifies
     .filter(function(memberWithMention) {
@@ -44,21 +43,19 @@ function generateMentionDeltaSet(newNotifies, originalMentions) {
    * Everyone who was added via a mention, plus everyone who was no longer
    * mentioned but is not lurking
    */
-  var addWithoutMentionSeq = forNotifyWithRemoveMentions
-    .map(function(userId) {
-      return {
-        userId: userId,
-        mention: false
-      };
-    });
+  var addWithoutMentionSeq = forNotifyWithRemoveMentions.map(function(userId) {
+    return {
+      userId: userId,
+      mention: false
+    };
+  });
 
-  var addWithMentionSequence = addMentions
-    .map(function(userId) {
-      return {
-        userId: userId,
-        mention: true
-      };
-    });
+  var addWithMentionSequence = addMentions.map(function(userId) {
+    return {
+      userId: userId,
+      mention: true
+    };
+  });
 
   var add = addWithoutMentionSeq.concat(addWithMentionSequence);
 
@@ -80,8 +77,8 @@ function createDelta(fromUserId, troupe, newMentions, originalMentions) {
     createDistribution(fromUserId, troupe, originalMentions, { delta: true }),
     function(newDistribution, originalDistribution) {
       return [deltaDistributions(newDistribution, originalDistribution), newDistribution];
-    });
+    }
+  );
 }
-
 
 module.exports = createDelta;

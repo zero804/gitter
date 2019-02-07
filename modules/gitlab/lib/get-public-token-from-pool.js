@@ -11,8 +11,8 @@ var usageIterator = 0;
 
 module.exports = function() {
   var accessToken = null;
-  if(accessTokenPool.length > 0) {
-     accessToken = accessTokenPool[usageIterator++ % accessTokenPool.length];
+  if (accessTokenPool.length > 0) {
+    accessToken = accessTokenPool[usageIterator++ % accessTokenPool.length];
   }
   return accessToken;
 };

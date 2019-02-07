@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node:true, unused:true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
@@ -9,15 +9,17 @@ var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect'
 var shimPositionOption = require('../yargs-shim-position-option');
 
 var opts = require('yargs')
-  .option('username', shimPositionOption({
-    position: 0,
-    required: true,
-    description: "username to send badge update to",
-    string: true
-  }))
+  .option(
+    'username',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'username to send badge update to',
+      string: true
+    })
+  )
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 onMongoConnect()
   .then(function() {

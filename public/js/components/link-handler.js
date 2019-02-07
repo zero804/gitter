@@ -16,10 +16,12 @@ function routeLink(target, options) {
   // If the only difference between the current URL and the clicked URL is the hash
   // then force a window.location update so that Backbone.Router can take care of it
   if (!appFrame) {
-    if (location.scheme === target.scheme &&
-        location.host === target.host &&
-        location.pathname === target.pathname &&
-        location.search === target.search) {
+    if (
+      location.scheme === target.scheme &&
+      location.host === target.host &&
+      location.pathname === target.pathname &&
+      location.search === target.search
+    ) {
       window.location = target.href;
       return true;
     }
@@ -36,21 +38,19 @@ function routeLink(target, options) {
     appEvents.trigger('navigation', target.pathname + target.search, type, uri);
     return true;
   }
-
 }
 
 function installLinkHandler() {
-  $(document).on('click', 'a', function (e) {
+  $(document).on('click', 'a', function(e) {
     var target = e.currentTarget;
 
     var disableRouting = dataset.get(target, 'disableRouting');
     if (disableRouting) return; // Propegate the event....
 
-    if(routeLink(target)) {
+    if (routeLink(target)) {
       e.preventDefault();
     }
   });
-
 }
 
 module.exports = {

@@ -34,4 +34,4 @@ function hasSecondaryView() {
 module.exports = {
   renderPrimaryView: renderPrimaryView,
   hasSecondaryView: hasSecondaryView
-}
+};

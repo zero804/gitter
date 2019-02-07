@@ -33,7 +33,7 @@ RoomContextDelegate.prototype = {
           // so we can't be absolutely sure that the next memoize call won't
           // happen before the removal is complete
           memoizePromise.unmemoize(this, 'isMember');
-          return appEvents.roomMemberPermCheckFailed(this.roomId, this.userId)
+          return appEvents.roomMemberPermCheckFailed(this.roomId, this.userId);
         }
 
         return null;

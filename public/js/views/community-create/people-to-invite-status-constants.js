@@ -7,5 +7,4 @@ var peopleToInviteStatusConstants = {
   READY_VALID_EMAIL: 'ready_valid_email'
 };
 
-
 module.exports = peopleToInviteStatusConstants;

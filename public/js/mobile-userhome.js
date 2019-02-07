@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');
 var Backbone = require('backbone');
@@ -23,7 +23,6 @@ require('./components/ping');
 require('./template/helpers/all');
 
 onready(function() {
-
   //Left Menu Additions
   //gestures.init();
 
@@ -39,7 +38,6 @@ onready(function() {
     template: false,
     el: 'body'
   }).render();
-
 
   new Router({
     dialogRegion: modalRegion,

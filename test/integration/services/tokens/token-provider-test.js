@@ -6,15 +6,13 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 
 describe('token-provider', function() {
-
   require('./provider-tests-common-full')(tokenProvider, true);
-
 
   describe('anonymous', function() {
     var clientId;
 
     beforeEach(function() {
-      clientId = mongoUtils.getNewObjectIdString() + "";
+      clientId = mongoUtils.getNewObjectIdString() + '';
     });
 
     it('should create tokens for user-clients that do not exist', function(done) {
@@ -42,10 +40,7 @@ describe('token-provider', function() {
           assert.notEqual(token2, token3);
           done();
         });
-
       });
-
     });
-
   });
 });

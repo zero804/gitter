@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
@@ -44,7 +44,7 @@ routes.invited = [
       username: query.welcome,
       uri: query.uri,
       bootScriptName: 'router-login',
-      cssFileName:  "styles/login.css",
+      cssFileName: 'styles/login.css',
       // TODO: remove this and just show it anyway
       showNewLogin: true
     });
@@ -54,8 +54,7 @@ routes.invited = [
 routes.explain = [
   identifyRoute('login-explain'),
   function(req, res) {
-    res.render('github-explain', {
-    });
+    res.render('github-explain', {});
   }
 ];
 
@@ -70,7 +69,7 @@ routes.upgradeLandingPage = [
       user: req.user,
       newScopes,
       fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies)
     });
   }
 ];
@@ -80,25 +79,27 @@ routes.upgrade = [
   identifyRoute('login-upgrade'),
   function(req, res, next) {
     var scopes = getScopesFromReq(req);
-    var existing = req.user.githubScopes || { };
+    var existing = req.user.githubScopes || {};
     var addedScopes = false;
 
     scopes.forEach(function(scope) {
-      if(!existing[scope]) addedScopes = true;
+      if (!existing[scope]) addedScopes = true;
       existing[scope] = true;
     });
 
-    if(!addedScopes) {
+    if (!addedScopes) {
       res.render('github-upgrade-complete', {
         oAuthCompletePostMessage: JSON.stringify({
-          type: "oauth_upgrade_complete",
+          type: 'oauth_upgrade_complete',
           scopes: userScopes.getScopesHash(req.user)
         })
       });
       return;
     }
 
-    var requestedScopes = Object.keys(existing).filter(function(f) { return !!f; });
+    var requestedScopes = Object.keys(existing).filter(function(f) {
+      return !!f;
+    });
     req.session.githubScopeUpgrade = true;
 
     passport.authorize('github_upgrade', {

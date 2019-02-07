@@ -12,12 +12,14 @@ var ONE_DAY_TIME = 24 * 60 * 60 * 1000; // One day
 var PROBATION_PERIOD = 14 * ONE_DAY_TIME;
 
 function hellbanUser(userId) {
-  return User.update({ _id: userId }, {
+  return User.update(
+    { _id: userId },
+    {
       $set: {
         hellbanned: true
       }
-    })
-    .exec();
+    }
+  ).exec();
 }
 /**
  * Super basic spam detection
@@ -30,26 +32,25 @@ function detect(user, parsedMessage) {
   var userCreated = mongoUtils.getTimestampFromObjectId(userId);
 
   // Outside of the probation period? For now, let them do anything
-  if ((Date.now() - userCreated) > PROBATION_PERIOD) {
+  if (Date.now() - userCreated > PROBATION_PERIOD) {
     return false;
   }
 
-  return duplicateChatDetector(userId, parsedMessage.text)
-    .tap(function(isSpamming) {
-      if (!isSpamming) return;
+  return duplicateChatDetector(userId, parsedMessage.text).tap(function(isSpamming) {
+    if (!isSpamming) return;
 
-      logger.warn('Auto spam detector to hellban user for suspicious activity', {
-        userId: user._id,
-        username: user.username,
-        text: parsedMessage.text,
-      });
+    logger.warn('Auto spam detector to hellban user for suspicious activity', {
+      userId: user._id,
+      username: user.username,
+      text: parsedMessage.text
+    });
 
-      stats.event('auto_hellban_user', {
-        userId: user._id
-      });
+    stats.event('auto_hellban_user', {
+      userId: user._id
+    });
 
-      return hellbanUser(userId);
-    })
+    return hellbanUser(userId);
+  });
 }
 
 module.exports = {

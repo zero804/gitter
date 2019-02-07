@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assertRoom = function(uri) {
   if (!uri) {
@@ -10,11 +10,15 @@ module.exports = {
   generateTwitterShareUrl: function(uri) {
     assertRoom(uri);
 
-    return 'https://twitter.com/share?' +
-      'text=' + encodeURIComponent('Join the chat room on Gitter for ' + uri + ':') +
-      '&url=https://gitter.im/' + uri +
+    return (
+      'https://twitter.com/share?' +
+      'text=' +
+      encodeURIComponent('Join the chat room on Gitter for ' + uri + ':') +
+      '&url=https://gitter.im/' +
+      uri +
       '&related=gitchat' +
-      '&via=gitchat';
+      '&via=gitchat'
+    );
   },
 
   generateFacebookShareUrl: function(uri) {
@@ -26,12 +30,17 @@ module.exports = {
   generateLinkedinShareUrl: function(uri) {
     assertRoom(uri);
 
-    return 'https://www.linkedin.com/shareArticle?' +
+    return (
+      'https://www.linkedin.com/shareArticle?' +
       'mini=true' +
-      '&url=https://gitter.im/' + uri +
-      '&title=' + encodeURIComponent(uri + ' on Gitter') +
-      '&summary=' + encodeURIComponent('Join the chat room on Gitter for ' + uri) +
-      '&source=Gitter';
+      '&url=https://gitter.im/' +
+      uri +
+      '&title=' +
+      encodeURIComponent(uri + ' on Gitter') +
+      '&summary=' +
+      encodeURIComponent('Join the chat room on Gitter for ' + uri) +
+      '&source=Gitter'
+    );
   },
 
   generateGooglePlusShareUrl: function(uri) {

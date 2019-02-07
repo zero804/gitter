@@ -17,7 +17,7 @@ describe('split-tests', function() {
 
   it('reads the group from the query string', function() {
     var req = {
-      query: { '_set_variant_mytest': 'treatment' }
+      query: { _set_variant_mytest: 'treatment' }
     };
     var res = {};
     var testname = 'mytest';
@@ -29,7 +29,7 @@ describe('split-tests', function() {
 
   it('defaults to control if the group from the query string is nonsense', function() {
     var req = {
-      query: { '_set_variant_mytest': 'I_AM_NONSENSE' }
+      query: { _set_variant_mytest: 'I_AM_NONSENSE' }
     };
     var res = {};
     var testname = 'mytest';
@@ -40,7 +40,6 @@ describe('split-tests', function() {
   });
 
   describe('selectTemplate', function() {
-
     it('picks the control template correctly', function() {
       var result = split.selectTemplate('control', 'control_tmpl', 'treatment_tmpl');
 
@@ -59,5 +58,4 @@ describe('split-tests', function() {
       assert.equal(result, 'control_tmpl');
     });
   });
-
 });

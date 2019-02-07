@@ -15,20 +15,17 @@ function test(name, expected) {
   assert.equal(result, expected);
 }
 
-describe('valid-room-uri', function () {
-
-  it('rejects vanity keywords', function () {
-    RESERVED
-      .forEach(function (keyword) {
-        test('/' + keyword, false);
-      });
-    RESERVED_SUB
-      .forEach(function (keyword) {
-        test('/foo/' + keyword, false);
-      });
+describe('valid-room-uri', function() {
+  it('rejects vanity keywords', function() {
+    RESERVED.forEach(function(keyword) {
+      test('/' + keyword, false);
+    });
+    RESERVED_SUB.forEach(function(keyword) {
+      test('/foo/' + keyword, false);
+    });
   });
 
-  it('accepts rooms with vanity keywords, but aren\'t vanity keyworkds', function () {
+  it("accepts rooms with vanity keywords, but aren't vanity keyworkds", function() {
     test('/aboutandrew');
     test('/apiguy');
     test('/aboutandrew?test=true');
@@ -37,7 +34,7 @@ describe('valid-room-uri', function () {
     test('/aboutandrew/topicsname');
   });
 
-  it('rejects undefined and empty string', function () {
+  it('rejects undefined and empty string', function() {
     test('     ', false);
     test(null, false);
     test(undefined, false);
@@ -45,14 +42,14 @@ describe('valid-room-uri', function () {
     test('a', false);
   });
 
-  it('rejects archive links', function () {
+  it('rejects archive links', function() {
     test('/gitterHQ/gitter/archives/all', false);
     test('/gitterHQ/gitter/archives/2014/12/11', false);
     test('/gitterHQ/gitter/archives/all?test=true', false);
     test('/gitterHQ/gitter/archives/2014/12/11?test=true', false);
   });
 
-  it('accepts room URIs', function () {
+  it('accepts room URIs', function() {
     test('/i-love-cats');
     test('/i-love-cats/Lobby');
     test('/i-love-cats/community');

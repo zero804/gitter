@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
@@ -11,12 +11,12 @@ var FeaturesView = require('./notification-features-collection-view');
 var OPTIONS = {
   all: 'All: Notify me for all messages',
   announcement: 'Announcements: Notify me for mentions and announcements',
-  mute: 'Mute: Notify me only when I\'m directly mentioned'
+  mute: "Mute: Notify me only when I'm directly mentioned"
 };
 
 var View = Marionette.LayoutView.extend({
   template: template,
-  events:   {
+  events: {
     'click #close-settings': 'destroySettings',
     'change #notification-options': 'formChange'
   },
@@ -35,7 +35,8 @@ var View = Marionette.LayoutView.extend({
   initialize: function() {
     // TODO: this should go to the userRoom endpoint as a get
     // or better yet should be a live field on the room
-    apiClient.userRoom.get('/settings/notifications')
+    apiClient.userRoom
+      .get('/settings/notifications')
       .bind(this)
       .then(function(settings) {
         this.model.set(settings);
@@ -56,9 +57,13 @@ var View = Marionette.LayoutView.extend({
 
     var nonStandard;
 
-    var defaultDescription = 'Legacy setting: ' + value + ' mode, with ' + (lurk ? 'unread item count off' : 'unread item count on');
+    var defaultDescription =
+      'Legacy setting: ' +
+      value +
+      ' mode, with ' +
+      (lurk ? 'unread item count off' : 'unread item count on');
 
-    switch(value) {
+    switch (value) {
       case 'all':
         nonStandard = lurk === true;
         return {
@@ -116,14 +121,13 @@ var View = Marionette.LayoutView.extend({
           this.setOption(val.selectValue);
         }
       }
-
     } else {
       this.setOption('', 'Please wait...');
       this.ui.nonstandard.hide();
     }
 
     var count = 0;
-    if(this.featuresView) {
+    if (this.featuresView) {
       count = this.featuresView.resetFromHash(this.model.attributes);
     } else {
       count = 0;
@@ -141,11 +145,11 @@ var View = Marionette.LayoutView.extend({
     selectInput.empty();
     var found = false;
 
-    var defaultOptgroup = document.createElement("optgroup");
+    var defaultOptgroup = document.createElement('optgroup');
     defaultOptgroup.label = 'Use Default';
     selectInput.append(defaultOptgroup);
 
-    var defaultOption = document.createElement("option");
+    var defaultOption = document.createElement('option');
     defaultOption.value = 'default';
     defaultOption.textContent = this.getDefaulDescription();
     if (val === 'default') {
@@ -154,14 +158,14 @@ var View = Marionette.LayoutView.extend({
     }
     defaultOptgroup.appendChild(defaultOption);
 
-    var overrideOptGroup = document.createElement("optgroup");
+    var overrideOptGroup = document.createElement('optgroup');
     overrideOptGroup.label = 'Override';
     selectInput.append(overrideOptGroup);
 
     Object.keys(OPTIONS).forEach(function(key) {
       var text = OPTIONS[key];
 
-      var option = document.createElement("option");
+      var option = document.createElement('option');
       option.value = key;
       option.textContent = text;
       var selected = key === val;
@@ -173,7 +177,7 @@ var View = Marionette.LayoutView.extend({
     });
 
     if (!found) {
-      var option = document.createElement("option");
+      var option = document.createElement('option');
       option.value = val;
       option.textContent = text;
       option.selected = true;
@@ -185,20 +189,20 @@ var View = Marionette.LayoutView.extend({
   getDefaulDescription: function() {
     var model = this.model;
     var defaultSettings = model.get('defaultSettings');
-    if (!defaultSettings) return "Default settings";
+    if (!defaultSettings) return 'Default settings';
 
-    if (!defaultSettings.mode || !OPTIONS[defaultSettings.mode]) return "Legacy settings";
+    if (!defaultSettings.mode || !OPTIONS[defaultSettings.mode]) return 'Legacy settings';
     return OPTIONS[defaultSettings.mode];
   },
 
   onRender: function() {
-    this.featuresView = new FeaturesView({ });
+    this.featuresView = new FeaturesView({});
     this.getRegion('notifyFeatures').show(this.featuresView);
     this.update();
   },
 
   formChange: function(e) {
-    if(e) e.preventDefault();
+    if (e) e.preventDefault();
     var mode = this.ui.options.val();
     var oldIsDefault = this.model.get('default');
 
@@ -211,7 +215,7 @@ var View = Marionette.LayoutView.extend({
 
     var noChange;
     if (oldIsDefault) {
-      noChange = mode === "default";
+      noChange = mode === 'default';
     } else {
       noChange = mode === this.model.get('mode');
     }
@@ -227,14 +231,14 @@ var View = Marionette.LayoutView.extend({
 
   serializeData: function() {
     return {
-      notificationsBlocked: userNotifications.isAccessDenied(),
+      notificationsBlocked: userNotifications.isAccessDenied()
     };
   },
 
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'set-defaults':
-        window.location.href = "#notification-defaults";
+        window.location.href = '#notification-defaults';
         break;
       case 'apply':
         this.applyChangeAndClose();
@@ -245,7 +249,8 @@ var View = Marionette.LayoutView.extend({
   applyChangeAndClose: function() {
     var mode = this.ui.options.val();
     // TODO: this should go to the userRoom endpoint as a patch
-    apiClient.userRoom.put('/settings/notifications', { mode: mode })
+    apiClient.userRoom
+      .put('/settings/notifications', { mode: mode })
       .bind(this)
       .then(function() {
         this.dialog.hide();
@@ -255,16 +260,29 @@ var View = Marionette.LayoutView.extend({
 });
 
 module.exports = ModalView.extend({
-    initialize: function(options) {
-      options = _.extend({
-        title: "Notification Settings",
+  initialize: function(options) {
+    options = _.extend(
+      {
+        title: 'Notification Settings',
         menuItems: [
-          { action: "set-defaults", pull: 'left', text: "Configure Defaults", className: "modal--default__footer__link" },
-          { action: "apply", pull: 'right', text: "Apply", className: "modal--default__footer__btn--neutral" }
+          {
+            action: 'set-defaults',
+            pull: 'left',
+            text: 'Configure Defaults',
+            className: 'modal--default__footer__link'
+          },
+          {
+            action: 'apply',
+            pull: 'right',
+            text: 'Apply',
+            className: 'modal--default__footer__btn--neutral'
+          }
         ]
-      }, options);
+      },
+      options
+    );
 
-      ModalView.prototype.initialize.call(this, options);
-      this.view = new View(options);
-    }
+    ModalView.prototype.initialize.call(this, options);
+    this.view = new View(options);
+  }
 });

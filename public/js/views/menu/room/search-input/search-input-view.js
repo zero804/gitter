@@ -10,28 +10,27 @@ var toggleClass = require('../../../../utils/toggle-class');
 var RAF = require('../../../../utils/raf');
 
 var SearchInputView = Marionette.ItemView.extend({
-
   template: template,
   className: 'left-menu-search empty',
 
   ui: {
     clear: '.js-search-clear',
-    input: 'input',
+    input: 'input'
   },
 
   events: {
-    'change':          'onInputChange',
-    'input':           'onInputChange',
-    'click @ui.clear': 'onClearClicked',
+    change: 'onInputChange',
+    input: 'onInputChange',
+    'click @ui.clear': 'onClearClicked'
   },
 
   modelEvents: {
-    'change:state':      'onModelChangeState',
-    'change:searchTerm': 'onModelChangeSearchTerm',
+    'change:state': 'onModelChangeState',
+    'change:searchTerm': 'onModelChangeSearchTerm'
   },
 
   keyboardEvents: {
-    'room-list.start-nav': 'focusSearchInput',
+    'room-list.start-nav': 'focusSearchInput'
   },
 
   initialize: function(attrs) {
@@ -52,19 +51,26 @@ var SearchInputView = Marionette.ItemView.extend({
     this.model.set('searchTerm', val);
   }, 500),
 
-  onModelChangeState: function (model, val){ //jshint unused: true
+  onModelChangeState: function(model, val) {
+    //jshint unused: true
     toggleClass(this.el, 'active', val === 'search');
   },
 
-  onRender: function (){
+  onRender: function() {
     this.onModelChangeState(this.model, this.model.get('state'));
-    setTimeout(function(){
-      this.onFocusUpdate(this.focusModel, this.focusModel.get('focus'));
-    }.bind(this), 1000);
+    setTimeout(
+      function() {
+        this.onFocusUpdate(this.focusModel, this.focusModel.get('focus'));
+      }.bind(this),
+      1000
+    );
   },
 
-  onModelChangeSearchTerm: function(model, val) { //jshint unused: true
-    if(val === '') { this.ui.input.val(val); }
+  onModelChangeSearchTerm: function(model, val) {
+    //jshint unused: true
+    if (val === '') {
+      this.ui.input.val(val);
+    }
     toggleClass(this.el, 'empty', !val);
   },
 
@@ -73,20 +79,22 @@ var SearchInputView = Marionette.ItemView.extend({
     this.model.set('searchTerm', '');
   },
 
-  onRecentSearchUpdate: function (val){
+  onRecentSearchUpdate: function(val) {
     this.ui.input.val(val);
   },
 
-  onFocusUpdate: function (model, val){
-    RAF(function(){
-      if(val) { return this.ui.input.focus();}
-      this.ui.input.blur();
-    }.bind(this));
-  },
-
+  onFocusUpdate: function(model, val) {
+    RAF(
+      function() {
+        if (val) {
+          return this.ui.input.focus();
+        }
+        this.ui.input.blur();
+      }.bind(this)
+    );
+  }
 });
 
 cocktail.mixin(SearchInputView, KeyboardEventMixin);
-
 
 module.exports = SearchInputView;

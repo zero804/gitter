@@ -3,19 +3,22 @@
 var makeBenchmark = require('../make-benchmark');
 var lazy = require('lazy.js');
 
-var items = lazy.range(1000)
-  .map(function(x, index) {
-    return {
-      oneToOne: true,
-      oneToOneUsers: [{
-        userId: 'user' + index,
-      }, {
+var items = lazy.range(1000).map(function(x, index) {
+  return {
+    oneToOne: true,
+    oneToOneUsers: [
+      {
+        userId: 'user' + index
+      },
+      {
         userId: 'user' + (index + 1)
-      }],
-    };
-  });
+      }
+    ]
+  };
+});
 
-var approach1 = items.filter(function(troupe) {
+var approach1 = items
+  .filter(function(troupe) {
     return troupe.oneToOne;
   })
   .map(function(troupe) {
@@ -27,7 +30,8 @@ var approach1 = items.filter(function(troupe) {
   })
   .uniq();
 
-var approach2 = items.filter(function(troupe) {
+var approach2 = items
+  .filter(function(troupe) {
     return troupe.oneToOne;
   })
   .map(function(troupe) {
@@ -36,25 +40,27 @@ var approach2 = items.filter(function(troupe) {
   .flatten()
   .uniq();
 
-var approach3a = items.filter(function(troupe) {
+var approach3a = items
+  .filter(function(troupe) {
     return troupe.oneToOne;
   })
   .map(function(troupe) {
     return troupe.oneToOneUsers[0].userId;
   });
 
-var approach3b = items.filter(function(troupe) {
+var approach3b = items
+  .filter(function(troupe) {
     return troupe.oneToOne;
   })
   .map(function(troupe) {
     return troupe.oneToOneUsers[1].userId;
   });
 
-var approach3 = approach3a.union(approach3b)
-  .uniq();
+var approach3 = approach3a.union(approach3b).uniq();
 
 var currentUserId = 'user1';
-var approach4 = items.filter(function(troupe) {
+var approach4 = items
+  .filter(function(troupe) {
     return troupe.oneToOne;
   })
   .map(function(troupe) {
@@ -99,7 +105,6 @@ makeBenchmark({
 
     'map#size': function() {
       approach4.size();
-    },
+    }
   }
-
 });

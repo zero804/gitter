@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../utils/context');
 var appEvents = require('../utils/appevents');
@@ -19,10 +19,10 @@ if (REPORT_UNHANDLED_REJECTIONS) {
   // We handle this ourselves because Bluebird doesn't implement PromiseRejectionEvent correctly(spec-compliant)
   // TODO: This handler can be removed when there is a new Bluebird release, tracked by https://github.com/petkaantonov/bluebird/issues/1509
   window.addEventListener('unhandledrejection', function(e) {
-      // `e.detail.reason` is bluebird
-      // `e.reason` is native PromiseRejectionEvent, https://developer.mozilla.org/en-US/docs/Web/API/PromiseRejectionEvent/reason
-      var reason = e.detail ? e.detail.reason : e.reason;
-      ravenClient(reason);
+    // `e.detail.reason` is bluebird
+    // `e.reason` is native PromiseRejectionEvent, https://developer.mozilla.org/en-US/docs/Web/API/PromiseRejectionEvent/reason
+    var reason = e.detail ? e.detail.reason : e.reason;
+    ravenClient(reason);
   });
 }
 

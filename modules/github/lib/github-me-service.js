@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
@@ -14,16 +14,19 @@ GitHubMeService.prototype.getUser = function() {
 };
 
 GitHubMeService.prototype.getEmail = function() {
-  return tentacles.userEmail.listForAuthUser({
+  return tentacles.userEmail
+    .listForAuthUser({
       accessToken: this.accessToken,
       headers: { Accept: 'application/json' } // Override the default. Remove once default is back to original
     })
     .then(function(emailHashes) {
-      var primaries = emailHashes.filter(function(hash) {
-        return hash.primary;
-      }).map(function(hash) {
-        return hash.email;
-      });
+      var primaries = emailHashes
+        .filter(function(hash) {
+          return hash.primary;
+        })
+        .map(function(hash) {
+          return hash.email;
+        });
 
       return primaries[0];
     });
@@ -32,13 +35,13 @@ GitHubMeService.prototype.getEmail = function() {
 // TODO: evaluate with upcoming changes
 GitHubMeService.prototype.getOrgs = function() {
   return tentacles.org.listForAuthUser({
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
 GitHubMeService.prototype.getOrgMembership = function(org) {
   return tentacles.orgMember.getMembershipForAuthUser(org, {
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 
@@ -46,8 +49,8 @@ GitHubMeService.prototype.isOrgAdmin = function(org) {
   return this.getOrgMembership(org)
     .then(function(membership) {
       if (!membership) return false;
-      if (membership.state !== "active") return false;
-      return membership.role === "admin";
+      if (membership.state !== 'active') return false;
+      return membership.role === 'admin';
     })
     .catch(function(err) {
       if (err.statusCode === 404) return false;
@@ -59,7 +62,7 @@ GitHubMeService.prototype.isOrgMember = function(org) {
   return this.getOrgMembership(org)
     .then(function(membership) {
       if (!membership) return false;
-      if (membership.state !== "active") return false;
+      if (membership.state !== 'active') return false;
       return true;
     })
     .catch(function(err) {
@@ -71,7 +74,7 @@ GitHubMeService.prototype.isOrgMember = function(org) {
 /* TODO: this will be affected by scope issues? */
 GitHubMeService.prototype.getRepos = function() {
   return tentacles.repo.listForAuthUser({
-    accessToken: this.accessToken,
+    accessToken: this.accessToken
   });
 };
 

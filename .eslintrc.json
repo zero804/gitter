@@ -7,28 +7,16 @@
     "ecmaVersion": 2017,
     "sourceType": "script"
   },
-  "plugins": [
-    "node"
-  ],
-  "extends": "eslint:recommended",
+  "plugins": ["node"],
+  "extends": ["eslint:recommended", "prettier"],
   "rules": {
     "indent": "off",
     "comma-dangle": "off",
     "quotes": "off",
-    "eqeqeq": [
-      "warn",
-      "allow-null"
-    ],
-    "strict": [
-      "error",
-      "safe"
-    ],
-    "no-unused-vars": [
-      "warn"
-    ],
-    "no-extra-boolean-cast": [
-      "warn"
-    ],
+    "eqeqeq": ["warn", "allow-null"],
+    "strict": ["error", "safe"],
+    "no-unused-vars": ["warn"],
+    "no-extra-boolean-cast": ["warn"],
     "complexity": [
       "error",
       {
@@ -48,25 +36,14 @@
     "no-useless-call": "error",
     "no-spaced-func": "error",
     "no-useless-escape": "warn",
-    "max-statements": [
-      "warn",
-      30
-    ],
-    "max-depth": [
-      "error",
-      4
-    ],
-    "no-throw-literal": [
-      "error"
-    ],
+    "max-statements": ["warn", 30],
+    "max-depth": ["error", 4],
+    "no-throw-literal": ["error"],
     "no-sequences": "error",
     "no-warning-comments": [
       "warn",
       {
-        "terms": [
-          "fixme",
-          "xxx"
-        ],
+        "terms": ["fixme", "xxx"],
         "location": "anywhere"
       }
     ],
@@ -75,14 +52,8 @@
     "no-nested-ternary": "warn",
     "no-whitespace-before-property": "error",
     "no-trailing-spaces": ["error"],
-    "space-in-parens": [
-      "warn",
-      "never"
-    ],
-    "max-nested-callbacks": [
-      "error",
-      6
-    ],
+    "space-in-parens": ["warn", "never"],
+    "max-nested-callbacks": ["error", 6],
     "eol-last": "warn",
     "no-mixed-spaces-and-tabs": "error",
     "no-negated-condition": "warn",

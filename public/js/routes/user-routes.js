@@ -10,8 +10,8 @@ function createRoutes(options = {}) {
 
         dialogRegion.show(new DeleteModal({}));
       });
-    },
-  }
+    }
+  };
 }
 
 module.exports = createRoutes;

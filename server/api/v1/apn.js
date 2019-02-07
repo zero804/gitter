@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -12,9 +12,14 @@ module.exports = function(req, res, next) {
   var appVersion = req.body.version || null;
   var appBuild = req.body.build || null;
 
-  winston.info("APN device registration", { deviceId: deviceId, deviceName: deviceName, deviceType: deviceType });
+  winston.info('APN device registration', {
+    deviceId: deviceId,
+    deviceName: deviceName,
+    deviceType: deviceType
+  });
 
-  return pushNotificationService.registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild)
+  return pushNotificationService
+    .registerDevice(deviceId, deviceType, deviceToken, deviceName, appVersion, appBuild)
     .then(function() {
       res.send({ success: true });
     })

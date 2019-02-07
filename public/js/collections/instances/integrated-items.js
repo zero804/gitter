@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var userModels = require('../users');
 var eventModels = require('../events');

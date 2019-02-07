@@ -14,23 +14,24 @@ var opts = require('yargs')
     string: true
   })
   .option('type', {
-    description: 'null, \'GH_REPO\', \'GH_ORG\''
+    description: "null, 'GH_REPO', 'GH_ORG'"
   })
   .option('linkPath', {
     description: 'Vendor path to find backing object on their platform according to the type'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-userService.findByUsername(opts.username)
+userService
+  .findByUsername(opts.username)
   .then(function(user) {
     if (!user) {
       console.log('User not found with given username', opts.username);
-      throw new Error('User not found with given username' + opts.username)
+      throw new Error('User not found with given username' + opts.username);
     }
 
-    return collaboratorsService.findCollaborators(user, opts.type || null, opts.linkPath || null)
+    return collaboratorsService
+      .findCollaborators(user, opts.type || null, opts.linkPath || null)
       .then(function(suggestions) {
         console.log('Suggestions', suggestions);
         return suggestions;

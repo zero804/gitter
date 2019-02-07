@@ -1,5 +1,5 @@
 /* eslint complexity: ["error", 31], max-depth: ["error", 5] */
-"use strict";
+'use strict';
 
 /* This require looks HORRIBLE, but it's a way to use the non-aliased underscore */
 /* Webpack config will alias all usages of underscore to this module */
@@ -31,7 +31,7 @@ function eq(a, b, aStack, bStack) {
   if (className !== toString.call(b)) return false;
   switch (className) {
     // RegExps are coerced to strings for comparison.
-    case '[object RegExp]':  // Strings, numbers, dates, and booleans are compared by value.
+    case '[object RegExp]': // Strings, numbers, dates, and booleans are compared by value.
     case '[object String]':
       // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
       // equivalent to `String("5")`.
@@ -60,18 +60,26 @@ function eq(a, b, aStack, bStack) {
   }
   // Objects with different constructors are not equivalent, but `Object`s
   // from different frames are.
-  var aCtor = a.constructor, bCtor = b.constructor;
+  var aCtor = a.constructor,
+    bCtor = b.constructor;
   if (
-    aCtor !== bCtor && 'constructor' in a && 'constructor' in b &&
-    !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-      _.isFunction(bCtor) && bCtor instanceof bCtor)
+    aCtor !== bCtor &&
+    'constructor' in a &&
+    'constructor' in b &&
+    !(
+      _.isFunction(aCtor) &&
+      aCtor instanceof aCtor &&
+      _.isFunction(bCtor) &&
+      bCtor instanceof bCtor
+    )
   ) {
     return false;
   }
   // Add the first object to the stack of traversed objects.
   aStack.push(a);
   bStack.push(b);
-  var size = 0, result = true;
+  var size = 0,
+    result = true;
   // Recursively compare objects and arrays.
   if (className === '[object Array]') {
     // Compare array lengths to determine if a deep comparison is necessary.
@@ -84,7 +92,7 @@ function eq(a, b, aStack, bStack) {
       }
     }
   } else {
-    if(customValueOfFunction(a.valueOf) && customValueOfFunction(b.valueOf)) {
+    if (customValueOfFunction(a.valueOf) && customValueOfFunction(b.valueOf)) {
       var vA = a.valueOf();
       var vB = b.valueOf();
 
@@ -102,7 +110,7 @@ function eq(a, b, aStack, bStack) {
       // Ensure that both objects contain the same number of properties.
       if (result) {
         for (key in b) {
-          if (_.has(b, key) && !(size--)) break;
+          if (_.has(b, key) && !size--) break;
         }
         result = !size;
       }

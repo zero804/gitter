@@ -2,7 +2,7 @@
 
 var isGitHubUsername = require('./is-github-username');
 
-var LEGACY_DEFAULT_SCOPE = {'user': 1, 'user:email': 1, 'user:follow': 1, 'repo': 1, 'public_repo': 1};
+var LEGACY_DEFAULT_SCOPE = { user: 1, 'user:email': 1, 'user:follow': 1, repo: 1, public_repo: 1 };
 
 // eslint-disable-next-line complexity
 function hasGitHubScope(user, scope) {
@@ -10,26 +10,24 @@ function hasGitHubScope(user, scope) {
   var githubScopes = user.githubScopes;
   var githubUserToken = user.githubUserToken;
 
-  if(!githubUserToken && !githubToken) {
+  if (!githubUserToken && !githubToken) {
     return false;
   }
 
   // Get the simple case out the way
-  if(githubUserToken && (scope === 'user' ||
-             scope === 'user:email'||
-             scope === 'user:follow')) {
+  if (githubUserToken && (scope === 'user' || scope === 'user:email' || scope === 'user:follow')) {
     return true;
   }
 
   function hasScope() {
-    for(var i = 0; i < arguments.length; i++) {
-      if(githubScopes[arguments[i]]) return true;
+    for (var i = 0; i < arguments.length; i++) {
+      if (githubScopes[arguments[i]]) return true;
     }
     return false;
   }
 
-  if(!githubScopes) {
-    if(githubToken) {
+  if (!githubScopes) {
+    if (githubToken) {
       return !!LEGACY_DEFAULT_SCOPE[scope];
     }
     // Legacy users will need to reauthenticate unfortunately
@@ -37,12 +35,17 @@ function hasGitHubScope(user, scope) {
   }
 
   // Crazy github rules codified here....
-  switch(scope) {
-    case 'notifications': return hasScope('notifications', 'repo');
-    case 'user:follow': return hasScope('user:follow', 'user');
-    case 'user:email': return hasScope('user:email', 'user');
-    case 'public_repo': return hasScope('public_repo', 'repo');
-    case 'repo:status': return hasScope('repo:status', 'repo');
+  switch (scope) {
+    case 'notifications':
+      return hasScope('notifications', 'repo');
+    case 'user:follow':
+      return hasScope('user:follow', 'user');
+    case 'user:email':
+      return hasScope('user:email', 'user');
+    case 'public_repo':
+      return hasScope('public_repo', 'repo');
+    case 'repo:status':
+      return hasScope('repo:status', 'repo');
   }
 
   // The less crazy case
@@ -50,9 +53,9 @@ function hasGitHubScope(user, scope) {
 }
 
 function getGitHubToken(user, scope) {
-  if(!scope) return user.githubToken || user.githubUserToken;
+  if (!scope) return user.githubToken || user.githubUserToken;
 
-  switch(scope) {
+  switch (scope) {
     case 'user':
     case 'user:email':
     case 'user:follow':
@@ -78,8 +81,8 @@ function isMissingTokens(user) {
  */
 function getScopesHash(user) {
   return {
-    'public_repo': hasGitHubScope(user, 'public_repo'),
-    'private_repo': hasGitHubScope(user, 'repo')
+    public_repo: hasGitHubScope(user, 'public_repo'),
+    private_repo: hasGitHubScope(user, 'repo')
   };
 }
 

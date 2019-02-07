@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -17,9 +17,9 @@ function registerPartial(name) {
   handlebarsWrapper.handlebars.registerPartial(name, partialContent);
 }
 
-var CACHED = { };
+var CACHED = {};
 function getCachedTemplate(templateName) {
-  if(CACHED[templateName]) return CACHED[templateName];
+  if (CACHED[templateName]) return CACHED[templateName];
 
   var templateFile = path.join(__dirname, '/../templates', templateName + '.hbs');
   CACHED[templateName] = handlebarsWrapper.compile(templateFile);
@@ -27,13 +27,14 @@ function getCachedTemplate(templateName) {
 }
 
 function mailerTemplate(templateName, data) {
-  return getCachedTemplate(templateName)
-    .then(function(template) {
-      return template(_.extend({ }, data, {
-        emailBasePath: emailBasePath,
+  return getCachedTemplate(templateName).then(function(template) {
+    return template(
+      _.extend({}, data, {
+        emailBasePath: emailBasePath
         // Other globals go here...
-      }));
-    });
+      })
+    );
+  });
 }
 
 module.exports = mailerTemplate;

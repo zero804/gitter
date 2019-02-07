@@ -1,18 +1,16 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var _ = require('underscore');
 var appEvents = require('../utils/appevents');
 
 module.exports = (function() {
-
-
   // Central logic for focus events
   // Listens to specific keyboard events to trigger corresponding 'focus.request' events
 
   var previousFocusOutOrigin;
   var $previous;
   var isEditing = false;
-  var thisFrame = $('#content-frame').hasClass('trpChatContainer') && 'chat' || 'app';
+  var thisFrame = ($('#content-frame').hasClass('trpChatContainer') && 'chat') || 'app';
 
   // Listen to chat.edit toggle to handle proper focus between inputs
 
@@ -35,8 +33,9 @@ module.exports = (function() {
     var index = order.indexOf(name);
     var findIndex = index + position;
 
-    if (index === -1 || !order[ findIndex ]) { // not found
-      if (position === -1) return order[ order.length-1 ];
+    if (index === -1 || !order[findIndex]) {
+      // not found
+      if (position === -1) return order[order.length - 1];
       return order[0];
     }
     return order[findIndex];
@@ -81,8 +80,7 @@ module.exports = (function() {
     // If the original event comes from another frame, transfer the focus request to it
     if (event.origin && event.origin !== 'top' && event.origin !== thisFrame) {
       return appEvents.trigger('focus.request.' + event.origin + '.in', event);
-    }
-    else if(previousFocusOutOrigin && previousFocusOutOrigin !== thisFrame) {
+    } else if (previousFocusOutOrigin && previousFocusOutOrigin !== thisFrame) {
       var newEvent = new Event(event);
       newEvent.origin = 'top';
       return appEvents.trigger('focus.request.' + previousFocusOutOrigin + '.in', newEvent);
@@ -113,8 +111,7 @@ module.exports = (function() {
       var args = Array.prototype.slice.call(arguments);
       if (_.isFunction(dest)) {
         dest.apply(dest, args);
-      }
-      else {
+      } else {
         args.unshift('focus.request.' + dest);
         appEvents.trigger.apply(appEvents, args);
       }
@@ -129,11 +126,8 @@ module.exports = (function() {
       _.each(sources, function(s) {
         _bind(s, dest);
       });
-    }
-    else {
+    } else {
       _bind(src, dest);
     }
   });
-
-
 })();

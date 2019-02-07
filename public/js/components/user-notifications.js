@@ -25,9 +25,12 @@ function getDesktopNotificationAccess() {
     return WindowNotification.permission;
   } else {
     switch (webkitNotifications.checkPermission()) {
-      case 0: return 'granted';
-      case 1: return 'default';
-      case 2: return 'denied';
+      case 0:
+        return 'granted';
+      case 1:
+        return 'default';
+      case 2:
+        return 'denied';
     }
   }
 }
@@ -61,27 +64,22 @@ function onUserNotification(message) {
   }
 
   if (message.notificationKey) {
-    sessionMutex(message.notificationKey)
-      .then(function(lockObtained) {
-        if (lockObtained) {
-          showDesktopNotification(message, onNotificationMessageClicked);
-        }
-      });
+    sessionMutex(message.notificationKey).then(function(lockObtained) {
+      if (lockObtained) {
+        showDesktopNotification(message, onNotificationMessageClicked);
+      }
+    });
   } else {
     showDesktopNotification(message, onNotificationMessageClicked);
   }
-
 }
-
 
 function requestDesktopNotificationAccess() {
   if (!WindowNotification) return;
   if (getDesktopNotificationAccess() === 'granted') return;
 
-  WindowNotification.requestPermission(function() {
-  });
+  WindowNotification.requestPermission(function() {});
 }
-
 
 function initUserNotifications() {
   //subscribe to notifications
@@ -91,7 +89,7 @@ function initUserNotifications() {
     appEvents.trigger('user_notification', {
       notificationKey: 'ajax.error',
       title: 'Unable to communicate with Gitter',
-      text: 'We\'re having problems communicating with the server at the moment....',
+      text: "We're having problems communicating with the server at the moment....",
       click: function() {
         try {
           window.parent.location.reload(true);
@@ -110,7 +108,6 @@ function initUserNotifications() {
     }
   });
 }
-
 
 module.exports = {
   initUserNotifications: initUserNotifications,

@@ -9,5 +9,5 @@ module.exports = {
   roomMembers: new EventEmitter(),
   users: new EventEmitter(),
   userGroups: new EventEmitter(),
-  groupMembers: new EventEmitter(),
+  groupMembers: new EventEmitter()
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-var speedy = require("speedy");
+var speedy = require('speedy');
 var persistence = require('gitter-web-persistence');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 
@@ -16,24 +16,25 @@ onMongoConnect(function() {
 
     withAggregation: function(done) {
       persistence.Troupe.aggregate([
-          // { $limit: 100 },
-          { $project: {
+        // { $limit: 100 },
+        {
+          $project: {
             uri: 1,
             oneToOne: 1,
             users: {
               $cond: {
                 if: {
-                  $eq: ["$oneToOne", true]
+                  $eq: ['$oneToOne', true]
                 },
-                then: "$users",
+                then: '$users',
                 else: undefined
               }
+            }
           }
-        } } ])
-        .exec(function() {
-          done();
-        });
-    },
-
+        }
+      ]).exec(function() {
+        done();
+      });
+    }
   });
 });

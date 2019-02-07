@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 
-var slugify = function(str){
+var slugify = function(str) {
   return str
     .toLowerCase()
     .replace(/ +/g, '-')
@@ -14,7 +14,6 @@ var FAUX_KEY_TAG_PREFIX = 'curated';
 
 var SUGGESTED_TAG_LABEL = 'Suggested';
 var SUGGESTED_BACKEND_TAG = 'generated:suggested';
-
 
 // Given a simple faux map from readable label to array of tags,
 // generate lookup-able map we can do work with
@@ -56,13 +55,12 @@ var getSelectedEntriesInTagMap = function(tagMap, selectedTags) {
 
     var fauxKey = FAUX_KEY_TAG_MAP_KEY_PREFIX + ':' + key;
     var tagEntry = tagMap[fauxKey];
-    if(shouldMatchFauxKey && tagEntry) {
+    if (shouldMatchFauxKey && tagEntry) {
       var newTagEntry = _.extend({}, tagEntry, {
         selected: true
       });
       selectedTagMap[fauxKey] = newTagEntry;
-    }
-    else {
+    } else {
       var newEntry = {
         name: selectedTag,
         tags: [selectedTag],
@@ -90,7 +88,6 @@ var generateSelectedTagMap = function(tagMap, selectedTags) {
 
   return selectedTagMap;
 };
-
 
 module.exports = {
   generateTagMap: generateTagMap,

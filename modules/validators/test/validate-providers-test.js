@@ -29,5 +29,5 @@ describe('validate-providers', function() {
     it(name + ' ' + JSON.stringify(input), function() {
       assert.strictEqual(validateProviders(input), result);
     });
-  })
+  });
 });

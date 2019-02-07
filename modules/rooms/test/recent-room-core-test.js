@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
@@ -9,22 +9,23 @@ var recentRoomCore = require('../lib/recent-room-core');
 describe('recent-room-core', function() {
   describe('ordering #slow', function() {
     var fixture = fixtureLoader.setup({
-      user1: { },
-      userNoTroupes: { },
+      user1: {},
+      userNoTroupes: {},
       troupe1: { users: ['user1'] },
       troupe2: { users: ['user1'] },
       troupe3: { users: ['user1'] },
       troupe4: { users: ['user1'] }
     });
 
-    it('should rearrange the order of favourites correctly',function() {
+    it('should rearrange the order of favourites correctly', function() {
       this.timeout(10000);
 
       function getFavs() {
         return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
       }
 
-      return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+      return recentRoomCore
+        .updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
         .then(getFavs)
         .then(function(favs) {
           assert.equal(favs[fixture.troupe1.id], 1);
@@ -83,25 +84,24 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe1.id], 4);
         });
     });
-
   });
 
   describe('updateFavourite #slow', function() {
     var fixture = fixtureLoader.setup({
-      user1: { },
+      user1: {},
       troupe1: { users: ['user1'] }
     });
 
-    it('should add a troupe to favourites',function() {
-
+    it('should add a troupe to favourites', function() {
       function fav(val) {
-        return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+        return recentRoomCore
+          .updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
           .then(function() {
             return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
           })
           .then(function(favs) {
             var isInTroupe = !!favs[fixture.troupe1.id];
-            assert(isInTroupe === val, 'Troupe should ' + (val? '': 'not ') + 'be a favourite');
+            assert(isInTroupe === val, 'Troupe should ' + (val ? '' : 'not ') + 'be a favourite');
           });
       }
 
@@ -110,18 +110,21 @@ describe('recent-room-core', function() {
         .then(() => fav(false))
         .then(() => fav(true));
     });
-
   });
 
   describe('findLastAccessTimesForUsersInRoom #slow', function() {
     var fixture = fixtureLoader.setup({
-      user1: { },
-      user2: { },
+      user1: {},
+      user2: {},
       troupe1: { users: ['user1'] }
     });
 
     it('should handle default values', function() {
-      return recentRoomCore.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id])
+      return recentRoomCore
+        .findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [
+          fixture.user1.id,
+          fixture.user2._id
+        ])
         .then(function(result) {
           assert(result[fixture.user1.id]);
           assert(result[fixture.user2.id]);
@@ -130,11 +133,14 @@ describe('recent-room-core', function() {
 
     it('should handle non default values', function() {
       return Promise.all([
-          recentRoomCore.saveUserTroupeLastAccess(fixture.user1.id, fixture.troupe1.id),
-          recentRoomCore.saveUserTroupeLastAccess(fixture.user2.id, fixture.troupe1.id)
-        ])
+        recentRoomCore.saveUserTroupeLastAccess(fixture.user1.id, fixture.troupe1.id),
+        recentRoomCore.saveUserTroupeLastAccess(fixture.user2.id, fixture.troupe1.id)
+      ])
         .then(function() {
-          return recentRoomCore.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [fixture.user1.id, fixture.user2._id]);
+          return recentRoomCore.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [
+            fixture.user1.id,
+            fixture.user2._id
+          ]);
         })
         .then(function(result) {
           var d1 = Date.now() - result[fixture.user1.id];
@@ -146,24 +152,23 @@ describe('recent-room-core', function() {
           assert(d2 < 5000);
         });
     });
-
   });
 
   describe('saveUserTroupeLastAccess #slow', function() {
     it('should update on insert', function() {
       var userId = new ObjectID();
       var troupeId = new ObjectID();
-      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
-        .then(function(didUpdate) {
-          assert.strictEqual(didUpdate, true);
-        })
+      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId).then(function(didUpdate) {
+        assert.strictEqual(didUpdate, true);
+      });
     });
 
     it('should update on update', function() {
       var userId = new ObjectID();
       var troupeId = new ObjectID();
       var troupeId2 = new ObjectID();
-      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId)
+      return recentRoomCore
+        .saveUserTroupeLastAccess(userId, troupeId)
         .then(function(didUpdate) {
           assert.strictEqual(didUpdate, true);
           return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId2);
@@ -179,7 +184,8 @@ describe('recent-room-core', function() {
       var lastAccessTime = new Date();
       var lastAccessTimeOld = new Date(lastAccessTime - 1000);
 
-      return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTime)
+      return recentRoomCore
+        .saveUserTroupeLastAccess(userId, troupeId, lastAccessTime)
         .then(function(didUpdate) {
           assert.strictEqual(didUpdate, true);
           return recentRoomCore.saveUserTroupeLastAccess(userId, troupeId, lastAccessTimeOld);
@@ -188,5 +194,5 @@ describe('recent-room-core', function() {
           assert.strictEqual(didUpdate, false);
         });
     });
-  })
+  });
 });

@@ -6,7 +6,6 @@ var Backbone = require('backbone');
 var localStorageSync = require('public/js/utils/local-storage-sync');
 
 describe('LocalStorageSync', function() {
-
   var model;
 
   beforeEach(function() {
@@ -21,10 +20,9 @@ describe('LocalStorageSync', function() {
     assert.equal(savedData.test, model.get('test'));
   });
 
-  it('should retrieve data from local storage when fetch is called', function(){
+  it('should retrieve data from local storage when fetch is called', function() {
     localStorage[model.cid] = '{ "test": 1 }';
     model.fetch();
     assert.equal(1, model.get('test'));
   });
-
 });

@@ -7,7 +7,7 @@ module.exports = function roomListGenerator(troupeCollection) {
     return {
       name: model.get('name'),
       id: model.get('id'),
-      lastAccess: lastAccess,
+      lastAccess: lastAccess
     };
   });
 };

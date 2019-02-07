@@ -12,11 +12,10 @@ var parseForTemplate = require('gitter-web-shared/parse/left-menu-primary-item')
 var proto = BaseCollectionView.prototype;
 
 var ItemView = BaseCollectionItemView.extend({
-
   getRoomUrl: function() {
     var url = BaseCollectionItemView.prototype.getRoomUrl.apply(this, arguments);
 
-    if(this.model.get('isSuggestion')) {
+    if (this.model.get('isSuggestion')) {
       url = urlJoin(url, '?source=suggested-menu');
     }
 
@@ -30,8 +29,8 @@ var ItemView = BaseCollectionItemView.extend({
 });
 
 module.exports = BaseCollectionView.extend({
-  childView:          ItemView,
-  className:          'tertiary-collection',
+  childView: ItemView,
+  className: 'tertiary-collection',
 
   ui: _.extend({}, BaseCollectionView.prototype.ui, {
     header: '#collection-header'
@@ -48,8 +47,8 @@ module.exports = BaseCollectionView.extend({
     BaseCollectionView.prototype.initialize.apply(this, arguments);
   },
 
-  getEmptyView: function(){
-    switch(this.roomMenuModel.get('state')) {
+  getEmptyView: function() {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
         return EmptySearchView;
       default:
@@ -57,13 +56,15 @@ module.exports = BaseCollectionView.extend({
     }
   },
 
-  filter: function (model, index){
-    switch(this.roomMenuModel.get('state')) {
+  filter: function(model, index) {
+    switch (this.roomMenuModel.get('state')) {
       case 'search':
-        return (index <= 5);
+        return index <= 5;
       default:
-        return !this.primaryCollection.get(model.get('id')) &&
-                !this.secondaryCollection.get(model.get('id'));
+        return (
+          !this.primaryCollection.get(model.get('id')) &&
+          !this.secondaryCollection.get(model.get('id'))
+        );
     }
   },
 
@@ -78,7 +79,7 @@ module.exports = BaseCollectionView.extend({
 
   /** Called from the base class */
   roomExistsForModel: function(model) {
-    if(this.roomMenuModel.get('state') === 'all') {
+    if (this.roomMenuModel.get('state') === 'all') {
       // Org room case
       return !!model.get('room');
     } else {
@@ -91,19 +92,18 @@ module.exports = BaseCollectionView.extend({
     this.bus.trigger('left-menu:recent-search', view.model.get('name'));
   },
 
-  onRender: function (){
+  onRender: function() {
     BaseCollectionView.prototype.onRender.apply(this, arguments);
-    if(this.ui.header && this.ui.header[0]) {
+    if (this.ui.header && this.ui.header[0]) {
       toggleClass(
         this.ui.header[0],
         'hidden',
-        (this.isEmpty() && (this.roomMenuModel.get('state') === 'search'))
+        this.isEmpty() && this.roomMenuModel.get('state') === 'search'
       );
     }
   },
 
   onDestroy: function() {
     this.stopListening();
-  },
-
+  }
 });

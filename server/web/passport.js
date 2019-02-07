@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var passport = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
@@ -23,12 +23,13 @@ function installApi() {
    */
 
   /* This is ONLY used to API clients, not WEB clients!! */
-  passport.use(new BearerStrategy(
-    function(accessToken, done) {
-      return oauthService.validateAccessTokenAndClient(accessToken)
+  passport.use(
+    new BearerStrategy(function(accessToken, done) {
+      return oauthService
+        .validateAccessTokenAndClient(accessToken)
         .then(function(tokenInfo) {
           // Token not found
-          if(!tokenInfo) return;
+          if (!tokenInfo) return;
 
           var user = tokenInfo.user;
           var client = tokenInfo.client;
@@ -43,18 +44,19 @@ function installApi() {
           return [user, { client: client, accessToken: accessToken }];
         })
         .asCallback(done, { spread: true });
-    }
-  ));
+    })
+  );
 }
 
 function install() {
   passport.serializeUser(function(user, done) {
-    var serializedId = user.id || user._id && user._id.toHexString();
+    var serializedId = user.id || (user._id && user._id.toHexString());
     done(null, serializedId);
   });
 
   passport.deserializeUser(function deserializeUserCallback(id, done) {
-    return userService.findById(id)
+    return userService
+      .findById(id)
       .then(function(user) {
         if (user && user.state === 'DISABLED') {
           return null;
@@ -65,9 +67,7 @@ function install() {
       .asCallback(done);
   });
 
-
   /* OAuth Strategies */
-
 
   /**
    * BasicStrategy & ClientPasswordStrategy
@@ -81,16 +81,19 @@ function install() {
    * the specification, in practice it is quite common.
    */
 
-  passport.use(new ClientPasswordStrategy(function(clientKey, clientSecret, done) {
-    return oauthService.findClientByClientKey(clientKey)
-      .then(function(client) {
-        if (!client) return false;
-        if (client.clientSecret !== clientSecret) return false;
+  passport.use(
+    new ClientPasswordStrategy(function(clientKey, clientSecret, done) {
+      return oauthService
+        .findClientByClientKey(clientKey)
+        .then(function(client) {
+          if (!client) return false;
+          if (client.clientSecret !== clientSecret) return false;
 
-        return client;
-      })
-      .asCallback(done);
-  }));
+          return client;
+        })
+        .asCallback(done);
+    })
+  );
 
   /* Install the API OAuth strategy too */
   installApi();

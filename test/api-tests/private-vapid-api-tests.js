@@ -11,9 +11,9 @@ describe('vapid-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -36,7 +36,6 @@ describe('vapid-api', function() {
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(204)
+      .expect(204);
   });
-
-})
+});

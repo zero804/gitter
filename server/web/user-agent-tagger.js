@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var isPhone = require('./is-phone');
 var isNative = require('./is-native');
@@ -13,7 +13,7 @@ var mobileBuildVersionMapping = {
 };
 
 function getType(req, userAgentString) {
-  return (isPhone(req) || userAgentString.indexOf('Mobile') >= 0) ? 'mobile' : 'desktop';
+  return isPhone(req) || userAgentString.indexOf('Mobile') >= 0 ? 'mobile' : 'desktop';
 }
 
 function getGitterAppMetadata(req, userAgentString) {
@@ -25,7 +25,7 @@ function getGitterAppMetadata(req, userAgentString) {
   var family = parts[0];
   var version = parts[1];
 
-  if(getType(req, userAgentString) === 'mobile') {
+  if (getType(req, userAgentString) === 'mobile') {
     version = mobileBuildVersionMapping[version] || version;
   }
 
@@ -47,17 +47,17 @@ function tagify(ua) {
     'agent:device:family': ua.device.family,
     'agent:device:version': createVersionString(ua.device),
     'agent:os:family': ua.os.family,
-    'agent:os:version': createVersionString(ua.os),
+    'agent:os:version': createVersionString(ua.os)
   };
 }
 
 function createVersionString(obj) {
   var version;
-  if(obj.major) {
+  if (obj.major) {
     version = '' + obj.major;
-    if(obj.minor) {
+    if (obj.minor) {
       version = version + '.' + obj.minor;
-      if(obj.patch) {
+      if (obj.patch) {
         version = version + '.' + obj.patch;
       }
     }
@@ -70,11 +70,11 @@ module.exports = function(req) {
   var userAgentString = req.headers['user-agent'];
 
   // no useragentstring? no tags for you.
-  if(!userAgentString) return {};
+  if (!userAgentString) return {};
 
   var userAgentObj = req.getParsedUserAgent().toJSON();
 
-  if(isNative(req)) {
+  if (isNative(req)) {
     var appMetadata = getGitterAppMetadata(req, userAgentString);
     userAgentObj = _.extend({}, userAgentObj, appMetadata);
   }

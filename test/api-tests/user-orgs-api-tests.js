@@ -10,12 +10,16 @@ var groupService = require('gitter-web-groups/lib/group-service');
 describe('user-orgs #slow', function() {
   var app, request;
 
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG', '#oauthTokens');
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    'GITTER_INTEGRATION_ORG',
+    '#oauthTokens'
+  );
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -41,9 +45,11 @@ describe('user-orgs #slow', function() {
       .then(function(result) {
         var orgs = result.body;
 
-        assert(orgs.some(function(org) {
-          return org.name === fixtureLoader.GITTER_INTEGRATION_ORG;
-        }));
+        assert(
+          orgs.some(function(org) {
+            return org.name === fixtureLoader.GITTER_INTEGRATION_ORG;
+          })
+        );
       });
   });
 
@@ -55,20 +61,22 @@ describe('user-orgs #slow', function() {
       .then(function(result) {
         var orgs = result.body;
 
-        assert(orgs.some(function(org) {
-          return org.name === fixtureLoader.GITTER_INTEGRATION_ORG
-        }));
+        assert(
+          orgs.some(function(org) {
+            return org.name === fixtureLoader.GITTER_INTEGRATION_ORG;
+          })
+        );
 
         // now try and add one and see if it is still in there
         // (should we do this via the API too? Going with groupService directly
         //  as it is faster to execute and which user took the linkPath is
         //  irrelevant)
         return groupService.createGroup(fixture.user1, {
-            type: 'GH_ORG',
-            name: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
-            uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
-            linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
-          })
+          type: 'GH_ORG',
+          name: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
+          uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG
+        });
       })
       .then(function() {
         return request(app)
@@ -79,9 +87,11 @@ describe('user-orgs #slow', function() {
       .then(function(result) {
         var orgs = result.body;
 
-        assert(orgs.every(function(org) {
-          return org.name !== fixtureLoader.GITTER_INTEGRATION_ORG
-        }));
-      })
+        assert(
+          orgs.every(function(org) {
+            return org.name !== fixtureLoader.GITTER_INTEGRATION_ORG;
+          })
+        );
+      });
   });
 });

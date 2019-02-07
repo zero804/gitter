@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -29,8 +29,9 @@ var WELCOME_MESSAGES = [
 ];
 
 function renderHomePage(req, res, next) {
-  contextGenerator.generateBasicContext(req)
-    .then(function (troupeContext) {
+  contextGenerator
+    .generateBasicContext(req)
+    .then(function(troupeContext) {
       var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
       var osName = req.getParsedUserAgent().os.family.toLowerCase();
@@ -59,34 +60,34 @@ function renderHomePage(req, res, next) {
 }
 
 function renderMobileUserHome(req, res, next) {
-  contextGenerator.generateBasicContext(req)
-  .then(function(troupeContext) {
-    res.render('mobile/mobile-userhome', {
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-      fonts: fonts.getFonts(),
-      troupeName: troupeContext.troupe && troupeContext.troupe.uri || "Home",
-      troupeContext: troupeContext,
-      agent: req.headers['user-agent'],
-      user: req.user
-    });
-  })
-  .catch(next);
+  contextGenerator
+    .generateBasicContext(req)
+    .then(function(troupeContext) {
+      res.render('mobile/mobile-userhome', {
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
+        troupeName: (troupeContext.troupe && troupeContext.troupe.uri) || 'Home',
+        troupeContext: troupeContext,
+        agent: req.headers['user-agent'],
+        user: req.user
+      });
+    })
+    .catch(next);
 }
 
 function renderMobileNativeUserhome(req, res) {
-  contextGenerator.generateBasicContext(req)
-    .then(function(troupeContext) {
-      res.render('mobile/native-userhome-app', {
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        bootScriptName: 'mobile-native-userhome',
-        troupeContext: troupeContext
-      });
+  contextGenerator.generateBasicContext(req).then(function(troupeContext) {
+    res.render('mobile/native-userhome-app', {
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+      fonts: fonts.getFonts(),
+      bootScriptName: 'mobile-native-userhome',
+      troupeContext: troupeContext
     });
+  });
 }
 
 module.exports = exports = {
   renderHomePage: renderHomePage,
   renderMobileUserHome: renderMobileUserHome,
-  renderMobileNativeUserhome: renderMobileNativeUserhome,
+  renderMobileNativeUserhome: renderMobileNativeUserhome
 };

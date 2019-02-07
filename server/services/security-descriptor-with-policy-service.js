@@ -30,7 +30,9 @@ SecurityDescriptorWithPolicy.prototype.addExtraAdmin = secureMethod([allowAdmin]
   return this.securityDescriptorService.addExtraAdmin(this.id, userId);
 });
 
-SecurityDescriptorWithPolicy.prototype.removeExtraAdmin = secureMethod([allowAdmin], function(userId) {
+SecurityDescriptorWithPolicy.prototype.removeExtraAdmin = secureMethod([allowAdmin], function(
+  userId
+) {
   return this.securityDescriptorService.removeExtraAdmin(this.id, userId);
 });
 
@@ -40,20 +42,31 @@ SecurityDescriptorWithPolicy.prototype.listExtraAdmins = secureMethod([allowAdmi
 
 SecurityDescriptorWithPolicy.prototype.update = secureMethod([allowAdmin], function(update) {
   return this.securityDescriptorService.update(this.id, update, {
-      groupId: this.ownerGroupId
-    });
+    groupId: this.ownerGroupId
+  });
 });
 
-
 function createForGroup(group, policy) {
-  return new SecurityDescriptorWithPolicy(securityDescriptorService.group, group._id, group.sd, policy, null);
+  return new SecurityDescriptorWithPolicy(
+    securityDescriptorService.group,
+    group._id,
+    group.sd,
+    policy,
+    null
+  );
 }
 
 function createForRoom(room, policy) {
-  return new SecurityDescriptorWithPolicy(securityDescriptorService.room, room._id, room.sd, policy, room.groupId);
+  return new SecurityDescriptorWithPolicy(
+    securityDescriptorService.room,
+    room._id,
+    room.sd,
+    policy,
+    room.groupId
+  );
 }
 
 module.exports = {
   createForGroup: createForGroup,
-  createForRoom: createForRoom,
+  createForRoom: createForRoom
 };

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils');
@@ -37,28 +37,31 @@ describe('SearchResultsStrategy', function() {
     };
 
     var strategy = new SearchResultsStrategy({
-      resultItemStrategy: new TroupeStrategy({ })
+      resultItemStrategy: new TroupeStrategy({})
     });
-    return serialize([result], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
-          results: [{
-            id: t.id,
-            name: t.uri,
-            topic: '',
-            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
-            uri: t.uri,
-            oneToOne: false,
-            userCount: 1,
-            url: '/' + t.uri,
-            githubType: 'USER_CHANNEL',
-            security: 'PUBLIC',
-            noindex: false,
-            public: true,
-            v: 1
-          }]
-        }]);
-      });
+    return serialize([result], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
+          results: [
+            {
+              id: t.id,
+              name: t.uri,
+              topic: '',
+              avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
+              uri: t.uri,
+              oneToOne: false,
+              userCount: 1,
+              url: '/' + t.uri,
+              githubType: 'USER_CHANNEL',
+              security: 'PUBLIC',
+              noindex: false,
+              public: true,
+              v: 1
+            }
+          ]
+        }
+      ]);
+    });
   });
 
   it('should serialize with results and pagination', function() {
@@ -71,31 +74,33 @@ describe('SearchResultsStrategy', function() {
     };
 
     var strategy = new SearchResultsStrategy({
-      resultItemStrategy: new TroupeStrategy({ })
+      resultItemStrategy: new TroupeStrategy({})
     });
-    return serialize([result], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    return serialize([result], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           hasMoreResults: false,
           limit: 100,
           skip: 0,
-          results: [{
-            id: t.id,
-            name: t.uri,
-            topic: '',
-            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
-            uri: t.uri,
-            oneToOne: false,
-            userCount: 1,
-            url: '/' + t.uri,
-            githubType: 'USER_CHANNEL',
-            security: 'PUBLIC',
-            noindex: false,
-            public: true,
-            v: 1
-          }]
-        }]);
-      });
+          results: [
+            {
+              id: t.id,
+              name: t.uri,
+              topic: '',
+              avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + t.uri,
+              uri: t.uri,
+              oneToOne: false,
+              userCount: 1,
+              url: '/' + t.uri,
+              githubType: 'USER_CHANNEL',
+              security: 'PUBLIC',
+              noindex: false,
+              public: true,
+              v: 1
+            }
+          ]
+        }
+      ]);
+    });
   });
-
 });

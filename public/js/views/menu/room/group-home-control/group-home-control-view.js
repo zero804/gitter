@@ -7,7 +7,6 @@ var appEvents = require('../../../../utils/appevents');
 var context = require('../../../../utils/context');
 
 module.exports = Marionette.ItemView.extend({
-
   template: template,
 
   modelEvents: {
@@ -15,7 +14,7 @@ module.exports = Marionette.ItemView.extend({
   },
 
   events: {
-    'click': 'onClick'
+    click: 'onClick'
   },
 
   initialize: function(attrs) {
@@ -57,9 +56,9 @@ module.exports = Marionette.ItemView.extend({
     e.preventDefault();
     e.stopPropagation();
 
-    var groupModel = this.findGroup()
+    var groupModel = this.findGroup();
 
-    if(!groupModel) return;
+    if (!groupModel) return;
 
     //Build org profile room url
     var groupHomeUri = groupModel.get('homeUri');
@@ -68,5 +67,4 @@ module.exports = Marionette.ItemView.extend({
     //Call navigation
     appEvents.trigger('navigation', '/' + groupHomeUri, 'iframe', groupName);
   }
-
-})
+});

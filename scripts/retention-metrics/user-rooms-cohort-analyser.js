@@ -2,7 +2,7 @@
 
 var moment = require('moment');
 var _ = require('lodash');
-var util = require("util");
+var util = require('util');
 var BaseRetentionAnalyser = require('./base-cohort-analyser');
 
 function UserRoomsRetentionAnalyser() {
@@ -11,9 +11,9 @@ function UserRoomsRetentionAnalyser() {
 util.inherits(UserRoomsRetentionAnalyser, BaseRetentionAnalyser);
 
 UserRoomsRetentionAnalyser.prototype.bucketFor = function(category) {
-  if(category === 0) return "0";
-  if(category < 10) return "0" + category;
-  return "10 or more";
+  if (category === 0) return '0';
+  if (category < 10) return '0' + category;
+  return '10 or more';
 };
 
 UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, callback) {
@@ -22,26 +22,31 @@ UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, 
   var orTerms = _(allCohortUsers)
     .transform(function(result, userIds, timestamp) {
       var start = new Date(parseInt(timestamp, 10));
-      var endOfClassificationPeriod = moment(start).add(14, 'days').toDate(); // 2 week classification
+      var endOfClassificationPeriod = moment(start)
+        .add(14, 'days')
+        .toDate(); // 2 week classification
 
       result.push({
         'd.userId': { $in: userIds },
         t: { $gte: start, $lt: endOfClassificationPeriod }
       });
-
     }, [])
     .value();
 
-  var joinRoomEvents = this.db.collection("gitter_join_room_events");
-  joinRoomEvents.aggregate([
-    { $match: {
-        $or: orTerms
+  var joinRoomEvents = this.db.collection('gitter_join_room_events');
+  joinRoomEvents.aggregate(
+    [
+      {
+        $match: {
+          $or: orTerms
+        }
+      },
+      {
+        $group: { _id: '$d.userId', total: { $sum: 1 } }
       }
-    },{
-      $group: { _id: "$d.userId", total: { $sum: 1 } }
-    }
-    ], function(err, result) {
-      if(err) return callback(err);
+    ],
+    function(err, result) {
+      if (err) return callback(err);
 
       var indexed = result.reduce(function(memo, r) {
         memo[r._id] = r.total;
@@ -59,7 +64,8 @@ UserRoomsRetentionAnalyser.prototype.categoriseUsers = function(allCohortUsers, 
         .value();
 
       callback(null, categorised);
-    });
+    }
+  );
 };
 
 module.exports = UserRoomsRetentionAnalyser;

@@ -12,25 +12,21 @@ describe('user-group-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
-  fixtureLoader.ensureIntegrationEnvironment(
-      '#integrationUser1',
-      'GITTER_INTEGRATION_ORG');
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }]
     },
     user1: '#integrationUser1',
-    group1: {
-    },
-    group2: {
-    },
+    group1: {},
+    group2: {},
     troupe1: {
       security: 'PUBLIC',
       group: 'group1',
@@ -56,18 +52,21 @@ describe('user-group-api', function() {
       .then(function(result) {
         var groups = result.body;
 
-        assert(groups.some(function(r) {
-          return r.id === fixture.group1.id;
-        }));
+        assert(
+          groups.some(function(r) {
+            return r.id === fixture.group1.id;
+          })
+        );
 
-        assert(groups.some(function(r) {
-          return r.id === fixture.group2.id;
-        }));
+        assert(
+          groups.some(function(r) {
+            return r.id === fixture.group2.id;
+          })
+        );
 
         assert.strictEqual(result.body.length, 2);
       });
   });
-
 
   it('PATCH /v1/user/:userId/groups/:groupId', function() {
     return request(app)
@@ -83,5 +82,4 @@ describe('user-group-api', function() {
         assert.equal(group.favourite, 1);
       });
   });
-
-})
+});

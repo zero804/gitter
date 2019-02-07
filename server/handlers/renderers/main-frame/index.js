@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') });
 var Promise = require('bluebird');
 var contextGenerator = require('../../../web/context-generator');
 var restful = require('../../../services/restful');
@@ -17,10 +17,11 @@ var getLeftMenuViewData = require('./get-left-menu-view-data');
 var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) {
-  return contextGenerator.generateMainMenuContext(req, leftMenu)
+  return contextGenerator
+    .generateMainMenuContext(req, leftMenu)
     .bind({
       troupeContext: null,
-      socialMetadata: null,
+      socialMetadata: null
     })
     .then(function(troupeContext) {
       this.troupeContext = troupeContext;
@@ -53,7 +54,7 @@ function renderMainFrame(req, res, next, options) {
         getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator),
         restful.serializeTroupesForUser(userId),
         restful.serializeGroupsForUserId(userId),
-        generateUserThemeSnapshot(req),
+        generateUserThemeSnapshot(req)
       ];
     })
     .spread(function(troupeContextAndDerivedInfo, rooms, groups, userThemeSnapshot) {
@@ -109,21 +110,21 @@ function renderMainFrame(req, res, next, options) {
           rooms: rooms
         }),
         //fonts
-        hasCachedFonts:         fonts.hasCachedFonts(req.cookies),
-        fonts:                  fonts.getFonts(),
-        socialMetadata:         socialMetadata,
-        bootScriptName:         bootScriptName,
-        cssFileName:            "styles/" + bootScriptName + ".css",
-        troupeName:             options.title,
-        troupeContext:          troupeContext,
-        chatAppLocation:        chatAppLocation,
-        agent:                  req.headers['user-agent'],
-        subresources:           getSubResources(bootScriptName),
-        showFooterButtons:      true,
-        showUnreadTab:          true,
-        showHiringBadge:        req.fflip.has('hiring-badge'),
-        user:                   user,
-        isPhone:                req.isPhone
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
+        socialMetadata: socialMetadata,
+        bootScriptName: bootScriptName,
+        cssFileName: 'styles/' + bootScriptName + '.css',
+        troupeName: options.title,
+        troupeContext: troupeContext,
+        chatAppLocation: chatAppLocation,
+        agent: req.headers['user-agent'],
+        subresources: getSubResources(bootScriptName),
+        showFooterButtons: true,
+        showUnreadTab: true,
+        showHiringBadge: req.fflip.has('hiring-badge'),
+        user: user,
+        isPhone: req.isPhone
       });
 
       return null;
@@ -131,11 +132,11 @@ function renderMainFrame(req, res, next, options) {
     .catch(next);
 }
 
-
 function renderMobileMainFrame(req, res, next, options) {
   var socialMetadataGenerator = options.socialMetadataGenerator;
 
-  contextGenerator.generateMainMenuContext(req)
+  contextGenerator
+    .generateMainMenuContext(req)
     .then(function(troupeContext) {
       return Promise.all([
         Promise.resolve(troupeContext),

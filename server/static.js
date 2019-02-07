@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* For development only */
 
@@ -27,12 +27,7 @@ var corsOptions = {
   origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   maxAge: 600, // 10 minutes
-  allowedHeaders: [
-    'content-type',
-    'x-access-token',
-    'authorization',
-    'accept'
-  ],
+  allowedHeaders: ['content-type', 'x-access-token', 'authorization', 'accept'],
   exposedHeaders: [
     // Rate limiting with dolph
     'X-RateLimit-Limit',
@@ -48,11 +43,10 @@ require('./web/express-static').install(app);
 
 var port = process.env.PORT || 5001;
 
-server
-  .listen(port, function(err) {
-    if(err) {
-      winston.error('An error occured during static server startup: ' + err, { exception: err });
-    }
+server.listen(port, function(err) {
+  if (err) {
+    winston.error('An error occured during static server startup: ' + err, { exception: err });
+  }
 
-    winston.info("Listening on " + port);
-  });
+  winston.info('Listening on ' + port);
+});

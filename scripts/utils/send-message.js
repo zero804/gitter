@@ -30,8 +30,7 @@ var opts = require('yargs')
     default: 1
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 function getTroupe(fromUser) {
   if (opts.uri) {
@@ -42,16 +41,15 @@ function getTroupe(fromUser) {
     return Promise.reject(new Error('Please specify either a uri or a fromUser and toUser'));
   }
 
-  return userService.findByUsername(opts.toUser)
-  .then(function(toUser) {
+  return userService.findByUsername(opts.toUser).then(function(toUser) {
     if (!toUser) throw new Error('User ' + opts.toUser + ' not found');
 
     return oneToOneRoomService.findOneToOneRoom(fromUser._id, toUser._id);
   });
-
 }
 
-userService.findByUsername(opts.fromUser)
+userService
+  .findByUsername(opts.fromUser)
   .then(function(fromUser) {
     if (!fromUser) throw new Error('User ' + opts.fromUser + ' not found');
 

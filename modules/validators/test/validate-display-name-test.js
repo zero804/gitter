@@ -21,16 +21,13 @@ describe('validate-display-name', function() {
     it(name + ' ' + key, function() {
       assert.strictEqual(validateDisplayName(key), result);
     });
-  })
+  });
 
   it('should not validate things that are not strings', function() {
-    assert.strictEqual(validateDisplayName({foo: 'bar'}), false);
+    assert.strictEqual(validateDisplayName({ foo: 'bar' }), false);
     assert.strictEqual(validateDisplayName([]), false);
     assert.strictEqual(validateDisplayName(100), false);
     assert.strictEqual(validateDisplayName(undefined), false);
     assert.strictEqual(validateDisplayName(null), false);
   });
-
 });
-
-

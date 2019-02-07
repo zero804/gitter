@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -22,7 +22,7 @@ function getIssueInfoFromQuery(query) {
       provider: provider,
       repo: repo,
       iid: iid
-    }
+    };
   }
 
   return null;
@@ -35,18 +35,17 @@ module.exports = function(req, res, next) {
     return next(new StatusError(400));
   }
 
-
   var getIssueStatePromise;
-  if(issueQueryInfo.provider === 'gitlab') {
+  if (issueQueryInfo.provider === 'gitlab') {
     var glService = new GitLabIssuableStateService(req.user, issueQueryInfo.type);
     getIssueStatePromise = glService.getIssueState(issueQueryInfo.repo, issueQueryInfo.iid);
-  }
-  else {
+  } else {
     var ghService = new GithubIssueStateService(req.user);
     getIssueStatePromise = ghService.getIssueState(issueQueryInfo.repo, issueQueryInfo.iid);
   }
 
-  return getIssueStatePromise.then(function(results) {
+  return getIssueStatePromise
+    .then(function(results) {
       res.setHeader('Cache-Control', 'public, max-age=' + EXPIRES_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + EXPIRES_MILLISECONDS).toUTCString());
 
@@ -55,11 +54,18 @@ module.exports = function(req, res, next) {
     .catch(function(err) {
       stats.eventHF('issue.state.query.fail', 1, 1);
 
-      logger.warn('Unable to obtain issue state for ' + issueQueryInfo.provider + ' ' + issueQueryInfo.repo + '/' + issueQueryInfo.iid + ': ' + err,
-          { exception: err });
+      logger.warn(
+        'Unable to obtain issue state for ' +
+          issueQueryInfo.provider +
+          ' ' +
+          issueQueryInfo.repo +
+          '/' +
+          issueQueryInfo.iid +
+          ': ' +
+          err,
+        { exception: err }
+      );
       throw err;
     })
     .catch(next);
-
-
 };

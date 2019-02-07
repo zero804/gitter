@@ -6,22 +6,23 @@ var persistence = require('gitter-web-persistence');
 var BatchStream = require('batch-stream');
 var through2Concurrent = require('through2-concurrent');
 
-var stream = persistence.Troupe
-  .find({
+var stream = persistence.Troupe.find(
+  {
     tags: { $exists: true, $ne: [] }
-  }, {tags: 1})
+  },
+  { tags: 1 }
+)
   .lean()
   .slaveOk()
   .stream();
 
 var batchNum = 0;
 var tags = {};
-var pipe = stream
-  .pipe(new BatchStream({size: 100}))
-  .pipe(through2Concurrent.obj({maxConcurrency: 10}, function(batch, enc, cb) {
+var pipe = stream.pipe(new BatchStream({ size: 100 })).pipe(
+  through2Concurrent.obj({ maxConcurrency: 10 }, function(batch, enc, cb) {
     batchNum++;
     if (batchNum % 10 === 0) {
-      console.log(batchNum*100);
+      console.log(batchNum * 100);
     }
 
     batch.forEach(function(room) {
@@ -35,15 +36,21 @@ var pipe = stream
     });
 
     cb();
-  }));
+  })
+);
 
-pipe.on('data', function() { });
+pipe.on('data', function() {});
 
 pipe.on('end', function() {
-  var popular = _(tags).chain()
+  var popular = _(tags)
+    .chain()
     .pairs()
-    .filter(function(pair) {return pair[1] > 1})
-    .sortBy(function(pair) {return -pair[1];})
+    .filter(function(pair) {
+      return pair[1] > 1;
+    })
+    .sortBy(function(pair) {
+      return -pair[1];
+    })
     .slice(0, 1000)
     .value();
 

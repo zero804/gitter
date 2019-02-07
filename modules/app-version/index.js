@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* #### See version-files in the Makefile #### */
 const fs = require('fs');
@@ -8,10 +8,10 @@ const winston = require('gitter-web-env').logger;
 function readFileSync(fileName) {
   var file = path.join(__dirname, '../..', fileName);
   try {
-    if(fs.existsSync(file)) {
+    if (fs.existsSync(file)) {
       return ('' + fs.readFileSync(file)).trim();
     }
-  } catch(e) {
+  } catch (e) {
     winston.error('Unable to read ' + file + ': ' + e);
   }
   return '';
@@ -44,8 +44,7 @@ function getBranch() {
 }
 
 function getGithubLink() {
-  if(commit)
-    return 'https://github.com/troupe/gitter-webapp/commit/' + commit;
+  if (commit) return 'https://github.com/troupe/gitter-webapp/commit/' + commit;
 
   return '';
 }

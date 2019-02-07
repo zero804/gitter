@@ -13,18 +13,18 @@ function searchChatsForUserId(userId, options) {
     type: 'chat',
     body: {
       query: {
-        "bool": {
-          "must": [
+        bool: {
+          must: [
             {
-              "term": {
-                "fromUserId": userId
+              term: {
+                fromUserId: userId
               }
             }
           ],
-          "must_not": [],
-          "should": []
+          must_not: [],
+          should: []
         }
-      },
+      }
     }
   };
 
@@ -34,5 +34,5 @@ function searchChatsForUserId(userId, options) {
 }
 
 module.exports = {
-  searchChatsForUserId: Promise.method(searchChatsForUserId),
-}
+  searchChatsForUserId: Promise.method(searchChatsForUserId)
+};

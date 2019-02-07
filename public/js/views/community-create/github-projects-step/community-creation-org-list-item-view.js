@@ -9,14 +9,13 @@ var CommunityCreationOrgListItemTemplate = require('./community-creation-org-lis
 
 var ORG_LIST_AVATAR_SIZE = 44;
 
-
 var CommunityCreationOrgListItemView = Marionette.ItemView.extend({
   template: CommunityCreationOrgListItemTemplate,
   tagName: 'li',
   className: 'community-create-org-list-item',
 
   triggers: {
-    'click': 'item:activated'
+    click: 'item:activated'
   },
 
   modelEvents: {

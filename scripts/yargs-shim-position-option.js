@@ -8,12 +8,11 @@ var argv = require('yargs').argv;
 var shimPositionOption = function(optionsOpts) {
   var opts = _.extend({}, optionsOpts);
 
-  if(opts.hasOwnProperty('position') && opts.position < argv._.length) {
+  if (opts.hasOwnProperty('position') && opts.position < argv._.length) {
     opts.default = opts.default || argv._[opts.position];
   }
 
   return opts;
-}
-
+};
 
 module.exports = shimPositionOption;

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var autoLurkerService = require('gitter-web-rooms/lib/auto-lurker-service');
@@ -29,8 +29,7 @@ var opts = require('yargs')
     description: 'Just show the users who will be affected'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);
@@ -42,12 +41,14 @@ function run() {
 }
 
 function handleRoom(troupe) {
-  return (opts.dryRun ?
-            autoLurkerService.findLurkCandidates(troupe, { minTimeInDays: minTimeInDays }) :
-            autoLurkerService.autoLurkInactiveUsers(troupe, { minTimeInDays: minTimeInDays })
-            )
+  return (opts.dryRun
+    ? autoLurkerService.findLurkCandidates(troupe, { minTimeInDays: minTimeInDays })
+    : autoLurkerService.autoLurkInactiveUsers(troupe, { minTimeInDays: minTimeInDays })
+  )
     .then(function(candidates) {
-      var userIds = candidates.map(function(c) { return c.userId; });
+      var userIds = candidates.map(function(c) {
+        return c.userId;
+      });
       return [candidates, userService.findByIds(userIds)];
     })
     .spread(function(candidates, users) {
@@ -69,37 +70,36 @@ function handleRoom(troupe) {
 }
 
 function handleSingleRoom() {
-  return troupeService.findByUri(opts.room)
-    .then(handleRoom);
+  return troupeService.findByUri(opts.room).then(handleRoom);
 }
 
 function handleMultipleRooms() {
   return new Promise(function(resolve, reject) {
-    persistence.Troupe
-      .find({ userCount: { $gt: members } })
+    persistence.Troupe.find({ userCount: { $gt: members } })
       .sort({ userCount: -1 })
       .limit(10)
       .stream()
-      .pipe(es.through(function(room) {
-        this.pause();
+      .pipe(
+        es.through(function(room) {
+          this.pause();
 
-        var self = this;
-        return handleRoom(room)
-          .catch(function(err) {
-            self.emit('error', err);
-          })
-          .finally(function() {
-            self.resume();
-          })
-          .done();
-      }))
+          var self = this;
+          return handleRoom(room)
+            .catch(function(err) {
+              self.emit('error', err);
+            })
+            .finally(function() {
+              self.resume();
+            })
+            .done();
+        })
+      )
       .on('end', function() {
         resolve();
       })
       .on('error', function(err) {
         reject(err);
       });
-
   });
 }
 

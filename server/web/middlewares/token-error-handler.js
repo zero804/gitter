@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;

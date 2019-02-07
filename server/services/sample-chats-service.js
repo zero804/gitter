@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var chatService = require('gitter-web-chats');
 var restSerializer = require('../serializers/rest-serializer');
@@ -6,14 +6,15 @@ var Promise = require('bluebird');
 
 var cachedSamples = null;
 function getSamples() {
-  if(cachedSamples) return Promise.resolve(cachedSamples);
+  if (cachedSamples) return Promise.resolve(cachedSamples);
 
-  return chatService.getRecentPublicChats()
+  return chatService
+    .getRecentPublicChats()
     .then(function(chatMessage) {
       // Remove any duplicate users
       var users = {};
       return chatMessage.filter(function(chatMessage) {
-        if(users[chatMessage.fromUserId]) {
+        if (users[chatMessage.fromUserId]) {
           return false;
         }
         users[chatMessage.fromUserId] = true;

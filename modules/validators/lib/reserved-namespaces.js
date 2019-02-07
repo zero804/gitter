@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // These are top-level namespaces, so used to validate things like group uris,
 // usernames and org rooms.
@@ -36,7 +36,7 @@ var namespaces = [
   'app',
   'private',
   'c',
-  'u',
+  'u'
 ];
 
 module.exports = {
@@ -45,5 +45,4 @@ module.exports = {
     memo[name.toLowerCase()] = true;
     return memo;
   }, {})
-}
-
+};

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -30,9 +30,9 @@ var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/p
 var passphrase = config.get('email:unsubscribeNotificationsSecret');
 
 var supportedServices = [
-  { id: 'github', name: 'GitHub'},
-  { id: 'bitbucket', name: 'BitBucket'},
-  { id: 'trello', name: 'Trello'},
+  { id: 'github', name: 'GitHub' },
+  { id: 'bitbucket', name: 'BitBucket' },
+  { id: 'trello', name: 'Trello' }
 ];
 
 var openServices = Object.keys(services).map(function(id) {
@@ -50,94 +50,112 @@ var serviceIdNameMap = supportedServices.concat(openServices).reduce(function(ma
 function getIntegrations(req, res, next) {
   debug('Get integrations for %s', req.troupe.url);
 
-  var url = config.get('webhooks:basepath')+'/troupes/' + req.troupe.id + '/hooks';
-  request.get({
-    url: url,
-    json: true
-  }, function(err, resp, hooks) {
-    if(err || resp.statusCode !== 200 || !Array.isArray(hooks)) {
-      logger.error('failed to fetch hooks for troupe', { exception: err, resp: resp, hooks: hooks});
-      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
+  var url = config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks';
+  request.get(
+    {
+      url: url,
+      json: true
+    },
+    function(err, resp, hooks) {
+      if (err || resp.statusCode !== 200 || !Array.isArray(hooks)) {
+        logger.error('failed to fetch hooks for troupe', {
+          exception: err,
+          resp: resp,
+          hooks: hooks
+        });
+        return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
+      }
+
+      hooks.forEach(function(hook) {
+        hook.serviceDisplayName = serviceIdNameMap[hook.service];
+      });
+
+      res.render('integrations', {
+        hooks: hooks,
+        troupe: req.troupe,
+        accessToken: req.accessToken,
+        cdnRoot: cdn(''),
+        supportedServices: supportedServices,
+        openServices: openServices,
+        fonts: fonts.getFonts(),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies)
+      });
     }
-
-    hooks.forEach(function(hook) {
-      hook.serviceDisplayName = serviceIdNameMap[hook.service];
-    });
-
-    res.render('integrations', {
-      hooks: hooks,
-      troupe: req.troupe,
-      accessToken: req.accessToken,
-      cdnRoot: cdn(''),
-      supportedServices: supportedServices,
-      openServices: openServices,
-      fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-    });
-  });
+  );
 }
-
 
 function deleteIntegration(req, res, next) {
   debug('Delete integration %s for %s', req.body.id, req.troupe.url);
 
-  request.del({
-    url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/' + req.body.id,
-    json: true
-  },
-  function(err, resp) {
-    if(err || resp.statusCode !== 200) {
-      logger.error('failed to delete hook for troupe', { exception: err, resp: resp });
-      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
+  request.del(
+    {
+      url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks/' + req.body.id,
+      json: true
+    },
+    function(err, resp) {
+      if (err || resp.statusCode !== 200) {
+        logger.error('failed to delete hook for troupe', { exception: err, resp: resp });
+        return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
+      }
+
+      res.redirect('/settings/integrations/' + req.troupe.uri);
     }
-
-    res.redirect('/settings/integrations/' + req.troupe.uri);
-  });
-
+  );
 }
 
 function createIntegration(req, res, next) {
   debug('Create integration for %s', req.body.service, req.troupe.url);
 
-  request.post({
-    url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
-    json: {
-      service: req.body.service,
-      endpoint: 'gitter'
+  request.post(
+    {
+      url: config.get('webhooks:basepath') + '/troupes/' + req.troupe.id + '/hooks',
+      json: {
+        service: req.body.service,
+        endpoint: 'gitter'
+      }
+    },
+
+    function(err, resp, body) {
+      if (err || resp.statusCode !== 200 || !body) {
+        logger.error('failed to create hook for troupe', { exception: err, resp: resp });
+        return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
+      }
+
+      var encryptedUserToken;
+
+      // Pass through the token if we have write access
+      // TODO: deal with private repos too
+      if (userScopes.hasGitHubScope(req.user, 'public_repo')) {
+        encryptedUserToken = jwt.encode(
+          userScopes.getGitHubToken(req.user, 'public_repo'),
+          config.get('integrations:secret')
+        );
+      } else {
+        encryptedUserToken = '';
+      }
+
+      res.redirect(
+        body.configurationURL +
+          '&rt=' +
+          resp.body.token +
+          '&ut=' +
+          encryptedUserToken +
+          '&returnTo=' +
+          config.get('web:basepath') +
+          req.originalUrl
+      );
     }
-  },
-
-  function(err, resp, body) {
-    if(err || resp.statusCode !== 200 || !body) {
-      logger.error('failed to create hook for troupe', { exception: err, resp: resp });
-      return next(new StatusError(500, 'Unable to perform request. Please try again later.'));
-    }
-
-    var encryptedUserToken;
-
-    // Pass through the token if we have write access
-    // TODO: deal with private repos too
-    if(userScopes.hasGitHubScope(req.user, 'public_repo')) {
-      encryptedUserToken = jwt.encode(userScopes.getGitHubToken(req.user, 'public_repo'), config.get('integrations:secret'));
-    } else {
-      encryptedUserToken = "";
-    }
-
-    res.redirect(body.configurationURL +
-      "&rt=" + resp.body.token +
-      "&ut=" + encryptedUserToken +
-      "&returnTo=" + config.get('web:basepath') + req.originalUrl
-    );
-  });
+  );
 }
 
 function adminAccessCheck(req, res, next) {
   var uriContext = req.uriContext;
   var policy = uriContext.policy;
 
-  return policy.canAdmin()
+  return policy
+    .canAdmin()
     .then(function(access) {
-      if(!access) throw new StatusError(403);
+      if (!access) throw new StatusError(403);
     })
     .nodeify(next);
 }
@@ -149,7 +167,6 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   '/integrations/:roomPart1/:roomPart2',
   '/integrations/:roomPart1/:roomPart2/:roomPart3'
 ].forEach(function(uri) {
-
   router.use(uri, function(req, res, next) {
     // Shitty method override because the integrations page
     // doesn't use javascript and relies on forms aka, the web as of 1996.
@@ -160,38 +177,46 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
     next();
   });
 
-  router.get(uri,
+  router.get(
+    uri,
     ensureLoggedIn,
     preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-get'),
     uriContextResolverMiddleware,
     adminAccessCheck,
-    getIntegrations);
+    getIntegrations
+  );
 
-  router.delete(uri,
+  router.delete(
+    uri,
     ensureLoggedIn,
     preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-delete'),
     uriContextResolverMiddleware,
     adminAccessCheck,
-    deleteIntegration);
+    deleteIntegration
+  );
 
-  router.post(uri,
+  router.post(
+    uri,
     ensureLoggedIn,
     preventClickjackingOnlyGitterEmbedMiddleware,
     identifyRoute('settings-room-create'),
     uriContextResolverMiddleware,
     adminAccessCheck,
-    createIntegration);
+    createIntegration
+  );
 });
 
-router.get('/accept-invite/:secret',
+router.get(
+  '/accept-invite/:secret',
   identifyRoute('settings-accept-invite'),
   ensureLoggedIn,
   preventClickjackingMiddleware,
   function(req, res, next) {
     var secret = req.params.secret;
-    return acceptInviteService.acceptInvite(req.user, secret, { source: req.query.source })
+    return acceptInviteService
+      .acceptInvite(req.user, secret, { source: req.query.source })
       .then(function(room) {
         return resolveRoomUri(room, req.user._id);
       })
@@ -212,24 +237,28 @@ router.get('/accept-invite/:secret',
         }
         // TODO: tell the user why they could not get invited
 
-        logger.error('Unable to use invite', { username: req.user && req.user.username, exception: err });
-        return loginUtils.whereToNext(req.user)
-          .then(function(next) {
-            res.relativeRedirect(next);
-          });
+        logger.error('Unable to use invite', {
+          username: req.user && req.user.username,
+          exception: err
+        });
+        return loginUtils.whereToNext(req.user).then(function(next) {
+          res.relativeRedirect(next);
+        });
       })
       .catch(next);
-  });
+  }
+);
 
-router.get('/unsubscribe/:hash',
+router.get(
+  '/unsubscribe/:hash',
   identifyRoute('settings-unsubscribe'),
   preventClickjackingMiddleware,
-  function (req, res, next) {
+  function(req, res, next) {
     var plaintext;
     try {
       var decipher = crypto.createDecipher('aes256', passphrase);
       plaintext = decipher.update(req.params.hash, 'hex', 'utf8') + decipher.final('utf8');
-    } catch(err) {
+    } catch (err) {
       return next(new StatusError(400, 'Invalid hash'));
     }
 
@@ -237,30 +266,33 @@ router.get('/unsubscribe/:hash',
     var userId = parts[0];
     var notificationType = parts[1];
 
-    debug("User %s opted-out from ", userId, notificationType);
+    debug('User %s opted-out from ', userId, notificationType);
     stats.event('unsubscribed_unread_notifications', { userId: userId });
 
-    userSettingsService.setUserSettings(userId, 'unread_notifications_optout', 1)
+    userSettingsService
+      .setUserSettings(userId, 'unread_notifications_optout', 1)
       .then(function() {
         var msg = "Done. You won't receive notifications like that one in the future.";
 
         res.render('unsubscribe', { layout: 'generic-layout', title: 'Unsubscribe', msg: msg });
       })
       .catch(next);
+  }
+);
 
-  });
-
-router.get('/badger/opt-out',
+router.get(
+  '/badger/opt-out',
   ensureLoggedIn,
   preventClickjackingMiddleware,
   identifyRoute('settings-badger-optout'),
-  function (req, res, next) {
+  function(req, res, next) {
     var userId = req.user.id;
 
-    logger.info("User " + userId + " opted-out from auto badgers");
+    logger.info('User ' + userId + ' opted-out from auto badgers');
     stats.event('optout_badger', { userId: userId });
 
-    return userSettingsService.setUserSettings(userId, 'badger_optout', 1)
+    return userSettingsService
+      .setUserSettings(userId, 'badger_optout', 1)
       .then(function() {
         var msg = "Done. We won't send you automatic pull-requests in future.";
 
@@ -271,6 +303,7 @@ router.get('/badger/opt-out',
         });
       })
       .catch(next);
-  });
+  }
+);
 
 module.exports = router;

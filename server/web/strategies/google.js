@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -15,7 +15,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
   var avatar = profile.photos[0].value; // is this always set?
 
   var googleUser = {
-    username: profile.id+'_google',
+    username: profile.id + '_google',
     displayName: profile.displayName,
     gravatarImageUrl: avatar
   };
@@ -32,7 +32,8 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     avatar: avatar
   };
   var user;
-  return userService.findOrCreateUserForProvider(googleUser, googleIdentity)
+  return userService
+    .findOrCreateUserForProvider(googleUser, googleIdentity)
     .spread(function(_user, isNewUser) {
       user = _user;
 
@@ -44,12 +45,15 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
     .asCallback(done);
 }
 
-var googleStrategy = new GoogleStrategy({
+var googleStrategy = new GoogleStrategy(
+  {
     clientID: config.get('googleoauth2:client_id'),
     clientSecret: config.get('googleoauth2:client_secret'),
     callbackURL: callbackUrlBuilder('google'),
     passReqToCallback: true
-  }, googleOauth2Callback);
+  },
+  googleOauth2Callback
+);
 
 googleStrategy.name = 'google';
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var autoRemovalService = require('gitter-web-rooms/lib/auto-removal-service');
@@ -37,8 +37,7 @@ var opts = require('yargs')
     default: false
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var minTimeInDays = parseInt(opts.min, 10);
 var members = parseInt(opts.members, 10);
@@ -56,12 +55,16 @@ function run() {
 var total = 0;
 
 function handleRoom(troupe) {
-  return (opts.dryRun ?
-    autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays }) :
-    autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, { minTimeInDays: minTimeInDays })
+  return (opts.dryRun
+    ? autoRemovalService.findRemovalCandidates(troupe.id, { minTimeInDays: minTimeInDays })
+    : autoRemovalService.autoRemoveInactiveUsers(troupe.id, troupe.groupId, {
+        minTimeInDays: minTimeInDays
+      })
   )
     .then(function(candidates) {
-      var userIds = candidates.map(function(c) { return c.userId; });
+      var userIds = candidates.map(function(c) {
+        return c.userId;
+      });
       return [candidates, userService.findByIds(userIds)];
     })
     .spread(function(candidates, users) {
@@ -86,45 +89,45 @@ function handleRoom(troupe) {
         c.lastAccess = c.lastAccessTime && moment(c.lastAccessTime).format('YYYY/MM/DD HH:mm');
       });
 
-      if(!opts.quiet) {
+      if (!opts.quiet) {
         console.log(cliff.stringifyObjectRows(candidates, ['userId', 'username', 'lastAccess'])); // eslint-disable-line
       }
     });
 }
 
 function handleSingleRoom() {
-  return troupeService.findByUri(opts.room)
-    .then((troupe) => {
-      if(!troupe) {
-        console.warn(`${opts.room} room passed does not exist! Skipping ${opts.room} room`);
-        return Promise.resolve();
-      }
+  return troupeService.findByUri(opts.room).then(troupe => {
+    if (!troupe) {
+      console.warn(`${opts.room} room passed does not exist! Skipping ${opts.room} room`);
+      return Promise.resolve();
+    }
 
-      return handleRoom(troupe)
-    });
+    return handleRoom(troupe);
+  });
 }
 
 function handleMultipleRooms() {
   return new Promise(function(resolve, reject) {
-    persistence.Troupe
-      .find({ userCount: { $gt: members } })
+    persistence.Troupe.find({ userCount: { $gt: members } })
       .sort({ userCount: -1 })
       .select('uri userCount groupId')
       .limit(10)
       .stream()
-      .pipe(es.through(function(room) {
-        this.pause();
-        console.log('Checking ' + room.uri + ' (' + room.userCount + ' members)')
-        var self = this;
-        return handleRoom(room)
-          .catch(function(err) {
-            self.emit('error', err);
-          })
-          .finally(function() {
-            self.resume();
-          })
-          .done();
-      }))
+      .pipe(
+        es.through(function(room) {
+          this.pause();
+          console.log('Checking ' + room.uri + ' (' + room.userCount + ' members)');
+          var self = this;
+          return handleRoom(room)
+            .catch(function(err) {
+              self.emit('error', err);
+            })
+            .finally(function() {
+              self.resume();
+            })
+            .done();
+        })
+      )
       .on('end', function() {
         resolve();
       })

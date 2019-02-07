@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -17,9 +17,9 @@ var View = Marionette.ItemView.extend({
 });
 
 module.exports = ModalView.extend({
-    initialize: function(options) {
-      options.title = "Integration Settings";
-      ModalView.prototype.initialize.apply(this, arguments);
-      this.view = new View({ });
-    }
-  });
+  initialize: function(options) {
+    options.title = 'Integration Settings';
+    ModalView.prototype.initialize.apply(this, arguments);
+    this.view = new View({});
+  }
+});

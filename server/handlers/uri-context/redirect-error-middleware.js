@@ -8,7 +8,7 @@ var StatusError = require('statuserror');
  * in a reasonable manner
  */
 function redirectErrorMiddleware(err, req, res, next) {
-  switch(err.status) {
+  switch (err.status) {
     case 301:
       // TODO: check this works for userhome....
       if (err.path) {
@@ -24,7 +24,7 @@ function redirectErrorMiddleware(err, req, res, next) {
         var url = '/orgs/' + err.uri + '/rooms';
         //test if we are trying to load the org page in the chat frame.
         //fixes: https://github.com/troupe/gitter-webapp/issues/628
-        if(/~chat$/.test(req.route.path)){
+        if (/~chat$/.test(req.route.path)) {
           url = url += '/~iframe';
         }
         res.redirect(url);

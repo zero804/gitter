@@ -10,7 +10,6 @@ var headerViewTemplate = require('./org-directory-header-view.hbs');
 require('../behaviors/isomorphic');
 require('../behaviors/tooltip');
 
-
 var HeaderView = Marionette.LayoutView.extend({
   el: 'header',
   template: headerViewTemplate,
@@ -21,7 +20,7 @@ var HeaderView = Marionette.LayoutView.extend({
   },
 
   events: {
-    'click @ui.favourite': 'onFavouriteButtonClicked',
+    'click @ui.favourite': 'onFavouriteButtonClicked'
   },
 
   modelEvents: {
@@ -30,28 +29,28 @@ var HeaderView = Marionette.LayoutView.extend({
 
   behaviors: function() {
     var behaviors = {
-      Isomorphic: {
-
-      },
+      Isomorphic: {},
       Tooltip: {
         '.js-group-favourite-button': { placement: 'left' }
-      },
+      }
     };
 
-    if(context.isLoggedIn()) {
+    if (context.isLoggedIn()) {
       behaviors.Isomorphic.profileMenuView = {
         el: '#profile-menu',
         init: 'initProfileMenuView'
       };
     }
 
-    return behaviors
+    return behaviors;
   },
 
   initProfileMenuView: function(optionsForRegion) {
-    this.profileMenuView = new ProfileMenu(optionsForRegion({
-      // ...
-    }));
+    this.profileMenuView = new ProfileMenu(
+      optionsForRegion({
+        // ...
+      })
+    );
     return this.profileMenuView;
   },
 
@@ -62,14 +61,16 @@ var HeaderView = Marionette.LayoutView.extend({
 
   onFavouriteButtonClicked: function() {
     var isFavourited = !!this.model.get('favourite');
-    this.model.save({
-      favourite: !isFavourited
-    }, {
-      wait: true,
-      patch: true
-    });
+    this.model.save(
+      {
+        favourite: !isFavourited
+      },
+      {
+        wait: true,
+        patch: true
+      }
+    );
   }
-
 });
 
 module.exports = HeaderView;

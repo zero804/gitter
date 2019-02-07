@@ -6,27 +6,25 @@
  * chatItem `Object` chat-item to be set as burst final
  * void
  */
-var setBurstFinal = function (chatItem) {
+var setBurstFinal = function(chatItem) {
   chatItem.burstFinal = true;
 };
 
 /**
-  * IMPORTANT: this version differs from client-side calculateBursts() due to backbone access methods!
-  * calculateBursts() calculates what chat messages are 'bursts'.
-  *
-  * `Array` chats - the collection of chat messages
-  * returns the modified chats array
-  */
-var calculateBursts = function (chats) {
+ * IMPORTANT: this version differs from client-side calculateBursts() due to backbone access methods!
+ * calculateBursts() calculates what chat messages are 'bursts'.
+ *
+ * `Array` chats - the collection of chat messages
+ * returns the modified chats array
+ */
+var calculateBursts = function(chats) {
   // console.time('calculateBursts'); // benchmarking
   /* @const - time window, in which an user can keep adding chat items as part of a initial "burst" */
   var BURST_WINDOW = 5 * 60 * 1000; // 5 minutes
 
-  var burstUser,
-      burstStart;
+  var burstUser, burstStart;
 
-  chats.forEach(function (chat, index) {
-
+  chats.forEach(function(chat, index) {
     var newUser = chat.fromUser && chat.fromUser.username;
     var newSentTime = chat.sent;
 

@@ -18,12 +18,12 @@ module.exports = Marionette.ItemView.extend({
 
   modelEvents: {
     'change:state': 'onModelChange',
-    'change:searchTerm': 'onModelChange',
+    'change:searchTerm': 'onModelChange'
   },
 
   ui: {
     searchFooter: '#panel-footer--search',
-    allFooter:    '#panel-footer--all',
+    allFooter: '#panel-footer--all'
   },
 
   initialize: function(attrs) {
@@ -36,15 +36,18 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onModelChange: function() {
-    fastdom.mutate(function() {
-      var shouldShowSearchFooter = ((this.model.get('state') === 'search') && !this.model.get('searchTerm'));
-      toggleClass(this.ui.searchFooter[0], 'active', shouldShowSearchFooter);
-      toggleClass(this.ui.allFooter[0], 'active', (this.model.get('state') !== 'search'));
-    }.bind(this));
+    fastdom.mutate(
+      function() {
+        var shouldShowSearchFooter =
+          this.model.get('state') === 'search' && !this.model.get('searchTerm');
+        toggleClass(this.ui.searchFooter[0], 'active', shouldShowSearchFooter);
+        toggleClass(this.ui.allFooter[0], 'active', this.model.get('state') !== 'search');
+      }.bind(this)
+    );
   },
 
-  onModelChangeSearchTerm: function(mode, val) { //jshint unused: true
-      toggleClass(this.ui.searchFooter[0], 'active', !!val);
-  },
-
+  onModelChangeSearchTerm: function(mode, val) {
+    //jshint unused: true
+    toggleClass(this.ui.searchFooter[0], 'active', !!val);
+  }
 });

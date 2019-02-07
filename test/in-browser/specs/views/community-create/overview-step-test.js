@@ -11,7 +11,6 @@ var CommunityCreateStepViewModel = require('public/js/views/community-create/com
 var OverviewView = require('public/js/views/community-create/overview-step/community-creation-overview-view');
 
 describe('community-creation-overview-view', function() {
-
   var communityCreateModel;
   var viewModel;
   var el;
@@ -19,7 +18,7 @@ describe('community-creation-overview-view', function() {
 
   var generateBeforeEachCb = function(newTroupeContext) {
     return function() {
-      if(newTroupeContext) {
+      if (newTroupeContext) {
         context.testOnly.resetTroupeContext(newTroupeContext);
       }
 
@@ -41,29 +40,30 @@ describe('community-creation-overview-view', function() {
         repoCollection: new Backbone.Collection()
       });
       view.render();
-    }
+    };
   };
 
   beforeEach(generateBeforeEachCb());
 
-
-
   it('should have invited people include users and emails', function() {
-    communityCreateModel.peopleToInvite.add([{
-      username: 'foo'
-    }]);
-    communityCreateModel.emailsToInvite.add([{
-      emailAddress: 'foo@bar.com'
-    }, {
-      emailAddress: 'asdf@qwer.com'
-    }]);
+    communityCreateModel.peopleToInvite.add([
+      {
+        username: 'foo'
+      }
+    ]);
+    communityCreateModel.emailsToInvite.add([
+      {
+        emailAddress: 'foo@bar.com'
+      },
+      {
+        emailAddress: 'asdf@qwer.com'
+      }
+    ]);
     assert.strictEqual(view.inviteCollection.length, 3);
   });
-
 
   it('should show heading for the current community', function() {
     communityCreateModel.set('communityName', 'foo');
     assert.strictEqual(view.ui.communityNameHeading[0].innerText, 'foo');
   });
-
 });

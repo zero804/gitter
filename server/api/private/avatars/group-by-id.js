@@ -1,9 +1,10 @@
-"use strict";
+'use strict';
 
 var groupAvatars = require('gitter-web-groups/lib/group-avatars');
 
 module.exports = function(groupId, size, isVersioned) {
-  return groupAvatars.getAvatarUrlForGroupId(groupId, size)
+  return groupAvatars
+    .getAvatarUrlForGroupId(groupId, size)
     .bind({
       isVersioned: isVersioned
     })
@@ -15,4 +16,4 @@ module.exports = function(groupId, size, isVersioned) {
         longTermCachable: !!this.isVersioned
       };
     });
-}
+};

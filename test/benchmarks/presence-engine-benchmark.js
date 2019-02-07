@@ -8,7 +8,9 @@ var assert = require('assert');
 var Promise = require('bluebird');
 
 var fakeEngine = {
-  clientExists: function(socketId, callback) { callback(!socketId.match(/^TEST/)); }
+  clientExists: function(socketId, callback) {
+    callback(!socketId.match(/^TEST/));
+  }
 };
 
 function FakeClient(socketId, userId, troupeId, script) {
@@ -23,7 +25,17 @@ function FakeClient(socketId, userId, troupeId, script) {
 
 FakeClient.prototype = {
   connect: function() {
-    return presenceService.userSocketConnected(this.userId, this.socketId, 'test', 'test', 'fake', null, this.troupeId, null, true);
+    return presenceService.userSocketConnected(
+      this.userId,
+      this.socketId,
+      'test',
+      'test',
+      'fake',
+      null,
+      this.troupeId,
+      null,
+      true
+    );
   },
 
   disconnect: function() {
@@ -33,7 +45,8 @@ FakeClient.prototype = {
   signalEyeball: function() {
     var newSignal = this.eyeballSignal ? 0 : 1;
     var self = this;
-    return presenceService.clientEyeballSignal(this.userId, this.socketId, newSignal)
+    return presenceService
+      .clientEyeballSignal(this.userId, this.socketId, newSignal)
       .then(function() {
         self.eyeballSignal = newSignal;
       });
@@ -45,7 +58,7 @@ FakeClient.prototype = {
     this.lastAction = nextAction;
 
     var nextPromise;
-    switch(nextAction) {
+    switch (nextAction) {
       case 0:
         nextPromise = this.connect();
         break;
@@ -67,20 +80,19 @@ FakeClient.prototype = {
       return self.next();
     });
   })
-
 };
 
 function doTest(iterations) {
   var n = Date.now();
 
   var iterationsScript = [];
-  for(var i = 0; i < iterations; i++) {
+  for (var i = 0; i < iterations; i++) {
     var userId = 'TESTUSER' + i + '-' + n;
     var socketId = 'TESTSOCKET' + i + '-' + n;
     var troupeId = 'TESTTROUPE' + (i % 10) + '-' + n;
 
     var script = [0];
-    for(var j = 1; j < i; j++) {
+    for (var j = 1; j < i; j++) {
       script.push(1);
     }
     script.push(2);
@@ -93,21 +105,25 @@ function doTest(iterations) {
     });
   }
 
-  return Promise.map(iterationsScript, function(itr) {
-    var c = new FakeClient(itr.socketId, itr.userId, itr.troupeId, itr.script);
-    return c.next()
-      .then(function() {
-        return presenceService.findOnlineUsersForTroupe(troupeId);
-      })
-      .then(function(online) {
-        assert(online.length === 0);
-      });
-  }, { concurrency: 1 });
+  return Promise.map(
+    iterationsScript,
+    function(itr) {
+      var c = new FakeClient(itr.socketId, itr.userId, itr.troupeId, itr.script);
+      return c
+        .next()
+        .then(function() {
+          return presenceService.findOnlineUsersForTroupe(troupeId);
+        })
+        .then(function(online) {
+          assert(online.length === 0);
+        });
+    },
+    { concurrency: 1 }
+  );
 }
 
 function cleanup(done) {
-  return presenceService.collectGarbage(fakeEngine)
-    .nodeify(done);
+  return presenceService.collectGarbage(fakeEngine).nodeify(done);
 }
 
 makeBenchmark({
@@ -115,7 +131,7 @@ makeBenchmark({
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     var troupeId = 'TESTTROUPE1' + Date.now();
-    var c = new FakeClient(socketId, userId, troupeId, [0,1,1,1,1,1,1,1,1,2]);
+    var c = new FakeClient(socketId, userId, troupeId, [0, 1, 1, 1, 1, 1, 1, 1, 1, 2]);
 
     c.next()
       .then(function() {
@@ -130,8 +146,7 @@ makeBenchmark({
 
   tests: {
     'eyeballs-benchmark': function(done) {
-      return doTest(100)
-        .nodeify(done);
+      return doTest(100).nodeify(done);
     }
   }
 });

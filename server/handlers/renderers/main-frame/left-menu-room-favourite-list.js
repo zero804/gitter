@@ -8,17 +8,21 @@ var parseToTemplateItem = require('gitter-web-shared/parse/left-menu-primary-ite
 
 function generateLeftMenuFavouriteRoomsList(state, rooms, groupId) {
   var filter;
-  switch(state) {
+  switch (state) {
     //There is no filter here because you can only be in the temp org state
     //if you have not joined any rooms for a given group
     case 'search':
-      filter = function() { return false; };
+      filter = function() {
+        return false;
+      };
       break;
     case 'people':
       filter = favouriteOneToOneFilter;
       break;
     case 'org':
-      filter = function(model) { return orgFavouriteFilter(model, groupId) };
+      filter = function(model) {
+        return orgFavouriteFilter(model, groupId);
+      };
       break;
     default:
       filter = favouriteFilter;
@@ -26,8 +30,8 @@ function generateLeftMenuFavouriteRoomsList(state, rooms, groupId) {
 
   return rooms
     .filter(favouriteFilter)
-    .map(function(model){
-      if(!filter(model)) {
+    .map(function(model) {
+      if (!filter(model)) {
         model.isHidden = true;
       }
       return parseToTemplateItem(model, state);

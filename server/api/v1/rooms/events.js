@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var eventService = require("gitter-web-events");
-var restSerializer = require("../../../serializers/rest-serializer");
+var eventService = require('gitter-web-events');
+var restSerializer = require('../../../serializers/rest-serializer');
 
 module.exports = {
   id: 'event',
@@ -17,12 +17,12 @@ module.exports = {
       limit: limit
     };
 
-    return eventService.findEventsForTroupe(req.params.troupeId, options)
-      .then(function(events) {
-        var strategy = new restSerializer.EventStrategy({ currentUserId: req.user.id, troupeId: req.params.troupeId });
-        return restSerializer.serialize(events, strategy);
+    return eventService.findEventsForTroupe(req.params.troupeId, options).then(function(events) {
+      var strategy = new restSerializer.EventStrategy({
+        currentUserId: req.user.id,
+        troupeId: req.params.troupeId
       });
-
+      return restSerializer.serialize(events, strategy);
+    });
   }
-
 };

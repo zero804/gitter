@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
 var dolph = require('dolph');
-var redis = require("gitter-web-utils/lib/redis");
+var redis = require('gitter-web-utils/lib/redis');
 var redisClient = redis.getClient();
 
 var env = require('gitter-web-env');
@@ -31,7 +31,7 @@ var rateLimiter = dolph({
     }
 
     /* Should never get here */
-    return "anonymous";
+    return 'anonymous';
   },
   redisClient: redisClient
 });

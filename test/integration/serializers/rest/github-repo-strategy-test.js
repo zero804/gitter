@@ -1,14 +1,13 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../../test-require');
-var assertUtils = require('../../assert-utils')
+var assertUtils = require('../../assert-utils');
 var env = require('gitter-web-env');
 var nconf = env.config;
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var serialize = require('gitter-web-serialization/lib/serialize');
 var GithubRepoStrategy = testRequire('./serializers/rest/github-repo-strategy');
-
 
 describe('GithubRepoStrategy', function() {
   var blockTimer = require('gitter-web-test-utils/lib/block-timer');
@@ -31,14 +30,14 @@ describe('GithubRepoStrategy', function() {
       description: 'do re me',
       private: false,
       owner: {
-        avatar_url: 'https://github.com/images/error/octocat_happy.gif',
+        avatar_url: 'https://github.com/images/error/octocat_happy.gif'
       }
     };
 
-    var strategy = new GithubRepoStrategy({ });
-    return serialize([repo], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    var strategy = new GithubRepoStrategy({});
+    return serialize([repo], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: repo.id,
           name: repo.full_name,
           description: repo.description,
@@ -46,8 +45,9 @@ describe('GithubRepoStrategy', function() {
           private: false,
           exists: false,
           avatar_url: repo.owner.avatar_url
-        }]);
-      });
+        }
+      ]);
+    });
   });
 
   it('should serialize a repo that has a room', function() {
@@ -57,16 +57,16 @@ describe('GithubRepoStrategy', function() {
       description: 'this one has a room',
       private: false,
       owner: {
-        avatar_url: 'https://github.com/images/error/octocat_happy.gif',
+        avatar_url: 'https://github.com/images/error/octocat_happy.gif'
       }
     };
 
     var t = fixture.troupe1;
 
-    var strategy = new GithubRepoStrategy({ });
-    return serialize([repo], strategy)
-      .then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{
+    var strategy = new GithubRepoStrategy({});
+    return serialize([repo], strategy).then(function(s) {
+      assertUtils.assertSerializedEqual(s, [
+        {
           id: repo.id,
           name: repo.full_name,
           description: repo.description,
@@ -76,7 +76,7 @@ describe('GithubRepoStrategy', function() {
             id: t.id,
             name: t.uri,
             topic: '',
-            avatarUrl:  nconf.get('avatar:officialHost') + '/gh/u/' + getOrgNameFromUri(t.uri),
+            avatarUrl: nconf.get('avatar:officialHost') + '/gh/u/' + getOrgNameFromUri(t.uri),
             uri: t.uri,
             // NOTE: Why false here, but undefined in troupe-strategy-test.js?
             // Probably because it is being loaded from the database by
@@ -93,7 +93,8 @@ describe('GithubRepoStrategy', function() {
           },
           exists: true,
           avatar_url: repo.owner.avatar_url
-        }]);
-      });
+        }
+      ]);
+    });
   });
 });

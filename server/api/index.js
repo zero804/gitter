@@ -10,12 +10,7 @@ var corsOptions = {
   origin: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   maxAge: 600, // 10 minutes
-  allowedHeaders: [
-    'content-type',
-    'x-access-token',
-    'authorization',
-    'accept'
-  ],
+  allowedHeaders: ['content-type', 'x-access-token', 'authorization', 'accept'],
   exposedHeaders: [
     // Rate limiting with dolph
     'X-RateLimit-Limit',
@@ -40,13 +35,17 @@ router.use('/private', require('./private'));
  * /api/private/health_check on the api.gitter.com/api/private/.. even though
  * everything else is mounted on the root
  */
-router.get('/api/private/health_check',
+router.get(
+  '/api/private/health_check',
   identifyRoute('api-private-health-check'),
-  require('./private/health-check'));
+  require('./private/health-check')
+);
 
-router.get('/api/private/health_check/full',
+router.get(
+  '/api/private/health_check/full',
   identifyRoute('api-private-health-check-full'),
-  require('./private/health-check-full'));
+  require('./private/health-check-full')
+);
 
 /* Catch all - return 404 error */
 if (!process.env.DISABLE_API_404_HANDLER) {

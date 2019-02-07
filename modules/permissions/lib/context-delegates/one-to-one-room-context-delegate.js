@@ -26,7 +26,6 @@ OneToOneRoomContextDelegate.prototype = {
     // This should never get called for a one-to-one room where the user is in
     // the room, so we ignore the failure
   })
-
 };
 
 module.exports = OneToOneRoomContextDelegate;

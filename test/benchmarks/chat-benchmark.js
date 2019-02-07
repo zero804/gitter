@@ -3,7 +3,7 @@
 var makeBenchmark = require('../make-benchmark');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var chatService = require('gitter-web-chats');
-var roomMembershipFlags = require("gitter-web-rooms/lib/room-membership-flags");
+var roomMembershipFlags = require('gitter-web-rooms/lib/room-membership-flags');
 
 var fixture = {};
 var count = 0;
@@ -35,17 +35,16 @@ makeBenchmark({
               };
           }
         }
-      },
+      }
     };
 
-    for(var i = 0; i < 10000; i++) {
+    for (var i = 0; i < 10000; i++) {
       fixtureDescription['user' + i] = {};
       fixtureDescription.troupeBig.users.push('user' + i);
     }
     // userOnlyOne is in one room
     // user0...5000 are in two or three rooms
-    return fixtureLoader.manual(fixture, fixtureDescription, null)
-      .asCallback(done);
+    return fixtureLoader.manual(fixture, fixtureDescription, null).asCallback(done);
   },
 
   after: function(done) {
@@ -60,15 +59,15 @@ makeBenchmark({
 
     'newChatMessageToTroupeWithDelete#troupeBig': function(done) {
       count++;
-      chatService.newChatMessageToTroupe(fixture.troupeBig, fixture.user1, { text: 'This is a message: ' + count})
+      chatService
+        .newChatMessageToTroupe(fixture.troupeBig, fixture.user1, {
+          text: 'This is a message: ' + count
+        })
         .delay(100)
         .then(function(chat) {
-          return chatService.deleteMessageFromRoom(fixture.troupeBig, chat)
+          return chatService.deleteMessageFromRoom(fixture.troupeBig, chat);
         })
         .nodeify(done);
-    },
-
-
+    }
   }
-
 });

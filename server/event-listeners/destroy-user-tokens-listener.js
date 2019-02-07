@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var appEvents = require('gitter-web-appevents');
 var userService = require('gitter-web-users');

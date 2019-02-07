@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
 var User = require('gitter-web-persistence').User;
 var isGitHubUsername = require('gitter-web-identity/lib/is-github-username');
 var utils = require('./utils');
 
 module.exports = function(username, size) {
-  return User.findOne({ username: username }, { _id: 0, gravatarImageUrl: 1 }, { lean: true })
-    .then(function(doc) {
+  return User.findOne({ username: username }, { _id: 0, gravatarImageUrl: 1 }, { lean: true }).then(
+    function(doc) {
       if (!doc || !doc.gravatarImageUrl) {
         // We don't know who this user is. Just fallback to GitHub for now
         return {
@@ -28,5 +28,6 @@ module.exports = function(username, size) {
         url: doc.gravatarImageUrl,
         longTermCachable: true
       };
-    });
-}
+    }
+  );
+};

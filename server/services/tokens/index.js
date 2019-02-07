@@ -32,30 +32,34 @@ function iterateProviders(downstream, upstream) {
  * Returns a promise of a token
  */
 exports.getToken = function(userId, clientId, callback) {
-  return iterateProviders(function(provider, callback) {
+  return iterateProviders(
+    function(provider, callback) {
       /* Find the token */
       return provider.getToken(userId, clientId, callback);
-    }, function(token, provider, callback) {
+    },
+    function(token, provider, callback) {
       /* Update upstream caches */
       return provider.cacheToken(userId, clientId, token, callback);
-    })
-    .nodeify(callback);
+    }
+  ).nodeify(callback);
 };
 
 /**
  * Validate a token and return a promise of [userId, clientId] or null
  */
 exports.validateToken = function(token, callback) {
-  return iterateProviders(function(provider, callback) {
+  return iterateProviders(
+    function(provider, callback) {
       /* Find the token... */
       return provider.validateToken(token, callback);
-    }, function(result, provider, callback) {
+    },
+    function(result, provider, callback) {
       /* Update upstream caches */
       var userId = result[0];
       var clientId = result[1];
       return provider.cacheToken(userId, clientId, token, callback);
-    })
-    .nodeify(callback);
+    }
+  ).nodeify(callback);
 };
 
 /**
@@ -64,13 +68,11 @@ exports.validateToken = function(token, callback) {
 exports.deleteToken = function(token, callback) {
   /* Delete the token from all caches simultaneously */
   return Promise.map(PROVIDERS, function(provider) {
-      return Promise.fromCallback(function(callback) {
-        provider.deleteToken(token, callback);
-      });
-    })
-    .nodeify(callback);
+    return Promise.fromCallback(function(callback) {
+      provider.deleteToken(token, callback);
+    });
+  }).nodeify(callback);
 };
-
 
 exports.testOnly = {
   invalidateCache: function() {

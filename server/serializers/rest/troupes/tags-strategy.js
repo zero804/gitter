@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
-function TagsStrategy() {
-}
+function TagsStrategy() {}
 
 TagsStrategy.prototype = {
-  preload: function() { },
+  preload: function() {},
   map: function(room) {
     return room.tags || [];
   },

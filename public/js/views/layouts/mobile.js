@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../../utils/context');
 var Marionette = require('backbone.marionette');
@@ -18,7 +18,6 @@ var JoinRoomView = require('../chat/join-room-view');
 
 require('../behaviors/isomorphic');
 
-
 module.exports = Marionette.LayoutView.extend({
   template: false,
   el: 'body',
@@ -27,7 +26,7 @@ module.exports = Marionette.LayoutView.extend({
     Isomorphic: {
       chat: { el: '#content-wrapper', init: 'initChatRegion' },
       input: { el: '#chat-input', init: 'initInputRegion' },
-      menu: { el: '#menu-region', init: 'initMenuRegion' },
+      menu: { el: '#menu-region', init: 'initMenuRegion' }
       //Left Menu
       //roomMenu: { el: '#room-menu-container', init: 'initMenuRegion' }
     }
@@ -52,18 +51,18 @@ module.exports = Marionette.LayoutView.extend({
     var inputRegion = this.regionManager.get('input');
 
     if (this.model.get('roomMember')) {
-      inputRegion.show(new ChatInputView({
-        model: context.troupe(),
-        collection: this.options.chatCollection
-      }));
+      inputRegion.show(
+        new ChatInputView({
+          model: context.troupe(),
+          collection: this.options.chatCollection
+        })
+      );
     } else {
       if (!this.model.get('aboutToLeave')) {
-        inputRegion.show(new JoinRoomView({ }));
+        inputRegion.show(new JoinRoomView({}));
       }
     }
-
   },
-
 
   initialize: function(options) {
     this.chatCollection = options.chatCollection;
@@ -78,11 +77,13 @@ module.exports = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    var chatCollectionView = new ChatContainerView(optionsForRegion({
-      collection: this.options.chatCollection,
-      decorators: [emojiDecorator, mobileDecorator],
-      monitorScrollPane: this.ui.scroll // Monitor the scroll region for unread items
-    }));
+    var chatCollectionView = new ChatContainerView(
+      optionsForRegion({
+        collection: this.options.chatCollection,
+        decorators: [emojiDecorator, mobileDecorator],
+        monitorScrollPane: this.ui.scroll // Monitor the scroll region for unread items
+      })
+    );
 
     return chatCollectionView;
   },
@@ -104,14 +105,18 @@ module.exports = Marionette.LayoutView.extend({
     //  collection: this.options.chatCollection,
     //}));
     if (this.model.get('roomMember')) {
-      return new ChatInputView(optionsForRegion({
-        model: context.troupe(),
-        collection: this.options.chatCollection
-      }, {rerender: true}));
+      return new ChatInputView(
+        optionsForRegion(
+          {
+            model: context.troupe(),
+            collection: this.options.chatCollection
+          },
+          { rerender: true }
+        )
+      );
     } else {
-      return new JoinRoomView(optionsForRegion({}, {rerender: true}));
+      return new JoinRoomView(optionsForRegion({}, { rerender: true }));
     }
-
   },
 
   hideTroupes: function() {
@@ -129,6 +134,5 @@ module.exports = Marionette.LayoutView.extend({
     this.makeAppFullScreen();
     this.ui.mainPage.toggleClass('partiallyOffScreen');
     e.stopPropagation();
-  },
-
+  }
 });

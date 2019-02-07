@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var Backbone = require('backbone');
 var debug = require('debug-proxy')('app:nes');
 var isMobile = require('./is-mobile');
 var passiveEventListener = require('./passive-event-listener');
-
 
 /* Put your scrolling panels on rollers */
 function NeverEndingStory(target, options) {
@@ -15,7 +14,10 @@ function NeverEndingStory(target, options) {
   this._prevScrollTime = Date.now();
   this._nearTop = false;
   this._nearBottom = false;
-  this._scrollHandler = _.throttle((isMobile() ? this.mobileScroll.bind(this) : this.scroll.bind(this)), 100);
+  this._scrollHandler = _.throttle(
+    isMobile() ? this.mobileScroll.bind(this) : this.scroll.bind(this),
+    100
+  );
   this._contentWrapper = options && options.contentWrapper;
   this.enable();
 }
@@ -36,14 +38,14 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
     var deltaTop = prevScrollTop - scrollTop;
     var deltaBottom = prevScrollBottom - scrollBottom;
 
-    var halfClientHeight = target.clientHeight/2;
+    var halfClientHeight = target.clientHeight / 2;
     var nearTop = scrollTop < halfClientHeight;
     var nearBottom = scrollBottom < halfClientHeight;
 
-    if(deltaTop > 0 && nearTop) {
+    if (deltaTop > 0 && nearTop) {
       /* We're scrolling towards the top */
       this.trigger('approaching.top');
-    } else if(deltaBottom > 0 && nearBottom) {
+    } else if (deltaBottom > 0 && nearBottom) {
       /* We're scrolling towards the bottom */
       this.trigger('approaching.bottom');
     }
@@ -73,10 +75,10 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
     var isAtTop = scrollTop <= 0;
     var isAtBottom = scrollBottom <= 0;
 
-    if(deltaTop > 0 && isAtTop) {
+    if (deltaTop > 0 && isAtTop) {
       /* We're scrolling towards the top */
       this.trigger('approaching.top');
-    } else if(deltaBottom > 0 && isAtBottom) {
+    } else if (deltaBottom > 0 && isAtBottom) {
       /* We're scrolling towards the bottom */
       this.trigger('approaching.bottom');
     }
@@ -97,40 +99,39 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
     this._prevScrollBottomRate = scrollBottom;
     this._prevScrollTimeRate = now;
 
-    if(!prevScrollTime) return;
+    if (!prevScrollTime) return;
 
     var deltaTop = prevScrollTop - scrollTop;
     var deltaBottom = prevScrollBottom - scrollBottom;
     var timeDelta = now - prevScrollTime;
     var speed, timeToLimit;
 
-    if(deltaTop > 0) {
-      if(scrollTop > target.clientHeight) return;
+    if (deltaTop > 0) {
+      if (scrollTop > target.clientHeight) return;
 
       speed = deltaTop / timeDelta;
       timeToLimit = scrollTop / speed;
-      if(timeToLimit < 600) {
+      if (timeToLimit < 600) {
         this.trigger('approaching.top');
       }
       return;
     }
 
-    if(deltaBottom > 0) {
-      if(scrollBottom > target.clientHeight) return;
+    if (deltaBottom > 0) {
+      if (scrollBottom > target.clientHeight) return;
 
       speed = deltaBottom / timeDelta;
       timeToLimit = scrollBottom / speed;
 
-      if(timeToLimit < 600) {
+      if (timeToLimit < 600) {
         this.trigger('approaching.bottom');
       }
     }
-
   },
 
   scrollToOrigin: function() {
     var target = this._target;
-    if(this._reverse) {
+    if (this._reverse) {
       var scrollTop = target.scrollHeight - target.clientHeight;
       target.scrollTop = scrollTop;
     } else {
@@ -157,7 +158,7 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
   enable: function() {
     var self = this;
 
-    if(!this._enabled) {
+    if (!this._enabled) {
       debug('enabling scroll listener');
       passiveEventListener.addEventListener(this._target, 'scroll', this._scrollHandler);
 
@@ -165,9 +166,9 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
 
       // If we have a content wrapper and it's smaller than the
       // client area, we need to load more content immediately
-      if(this._contentWrapper) {
+      if (this._contentWrapper) {
         setTimeout(function() {
-          if(self._contentWrapper.offsetHeight < self._target.clientHeight) {
+          if (self._contentWrapper.offsetHeight < self._target.clientHeight) {
             self.trigger('approaching.top');
           }
         }, 10);
@@ -176,14 +177,12 @@ _.extend(NeverEndingStory.prototype, Backbone.Events, {
   },
 
   disable: function() {
-    if(this._enabled) {
+    if (this._enabled) {
       debug('disabling scroll listener');
       passiveEventListener.removeEventListener(this._target, 'scroll', this._scrollHandler);
       this._enabled = false;
     }
-
   }
 });
-
 
 module.exports = NeverEndingStory;

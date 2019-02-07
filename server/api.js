@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* Listen for SIGUSR1 signals to start/stop profiling */
 // require('./utils/profiler');
@@ -38,9 +38,9 @@ if (!process.env.DISABLE_API_LISTEN) {
   onMongoConnect(function() {
     serverStats('api', server);
 
-    var port = nconf.get("PORT");
-    server.listen(port, undefined, nconf.get("web:backlog"), function() {
-      winston.info("Listening on " + port);
+    var port = nconf.get('PORT');
+    server.listen(port, undefined, nconf.get('web:backlog'), function() {
+      winston.info('Listening on ' + port);
     });
   });
 }

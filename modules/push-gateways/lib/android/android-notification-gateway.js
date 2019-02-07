@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -20,15 +20,14 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
 
   return Promise.fromCallback(function(callback) {
     sender.send(message, [device.androidToken], MAX_RETRIES, callback);
-  })
-  .then(function(body) {
+  }).then(function(body) {
     if (body.canonical_ids) {
       // this registration id/token is an old duplicate which has been superceded by a canonical id,
       // and we've probably just sent two identical messages to the same phone.
       throw new InvalidRegistrationError('Duplicate identifier');
     }
 
-    if (body.failure && body.results[0] && body.results[0].error === "NotRegistered") {
+    if (body.failure && body.results[0] && body.results[0].error === 'NotRegistered') {
       // app has been uninstalled / token revoked
       throw new InvalidRegistrationError('Not registered');
     }

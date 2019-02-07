@@ -50,8 +50,12 @@ var Resource = require('./resource');
 var CONFIG_DEFAULTS = {
   baseUrl: 'https://api.gitter.im/',
   accessToken: '',
-  getUserId: function() { return ''; },
-  getTroupeId: function() { return ''; }
+  getUserId: function() {
+    return '';
+  },
+  getTroupeId: function() {
+    return '';
+  }
 };
 
 function ApiClient(config) {
@@ -59,7 +63,7 @@ function ApiClient(config) {
 
   var apiBasePath = config.baseUrl;
 
-  var base = this.base = new Resource(this, config, apiBasePath, '');
+  var base = (this.base = new Resource(this, config, apiBasePath, ''));
 
   // Splice public methods from base onto the client
   // to maintain backwards compatibility
@@ -68,7 +72,7 @@ function ApiClient(config) {
     var v = base[key];
     if (typeof v !== 'function') return;
     this[key] = v.bind(base);
-  }, this)
+  }, this);
 
   /* /v1/user/:currentUserId/ */
   this.user = new Resource(this, config, apiBasePath, this._getUserUrl);
@@ -107,8 +111,7 @@ _.extend(ApiClient.prototype, Backbone.Events, {
     }
 
     return accessToken;
-  }),
-
+  })
 });
 
 module.exports = ApiClient;

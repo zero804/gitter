@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var assert = require('assert');
@@ -22,7 +22,6 @@ require('../lib/room-service');
 require('../lib/room-service');
 
 describe('room-service', function() {
-
   fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_USER_SCOPE_TOKEN');
 
   var fixture = fixtureLoader.setup({
@@ -30,13 +29,13 @@ describe('room-service', function() {
       Troupe: [{ lcUri: 'gittertest' }]
     },
     user1: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
     },
     user2: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
     },
     user3: {
-      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
+      githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN
     },
     troupeOrg1: {
       githubType: 'ORG',
@@ -52,12 +51,11 @@ describe('room-service', function() {
       users: ['user1', 'user2']
     },
     group1: {},
-    userToRemove: {},
+    userToRemove: {}
   });
 
   describe('classic functionality #slow', function() {
-    it('should fail to create a room for an org where the user is not an admin', function () {
-
+    it('should fail to create a room for an org where the user is not an admin', function() {
       var roomService = proxyquireNoCallThru('../lib/room-service', {
         'gitter-web-permissions/lib/policy-factory': {
           getPreCreationPolicyEvaluator: function() {
@@ -70,8 +68,9 @@ describe('room-service', function() {
         }
       });
 
-      return roomService.createRoomByUri(fixture.user1, 'gitterTest')
-        .then(function () {
+      return roomService
+        .createRoomByUri(fixture.user1, 'gitterTest')
+        .then(function() {
           assert(false, 'Expected an exception');
         })
         .catch(StatusError, function(err) {
@@ -79,7 +78,7 @@ describe('room-service', function() {
         });
     });
 
-    it('should disallow users from accessing rooms they cannot read #slow', function () {
+    it('should disallow users from accessing rooms they cannot read #slow', function() {
       var uriResolver = mockito.mockFunction();
       var roomService = proxyquireNoCallThru('../lib/room-service', {
         './uri-resolver': uriResolver,
@@ -96,7 +95,7 @@ describe('room-service', function() {
 
       mockito
         .when(uriResolver)()
-        .then(function () {
+        .then(function() {
           return Promise.resolve({
             room: {
               _id: '5436981c00062eebf0fbc0d5',
@@ -108,7 +107,7 @@ describe('room-service', function() {
               status: 'ACTIVE',
               lcUri: 'gitterhq',
               tags: [],
-              topic: 'Gitter',
+              topic: 'Gitter'
             },
             roomMember: false
           });
@@ -117,14 +116,13 @@ describe('room-service', function() {
       // test
       return roomService
         .createRoomByUri(fixture.user1, 'gitterTest')
-        .then(function () {
+        .then(function() {
           assert(false, 'Expected an exception');
         })
         .catch(StatusError, function(err) {
           assert.strictEqual(err.status, 403);
         });
     });
-
 
     it('should find or create a room for an organization', function() {
       var groupId = new ObjectID();
@@ -164,15 +162,16 @@ describe('room-service', function() {
         }
       });
 
-      mockito.when(uriResolver)()
-        .then(function () {
+      mockito
+        .when(uriResolver)()
+        .then(function() {
           return Promise.resolve(null);
         });
 
       return roomService
         .createRoomByUri(fixture.user1, 'gitterTest')
         .bind({})
-        .then(function (uriContext) {
+        .then(function(uriContext) {
           this.uriContext = uriContext;
           assert(uriContext.didCreate);
           assert.equal(uriContext.troupe.uri, 'gitterTest');
@@ -183,15 +182,15 @@ describe('room-service', function() {
         .then(function(securityDescriptor) {
           securityDescriptorValidator(securityDescriptor);
           assert.deepEqual(securityDescriptor, {
-            admins: "GH_ORG_MEMBER",
+            admins: 'GH_ORG_MEMBER',
             externalId: this.uriContext.troupe.githubId,
-            linkPath: "gitterTest",
-            members: "GH_ORG_MEMBER",
+            linkPath: 'gitterTest',
+            members: 'GH_ORG_MEMBER',
             public: false,
-            type: "GH_ORG"
+            type: 'GH_ORG'
           });
         })
-        .finally(function () {
+        .finally(function() {
           return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         });
     });
@@ -200,7 +199,8 @@ describe('room-service', function() {
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
       var roomService = require('../lib/room-service');
 
-      return roomService.createRoomByUri(fixture.user1, fixture.user2.username)
+      return roomService
+        .createRoomByUri(fixture.user1, fixture.user2.username)
         .bind({})
         .then(function(uriContext) {
           this.uriContext = uriContext;
@@ -214,7 +214,7 @@ describe('room-service', function() {
             // extraAdmins: [],
             // extraMembers: [],
             public: false,
-            type: "ONE_TO_ONE"
+            type: 'ONE_TO_ONE'
           });
         });
     });
@@ -228,8 +228,8 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                obtainAccessFromGitHubRepo: "gitterHQ/cloaked-avenger",
-                uri: "gitterHQ"
+                obtainAccessFromGitHubRepo: 'gitterHQ/cloaked-avenger',
+                uri: 'gitterHQ'
               });
               return Promise.resolve({ _id: groupId });
             }
@@ -268,15 +268,18 @@ describe('room-service', function() {
           securityDescriptorValidator(securityDescriptor);
 
           assert.deepEqual(securityDescriptor, {
-            admins: "GH_REPO_PUSH",
+            admins: 'GH_REPO_PUSH',
             externalId: this.uriContext.troupe.githubId,
             linkPath: 'gitterHQ/cloaked-avenger',
-            members: "PUBLIC",
+            members: 'PUBLIC',
             public: true,
-            type: "GH_REPO"
+            type: 'GH_REPO'
           });
 
-          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+          return roomMembershipService.checkRoomMembership(
+            this.uriContext.troupe._id,
+            fixture.user1._id
+          );
         })
         .then(function(isRoomMember) {
           assert.strictEqual(isRoomMember, true);
@@ -291,8 +294,8 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                obtainAccessFromGitHubRepo: "gitterHQ/cloaked-avenger",
-                uri: "gitterHQ"
+                obtainAccessFromGitHubRepo: 'gitterHQ/cloaked-avenger',
+                uri: 'gitterHQ'
               });
               return Promise.resolve({ _id: groupId });
             }
@@ -328,17 +331,26 @@ describe('room-service', function() {
         .bind({})
         .then(function(uriContext) {
           this.uriContext = uriContext;
-          return roomMembershipService.removeRoomMember(this.uriContext.troupe._id, fixture.user1._id);
+          return roomMembershipService.removeRoomMember(
+            this.uriContext.troupe._id,
+            fixture.user1._id
+          );
         })
         .then(function() {
-          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+          return roomMembershipService.checkRoomMembership(
+            this.uriContext.troupe._id,
+            fixture.user1._id
+          );
         })
         .then(function(isRoomMember) {
           assert.strictEqual(isRoomMember, false);
           return roomService.createRoomByUri(fixture.user1, 'gitterHQ/cloaked-avenger');
         })
         .then(function() {
-          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+          return roomMembershipService.checkRoomMembership(
+            this.uriContext.troupe._id,
+            fixture.user1._id
+          );
         })
         .then(function(isRoomMember) {
           assert.strictEqual(isRoomMember, false);
@@ -356,7 +368,7 @@ describe('room-service', function() {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
                 uri: 'gitterHQ',
-                obtainAccessFromGitHubRepo: "gitterHQ/sandbox"
+                obtainAccessFromGitHubRepo: 'gitterHQ/sandbox'
               });
               return Promise.resolve({ _id: groupId });
             }
@@ -385,7 +397,9 @@ describe('room-service', function() {
         .exec()
         .bind({})
         .then(function() {
-          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox', { ignoreCase: true });
+          return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox', {
+            ignoreCase: true
+          });
         })
         .then(function(uriContext) {
           this.uriContext = uriContext;
@@ -399,15 +413,18 @@ describe('room-service', function() {
           securityDescriptorValidator(securityDescriptor);
 
           assert.deepEqual(securityDescriptor, {
-            admins: "GH_REPO_PUSH",
+            admins: 'GH_REPO_PUSH',
             externalId: this.uriContext.troupe.githubId,
             linkPath: 'gitterHQ/sandbox',
-            members: "PUBLIC",
+            members: 'PUBLIC',
             public: true,
-            type: "GH_REPO"
+            type: 'GH_REPO'
           });
 
-          return roomMembershipService.checkRoomMembership(this.uriContext.troupe._id, fixture.user1._id);
+          return roomMembershipService.checkRoomMembership(
+            this.uriContext.troupe._id,
+            fixture.user1._id
+          );
         })
         .then(function(isRoomMember) {
           assert.strictEqual(isRoomMember, true);
@@ -417,7 +434,8 @@ describe('room-service', function() {
     it('should detect when a user hits their own userhome', function() {
       var roomService = require('../lib/room-service');
 
-      return roomService.createRoomByUri(fixture.user1, fixture.user1.username)
+      return roomService
+        .createRoomByUri(fixture.user1, fixture.user1.username)
         .then(function() {
           assert.ok(false, 'Expected an exception');
         })
@@ -434,20 +452,23 @@ describe('room-service', function() {
         .then(function() {
           return roomService.createRoomByUri(fixture.user1, 'gitterhq/sandbox');
         })
-        .then(function() {
-          assert(false, 'Expected redirect');
-        }, function(err) {
-          assert.strictEqual(err.status, 301);
-          assert.strictEqual(err.path, '/gitterHQ/sandbox');
-        });
-
+        .then(
+          function() {
+            assert(false, 'Expected redirect');
+          },
+          function(err) {
+            assert.strictEqual(err.status, 301);
+            assert.strictEqual(err.path, '/gitterHQ/sandbox');
+          }
+        );
     });
 
     it('should handle a user trying to create a room they dont have access to', function() {
       var roomService = require('../lib/room-service');
 
-      return roomService.createRoomByUri(fixture.user1, 'joyent')
-        .then(function () {
+      return roomService
+        .createRoomByUri(fixture.user1, 'joyent')
+        .then(function() {
           assert(false, 'Expected exception');
         })
         .catch(StatusError, function(err) {
@@ -471,7 +492,8 @@ describe('room-service', function() {
         }
       });
 
-      return roomService.createRoomByUri(fixture.user3, fixture.troupeOrg1.uri)
+      return roomService
+        .createRoomByUri(fixture.user3, fixture.troupeOrg1.uri)
         .then(function() {
           assert(false, 'Expected exception');
         })
@@ -487,9 +509,9 @@ describe('room-service', function() {
         'gitter-web-permissions/lib/add-invite-policy-factory': {
           createPolicyForRoomAdd: function() {
             return Promise.resolve({
-                canJoin: function() {
-                  return Promise.resolve(stubs.canBeInvited);
-                }
+              canJoin: function() {
+                return Promise.resolve(stubs.canBeInvited);
+              }
             });
           }
         },
@@ -535,7 +557,7 @@ describe('room-service', function() {
         _id: _userToAddId,
         id: _userToAddId.toString(),
         username: 'test-user'
-      }
+      };
 
       return service.addUserToRoom(troupe, user, userToAdd);
     });
@@ -570,7 +592,7 @@ describe('room-service', function() {
         _id: _userToAddId,
         id: _userToAddId.toString(),
         username: 'test-user'
-      }
+      };
 
       return service.addUserToRoom(troupe, user, userToAdd);
     });
@@ -604,9 +626,10 @@ describe('room-service', function() {
         _id: _userToAddId,
         id: _userToAddId.toString(),
         username: 'test-user'
-      }
+      };
 
-      return service.addUserToRoom(troupe, user, userToAdd)
+      return service
+        .addUserToRoom(troupe, user, userToAdd)
         .then(function(user) {
           assert.equal(user.id, _userToAddId);
           assert.equal(user.username, 'test-user');
@@ -650,7 +673,7 @@ describe('room-service', function() {
         _id: _userToAddId,
         id: _userToAddId.toString(),
         username: 'test-user'
-      }
+      };
 
       return service.addUserToRoom(troupe, user, userToAdd);
     });
@@ -677,12 +700,14 @@ describe('room-service', function() {
         username: 'test-user'
       };
 
-      return service.addUserToRoom(troupe, {}, userToAdd)
-        .then(function() {
+      return service.addUserToRoom(troupe, {}, userToAdd).then(
+        function() {
           assert.ok(false, 'Expected exception');
-        }, function(err) {
+        },
+        function(err) {
           assert.equal(err.status, 403);
-        });
+        }
+      );
     });
 
     it('should not fail when adding someone who is already in the room', function() {
@@ -721,7 +746,6 @@ describe('room-service', function() {
   });
 
   describe('removals', function() {
-
     var fixture = fixtureLoader.setup({
       troupeCanRemove: {
         security: 'PUBLIC',
@@ -738,12 +762,12 @@ describe('room-service', function() {
 
     var roomService = proxyquireNoCallThru('../lib/room-service', {
       'gitter-web-permissions/lib/policy-factory': {
-        createPolicyForRoom: function(user/*, room*/) {
+        createPolicyForRoom: function(user /*, room*/) {
           return Promise.resolve({
             canAdmin: function() {
-              if(user.id === fixture.userRemoveNonAdmin.id) {
+              if (user.id === fixture.userRemoveNonAdmin.id) {
                 return Promise.resolve(false);
-              } else if(user.id === fixture.userRemoveAdmin.id) {
+              } else if (user.id === fixture.userRemoveAdmin.id) {
                 return Promise.resolve(true);
               } else {
                 assert(false, 'Unknown user');
@@ -758,17 +782,25 @@ describe('room-service', function() {
     var roomMembershipService = require('../lib/room-membership-service');
 
     it('should prevent from removing users from one-to-one rooms', function() {
-      return roomMembershipService.checkRoomMembership(fixture.troupeCannotRemove._id, fixture.userToRemove._id)
+      return roomMembershipService
+        .checkRoomMembership(fixture.troupeCannotRemove._id, fixture.userToRemove._id)
         .then(function(here) {
           assert(here);
-          return roomService.removeUserFromRoom(fixture.troupeCannotRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+          return roomService.removeUserFromRoom(
+            fixture.troupeCannotRemove,
+            fixture.userToRemove,
+            fixture.userRemoveAdmin
+          );
         })
         .catch(function(err) {
           assert.equal(err.status, 400);
           assert.equal(err.message, 'This room does not support removing.');
         })
         .then(function() {
-          return roomMembershipService.checkRoomMembership(fixture.troupeCannotRemove._id, fixture.userToRemove._id)
+          return roomMembershipService.checkRoomMembership(
+            fixture.troupeCannotRemove._id,
+            fixture.userToRemove._id
+          );
         })
         .then(function(here) {
           assert(here);
@@ -776,19 +808,26 @@ describe('room-service', function() {
     });
 
     it('should remove users from rooms', function() {
-      return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
+      return roomMembershipService
+        .checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
         .then(function(here) {
           assert(here);
-          return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+          return roomService.removeUserFromRoom(
+            fixture.troupeCanRemove,
+            fixture.userToRemove,
+            fixture.userRemoveAdmin
+          );
         })
         .then(function() {
-          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
+          return roomMembershipService.checkRoomMembership(
+            fixture.troupeCanRemove._id,
+            fixture.userToRemove._id
+          );
         })
         .then(function(here) {
           assert(!here);
         });
     });
-
   });
 
   describe('remove and hide #slow', function() {
@@ -799,12 +838,17 @@ describe('room-service', function() {
     var appEvents = require('gitter-web-appevents');
 
     describe('room-service #slow', function() {
-
       var fixture = fixtureLoader.setup({
         troupeCanRemove: {
           security: 'PUBLIC',
           githubType: 'REPO',
-          users: ['userFavourite', 'userLeave', 'userToRemove', 'userRemoveNonAdmin', 'userRemoveAdmin']
+          users: [
+            'userFavourite',
+            'userLeave',
+            'userToRemove',
+            'userRemoveNonAdmin',
+            'userRemoveAdmin'
+          ]
         },
         troupeCannotRemove: {
           security: 'PRIVATE',
@@ -824,7 +868,6 @@ describe('room-service', function() {
       });
 
       describe('#removeFavourite', function() {
-
         var roomService = require('../lib/room-service');
 
         var getFavs = function() {
@@ -832,19 +875,23 @@ describe('room-service', function() {
         };
 
         var createFav = function() {
-          return recentRoomService.updateFavourite(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
-          .then(getFavs)
-          .then(function(favs) {
-            assert(favs[fixture.troupeCanRemove.id]); // Favourite is created
-          });
+          return recentRoomService
+            .updateFavourite(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+            .then(getFavs)
+            .then(function(favs) {
+              assert(favs[fixture.troupeCanRemove.id]); // Favourite is created
+            });
         };
 
         var checkHere = function() {
-          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userFavourite._id)
+          return roomMembershipService.checkRoomMembership(
+            fixture.troupeCanRemove._id,
+            fixture.userFavourite._id
+          );
         };
 
         beforeEach(function() {
-          if(this._skipFixtureSetup) return;
+          if (this._skipFixtureSetup) return;
 
           return createFav();
         });
@@ -863,7 +910,8 @@ describe('room-service', function() {
             }
           });
 
-          return roomService.hideRoomFromUser(fixture.troupeCanRemove, fixture.userFavourite.id)
+          return roomService
+            .hideRoomFromUser(fixture.troupeCanRemove, fixture.userFavourite.id)
             .then(checkEvent) // Ensure event was emitted
             .then(getFavs)
             .then(function(favs) {
@@ -877,8 +925,10 @@ describe('room-service', function() {
 
         it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
-          return roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
-            .then(function() { // Get updated troupe
+          return roomMembershipService
+            .setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
+            .then(function() {
+              // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
@@ -896,8 +946,10 @@ describe('room-service', function() {
 
         it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
-          return roomMembershipService.setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
-            .then(function() { // Get updated troupe
+          return roomMembershipService
+            .setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
+            .then(function() {
+              // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
@@ -917,10 +969,11 @@ describe('room-service', function() {
           var checkEvent = appEvents.addListener('dataChange2', {
             url: '/user/' + fixture.userFavourite.id + '/rooms',
             operation: 'remove',
-            model: {id: fixture.troupeEmpty.id}
+            model: { id: fixture.troupeEmpty.id }
           });
 
-          return roomMembershipService.checkRoomMembership(fixture.troupeEmpty._id, fixture.userFavourite._id)
+          return roomMembershipService
+            .checkRoomMembership(fixture.troupeEmpty._id, fixture.userFavourite._id)
             .then(function(here) {
               assert(!here); // Check that user is not in the room
             })
@@ -933,51 +986,60 @@ describe('room-service', function() {
               assert(!favs[fixture.troupeEmpty.id]); // Favourite is removed
             });
         });
-
       });
 
       describe('#removeUserFromRoom', function() {
-
         var roomService = require('../lib/room-service');
 
         it('should remove user from room', function() {
-          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userLeave._id)
+          return roomMembershipService
+            .checkRoomMembership(fixture.troupeCanRemove._id, fixture.userLeave._id)
             .then(function(here) {
               assert(here);
-              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userLeave, fixture.userLeave);
+              return roomService.removeUserFromRoom(
+                fixture.troupeCanRemove,
+                fixture.userLeave,
+                fixture.userLeave
+              );
             })
             .then(function() {
-              return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userLeave._id);
+              return roomMembershipService.checkRoomMembership(
+                fixture.troupeCanRemove._id,
+                fixture.userLeave._id
+              );
             })
             .then(function(here) {
               assert(!here);
             });
         });
-
       });
 
       describe('#removeUserFromRoom', function() {
-
         var roomService = require('../lib/room-service');
 
         it('should remove users from rooms', function() {
-          return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
+          return roomMembershipService
+            .checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id)
             .then(function(here) {
               assert(here);
-              return roomService.removeUserFromRoom(fixture.troupeCanRemove, fixture.userToRemove, fixture.userRemoveAdmin);
+              return roomService.removeUserFromRoom(
+                fixture.troupeCanRemove,
+                fixture.userToRemove,
+                fixture.userRemoveAdmin
+              );
             })
             .then(function() {
-              return roomMembershipService.checkRoomMembership(fixture.troupeCanRemove._id, fixture.userToRemove._id);
+              return roomMembershipService.checkRoomMembership(
+                fixture.troupeCanRemove._id,
+                fixture.userToRemove._id
+              );
             })
             .then(function(here) {
               assert(!here);
             });
         });
-
       });
-
     });
-
   });
 
   describe('createRoomForGitHubUri #slow', function() {
@@ -989,7 +1051,7 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                uri: "gitterTest",
+                uri: 'gitterTest',
                 useHomeUriSuffix: true
               });
               return Promise.resolve({ _id: groupId });
@@ -1012,11 +1074,11 @@ describe('room-service', function() {
 
       return roomService.testOnly
         .createRoomForGitHubUri(fixture.user1, 'gitterTest')
-        .then(function (result) {
+        .then(function(result) {
           assert.equal(result.troupe.uri, 'gitterTest');
           assert.equal(result.troupe.userCount, 0);
         })
-        .finally(function () {
+        .finally(function() {
           return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
         });
     });
@@ -1029,7 +1091,7 @@ describe('room-service', function() {
             ensureGroupForGitHubRoomCreation: function(pUser, options) {
               assert.strictEqual(pUser, fixture.user1);
               assert.deepEqual(options, {
-                uri: "gitterTest",
+                uri: 'gitterTest',
                 useHomeUriSuffix: true
               });
               return Promise.resolve({ _id: groupId });
@@ -1055,7 +1117,8 @@ describe('room-service', function() {
         roomService.testOnly.createRoomForGitHubUri(fixture.user1, 'gitterTest'),
         function(r1, r2) {
           assert(mongoUtils.objectIDsEqual(r1.troupe._id, r2.troupe._id));
-        });
+        }
+      );
     });
   });
 
@@ -1082,7 +1145,7 @@ describe('room-service', function() {
               return Promise.resolve({ _id: groupId });
             }
           }
-        },
+        }
       });
     });
 
@@ -1091,36 +1154,39 @@ describe('room-service', function() {
      * • User attempts to create a new room "a/b"
      * • Should return room 'x/y'
      */
-     describe('rename a room if a user attempts to create an repo room which has been renamed but does not have a room on Gitter', function() {
-       var originalUrl4 = 'moo4/cow-' + Date.now();
-       var renamedUrl4 = 'bob4/renamed-cow-' + Date.now();
+    describe('rename a room if a user attempts to create an repo room which has been renamed but does not have a room on Gitter', function() {
+      var originalUrl4 = 'moo4/cow-' + Date.now();
+      var renamedUrl4 = 'bob4/renamed-cow-' + Date.now();
 
-       it('should succeed', function() {
-         mockito.when(roomValidatorMock)().then(function() {
-           return Promise.resolve({
-             type: 'REPO',
-             uri: renamedUrl4,
-             description: 'renamed',
-             githubId: fixture.generateGithubId(),
-             security: 'PUBLIC'
-           });
-         });
+      it('should succeed', function() {
+        mockito
+          .when(roomValidatorMock)()
+          .then(function() {
+            return Promise.resolve({
+              type: 'REPO',
+              uri: renamedUrl4,
+              description: 'renamed',
+              githubId: fixture.generateGithubId(),
+              security: 'PUBLIC'
+            });
+          });
 
-         mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
-           return {
-             canAdmin: function() {
-               return Promise.resolve(true);
-             }
-           };
-         })
+        mockito
+          .when(getPreCreationPolicyEvaluatorMock)()
+          .then(function() {
+            return {
+              canAdmin: function() {
+                return Promise.resolve(true);
+              }
+            };
+          });
 
-         return roomService.createRoomByUri(fixture.user1, originalUrl4, {})
-           .then(function(result) {
-             assert.strictEqual(result.didCreate, true);
-             assert.strictEqual(result.troupe.uri, renamedUrl4);
-             assert.strictEqual(result.troupe.lcUri, renamedUrl4);
-           });
-       });
+        return roomService.createRoomByUri(fixture.user1, originalUrl4, {}).then(function(result) {
+          assert.strictEqual(result.didCreate, true);
+          assert.strictEqual(result.troupe.uri, renamedUrl4);
+          assert.strictEqual(result.troupe.lcUri, renamedUrl4);
+        });
+      });
     });
     /**
      * • A room "x/y" exists.
@@ -1144,34 +1210,36 @@ describe('room-service', function() {
       });
 
       it('should succeed', function() {
-        mockito.when(roomValidatorMock)().then(function() {
-          return Promise.resolve({
-            type: 'REPO',
-            uri: renamedUrl2,
-            description: 'renamed',
-            githubId: fixture.troupeRepo2.githubId,
-            security: 'PUBLIC'
+        mockito
+          .when(roomValidatorMock)()
+          .then(function() {
+            return Promise.resolve({
+              type: 'REPO',
+              uri: renamedUrl2,
+              description: 'renamed',
+              githubId: fixture.troupeRepo2.githubId,
+              security: 'PUBLIC'
+            });
           });
+
+        mockito
+          .when(getPreCreationPolicyEvaluatorMock)()
+          .then(function() {
+            return {
+              canAdmin: function() {
+                return true;
+              }
+            };
+          });
+
+        return roomService.createRoomByUri(fixture.user1, originalUrl2, {}).then(function(result) {
+          assert.strictEqual(result.didCreate, false);
+          assert.strictEqual(result.troupe.id, fixture.troupeRepo2.id);
+          assert.strictEqual(result.troupe.uri, renamedUrl2);
+          assert.strictEqual(result.troupe.lcUri, renamedUrl2);
         });
-
-        mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
-          return {
-            canAdmin: function() {
-              return true;
-            }
-          };
-        })
-
-        return roomService.createRoomByUri(fixture.user1, originalUrl2, {})
-          .then(function(result) {
-            assert.strictEqual(result.didCreate, false);
-            assert.strictEqual(result.troupe.id, fixture.troupeRepo2.id);
-            assert.strictEqual(result.troupe.uri, renamedUrl2);
-            assert.strictEqual(result.troupe.lcUri, renamedUrl2);
-          });
       });
     });
-
   });
 
   describe('createRoomForGitHubUri #slow', function() {
@@ -1212,34 +1280,38 @@ describe('room-service', function() {
           GitHubUriValidator: roomValidatorMock
         },
         'gitter-web-permissions/lib/policy-factory': {
-          getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluatorMock,
+          getPreCreationPolicyEvaluator: getPreCreationPolicyEvaluatorMock
         }
       });
     });
 
     it('should return an new room if one does not exist', function() {
-
-      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
-        return {
-          canAdmin: function() {
-            return Promise.resolve(true);
-          }
-        };
-      })
+      mockito
+        .when(getPreCreationPolicyEvaluatorMock)()
+        .then(function() {
+          return {
+            canAdmin: function() {
+              return Promise.resolve(true);
+            }
+          };
+        });
 
       var orgUri = fixture.generateUri('ORG');
       var githubId = fixture.generateGithubId();
-      mockito.when(roomValidatorMock)().then(function() {
-        return Promise.resolve({
-          type: 'ORG',
-          uri: orgUri,
-          githubId: githubId,
-          description: 'renamed',
-          security: 'PUBLIC'
+      mockito
+        .when(roomValidatorMock)()
+        .then(function() {
+          return Promise.resolve({
+            type: 'ORG',
+            uri: orgUri,
+            githubId: githubId,
+            description: 'renamed',
+            security: 'PUBLIC'
+          });
         });
-      });
 
-      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, orgUri)
+      return roomService.testOnly
+        .createRoomForGitHubUri(fixture.user1, orgUri)
         .then(function(result) {
           assert.strictEqual(result.troupe.uri, orgUri);
           assert.strictEqual(result.troupe.githubId, githubId);
@@ -1247,56 +1319,65 @@ describe('room-service', function() {
     });
 
     it('should return an existing room if it exists', function() {
-      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
-        return {
-          canAdmin: function() {
-            return Promise.resolve(true);
-          }
-        };
-      })
-
-      mockito.when(roomValidatorMock)().then(function() {
-        return Promise.resolve({
-          type: fixture.troupeOrg1.githubType,
-          uri: fixture.troupeOrg1.uri,
-          githubId: fixture.troupeOrg1.githubId,
-          description: 'renamed',
-          security: 'PUBLIC'
+      mockito
+        .when(getPreCreationPolicyEvaluatorMock)()
+        .then(function() {
+          return {
+            canAdmin: function() {
+              return Promise.resolve(true);
+            }
+          };
         });
-      });
 
-      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, fixture.troupeOrg1.uri)
+      mockito
+        .when(roomValidatorMock)()
+        .then(function() {
+          return Promise.resolve({
+            type: fixture.troupeOrg1.githubType,
+            uri: fixture.troupeOrg1.uri,
+            githubId: fixture.troupeOrg1.githubId,
+            description: 'renamed',
+            security: 'PUBLIC'
+          });
+        });
+
+      return roomService.testOnly
+        .createRoomForGitHubUri(fixture.user1, fixture.troupeOrg1.uri)
         .then(function(result) {
           assert.strictEqual(result.troupe.id, fixture.troupeOrg1.id);
         });
     });
 
     it('should deal with room renames where a room with the new URI has been created', function() {
-      mockito.when(getPreCreationPolicyEvaluatorMock)().then(function() {
-        return {
-          canAdmin: function() {
-            return Promise.resolve(true);
-          }
-        };
-      })
-
-      mockito.when(roomValidatorMock)().then(function() {
-        // The room has been renamed
-        return Promise.resolve({
-          type: 'REPO',
-          uri: fixture.troupeDup2.uri,
-          githubId: duplicateGithubId,
-          description: 'renamed',
-          security: 'PUBLIC'
+      mockito
+        .when(getPreCreationPolicyEvaluatorMock)()
+        .then(function() {
+          return {
+            canAdmin: function() {
+              return Promise.resolve(true);
+            }
+          };
         });
-      });
 
-      return roomService.testOnly.createRoomForGitHubUri(fixture.user1, fixture.troupeDup1.uri)
+      mockito
+        .when(roomValidatorMock)()
+        .then(function() {
+          // The room has been renamed
+          return Promise.resolve({
+            type: 'REPO',
+            uri: fixture.troupeDup2.uri,
+            githubId: duplicateGithubId,
+            description: 'renamed',
+            security: 'PUBLIC'
+          });
+        });
+
+      return roomService.testOnly
+        .createRoomForGitHubUri(fixture.user1, fixture.troupeDup1.uri)
         .then(function(result) {
           assert.strictEqual(result.troupe.id, fixture.troupeDup2.id);
         });
     });
-
   });
 
   describe('findAllRoomsIdsForUserIncludingMentions', function() {
@@ -1318,17 +1399,22 @@ describe('room-service', function() {
     function runWithValues(roomIdsForUser, roomIdsMentioningUser, expected, expectedNonMembers) {
       var userId = 'user1';
 
-      mockito.when(getRoomIdsMentioningUserMock)().then(function(pUserId) {
-        assert.strictEqual(pUserId, userId);
-        return Promise.resolve(roomIdsMentioningUser);
-      });
+      mockito
+        .when(getRoomIdsMentioningUserMock)()
+        .then(function(pUserId) {
+          assert.strictEqual(pUserId, userId);
+          return Promise.resolve(roomIdsMentioningUser);
+        });
 
-      mockito.when(findRoomIdsForUserMock)().then(function(pUserId) {
-        assert.strictEqual(pUserId, userId);
-        return Promise.resolve(roomIdsForUser);
-      });
+      mockito
+        .when(findRoomIdsForUserMock)()
+        .then(function(pUserId) {
+          assert.strictEqual(pUserId, userId);
+          return Promise.resolve(roomIdsForUser);
+        });
 
-      return roomService.findAllRoomsIdsForUserIncludingMentions(userId)
+      return roomService
+        .findAllRoomsIdsForUserIncludingMentions(userId)
         .spread(function(allTroupeIds, nonMemberTroupeIds) {
           allTroupeIds.sort();
           nonMemberTroupeIds.sort();
@@ -1356,10 +1442,8 @@ describe('room-service', function() {
     });
 
     it('should handle the mixed cases', function() {
-      return runWithValues(['1','2','3'], ['2','3','4'], ['1','2','3', '4'], ['4']);
+      return runWithValues(['1', '2', '3'], ['2', '3', '4'], ['1', '2', '3', '4'], ['4']);
     });
-
-
   });
 
   describe('joinRoom', function() {
@@ -1390,25 +1474,31 @@ describe('room-service', function() {
         recentRoomServiceSaveLastVisitedTroupeforUserId = mockito.mockFunction();
         roomMembershipServiceAddRoomMember = mockito.mockFunction();
 
-        mockito.when(assertJoinRoomChecks)().then(function(pRoom, pUser) {
-          assert.strictEqual(pUser, user);
-          assert.strictEqual(pRoom, troupe);
-          if (joinRoomCheckFailed) return Promise.reject(new StatusError());
-          return Promise.resolve();
-        });
+        mockito
+          .when(assertJoinRoomChecks)()
+          .then(function(pRoom, pUser) {
+            assert.strictEqual(pUser, user);
+            assert.strictEqual(pRoom, troupe);
+            if (joinRoomCheckFailed) return Promise.reject(new StatusError());
+            return Promise.resolve();
+          });
 
-        mockito.when(recentRoomServiceSaveLastVisitedTroupeforUserId)().then(function(pUserId, pRoomId, pOptions) {
-          assert.strictEqual(pUserId, userId);
-          assert.strictEqual(pRoomId, troupeId);
-          assert.deepEqual(pOptions, { skipFayeUpdate: true });
-          return Promise.resolve();
-        });
+        mockito
+          .when(recentRoomServiceSaveLastVisitedTroupeforUserId)()
+          .then(function(pUserId, pRoomId, pOptions) {
+            assert.strictEqual(pUserId, userId);
+            assert.strictEqual(pRoomId, troupeId);
+            assert.deepEqual(pOptions, { skipFayeUpdate: true });
+            return Promise.resolve();
+          });
 
-        mockito.when(roomMembershipServiceAddRoomMember)().then(function(pRoomId, pUserId) {
-          assert.strictEqual(pUserId, userId);
-          assert.strictEqual(pRoomId, troupeId);
-          return Promise.resolve();
-        });
+        mockito
+          .when(roomMembershipServiceAddRoomMember)()
+          .then(function(pRoomId, pUserId) {
+            assert.strictEqual(pUserId, userId);
+            assert.strictEqual(pRoomId, troupeId);
+            return Promise.resolve();
+          });
 
         roomService = proxyquireNoCallThru('../lib/room-service', {
           './room-membership-service': {
@@ -1424,18 +1514,18 @@ describe('room-service', function() {
       it('should allow a user to join a room', function() {
         joinRoomCheckFailed = false;
 
-        return roomService.joinRoom(troupe, user)
-          .then(function() {
-            mockito.verify(assertJoinRoomChecks, once)();
-            mockito.verify(recentRoomServiceSaveLastVisitedTroupeforUserId, once)();
-            mockito.verify(roomMembershipServiceAddRoomMember, once)();
-          });
+        return roomService.joinRoom(troupe, user).then(function() {
+          mockito.verify(assertJoinRoomChecks, once)();
+          mockito.verify(recentRoomServiceSaveLastVisitedTroupeforUserId, once)();
+          mockito.verify(roomMembershipServiceAddRoomMember, once)();
+        });
       });
 
       it('should deny a user join room there are too many people in the room', function() {
         joinRoomCheckFailed = true;
 
-        return roomService.joinRoom(troupe, user)
+        return roomService
+          .joinRoom(troupe, user)
           .then(function() {
             assert.ok(false, 'Expected an exception');
           })
@@ -1466,15 +1556,17 @@ describe('room-service', function() {
         roomMembershipService = require('../lib/room-membership-service');
         createPolicyForRoom = mockito.mockFunction();
 
-        mockito.when(createPolicyForRoom)().then(function(pUser, pRoom) {
-          assert.strictEqual(pUser, fixture.user1);
-          assert.strictEqual(pRoom.id, fixture.troupeOrg1.id);
-          return Promise.resolve({
-            canJoin: function() {
-              return Promise.resolve(access);
-            }
+        mockito
+          .when(createPolicyForRoom)()
+          .then(function(pUser, pRoom) {
+            assert.strictEqual(pUser, fixture.user1);
+            assert.strictEqual(pRoom.id, fixture.troupeOrg1.id);
+            return Promise.resolve({
+              canJoin: function() {
+                return Promise.resolve(access);
+              }
+            });
           });
-        });
 
         roomService = proxyquireNoCallThru('../lib/room-service', {
           'gitter-web-permissions/lib/policy-factory': {
@@ -1483,74 +1575,77 @@ describe('room-service', function() {
         });
       });
 
-
       it('should add a member to the room', function() {
         access = true;
 
-        return roomService.joinRoom(fixture.troupeOrg1, fixture.user1)
+        return roomService
+          .joinRoom(fixture.troupeOrg1, fixture.user1)
           .then(function() {
-            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+            return roomMembershipService.checkRoomMembership(
+              fixture.troupeOrg1.id,
+              fixture.user1.id
+            );
           })
           .then(function(isMember) {
-            assert.strictEqual(isMember,true);
+            assert.strictEqual(isMember, true);
           });
       });
 
       it('should be idempotent', function() {
         access = true;
 
-        return roomService.joinRoom(fixture.troupeOrg1, fixture.user1)
+        return roomService
+          .joinRoom(fixture.troupeOrg1, fixture.user1)
           .then(function() {
-            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+            return roomMembershipService.checkRoomMembership(
+              fixture.troupeOrg1.id,
+              fixture.user1.id
+            );
           })
           .then(function(isMember) {
-            assert.strictEqual(isMember,true);
+            assert.strictEqual(isMember, true);
             return roomService.joinRoom(fixture.troupeOrg1, fixture.user1);
           })
           .then(function() {
-            return roomMembershipService.checkRoomMembership(fixture.troupeOrg1.id, fixture.user1.id);
+            return roomMembershipService.checkRoomMembership(
+              fixture.troupeOrg1.id,
+              fixture.user1.id
+            );
           })
           .then(function(isMember) {
-            assert.strictEqual(isMember,true);
+            assert.strictEqual(isMember, true);
           });
       });
-
     });
-
   });
 
   describe('updateTopic #slow', function() {
     var roomService = require('../lib/room-service');
 
-
     var fixture = fixtureLoader.setup({
-      troupe1: { },
+      troupe1: {}
     });
 
     it('should update the topic', function() {
-      return roomService.updateTopic(fixture.troupe1.id, 'THE TOPIC')
+      return roomService
+        .updateTopic(fixture.troupe1.id, 'THE TOPIC')
         .then(function() {
-          return persistence.Troupe.findById(fixture.troupe1.id)
-            .exec();
+          return persistence.Troupe.findById(fixture.troupe1.id).exec();
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.topic, 'THE TOPIC');
         });
     });
 
-
     it('null should update the topic', function() {
-      return roomService.updateTopic(fixture.troupe1.id, null)
+      return roomService
+        .updateTopic(fixture.troupe1.id, null)
         .then(function() {
-          return persistence.Troupe.findById(fixture.troupe1.id)
-            .exec();
+          return persistence.Troupe.findById(fixture.troupe1.id).exec();
         })
         .then(function(troupe) {
           assert.strictEqual(troupe.topic, '');
         });
     });
-
-
-  })
-
+  });
 });

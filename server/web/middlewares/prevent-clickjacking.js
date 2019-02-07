@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // Don't allow others to iframe embed which can lead to clickjacking
 function preventClickjackingMiddleware(req, res, next) {

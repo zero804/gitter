@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var userService = require('gitter-web-users');
@@ -14,19 +14,18 @@ var opts = require('yargs')
     description: 'Email of the user to find'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-userService.findAllByEmail(opts.email)
+userService
+  .findAllByEmail(opts.email)
   .delay(5000)
   .then(function(users) {
     if (users.length > 0) {
       console.log('Found ' + users.length + ' users');
       users.forEach(function(user, index) {
         console.log('[' + index + '] ' + user.username);
-      })
-    }
-    else {
+      });
+    } else {
       console.log('No user found!');
     }
 

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var _ = require('underscore');
@@ -21,8 +21,8 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   events: {
-    'click .close':                     'hide',
-    'click [data-action=close]':        'hide',
+    'click .close': 'hide',
+    'click [data-action=close]': 'hide'
   },
 
   regions: {
@@ -42,10 +42,9 @@ var ModalView = Marionette.LayoutView.extend({
 
     this.view = this.options.view || this.view;
 
-    if(this.options.menuItems && this.options.menuItems.models) {
+    if (this.options.menuItems && this.options.menuItems.models) {
       this.menuItemCollection = this.options.menuItems;
-    }
-    else {
+    } else {
       var menuItems = this.menuItems || this.options.menuItems || [];
       if (typeof menuItems === 'function') {
         menuItems = menuItems.call(this);
@@ -80,29 +79,29 @@ var ModalView = Marionette.LayoutView.extend({
     this.modalBody.show(this.view);
     this.modalFooter.show(this.footerView);
 
-    if(!isCompact() && !this.disableAutoFocus) {
+    if (!isCompact() && !this.disableAutoFocus) {
       window.setTimeout(function() {
         try {
-          var v = self.$el.find('input[type=text], input[type=url], input[type=tel], input[type=number], input[type=color], input[type=email]')[0];
-          if(v) {
+          var v = self.$el.find(
+            'input[type=text], input[type=url], input[type=tel], input[type=number], input[type=color], input[type=email]'
+          )[0];
+          if (v) {
             v.focus();
             v.select();
           }
-        } catch(e) {
+        } catch (e) {
           /* */
         }
       }, 100);
-
-    }
-    else if(!isCompact()) {
+    } else if (!isCompact()) {
       // Focus the modal overall so you can start navigating to the controls
       this.el.focus();
     }
   },
 
-  setButtonState: function(name,state) {
+  setButtonState: function(name, state) {
     var $s = this.$el.find('button[data-action=' + name + ']');
-    if(state) {
+    if (state) {
       $s.removeAttr('disabled');
     } else {
       $s.attr('disabled', true);
@@ -142,7 +141,7 @@ var ModalView = Marionette.LayoutView.extend({
   },
 
   prepare: function() {
-    if(!this.rendered) {
+    if (!this.rendered) {
       this.render();
       this.rendered = true;
     }
@@ -163,9 +162,8 @@ var ModalView = Marionette.LayoutView.extend({
     this.trigger('show');
 
     this.escape();
-    this.backdrop(function () {
-
-      if(!that.$el.parent().length) {
+    this.backdrop(function() {
+      if (!that.$el.parent().length) {
         that.$el.appendTo(that.$backdrop); //don't move modals dom position
       }
 
@@ -176,9 +174,9 @@ var ModalView = Marionette.LayoutView.extend({
     });
   },
 
-  hide: function (e) {
-    if(e) e.preventDefault();
-    if(this.navigable) {
+  hide: function(e) {
+    if (e) e.preventDefault();
+    if (this.navigable) {
       window.location = '#';
       return;
     }
@@ -199,19 +197,15 @@ var ModalView = Marionette.LayoutView.extend({
 
     this.escape();
 
-    this.$el
-      .trigger('hide')
-      .removeClass('in');
+    this.$el.trigger('hide').removeClass('in');
 
     this.trigger('hide');
 
     this.hideModal();
   },
 
-  hideModal: function () {
-    this.$el
-      .hide()
-      .trigger('hidden');
+  hideModal: function() {
+    this.$el.hide().trigger('hidden');
 
     this.trigger('hidden');
     this.backdrop();
@@ -221,24 +215,22 @@ var ModalView = Marionette.LayoutView.extend({
 
   backdrop: function(callback) {
     if (this.isShown && this.options.backdrop !== false) {
-      this.$backdrop = $('<div class="modal-backdrop" />')
-        .appendTo(document.body);
+      this.$backdrop = $('<div class="modal-backdrop" />').appendTo(document.body);
 
       var bd = this.$backdrop;
       this.$backdrop.click(function(e) {
-        if(e.target !== this) return;
+        if (e.target !== this) return;
         bd.modal.hide();
       });
       this.$backdrop.modal = this;
       this.$backdrop.addClass('in');
 
       callback();
-    } else if(!this.isShown && this.$backdrop) {
+    } else if (!this.isShown && this.$backdrop) {
       this.$backdrop.removeClass('in');
 
       this.removeBackdrop();
-
-    } else if(callback) {
+    } else if (callback) {
       callback();
     }
   },
@@ -248,7 +240,7 @@ var ModalView = Marionette.LayoutView.extend({
     this.$backdrop = null;
   },
 
-  escape: function () {
+  escape: function() {
     var that = this;
     if (this.isShown) {
       $(document).on('keydown', keydown);
@@ -257,9 +249,8 @@ var ModalView = Marionette.LayoutView.extend({
     }
 
     function keydown(e) {
-      if(e.which === 27) that.hide();
+      if (e.which === 27) that.hide();
     }
-
   }
 });
 

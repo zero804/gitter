@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-var stream = require("stream");
-var util = require("util");
+var stream = require('stream');
+var util = require('util');
 
 exports.readStreamIntoString = function(input, callback) {
   // note, piping the input instead of just listening to events is a much safer implementation,
@@ -19,17 +19,16 @@ exports.StringStream = function() {
   stream.Stream.call(this);
   this.writable = true;
 
-  var str = "";
+  var str = '';
 
   this.write = function(chunk) {
-    str += (chunk || "").toString("utf-8");
+    str += (chunk || '').toString('utf-8');
   };
 
   this.end = function(chunk) {
-    str += (chunk || "").toString("utf-8");
+    str += (chunk || '').toString('utf-8');
     this.emit('end', str);
   };
-
 };
 
 util.inherits(exports.StringStream, stream.Stream);

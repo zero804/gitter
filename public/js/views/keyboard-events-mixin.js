@@ -1,11 +1,9 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var appEvents = require('../utils/appevents');
 require('../components/keyboard-events');
 
 module.exports = (function() {
-
-
   // Bind `keyboardEvents` names to functions or method names, as you would with Backbones' `events`
   // See/change components/keyboard-events for events listeners
 
@@ -30,12 +28,10 @@ module.exports = (function() {
           _.each(keys, function(k) {
             _listen(k, method);
           });
-        }
-        else {
+        } else {
           _listen(key, method);
         }
       });
     }
   };
-
 })();

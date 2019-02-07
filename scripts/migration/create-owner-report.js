@@ -1,9 +1,7 @@
 #!/usr/bin/env node
-'use strict';
+'use strict' /* messy messy @lerouxb */;
 
-/* eslint-disable */ /* messy messy @lerouxb */
-
-var fs = require('fs');
+/* eslint-disable */ var fs = require('fs');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
@@ -13,57 +11,58 @@ var installMigrationSchemas = require('./migration-schemas').install;
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 var userService = require('gitter-web-users');
 var through2Concurrent = require('through2-concurrent');
-var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs')
+var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var migrationSchemas;
 
-
 function getBatchedRooms() {
-    return persistence.Troupe.aggregate([
-      {
-        $match: {
-          githubType: { $nin: ['ONETOONE'] },
-          oneToOne: { $ne: true },
-          lcOwner: { $exists: true, $ne: null },
-          // NOTE: this skips existing org-owned room renames for now, but it
-          // speeds things up a lot when testing remotely
-          //groupId: { $exists: false }
-        }
-      },
-      {
-        $project: {
-          _id: 1,
-          lcOwner: 1,
-          uri: 1,
-          githubType: 1,
-          parentId: 1,
-          githubId: 1,
-          ownerUserId: 1,
-          userCount: 1,
-          security: 1
-        }
-      },
-      {
-        $group: {
-          _id: '$lcOwner',
-          rooms: { $push: '$$CURRENT' }
-        }
-      }, {
-        $lookup: {
-          from: "githubusers",
-          localField: "_id",
-          foreignField: "lcUri",
-          as: "githubuser"
-        }
-      }, {
-        $lookup: {
-          from: "githuborgs",
-          localField: "_id",
-          foreignField: "lcUri",
-          as: "githuborg"
-        }
+  return persistence.Troupe.aggregate([
+    {
+      $match: {
+        githubType: { $nin: ['ONETOONE'] },
+        oneToOne: { $ne: true },
+        lcOwner: { $exists: true, $ne: null }
+        // NOTE: this skips existing org-owned room renames for now, but it
+        // speeds things up a lot when testing remotely
+        //groupId: { $exists: false }
       }
-    ])
+    },
+    {
+      $project: {
+        _id: 1,
+        lcOwner: 1,
+        uri: 1,
+        githubType: 1,
+        parentId: 1,
+        githubId: 1,
+        ownerUserId: 1,
+        userCount: 1,
+        security: 1
+      }
+    },
+    {
+      $group: {
+        _id: '$lcOwner',
+        rooms: { $push: '$$CURRENT' }
+      }
+    },
+    {
+      $lookup: {
+        from: 'githubusers',
+        localField: '_id',
+        foreignField: 'lcUri',
+        as: 'githubuser'
+      }
+    },
+    {
+      $lookup: {
+        from: 'githuborgs',
+        localField: '_id',
+        foreignField: 'lcUri',
+        as: 'githuborg'
+      }
+    }
+  ])
     .read(mongoReadPrefs.secondaryPreferred)
     .cursor({ batchSize: 1000 })
     .exec()
@@ -90,7 +89,7 @@ function findBatchWarnings(opts) {
   });
 
   // gather info
-  var missingParentIdMap = {}
+  var missingParentIdMap = {};
   var ownerUserIdMap = {};
   batch.rooms.forEach(function(room) {
     if (room.parentId && !idMap[room.parentId]) {
@@ -114,7 +113,7 @@ function findBatchWarnings(opts) {
   var ownerUserIds = Object.keys(ownerUserIdMap);
   if (ownerUserIds.length > 1) {
     // this is very rare and we'll have to just fix it manually
-    warning = lcOwner + " has more than one ownerUserId.";
+    warning = lcOwner + ' has more than one ownerUserId.';
     console.log(warning);
     warnings.push(warning);
   }
@@ -127,7 +126,7 @@ function findBatchWarnings(opts) {
   });
   if ((githubTypeMap['ORG_CHANNEL'] || githubTypeMap['ORG']) && githubTypeMap['USER_CHANNEL']) {
     // this is very rare and we'll have to just fix it manually
-    warning = lcOwner + " has both org rooms or channels AND user channels.";
+    warning = lcOwner + ' has both org rooms or channels AND user channels.';
     console.log(warning);
     warnings.push(warning);
   }
@@ -135,8 +134,18 @@ function findBatchWarnings(opts) {
   if (user) {
     if (oldUser) {
       // warn if user id doesn't match all the ownerUserIds
-      if (!_.every(ownerUserIds, function(ownerId) { return ownerId == oldUser._id })) {
-        warning = lcOwner + " has ownerUserIds that don't match the owner user's id. ("+ownerUserIds+' != '+oldUser._id+')';
+      if (
+        !_.every(ownerUserIds, function(ownerId) {
+          return ownerId == oldUser._id;
+        })
+      ) {
+        warning =
+          lcOwner +
+          " has ownerUserIds that don't match the owner user's id. (" +
+          ownerUserIds +
+          ' != ' +
+          oldUser._id +
+          ')';
         console.log(warning);
         warnings.push(warning);
       }
@@ -144,7 +153,7 @@ function findBatchWarnings(opts) {
   } else {
     // warn if the batch has ownerUserIds, but the owner is not a user
     if (ownerUserIds.length) {
-      warning = lcOwner + " has ownerUserIds, but is not a user.";
+      warning = lcOwner + ' has ownerUserIds, but is not a user.';
       console.log(warning);
       warnings.push(warning);
     }
@@ -173,56 +182,51 @@ function findGithubUserById(githubId) {
   return migrationSchemas.GitHubUser.findOne({ githubId: githubId })
     .read(mongoReadPrefs.secondaryPreferred)
     .lean()
-    .exec()
+    .exec();
 }
 
 var findUsersByOwner = function(lcOwner) {
-  var regex = new RegExp(["^", lcOwner, "$"].join(""), "i");
-  return userService.findByUsername(regex)
-    .then(function(gitterUser) {
-      if (gitterUser) {
-        return findGithubUserById(gitterUser.githubId)
-          .then(function(githubUser) {
-            if (githubUser) {
-              return {
-                gitterUser: gitterUser,
-                githubUser: githubUser
-              };
-            } else {
-              return null;
-            }
-          });
-      } else {
-        return null;
-      }
-    });
-}
-
-var findUsersByGitterId = Promise.method(function(ownerUserId) {
-  if (ownerUserId) {
-    return userService.findById(ownerUserId)
-      .then(function(gitterUser) {
-        if (gitterUser) {
-          return findGithubUserById(gitterUser.githubId)
-            .then(function(githubUser) {
-              if (githubUser) {
-                return {
-                  gitterUser: gitterUser,
-                  githubUser: githubUser
-                };
-              } else {
-                return null;
-              }
-            });
+  var regex = new RegExp(['^', lcOwner, '$'].join(''), 'i');
+  return userService.findByUsername(regex).then(function(gitterUser) {
+    if (gitterUser) {
+      return findGithubUserById(gitterUser.githubId).then(function(githubUser) {
+        if (githubUser) {
+          return {
+            gitterUser: gitterUser,
+            githubUser: githubUser
+          };
         } else {
           return null;
         }
       });
+    } else {
+      return null;
+    }
+  });
+};
+
+var findUsersByGitterId = Promise.method(function(ownerUserId) {
+  if (ownerUserId) {
+    return userService.findById(ownerUserId).then(function(gitterUser) {
+      if (gitterUser) {
+        return findGithubUserById(gitterUser.githubId).then(function(githubUser) {
+          if (githubUser) {
+            return {
+              gitterUser: gitterUser,
+              githubUser: githubUser
+            };
+          } else {
+            return null;
+          }
+        });
+      } else {
+        return null;
+      }
+    });
   } else {
     return null;
   }
 });
-
 
 var numProcessed = 0;
 
@@ -230,9 +234,11 @@ var numProcessed = 0;
 var findBatchInfo = Promise.method(function(batch) {
   var lcOwner = batch._id;
 
-  var uniqueOwners = _.uniq(batch.rooms.map(function(room) {
-    return room.uri.split('/')[0];
-  }));
+  var uniqueOwners = _.uniq(
+    batch.rooms.map(function(room) {
+      return room.uri.split('/')[0];
+    })
+  );
 
   var githubTypeMap = {};
   batch.rooms.forEach(function(room) {
@@ -240,9 +246,11 @@ var findBatchInfo = Promise.method(function(batch) {
   });
   var githubTypes = Object.keys(githubTypeMap);
 
-  var uniqueUserIds = _.uniq(batch.rooms.map(function(room) {
-    return room.ownerUserId;
-  }));
+  var uniqueUserIds = _.uniq(
+    batch.rooms.map(function(room) {
+      return room.ownerUserId;
+    })
+  );
 
   var type = 'unknown';
   var reason = 'unknown';
@@ -251,22 +259,22 @@ var findBatchInfo = Promise.method(function(batch) {
   var lookups = {};
 
   return Promise.join(
-    function() {
+    (function() {
       // no need to look this up if we're using the matching gh org
       if (batch.githuborg.length) {
         return Promise.resolve(null);
       } else {
         return findUsersByOwner(lcOwner);
       }
-    }(),
-    function() {
+    })(),
+    (function() {
       // ditto
       if (batch.githuborg.length) {
         return Promise.resolve(null);
       } else {
         return findUsersByGitterId(uniqueUserIds[0]);
       }
-    }(),
+    })(),
     function(ownerUsers, roomUsers) {
       var org = batch.githuborg[0]; // could be undefined
       var user = batch.githubuser[0]; // could be undefined
@@ -279,9 +287,13 @@ var findBatchInfo = Promise.method(function(batch) {
         reason = 'github-org-lookup';
 
         // if they aren't all this org, update them
-        if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == org.uri; })) {
+        if (
+          !_.every(uniqueOwners, function(uniqueUri) {
+            return uniqueUri == org.uri;
+          })
+        ) {
           errors.push({
-            errorType: "owner",
+            errorType: 'owner',
             type: type,
             lcOwner: lcOwner,
             correctOwner: org.uri,
@@ -289,7 +301,6 @@ var findBatchInfo = Promise.method(function(batch) {
             org: org
           });
         }
-
       } else if (user) {
         githubUser = user;
 
@@ -298,7 +309,11 @@ var findBatchInfo = Promise.method(function(batch) {
         reason = 'github-username-lookup';
 
         // if they aren't all this user, update them
-        if (!_.every(uniqueOwners, function(uniqueUri) { return uniqueUri == user.uri; })) {
+        if (
+          !_.every(uniqueOwners, function(uniqueUri) {
+            return uniqueUri == user.uri;
+          })
+        ) {
           if (ownerUsers && ownerUsers.gitterUser) {
             // we already have a user with a username matching the lcOwner
             // (case insensitive), but it has clearly been renamed
@@ -307,7 +322,12 @@ var findBatchInfo = Promise.method(function(batch) {
             if (ownerUsers.gitterUser.githubId === user.githubId) {
               oldUser = ownerUsers.gitterUser;
             } else {
-              console.log("WARNING: owner user and github user doesn't match!", ownerUsers.gitterUser.githubId, '!=', user.githubId);
+              console.log(
+                "WARNING: owner user and github user doesn't match!",
+                ownerUsers.gitterUser.githubId,
+                '!=',
+                user.githubId
+              );
             }
           } else if (roomUsers && roomUsers.gitterUser) {
             // If at least one of the rooms already belonged to a user that
@@ -317,11 +337,16 @@ var findBatchInfo = Promise.method(function(batch) {
             if (roomUsers.gitterUser.githubId === user.githubId) {
               oldUser = roomUsers.gitterUser;
             } else {
-              console.log("WARNING: room user and github user doesn't match!", roomUsers.gitterUser.githubId, '!=', user.githubId);
+              console.log(
+                "WARNING: room user and github user doesn't match!",
+                roomUsers.gitterUser.githubId,
+                '!=',
+                user.githubId
+              );
             }
           }
           errors.push({
-            errorType: "owner",
+            errorType: 'owner',
             type: type,
             lcOwner: lcOwner,
             correctOwner: user.uri,
@@ -332,7 +357,6 @@ var findBatchInfo = Promise.method(function(batch) {
             user: githubUser
           });
         }
-
       } else if (ownerUsers) {
         // The lcOwner still matches a username (case-insensitive) on our
         // system and we could still find a github user with that user's
@@ -344,7 +368,7 @@ var findBatchInfo = Promise.method(function(batch) {
         githubUser = ownerUsers.githubUser;
         oldUser = ownerUsers.gitterUser;
         errors.push({
-          errorType: "owner",
+          errorType: 'owner',
           type: type,
           lcOwner: lcOwner,
           correctOwner: ownerUsers.githubUser.uri,
@@ -352,7 +376,6 @@ var findBatchInfo = Promise.method(function(batch) {
           oldUser: oldUser,
           user: githubUser
         });
-
       } else if (roomUsers) {
         // At least one room in this batch was a user channel and we managed to
         // still find that user and then a github user for the same github id.
@@ -368,7 +391,7 @@ var findBatchInfo = Promise.method(function(batch) {
         githubUser = roomUsers.githubUser;
         oldUser = roomUsers.gitterUser;
         errors.push({
-          errorType: "owner",
+          errorType: 'owner',
           type: type,
           lcOwner: lcOwner,
           correctOwner: roomUsers.githubUser.uri,
@@ -376,7 +399,6 @@ var findBatchInfo = Promise.method(function(batch) {
           oldUser: oldUser,
           user: githubUser
         });
-
       } else {
         // any other ideas? Try and check github using a room id and see if we
         // get anything back? Most remaining differences are probably caused by
@@ -395,51 +417,50 @@ var findBatchInfo = Promise.method(function(batch) {
         }
       }
 
-      return Promise.props(lookups)
-        .then(function(results) {
-          console.log(++numProcessed, lcOwner, type, reason);
+      return Promise.props(lookups).then(function(results) {
+        console.log(++numProcessed, lcOwner, type, reason);
 
-          errors.forEach(function(error) {
-            // in case there was a matching github user above, but no
-            // ownerUsers and no roomUsers, so we didn't already have the old
-            // gitterUser set.
-            error.oldUser = oldUser || results.gitterUser;
-          });
+        errors.forEach(function(error) {
+          // in case there was a matching github user above, but no
+          // ownerUsers and no roomUsers, so we didn't already have the old
+          // gitterUser set.
+          error.oldUser = oldUser || results.gitterUser;
+        });
 
-          return errorsToUpdates(errors)
-            .then(function(updates) {
-              /*
+        return errorsToUpdates(errors).then(function(updates) {
+          /*
               if (updates.length) {
                 console.log(updates);
               }
               */
-              var data = {
-                type: type,
-                reason: reason,
-                updates: updates,
-                org: org,
-                user: githubUser,
-                githubTypeMap: githubTypeMap,
-                warnings: findBatchWarnings({
-                  batch: batch,
-                  githubTypes: githubTypes,
-                  githubTypeMap: githubTypeMap,
-                  uniqueUserIds: uniqueUserIds,
-                  uniqueOwners: uniqueOwners,
-                  org: org,
-                  user: githubUser,
-                  oldUser: oldUser || results.gitterUser
-                })
-              };
+          var data = {
+            type: type,
+            reason: reason,
+            updates: updates,
+            org: org,
+            user: githubUser,
+            githubTypeMap: githubTypeMap,
+            warnings: findBatchWarnings({
+              batch: batch,
+              githubTypes: githubTypes,
+              githubTypeMap: githubTypeMap,
+              uniqueUserIds: uniqueUserIds,
+              uniqueOwners: uniqueOwners,
+              org: org,
+              user: githubUser,
+              oldUser: oldUser || results.gitterUser
+            })
+          };
 
-              if (lookups.gitterUser) {
-                data.hasGitterUser = !!results.gitterUser;
-              }
+          if (lookups.gitterUser) {
+            data.hasGitterUser = !!results.gitterUser;
+          }
 
-              return data;
-            });
+          return data;
         });
-    });
+      });
+    }
+  );
 });
 
 // promise wrapping a stream that will return the things that are wrong that we
@@ -462,10 +483,10 @@ function getInfo() {
     var unknown = [];
 
     getBatchedRooms()
-      .pipe(through2Concurrent.obj({ concurrency: 25 }, function(batch, enc, callback) {
-        numBatches++;
-        findBatchInfo(batch)
-          .then(function(info) {
+      .pipe(
+        through2Concurrent.obj({ concurrency: 25 }, function(batch, enc, callback) {
+          numBatches++;
+          findBatchInfo(batch).then(function(info) {
             if (info.type == 'org') {
               numOrgs++;
               if (batch.rooms.length > 1) {
@@ -530,9 +551,9 @@ function getInfo() {
             }
             callback();
           });
-      }))
-      .on('data', function(batch) {
-      })
+        })
+      )
+      .on('data', function(batch) {})
       .on('end', function() {
         // because things are happening that are making me paranoid
         console.log('------------------------------------------');
@@ -547,7 +568,7 @@ function getInfo() {
         console.log(numOrgMultiple + ' orgs with multiple rooms.');
         console.log(numUserMultiple + ' users with multiple rooms.');
         console.log(numMissingUsers + " users haven't signed up with us.");
-        console.log("NOTE: rooms could still be wrong in other parts or aspects");
+        console.log('NOTE: rooms could still be wrong in other parts or aspects');
         resolve({
           numBatches: numBatches,
           numOrgs: numOrgs,
@@ -574,12 +595,11 @@ function getInfo() {
 var findUpdatesForOwnerError = Promise.method(function(error) {
   // check all the room uris and all the rooms with incorrect uris have to
   // be updated. also add a redirect.
-  var updates = []
+  var updates = [];
 
   // either or both of these could be null
   var gitterUser = error.oldUser;
   var githubUser = error.user;
-
 
   if (error.type == 'user' && error.oldUser) {
     // double check again
@@ -590,7 +610,7 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
         gitterUserId: gitterUser._id,
         githubUserId: githubUser.githubId,
         oldUsername: gitterUser.username,
-        newUsername: githubUser.uri,
+        newUsername: githubUser.uri
       };
       //console.log(JSON.stringify(userUpdate));
       updates.push(userUpdate);
@@ -618,7 +638,7 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
       githubUserId: githubUser && githubUser.githubId,
       oldUri: room.uri,
       newUri: correctUri,
-      newLcUri: correctUri.toLowerCase(),
+      newLcUri: correctUri.toLowerCase()
     };
     //console.log(JSON.stringify(roomUpdate));
     updates.push(roomUpdate);
@@ -631,21 +651,18 @@ var findUpdatesForOwnerError = Promise.method(function(error) {
 // updates
 function errorsToUpdates(errors) {
   return Promise.map(errors, function(error) {
-      // return an array of objects representing updates. could be empty.
-      if (error.errorType == 'owner') {
-        return findUpdatesForOwnerError(error);
-
-      } else {
-        return Promise.resolve([]);
-      }
-    })
-    .then(function(arrays) {
-      // each error could expand into 0, 1 or n updates, so join then all into
-      // one array
-      return [].concat.apply([], arrays);
-    });
+    // return an array of objects representing updates. could be empty.
+    if (error.errorType == 'owner') {
+      return findUpdatesForOwnerError(error);
+    } else {
+      return Promise.resolve([]);
+    }
+  }).then(function(arrays) {
+    // each error could expand into 0, 1 or n updates, so join then all into
+    // one array
+    return [].concat.apply([], arrays);
+  });
 }
-
 
 function die(error) {
   console.error(error);
@@ -659,16 +676,14 @@ var opts = require('yargs')
     description: 'where to write the json report'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-onMongoConnect()
-  .then(function() {
-    migrationSchemas = installMigrationSchemas(mongoose.connection);
-    return getInfo()
-      .then(function(report) {
-        fs.writeFileSync(opts.output, JSON.stringify(report));
-        shutdown.shutdownGracefully();
-      })
-      .catch(die);
-  });
+onMongoConnect().then(function() {
+  migrationSchemas = installMigrationSchemas(mongoose.connection);
+  return getInfo()
+    .then(function(report) {
+      fs.writeFileSync(opts.output, JSON.stringify(report));
+      shutdown.shutdownGracefully();
+    })
+    .catch(die);
+});

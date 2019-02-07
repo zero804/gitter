@@ -16,9 +16,8 @@ var parsePath = function(path) {
 var formatPath = function(pathObj) {
   pathObj = pathObj || {};
 
-  return path.join(pathObj.dir, (pathObj.name + pathObj.ext));
+  return path.join(pathObj.dir, pathObj.name + pathObj.ext);
 };
-
 
 module.exports = {
   parsePath: parsePath,

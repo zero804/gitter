@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var Identity = require('gitter-web-persistence').Identity;
@@ -27,16 +27,17 @@ function createIdentities(expected, fixture) {
 
       expectedIdentity.userId = fixture[expectedIdentity.user]._id;
 
-      return createIdentity(key, expectedIdentity)
-        .then(function(identity) {
-          fixture[key] = identity;
+      return createIdentity(key, expectedIdentity).then(function(identity) {
+        fixture[key] = identity;
 
-          // Add the identity back on the user object
-          fixture[expectedIdentity.user].identities = (fixture[expectedIdentity.user].identities || []).concat({
-            provider: identity.provider,
-            providerKey: identity.providerKey
-          });
+        // Add the identity back on the user object
+        fixture[expectedIdentity.user].identities = (
+          fixture[expectedIdentity.user].identities || []
+        ).concat({
+          provider: identity.provider,
+          providerKey: identity.providerKey
         });
+      });
     }
 
     return null;

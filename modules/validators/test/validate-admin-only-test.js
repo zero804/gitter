@@ -15,7 +15,7 @@ describe('validate-admin-only', function() {
     [1, false],
     [-1, false],
     [{}, false],
-    [[], false],
+    [[], false]
   ];
 
   FIXTURES.forEach(function(fixture) {
@@ -27,7 +27,5 @@ describe('validate-admin-only', function() {
     it(name + ' ' + input, function() {
       assert.strictEqual(validateAdminOnly(input), result);
     });
-  })
+  });
 });
-
-

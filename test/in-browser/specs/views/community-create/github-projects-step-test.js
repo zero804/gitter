@@ -12,7 +12,6 @@ var CommunityCreateGitHubProjectsStepViewModel = require('public/js/views/commun
 var GithubProjectsView = require('public/js/views/community-create/github-projects-step/community-creation-github-projects-view');
 
 describe('community-creation-github-projects-view', function() {
-
   var communityCreateModel;
   var viewModel;
   var el;
@@ -20,7 +19,7 @@ describe('community-creation-github-projects-view', function() {
 
   var generateBeforeEachCb = function(newTroupeContext) {
     return function() {
-      if(newTroupeContext) {
+      if (newTroupeContext) {
         context.testOnly.resetTroupeContext(newTroupeContext);
       }
 
@@ -69,17 +68,18 @@ describe('community-creation-github-projects-view', function() {
         ])
       });
       view.render();
-    }
+    };
   };
 
-  beforeEach(generateBeforeEachCb({
-    user: {
-      scopes: {
-        'public_repo': true
+  beforeEach(
+    generateBeforeEachCb({
+      user: {
+        scopes: {
+          public_repo: true
+        }
       }
-    }
-  }));
-
+    })
+  );
 
   it('should have only one tab active at a time', function() {
     assert.strictEqual(viewModel.get('isOrgAreaActive'), true);
@@ -113,7 +113,6 @@ describe('community-creation-github-projects-view', function() {
     assert.strictEqual(communityCreateModel.get('githubRepoId'), repoItem.model.get('id'));
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.MAIN);
   });
-
 
   it('should move to main view after changing mind and choosing org', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.GITHUB_PROJECTS);
@@ -152,16 +151,16 @@ describe('community-creation-github-projects-view', function() {
     assert.strictEqual(communityCreateModel.get('stepState'), stepConstants.MAIN);
   });
 
-
-
   describe('without private repo scope', function() {
-    beforeEach(generateBeforeEachCb({
-      user: {
-        scopes: {
-          'public_repo': true
+    beforeEach(
+      generateBeforeEachCb({
+        user: {
+          scopes: {
+            public_repo: true
+          }
         }
-      }
-    }));
+      })
+    );
 
     it('should show the private repo scope missing note', function() {
       assert.ok(view.ui.repoScopeMissingNote.children().length > 0);
@@ -169,19 +168,19 @@ describe('community-creation-github-projects-view', function() {
   });
 
   describe('with private repo scope', function() {
-    beforeEach(generateBeforeEachCb({
-      user: {
-        scopes: {
-          'private_repo': true,
-          'public_repo': true
+    beforeEach(
+      generateBeforeEachCb({
+        user: {
+          scopes: {
+            private_repo: true,
+            public_repo: true
+          }
         }
-      }
-    }));
+      })
+    );
 
     it('should not show the private repo scope missing note', function() {
       assert.ok(view.ui.repoScopeMissingNote.children().length === 0);
     });
   });
-
-
 });

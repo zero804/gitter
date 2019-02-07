@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
@@ -7,8 +7,7 @@ var elasticsearch = require('elasticsearch');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:elasticsearch');
 
-function ElasticSearchLoggingAdapter(/*config*/) {
-}
+function ElasticSearchLoggingAdapter(/*config*/) {}
 
 ElasticSearchLoggingAdapter.prototype.error = function(error) {
   logger.error('es: error ' + error, { exception: error });
@@ -26,21 +25,25 @@ ElasticSearchLoggingAdapter.prototype.debug = function(message) {
   debug(message);
 };
 
-ElasticSearchLoggingAdapter.prototype.trace = function (method, requestUrl, body/*, responseBody, responseStatus*/) {
-  debug("trace: method=%s url=%s, body=%j", method, requestUrl && requestUrl.path, body);
+ElasticSearchLoggingAdapter.prototype.trace = function(
+  method,
+  requestUrl,
+  body /*, responseBody, responseStatus*/
+) {
+  debug('trace: method=%s url=%s, body=%j', method, requestUrl && requestUrl.path, body);
 };
-ElasticSearchLoggingAdapter.prototype.close = function () { };
+ElasticSearchLoggingAdapter.prototype.close = function() {};
 
 function defer() {
   var resolve, reject;
   var promise = new Promise(function() {
-      resolve = arguments[0];
-      reject = arguments[1];
+    resolve = arguments[0];
+    reject = arguments[1];
   });
   return {
-      resolve: resolve,
-      reject: reject,
-      promise: promise
+    resolve: resolve,
+    reject: reject,
+    promise: promise
   };
 }
 

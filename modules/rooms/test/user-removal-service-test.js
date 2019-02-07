@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -19,23 +19,25 @@ describe('user-removal-service', function() {
 
   describe('#removeByUsername', () => {
     it('should mark user as removed', function(done) {
-      userRemovalService.removeByUsername(fixture.user1.username)
+      userRemovalService
+        .removeByUsername(fixture.user1.username)
         .then(() => User.findOne({ _id: fixture.user1._id }))
-        .then((user) => {
+        .then(user => {
           assert.strictEqual(user.state, 'REMOVED');
         })
         .nodeify(done);
     });
 
-		it('should remove and convert to ghost user when ghost option is passed', function(done) {
+    it('should remove and convert to ghost user when ghost option is passed', function(done) {
       assert.strictEqual(fixture.user1.identities.length, 1);
 
-      userRemovalService.removeByUsername(fixture.user1.username, { ghost: true })
+      userRemovalService
+        .removeByUsername(fixture.user1.username, { ghost: true })
         .then(() => {
           return Promise.props({
             user: User.findOne({ _id: fixture.user1._id }),
             identities: Identity.find({ userId: fixture.user1._id })
-          })
+          });
         })
         .then(({ user, identities }) => {
           assert.strictEqual(user.state, 'REMOVED');

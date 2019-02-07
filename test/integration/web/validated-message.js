@@ -19,7 +19,7 @@ describe('validated-message', function() {
     var message = 'All your bases are belong to us';
     var check = validatedMessage.getCheck(message);
     assert(check);
-    var validated = validatedMessage.validate(message, check, "DEFAULT");
+    var validated = validatedMessage.validate(message, check, 'DEFAULT');
     assert.strictEqual(validated, message);
   });
 
@@ -27,24 +27,23 @@ describe('validated-message', function() {
     var message = 'All your bases are belong to us';
     var check = validatedMessage.getCheck(message);
     assert(check);
-    var validated = validatedMessage.validate(message, 'a' + check, "DEFAULT");
-    assert.strictEqual(validated, "DEFAULT");
+    var validated = validatedMessage.validate(message, 'a' + check, 'DEFAULT');
+    assert.strictEqual(validated, 'DEFAULT');
   });
 
   it('should reject tampered messages', function() {
     var message = 'All your bases are belong to us';
     var check = validatedMessage.getCheck(message);
     assert(check);
-    var validated = validatedMessage.validate('a' + message, check, "DEFAULT");
-    assert.strictEqual(validated, "DEFAULT");
+    var validated = validatedMessage.validate('a' + message, check, 'DEFAULT');
+    assert.strictEqual(validated, 'DEFAULT');
   });
 
   it('should reject invalid checks', function() {
     var message = 'All your bases are belong to us';
     var check = validatedMessage.getCheck(message);
     assert(check);
-    var validated = validatedMessage.validate(message, '::::::::', "DEFAULT");
-    assert.strictEqual(validated, "DEFAULT");
+    var validated = validatedMessage.validate(message, '::::::::', 'DEFAULT');
+    assert.strictEqual(validated, 'DEFAULT');
   });
-
 });

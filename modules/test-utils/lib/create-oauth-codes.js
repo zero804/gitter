@@ -1,10 +1,9 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var crypto = require('crypto');
 var OAuthCode = require('gitter-web-persistence').OAuthCode;
-
 
 function createOAuthCode(fixtureName, f) {
   debug('Creating %s', fixtureName);
@@ -25,10 +24,9 @@ function createOAuthCodes(expected, fixture) {
       expectedOAuthCode.clientId = fixture[expectedOAuthCode.client]._id;
       expectedOAuthCode.redirectUri = fixture[expectedOAuthCode.client].registeredRedirectUri;
 
-      return createOAuthCode(key, expectedOAuthCode)
-        .then(function(oAuthCode) {
-          fixture[key] = oAuthCode;
-        });
+      return createOAuthCode(key, expectedOAuthCode).then(function(oAuthCode) {
+        fixture[key] = oAuthCode;
+      });
     }
 
     return null;

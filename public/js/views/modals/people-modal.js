@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
@@ -101,9 +101,13 @@ var View = Marionette.CompositeView.extend({
       self.collection.search(term);
     }, 250);
 
-    this.once('render', function() {
-      new InfiniteScrollBehavior({ scrollElement: this.ui.results[0] }, this);
-    }, this);
+    this.once(
+      'render',
+      function() {
+        new InfiniteScrollBehavior({ scrollElement: this.ui.results[0] }, this);
+      },
+      this
+    );
   },
   emptyViewOptions: function() {
     return { collection: this.collection };
@@ -127,7 +131,7 @@ var View = Marionette.CompositeView.extend({
 var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
-    options.title = "People";
+    options.title = 'People';
 
     var room = context.troupe();
 

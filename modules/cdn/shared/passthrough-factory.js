@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 function cdnPassthroughFactory(cdnOptions) {
   var emailBasePath = cdnOptions.emailBasePath;
@@ -6,39 +6,37 @@ function cdnPassthroughFactory(cdnOptions) {
 
   if (cdnOptions.emailBasePath && cdnOptions.webBasepath) {
     return function cdnPassthroughServer(url, options) {
-      if(!url) url = ""; // This should not be happening
+      if (!url) url = ''; // This should not be happening
 
       if (options && options.email) {
-        return emailBasePath + "/_s/l/" + url;
+        return emailBasePath + '/_s/l/' + url;
       }
 
       if (options && options.nonrelative) {
-        return webBasepath + "/_s/l/" + url;
+        return webBasepath + '/_s/l/' + url;
       }
 
       if (options && options.notStatic) {
-        return "/" + url;
+        return '/' + url;
       }
 
-      return "/_s/l/" + url;
-    }
+      return '/_s/l/' + url;
+    };
   } else {
     return function cdnPassthrough(url, options) {
-      if(!url) url = ""; // This should not be happening
+      if (!url) url = ''; // This should not be happening
 
       if (options && options.email) {
-        throw new Error('emailBasePath not supplied')
+        throw new Error('emailBasePath not supplied');
       }
 
       if (options && options.notStatic) {
-        return "/" + url;
+        return '/' + url;
       }
 
-      return "/_s/l/" + url;
-    }
-
+      return '/_s/l/' + url;
+    };
   }
-
 }
 
 module.exports = cdnPassthroughFactory;

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* This require looks HORRIBLE, but it's a way to use the non-aliased moment */
 /* Webpack config will alias all usages of moment to this module */
@@ -10,7 +10,7 @@ function getBluebirdConfig() {
       warnings: window.localStorage.BLUEBIRD_LONG_STACK_TRACES === '1',
       longStackTraces: window.localStorage.BLUEBIRD_WARNINGS === '1'
     };
-  } catch(e) {
+  } catch (e) {
     return {
       warnings: false,
       longStackTraces: false

@@ -36,19 +36,39 @@ describe('chatReportService', function() {
 
     message1: { user: 'userBad1', troupe: 'troupe1', text: 'new_message', sent: new Date() },
     message2: { user: 'userBad1', troupe: 'troupe1', text: 'new_message2', sent: new Date() },
-    messageOld3: { user: 'userBad1', troupe: 'troupe1', text: 'old_message3', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)) },
+    messageOld3: {
+      user: 'userBad1',
+      troupe: 'troupe1',
+      text: 'old_message3',
+      sent: new Date(Date.now() - 500 * ONE_DAY_TIME)
+    },
 
     messageReport1: { user: 'user2', message: 'message1', sent: Date.now(), weight: 1 },
     // Ignored because report is too old
-    messageReport2: { user: 'user4', message: 'message1', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)), weight: 7 },
+    messageReport2: {
+      user: 'user4',
+      message: 'message1',
+      sent: new Date(Date.now() - 500 * ONE_DAY_TIME),
+      weight: 7
+    },
     // Ignored because report is too old
-    messageReport3: { user: 'user2', message: 'message2', sent: new Date(Date.now() - (500 * ONE_DAY_TIME)), weight: 7 },
+    messageReport3: {
+      user: 'user2',
+      message: 'message2',
+      sent: new Date(Date.now() - 500 * ONE_DAY_TIME),
+      weight: 7
+    },
     // Ignored because there is another report from this user with higher weight below
     messageReport4: { user: 'user3', message: 'message1', sent: Date.now(), weight: 1 },
     messageReport5: { user: 'user3', message: 'message2', sent: Date.now(), weight: 2 },
 
     userMessageOverThreshold1: {},
-    messageToReportOverThreshold1: { user: 'userMessageOverThreshold1', troupe: 'troupe1', text: 'over_threshold_message (message)', sent: new Date() },
+    messageToReportOverThreshold1: {
+      user: 'userMessageOverThreshold1',
+      troupe: 'troupe1',
+      text: 'over_threshold_message (message)',
+      sent: new Date()
+    },
     messageReportOverThreshold1: {
       user: 'user2',
       message: 'messageToReportOverThreshold1',
@@ -57,7 +77,12 @@ describe('chatReportService', function() {
     },
 
     userOverThreshold1: {},
-    messageToReportUserOverThreshold1: { user: 'userOverThreshold1', troupe: 'troupe1', text: 'over_threshold_message (user)', sent: new Date() },
+    messageToReportUserOverThreshold1: {
+      user: 'userOverThreshold1',
+      troupe: 'troupe1',
+      text: 'over_threshold_message (user)',
+      sent: new Date()
+    },
     messageReportUserOverThreshold1: {
       user: 'user2',
       message: 'messageToReportUserOverThreshold1',
@@ -66,15 +91,20 @@ describe('chatReportService', function() {
     },
 
     userOldOverThreshold1: {
-      _id: mongoUtils.createTestIdForTimestampString(Date.now() - (500 * ONE_DAY_TIME))
+      _id: mongoUtils.createTestIdForTimestampString(Date.now() - 500 * ONE_DAY_TIME)
     },
-    messageToReportUserOldOverThreshold1: { user: 'userOldOverThreshold1', troupe: 'troupe1', text: 'over_threshold_message (old user)', sent: new Date() },
+    messageToReportUserOldOverThreshold1: {
+      user: 'userOldOverThreshold1',
+      troupe: 'troupe1',
+      text: 'over_threshold_message (old user)',
+      sent: new Date()
+    },
     messageReportUserOldOverThreshold1: {
       user: 'user2',
       message: 'messageToReportUserOldOverThreshold1',
       sent: Date.now(),
       weight: vanillaChatReportService.BAD_USER_THRESHOLD
-    },
+    }
   });
 
   beforeEach(function() {
@@ -89,62 +119,63 @@ describe('chatReportService', function() {
           event: function(message) {
             statsLog.push(message);
           }
-        },
+        }
       }),
       'gitter-web-chats': Object.assign(require('gitter-web-chats'), {
         removeAllMessagesForUserId: removeAllMessagesForUserIdSpy,
-        deleteMessageFromRoom: deleteMessageFromRoomSpy,
+        deleteMessageFromRoom: deleteMessageFromRoomSpy
       }),
       'gitter-web-users': Object.assign(require('gitter-web-chats'), {
-        hellbanUser: hellbanUserSpy,
+        hellbanUser: hellbanUserSpy
       })
     });
   });
 
   describe('getReportSumForUser', function() {
     it('sum reports across all of their messages from many users', function() {
-      return chatReportService.getReportSumForUser(fixture.userBad1.id)
-        .then(function(sum) {
-          assert.strictEqual(sum, 3);
-        });
+      return chatReportService.getReportSumForUser(fixture.userBad1.id).then(function(sum) {
+        assert.strictEqual(sum, 3);
+      });
     });
   });
 
   describe('getReportSumForMessage', function() {
     it('sum reports from many users', function() {
-      return chatReportService.getReportSumForMessage(fixture.message1.id)
-        .then(function(sum) {
-          assert.strictEqual(sum, 2);
-        });
+      return chatReportService.getReportSumForMessage(fixture.message1.id).then(function(sum) {
+        assert.strictEqual(sum, 2);
+      });
     });
   });
 
   describe('newReport', function() {
     it('report another users message', function() {
-      return chatReportService.newReport(fixture.user2, fixture.message1.id)
-        .then(function(report) {
-          assert.equal(report.sent.getTime(), fixture.messageReport1.sent.getTime());
-          assert.strictEqual(report.weight, fixture.messageReport1.weight);
-          assert(mongoUtils.objectIDsEqual(report.reporterUserId, fixture.user2._id));
-          assert(mongoUtils.objectIDsEqual(report.messageId, fixture.message1._id));
-          assert(mongoUtils.objectIDsEqual(report.messageUserId, fixture.message1.fromUserId));
-          assert.strictEqual(report.text, fixture.message1.text);
-        });
+      return chatReportService.newReport(fixture.user2, fixture.message1.id).then(function(report) {
+        assert.equal(report.sent.getTime(), fixture.messageReport1.sent.getTime());
+        assert.strictEqual(report.weight, fixture.messageReport1.weight);
+        assert(mongoUtils.objectIDsEqual(report.reporterUserId, fixture.user2._id));
+        assert(mongoUtils.objectIDsEqual(report.messageId, fixture.message1._id));
+        assert(mongoUtils.objectIDsEqual(report.messageUserId, fixture.message1.fromUserId));
+        assert.strictEqual(report.text, fixture.message1.text);
+      });
     });
 
     it('report own message', function() {
-      return chatReportService.newReport(fixture.userBad1, fixture.message1.id)
+      return chatReportService
+        .newReport(fixture.userBad1, fixture.message1.id)
         .catch(function(err) {
           assert.strictEqual(err.status, 403);
         });
     });
 
     it('detected bad message', function() {
-      return chatReportService.newReport(fixture.user3, fixture.messageToReportOverThreshold1.id)
+      return chatReportService
+        .newReport(fixture.user3, fixture.messageToReportOverThreshold1.id)
         .then(function() {
-          assert(statsLog.some(function(entry) {
-            return entry === 'new_bad_message_from_reports';
-          }));
+          assert(
+            statsLog.some(function(entry) {
+              return entry === 'new_bad_message_from_reports';
+            })
+          );
 
           assert.strictEqual(hellbanUserSpy.callCount, 0);
           assert.strictEqual(deleteMessageFromRoomSpy.callCount, 1);
@@ -152,11 +183,14 @@ describe('chatReportService', function() {
     });
 
     it('detected bad user that is new will clear messages', function() {
-      return chatReportService.newReport(fixture.user3, fixture.messageToReportUserOverThreshold1.id)
+      return chatReportService
+        .newReport(fixture.user3, fixture.messageToReportUserOverThreshold1.id)
         .then(function() {
-          assert(statsLog.some(function(entry) {
-            return entry === 'new_bad_user_from_reports';
-          }));
+          assert(
+            statsLog.some(function(entry) {
+              return entry === 'new_bad_user_from_reports';
+            })
+          );
 
           assert.strictEqual(hellbanUserSpy.callCount, 1);
           assert.strictEqual(removeAllMessagesForUserIdSpy.callCount, 1);
@@ -164,11 +198,14 @@ describe('chatReportService', function() {
     });
 
     it('detected bad user but is old enough to not automatically clear messages', function() {
-      return chatReportService.newReport(fixture.user3, fixture.messageToReportUserOldOverThreshold1.id)
+      return chatReportService
+        .newReport(fixture.user3, fixture.messageToReportUserOldOverThreshold1.id)
         .then(function() {
-          assert(statsLog.some(function(entry) {
-            return entry === 'new_bad_user_from_reports';
-          }));
+          assert(
+            statsLog.some(function(entry) {
+              return entry === 'new_bad_user_from_reports';
+            })
+          );
 
           assert.strictEqual(hellbanUserSpy.callCount, 1);
           assert.strictEqual(removeAllMessagesForUserIdSpy.callCount, 0);

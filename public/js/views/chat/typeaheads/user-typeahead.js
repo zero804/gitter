@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var isMobile = require('../../../utils/is-mobile');
 var context = require('../../../utils/context');
@@ -7,11 +7,14 @@ var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');
 
 function getRecentMessageSenders(chatCollection) {
-  var users = chatCollection.map(function(message) {
-    return message.get('fromUser');
-  }).filter(function(user) {
-    return !!user;
-  }).reverse();
+  var users = chatCollection
+    .map(function(message) {
+      return message.get('fromUser');
+    })
+    .filter(function(user) {
+      return !!user;
+    })
+    .reverse();
   users = unique(users);
   return users;
 }
@@ -19,15 +22,16 @@ function getRecentMessageSenders(chatCollection) {
 function filterWithTerm(term) {
   var lowerTerm = term.toLowerCase();
   return function(user) {
-    return user && (
-             user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
-             (user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0)
-           );
+    return (
+      user &&
+      (user.username.toLowerCase().indexOf(lowerTerm) === 0 ||
+        (user.displayName && user.displayName.toLowerCase().indexOf(lowerTerm) === 0))
+    );
   };
 }
 
 function isNotCurrentUser(user) {
-  var lcUsername = (context.user() && context.user().get('username') || '').toLowerCase();
+  var lcUsername = ((context.user() && context.user().get('username')) || '').toLowerCase();
   return user.username.toLowerCase() !== lcUsername;
 }
 
@@ -72,7 +76,8 @@ function userSearchDebounced(term, callback) {
 }
 
 function userSearch(term, callback) {
-  apiClient.room.get('/users', { q: term, limit: isMobile() ? 3 : 10 })
+  apiClient.room
+    .get('/users', { q: term, limit: isMobile() ? 3 : 10 })
     .catch(function() {
       return [];
     })
@@ -85,7 +90,7 @@ var lcPrevTerm = '';
 var prevResults = [];
 
 //If we change rooms we need to wipe the old results
-context.troupe().on('change:id', function (){
+context.troupe().on('change:id', function() {
   lcPrevTerm = '';
   prevResults = [];
 });

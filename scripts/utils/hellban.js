@@ -1,33 +1,35 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var shutdown = require('shutdown');
 var shimPositionOption = require('../yargs-shim-position-option');
 
 var opts = require('yargs')
-  .option('username', shimPositionOption({
-    position: 0,
-    required: true,
-    description: 'username to hellban e.g trevorah',
-    string: true
-  }))
- .option('unban', {
+  .option(
+    'username',
+    shimPositionOption({
+      position: 0,
+      required: true,
+      description: 'username to hellban e.g trevorah',
+      string: true
+    })
+  )
+  .option('unban', {
     alias: 'u',
     type: 'boolean',
     description: 'unban user from hell'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 console.log(opts);
 
-
 var banned = !opts.unban;
 
-userService.findByUsername(opts.username)
+userService
+  .findByUsername(opts.username)
   .then(function(user) {
     user.hellbanned = banned;
     return user.save();

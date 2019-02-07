@@ -12,13 +12,13 @@ var extendCallbackHash = function(oldHash, newHash) {
       var oldCb = oldHash[key];
       var newCb = newHash[key];
       // Coerce string into function
-      oldCb = (typeof oldCb === 'string') ? this[oldCb] : oldCb;
-      newCb = (typeof newCb === 'string') ? this[newCb] : newCb;
+      oldCb = typeof oldCb === 'string' ? this[oldCb] : oldCb;
+      newCb = typeof newCb === 'string' ? this[newCb] : newCb;
 
-      if(oldCb) {
+      if (oldCb) {
         oldCb.apply(this, arguments);
       }
-      if(newCb) {
+      if (newCb) {
         newCb.apply(this, arguments);
       }
     };

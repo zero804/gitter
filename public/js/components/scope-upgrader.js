@@ -8,15 +8,15 @@ var context = require('../utils/context');
  */
 function doScopeUpgrade(requiredScope) {
   return new Promise(function(resolve) {
-   function oauthUpgradeAfterRoomCreationCallback(e) {
-     var data = e.data;
-     if (!data || data.type !== 'oauth_upgrade_complete') return;
+    function oauthUpgradeAfterRoomCreationCallback(e) {
+      var data = e.data;
+      if (!data || data.type !== 'oauth_upgrade_complete') return;
 
-     window.removeEventListener('message', oauthUpgradeAfterRoomCreationCallback, false);
+      window.removeEventListener('message', oauthUpgradeAfterRoomCreationCallback, false);
 
-     // Update the model
-     context.user().set({ scopes: data.scopes });
-     return resolve(data.scopes);
+      // Update the model
+      context.user().set({ scopes: data.scopes });
+      return resolve(data.scopes);
     }
 
     window.addEventListener('message', oauthUpgradeAfterRoomCreationCallback, false);

@@ -20,12 +20,9 @@ function getOutputPath(relative) {
 gulp.task('service-worker:compile', ['service-worker:compile:webpack']);
 
 gulp.task('service-worker:compile:webpack', function(cb) {
-  return webpackPipeline(ROOT, cb)
-    .pipe(gulp.dest(getOutputPath('assets')));
+  return webpackPipeline(ROOT, cb).pipe(gulp.dest(getOutputPath('assets')));
 });
 
 gulp.task('service-worker:clean', function(cb) {
-  del([
-    getOutputPath()
-  ], cb);
+  del([getOutputPath()], cb);
 });

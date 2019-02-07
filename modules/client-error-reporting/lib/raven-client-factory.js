@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var clientEnv = require('gitter-client-env');
 var Raven = require('raven-js');
@@ -29,18 +29,17 @@ function ravenClientFactory(options) {
     dataCallback: function(data) {
       try {
         data.stacktrace.frames.forEach(function(frame) {
-          if(frame.filename) {
+          if (frame.filename) {
             frame.filename = normalise(frame.filename);
           }
         });
 
-        if(data.culprit) {
+        if (data.culprit) {
           data.culprit = normalise(data.culprit);
         }
-      } catch(e) {
+      } catch (e) {
         /* */
       }
-
 
       return data;
     },
@@ -58,7 +57,7 @@ function ravenClientFactory(options) {
       'canvas.contentDocument',
       'MyApp_RemoveAllHighlights',
       'http://tt.epicplay.com',
-      'Can\'t find variable: ZiteReader',
+      "Can't find variable: ZiteReader",
       'jigsaw is not defined',
       'ComboSearch is not defined',
       'http://loading.retry.widdit.com/',
@@ -97,7 +96,7 @@ function ravenClientFactory(options) {
 
   return function(err, extraData) {
     return Raven.captureException(err, extraData);
-  }
+  };
 }
 
 module.exports = ravenClientFactory;

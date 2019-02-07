@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var nconf = env.config;
 var logger = env.logger;
 var errorReporter = env.errorReporter;
-var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix')});
+var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') });
 
 var oauth = require('../../services/oauth-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -19,11 +19,13 @@ var useragent = require('useragent');
 var debug = require('debug')('gitter:app:bayeux-authenticator');
 
 function getConnectionType(incoming) {
-  if(!incoming) return 'online';
+  if (!incoming) return 'online';
 
-  switch(incoming) {
-    case 'online': return 'online';
-    case 'mobile': return 'mobile';
+  switch (incoming) {
+    case 'online':
+      return 'online';
+    case 'mobile':
+      return 'mobile';
 
     default:
       return 'online';
@@ -53,8 +55,8 @@ module.exports = bayeuxExtension({
 
     var token = ext.token;
 
-    if(!token || typeof token !== 'string') {
-      return callback(new StatusError(401, "Access token required"));
+    if (!token || typeof token !== 'string') {
+      return callback(new StatusError(401, 'Access token required'));
     }
 
     var tags = [];
@@ -70,7 +72,6 @@ module.exports = bayeuxExtension({
       tags.push('anonymous:0');
     }
 
-
     var useragentFamily = getUserAgentFamily(req);
     if (useragentFamily) {
       tags.push('useragent:' + useragentFamily);
@@ -78,21 +79,27 @@ module.exports = bayeuxExtension({
 
     statsd.increment('bayeux.handshake.attempt', 1, 0.25, tags);
 
-    oauth.validateAccessTokenAndClient(ext.token)
+    oauth
+      .validateAccessTokenAndClient(ext.token)
       .then(function(tokenInfo) {
-        if(!tokenInfo) {
-          return callback(new StatusError(401, "Invalid access token"));
+        if (!tokenInfo) {
+          return callback(new StatusError(401, 'Invalid access token'));
         }
 
         var user = tokenInfo.user;
         var oauthClient = tokenInfo.client;
         var userId = user && user.id;
 
-        if(user && oauthClient) {
+        if (user && oauthClient) {
           clientUsageStats.record(user, oauthClient, req);
         }
 
-        debug('bayeux: handshake. appVersion=%s, username=%s, client=%s', ext.appVersion, user && user.username, oauthClient.name);
+        debug(
+          'bayeux: handshake. appVersion=%s, username=%s, client=%s',
+          ext.appVersion,
+          user && user.username,
+          oauthClient.name
+        );
 
         var connectionType = getConnectionType(ext.connType);
 
@@ -110,15 +117,14 @@ module.exports = bayeuxExtension({
         return message;
       })
       .asCallback(callback);
-
   },
 
   outgoing: function(message, req, callback) {
-    if(!message.ext) message.ext = {};
+    if (!message.ext) message.ext = {};
     message.ext.appVersion = version;
 
     var state = message._private && message._private.authenticator;
-    if(!state) return callback(null, message);
+    if (!state) return callback(null, message);
 
     var userId = state.userId;
     var connectionType = state.connectionType;
@@ -131,40 +137,64 @@ module.exports = bayeuxExtension({
     var eyeballState = state.eyeballState;
 
     // Get the presence service involved around about now
-    presenceService.userSocketConnected(userId, clientId, connectionType, clientType, realtimeLibrary, troupeId, oauthClientId, uniqueClientId, eyeballState, function(err) {
-
-      if(err) {
-        logger.warn("bayeux: Unable to associate connection " + clientId + ' to ' + userId, { troupeId: troupeId, client: clientType, exception: err });
-        return callback(err);
-      }
-
-      debug("Connection %s is associated to user %s (troupeId=%s, clientId=%s, oauthClientId=%s)", clientId, userId, troupeId, clientType, oauthClientId);
-
-      message.ext.userId = userId;
-
-      if(userId && troupeId && mongoUtils.isLikeObjectId(troupeId)) {
-        // In chat-cache mode, this will give the room an incorrect last-access-time
-        recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true })
-          .catch(function(err) {
-            logger.error('Error while saving last visted room. Silently ignoring. ' + err, { exception: err });
-            errorReporter(err, { troupeId: troupeId, userId: userId }, { module: 'authenticator' });
+    presenceService.userSocketConnected(
+      userId,
+      clientId,
+      connectionType,
+      clientType,
+      realtimeLibrary,
+      troupeId,
+      oauthClientId,
+      uniqueClientId,
+      eyeballState,
+      function(err) {
+        if (err) {
+          logger.warn('bayeux: Unable to associate connection ' + clientId + ' to ' + userId, {
+            troupeId: troupeId,
+            client: clientType,
+            exception: err
           });
-      }
+          return callback(err);
+        }
 
-      // If the troupeId was included, it means we've got a native
-      // client and they'll be looking for a snapshot:
-      contextGenerator.generateSocketContext(userId, troupeId)
-        .nodeify(function(err, context) {
-          if(err) return callback(err);
+        debug(
+          'Connection %s is associated to user %s (troupeId=%s, clientId=%s, oauthClientId=%s)',
+          clientId,
+          userId,
+          troupeId,
+          clientType,
+          oauthClientId
+        );
+
+        message.ext.userId = userId;
+
+        if (userId && troupeId && mongoUtils.isLikeObjectId(troupeId)) {
+          // In chat-cache mode, this will give the room an incorrect last-access-time
+          recentRoomService
+            .saveLastVisitedTroupeforUserId(userId, troupeId, { skipFayeUpdate: true })
+            .catch(function(err) {
+              logger.error('Error while saving last visted room. Silently ignoring. ' + err, {
+                exception: err
+              });
+              errorReporter(
+                err,
+                { troupeId: troupeId, userId: userId },
+                { module: 'authenticator' }
+              );
+            });
+        }
+
+        // If the troupeId was included, it means we've got a native
+        // client and they'll be looking for a snapshot:
+        contextGenerator.generateSocketContext(userId, troupeId).nodeify(function(err, context) {
+          if (err) return callback(err);
 
           message.ext.context = context;
 
           // Not possible to throw an error here, so just carry only
           callback(null, message);
         });
-
-    });
-
+      }
+    );
   }
-
 });

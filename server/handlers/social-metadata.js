@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
@@ -9,9 +9,9 @@ var facebookAppId = nconf.get('facebook:appId');
 function getMetadata(options) {
   var room = options && options.room;
 
-  var title = room && room.uri || 'Gitter';
-  var description = room && room.topic || 'Where developers come to talk.';
-  var imageUrl = room && room.avatarUrl || avatars.getDefault();
+  var title = (room && room.uri) || 'Gitter';
+  var description = (room && room.topic) || 'Where developers come to talk.';
+  var imageUrl = (room && room.avatarUrl) || avatars.getDefault();
 
   return {
     'og:title': title,
@@ -35,9 +35,9 @@ function getMetadataForChatPermalink(options) {
 
   var fromUser = chat.fromUser;
 
-  var title = room && room.uri || 'Gitter';
+  var title = (room && room.uri) || 'Gitter';
   var description = '@' + fromUser.username + ': ' + chat.text;
-  var imageUrl = room && room.avatarUrl || avatars.getDefault();
+  var imageUrl = (room && room.avatarUrl) || avatars.getDefault();
 
   return {
     'og:title': title,

@@ -4,7 +4,7 @@
 var Benchmark = require('benchmark');
 var benchmarks = require('beautify-benchmark');
 var metrics = require('datadog-metrics');
-var os = require("os");
+var os = require('os');
 var path = require('path');
 
 var benchmarkName = path.basename(module.parent.filename, '.js');
@@ -17,7 +17,7 @@ if (submitToDatadog) {
 
 function submitDatadogMetrics(stats) {
   var tags = ['benchmark_host:' + os.hostname()]; // Can't use host
-  if(process.env.GIT_BRANCH) tags.push("branch:" + process.env.GIT_BRANCH);
+  if (process.env.GIT_BRANCH) tags.push('branch:' + process.env.GIT_BRANCH);
 
   metrics.gauge(benchmarkName + '.' + stats.name, stats.mean, tags);
   metrics.flush();
@@ -28,7 +28,7 @@ function targetStats(target) {
     name: target.name,
     hz: target.hz,
     size: target.stats.sample.length,
-    mean: target.stats.mean,
+    mean: target.stats.mean
   };
 }
 
@@ -81,7 +81,7 @@ module.exports = function makeBenchmark(options) {
       if (options.after.length === 0) {
         try {
           options.after();
-        } catch(err) {
+        } catch (err) {
           callback(err);
         }
         return;
@@ -107,19 +107,18 @@ module.exports = function makeBenchmark(options) {
   var before = options.before;
 
   if (!before) {
-    suite.run({ 'async': true });
+    suite.run({ async: true });
     return;
   }
 
   if (before.length === 0) {
     before();
-    suite.run({ 'async': true });
+    suite.run({ async: true });
     return;
   }
 
   before(function(err) {
     if (err) throw err;
-    suite.run({ 'async': true });
+    suite.run({ async: true });
   });
-
 };

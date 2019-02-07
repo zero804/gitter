@@ -34,8 +34,7 @@ TwitterService.prototype.findFollowers = function(username) {
     qs: {
       screen_name: username
     }
-  })
-  .then(function(results) {
+  }).then(function(results) {
     debug('Twitter API results: %j', results && results.body);
     if (!results.body || !results.body.users) {
       return [];
@@ -44,7 +43,6 @@ TwitterService.prototype.findFollowers = function(username) {
     return results.body.users;
   });
 };
-
 
 TwitterService.prototype.findFavorites = function() {
   return request({
@@ -74,28 +72,33 @@ TwitterService.prototype.sendTweet = function(status) {
     headers: {
       'content-type': 'application/x-www-form-urlencoded'
     },
-    body: querystring.stringify({
+    body: querystring.stringify(
+      {
         status: status
-      }, '&', '=', {
+      },
+      '&',
+      '=',
+      {
         encodeURIComponent: escapeTweet
-      })
-  })
-  .then(function(res) {
-    if(res.statusCode === 200) {
+      }
+    )
+  }).then(function(res) {
+    if (res.statusCode === 200) {
       return;
     }
 
     var errorMessage = res.body;
-    if(res.body.errors) {
+    if (res.body.errors) {
       errorMessage = (res.body.errors || []).reduce(function(errorString, error) {
-        return errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message;
+        return (
+          errorString + (errorString.length > 0 ? ' -- ' : '') + error.code + ' ' + error.message
+        );
       }, '');
     }
     var errorString = 'Status: ' + res.statusCode + ' -- ' + errorMessage;
 
     throw new StatusError(400, errorString);
   });
-
 };
 
 module.exports = TwitterService;

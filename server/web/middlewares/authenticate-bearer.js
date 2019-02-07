@@ -9,13 +9,12 @@ var checkAlreadyOnUnauthorizedUrl = require('../../utils/check-already-on-unauth
 
 // eslint-disable-next-line complexity
 function getAccessToken(req) {
-
-  if(req.headers && req.headers['authorization']) {
+  if (req.headers && req.headers['authorization']) {
     var authHeader = req.headers['authorization'];
 
     /* Temporary fix - remove 15 May 2014 */
     /* A bug in the OSX client adds this header each time a refresh is done */
-    if(authHeader.indexOf('Bearer ') === 0 && authHeader.indexOf(',') >= 0) {
+    if (authHeader.indexOf('Bearer ') === 0 && authHeader.indexOf(',') >= 0) {
       logger.warn('auth: compensating for incorrect auth header');
       authHeader = authHeader.split(/,/)[0];
     }
@@ -41,11 +40,10 @@ function getAccessToken(req) {
 
   // FIXME Hack for the node-webkit app, we *have* to send the token in the user-agent header.
   // If in the future node-webkit adds support for custom headers we can remove this.
-  if(req.headers && req.headers['user-agent']) {
+  if (req.headers && req.headers['user-agent']) {
     var ua_token = req.headers['user-agent'].match(/Token\/(\w+)/);
     if (ua_token) return ua_token[1];
   }
-
 }
 
 /**
@@ -58,22 +56,23 @@ module.exports = function(req, res, next) {
   // Avoid a redirect loop even when someone is forcing a token via
   // `?access_token=xxxtoken` query parameter or `Authorization: bearer xxxtoken` header
   var alreadyOnUnauthorizedUrl = checkAlreadyOnUnauthorizedUrl(req.url);
-  if(!accessToken || alreadyOnUnauthorizedUrl) return next();
+  if (!accessToken || alreadyOnUnauthorizedUrl) return next();
 
   validateUserAgentFromReq(req)
     .then(() => oauthService.validateAccessTokenAndClient(accessToken))
     .then(function(tokenInfo) {
       // Token not found
-      if(!tokenInfo) return next(new StatusError(401, 'Token not found'));
+      if (!tokenInfo) return next(new StatusError(401, 'Token not found'));
 
       // Anonymous tokens cannot be used for Bearer tokens
-      if(!tokenInfo.user) return next(new StatusError(401, 'Anonymous tokens cannot be used for Bearer tokens'));
+      if (!tokenInfo.user)
+        return next(new StatusError(401, 'Anonymous tokens cannot be used for Bearer tokens'));
 
       var user = tokenInfo.user;
       var client = tokenInfo.client;
 
       req.login(user, function(err) {
-        if(err) return next(err);
+        if (err) return next(err);
 
         req.authInfo = { client: client, accessToken: accessToken };
         next();
@@ -83,5 +82,4 @@ module.exports = function(req, res, next) {
       return null;
     })
     .catch(next);
-
 };

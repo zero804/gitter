@@ -14,7 +14,8 @@ var Model = Backbone.Model.extend({
 var SuggestedCollection = Backbone.Collection.extend({
   model: Model,
 
-  initialize: function(models, attrs) { //jshint unused: true
+  initialize: function(models, attrs) {
+    //jshint unused: true
 
     if (!attrs || !attrs.contextModel) {
       throw new Error('A valid model must be passed to SuggestedOrgCollection when initialized');
@@ -25,24 +26,24 @@ var SuggestedCollection = Backbone.Collection.extend({
     this.urlModel = backboneUrlResolver('/v1/groups/:groupId/suggestedRooms', this.contextModel);
     this.listenTo(this.contextModel, 'change:groupId', this.onOrgNameUpdate, this);
 
-    if(this.contextModel.get('state') === 'org') {
+    if (this.contextModel.get('state') === 'org') {
       this.fetch({ reset: true });
     }
-
   },
 
   url: function() {
     return this.urlModel.get('url');
   },
 
-  onOrgNameUpdate: function(model, val) {//jshint unused: true
+  onOrgNameUpdate: function(model, val) {
+    //jshint unused: true
     if (!val || val === '') return;
     //clear any old models
     this.reset([]);
     this.fetch({ reset: true });
   },
 
-  sync: SyncMixin.sync,
+  sync: SyncMixin.sync
 });
 
 var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
@@ -60,8 +61,7 @@ var FilteredSuggestionsCollection = SimpleFilteredCollection.extend({
     this.listenTo(roomCollection, 'update', function() {
       this.setFilter();
     });
-  },
-
+  }
 });
 
 module.exports = FilteredSuggestionsCollection;

@@ -47,7 +47,7 @@ var getIdentityForUser = Promise.method(function(user, provider) {
     return cachedIdentities[provider];
   }
 
-  var query = cachedIdentities[provider] = findIdentityForUser(user, provider);
+  var query = (cachedIdentities[provider] = findIdentityForUser(user, provider));
   return query;
 });
 
@@ -79,7 +79,7 @@ var findIdentityForUser = Promise.method(function(user, provider) {
  * really need (pretty much) the full user object to be sure and to get any useful
  * info out. So be careful.
  */
-var listForUser = Promise.method(function (user) {
+var listForUser = Promise.method(function(user) {
   if (!user) return [];
 
   if (isGitHubUser(user)) {
@@ -93,9 +93,12 @@ var listForUser = Promise.method(function (user) {
 
   var userId = user._id;
 
-  var query = user._cachedIdentityList = Identity.find({ userId: userId }, { _id: 0, userId: 0, __v: 0 })
+  var query = (user._cachedIdentityList = Identity.find(
+    { userId: userId },
+    { _id: 0, userId: 0, __v: 0 }
+  )
     .lean()
-    .exec();
+    .exec());
 
   return query;
 });
@@ -119,10 +122,8 @@ var listProvidersForUser = Promise.method(function(user) {
     return Object.keys(user._cachedIdentityList);
   }
 
-  return Identity.distinct('provider', { userId: user._id })
-    .exec();
+  return Identity.distinct('provider', { userId: user._id }).exec();
 });
-
 
 /**
  * Given a provider, eg "twitter" and a username on that provider
@@ -133,7 +134,7 @@ function findUserIdForProviderUsername(provider, username) {
     .lean()
     .then(function(result) {
       return result && result.userId;
-    })
+    });
 }
 
 /**
@@ -161,7 +162,7 @@ function findPrimaryIdentityForUser(user) {
 /**
  * Remove all the identities for a user
  */
-var removeForUser = function (user) {
+var removeForUser = function(user) {
   assert(user);
 
   var userId = user._id;
@@ -181,5 +182,5 @@ module.exports = {
   GITHUB_IDENTITY_PROVIDER: 'github',
   GOOGLE_IDENTITY_PROVIDER: 'google',
   TWITTER_IDENTITY_PROVIDER: 'twitter',
-  LINKEDIN_IDENTITY_PROVIDER: 'linkedin',
+  LINKEDIN_IDENTITY_PROVIDER: 'linkedin'
 };

@@ -5,23 +5,25 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor')
+var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
 
 describe('group-api', function() {
   var app, request;
 
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG', '#oauthTokens');
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    'GITTER_INTEGRATION_ORG',
+    '#oauthTokens'
+  );
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
-  fixtureLoader.ensureIntegrationEnvironment(
-      '#integrationUser1',
-      'GITTER_INTEGRATION_ORG');
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
@@ -33,12 +35,17 @@ describe('group-api', function() {
         { lcUri: '_repo-group' }
       ],
       Troupe: [
-        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
+        {
+          lcUri:
+            fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() +
+            '/' +
+            fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase()
+        },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/community' },
         { lcUri: 'repo-group/community' },
-        { lcUri: '_repo-group/community' },
-      ],
+        { lcUri: '_repo-group/community' }
+      ]
     },
     user1: '#integrationUser1',
     user2: {
@@ -73,21 +80,21 @@ describe('group-api', function() {
     return request(app)
       .get('/v1/groups')
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
+      .expect(200);
   });
 
   it('GET /v1/groups?type=admin for github user', function() {
     return request(app)
       .get('/v1/groups?type=admin')
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
+      .expect(200);
   });
 
   it('GET /v1/groups?type=admin for non-github user', function() {
     return request(app)
       .get('/v1/groups?type=admin')
       .set('x-access-token', fixture.user2.accessToken)
-      .expect(200)
+      .expect(200);
   });
 
   it('POST /v1/groups (new style community)', function() {
@@ -99,7 +106,10 @@ describe('group-api', function() {
       .then(function(result) {
         var group = result.body;
         assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
-        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/community');
+        assert.strictEqual(
+          group.defaultRoom.uri,
+          fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/community'
+        );
       });
   });
 
@@ -119,7 +129,10 @@ describe('group-api', function() {
       .then(function(result) {
         var group = result.body;
         assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_ORG);
-        assert.strictEqual(group.defaultRoom.uri, fixtureLoader.GITTER_INTEGRATION_ORG + '/community');
+        assert.strictEqual(
+          group.defaultRoom.uri,
+          fixtureLoader.GITTER_INTEGRATION_ORG + '/community'
+        );
       });
   });
 
@@ -158,20 +171,26 @@ describe('group-api', function() {
       .then(function(result) {
         var rooms = result.body;
 
-        assert(rooms.some(function(r) {
-          return r.id === fixture.troupe1.id;
-        }));
+        assert(
+          rooms.some(function(r) {
+            return r.id === fixture.troupe1.id;
+          })
+        );
 
-        assert(rooms.every(function(r) {
-          return r.id !== fixture.troupe2.id;
-        }));
+        assert(
+          rooms.every(function(r) {
+            return r.id !== fixture.troupe2.id;
+          })
+        );
 
-        assert(rooms.every(function(r) {
-          return r.id !== fixture.troupe3.id;
-        }));
+        assert(
+          rooms.every(function(r) {
+            return r.id !== fixture.troupe3.id;
+          })
+        );
 
         assert.strictEqual(result.body.length, 1);
-      })
+      });
   });
 
   it('POST /v1/groups/:groupId/rooms with GH_REPO security', function() {
@@ -184,7 +203,8 @@ describe('group-api', function() {
         security: {
           security: 'PRIVATE',
           type: 'GH_REPO',
-          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
+          linkPath:
+            fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
@@ -204,7 +224,7 @@ describe('group-api', function() {
         topic: 'all about testing',
         security: {
           security: 'PRIVATE',
-          type: 'GROUP',
+          type: 'GROUP'
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
@@ -236,7 +256,7 @@ describe('group-api', function() {
         topic: 'all about testing',
         security: {
           security: 'INHERITED',
-          type: 'GROUP',
+          type: 'GROUP'
         }
       })
       .set('x-access-token', fixture.user1.accessToken)
@@ -257,7 +277,6 @@ describe('group-api', function() {
         assert.strictEqual(descriptor.public, false);
         assert.strictEqual(descriptor.admins, 'GROUP_ADMIN');
         assert.strictEqual(descriptor.type, 'GROUP');
-
       });
   });
 
@@ -280,7 +299,10 @@ describe('group-api', function() {
           assert(suggestion.hasOwnProperty('tags'));
           assert(suggestion.hasOwnProperty('description'));
           assert(suggestion.hasOwnProperty('exists'));
-          assert(suggestion.exists === true && suggestion.id || suggestion.exists === false && !suggestion.id);
+          assert(
+            (suggestion.exists === true && suggestion.id) ||
+              (suggestion.exists === false && !suggestion.id)
+          );
         });
       });
   });

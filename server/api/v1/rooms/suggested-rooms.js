@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var _ = require('lodash');
-var restSerializer = require("../../../serializers/rest-serializer");
+var restSerializer = require('../../../serializers/rest-serializer');
 var suggestions = require('gitter-web-suggestions');
 var loadTroupeFromParam = require('./load-troupe-param');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
@@ -44,5 +44,4 @@ module.exports = {
         return restSerializer.serialize(suggestedRooms, strategy);
       });
   }
-
 };

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -12,18 +12,17 @@ var isMobile = require('../../utils/is-mobile');
 require('../behaviors/isomorphic');
 
 module.exports = (function() {
-
   return Marionette.LayoutView.extend({
     template: userHomeTemplate,
 
     events: {
-      'click #upgrade-auth': 'onUpgradeAuthClick',
+      'click #upgrade-auth': 'onUpgradeAuthClick'
     },
 
     behaviors: {
       Isomorphic: {
-        orgs: { el: "#org-list", init: 'initOrgsRegion' },
-        suggestedRooms: { el: "#suggested-room-list", init: 'initSuggestedRoomsRegion' },
+        orgs: { el: '#org-list', init: 'initOrgsRegion' },
+        suggestedRooms: { el: '#suggested-room-list', init: 'initSuggestedRoomsRegion' }
       }
     },
 
@@ -32,7 +31,9 @@ module.exports = (function() {
     },
 
     initSuggestedRoomsRegion: function(optionsForRegion) {
-      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection({ roomsCollection: troupeCollections.troupes });
+      var suggestedRoomCollection = new FilteredSuggestedRoomsCollection({
+        roomsCollection: troupeCollections.troupes
+      });
       suggestedRoomCollection.fetchForUser();
 
       return new SuggestedCollectionView(optionsForRegion({ collection: suggestedRoomCollection }));
@@ -43,7 +44,7 @@ module.exports = (function() {
     },
 
     getUserTimestamp: function(id) {
-      return new Date(parseInt(id.toString().slice(0,8), 16)*1000);
+      return new Date(parseInt(id.toString().slice(0, 8), 16) * 1000);
     },
 
     serializeData: function() {
@@ -59,19 +60,20 @@ module.exports = (function() {
     onUpgradeAuthClick: function(e) {
       var target = e.target.href;
 
-      window.addEventListener("message", function(event) {
-        var data = event.data;
+      window.addEventListener(
+        'message',
+        function(event) {
+          var data = event.data;
 
-        if(data && data.type === 'oauth_upgrade_complete') {
-          window.location.reload(true);
-        }
-      }, false);
+          if (data && data.type === 'oauth_upgrade_complete') {
+            window.location.reload(true);
+          }
+        },
+        false
+      );
 
       window.open(target);
       e.preventDefault();
     }
-
   });
-
-
 })();

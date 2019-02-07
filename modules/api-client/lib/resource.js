@@ -21,7 +21,7 @@ var GET_DEFAULTS = {
 var POST_DEFAULTS = {
   timeout: DEFAULT_TIMEOUT,
   dataType: 'json',
-  contentType: JSON_MIME_TYPE,
+  contentType: JSON_MIME_TYPE
 };
 
 function makeError(method, fullUrl, jqXhr, textStatus, errorThrown) {
@@ -47,7 +47,7 @@ function Resource(client, config, urlRoot, baseUrl) {
     // BaseURL is a static string
     this._baseUrlFn = function() {
       return baseUrl;
-    }
+    };
   } else {
     // BaseURL is a function
     this._baseUrlFn = baseUrl.bind(client);
@@ -86,7 +86,7 @@ Resource.prototype = {
     var opts = _.extend({}, POST_DEFAULTS, options);
 
     // If we have no data, unset the contentType
-    if(!data) {
+    if (!data) {
       delete opts.contentType;
     }
 
@@ -100,7 +100,7 @@ Resource.prototype = {
     var opts = _.extend({}, POST_DEFAULTS, options);
 
     // If we have no data, unset the contentType
-    if(!data) {
+    if (!data) {
       delete opts.contentType;
     }
 
@@ -130,66 +130,66 @@ Resource.prototype = {
   },
 
   _execute: function(method, relativeUrl, data, options) {
-      var dataSerialized;
-      if(options.contentType === JSON_MIME_TYPE) {
-        dataSerialized = JSON.stringify(data);
-      } else {
-        // JQuery will serialize to form data for us
-        dataSerialized = data;
-      }
+    var dataSerialized;
+    if (options.contentType === JSON_MIME_TYPE) {
+      dataSerialized = JSON.stringify(data);
+    } else {
+      // JQuery will serialize to form data for us
+      dataSerialized = data;
+    }
 
-      return this._client._getAccessToken()
-        .bind(this)
-        .then(function(accessToken) {
-          var fullUrl = this.url(relativeUrl);
-          var isGlobal = options.global !== false;
+    return this._client
+      ._getAccessToken()
+      .bind(this)
+      .then(function(accessToken) {
+        var fullUrl = this.url(relativeUrl);
+        var isGlobal = options.global !== false;
 
-          var promise = new Promise(function(resolve, reject) {
-            var headers = {};
+        var promise = new Promise(function(resolve, reject) {
+          var headers = {};
 
-            if (accessToken) {
-              headers['x-access-token'] = accessToken;
-            }
-
-            debug('%s: %s', method, fullUrl);
-
-            // TODO: drop jquery `ajax`
-            $.ajax({
-              url: fullUrl,
-              contentType: options.contentType,
-              dataType: options.dataType,
-              type: method,
-              global: isGlobal,
-              data: dataSerialized,
-              timeout: options.timeout,
-              async: options.async,
-              headers: headers,
-              success: function(data, textStatus, xhr) {
-                var status = xhr.status;
-                if (status >= 400 && status !== 1223) {
-                  return reject(makeError(method, fullUrl, xhr, textStatus, 'HTTP Status ' + status));
-                }
-
-                resolve(data);
-              },
-              error: function(xhr, textStatus, errorThrown) {
-                return reject(makeError(method, fullUrl, xhr, textStatus, errorThrown));
-              }
-            });
-          })
-          .bind(this);
-
-          if(isGlobal) {
-            promise.catch(function(err) {
-              /* Asyncronously notify */
-              this._client.trigger('error', err);
-              throw err;
-            });
+          if (accessToken) {
+            headers['x-access-token'] = accessToken;
           }
 
-          return promise;
-        });
+          debug('%s: %s', method, fullUrl);
+
+          // TODO: drop jquery `ajax`
+          $.ajax({
+            url: fullUrl,
+            contentType: options.contentType,
+            dataType: options.dataType,
+            type: method,
+            global: isGlobal,
+            data: dataSerialized,
+            timeout: options.timeout,
+            async: options.async,
+            headers: headers,
+            success: function(data, textStatus, xhr) {
+              var status = xhr.status;
+              if (status >= 400 && status !== 1223) {
+                return reject(makeError(method, fullUrl, xhr, textStatus, 'HTTP Status ' + status));
+              }
+
+              resolve(data);
+            },
+            error: function(xhr, textStatus, errorThrown) {
+              return reject(makeError(method, fullUrl, xhr, textStatus, errorThrown));
+            }
+          });
+        }).bind(this);
+
+        if (isGlobal) {
+          promise.catch(function(err) {
+            /* Asyncronously notify */
+            this._client.trigger('error', err);
+            throw err;
+          });
+        }
+
+        return promise;
+      });
   }
-}
+};
 
 module.exports = Resource;

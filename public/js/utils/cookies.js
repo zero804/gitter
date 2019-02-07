@@ -26,13 +26,31 @@
 var secure = document.location.protocol === 'https:';
 
 module.exports = {
-  get: function (sKey) {
-    if (!sKey) { return null; }
-    return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+  get: function(sKey) {
+    if (!sKey) {
+      return null;
+    }
+    return (
+      decodeURIComponent(
+        document.cookie.replace(
+          new RegExp(
+            '(?:(?:^|.*;)\\s*' +
+              encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') +
+              '\\s*\\=\\s*([^;]*).*$)|^.*$'
+          ),
+          '$1'
+        )
+      ) || null
+    );
   },
-  set: function (sKey, sValue) {
+  set: function(sKey, sValue) {
     if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) return;
     // document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + "; expires=Fri, 31 Dec 9999 23:59:59 GMT; domain=" + domain + (secure ? "; secure" : "");
-    document.cookie = encodeURIComponent(sKey) + "=" + encodeURIComponent(sValue) + "; expires=Fri, 31 Dec 9999 23:59:59 GMT; " + (secure ? "; secure" : "");
+    document.cookie =
+      encodeURIComponent(sKey) +
+      '=' +
+      encodeURIComponent(sValue) +
+      '; expires=Fri, 31 Dec 9999 23:59:59 GMT; ' +
+      (secure ? '; secure' : '');
   }
 };

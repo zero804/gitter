@@ -9,12 +9,11 @@ var emailNotificationService = require('gitter-web-email-notifications');
 var roomService = require('gitter-web-rooms');
 var invitesService = require('gitter-web-invites/lib/invites-service');
 
-
 /**
  * @private
  */
 function addUserToRoomInsteadOfInvite(room, invitingUser, userToInvite) {
-  return roomService.addUserToRoom(room, invitingUser, userToInvite)
+  return roomService.addUserToRoom(room, invitingUser, userToInvite);
 }
 
 /**
@@ -22,19 +21,19 @@ function addUserToRoomInsteadOfInvite(room, invitingUser, userToInvite) {
  */
 function createInviteForNewUser(room, invitingUser, type, externalId, emailAddress) {
   return Promise.try(function() {
-      // If an email address is provided, assert that its valid
-      // and use it
-      if (emailAddress) {
-        if (!isValidEmail(emailAddress)) {
-          throw new StatusError(400);
-        }
-        return emailAddress;
+    // If an email address is provided, assert that its valid
+    // and use it
+    if (emailAddress) {
+      if (!isValidEmail(emailAddress)) {
+        throw new StatusError(400);
       }
+      return emailAddress;
+    }
 
-      // No email address was provided, attempt to
-      // sniff out the email address given the external username and type
-      return invitesService.resolveEmailAddress(invitingUser, type, externalId);
-    })
+    // No email address was provided, attempt to
+    // sniff out the email address given the external username and type
+    return invitesService.resolveEmailAddress(invitingUser, type, externalId);
+  })
     .bind({
       email: null
     })
@@ -43,14 +42,14 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
       if (!resolvedEmailAddress) throw new StatusError(428);
 
       return invitesService.createInvite(room._id, {
-          type: type,
-          externalId: externalId,
-          emailAddress: resolvedEmailAddress,
-          invitedByUserId: invitingUser._id
-        });
+        type: type,
+        externalId: externalId,
+        emailAddress: resolvedEmailAddress,
+        invitedByUserId: invitingUser._id
+      });
     })
     .tap(function(invite) {
-      stats.event("new_invite", {
+      stats.event('new_invite', {
         userId: invitingUser && (invitingUser.id || invitingUser._id),
         troupeId: room && (room.id || room._id),
         type: type,
@@ -62,7 +61,6 @@ function createInviteForNewUser(room, invitingUser, type, externalId, emailAddre
     .then(function(invite) {
       return invite.emailAddress;
     });
-
 }
 
 /**
@@ -79,32 +77,31 @@ function createInvite(room, invitingUser, options) {
   var emailAddress = options.emailAddress;
 
   // Firstly, try figure out whether this user is already on gitter.
-  return invitesService.findExistingUser(type, externalId)
-    .then(function(userToInvite) {
-      if (userToInvite) {
-        // The user already exists!
-        // Rather than inviting them, we'll add them
-        // immediately (for now)
-        return addUserToRoomInsteadOfInvite(room, invitingUser, userToInvite)
-          .then(function() {
-            return {
-              status: 'added',
-              user: userToInvite
-            };
-          })
-      } else {
-        // The user doesn't exist. We'll try invite them
-        return createInviteForNewUser(room, invitingUser, type, externalId, emailAddress)
-          .then(function(resolvedEmailAddress) {
-            return {
-              status: 'invited',
-              emailAddress: resolvedEmailAddress
-            };
-          });
-      }
-    });
+  return invitesService.findExistingUser(type, externalId).then(function(userToInvite) {
+    if (userToInvite) {
+      // The user already exists!
+      // Rather than inviting them, we'll add them
+      // immediately (for now)
+      return addUserToRoomInsteadOfInvite(room, invitingUser, userToInvite).then(function() {
+        return {
+          status: 'added',
+          user: userToInvite
+        };
+      });
+    } else {
+      // The user doesn't exist. We'll try invite them
+      return createInviteForNewUser(room, invitingUser, type, externalId, emailAddress).then(
+        function(resolvedEmailAddress) {
+          return {
+            status: 'invited',
+            emailAddress: resolvedEmailAddress
+          };
+        }
+      );
+    }
+  });
 }
 
 module.exports = {
   createInvite: Promise.method(createInvite)
-}
+};

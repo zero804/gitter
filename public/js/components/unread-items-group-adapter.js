@@ -1,12 +1,11 @@
-"use strict";
+'use strict';
 
-var raf = require('../utils/raf')
+var raf = require('../utils/raf');
 
 /**
  * Copies unread-item info from the troupes collection onto the groups collection
  */
 function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
-
   var groupIndex;
 
   var workQueue = null;
@@ -97,7 +96,7 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
   function queueGroupUpdate(groupId) {
     if (!workQueue) {
       // No workQueue? create one and process it in the next animation frame
-      workQueue = { }
+      workQueue = {};
       raf(executeGroupUpdates);
     }
 
@@ -124,7 +123,9 @@ function unreadItemsGroupAdapter(groupCollection, troupesCollection) {
     if (!groupId) return;
 
     if (groupIndex[groupId]) {
-      var without = groupIndex[groupId].filter(function(id) { return id !== troupeId });
+      var without = groupIndex[groupId].filter(function(id) {
+        return id !== troupeId;
+      });
       if (without.length) {
         groupIndex[groupId] = without;
       } else {

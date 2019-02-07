@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -10,7 +10,7 @@ var widgetHelpers = ['avatar'].reduce(function(memo, v) {
   var handlerConstructor = require('./' + v);
   var handler;
 
-  if(handlerConstructor.length === 1) {
+  if (handlerConstructor.length === 1) {
     widgetTemplate = compileTemplate('/js/views/widgets/tmpl/' + v);
     handler = handlerConstructor(widgetTemplate);
   } else {
@@ -19,14 +19,15 @@ var widgetHelpers = ['avatar'].reduce(function(memo, v) {
 
   memo[v] = safeTemplateWrapper(handler);
   return memo;
-  }, {});
+}, {});
 
 function getWidgetHandler(widget) {
   var helper = widgetHelpers[widget];
-  if(!helper) helper = function() {
-    winston.warn('Unknown helper ' + widget);
-    return "";
-  };
+  if (!helper)
+    helper = function() {
+      winston.warn('Unknown helper ' + widget);
+      return '';
+    };
   return helper;
 }
 

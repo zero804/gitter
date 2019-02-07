@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
@@ -87,13 +87,14 @@ describe('policy-factory', function() {
       function checkPolicyForRoom(user, room, expected) {
         var roomId = room._id;
 
-        return policyFactory.createPolicyForRoomId(user, roomId)
+        return policyFactory
+          .createPolicyForRoomId(user, roomId)
           .then(function(policy) {
             return Promise.props({
               canRead: policy.canRead(),
               canJoin: policy.canJoin(),
               canAdmin: policy.canAdmin(),
-              canAddUser: policy.canAddUser(),
+              canAddUser: policy.canAddUser()
             });
           })
           .then(function(results) {
@@ -147,7 +148,6 @@ describe('policy-factory', function() {
       });
 
       describe('group backed rooms', function() {
-
         describe('public', function() {
           it('group admin is admin of a group-backed room', function() {
             return checkPolicyForRoom(fixture.user1, fixture.troupe3, {
@@ -175,9 +175,7 @@ describe('policy-factory', function() {
               canAddUser: true
             });
           });
-
         });
-
       });
 
       describe('invite-only', function() {
@@ -225,23 +223,22 @@ describe('policy-factory', function() {
             canAddUser: true
           });
         });
-
       });
-
     });
 
     describe('createPolicyForGroupId', function() {
       function checkPolicyForGroup(user, group, expected) {
         var groupId = group._id;
 
-        return policyFactory.createPolicyForGroupId(user, groupId)
+        return policyFactory
+          .createPolicyForGroupId(user, groupId)
           .then(function(policy) {
             return Promise.props({
               canRead: policy.canRead(),
               canWrite: policy.canWrite(),
               canJoin: policy.canJoin(),
               canAdmin: policy.canAdmin(),
-              canAddUser: policy.canAddUser(),
+              canAddUser: policy.canAddUser()
             });
           })
           .then(function(results) {
@@ -280,12 +277,10 @@ describe('policy-factory', function() {
       });
     });
 
-
     // TODO
     //createPolicyForGroupIdWithUserLoader
     //createPolicyForGroupIdWithRepoFallback
     //getPreCreationPolicyEvaluator
     //getPreCreationPolicyEvaluatorWithRepoFallback
-
   });
 });

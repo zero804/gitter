@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /*jslint node: true, unused:true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -22,9 +22,7 @@ var opts = require('yargs')
   .option('frequency', {
     alias: 'f',
     default: '10'
-  })
-  .argv;
-
+  }).argv;
 
 var count = 0;
 
@@ -38,42 +36,38 @@ function sendMessage(troupe, user) {
 var finished = false;
 
 function chatbot() {
-  return userService.findByUsername(opts.user)
-    .then(function(user) {
-      if(!user) throw new Error('User not found');
+  return userService.findByUsername(opts.user).then(function(user) {
+    if (!user) throw new Error('User not found');
 
-      return troupeService.findByUri(opts.troupe)
-        .then(function(troupe) {
-            if(!troupe) throw new Error('Troupe not found');
+    return troupeService.findByUri(opts.troupe).then(function(troupe) {
+      if (!troupe) throw new Error('Troupe not found');
 
-            var freq = parseFloat(opts.frequency, 10) * 1000;
+      var freq = parseFloat(opts.frequency, 10) * 1000;
 
-            console.log('Hit any key to stop');
+      console.log('Hit any key to stop');
 
-            function next() {
-              if (finished) {
-                return;
-              }
+      function next() {
+        if (finished) {
+          return;
+        }
 
-              return sendMessage(troupe, user)
-                .delay(freq)
-                .then(next);
-            }
+        return sendMessage(troupe, user)
+          .delay(freq)
+          .then(next);
+      }
 
-            return next();
-          });
-
+      return next();
+    });
   });
-
 }
 
-process.stdin.on('data', function () {
+process.stdin.on('data', function() {
   console.log('Okay, shutting down');
   finished = true;
 });
 
 chatbot()
   .delay(5000)
-  .then(function () {
+  .then(function() {
     shutdown.shutdownGracefully();
   });

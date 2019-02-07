@@ -26,7 +26,7 @@ module.exports = function(options, callback, request) {
     var loggableStatusCode = statusCode && statusCode >= 400 && statusCode !== 404;
 
     if (error || loggableStatusCode) {
-      logger.error("Error while communicating with GitHub", {
+      logger.error('Error while communicating with GitHub', {
         exception: error,
         // NOTE: this could potentially leak access_token, client_id or
         // client_secret query parameters. Ideally we would parse the url,

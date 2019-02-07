@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 var env = require('gitter-web-env');
 var stats = env.stats;
@@ -30,11 +30,11 @@ module.exports = function trackLoginForProvider(provider) {
 
     //send data to stats service
     if (query.action) {
-      stats.event(query.action + "_clicked", {
-        method: provider+'_oauth',
+      stats.event(query.action + '_clicked', {
+        method: provider + '_oauth',
         button: query.source
       });
     }
     next();
   };
-}
+};

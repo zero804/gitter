@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -26,19 +26,21 @@ function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile,
     logger.info('passport: User updated with token');
     return done(null, req.user);
   });
-
 }
 
 var statePassphrase = config.get('github:statePassphrase');
 
-var githubUpgradeStrategy = new GitHubStrategy({
+var githubUpgradeStrategy = new GitHubStrategy(
+  {
     clientID: config.get('github:client_id'),
     clientSecret: config.get('github:client_secret'),
     callbackURL: callbackUrlBuilder(),
     stateProvider: statePassphrase && new TokenStateProvider({ passphrase: statePassphrase }),
     skipUserProfile: true,
     passReqToCallback: true
-  }, githubUpgradeCallback);
+  },
+  githubUpgradeCallback
+);
 
 githubUpgradeStrategy.name = 'github_upgrade';
 

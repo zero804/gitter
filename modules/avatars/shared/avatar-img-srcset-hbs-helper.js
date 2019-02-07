@@ -8,10 +8,10 @@ function avatarImgSrcSetHbsHelper(avatarServerUrl, size) {
     return " height='" + size + "' width='" + size + "' src='" + avatars.getDefault() + "'";
   }
 
-  var parsedAvatarServerUrl = urlParse(avatarServerUrl , true);
+  var parsedAvatarServerUrl = urlParse(avatarServerUrl, true);
   parsedAvatarServerUrl.query.s = size;
 
-  var parsedAvatarServerUrlSrcSet = urlParse(avatarServerUrl , true);
+  var parsedAvatarServerUrlSrcSet = urlParse(avatarServerUrl, true);
   parsedAvatarServerUrlSrcSet.query.s = 2 * size;
 
   var src = parsedAvatarServerUrl.toString();

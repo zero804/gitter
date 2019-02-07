@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -6,11 +6,10 @@ var groupService = require('gitter-web-groups/lib/group-service');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var groupCreationService = require('../../../services/group-creation-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
-var restful = require("../../../services/restful");
+var restful = require('../../../services/restful');
 var restSerializer = require('../../../serializers/rest-serializer');
 var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
 var GroupWithPolicyService = require('../../../services/group-with-policy-service');
-
 
 var MAX_BATCHED_INVITES = 100;
 
@@ -49,7 +48,7 @@ function getGroupOptions(body) {
   var uri = body.uri ? String(body.uri) : undefined;
   var name = body.name ? String(body.name) : undefined;
   var defaultRoomName = body.defaultRoomName ? String(body.defaultRoomName) : undefined;
-  var providers = validateStringArray(body.providers, "Providers must be strings.");
+  var providers = validateStringArray(body.providers, 'Providers must be strings.');
   var invites = getInvites(body.invites);
 
   var groupOptions = {
@@ -73,7 +72,6 @@ function getGroupOptions(body) {
   return groupOptions;
 }
 
-
 module.exports = {
   id: 'group',
 
@@ -82,10 +80,10 @@ module.exports = {
       throw new StatusError(401);
     }
 
-    var lean = req.query.lean && parseInt(req.query.lean, 10) || false;
+    var lean = (req.query.lean && parseInt(req.query.lean, 10)) || false;
 
     if (req.query.type === 'admin') {
-      return restful.serializeAdminGroupsForUser(req.user, { lean: lean })
+      return restful.serializeAdminGroupsForUser(req.user, { lean: lean });
     }
 
     return restful.serializeGroupsForUserId(req.user._id, { lean: lean });
@@ -105,32 +103,32 @@ module.exports = {
 
     var groupCreationOptions = getGroupOptions(req.body);
 
-    return groupCreationService(user, groupCreationOptions)
-      .then(function(groupCreationResult) {
-        var group = groupCreationResult.group;
-        var defaultRoom = groupCreationResult.defaultRoom;
+    return groupCreationService(user, groupCreationOptions).then(function(groupCreationResult) {
+      var group = groupCreationResult.group;
+      var defaultRoom = groupCreationResult.defaultRoom;
 
-        var groupStrategy = new restSerializer.GroupStrategy({
-          currentUserId: req.user.id,
-        });
-        var troupeStrategy = new restSerializer.TroupeStrategy({
-          currentUserId: req.user.id,
-          includeTags: true,
-          includePermissions: true,
-          includeProviders: true,
-          includeBackend: true
-        });
-
-        return Promise.join(
-            restSerializer.serializeObject(group, groupStrategy),
-            restSerializer.serializeObject(defaultRoom, troupeStrategy),
-            function(serializedGroup, serializedRoom) {
-              serializedGroup.defaultRoom = serializedRoom;
-              serializedGroup.hookCreationFailedDueToMissingScope = groupCreationResult.hookCreationFailedDueToMissingScope;
-              return serializedGroup;
-            }
-          );
+      var groupStrategy = new restSerializer.GroupStrategy({
+        currentUserId: req.user.id
       });
+      var troupeStrategy = new restSerializer.TroupeStrategy({
+        currentUserId: req.user.id,
+        includeTags: true,
+        includePermissions: true,
+        includeProviders: true,
+        includeBackend: true
+      });
+
+      return Promise.join(
+        restSerializer.serializeObject(group, groupStrategy),
+        restSerializer.serializeObject(defaultRoom, troupeStrategy),
+        function(serializedGroup, serializedRoom) {
+          serializedGroup.defaultRoom = serializedRoom;
+          serializedGroup.hookCreationFailedDueToMissingScope =
+            groupCreationResult.hookCreationFailedDueToMissingScope;
+          return serializedGroup;
+        }
+      );
+    });
   },
 
   update: function(req) {
@@ -144,14 +142,13 @@ module.exports = {
       throw new StatusError(400, 'Nothing to update.');
     }
 
-    return Promise.all(promises)
-      .then(function() {
-        var strategy = new restSerializer.GroupStrategy({
-          currentUserId: user && user._id,
-          currentUser: user
-        });
-        return restSerializer.serializeObject(group, strategy);
+    return Promise.all(promises).then(function() {
+      var strategy = new restSerializer.GroupStrategy({
+        currentUserId: user && user._id,
+        currentUser: user
       });
+      return restSerializer.serializeObject(group, strategy);
+    });
   },
 
   show: function(req) {
@@ -167,14 +164,13 @@ module.exports = {
   },
 
   load: function(req, id) {
-    return policyFactory.createPolicyForGroupId(req.user, id)
+    return policyFactory
+      .createPolicyForGroupId(req.user, id)
       .then(function(policy) {
         // TODO: middleware?
         req.userGroupPolicy = policy;
 
-        return req.method === 'GET' ?
-          policy.canRead() :
-          policy.canWrite();
+        return req.method === 'GET' ? policy.canRead() : policy.canWrite();
       })
       .then(function(access) {
         if (!access) return null;
@@ -184,9 +180,8 @@ module.exports = {
   },
 
   subresources: {
-    'rooms': require('./rooms'),
-    'suggestedRooms': require('./suggested-rooms'),
-    'security': require('./security')
+    rooms: require('./rooms'),
+    suggestedRooms: require('./suggested-rooms'),
+    security: require('./security')
   }
-
 };

@@ -16,10 +16,7 @@ routes.login = [
   identifyRoute('login-google'),
   trackLoginForProvider('google'),
   passport.authorize('google', {
-    scope: [
-      'profile',
-      'email'
-    ],
+    scope: ['profile', 'email'],
     failWithError: true
   })
 ];

@@ -30,53 +30,72 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       mainStepView: { el: '.js-community-create-main-step-root', init: 'initMainStepView' },
-      invitePeopleStepView: { el: '.js-community-create-invite-people-step-root', init: 'initInvitePeopleView' },
-      inviteConfirmationStepView: { el: '.js-community-create-invite-confirmation-step-root', init: 'initInviteConfirmationView' },
-      githubProjectsStepView: { el: '.js-community-create-github-projects-step-root', init: 'initGitHubProjectsView' },
-      overviewStepView: { el: '.js-community-create-overview-step-root', init: 'initOverviewView' },
-    },
+      invitePeopleStepView: {
+        el: '.js-community-create-invite-people-step-root',
+        init: 'initInvitePeopleView'
+      },
+      inviteConfirmationStepView: {
+        el: '.js-community-create-invite-confirmation-step-root',
+        init: 'initInviteConfirmationView'
+      },
+      githubProjectsStepView: {
+        el: '.js-community-create-github-projects-step-root',
+        init: 'initGitHubProjectsView'
+      },
+      overviewStepView: { el: '.js-community-create-overview-step-root', init: 'initOverviewView' }
+    }
   },
 
   initMainStepView: function(optionsForRegion) {
-    this.mainStepView = new CommunityCreationMainView(optionsForRegion({
-      model: this.mainStepViewModel,
-      communityCreateModel: this.model
-    }));
+    this.mainStepView = new CommunityCreationMainView(
+      optionsForRegion({
+        model: this.mainStepViewModel,
+        communityCreateModel: this.model
+      })
+    );
 
     return this.mainStepView;
   },
 
   initGitHubProjectsView: function(optionsForRegion) {
-    this.githubProjectsStepView = new CommunityCreationGithubProjectsView(optionsForRegion({
-      model: this.githubProjectsStepViewModel,
-      communityCreateModel: this.model
-    }));
+    this.githubProjectsStepView = new CommunityCreationGithubProjectsView(
+      optionsForRegion({
+        model: this.githubProjectsStepViewModel,
+        communityCreateModel: this.model
+      })
+    );
 
     return this.githubProjectsStepView;
   },
 
   initInvitePeopleView: function(optionsForRegion) {
-    this.invitePeopleStepView = new CommunityCreationInvitePeopleView(optionsForRegion({
-      model: this.invitePeopleStepViewModel,
-      communityCreateModel: this.model
-    }));
+    this.invitePeopleStepView = new CommunityCreationInvitePeopleView(
+      optionsForRegion({
+        model: this.invitePeopleStepViewModel,
+        communityCreateModel: this.model
+      })
+    );
 
     return this.invitePeopleStepView;
   },
 
   initInviteConfirmationView: function(optionsForRegion) {
-    this.invitePeopleStepView = new CommunityCreationInviteConfirmationView(optionsForRegion({
-      model: this.inviteConfirmationStepViewModel,
-      communityCreateModel: this.model,
-    }));
+    this.invitePeopleStepView = new CommunityCreationInviteConfirmationView(
+      optionsForRegion({
+        model: this.inviteConfirmationStepViewModel,
+        communityCreateModel: this.model
+      })
+    );
     return this.invitePeopleStepView;
   },
 
   initOverviewView: function(optionsForRegion) {
-    this.overviewStepView = new CommunityCreationOverviewView(optionsForRegion({
-      model: this.overviewStepViewModel,
-      communityCreateModel: this.model,
-    }));
+    this.overviewStepView = new CommunityCreationOverviewView(
+      optionsForRegion({
+        model: this.overviewStepViewModel,
+        communityCreateModel: this.model
+      })
+    );
     return this.overviewStepView;
   },
 
@@ -128,9 +147,13 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     appEvents.trigger('track-event', 'community.create.active.' + this.model.get('stepState'));
 
     this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
-    this.githubProjectsStepViewModel.set({ active: newStepState === stepConstants.GITHUB_PROJECTS });
+    this.githubProjectsStepViewModel.set({
+      active: newStepState === stepConstants.GITHUB_PROJECTS
+    });
     this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
-    this.inviteConfirmationStepViewModel.set({ active: newStepState === stepConstants.INVITE_CONFIRMATION });
+    this.inviteConfirmationStepViewModel.set({
+      active: newStepState === stepConstants.INVITE_CONFIRMATION
+    });
     this.overviewStepViewModel.set({ active: newStepState === stepConstants.OVERVIEW });
   },
 
@@ -158,10 +181,8 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   /* Called after navigation to destroy an navigable dialog box */
   navigationalHide: function() {
     this.hideInternal();
-  },
-
+  }
 });
-
 
 cocktail.mixin(CommunityCreateView, KeyboardEventMixin);
 

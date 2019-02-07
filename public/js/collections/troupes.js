@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../utils/context');
 var realtime = require('../components/realtime');
@@ -21,5 +21,5 @@ var TroupeCollection = gitterRealtimeClient.RoomCollection.extend({
 
 module.exports = {
   TroupeCollection: TroupeCollection,
-  TroupeModel:      RoomModel
+  TroupeModel: RoomModel
 };

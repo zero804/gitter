@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
@@ -6,18 +6,20 @@ var ObjectId = Schema.ObjectId;
 
 module.exports = {
   install: function(mongooseConnection) {
-
-    var TroupeInviteSchema = new Schema({
-      troupeId: { type: ObjectId, required: true },
-      type: { type: String, 'enum': ['email', 'github', 'twitter', 'gitlab'], required: true },
-      emailAddress: { type: String, required: true },
-      externalId: { type: String, required: true },
-      userId: { type: ObjectId, required: false },
-      invitedByUserId: { type: ObjectId },
-      secret: { type: String },
-      state: { type: String, 'enum': ['PENDING', 'ACCEPTED', 'REJECTED'], required: true },
-      reminderSent: { type: Date, required: false }
-    }, { strict: 'throw' });
+    var TroupeInviteSchema = new Schema(
+      {
+        troupeId: { type: ObjectId, required: true },
+        type: { type: String, enum: ['email', 'github', 'twitter', 'gitlab'], required: true },
+        emailAddress: { type: String, required: true },
+        externalId: { type: String, required: true },
+        userId: { type: ObjectId, required: false },
+        invitedByUserId: { type: ObjectId },
+        secret: { type: String },
+        state: { type: String, enum: ['PENDING', 'ACCEPTED', 'REJECTED'], required: true },
+        reminderSent: { type: Date, required: false }
+      },
+      { strict: 'throw' }
+    );
 
     TroupeInviteSchema.schemaTypeName = 'TroupeInviteSchema';
 
@@ -29,20 +31,22 @@ module.exports = {
 
     // Only allow a single pending invite
     // per external id
-    TroupeInviteSchema.extraIndices = [{
-      keys: {
-        troupeId: 1,
-        type: 1,
-        externalId: 1
-      },
-      options: {
-        background: true,
-        unique: true,
-        partialFilterExpression: {
-          state: 'PENDING'
+    TroupeInviteSchema.extraIndices = [
+      {
+        keys: {
+          troupeId: 1,
+          type: 1,
+          externalId: 1
+        },
+        options: {
+          background: true,
+          unique: true,
+          partialFilterExpression: {
+            state: 'PENDING'
+          }
         }
       }
-    }];
+    ];
 
     var TroupeInvite = mongooseConnection.model('TroupeInvite', TroupeInviteSchema);
 

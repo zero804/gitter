@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
@@ -26,10 +26,14 @@ function processText(markdown) {
   }
 
   return new Promise(function(resolve, reject) {
-    processor.process(markdown, function (err, result) {
+    processor.process(markdown, function(err, result) {
       if (err) {
         stats.event('markdown.failure');
-        errorReporter(err, { text: markdown, processed: !!result }, { module: 'markdown-processor' });
+        errorReporter(
+          err,
+          { text: markdown, processed: !!result },
+          { module: 'markdown-processor' }
+        );
 
         if (result) {
           // hey, at least we got a result!
@@ -42,9 +46,7 @@ function processText(markdown) {
 
       return resolve(result);
     });
-
   });
 }
-
 
 module.exports = processText;

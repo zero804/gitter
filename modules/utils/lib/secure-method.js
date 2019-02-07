@@ -24,20 +24,18 @@ function iterateValidators(validators, context, args) {
     }
 
     var validator = validators[position];
-    return Promise.resolve(validator.apply(context, args))
-      .then(function(access) {
-        if (access) return true;
-        return iteratorValidators(position + 1);
-      })
+    return Promise.resolve(validator.apply(context, args)).then(function(access) {
+      if (access) return true;
+      return iteratorValidators(position + 1);
+    });
   })(0);
 }
 
 function execSecurityValidators(context, validators, fn, args) {
-  return iterateValidators(validators, context, args)
-    .then(function(access) {
-      if (!access) throw new StatusError(403);
-      return fn.apply(context, args);
-    });
+  return iterateValidators(validators, context, args).then(function(access) {
+    if (!access) throw new StatusError(403);
+    return fn.apply(context, args);
+  });
 }
 
 function secureMethod(validators, fn) {
@@ -47,7 +45,7 @@ function secureMethod(validators, fn) {
     return Promise.try(function() {
       return execSecurityValidators(self, validators, fn, args);
     });
-  }
+  };
 }
 
 module.exports = secureMethod;

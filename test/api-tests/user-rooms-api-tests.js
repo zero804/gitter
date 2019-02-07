@@ -12,20 +12,17 @@ describe('user-rooms-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
     request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
-  fixtureLoader.ensureIntegrationEnvironment(
-    '#integrationUser1',
-    'GITTER_INTEGRATION_ORG'
-  );
+  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   var fixture = fixtureLoader.setup({
     deleteDocuments: {
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }],
+      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }]
     },
     user1: '#integrationUser1',
     troupe1: {
@@ -35,7 +32,7 @@ describe('user-rooms-api', function() {
     troupe2: {
       security: 'PRIVATE',
       users: ['user1']
-    },
+    }
   });
 
   it('GET /v1/user/:userId/rooms', function() {
@@ -46,13 +43,17 @@ describe('user-rooms-api', function() {
       .then(function(result) {
         var rooms = result.body;
 
-        assert(rooms.some(function(r) {
-          return r.id === fixture.troupe1.id;
-        }));
+        assert(
+          rooms.some(function(r) {
+            return r.id === fixture.troupe1.id;
+          })
+        );
 
-        assert(rooms.some(function(r) {
-          return r.id === fixture.troupe2.id;
-        }));
+        assert(
+          rooms.some(function(r) {
+            return r.id === fixture.troupe2.id;
+          })
+        );
 
         assert.strictEqual(rooms.length, 2);
       });
@@ -70,5 +71,4 @@ describe('user-rooms-api', function() {
         assert.strictEqual(mention.length, 0);
       });
   });
-
-})
+});

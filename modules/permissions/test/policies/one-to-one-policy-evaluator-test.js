@@ -1,11 +1,10 @@
-"use strict";
+'use strict';
 
 var assert = require('assert');
 var Promise = require('bluebird');
 var OneToOnePolicyEvaluator = require('../../lib/policies/one-to-one-policy-evaluator');
 
 describe('one-to-one-policy-evaluator', function() {
-
   var FIXTURES = [
     { name: 'anon users can access anything', userId: null },
     { name: 'User in the room can access', userId: '1', inRoom: true },
@@ -46,7 +45,8 @@ describe('one-to-one-policy-evaluator', function() {
           }
           assert.strictEqual(admin, false);
           assert.strictEqual(addUser, false);
-        });
+        }
+      );
     });
-  })
+  });
 });

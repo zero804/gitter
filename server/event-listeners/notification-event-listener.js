@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
@@ -9,8 +9,8 @@ var presenceService = require('gitter-web-presence');
 var onlineNotificationGeneratorService = require('../services/notifications/online-notification-generator-service');
 var pushNotificationPostbox = require('../services/notifications/push-notification-postbox');
 var debug = require('debug')('gitter:app:notification-event-listener');
-var pushNotificationGateway = require("../gateways/push-notification-gateway");
-var pushNotificationFilter = require("gitter-web-push-notification-filter");
+var pushNotificationGateway = require('../gateways/push-notification-gateway');
+var pushNotificationFilter = require('gitter-web-push-notification-filter');
 
 //
 // This installs the listeners that will listen to events
@@ -22,16 +22,18 @@ exports.install = function() {
 
   /* New online notification */
   appEvents.onNewOnlineNotification(function(troupeId, chatId, userIds) {
-    return onlineNotificationGeneratorService.sendOnlineNotifications(troupeId, chatId, userIds)
-      .catch(function (err) {
+    return onlineNotificationGeneratorService
+      .sendOnlineNotifications(troupeId, chatId, userIds)
+      .catch(function(err) {
         logger.error('Error while generating online notifications: ' + err, { exception: err });
       });
   });
 
   /* New push notification */
   appEvents.onNewPushNotificationForChat(function(troupeId, chatId, userIds, mentioned) {
-    return pushNotificationPostbox.queueNotificationsForChat(troupeId, chatId, userIds, mentioned)
-      .catch(function (err) {
+    return pushNotificationPostbox
+      .queueNotificationsForChat(troupeId, chatId, userIds, mentioned)
+      .catch(function(err) {
         logger.error('Error while generating push notification: ' + err, { exception: err });
       });
   });
@@ -41,20 +43,24 @@ exports.install = function() {
     var userIds = data.userIds;
     debug('Publishing badge count updates for %s  users.', userIds.length);
 
-    return pushNotificationGateway.sendUsersBadgeUpdates(userIds)
-      .catch(function(err) {
-        logger.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, { exception: err });
-        errorReporter(err, { users: userIds }, { module: 'notification-event-listener' });
+    return pushNotificationGateway.sendUsersBadgeUpdates(userIds).catch(function(err) {
+      logger.error('Error while calling sendUsersBadgeUpdates. Silently ignoring. ' + err, {
+        exception: err
       });
+      errorReporter(err, { users: userIds }, { module: 'notification-event-listener' });
+    });
   });
 
   presenceService.on('eyeballSignal', function(userId, troupeId, eyeballSignal) {
-    if(!eyeballSignal) return; // Only clear the notifications when signals eyeballs on
+    if (!eyeballSignal) return; // Only clear the notifications when signals eyeballs on
 
-    return pushNotificationFilter.resetNotificationsForUserTroupe(userId, troupeId)
+    return pushNotificationFilter
+      .resetNotificationsForUserTroupe(userId, troupeId)
       .catch(function(err) {
-        logger.error('Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err, { exception: err });
+        logger.error(
+          'Error while calling resetNotificationsForUserTroupe. Silently ignoring. ' + err,
+          { exception: err }
+        );
       });
   });
-
 };

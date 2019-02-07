@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Backbone = require('backbone');
 var realtime = require('../components/realtime');
@@ -7,7 +7,7 @@ var SyncMixin = require('./sync-mixin');
 var context = require('../utils/context');
 
 var UserModel = Backbone.Model.extend({
-  idAttribute: "id",
+  idAttribute: 'id',
   sync: SyncMixin.sync
 });
 
@@ -16,7 +16,7 @@ var RosterCollection = LiveCollection.extend({
   modelName: 'user',
   urlTemplate: '/v1/rooms/:troupeId/users',
   contextModel: context.delayedContextModel(1000),
-  getSnapshotState: function () {
+  getSnapshotState: function() {
     return { lean: true, limit: 25 };
   },
   client: function() {

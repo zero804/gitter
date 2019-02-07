@@ -1,14 +1,12 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var context = require('../../../utils/context');
 var link = require('./tmpl/link.hbs');
 
 module.exports = (function() {
-
-
   function getRoomRepo() {
     var room = context.troupe();
-    if(room.get('githubType') === 'REPO') {
+    if (room.get('githubType') === 'REPO') {
       return room.get('uri');
     } else {
       return '';
@@ -16,7 +14,6 @@ module.exports = (function() {
   }
 
   var decorator = {
-
     decorate: function(view) {
       var roomRepo = getRoomRepo();
 
@@ -25,11 +22,13 @@ module.exports = (function() {
         var repo = $issue.data('issueRepo') || roomRepo;
         var issueNumber = $issue.data('issue');
 
-        if(repo && issueNumber) {
-          $issue.html(link({
-            href: 'https://github.com/' + repo + '/issues/' + issueNumber,
-            content: '#' + issueNumber
-          }));
+        if (repo && issueNumber) {
+          $issue.html(
+            link({
+              href: 'https://github.com/' + repo + '/issues/' + issueNumber,
+              content: '#' + issueNumber
+            })
+          );
         }
       });
 
@@ -37,11 +36,13 @@ module.exports = (function() {
         var $mention = $(this);
         var username = $mention.data('screenName');
 
-        if(username) {
-          $mention.html(link({
-            href: 'https://github.com/' + username,
-            content: '@' + username
-          }));
+        if (username) {
+          $mention.html(
+            link({
+              href: 'https://github.com/' + username,
+              content: '@' + username
+            })
+          );
         }
       });
 
@@ -50,19 +51,18 @@ module.exports = (function() {
         var repo = $commit.data('commitRepo');
         var sha = $commit.data('commitSha');
 
-        if(repo && sha) {
+        if (repo && sha) {
           var shortSha = sha.substring(0, 7);
-          $commit.html(link({
-            href: 'https://github.com/' + repo + '/commit/' + sha,
-            content: repo + '@' + shortSha
-          }));
+          $commit.html(
+            link({
+              href: 'https://github.com/' + repo + '/commit/' + sha,
+              content: repo + '@' + shortSha
+            })
+          );
         }
       });
-
     }
   };
 
   return decorator;
-
-
 })();

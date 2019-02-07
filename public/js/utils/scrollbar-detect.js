@@ -1,11 +1,11 @@
-"use strict";
+'use strict';
 
 var hasScrollBars;
 
 // Some innovative scrollbar measuring stuff
 function detect() {
-  var scrollDiv = document.createElement("div");
-  scrollDiv.className = "scrollbar-measure";
+  var scrollDiv = document.createElement('div');
+  scrollDiv.className = 'scrollbar-measure';
   document.body.appendChild(scrollDiv);
 
   // Get the scrollbar width

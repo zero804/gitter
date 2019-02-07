@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var appEvents = require('gitter-web-appevents');
@@ -11,13 +11,22 @@ var debug = require('debug')('gitter:app:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
   return Promise.all([
-      chatService.findByIdLean(chatId, { fromUserId: 1, text: 1 }),
-      troupeDao.findByIdRequired(troupeId, { uri: 1, oneToOne: true })
-    ])
+    chatService.findByIdLean(chatId, { fromUserId: 1, text: 1 }),
+    troupeDao.findByIdRequired(troupeId, { uri: 1, oneToOne: true })
+  ])
     .spread(function(chat, troupe) {
       if (!chat) throw new Error('Chat not found');
 
-      return [chat, troupe, userDao.findById(chat.fromUserId, { username: 1, displayName: 1, gravatarImageUrl: 1, gravatarVersion: 1 })];
+      return [
+        chat,
+        troupe,
+        userDao.findById(chat.fromUserId, {
+          username: 1,
+          displayName: 1,
+          gravatarImageUrl: 1,
+          gravatarVersion: 1
+        })
+      ];
     })
     .spread(function(chat, troupe, fromUser) {
       var oneToOne = troupe.oneToOne;
@@ -46,23 +55,21 @@ exports.sendOnlineNotifications = Promise.method(function(troupeId, chatId, user
   if (!userIds.length) return;
   debug('sendOnlineNotifications to %s users', userIds.length);
 
-  return generateChatMessageNotification(troupeId, chatId)
-    .then(function(notification) {
-      _.forEach(userIds, function(userId) {
-        var n = {
-          userId: userId,
-          troupeId: troupeId,
-          title: notification.title,
-          text: notification.text,
-          link: notification.link,
-          icon: notification.icon,
-          sound: notification.sound,
-          chatId: chatId
-        };
+  return generateChatMessageNotification(troupeId, chatId).then(function(notification) {
+    _.forEach(userIds, function(userId) {
+      var n = {
+        userId: userId,
+        troupeId: troupeId,
+        title: notification.title,
+        text: notification.text,
+        link: notification.link,
+        icon: notification.icon,
+        sound: notification.sound,
+        chatId: chatId
+      };
 
-        debug("Online notifications: %j", n);
-        appEvents.userNotification(n);
-      });
-
+      debug('Online notifications: %j', n);
+      appEvents.userNotification(n);
     });
+  });
 });

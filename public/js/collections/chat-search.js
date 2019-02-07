@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var Backbone = require('backbone');
 var chatModels = require('./chat');
 var apiClient = require('../components/api-client');
@@ -31,7 +31,7 @@ var ChatSearchCollection = Backbone.Collection.extend({
   fetchSearch: function(queryText, callback, context) {
     this.queryText = queryText;
     this.atBottom = false; // TODO: make this nicer
-    this.fetchLatest({ }, callback, context);
+    this.fetchLatest({}, callback, context);
   },
   sync: SyncMixin.sync
 });

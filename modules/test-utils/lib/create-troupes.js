@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var Troupe = require('gitter-web-persistence').Troupe;
@@ -6,10 +6,8 @@ var TroupeUser = require('gitter-web-persistence').TroupeUser;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
 
-
 // This corresponds with require("giter-web-rooms/lib/room-membership-flags").MODES.all
 var DEFAULT_ROOM_MEMBERSHIP_FLAGS = 109;
-
 
 function generateSecurityDescriptorForTroupeFixture(f, fixture) {
   var securityDescriptor = f.securityDescriptor || {};
@@ -79,39 +77,42 @@ function generateSecurityDescriptorForTroupeFixture(f, fixture) {
 }
 
 function bulkInsertTroupeUsers(troupeId, userIds, membershipStrategy) {
-    var bulk = TroupeUser.collection.initializeUnorderedBulkOp();
+  var bulk = TroupeUser.collection.initializeUnorderedBulkOp();
 
-    userIds.forEach(function(userId, index) {
-      var membership = membershipStrategy && membershipStrategy(userId, index);
-      var flags, lurk;
+  userIds.forEach(function(userId, index) {
+    var membership = membershipStrategy && membershipStrategy(userId, index);
+    var flags, lurk;
 
-      if (membership) {
-        flags = membership.flags;
-        lurk = membership.lurk;
-      } else {
-        flags = DEFAULT_ROOM_MEMBERSHIP_FLAGS;
-        lurk = false;
-      }
+    if (membership) {
+      flags = membership.flags;
+      lurk = membership.lurk;
+    } else {
+      flags = DEFAULT_ROOM_MEMBERSHIP_FLAGS;
+      lurk = false;
+    }
 
-      bulk.find({ troupeId: troupeId, userId: userId })
-        .upsert()
-        .updateOne({
-          $set: { flags: flags, lurk: lurk },
-          $setOnInsert: { troupeId: troupeId, userId: userId }
-        });
-    });
+    bulk
+      .find({ troupeId: troupeId, userId: userId })
+      .upsert()
+      .updateOne({
+        $set: { flags: flags, lurk: lurk },
+        $setOnInsert: { troupeId: troupeId, userId: userId }
+      });
+  });
 
-    return Promise.fromCallback(function(callback) {
-      bulk.execute(callback);
-    });
-  }
+  return Promise.fromCallback(function(callback) {
+    bulk.execute(callback);
+  });
+}
 
 // eslint-disable-next-line complexity
 function createTroupe(fixtureName, f, fixture) {
   var oneToOneUsers;
 
   if (f.oneToOne && f.userIds) {
-    oneToOneUsers = f.userIds.map(function(userId) { return { userId: userId }; });
+    oneToOneUsers = f.userIds.map(function(userId) {
+      return { userId: userId };
+    });
   } else {
     oneToOneUsers = [];
   }
@@ -141,46 +142,49 @@ function createTroupe(fixtureName, f, fixture) {
     oneToOneUsers: oneToOneUsers,
     githubType: githubType,
     dateDeleted: f.dateDeleted,
-    userCount: f.users && f.users.length || f.userCount,
+    userCount: (f.users && f.users.length) || f.userCount,
     tags: f.tags,
-    providers: f.providers,
+    providers: f.providers
   };
 
   doc.sd = generateSecurityDescriptorForTroupeFixture(f, fixture);
 
   debug('Creating troupe %s with %j', fixtureName, doc);
-  return Troupe.create(doc)
-    .tap(function(troupe) {
-      if (!f.userIds || !f.userIds.length) return;
-      return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
-    });
+  return Troupe.create(doc).tap(function(troupe) {
+    if (!f.userIds || !f.userIds.length) return;
+    return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
+  });
 }
 
 function createTroupes(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
-
     if (key.match(/^troupe/)) {
       var expectedTroupe = expected[key];
 
-      expectedTroupe.userIds = expectedTroupe.users && expectedTroupe.users.map(function(user) {
-        return fixture[user]._id;
-      });
+      expectedTroupe.userIds =
+        expectedTroupe.users &&
+        expectedTroupe.users.map(function(user) {
+          return fixture[user]._id;
+        });
 
       var expectedSecurityDescriptor = expectedTroupe && expectedTroupe.securityDescriptor;
       if (expectedSecurityDescriptor) {
-        expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
-          return fixture[user]._id;
-        });
+        expectedSecurityDescriptor.extraMembers =
+          expectedSecurityDescriptor.extraMembers &&
+          expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
 
-        expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
-          return fixture[user]._id;
-        });
+        expectedSecurityDescriptor.extraAdmins =
+          expectedSecurityDescriptor.extraAdmins &&
+          expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
       }
 
-      return createTroupe(key, expectedTroupe, fixture)
-        .then(function(troupe) {
-          fixture[key] = troupe;
-        });
+      return createTroupe(key, expectedTroupe, fixture).then(function(troupe) {
+        fixture[key] = troupe;
+      });
     }
 
     return null;

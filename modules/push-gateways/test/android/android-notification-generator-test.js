@@ -22,5 +22,4 @@ describe('android-notification-generator', function() {
       message: 'gittertestbot  \nhello  \nmooo'
     });
   });
-
-})
+});

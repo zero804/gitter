@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -13,7 +13,8 @@ var RequestHttpCache = require('request-http-cache');
 var useForeverExtension = require('./use-forever-extension');
 
 function createRedisClient() {
-  var redisCachingConfig = process.env.REDIS_CACHING_CONNECTION_STRING || config.get("redis_caching");
+  var redisCachingConfig =
+    process.env.REDIS_CACHING_CONNECTION_STRING || config.get('redis_caching');
   if (typeof redisCachingConfig === 'string') {
     redisCachingConfig = env.redis.parse(redisCachingConfig);
   }
@@ -40,7 +41,7 @@ var extensions = [
   logFailingRequest,
   httpRequestCache.extension,
   requestWithRetry({ maxRetries: 3 }),
-  logRateLimit,
+  logRateLimit
 ];
 
 if (config.get('github:foreverAgent')) {

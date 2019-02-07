@@ -10,7 +10,6 @@ var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filter
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 var scopeUpgrader = require('../../../components/scope-upgrader');
 
-
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-github-projects-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
@@ -22,7 +21,6 @@ require('../../behaviors/isomorphic');
 require('@gitterhq/styleguide/css/components/headings.css');
 require('@gitterhq/styleguide/css/components/buttons.css');
 
-
 var _super = CommunityCreateBaseStepView.prototype;
 
 module.exports = CommunityCreateBaseStepView.extend({
@@ -32,23 +30,27 @@ module.exports = CommunityCreateBaseStepView.extend({
   behaviors: {
     Isomorphic: {
       orgListView: { el: '.community-create-org-list-root', init: 'initOrgListView' },
-      repoListView: { el: '.community-create-repo-list-root', init: 'initRepoListView' },
-    },
+      repoListView: { el: '.community-create-repo-list-root', init: 'initRepoListView' }
+    }
   },
 
   initOrgListView: function(optionsForRegion) {
-    this.orgListView = new CommunityCreationOrgListView(optionsForRegion({
-      collection: this.communityCreateModel.orgs
-    }));
+    this.orgListView = new CommunityCreationOrgListView(
+      optionsForRegion({
+        collection: this.communityCreateModel.orgs
+      })
+    );
     this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
     this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
     return this.orgListView;
   },
 
   initRepoListView: function(optionsForRegion) {
-    this.repoListView = new CommunityCreationRepoListView(optionsForRegion({
-      collection: this.filteredRepos
-    }));
+    this.repoListView = new CommunityCreationRepoListView(
+      optionsForRegion({
+        collection: this.filteredRepos
+      })
+    );
     this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
     this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
     return this.repoListView;
@@ -63,7 +65,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     reposArea: '.js-community-create-github-projects-repos-area',
     repoFilterInput: '.primary-community-repo-name-filter-input',
     repoScopeMissingNote: '.community-create-repo-missing-note',
-    upgradeGitHub: '.js-upgrade-github',
+    upgradeGitHub: '.js-upgrade-github'
   }),
 
   events: _.extend({}, _super.events, {
@@ -101,7 +103,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   setSelectedGitHubProjectCommunityState: function() {
-    if(this.model.get('isOrgAreaActive')) {
+    if (this.model.get('isOrgAreaActive')) {
       var selectedOrgId = this.model.get('selectedOrgId');
       var selectedOrgName = this.model.get('selectedOrgName') || '';
       this.communityCreateModel.set({
@@ -112,7 +114,7 @@ module.exports = CommunityCreateBaseStepView.extend({
         githubRepoId: null,
         isUsingExplicitGitHubProject: !!selectedOrgName
       });
-    } else if(this.model.get('isRepoAreaActive')) {
+    } else if (this.model.get('isRepoAreaActive')) {
       var selectedRepoId = this.model.get('selectedRepoId');
       var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
       this.communityCreateModel.set({
@@ -155,14 +157,14 @@ module.exports = CommunityCreateBaseStepView.extend({
   onOrgSelectionChange: function(activeModel) {
     var selectedOrgId = null;
     var selectedOrgName = null;
-    if(activeModel) {
-       selectedOrgId = activeModel.get('id');
-       selectedOrgName = activeModel.get('name');
+    if (activeModel) {
+      selectedOrgId = activeModel.get('id');
+      selectedOrgName = activeModel.get('name');
     }
 
     // Set any repo item that may be selected inactive
     var previousActiveRepoModel = this.communityCreateModel.repos.findWhere({ active: true });
-    if(previousActiveRepoModel) {
+    if (previousActiveRepoModel) {
       previousActiveRepoModel.set('active', false);
     }
 
@@ -175,7 +177,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.setSelectedGitHubProjectCommunityState();
     // Clicking a org moves you onto the next step and fills in the data
-    if(activeModel) {
+    if (activeModel) {
       this.onStepNext();
     }
   },
@@ -183,14 +185,14 @@ module.exports = CommunityCreateBaseStepView.extend({
   onRepoSelectionChange: function(activeModel) {
     var selectedRepoId = null;
     var selectedRepoName = null;
-    if(activeModel) {
-       selectedRepoId = activeModel.get('id');
-       selectedRepoName = activeModel.get('name');
+    if (activeModel) {
+      selectedRepoId = activeModel.get('id');
+      selectedRepoName = activeModel.get('name');
     }
 
     // Set any org item that may be selected inactive
     var previousActiveOrgModel = this.communityCreateModel.orgs.findWhere({ active: true });
-    if(previousActiveOrgModel) {
+    if (previousActiveOrgModel) {
       previousActiveOrgModel.set('active', false);
     }
 
@@ -203,7 +205,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.setSelectedGitHubProjectCommunityState();
     // Clicking a repo moves you onto the next step and fills in the data
-    if(activeModel) {
+    if (activeModel) {
       this.onStepNext();
     }
   },
@@ -222,7 +224,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
     this.filteredRepos.setFilter(function(model) {
       var shouldShow = true;
-      if(filterString && filterString.length > 0) {
+      if (filterString && filterString.length > 0) {
         shouldShow = fuzzysearch(filterString, model.get('name').toLowerCase());
       }
 
@@ -237,11 +239,11 @@ module.exports = CommunityCreateBaseStepView.extend({
     scopeUpgrader('repo')
       .then(function() {
         self.ui.repoScopeMissingNote.hide();
-        return self.communityCreateModel.refreshGitHubCollections({ repos: true })
+        return self.communityCreateModel.refreshGitHubCollections({ repos: true });
       })
       .then(function() {
         self.applyFilterToRepos();
-      })
+      });
 
     return false;
   }

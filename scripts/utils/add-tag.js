@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-
 var opts = require('yargs')
   .option('uri', {
     alias: 'r',
@@ -20,27 +19,25 @@ var opts = require('yargs')
     type: 'boolean'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var persistenceService = require('gitter-web-persistence');
 
 function dedupe(item, index, arr) {
-  return (arr.indexOf(item) === index);
+  return arr.indexOf(item) === index;
 }
 
 tagRoom(opts.uri, opts.tags, {
   keepOriginal: opts['keep-original']
 });
 
-
 function addTag(room, tags, opts) {
   opts = opts || {};
   if (!room) throw new Error('Room not found.');
 
   var preExistingTags = [];
-  if(opts.keepOriginal) {
+  if (opts.keepOriginal) {
     preExistingTags = preExistingTags.concat(room.tags || []);
   }
   room.tags = preExistingTags.concat(tags).filter(dedupe);
@@ -56,11 +53,11 @@ function tagRoom(uri, tags, opts) {
     .then(function(room) {
       return addTag(room, tags, opts);
     })
-    .then(function (room) {
+    .then(function(room) {
       console.log('done.');
       process.exit();
     })
-    .catch(function (err) {
+    .catch(function(err) {
       console.log(err, err.stack);
       process.exit(1);
     });

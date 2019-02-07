@@ -4,5 +4,5 @@
 module.exports = function(number, singular, plural) {
   // TODO: use i18n as this doesn't work except in English
   if (number === 1) return singular;
-  return (typeof plural === 'string') ? plural : singular + 's';
+  return typeof plural === 'string' ? plural : singular + 's';
 };

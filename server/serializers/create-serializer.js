@@ -10,15 +10,17 @@ module.exports = function(serializerDirectory) {
   };
 
   fs.readdirSync(__dirname + '/' + serializerDirectory).forEach(function(fileName) {
-    if(!/\.js$/.test(fileName)) return;
+    if (!/\.js$/.test(fileName)) return;
 
     var baseName = path.basename(fileName, '.js');
 
-    var strategyName = baseName.replace(/\-./g, function(match) {
-      return match[1].toUpperCase();
-    }).replace(/^./, function(match) {
-      return match.toUpperCase();
-    });
+    var strategyName = baseName
+      .replace(/\-./g, function(match) {
+        return match[1].toUpperCase();
+      })
+      .replace(/^./, function(match) {
+        return match.toUpperCase();
+      });
 
     var Strategy = require('./' + serializerDirectory + '/' + baseName);
     if (Strategy.prototype) {

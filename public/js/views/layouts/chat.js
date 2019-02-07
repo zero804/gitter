@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var context = require('../../utils/context');
@@ -29,17 +29,18 @@ var ChatLayout = Marionette.LayoutView.extend({
   },
 
   initChatRegion: function(optionsForRegion) {
-    var monitorUnreadItems = Marionette.getOption(this, "monitorUnreadItems");
+    var monitorUnreadItems = Marionette.getOption(this, 'monitorUnreadItems');
 
     const decorators = [issuableDecorator, commitDecorator, mentionDecorator, emojiDecorator];
 
-    return new ChatContainerView(optionsForRegion({
-      collection: this.options.chatCollection,
-      decorators,
-      monitorScrollPane: monitorUnreadItems && this.ui.scroll // Monitor the scroll region for unread items
-    }));
+    return new ChatContainerView(
+      optionsForRegion({
+        collection: this.options.chatCollection,
+        decorators,
+        monitorScrollPane: monitorUnreadItems && this.ui.scroll // Monitor the scroll region for unread items
+      })
+    );
   }
-
 });
 
 module.exports = ChatLayout;

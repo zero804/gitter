@@ -12,7 +12,6 @@ var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 
 var clientEnv = require('gitter-client-env');
 
-
 var proto = BaseCollectionView.prototype;
 
 module.exports = BaseCollectionView.extend({
@@ -20,7 +19,7 @@ module.exports = BaseCollectionView.extend({
   className: 'secondary-collection',
 
   childEvents: extendCallbackHash(proto.childEvents, {
-    'item:activated': 'onItemActivated',
+    'item:activated': 'onItemActivated'
   }),
 
   modelEvents: extendCallbackHash(proto.modelEvents, {
@@ -50,16 +49,16 @@ module.exports = BaseCollectionView.extend({
   serializeData: function() {
     var data = this.model.toJSON();
     return _.extend({}, proto.serializeData.apply(this, arguments), data, {
-      isSearch:        (data.state === 'search'),
-      orgRoomUrl:      this.getOrgRoomUrl(),
+      isSearch: data.state === 'search',
+      orgRoomUrl: this.getOrgRoomUrl()
     });
   },
 
-  getOrgRoomUrl: function () {
+  getOrgRoomUrl: function() {
     var groupId = this.roomMenuModel.get('groupId');
     var selectedGroup = this.groupsCollection.get(groupId);
     var uri = getOrgNameFromUri(document.location.pathname);
-    if(selectedGroup) {
+    if (selectedGroup) {
       uri = selectedGroup.get('uri');
     }
     return urlJoin('/orgs', uri, 'rooms');
@@ -79,13 +78,16 @@ module.exports = BaseCollectionView.extend({
     this.listenTo(this.collection, 'reset', this.toggleShowMore, this);
   },
 
-  toggleShowMore: function () {
+  toggleShowMore: function() {
     //Sort out show more button
     if (this.roomMenuModel.get('state') === 'org' && this.collection.length >= 9) {
       this.ui.showMore.attr('href', this.getOrgRoomUrl());
       var groupId = this.roomMenuModel.get('groupId');
       var selectedGroup = this.groupsCollection.get(groupId);
-      this.ui.showMore.attr('title', 'more ' + !!selectedGroup ? selectedGroup.get('name') : '' + ' rooms');
+      this.ui.showMore.attr(
+        'title',
+        'more ' + !!selectedGroup ? selectedGroup.get('name') : '' + ' rooms'
+      );
       this.ui.showMore[0].classList.remove('hidden');
     } else {
       this.ui.showMore[0].classList.add('hidden');
@@ -97,7 +99,7 @@ module.exports = BaseCollectionView.extend({
 
     switch (this.roomMenuModel.get('state')) {
       case 'org':
-        isHidden = (index > 9);
+        isHidden = index > 9;
         break;
       default:
         isHidden = !!this.primaryCollection.get(model.get('id'));
@@ -113,9 +115,9 @@ module.exports = BaseCollectionView.extend({
   },
 
   onItemActivated: function(view) {
-    return (this.roomMenuModel.get('state') === 'search') ?
-      this.redirectToPermalink(view) :
-      proto.onItemActivated.apply(this, arguments);
+    return this.roomMenuModel.get('state') === 'search'
+      ? this.redirectToPermalink(view)
+      : proto.onItemActivated.apply(this, arguments);
   },
 
   redirectToPermalink: function(view) {
@@ -126,6 +128,5 @@ module.exports = BaseCollectionView.extend({
 
     var name = this.troupeModel.name;
     this._triggerNavigation(permalink, 'chat', name);
-  },
-
+  }
 });

@@ -1,11 +1,5 @@
 /*jshint unused:true, browser:true*/
-define([
-  'jquery',
-  'underscore',
-  'expect',
-  'faye'
-], function($, _, expect, Faye) {
-
+define(['jquery', 'underscore', 'expect', 'faye'], function($, _, expect, Faye) {
   var ClientAuth = function() {};
   ClientAuth.prototype.outgoing = function(message, callback) {
     message.ext = message.ext || {};
@@ -16,62 +10,59 @@ define([
   var userId = null;
 
   function getUserId(callback) {
-    if(userId) return callback(userId);
+    if (userId) return callback(userId);
 
     $.ajax({
       url: '/user/',
       headers: {
-        'Authorization': 'Bearer TEST-TOKEN-1'
+        Authorization: 'Bearer TEST-TOKEN-1'
       },
       success: function(data) {
         userId = data[0].id;
         return callback(null, userId);
       },
 
-      error: function(j,s,e) {
+      error: function(j, s, e) {
         return callback(e);
       }
     });
-
   }
 
   function emptyFunc() {}
 
-  describe('Faye', function(){
-    describe('.connect()', function(){
-      it('should be able to connect and disconnect many times', null, /* Disable this test for now */ function(done) {
+  describe('Faye', function() {
+    describe('.connect()', function() {
+      it(
+        'should be able to connect and disconnect many times',
+        null,
+        /* Disable this test for now */ function(done) {
+          getUserId(function(err, userId) {
+            if (err) return done(err);
+            var COUNT = 10;
+            var total = 0;
 
-        getUserId(function(err, userId) {
-          if(err) return done(err);
-          var COUNT = 10;
-          var total = 0;
-
-          function errorCallback(e) {
-            return done(e);
-          }
-
-          function subscriptionCallback(){
-            subscription.cancel();
-            if(++total == COUNT) {
-              done();
+            function errorCallback(e) {
+              return done(e);
             }
-          }
 
-          for(var i = 0; i < COUNT; i++) {
-            var client = new Faye.Client('/faye');
-            client.addExtension(new ClientAuth());
+            function subscriptionCallback() {
+              subscription.cancel();
+              if (++total == COUNT) {
+                done();
+              }
+            }
 
-            var subscription = client.subscribe('/user/' + userId, emptyFunc);
-            subscription.errback(errorCallback);
-            subscription.callback(subscriptionCallback);
+            for (var i = 0; i < COUNT; i++) {
+              var client = new Faye.Client('/faye');
+              client.addExtension(new ClientAuth());
 
-          }
-
-        });
-      });
-
+              var subscription = client.subscribe('/user/' + userId, emptyFunc);
+              subscription.errback(errorCallback);
+              subscription.callback(subscriptionCallback);
+            }
+          });
+        }
+      );
     });
-
   });
-
 });

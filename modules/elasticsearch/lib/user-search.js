@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var config = require('gitter-web-env').config;
 var Promise = require('bluebird');
@@ -13,29 +13,25 @@ function searchGlobalUsers(queryText, options) {
     index: 'gitter-primary',
     type: 'user',
     body: {
-      fields: ["_id"],
+      fields: ['_id'],
       query: {
         query_string: {
           query: queryText,
-          default_operator: "AND"
+          default_operator: 'AND'
         }
       },
-      sort: [
-        { _score: { order: "desc"} }
-      ],
+      sort: [{ _score: { order: 'desc' } }]
     }
   };
 
-  return client.search(queryRequest)
-    .then(function(response) {
-      return response.hits.hits.map(function(hit) {
-        return hit._id;
-      });
+  return client.search(queryRequest).then(function(response) {
+    return response.hits.hits.map(function(hit) {
+      return hit._id;
     });
+  });
 }
 
 function elasticsearchUserTypeahead(queryText, options) {
-
   // Normal searches dont work well for typeaheads
   // e.g searching "maldito" normally wouldnt match malditogeek.
   // but phrase_prefix handles that.
@@ -50,11 +46,8 @@ function elasticsearchUserTypeahead(queryText, options) {
   var query = {
     multi_match: {
       query: queryText,
-      type: "phrase_prefix",
-      fields: [
-        "username",
-        "displayName"
-      ]
+      type: 'phrase_prefix',
+      fields: ['username', 'displayName']
     }
   };
 
@@ -73,20 +66,17 @@ function elasticsearchUserTypeahead(queryText, options) {
     index: 'gitter-primary',
     type: 'user',
     body: {
-      fields: ["_id"],
+      fields: ['_id'],
       query: query,
-      sort: [
-        { _score: { order: "desc"} }
-      ],
+      sort: [{ _score: { order: 'desc' } }]
     }
   };
 
-  return client.search(queryRequest)
-    .then(function(response) {
-      return response.hits.hits.map(function(hit) {
-        return hit._id;
-      });
+  return client.search(queryRequest).then(function(response) {
+    return response.hits.hits.map(function(hit) {
+      return hit._id;
     });
+  });
 }
 
 module.exports = {

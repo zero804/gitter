@@ -14,12 +14,12 @@ module.exports = Marionette.LayoutView.extend({
 
   modelEvents: {
     'change:active': 'onActiveChange',
-    'change': 'onChange'
+    change: 'onChange'
   },
 
   events: {
     'click @ui.nextStep': 'onStepNext',
-    'click @ui.backStep': 'onStepBack',
+    'click @ui.backStep': 'onStepBack'
   },
 
   initialize: function(options) {

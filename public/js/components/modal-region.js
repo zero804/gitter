@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 module.exports = {
   currentView: null,
   show: function(view) {
-    if(this.currentView) {
+    if (this.currentView) {
       var cv = this.currentView;
       cv.hideInternal();
     }
@@ -15,7 +15,7 @@ module.exports = {
   },
 
   destroy: function() {
-    if(this.currentView) {
+    if (this.currentView) {
       this.currentView.navigationalHide();
       this.currentView = null;
     }

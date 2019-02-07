@@ -6,5 +6,4 @@ var requestingSecurityDescriptorStatusConstants = {
   ERROR: 'error'
 };
 
-
 module.exports = requestingSecurityDescriptorStatusConstants;

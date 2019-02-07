@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var context = require('../utils/context');
 var troupeModels = require('./../collections/troupes');
 var realtime = require('./realtime');
@@ -10,18 +10,18 @@ module.exports = {
       urlTemplate: '/v1/user/:userId/rooms',
       contextModel: context.contextModel(),
       onMessage: function(message) {
-        debug("Incoming: %j", message);
+        debug('Incoming: %j', message);
 
         var operation = message.operation;
         var newModel = message.model;
         var id = newModel.id;
 
         /* Only operate on the current context */
-        if(id !== context.getTroupeId()) return;
+        if (id !== context.getTroupeId()) return;
 
         var parsed = new troupeModels.TroupeModel(newModel, { parse: true });
 
-        switch(operation) {
+        switch (operation) {
           case 'create':
             // There can be existing documents for create events if the doc was created on this
             // client and lazy-inserted into the collection
@@ -40,7 +40,7 @@ module.exports = {
             break;
 
           default:
-            debug("Unknown operation %s ignoring", operation);
+            debug('Unknown operation %s ignoring', operation);
         }
       },
 

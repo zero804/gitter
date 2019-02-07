@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../utils/context');
 var apiClient = require('./api-client');
@@ -15,39 +15,43 @@ realtimePresenceTracking.track();
 function send(value) {
   if (localStore.get('gitterNoEyeballSignals')) return;
 
-  if(!context.getTroupeId()) {
+  if (!context.getTroupeId()) {
     return;
   }
 
   var clientId = realtime.getClientId();
 
-  if(!clientId) {
+  if (!clientId) {
     return;
   }
 
-  apiClient.post('/v1/eyeballs', {
-      socketId: clientId,
-      on: value
-    }, {
-      dataType: 'text',
-      global: false
-    })
+  apiClient
+    .post(
+      '/v1/eyeballs',
+      {
+        socketId: clientId,
+        on: value
+      },
+      {
+        dataType: 'text',
+        global: false
+      }
+    )
     .catch(function(err) {
-      if(err.status === 400) {
+      if (err.status === 400) {
         // The connection is gone...
         debug('Eyeballs returned 400. Realtime connection may be dead.');
-        appEvents.trigger('eyeballsInvalid', clientId)
+        appEvents.trigger('eyeballsInvalid', clientId);
       } else {
         debug('An error occurred while communicating eyeballs');
       }
     });
 }
 
-
 appEvents.on('change:room', function() {
   eyeballsDetector.forceActivity();
 });
 
 eyeballsDetector.events.on('change', function(state) {
-  send(state)
+  send(state);
 });

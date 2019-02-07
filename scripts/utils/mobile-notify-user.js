@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var chatService = require('gitter-web-chats');
 var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
 var serializer = require('../../server/serializers/notification-serializer');
-var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service')
+var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
 
@@ -18,14 +18,13 @@ var opts = require('yargs')
     string: true
   })
   .option('room-uri', {
-    description: 'room uri for chat',
+    description: 'room uri for chat'
   })
   .option('other-user', {
-    description: 'Other user',
+    description: 'Other user'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 var promise;
 
@@ -35,17 +34,17 @@ function findRoom(user, opts) {
   }
 
   if (opts.otherUser) {
-    return userService.findByUsername(opts.otherUser)
-      .then(function(otherUser) {
-        return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
-      });
+    return userService.findByUsername(opts.otherUser).then(function(otherUser) {
+      return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
+    });
   }
 
-  throw new Error('Require either other user or roomUri')
+  throw new Error('Require either other user or roomUri');
 }
 
 if (opts.username) {
-  promise = userService.findByUsername(opts.username)
+  promise = userService
+    .findByUsername(opts.username)
     .bind({})
     .then(function(user) {
       this.user = user;
@@ -64,7 +63,12 @@ if (opts.username) {
 
       return [
         serializer.serializeObject(this.room._id, troupeStrategy),
-        serializer.serialize(chats.map(function(x) { return x._id; }), chatStrategy),
+        serializer.serialize(
+          chats.map(function(x) {
+            return x._id;
+          }),
+          chatStrategy
+        )
       ];
     })
     .spread(function(room, chats) {
@@ -82,7 +86,8 @@ if (opts.username) {
   });
 }
 
-promise.catch(function(err) {
+promise
+  .catch(function(err) {
     console.error(err.stack);
   })
   .finally(function() {

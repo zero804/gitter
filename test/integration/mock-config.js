@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var events = require("events");
+var events = require('events');
 
 function MockConfig(hash) {
   this.hash = hash;
@@ -10,9 +10,9 @@ function MockConfig(hash) {
 MockConfig.prototype.get = function(key) {
   var path = key.split(':');
   var root = this.hash;
-  for(var i = 0; i < path.length; i++) {
+  for (var i = 0; i < path.length; i++) {
     root = root[path[i]];
-    if(root === null || root === undefined) return root;
+    if (root === null || root === undefined) return root;
   }
   return root;
 };

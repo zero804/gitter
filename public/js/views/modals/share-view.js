@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
@@ -29,10 +29,10 @@ var View = Marionette.ItemView.extend({
   },
 
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'add':
         this.dialog.hide();
-        window.location.hash = "#add";
+        window.location.hash = '#add';
         break;
 
       case 'cancel':
@@ -42,7 +42,12 @@ var View = Marionette.ItemView.extend({
   },
 
   getShareUrl: function() {
-    return clientEnv['basePath'] + '/' + context.getTroupe().uri + '?utm_source=share-link&utm_medium=link&utm_campaign=share-link';
+    return (
+      clientEnv['basePath'] +
+      '/' +
+      context.getTroupe().uri +
+      '?utm_source=share-link&utm_medium=link&utm_campaign=share-link'
+    );
   },
 
   getBadgeUrl: function() {
@@ -50,20 +55,24 @@ var View = Marionette.ItemView.extend({
   },
 
   getBadgeMD: function() {
-    var linkUrl = clientEnv['basePath'] + '/' + context.getTroupe().uri + '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
+    var linkUrl =
+      clientEnv['basePath'] +
+      '/' +
+      context.getTroupe().uri +
+      '?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge';
     return '[![Gitter](' + this.getBadgeUrl() + ')](' + linkUrl + ')';
   },
 
   detectFlash: function() {
-    if (navigator.plugins && navigator.plugins["Shockwave Flash"]) {
+    if (navigator.plugins && navigator.plugins['Shockwave Flash']) {
       return true;
     }
 
-    if(~navigator.appVersion.indexOf("MSIE") && !~navigator.userAgent.indexOf("Opera")){
-      try{
-        new window.ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+    if (~navigator.appVersion.indexOf('MSIE') && !~navigator.userAgent.indexOf('Opera')) {
+      try {
+        new window.ActiveXObject('ShockwaveFlash.ShockwaveFlash');
         return true;
-      } catch(e) {
+      } catch (e) {
         // Ignore the failure
       }
     }
@@ -109,7 +118,8 @@ var View = Marionette.ItemView.extend({
     $btn.text('Sending...');
     btn.disabled = true;
 
-    apiClient.priv.post('/create-badge', { uri: context.troupe().get('uri') }, { global: false })
+    apiClient.priv
+      .post('/create-badge', { uri: context.troupe().get('uri') }, { global: false })
       .then(function() {
         $btn.text('Pull Request sent!');
       })
@@ -123,13 +133,13 @@ var View = Marionette.ItemView.extend({
 var Modal = ModalView.extend({
   initialize: function(options) {
     options = options || {};
-    options.title = options.title || "Share this chat room";
+    options.title = options.title || 'Share this chat room';
 
     ModalView.prototype.initialize.call(this, options);
     this.view = new View(options);
   },
   menuItems: [
-    { action: "add", pull: 'right', text: "Add people", className: "modal--default__footer__link"}
+    { action: 'add', pull: 'right', text: 'Add people', className: 'modal--default__footer__link' }
   ]
 });
 

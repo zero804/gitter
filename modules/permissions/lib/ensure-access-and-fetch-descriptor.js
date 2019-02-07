@@ -15,9 +15,9 @@ var policyFactory = require('./policy-factory');
 function validateGitHubType(requestedType, actualGitHubType) {
   var expectedGitHubType;
 
-  switch(requestedType) {
+  switch (requestedType) {
     case 'GH_GUESS':
-      switch(actualGitHubType) {
+      switch (actualGitHubType) {
         case 'ORG':
           return 'GH_ORG';
         case 'REPO':
@@ -27,7 +27,7 @@ function validateGitHubType(requestedType, actualGitHubType) {
         default:
           throw new StatusError('Unknown GitHub type:' + actualGitHubType);
       }
-      /* break; */
+    /* break; */
 
     case 'GH_ORG':
       expectedGitHubType = 'ORG';
@@ -46,7 +46,10 @@ function validateGitHubType(requestedType, actualGitHubType) {
   }
 
   if (expectedGitHubType !== actualGitHubType) {
-    throw new StatusError(400, 'Backing object does not match type: ' + expectedGitHubType + ' vs ' + actualGitHubType);
+    throw new StatusError(
+      400,
+      'Backing object does not match type: ' + expectedGitHubType + ' vs ' + actualGitHubType
+    );
   }
 
   return requestedType;
@@ -57,29 +60,32 @@ function validateAndFetchBackingInfoForGitHub(user, options) {
     throw new StatusError(400, 'GitHub objects must have a linkPath');
   }
 
-  return validateGitHubUri(user, options.linkPath)
-    .then(function(githubInfo) {
-      if (!githubInfo) throw new StatusError(404);
-      var type = validateGitHubType(options.type, githubInfo.type);
+  return validateGitHubUri(user, options.linkPath).then(function(githubInfo) {
+    if (!githubInfo) throw new StatusError(404);
+    var type = validateGitHubType(options.type, githubInfo.type);
 
-      var policyEvaluator;
-      if (options.obtainAccessFromGitHubRepo) {
-        policyEvaluator = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(user, type, options.linkPath, options.obtainAccessFromGitHubRepo);
-      } else {
-        policyEvaluator = policyFactory.getPreCreationPolicyEvaluator(user, type, options.linkPath);
-      }
+    var policyEvaluator;
+    if (options.obtainAccessFromGitHubRepo) {
+      policyEvaluator = policyFactory.getPreCreationPolicyEvaluatorWithRepoFallback(
+        user,
+        type,
+        options.linkPath,
+        options.obtainAccessFromGitHubRepo
+      );
+    } else {
+      policyEvaluator = policyFactory.getPreCreationPolicyEvaluator(user, type, options.linkPath);
+    }
 
-      return policyEvaluator.canAdmin()
-        .then(function(isAdmin) {
-          if (!isAdmin) throw new StatusError(403);
+    return policyEvaluator.canAdmin().then(function(isAdmin) {
+      if (!isAdmin) throw new StatusError(403);
 
-          return [type, githubInfo];
-        });
+      return [type, githubInfo];
     });
+  });
 }
 
 function validateAndFetchBackingInfo(user, options) {
-  switch(options.type || null) {
+  switch (options.type || null) {
     case null:
       // No backing object. Nothing to do
       return Promise.resolve([null, null]);
@@ -103,16 +109,15 @@ function ensureAccessAndFetchDescriptor(user, options) {
   var linkPath = options.linkPath;
   var internalId = options.internalId;
 
-  return validateAndFetchBackingInfo(user, options)
-    .spread(function(type, githubInfo) {
-      return securityDescriptorGenerator.generate(user, {
-          type: type,
-          linkPath: linkPath,
-          externalId: githubInfo && githubInfo.githubId,
-          internalId: internalId,
-          security: security
-        });
+  return validateAndFetchBackingInfo(user, options).spread(function(type, githubInfo) {
+    return securityDescriptorGenerator.generate(user, {
+      type: type,
+      linkPath: linkPath,
+      externalId: githubInfo && githubInfo.githubId,
+      internalId: internalId,
+      security: security
     });
+  });
 }
 
 module.exports = Promise.method(ensureAccessAndFetchDescriptor);

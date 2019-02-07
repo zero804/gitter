@@ -16,7 +16,7 @@ describe('gitlab-issue-service #slow #gitlab', function() {
   );
 
   const FAKE_USER = {
-    username: 'FAKE_USER',
+    username: 'FAKE_USER'
   };
 
   let oauthToken = null;
@@ -41,22 +41,22 @@ describe('gitlab-issue-service #slow #gitlab', function() {
 
     it('should fetch public issue', () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 1)
-        .then((issue) => {
-          assert.strictEqual(issue.iid, 1);
-          assert.strictEqual(issue.state, 'open');
-          assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
-        });
+      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 1).then(issue => {
+        assert.strictEqual(issue.iid, 1);
+        assert.strictEqual(issue.state, 'open');
+        assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
+      });
     });
 
-    it('shouldn\'t fetch missing issue', () => {
+    it("shouldn't fetch missing issue", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 999999)
+      return glService
+        .getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 999999)
         .then(() => {
-          assert.fail('Shouldn\'t be able to fetch missing issue');
+          assert.fail("Shouldn't be able to fetch missing issue");
         })
-        .catch((err) => {
-          if(err instanceof assert.AssertionError) {
+        .catch(err => {
+          if (err instanceof assert.AssertionError) {
             throw err;
           }
 
@@ -66,32 +66,31 @@ describe('gitlab-issue-service #slow #gitlab', function() {
 
     it('should fetch confidential issue', () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 2)
-        .then((issue) => {
-          assert.strictEqual(issue.iid, 2);
-          assert.strictEqual(issue.state, 'open');
-          assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
-        });
+      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 2).then(issue => {
+        assert.strictEqual(issue.iid, 2);
+        assert.strictEqual(issue.state, 'open');
+        assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
+      });
     });
 
     it('should fetch private issue', () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PRIVATE_PROJECT1_URI, 1)
-        .then((issue) => {
-          assert.strictEqual(issue.iid, 1);
-          assert.strictEqual(issue.state, 'open');
-          assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
-        });
+      return glService.getIssue(fixtureLoader.GITLAB_PRIVATE_PROJECT1_URI, 1).then(issue => {
+        assert.strictEqual(issue.iid, 1);
+        assert.strictEqual(issue.state, 'open');
+        assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
+      });
     });
 
-    it('shouldn\'t fetch issue in unauthroized private project', () => {
+    it("shouldn't fetch issue in unauthroized private project", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)
+      return glService
+        .getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)
         .then(() => {
-          assert.fail('Shouldn\'t be able to fetch issue in unauthorized private project');
+          assert.fail("Shouldn't be able to fetch issue in unauthorized private project");
         })
-        .catch((err) => {
-          if(err instanceof assert.AssertionError) {
+        .catch(err => {
+          if (err instanceof assert.AssertionError) {
             throw err;
           }
 
@@ -107,22 +106,22 @@ describe('gitlab-issue-service #slow #gitlab', function() {
 
     it('should fetch public issue', () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 1)
-        .then((issue) => {
-          assert.strictEqual(issue.iid, 1);
-          assert.strictEqual(issue.state, 'open');
-          assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
-        });
+      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 1).then(issue => {
+        assert.strictEqual(issue.iid, 1);
+        assert.strictEqual(issue.state, 'open');
+        assert.strictEqual(issue.author.username, fixtureLoader.GITLAB_USER_USERNAME);
+      });
     });
 
-    it('shouldn\'t fetch confidential issue', () => {
+    it("shouldn't fetch confidential issue", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 2)
+      return glService
+        .getIssue(fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI, 2)
         .then(() => {
-          assert.fail('Shouldn\'t be able to fetch confidential issue');
+          assert.fail("Shouldn't be able to fetch confidential issue");
         })
-        .catch((err) => {
-          if(err instanceof assert.AssertionError) {
+        .catch(err => {
+          if (err instanceof assert.AssertionError) {
             throw err;
           }
 
@@ -130,14 +129,15 @@ describe('gitlab-issue-service #slow #gitlab', function() {
         });
     });
 
-    it('shouldn\'t fetch private issue', () => {
+    it("shouldn't fetch private issue", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_PRIVATE_PROJECT1_URI, 1)
+      return glService
+        .getIssue(fixtureLoader.GITLAB_PRIVATE_PROJECT1_URI, 1)
         .then(() => {
-          assert.fail('Shouldn\'t be able to fetch issue in unauthorized private project');
+          assert.fail("Shouldn't be able to fetch issue in unauthorized private project");
         })
-        .catch((err) => {
-          if(err instanceof assert.AssertionError) {
+        .catch(err => {
+          if (err instanceof assert.AssertionError) {
             throw err;
           }
 
@@ -145,14 +145,15 @@ describe('gitlab-issue-service #slow #gitlab', function() {
         });
     });
 
-    it('shouldn\'t fetch issue in unauthroized private project', () => {
+    it("shouldn't fetch issue in unauthroized private project", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
-      return glService.getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)
+      return glService
+        .getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)
         .then(() => {
-          assert.fail('Shouldn\'t be able to fetch issue in unauthorized private project');
+          assert.fail("Shouldn't be able to fetch issue in unauthorized private project");
         })
-        .catch((err) => {
-          if(err instanceof assert.AssertionError) {
+        .catch(err => {
+          if (err instanceof assert.AssertionError) {
             throw err;
           }
 

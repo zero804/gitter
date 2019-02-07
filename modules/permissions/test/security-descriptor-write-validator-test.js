@@ -5,7 +5,6 @@ var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
 
 describe('security-descriptor-write-validator', function() {
-
   it('should validate correctly', function() {
     var sd = {
       type: 'GH_REPO',
@@ -29,7 +28,7 @@ describe('security-descriptor-write-validator', function() {
     try {
       securityDescriptorWriteValidator(sd);
       assert.ok(false);
-    } catch(e) {
+    } catch (e) {
       assert.strictEqual(e.status, 400);
     }
   });
@@ -46,7 +45,7 @@ describe('security-descriptor-write-validator', function() {
     try {
       securityDescriptorWriteValidator(sd);
       assert.ok(false);
-    } catch(e) {
+    } catch (e) {
       assert.strictEqual(e.status, 400);
     }
   });

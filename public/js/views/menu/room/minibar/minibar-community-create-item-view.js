@@ -12,6 +12,5 @@ module.exports = ItemView.extend({
 
   onItemClicked: function() {
     window.location.hash = '#createcommunity';
-  },
-
+  }
 });

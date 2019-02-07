@@ -4,12 +4,10 @@ var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
 var PermissionsPeopleListItemTemplate = require('./tmpl/modal-footer-button-list-view-item.hbs');
 
-
 var FooterButtonListItemView = Marionette.ItemView.extend({
   template: PermissionsPeopleListItemTemplate,
   tagName: 'button',
   attributes: function() {
-
     var action = this.model.get('action');
 
     var attributes = {
@@ -18,7 +16,7 @@ var FooterButtonListItemView = Marionette.ItemView.extend({
     };
 
     var disabled = this.model.get('disabled');
-    if(disabled) {
+    if (disabled) {
       attributes['disabled'] = disabled;
     }
 
@@ -35,10 +33,9 @@ var FooterButtonListItemView = Marionette.ItemView.extend({
   },
 
   triggers: {
-    'click': 'item:activate'
-  },
+    click: 'item:activate'
+  }
 });
-
 
 var FooterButtonListView = Marionette.CollectionView.extend({
   template: '',

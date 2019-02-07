@@ -22,19 +22,26 @@ function getExtraIndices(schema) {
 // more information....
 
 function ensureIndices(models) {
-  return Promise.map(models, function(model) {
-    debug('Processing %s', model.modelName);
-    return model.ensureIndexes()
-      .then(function() {
+  return Promise.map(
+    models,
+    function(model) {
+      debug('Processing %s', model.modelName);
+      return model.ensureIndexes().then(function() {
         var extraIndices = getExtraIndices(model.schema);
 
-        return Promise.map(extraIndices, function(extraIndex) {
-          debug('Processing extra index on %s: %j', model.modelName, extraIndex);
+        return Promise.map(
+          extraIndices,
+          function(extraIndex) {
+            debug('Processing extra index on %s: %j', model.modelName, extraIndex);
 
-          return model.collection.createIndex(extraIndex.keys, extraIndex.options);
-        }, { concurrency: 1 });
+            return model.collection.createIndex(extraIndex.keys, extraIndex.options);
+          },
+          { concurrency: 1 }
+        );
       });
-  }, { concurrency: 1 });
+    },
+    { concurrency: 1 }
+  );
 }
 
 function reconcileSpecToActual(spec, actual) {
@@ -49,7 +56,10 @@ function reconcileSpecToActual(spec, actual) {
       if (Boolean(specIndex.options.sparse) !== Boolean(actualIndex.sparse)) return false;
 
       if (specIndex.options.partialFilterExpression) {
-        if (!_.isEqual(specIndex.options.partialFilterExpression, actualIndex.partialFilterExpression)) return false;
+        if (
+          !_.isEqual(specIndex.options.partialFilterExpression, actualIndex.partialFilterExpression)
+        )
+          return false;
       } else {
         if (actualIndex.partialFilterExpression) return false;
       }
@@ -65,7 +75,7 @@ function reconcileSpecToActual(spec, actual) {
           keys: specIndex.keys,
           options: specIndex.options
         }
-      })
+      });
     }
   });
 
@@ -77,51 +87,53 @@ function reconcileSpecToActual(spec, actual) {
         keys: actualIndex.key,
         options: _.omit(actualIndex, ['key', 'ns', 'v'])
       }
-    })
+    });
   });
 
   return result;
-
 }
 
 /**
  * This should only be called from `scripts/utils/reconcile-mongodb-indexes.js`
  */
 function reconcileIndices(models) {
-  return Promise.map(models, function(model) {
-    return Promise.fromCallback(function(cb) {
-      model.collection.indexes(cb);
-    })
-    .then(function(indexes) {
-      var specIndices = model.schema.indexes()
-        .map(function(mongooseIndex) {
+  return Promise.map(
+    models,
+    function(model) {
+      return Promise.fromCallback(function(cb) {
+        model.collection.indexes(cb);
+      })
+        .then(function(indexes) {
+          var specIndices = model.schema
+            .indexes()
+            .map(function(mongooseIndex) {
+              return {
+                keys: mongooseIndex[0],
+                options: mongooseIndex[1]
+              };
+            })
+            .concat(getExtraIndices(model.schema));
+
+          var reconciled = reconcileSpecToActual(specIndices, indexes);
           return {
-            keys: mongooseIndex[0],
-            options: mongooseIndex[1]
-          }
+            name: model.modelName,
+            changes: reconciled
+          };
         })
-        .concat(getExtraIndices(model.schema));
+        .catch(function(e) {
+          // If mongodb doesn't know about the collection,
+          // don't reconcile the indexes on it!
+          if (e.message !== 'no collection') throw e;
 
-      var reconciled = reconcileSpecToActual(specIndices, indexes);
-      return {
-        name: model.modelName,
-        changes: reconciled
-      };
-    })
-    .catch(function(e) {
-      // If mongodb doesn't know about the collection,
-      // don't reconcile the indexes on it!
-      if (e.message !== 'no collection') throw e;
-
-      return [];
-    })
-  }, { concurrency: 1 })
-  .then(function(reconciled) {
+          return [];
+        });
+    },
+    { concurrency: 1 }
+  ).then(function(reconciled) {
     return reconciled.filter(function(item) {
       return item.changes && item.changes.length;
     });
   });
-
 }
 
 module.exports = {

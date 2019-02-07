@@ -33,6 +33,6 @@ MenuBuilder.prototype = {
 
     return this.items;
   }
-}
+};
 
 module.exports = MenuBuilder;

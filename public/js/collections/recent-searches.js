@@ -7,7 +7,7 @@ var LimitedCollection = require('gitter-realtime-client/lib/limited-collection')
 var MAX_SAVED_SEARCHES = 5;
 
 var RecentSearchModel = Backbone.Model.extend({
-  defaults: { name: null, avatarUrl: null, isRecentSearch: true },
+  defaults: { name: null, avatarUrl: null, isRecentSearch: true }
 });
 
 var RecentSearchesCollection = Backbone.Collection.extend({
@@ -23,9 +23,13 @@ var RecentSearchesCollection = Backbone.Collection.extend({
 
   add: function(model) {
     var prev = this.findWhere({ name: model.name });
-    if (prev) { return prev.set('time', +new Date());}
+    if (prev) {
+      return prev.set('time', +new Date());
+    }
 
-    if (!model.name) { return; }
+    if (!model.name) {
+      return;
+    }
 
     model.time = +new Date();
     Backbone.Collection.prototype.add.apply(this, arguments);
@@ -41,7 +45,7 @@ var RecentSearchesCollection = Backbone.Collection.extend({
     return this.models.sort(this.comparator).slice(0, MAX_SAVED_SEARCHES);
   },
 
-  sync: localStorageSync.sync,
+  sync: localStorageSync.sync
 });
 
 var FilteredRecentSearches = LimitedCollection.extend({
@@ -54,7 +58,7 @@ var FilteredRecentSearches = LimitedCollection.extend({
       collection: collection,
       maxLength: MAX_SAVED_SEARCHES
     });
-  },
+  }
 });
 
 module.exports = FilteredRecentSearches;

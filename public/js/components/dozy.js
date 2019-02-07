@@ -1,9 +1,8 @@
-"use strict";
+'use strict';
 var appEvents = require('../utils/appevents');
 var debug = require('debug-proxy')('app:dozy');
 
 module.exports = (function() {
-
   var TIMEOUT = 120000;
   var THRESHOLD = TIMEOUT * 1.5;
 
@@ -15,12 +14,9 @@ module.exports = (function() {
     var sleepDetected = time > THRESHOLD;
     last = now;
 
-    if(sleepDetected) {
+    if (sleepDetected) {
       debug('Sleep detected!');
       appEvents.trigger('reawaken', time);
     }
-
   }, TIMEOUT);
-
-
 })();

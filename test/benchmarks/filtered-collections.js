@@ -47,13 +47,13 @@ makeBenchmark({
     'new adds': function() {
       var collection = makeNewCollections();
 
-      for(var i = 0; i < ITERATIONS; i++) {
+      for (var i = 0; i < ITERATIONS; i++) {
         collection.add({ id: i, i: i });
       }
     },
 
     'new changes': function() {
-      for(var i = 0; i < ITERATIONS; i++) {
+      for (var i = 0; i < ITERATIONS; i++) {
         var c = newStatic.at(i);
         c.set({ i: c.get('i') + 1 });
       }
@@ -62,9 +62,9 @@ makeBenchmark({
     'new change filter': function() {
       newStatic.comparator = function(a, b) {
         return a.get('i') - b.get('i');
-      }
+      };
 
-      for(var i = 0; i < 10; i++) {
+      for (var i = 0; i < 10; i++) {
         if (i % 2 === 0) {
           newStatic._filteredVersion.setFilter(function(model) {
             return model.get('i') % 3 === 0;
@@ -73,7 +73,6 @@ makeBenchmark({
           newStatic._filteredVersion.setFilter(defaultFilter);
         }
       }
-    },
-
+    }
   }
 });

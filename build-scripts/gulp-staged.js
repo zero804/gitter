@@ -9,8 +9,7 @@ var argv = require('yargs')
     array: true,
     describe: 'skip a stage'
   })
-  .help('help')
-  .argv;
+  .help('help').argv;
 
 function shouldSkip(stageName) {
   return argv['skip-stage'] && argv['skip-stage'].indexOf(stageName) >= 0;
@@ -32,7 +31,6 @@ function findStageTasks(config, stageName) {
 var stageMetaData = {};
 
 function configureTasks(config) {
-
   function createStageTask(stageName, previousStages) {
     if (shouldSkip(stageName)) return;
 
@@ -79,7 +77,6 @@ function configureTasks(config) {
     }
 
     gulp.task(stageName, previousStages, function(callback) {
-
       var seq = [];
       if (preSteps.length) {
         seq.push(preTaskName);
@@ -127,14 +124,14 @@ function configureTasks(config) {
         });
       }
       if (meta.pre && meta.pre.length) {
-        gutil.log('   Pre-steps:')
+        gutil.log('   Pre-steps:');
         meta.pre.forEach(function(m) {
           gutil.log('     ' + m);
         });
       }
 
       if (meta.main && meta.main.length) {
-        gutil.log('   Main:')
+        gutil.log('   Main:');
         meta.main.forEach(function(m) {
           gutil.log('     ' + m);
         });
@@ -146,7 +143,7 @@ function configureTasks(config) {
           gutil.log('     ' + m);
         });
       }
-    })
+    });
   });
 
   /**

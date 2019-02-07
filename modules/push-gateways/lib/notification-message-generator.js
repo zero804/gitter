@@ -1,5 +1,4 @@
-"use strict";
-
+'use strict';
 
 /**
 
@@ -30,7 +29,7 @@ var LAST_LINE_MIN_LENGTH = 30;
 var ent = require('ent');
 
 function truncate(line, maxLineLength) {
-  if(line.length > maxLineLength) {
+  if (line.length > maxLineLength) {
     line = line.substring(0, maxLineLength - 1).trim() + '…';
   }
   return line;
@@ -64,7 +63,7 @@ function getShortFromUserName(user) {
 // eslint-disable-next-line complexity
 function summarizeChatsInRoom(troupe, chats, options) {
   var appendText = options && options.appendText;
-  var maxMessageLength = options && options.maxMessageLength || MAX_NOTIFICATION_TEXT;
+  var maxMessageLength = (options && options.maxMessageLength) || MAX_NOTIFICATION_TEXT;
   var maxLength = maxMessageLength - (appendText ? appendText.length : 0);
 
   //
@@ -72,7 +71,11 @@ function summarizeChatsInRoom(troupe, chats, options) {
   //
   var notificationText = getHeaderLine(troupe) || '';
   var lastUsername = null;
-  for(var i = 0; i < chats.length && notificationText.length <= (maxLength - LAST_LINE_MIN_LENGTH); i++) {
+  for (
+    var i = 0;
+    i < chats.length && notificationText.length <= maxLength - LAST_LINE_MIN_LENGTH;
+    i++
+  ) {
     var chat = chats[i];
 
     // Only group chats prefix the username
@@ -86,7 +89,7 @@ function summarizeChatsInRoom(troupe, chats, options) {
     var text = getText(username, chat);
     if (!text) continue;
 
-    if ((notificationText.length + text.length) > maxLength) {
+    if (notificationText.length + text.length > maxLength) {
       text = truncate(text, maxLength - notificationText.length - 3 /* newline etc */);
       // We add extra spaces so that when they're removed on an iphone the notificationText still makes sense
     }

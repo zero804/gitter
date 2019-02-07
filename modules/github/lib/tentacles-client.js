@@ -9,5 +9,4 @@ var tentacles = new Tentacles({
   errorHandler: badCredentialsCheck
 });
 
-
 module.exports = tentacles;

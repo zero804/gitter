@@ -10,9 +10,7 @@ var CommunityCreateModel = require('public/js/views/community-create/community-c
 var CommunityCreateStepViewModel = require('public/js/views/community-create/community-create-step-view-model');
 var InvitePeopleView = require('public/js/views/community-create/invite-step/community-creation-invite-people-view');
 
-
 describe('community-creation-invite-people-view', function() {
-
   var communityCreateModel;
   var viewModel;
   var el;
@@ -20,7 +18,7 @@ describe('community-creation-invite-people-view', function() {
 
   var generateBeforeEachCb = function(newTroupeContext) {
     return function() {
-      if(newTroupeContext) {
+      if (newTroupeContext) {
         context.testOnly.resetTroupeContext(newTroupeContext);
       }
 
@@ -42,18 +40,19 @@ describe('community-creation-invite-people-view', function() {
         repoCollection: new Backbone.Collection()
       });
       view.render();
-    }
+    };
   };
 
   beforeEach(generateBeforeEachCb());
-
-
 
   it('should add email to list after submitting', function() {
     view.ui.emailInput.val('foo@bar.com');
     view.ui.emailInput.trigger('input');
     view.ui.emailSubmit.trigger('click');
-    assert.strictEqual(communityCreateModel.emailsToInvite.at(0).get('emailAddress'), 'foo@bar.com');
+    assert.strictEqual(
+      communityCreateModel.emailsToInvite.at(0).get('emailAddress'),
+      'foo@bar.com'
+    );
   });
 
   it('should not add email that is invalid after submitting', function() {
@@ -63,7 +62,4 @@ describe('community-creation-invite-people-view', function() {
     view.ui.emailSubmit.trigger('click');
     assert.strictEqual(communityCreateModel.emailsToInvite.length, 0);
   });
-
-
-
 });

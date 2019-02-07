@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var safeJson = require('./safe-json');
@@ -9,11 +9,11 @@ var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
 
 exports.cdn = function(url, parameters) {
-  return cdn(url, parameters ? parameters.hash:null);
+  return cdn(url, parameters ? parameters.hash : null);
 };
 
 function cdnUrlGenerator(url, options) {
-  if(options.root) {
+  if (options.root) {
     return options.root + url;
   }
 
@@ -22,26 +22,31 @@ function cdnUrlGenerator(url, options) {
 
 exports.bootScript = function(url, parameters) {
   var options = parameters.hash;
-  var jsRoot = options && options.jsRoot || "js";
+  var jsRoot = (options && options.jsRoot) || 'js';
 
   var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
-  var vendorScriptUrl = cdnUrlGenerator(jsRoot + "/vendor.js", options);
-  var bootScriptUrl = cdnUrlGenerator(jsRoot + "/" + url + ".js", options);
+  var vendorScriptUrl = cdnUrlGenerator(jsRoot + '/vendor.js', options);
+  var bootScriptUrl = cdnUrlGenerator(jsRoot + '/' + url + '.js', options);
 
   return util.format(
-         "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
-         "<script type='text/javascript' src='%s'></script>" +
-         "<script type='text/javascript' src='%s'></script>",
-         baseUrl,
-         vendorScriptUrl,
-         bootScriptUrl);
+    "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
+      "<script type='text/javascript' src='%s'></script>" +
+      "<script type='text/javascript' src='%s'></script>",
+    baseUrl,
+    vendorScriptUrl,
+    bootScriptUrl
+  );
 };
 
 function createEnv(context, options) {
-  if(options) {
-    return _.extend({
-      lang: context.lang
-    }, clientEnv, options);
+  if (options) {
+    return _.extend(
+      {
+        lang: context.lang
+      },
+      clientEnv,
+      options
+    );
   }
   return clientEnv;
 }
@@ -49,10 +54,13 @@ exports.generateEnv = function(parameters) {
   var options = parameters.hash;
   var env = createEnv(this, options);
 
-  return '<script type="text/javascript">' +
-          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
-          '</script>';
-
+  return (
+    '<script type="text/javascript">' +
+    'window.gitterClientEnv = ' +
+    safeJson(JSON.stringify(env)) +
+    ';' +
+    '</script>'
+  );
 };
 
 exports.generateTroupeContext = function(troupeContext, parameters) {
@@ -60,55 +68,63 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
 
   var env = createEnv(this, options);
 
-  return '<script type="text/javascript">' +
-          'window.gitterClientEnv = ' + safeJson(JSON.stringify(env)) + ';' +
-          'window.troupeContext = ' + safeJson(JSON.stringify(troupeContext)) + ';' +
-          '</script>';
+  return (
+    '<script type="text/javascript">' +
+    'window.gitterClientEnv = ' +
+    safeJson(JSON.stringify(env)) +
+    ';' +
+    'window.troupeContext = ' +
+    safeJson(JSON.stringify(troupeContext)) +
+    ';' +
+    '</script>'
+  );
 };
 
 exports.pluralize = pluralize;
 exports.when = when;
 
-  exports.toLowerCase = function (str) {
+exports.toLowerCase = function(str) {
   return str.toLowerCase();
 };
 
 exports.pad = function(options) {
-  var content = "" + options.fn(this);
+  var content = '' + options.fn(this);
   var width = options.hash.width || 40;
-  var directionRight = options.hash.direction ? options.hash.direction === "right" : true;
+  var directionRight = options.hash.direction ? options.hash.direction === 'right' : true;
 
   while (content.length < width) {
     if (directionRight) {
-      content+=" ";
+      content += ' ';
     } else {
-      content=" " + content;
+      content = ' ' + content;
     }
   }
   return content;
 };
 
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
-exports.typewriter = function (el, str) {
-  return util.format('<script type="text/javascript">\n' +
-    'var text = "%s";' +
-    'var input = $("%s");' +
-    'input.select();' +
-    'setTimeout(startTyping, 1000, input, text);' +
-    'function startTyping(input, text) {' +
+exports.typewriter = function(el, str) {
+  return util.format(
+    '<script type="text/javascript">\n' +
+      'var text = "%s";' +
+      'var input = $("%s");' +
+      'input.select();' +
+      'setTimeout(startTyping, 1000, input, text);' +
+      'function startTyping(input, text) {' +
       'for ( var i = 0; i < text.length; i++ ) {' +
-        'setTimeout(addText,120*i, input, text.charAt(i));' +
+      'setTimeout(addText,120*i, input, text.charAt(i));' +
       '}' +
-    '}' +
-    'function addText(i,c) {' +
+      '}' +
+      'function addText(i,c) {' +
       'if (c !== "-") i.val( i.val() + c );' +
-    '}' +
-  '</script>',
+      '}' +
+      '</script>',
     str,
-    el);
+    el
+  );
 };
 
-exports.formatNumber = function (n) {
+exports.formatNumber = function(n) {
   if (n < 1000) return n;
   if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
   return (n / 100000).toFixed(1) + 'm';
@@ -118,13 +134,13 @@ exports.formatNumber = function (n) {
  * githubTypeToClass() takes a GitHub type and provdides a css class
  *
  */
-exports.githubTypeToClass = function (type) {
+exports.githubTypeToClass = function(type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
   else if (/ORG/.test(type)) return 'octicon-organization';
   else return 'default';
 };
 
-exports.getRoomName = function (name) {
+exports.getRoomName = function(name) {
   return name.split('/')[1] || 'general';
 };

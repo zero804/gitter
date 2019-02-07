@@ -16,20 +16,21 @@ function GitHubUserEmailAddressService(user) {
  * On behalf of the calling user, find another users email address, given their username.
  * Will use various discovery methods to attempt to find it.
  */
-GitHubUserEmailAddressService.prototype.findEmailAddressForGitHubUser = Promise.method(function(username) {
+GitHubUserEmailAddressService.prototype.findEmailAddressForGitHubUser = Promise.method(function(
+  username
+) {
   // attempt to get a public email address
   return this._getValidPublicEmailAddress(username)
     .bind(this)
-    .then(function (email) {
+    .then(function(email) {
       if (email) return email; // we have found a valid public email address
 
-       // try get an email from commit
-      return this._getEmailFromCommit(username)
-        .then(function(email) {
-          if(email && isValidEmail(email)) return email;
-        });
+      // try get an email from commit
+      return this._getEmailFromCommit(username).then(function(email) {
+        if (email && isValidEmail(email)) return email;
+      });
     })
-    .catch(function (err) {
+    .catch(function(err) {
       logger.warn('Unable to discover email address for GitHub user', {
         username: username,
         exception: err
@@ -41,19 +42,19 @@ GitHubUserEmailAddressService.prototype.findEmailAddressForGitHubUser = Promise.
 
 GitHubUserEmailAddressService.prototype._getValidPublicEmailAddress = function(username) {
   var ghUser = new GitHubUserService(this.user);
-  return ghUser.getUser(username)
-    .then(function(githubUser) {
-      if(githubUser && githubUser.email && isValidEmail(githubUser.email)) {
-        return githubUser.email;
-      }
-    });
-}
+  return ghUser.getUser(username).then(function(githubUser) {
+    if (githubUser && githubUser.email && isValidEmail(githubUser.email)) {
+      return githubUser.email;
+    }
+  });
+};
 
 // Try to get email from the user commits if the user has at least one repo
 GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username) {
   var ghRepo = new GitHubRepoService(this.user);
 
-  return ghRepo.getReposForUser(username, {
+  return ghRepo
+    .getReposForUser(username, {
       firstPageOnly: true,
       sort: 'pushed',
       perPage: 10,
@@ -85,10 +86,11 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
         var repoFullname = repo.full_name;
 
         // Find the most recent commits by the author
-        return ghRepo.getCommits(repoFullname, {
+        return ghRepo
+          .getCommits(repoFullname, {
             firstPageOnly: true,
             author: username,
-            perPage: 5,
+            perPage: 5
           })
           .then(function(commits) {
             if (!commits) return null;
@@ -100,7 +102,12 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
 
             var emails = commits
               .map(function(commit) {
-                return commit.commit && commit.commit.author && commit.commit.author.email && commit.commit.author.email.toLowerCase();
+                return (
+                  commit.commit &&
+                  commit.commit.author &&
+                  commit.commit.author.email &&
+                  commit.commit.author.email.toLowerCase()
+                );
               })
               .filter(function(email) {
                 return email && isValidEmail(email);
@@ -132,8 +139,7 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
           .then(function(email) {
             if (email) return email;
             return findCommitsInNextRepo();
-          })
-
+          });
       })();
     })
     .then(function(email) {
@@ -149,7 +155,7 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
       }
 
       return email;
-    })
-}
+    });
+};
 
 module.exports = GitHubUserEmailAddressService;

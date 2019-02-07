@@ -37,7 +37,7 @@ PolicyEvaluator.prototype = {
         }
 
         return null;
-      })
+      });
   }),
 
   canWrite: Promise.method(function() {
@@ -163,13 +163,11 @@ PolicyEvaluator.prototype = {
         return this._checkAuthedMembershipWithGoodFaith();
       } else {
         return this._checkAuthedMembershipWithFullCheck();
-
       }
     } else {
       // Anonymous case
       return this._checkAnonymousAccessWithGoodFaith();
     }
-
   }),
 
   _checkAccessForInviteMembersPolicy: function() {
@@ -177,8 +175,7 @@ PolicyEvaluator.prototype = {
     var membersPolicy = this._securityDescriptor.members;
     var contextDelegate = this._contextDelegate;
 
-    assert(membersPolicy === 'INVITE' ||
-      membersPolicy === 'INVITE_OR_ADMIN');
+    assert(membersPolicy === 'INVITE' || membersPolicy === 'INVITE_OR_ADMIN');
 
     if (userId && contextDelegate) {
       return this._checkMembershipInContextForInviteRooms()
@@ -194,7 +191,7 @@ PolicyEvaluator.prototype = {
             // return this._isExtraAdmin();
             return this.canAdmin();
           }
-        })
+        });
     } else {
       return false;
     }
@@ -225,7 +222,8 @@ PolicyEvaluator.prototype = {
     var membersPolicy = this._securityDescriptor.members;
 
     var rateLimitKey = policyDelegate.getPolicyRateLimitKey(membersPolicy);
-    return policyCheckRateLimiter.checkForRecentSuccess(rateLimitKey)
+    return policyCheckRateLimiter
+      .checkForRecentSuccess(rateLimitKey)
       .bind(this)
       .then(function(recentCheck) {
         if (recentCheck) return true;
@@ -242,12 +240,16 @@ PolicyEvaluator.prototype = {
     var policyDelegate = this._policyDelegate;
     var membersPolicy = this._securityDescriptor.members;
 
-    return policyDelegate.hasPolicy(membersPolicy)
+    return policyDelegate
+      .hasPolicy(membersPolicy)
       .bind(this)
       .tap(function(access) {
         if (access) {
           var rateLimitKey = policyDelegate.getPolicyRateLimitKey(membersPolicy);
-          return policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, SUCCESS_RESULT_CACHE_TIME);
+          return policyCheckRateLimiter.recordSuccessfulCheck(
+            rateLimitKey,
+            SUCCESS_RESULT_CACHE_TIME
+          );
         }
       })
       .catch(PolicyDelegateTransportError, function(err) {
@@ -255,7 +257,7 @@ PolicyEvaluator.prototype = {
 
         // Anonymous access, public room, allow the user through
         return securityDescriptor.public;
-      })
+      });
   },
 
   /**
@@ -266,10 +268,10 @@ PolicyEvaluator.prototype = {
     var membersPolicy = this._securityDescriptor.members;
 
     var rateLimitKey = policyDelegate.getPolicyRateLimitKey(membersPolicy);
-    return policyCheckRateLimiter.checkForRecentSuccess(rateLimitKey)
+    return policyCheckRateLimiter
+      .checkForRecentSuccess(rateLimitKey)
       .bind(this)
       .then(function(recentSuccess) {
-
         // Whether or not you're a member, you still get access
         if (recentSuccess) {
           return true;
@@ -296,26 +298,28 @@ PolicyEvaluator.prototype = {
     var contextDelegate = this._contextDelegate;
     var membersPolicy = this._securityDescriptor.members;
 
-    return this._checkPolicyCacheResult(membersPolicy)
-      .catch(PolicyDelegateTransportError, function(err) {
-        logger.error('Error communicating with policy delegate backend' + err, { exception: err });
+    return this._checkPolicyCacheResult(membersPolicy).catch(PolicyDelegateTransportError, function(
+      err
+    ) {
+      logger.error('Error communicating with policy delegate backend' + err, { exception: err });
 
-        if (securityDescriptor.public) return true;
+      if (securityDescriptor.public) return true;
 
-        if (!contextDelegate) {
-          return false;
+      if (!contextDelegate) {
+        return false;
+      }
+
+      return contextDelegate.isMember().then(function(isMember) {
+        if (isMember) {
+          logger.error(
+            'Backend down but allowing user to access room on account of already being a member'
+          );
+          return true;
         }
 
-        return contextDelegate.isMember()
-          .then(function(isMember) {
-            if (isMember) {
-              logger.error('Backend down but allowing user to access room on account of already being a member');
-              return true;
-            }
-
-            return false;
-          });
+        return false;
       });
+    });
   },
 
   _checkAuthedAdminWithGoodFaith: function() {
@@ -323,15 +327,15 @@ PolicyEvaluator.prototype = {
     var adminPolicy = this._securityDescriptor.admins;
 
     var rateLimitKey = policyDelegate.getPolicyRateLimitKey(adminPolicy);
-    return policyCheckRateLimiter.checkForRecentSuccess(rateLimitKey)
+    return policyCheckRateLimiter
+      .checkForRecentSuccess(rateLimitKey)
       .bind(this)
       .then(function(recentSuccess) {
-
         // Whether or not you're a member, you still get access
         if (recentSuccess) {
           return true;
         } else {
-          return this._checkAuthedAdminWithFullCheck()
+          return this._checkAuthedAdminWithFullCheck();
         }
       });
   },
@@ -339,18 +343,20 @@ PolicyEvaluator.prototype = {
   _checkAuthedAdminWithFullCheck: function() {
     var adminPolicy = this._securityDescriptor.admins;
 
-    return this._checkPolicyCacheResult(adminPolicy)
-      .catch(PolicyDelegateTransportError, function(err) {
-        logger.error('Error communicating with policy delegate backend' + err, { exception: err });
+    return this._checkPolicyCacheResult(adminPolicy).catch(PolicyDelegateTransportError, function(
+      err
+    ) {
+      logger.error('Error communicating with policy delegate backend' + err, { exception: err });
 
-        return false;
-      });
+      return false;
+    });
   },
 
   _checkPolicyCacheResult: function(policyName) {
     var policyDelegate = this._policyDelegate;
 
-    return policyDelegate.hasPolicy(policyName)
+    return policyDelegate
+      .hasPolicy(policyName)
       .bind(this)
       .tap(function(access) {
         var userId = this._userId;
@@ -360,7 +366,14 @@ PolicyEvaluator.prototype = {
           var accessDetails = policyDelegate.getAccessDetails(policyName);
           if (accessDetails) {
             // This is not chained to the promise
-            knownAccessRecorder(userId, accessDetails.type, policyName, accessDetails.linkPath, accessDetails.externalId, access);
+            knownAccessRecorder(
+              userId,
+              accessDetails.type,
+              policyName,
+              accessDetails.linkPath,
+              accessDetails.externalId,
+              access
+            );
           }
         }
 
@@ -369,10 +382,13 @@ PolicyEvaluator.prototype = {
           var rateLimitKey = policyDelegate.getPolicyRateLimitKey(policyName);
 
           if (rateLimitKey) {
-            return policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, SUCCESS_RESULT_CACHE_TIME);
+            return policyCheckRateLimiter.recordSuccessfulCheck(
+              rateLimitKey,
+              SUCCESS_RESULT_CACHE_TIME
+            );
           }
         }
-      })
+      });
   }
 };
 
@@ -387,7 +403,6 @@ function bansIncludesUserId(bans, userId) {
     return mongoUtils.objectIDsEqual(userId, ban.userId);
   });
 }
-
 
 function userIdIsIn(userId, collection) {
   if (!collection || !collection.length) return false;

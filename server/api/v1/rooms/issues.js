@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var RepoService = require('gitter-web-github').GitHubRepoService;
@@ -12,9 +12,9 @@ var roomRepoService = require('gitter-web-rooms/lib/room-repo-service');
 
 function getEightSuggestedIssues(issues, includeRepo) {
   var suggestedIssues = [];
-  for(var i = issues.length - 1; i >= 0 && suggestedIssues.length < 8; i--) {
+  for (var i = issues.length - 1; i >= 0 && suggestedIssues.length < 8; i--) {
     var issue = issues[i];
-    if(issue) {
+    if (issue) {
       suggestedIssues.push(issue);
     }
   }
@@ -30,7 +30,7 @@ function getEightSuggestedIssues(issues, includeRepo) {
 function getTopEightMatchingIssues(issues, term, includeRepo) {
   var matches = issues
     .filter(function(issue) {
-      return issue && (''+issue.number).indexOf(term) === 0;
+      return issue && ('' + issue.number).indexOf(term) === 0;
     })
     .slice(0, 8)
     .map(function(issue) {
@@ -43,8 +43,6 @@ function getTopEightMatchingIssues(issues, term, includeRepo) {
   return matches;
 }
 
-
-
 module.exports = {
   id: 'issue',
 
@@ -53,19 +51,18 @@ module.exports = {
     var issueNumber = req.query.issueNumber || '';
 
     return Promise.try(function() {
-        if (repoName) {
-          return {
-            type: 'GH_REPO',
-            linkPath: repoName
-          }
-        }
+      if (repoName) {
+        return {
+          type: 'GH_REPO',
+          linkPath: repoName
+        };
+      }
 
-        // Resolve the repo name from the room
-        return loadTroupeFromParam(req)
-          .then(function(troupe) {
-            return roomRepoService.findAssociatedGithubObjectForRoom(troupe);
-          });
-      })
+      // Resolve the repo name from the room
+      return loadTroupeFromParam(req).then(function(troupe) {
+        return roomRepoService.findAssociatedGithubObjectForRoom(troupe);
+      });
+    })
       .bind({
         includeRepo: false
       })
@@ -94,7 +91,9 @@ module.exports = {
       .then(function(issues) {
         if (!issues) return [];
 
-        var matches = issueNumber ? getTopEightMatchingIssues(issues, issueNumber, this.includeRepo) : getEightSuggestedIssues(issues, this.includeRepo);
+        var matches = issueNumber
+          ? getTopEightMatchingIssues(issues, issueNumber, this.includeRepo)
+          : getEightSuggestedIssues(issues, this.includeRepo);
         return matches;
       });
   },
@@ -105,7 +104,7 @@ module.exports = {
         return roomRepoService.findAssociatedGithubRepoForRoom(troupe);
       })
       .then(function(repoUri) {
-        if(!repoUri) throw new StatusError(404);
+        if (!repoUri) throw new StatusError(404);
 
         var issueNumber = req.params.issue;
 
@@ -113,12 +112,11 @@ module.exports = {
         return issueService.getIssue(repoUri, issueNumber);
       })
       .then(function(issue) {
-        if(req.query.renderMarkdown && issue.body) {
-          return processText(issue.body)
-            .then(function(result) {
-              issue.body_html = result.html;
-              return issue;
-            });
+        if (req.query.renderMarkdown && issue.body) {
+          return processText(issue.body).then(function(result) {
+            issue.body_html = result.html;
+            return issue;
+          });
         }
 
         return issue;

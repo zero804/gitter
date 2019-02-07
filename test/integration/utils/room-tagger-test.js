@@ -20,9 +20,8 @@ var REPO = {
   }
 };
 
-describe('room-tagger', function () {
-
-  it('should work with repo information', function () {
+describe('room-tagger', function() {
+  it('should work with repo information', function() {
     assert.deepEqual(roomTagger(ROOM, REPO), [
       'javascript',
       'skills',
@@ -33,7 +32,7 @@ describe('room-tagger', function () {
     ]);
   });
 
-  it('should work without repo information', function () {
+  it('should work without repo information', function() {
     assert.deepEqual(roomTagger(ROOM), [
       'skills',
       'include',

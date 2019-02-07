@@ -1,14 +1,11 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 
 module.exports = (function() {
-
-
   var Behavior = Marionette.Behavior.extend({
-
     modelEvents: {
-      "change:lastMessageSeen": "onRender"
+      'change:lastMessageSeen': 'onRender'
     },
 
     onRender: function() {
@@ -21,7 +18,4 @@ module.exports = (function() {
 
   behaviourLookup.register('LastMessageSeen', Behavior);
   return Behavior;
-
-
 })();
-

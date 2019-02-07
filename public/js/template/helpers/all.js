@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Handlebars = require('handlebars/runtime').default;
 var cdn = require('gitter-web-cdn');

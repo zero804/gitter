@@ -22,14 +22,15 @@ function onMembersRemoved(troupeId, userIds) {
 
 function onMembersLurkChange(troupeId, userIds, lurk) {
   _.forEach(userIds, function(userId) {
-    stats.event("lurk_room", {
+    stats.event('lurk_room', {
       userId: '' + userId,
       troupeId: '' + troupeId,
       lurking: lurk
     });
 
     if (lurk) {
-      unreadItemService.ensureAllItemsRead(userId, troupeId)
+      unreadItemService
+        .ensureAllItemsRead(userId, troupeId)
         .catch(function(err) {
           errorReporter(err, { unreadItemsFailed: true }, { module: 'room-membership-events' });
         })
@@ -47,7 +48,7 @@ function onGroupMembersAdded(groupId, userIds) {
   _.forEach(userIds, function(userId) {
     stats.event('join_group', {
       userId: String(userId),
-      groupId: groupIdString,
+      groupId: groupIdString
     });
   });
 
@@ -60,7 +61,7 @@ function onGroupMembersRemoved(groupId, userIds) {
   _.forEach(userIds, function(userId) {
     stats.event('leave_group', {
       userId: String(userId),
-      groupId: groupIdString,
+      groupId: groupIdString
     });
   });
 
@@ -75,14 +76,13 @@ exports.install = function() {
   var events = roomMembershipService.events;
 
   // Room Member changes
-  events.on("members.added", onMembersAdded);
-  events.on("members.removed", onMembersRemoved);
-  events.on("members.lurk.change", onMembersLurkChange);
+  events.on('members.added', onMembersAdded);
+  events.on('members.removed', onMembersRemoved);
+  events.on('members.lurk.change', onMembersLurkChange);
 
   // Group Member Changes
-  events.on("group.members.added", onGroupMembersAdded);
-  events.on("group.members.removed", onGroupMembersRemoved);
-
+  events.on('group.members.added', onGroupMembersAdded);
+  events.on('group.members.removed', onGroupMembersRemoved);
 };
 
 exports.testOnly = {

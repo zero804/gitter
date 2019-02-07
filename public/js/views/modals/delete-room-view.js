@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
@@ -13,14 +13,14 @@ var View = Marionette.ItemView.extend({
   tagName: 'p',
   attributes: { style: 'padding-bottom: 15px' },
   modelEvents: {
-    'change': 'render'
+    change: 'render'
   },
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked);
   },
   template: template,
   menuItemClicked: function(button) {
-    switch(button) {
+    switch (button) {
       case 'delete':
         apiClient.room.delete().then(function() {
           appEvents.trigger('navigation', '/home', 'home', '');
@@ -39,12 +39,14 @@ var Modal = ModalView.extend({
     options = options || {};
     options.title = 'Careful Now...';
     var roomName = context.troupe().get('uri');
-    options.menuItems = [{
-      disabled: true,
-      action: 'delete',
-      text: 'Delete "' + roomName + '"',
-      className: 'modal--default__footer__btn--negative'
-    }];
+    options.menuItems = [
+      {
+        disabled: true,
+        action: 'delete',
+        text: 'Delete "' + roomName + '"',
+        className: 'modal--default__footer__btn--negative'
+      }
+    ];
 
     var lock = new DelayLock();
 

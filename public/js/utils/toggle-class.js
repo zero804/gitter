@@ -7,25 +7,24 @@ var toggleClass = function(element, class1, force) {
 
   // note: svg on IE does not have classList so fallback to class
   if (element.classList) {
-    if(arguments.length === 3) {
-      if(force) {
+    if (arguments.length === 3) {
+      if (force) {
         element.classList.add(class1);
-      }
-      else {
+      } else {
         element.classList.remove(class1);
       }
-    }
-    else {
+    } else {
       result = element.classList.toggle(class1);
     }
-  }
-  else if (element.getAttribute) {
+  } else if (element.getAttribute) {
     var classContent = element.getAttribute('class');
-    var classContentWithoutTargetClass = classContent.replace(new RegExp('(^|\\s)' + class1 + '($|\\s)'), '');
-    if(force || classContent === classContentWithoutTargetClass) {
+    var classContentWithoutTargetClass = classContent.replace(
+      new RegExp('(^|\\s)' + class1 + '($|\\s)'),
+      ''
+    );
+    if (force || classContent === classContentWithoutTargetClass) {
       element.setAttribute('class', classContentWithoutTargetClass + ' ' + class1);
-    }
-    else {
+    } else {
       element.setAttribute('class', classContentWithoutTargetClass);
     }
   }

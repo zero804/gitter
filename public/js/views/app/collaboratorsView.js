@@ -15,12 +15,10 @@ require('@gitterhq/styleguide/css/components/buttons.css');
 require('@gitterhq/styleguide/css/components/links.css');
 
 module.exports = (function() {
-
   var ItemView = Marionette.ItemView.extend({
-
     events: {
       'submit form': 'inviteUser',
-      'click .js-add': 'addUser',
+      'click .js-add': 'addUser'
     },
 
     className: 'welcome-modal__collaborator',
@@ -31,7 +29,7 @@ module.exports = (function() {
       this.userModel = options.model;
       this.stateModel = new Backbone.Model({
         state: 'initial',
-        emailRequiredUserId: null,
+        emailRequiredUserId: null
       });
 
       this.listenTo(this.userModel, 'change', this.render);
@@ -47,7 +45,8 @@ module.exports = (function() {
 
       this.stateModel.set('state', state);
 
-      return apiClient.room.post('/invites', data)
+      return apiClient.room
+        .post('/invites', data)
         .then(function(invite) {
           if (invite.email) {
             self.userModel.set('email', invite.email);
@@ -64,7 +63,7 @@ module.exports = (function() {
             self.stateModel.set('state', 'fail_409');
           } else if (e.status === 428) {
             self.stateModel.set({
-              state: 'email_address_required',
+              state: 'email_address_required'
             });
           } else {
             self.stateModel.set('state', 'fail');
@@ -95,21 +94,21 @@ module.exports = (function() {
       var email = this.userModel.get('email');
 
       var states = {
-        initial:                { text: displayName, showAddButton: true },
-        adding:                 { text: 'Adding…' },
-        added:                  { text: displayName + ' added' },
-        invited:                { text: email ? 'Invited ' + email : 'Invited' },
-        fail:                   { text: 'Unable to add ' + displayName },
-        fail_409:               { text: 'Already invited' },
-        email_address_required: { text: 'Enter ' + displayName + '\'s email', showEmailForm: true },
-        inviting:               { text: 'Inviting…' },
+        initial: { text: displayName, showAddButton: true },
+        adding: { text: 'Adding…' },
+        added: { text: displayName + ' added' },
+        invited: { text: email ? 'Invited ' + email : 'Invited' },
+        fail: { text: 'Unable to add ' + displayName },
+        fail_409: { text: 'Already invited' },
+        email_address_required: { text: 'Enter ' + displayName + "'s email", showEmailForm: true },
+        inviting: { text: 'Inviting…' }
       };
 
       var data = states[state] || states.initial;
       data.avatarUrl = this.userModel.get('avatarUrl');
 
       return data;
-    },
+    }
   });
 
   var EmptyView = Marionette.ItemView.extend({
@@ -141,11 +140,10 @@ module.exports = (function() {
       }
 
       return data;
-    },
+    }
   });
 
   var View = Marionette.CompositeView.extend({
-
     childViewContainer: '.js-container',
     childView: ItemView,
     emptyView: EmptyView,
@@ -154,8 +152,8 @@ module.exports = (function() {
       if (!this.collection.length) {
         return {
           githubType: context.troupe().get('githubType'),
-          security:   context.troupe().get('security'),
-          url:        context.troupe().get('url'),
+          security: context.troupe().get('security'),
+          url: context.troupe().get('url')
         };
       }
     },
@@ -176,14 +174,19 @@ module.exports = (function() {
 
       //if we don't need to get some data we should reset the catch
       else this.hasGotSomeData = true;
-      this.listenTo(this.collection, 'sync', function() {
-        //once we get some data we set it to true so we can
-        //once again render
-        this.hasGotSomeData = true;
+      this.listenTo(
+        this.collection,
+        'sync',
+        function() {
+          //once we get some data we set it to true so we can
+          //once again render
+          this.hasGotSomeData = true;
 
-        //and call a manual render
-        this.render();
-      }, this);
+          //and call a manual render
+          this.render();
+        },
+        this
+      );
 
       //call super()
       Marionette.CompositeView.prototype.constructor.apply(this, arguments);
@@ -197,7 +200,7 @@ module.exports = (function() {
     events: {
       'click .js-close': 'dismiss',
       'click #add-button': 'clickAddButton',
-      'click #share-button': 'clickShareButton',
+      'click #share-button': 'clickShareButton'
     },
 
     //when a room changes refresh the collection
@@ -216,9 +219,9 @@ module.exports = (function() {
     serializeData: function() {
       var uri = context.troupe().get('uri');
       return {
-        isPublic:     context.troupe().get('security') === 'PUBLIC',
-        twitterLink:  social.generateTwitterShareUrl(uri),
-        facebookLink: social.generateFacebookShareUrl(uri),
+        isPublic: context.troupe().get('security') === 'PUBLIC',
+        twitterLink: social.generateTwitterShareUrl(uri),
+        facebookLink: social.generateFacebookShareUrl(uri)
       };
     },
 
@@ -273,10 +276,8 @@ module.exports = (function() {
       }
 
       return this;
-    },
-
+    }
   });
 
   return View;
-
 })();

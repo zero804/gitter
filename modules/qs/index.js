@@ -2,8 +2,8 @@
 'use strict';
 
 // "?foo=bar&fish=chips" -> { foo: bar, fish: chips }
-var parse = function (qs) {
-  if(!qs || qs.length <= 1) return {};
+var parse = function(qs) {
+  if (!qs || qs.length <= 1) return {};
 
   return qs
     .substring(1)
@@ -15,6 +15,5 @@ var parse = function (qs) {
       return memo;
     }, {});
 };
-
 
 module.exports = parse(window.location.search);

@@ -37,14 +37,11 @@ var opts = require('yargs')
     description: 'Dry run: whether to actually delete the messages'
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
-
+  .alias('help', 'h').argv;
 
 var messageTextFilterRegex = opts.grep ? new RegExp(opts.grep, 'i') : null;
 
-
-if(opts.dry) {
+if (opts.dry) {
   console.log('Dry-run: nothing will be deleted/saved');
 }
 
@@ -54,7 +51,7 @@ var clearMessages = onMongoConnect()
     return userService.findByUsername(opts.username);
   })
   .then(function(user) {
-    if(!user) {
+    if (!user) {
       console.error('Could not find user with', opts.username);
       return;
     }
@@ -64,19 +61,19 @@ var clearMessages = onMongoConnect()
     });
   })
   .then(function(response) {
-    var hits = (response && response.hits && response.hits.hits) ? response.hits.hits : [];
+    var hits = response && response.hits && response.hits.hits ? response.hits.hits : [];
     console.log('Found ' + hits.length + ' messages');
 
     var filteredHits = hits;
-    if(messageTextFilterRegex) {
+    if (messageTextFilterRegex) {
       filteredHits = hits.filter(function(hit) {
-          return hit._source && hit._source.text && hit._source.text.match(messageTextFilterRegex);
-        });
+        return hit._source && hit._source.text && hit._source.text.match(messageTextFilterRegex);
+      });
     }
 
     var messageIds = filteredHits.map(function(hit) {
-        return hit._id;
-      });
+      return hit._id;
+    });
 
     var getMessages = chatService.findByIds(messageIds);
 
@@ -91,13 +88,23 @@ var clearMessages = onMongoConnect()
         console.log('Working with', messages.length + '/' + messageIds.length);
 
         var now = new Date();
-        var filename = 'messages-' + opts.username + '-bak-' + now.getFullYear() + '-' + now.getMonth() + '-' + now.getDate() + '--' + now.getTime() + '.json';
-        var saveLog = mkdir('gitter-delete-message-bak')
-          .then(function(dir) {
-            var filePath = path.join(dir, filename);
-            console.log('Saving log to:', filePath);
-            return outputFile(filePath, JSON.stringify(messages, null, 2));
-          });
+        var filename =
+          'messages-' +
+          opts.username +
+          '-bak-' +
+          now.getFullYear() +
+          '-' +
+          now.getMonth() +
+          '-' +
+          now.getDate() +
+          '--' +
+          now.getTime() +
+          '.json';
+        var saveLog = mkdir('gitter-delete-message-bak').then(function(dir) {
+          var filePath = path.join(dir, filename);
+          console.log('Saving log to:', filePath);
+          return outputFile(filePath, JSON.stringify(messages, null, 2));
+        });
 
         return saveLog;
       })
@@ -108,16 +115,14 @@ var clearMessages = onMongoConnect()
             html: ''
           });
 
-          if(!opts.dry) {
+          if (!opts.dry) {
             return message.save();
           }
         });
 
         return clearMessages;
       });
-
   });
-
 
 clearMessages
   .delay(2000)

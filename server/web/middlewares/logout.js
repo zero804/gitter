@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -15,8 +15,8 @@ function logoutPreserveSession(req, res, next) {
 
   var authCookie = req.cookies[authCookieName];
 
-  if(authCookie) {
-    res.clearCookie(authCookieName, { domain: nconf.get("web:cookieDomain") });
+  if (authCookie) {
+    res.clearCookie(authCookieName, { domain: nconf.get('web:cookieDomain') });
 
     return rememberMe.deleteRememberMeToken(authCookie, next);
   }
@@ -35,7 +35,7 @@ module.exports = function(req, res, next) {
   });
 
   logoutPreserveSession(req, res, function() {
-    res.clearCookie(sessionCookieName, { domain: nconf.get("web:cookieDomain") });
+    res.clearCookie(sessionCookieName, { domain: nconf.get('web:cookieDomain') });
 
     req.session.destroy(function(err) {
       req.session = null;

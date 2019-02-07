@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var context = require('../../utils/context');
 var appEvents = require('../../utils/appevents');
@@ -11,14 +11,13 @@ var ChatToolbarLayout = require('./chat-toolbar');
 var CollaboratorsView = require('../app/collaboratorsView');
 var JoinRoomView = require('../chat/join-room-view');
 
-
 require('../behaviors/isomorphic');
 
 var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   monitorUnreadItems: true,
   keyboardEvents: {
-    'backspace': 'onKeyBackspace',
-    'quote': 'onKeyQuote'
+    backspace: 'onKeyBackspace',
+    quote: 'onKeyQuote'
   },
 
   modelEvents: {
@@ -33,8 +32,8 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
       },
 
       toolbar: {
-        el: "#right-toolbar-layout",
-        init: 'initToolbarRegion'  // Declared in super
+        el: '#right-toolbar-layout',
+        init: 'initToolbarRegion' // Declared in super
       },
 
       input: {
@@ -69,28 +68,34 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
 
   initInputRegion: function(optionsForRegion) {
     if (this.model.get('roomMember')) {
-      return new ChatInputView(optionsForRegion({
-        model: context.troupe(),
-        collection: this.options.chatCollection
-      }));
+      return new ChatInputView(
+        optionsForRegion({
+          model: context.troupe(),
+          collection: this.options.chatCollection
+        })
+      );
     } else {
-      return new JoinRoomView(optionsForRegion({}, {rerender: true}));
+      return new JoinRoomView(optionsForRegion({}, { rerender: true }));
     }
   },
 
   initBannerTopRegion: function(optionsForRegion) {
-    return new UnreadBannerView.Top(optionsForRegion({
-      model: unreadItemsClient.acrossTheFold()
-    }));
+    return new UnreadBannerView.Top(
+      optionsForRegion({
+        model: unreadItemsClient.acrossTheFold()
+      })
+    );
   },
 
   initBannerBottomRegion: function(optionsForRegion) {
-    return new UnreadBannerView.Bottom(optionsForRegion({
-      model: unreadItemsClient.acrossTheFold()
-    }));
+    return new UnreadBannerView.Bottom(
+      optionsForRegion({
+        model: unreadItemsClient.acrossTheFold()
+      })
+    );
   },
 
-  initCollaboratorsView: function (optionsForRegion){
+  initCollaboratorsView: function(optionsForRegion) {
     return new CollaboratorsView(optionsForRegion());
   },
 
@@ -98,19 +103,18 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
     var inputRegion = this.regionManager.get('input');
 
     if (this.model.get('roomMember')) {
-      inputRegion.show(new ChatInputView({
-        model: context.troupe(),
-        collection: this.options.chatCollection
-      }));
+      inputRegion.show(
+        new ChatInputView({
+          model: context.troupe(),
+          collection: this.options.chatCollection
+        })
+      );
     } else {
       if (!this.model.get('aboutToLeave')) {
-        inputRegion.show(new JoinRoomView({ }));
+        inputRegion.show(new JoinRoomView({}));
       }
     }
-
   },
-
-
 
   onKeyBackspace: function(e) {
     e.stopPropagation();
@@ -124,10 +128,10 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   },
 
   getSelectionText: function() {
-    var text = "";
+    var text = '';
     if (window.getSelection) {
       text = window.getSelection().toString();
-    } else if (document.selection && document.selection.type != "Control") {
+    } else if (document.selection && document.selection.type != 'Control') {
       text = document.selection.createRange().text;
     }
     return text;
@@ -136,9 +140,9 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
   quoteText: function() {
     var selectedText = this.getSelectionText();
     if (selectedText.length > 0) {
-      appEvents.trigger('input.append', "> " + selectedText, { newLine: true });
+      appEvents.trigger('input.append', '> ' + selectedText, { newLine: true });
     }
-  },
+  }
 });
 
 cocktail.mixin(ChatToolbarInputLayout, KeyboardEventsMixin);

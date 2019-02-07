@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var _ = require('underscore');
 var $ = require('jquery');
@@ -25,8 +25,8 @@ onready(function() {
 
   var Router = Backbone.Router.extend({
     routes: {
-      "": "hideModal",
-      "login": "login"
+      '': 'hideModal',
+      login: 'login'
     },
 
     hideModal: function() {
@@ -34,7 +34,7 @@ onready(function() {
     },
 
     login: function(query) {
-      var options = (query) ? urlParse('?'+query, true).query : {};
+      var options = query ? urlParse('?' + query, true).query : {};
       modalRegion.show(new LoginView(options));
     }
   });
@@ -47,7 +47,7 @@ onready(function() {
     e.preventDefault();
     e.stopPropagation();
     var href = $(e.currentTarget).attr('href');
-    var route = 'login'+href.slice(href.indexOf('?'));
-    router.navigate(route, {trigger: true});
+    var route = 'login' + href.slice(href.indexOf('?'));
+    router.navigate(route, { trigger: true });
   });
 });

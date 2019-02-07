@@ -6,9 +6,10 @@ var persistence = require('gitter-web-persistence');
 var Troupe = persistence.Troupe;
 
 function findUnjoinedRoomsInGroup(groupId, userId) {
-  return groupMembershipService.findRoomIdsForUserInGroup(groupId, userId)
+  return groupMembershipService
+    .findRoomIdsForUserInGroup(groupId, userId)
     .then(function(joinedRoomIds) {
-      var query = groupRoomFinder.queryForPublicRooms(groupId)
+      var query = groupRoomFinder.queryForPublicRooms(groupId);
       query.troupeId = { $nin: joinedRoomIds };
 
       return Troupe.find(query)
@@ -20,9 +21,10 @@ function findUnjoinedRoomsInGroup(groupId, userId) {
 }
 
 function findUnjoinedRoomsInGroups(userId, groupIds) {
-  return groupMembershipService.findRoomIdsForUserInGroups(userId, groupIds)
+  return groupMembershipService
+    .findRoomIdsForUserInGroups(userId, groupIds)
     .then(function(joinedRoomIds) {
-      var query = groupRoomFinder.queryForPublicRoomsInGroupIds(groupIds)
+      var query = groupRoomFinder.queryForPublicRoomsInGroupIds(groupIds);
       query.troupeId = { $nin: joinedRoomIds };
 
       return Troupe.find(query)

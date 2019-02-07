@@ -21,7 +21,7 @@ GhRepoPolicyDelegate.prototype = {
   hasPolicy: Promise.method(function(policyName) {
     debug('Checking policy %s', policyName);
 
-    switch(policyName) {
+    switch (policyName) {
       case 'GH_REPO_ACCESS':
         // Shortcut for public repos
         if (this._securityDescriptor.public) {
@@ -58,7 +58,7 @@ GhRepoPolicyDelegate.prototype = {
           })
           .then(function(repoInfo) {
             /* Can't see the repo? no access */
-            if(!repoInfo) {
+            if (!repoInfo) {
               debug('User is unable to see repository, denying access');
               return false;
             }
@@ -87,8 +87,8 @@ GhRepoPolicyDelegate.prototype = {
     return {
       type: 'GH_REPO',
       linkPath: sd.linkPath,
-      externalId: sd.externalId,
-    }
+      externalId: sd.externalId
+    };
   },
 
   /**
@@ -102,7 +102,7 @@ GhRepoPolicyDelegate.prototype = {
       return null;
     }
 
-    return "GH_REPO:" + (userId || 'anon') + ":" + uri + ":" + policyName;
+    return 'GH_REPO:' + (userId || 'anon') + ':' + uri + ':' + policyName;
   },
 
   _fetch: function(user) {
@@ -114,18 +114,17 @@ GhRepoPolicyDelegate.prototype = {
     debug('Fetching repo %s from github', uri);
 
     var repoService = new GitHubRepoService(user);
-    this._fetchPromise = repoService.getRepo(uri)
-      .catch(function(err) {
-        debug('Exeception while fetching repo')
+    this._fetchPromise = repoService.getRepo(uri).catch(function(err) {
+      debug('Exeception while fetching repo');
 
-        if(err.errno && err.syscall || err.statusCode >= 500) {
-          // GitHub call failed and may be down.
-          // We can fall back to whether the user is already in the room
-          throw new PolicyDelegateTransportError(err.message);
-        }
+      if ((err.errno && err.syscall) || err.statusCode >= 500) {
+        // GitHub call failed and may be down.
+        // We can fall back to whether the user is already in the room
+        throw new PolicyDelegateTransportError(err.message);
+      }
 
-        throw err;
-      });
+      throw err;
+    });
 
     // TODO: warn of privacy mismatch.....
     return this._fetchPromise;

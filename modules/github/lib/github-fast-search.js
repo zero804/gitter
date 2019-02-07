@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var wrap = require('./github-cache-wrapper');
 var tentacles = require('./tentacles-client');
@@ -10,13 +10,14 @@ var Search = function(user) {
 };
 
 Search.prototype.findUsers = function(searchString, callback) {
-  return tentacles.search.users(searchString + ' type:user', {
+  return tentacles.search
+    .users(searchString + ' type:user', {
       accessToken: this.accessToken,
       firstPageOnly: true,
       noRetry: true
     })
     .then(function(body) {
-      return body && body.items || [];
+      return (body && body.items) || [];
     })
     .nodeify(callback);
 };

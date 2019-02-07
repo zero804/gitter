@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var config = env.config;
@@ -39,7 +39,7 @@ function ageInHours(date) {
 function updateUser(req, accessToken, user, githubUserProfile) {
   // If the user was in the DB already but was invited, notify stats services
   if (user.isInvited()) {
-    stats.event("new_user", {
+    stats.event('new_user', {
       userId: user.id,
       method: 'github_oauth',
       username: user.username,
@@ -59,28 +59,27 @@ function updateUser(req, accessToken, user, githubUserProfile) {
   user.githubUserToken = accessToken;
   user.state = undefined;
 
-  return user.save()
-    .then(function() {
-      trackUserLogin(req, user, 'github');
+  return user.save().then(function() {
+    trackUserLogin(req, user, 'github');
 
-      updateUserLocale(req, user);
+    updateUserLocale(req, user);
 
-      // Remove the old token for this user
-      req.accessToken = null;
+    // Remove the old token for this user
+    req.accessToken = null;
 
-      return passportLogin(req, user);
-    });
+    return passportLogin(req, user);
+  });
 }
 
 function addUser(req, accessToken, githubUserProfile) {
   var githubUser = {
-    username:           githubUserProfile.login,
-    displayName:        githubUserProfile.name || githubUserProfile.login,
-    emails:             githubUserProfile.email ? [githubUserProfile.email.toLowerCase()] : [],
-    gravatarImageUrl:   githubUserProfile.avatar_url,
-    gravatarVersion:    extractGravatarVersion(githubUserProfile.avatar_url),
-    githubUserToken:    accessToken,
-    githubId:           githubUserProfile.id,
+    username: githubUserProfile.login,
+    displayName: githubUserProfile.name || githubUserProfile.login,
+    emails: githubUserProfile.email ? [githubUserProfile.email.toLowerCase()] : [],
+    gravatarImageUrl: githubUserProfile.avatar_url,
+    gravatarVersion: extractGravatarVersion(githubUserProfile.avatar_url),
+    githubUserToken: accessToken,
+    githubId: githubUserProfile.id
   };
 
   debug('About to create GitHub user %j', githubUser);
@@ -93,28 +92,26 @@ function addUser(req, accessToken, githubUserProfile) {
     forwardedFor: req.headers && req.headers['x-forwarded-for']
   });
 
-  return userService.findOrCreateUserForGithubId(githubUser)
-    .then(function(user) {
+  return userService.findOrCreateUserForGithubId(githubUser).then(function(user) {
+    debug('Created GitHub user %j', user.toObject());
 
-      debug('Created GitHub user %j', user.toObject());
+    updateUserLocale(req, user);
 
-      updateUserLocale(req, user);
+    trackNewUser(req, user, 'github');
 
-      trackNewUser(req, user, 'github');
+    // Flag the user as a new github user if they've created their account
+    // in the last two hours
+    // NOTE: this relies on the fact that undefined is not smaller than 2..
+    if (ageInHours(githubUserProfile.created_at) < 2) {
+      stats.event('new_github_user', {
+        userId: user.id,
+        username: user.username,
+        googleAnalyticsUniqueId: gaCookieParser(req)
+      });
+    }
 
-      // Flag the user as a new github user if they've created their account
-      // in the last two hours
-      // NOTE: this relies on the fact that undefined is not smaller than 2..
-      if (ageInHours(githubUserProfile.created_at) < 2) {
-        stats.event("new_github_user", {
-          userId: user.id,
-          username: user.username,
-          googleAnalyticsUniqueId: gaCookieParser(req)
-        });
-      }
-
-      return passportLogin(req, user);
-    });
+    return passportLogin(req, user);
+  });
 }
 
 function githubUserCallback(req, accessToken, refreshToken, params, _profile, done) {
@@ -126,18 +123,22 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 
   var githubMeService = new GitHubMeService({ githubUserToken: accessToken });
   var githubUserProfile;
-  return githubMeService.getUser()
+  return githubMeService
+    .getUser()
     .then(function(_githubUserProfile) {
       logger.info('GitHub profile obtained', {
         accessToken: loggableToken
       });
 
       githubUserProfile = _githubUserProfile;
-      return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login)
+      return userService.findByGithubIdOrUsername(githubUserProfile.id, githubUserProfile.login);
     })
     .then(function(user) {
       if (user && user.state === 'DISABLED') {
-        throw new StatusError(403, 'Account temporarily disabled. Please contact support@gitter.im')
+        throw new StatusError(
+          403,
+          'Account temporarily disabled. Please contact support@gitter.im'
+        );
       }
 
       if (req.session && (!user || user.isInvited())) {
@@ -157,8 +158,8 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
       }
     })
     .catch(function(err) {
-      errorReporter(err, { oauth: "failed" }, { module: 'passport' });
-      stats.event("oauth_profile.error");
+      errorReporter(err, { oauth: 'failed' }, { module: 'passport' });
+      stats.event('oauth_profile.error');
       logger.error('Error during GitHub OAUTH process. Unable to obtain user profile.', {
         exception: err,
         accessToken: loggableToken
@@ -170,14 +171,17 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
 
 var statePassphrase = config.get('github:statePassphrase');
 
-var githubUserStrategy = new GitHubStrategy({
+var githubUserStrategy = new GitHubStrategy(
+  {
     clientID: config.get('github:user_client_id'),
     clientSecret: config.get('github:user_client_secret'),
     callbackURL: callbackUrlBuilder(),
     stateProvider: statePassphrase && new TokenStateProvider({ passphrase: statePassphrase }),
     skipUserProfile: true,
     passReqToCallback: true
-  }, githubUserCallback);
+  },
+  githubUserCallback
+);
 
 githubUserStrategy.name = 'github_user';
 

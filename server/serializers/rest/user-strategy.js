@@ -1,5 +1,5 @@
 /* eslint complexity: ["error", 21] */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var identityService = require('gitter-web-identity');
@@ -10,7 +10,7 @@ var userScopes = require('gitter-web-identity/lib/user-scopes');
 var collections = require('gitter-web-utils/lib/collections');
 var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
-var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter')
+var adminFilter = require('gitter-web-permissions/lib/known-external-access/admin-filter');
 
 function UserRoleInTroupeStrategy(options) {
   var contributors;
@@ -19,18 +19,17 @@ function UserRoleInTroupeStrategy(options) {
     if (userIds.isEmpty()) return;
 
     return Promise.try(function() {
-        if (options.includeRolesForTroupe) {
-          return options.includeRolesForTroupe;
-        }
+      if (options.includeRolesForTroupe) {
+        return options.includeRolesForTroupe;
+      }
 
-        if (options.includeRolesForTroupeId) {
-          // TODO: don't do this
-          return troupeService.findById(options.includeRolesForTroupeId);
-        }
-      })
+      if (options.includeRolesForTroupeId) {
+        // TODO: don't do this
+        return troupeService.findById(options.includeRolesForTroupeId);
+      }
+    })
       .then(function(troupe) {
         if (!troupe || !troupe.sd) return;
-
 
         if (troupe.sd.members === troupe.sd.admins) {
           // If all members of the room are always
@@ -49,8 +48,7 @@ function UserRoleInTroupeStrategy(options) {
             contributors[userId] = 'admin';
           });
         }
-
-      })
+      });
   };
 
   this.map = function(userId) {
@@ -66,10 +64,9 @@ function UserPresenceInTroupeStrategy(troupeId) {
   var onlineUsers;
 
   this.preload = function() {
-    return presenceService.findOnlineUsersForTroupe(troupeId)
-      .then(function(result) {
-        onlineUsers = collections.hashArray(result);
-      });
+    return presenceService.findOnlineUsersForTroupe(troupeId).then(function(result) {
+      onlineUsers = collections.hashArray(result);
+    });
   };
 
   this.map = function(userId) {
@@ -103,10 +100,9 @@ function UserProvidersStrategy() {
     }
 
     return Promise.map(nonGitHub, function(user) {
-      return identityService.listProvidersForUser(user)
-        .then(function(providers) {
-          providersByUser[user.id] = providers;
-        });
+      return identityService.listProvidersForUser(user).then(function(providers) {
+        providersByUser[user.id] = providers;
+      });
     });
   };
 
@@ -133,13 +129,19 @@ function UserStrategy(options) {
 
     if (options.includeRolesForTroupeId || options.includeRolesForTroupe) {
       userRoleInTroupeStrategy = new UserRoleInTroupeStrategy(options);
-      strategies.push(userRoleInTroupeStrategy.preload(users.map(function(user) {
-        return user._id;
-      })));
+      strategies.push(
+        userRoleInTroupeStrategy.preload(
+          users.map(function(user) {
+            return user._id;
+          })
+        )
+      );
     }
 
     if (options.showPresenceForTroupeId) {
-      userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(options.showPresenceForTroupeId)
+      userPresenceInTroupeStrategy = new UserPresenceInTroupeStrategy(
+        options.showPresenceForTroupeId
+      );
       strategies.push(userPresenceInTroupeStrategy.preload());
     }
 
@@ -152,7 +154,7 @@ function UserStrategy(options) {
   };
 
   function displayNameForUser(user) {
-    return options.exposeRawDisplayName ? user.displayName : user.displayName || user.username
+    return options.exposeRawDisplayName ? user.displayName : user.displayName || user.username;
   }
 
   // eslint-disable-next-line complexity
@@ -171,8 +173,11 @@ function UserStrategy(options) {
         id: user.id,
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
-        online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
-        role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
+        online:
+          (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id)) || undefined,
+        role:
+          (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id)) ||
+          undefined,
         invited: user.state === 'INVITED' || undefined, // true or undefined
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
@@ -199,10 +204,13 @@ function UserStrategy(options) {
       avatarUrlSmall: resolveUserAvatarUrl(user, 60),
       avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,
-      online: userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id) || undefined,
+      online:
+        (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id)) || undefined,
       staff: user.staff,
-      role: userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id) || undefined,
-      providers: userProvidersStrategy && userProvidersStrategy.map(user.id) || undefined,
+      role:
+        (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id)) ||
+        undefined,
+      providers: (userProvidersStrategy && userProvidersStrategy.map(user.id)) || undefined,
       /* TODO: when adding states use user.state and the respective string value desired */
       invited: user.state === 'INVITED' || undefined, // true or undefined
       removed: user.state === 'REMOVED' || undefined, // true or undefined
@@ -227,9 +235,7 @@ UserStrategy.prototype = {
   name: 'UserStrategy'
 };
 
-function SlimUserStrategy() {
-
-}
+function SlimUserStrategy() {}
 SlimUserStrategy.prototype = {
   preload: function() {},
   map: function(user) {
@@ -237,13 +243,13 @@ SlimUserStrategy.prototype = {
       id: user.id,
       username: user.username,
       displayName: user.displayName,
-      avatarUrl: avatars.getForUser(user),
+      avatarUrl: avatars.getForUser(user)
     };
   },
   name: 'SlimUserStrategy'
-}
+};
 
 UserStrategy.slim = function() {
   return new SlimUserStrategy();
-}
+};
 module.exports = UserStrategy;

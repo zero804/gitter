@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 require('./utils/font-setup');
 
@@ -25,35 +25,35 @@ require('./views/widgets/avatar');
 
 userNotifications.initUserNotifications();
 
-
 onready(function() {
   var router = new Router({
     dialogRegion: modalRegion,
-    routes: [{
-      'login': function(query) {
-        var dialogRegion = this.dialogRegion;
+    routes: [
+      {
+        login: function(query) {
+          var dialogRegion = this.dialogRegion;
 
-        require.ensure(['./views/modals/login-view'], function(require) {
-          var LoginView = require('./views/modals/login-view');
+          require.ensure(['./views/modals/login-view'], function(require) {
+            var LoginView = require('./views/modals/login-view');
 
-          var options = (query) ? urlParse('?'+query, true).query : {};
-          dialogRegion.show(new LoginView(options));
-        });
-      },
-    }]
+            var options = query ? urlParse('?' + query, true).query : {};
+            dialogRegion.show(new LoginView(options));
+          });
+        }
+      }
+    ]
   });
 
   Backbone.history.start();
 
-
   require('./components/link-handler').installLinkHandler();
 
-  appEvents.on('navigation', function(url/*, type, title*/) {
+  appEvents.on('navigation', function(url /*, type, title*/) {
     window.location = url;
   });
 
   var chatIFrame = document.getElementById('content-frame');
-  if(window.location.hash) {
+  if (window.location.hash) {
     var noHashSrc = chatIFrame.src.split('#')[0];
     chatIFrame.src = noHashSrc + window.location.hash;
   }
@@ -73,12 +73,12 @@ onready(function() {
   // appView.leftMenuRegion.show(new TroupeMenuView({ }));
 
   function updateContent(state) {
-    if(state) {
+    if (state) {
       // TODO: update the title....
       context.setTroupeId(undefined);
       var hash;
       var windowHash = window.location.hash;
-      if(!windowHash || windowHash === '#') {
+      if (!windowHash || windowHash === '#') {
         hash = '#initial';
       } else {
         hash = windowHash;
@@ -104,7 +104,6 @@ onready(function() {
   //   }
   // });
 
-
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
     // Add a /-/ if the path only has one component
@@ -119,14 +118,13 @@ onready(function() {
 
   // Revert to a previously saved state
   window.onpopstate = function(e) {
-    updateContent(e.state/* || window.location.pathname + '/~chat'*/);
+    updateContent(e.state /* || window.location.pathname + '/~chat'*/);
     appEvents.trigger('track', window.location.pathname + window.location.hash);
     return true;
   };
 
-
   window.addEventListener('message', function(e) {
-    if(e.origin !== clientEnv['basePath']) {
+    if (e.origin !== clientEnv['basePath']) {
       debug('Ignoring message from %s', e.origin);
       return;
     }
@@ -134,13 +132,13 @@ onready(function() {
     var message;
     try {
       message = JSON.parse(e.data);
-    } catch(err) {
+    } catch (err) {
       return; // Ignore non-json from extensions
     }
 
     debug('Received message %j', message);
 
-    switch(message.type) {
+    switch (message.type) {
       case 'context.troupeId':
         context.setTroupeId(message.troupeId);
         titlebarUpdater.setRoomName(message.name);
@@ -179,6 +177,4 @@ onready(function() {
     var serviceWorkerDeregistration = require('gitter-web-service-worker/browser/deregistration');
     serviceWorkerDeregistration.uninstall();
   }, 5000);
-
-
 });

@@ -14,7 +14,7 @@ function filterFiles(baseBranch) {
 
       var result = parse(diff);
 
-      var changedLines = {}
+      var changedLines = {};
       result.forEach(function(file) {
         var absPath = path.resolve(file.to);
         var diffLine = 0;
@@ -26,7 +26,7 @@ function filterFiles(baseBranch) {
               changedLines[absPath][change.ln] = diffLine;
             }
           });
-        })
+        });
       });
 
       return resolve(changedLines);
@@ -34,22 +34,23 @@ function filterFiles(baseBranch) {
   });
 
   return es.map(function(data, callback) {
-    changedPromise.then(function(changedLines) {
-      if (!changedLines[data.path]) return;
-      if (data.content) {
-        data.eslintFileChanges = changedLines[data.path];
-        return data;
-      }
+    changedPromise
+      .then(function(changedLines) {
+        if (!changedLines[data.path]) return;
+        if (data.content) {
+          data.eslintFileChanges = changedLines[data.path];
+          return data;
+        }
 
-      return vinylFile.read(data.path)
-        .then(function(data) {
+        return vinylFile.read(data.path).then(function(data) {
           data.eslintFileChanges = changedLines[data.path];
           return data;
         });
-    }).then(function(result) {
-      return callback(null, result);
-    }, callback)
-  })
+      })
+      .then(function(result) {
+        return callback(null, result);
+      }, callback);
+  });
 }
 
 function filterMessages() {
@@ -68,31 +69,34 @@ function filterMessages() {
       });
 
       eslintData.messages = messages;
-      var counts = messages.reduce(function(memo, message) {
-        switch(message.severity) {
-          case 1:
-            memo.warningCount++;
-            break;
+      var counts = messages.reduce(
+        function(memo, message) {
+          switch (message.severity) {
+            case 1:
+              memo.warningCount++;
+              break;
 
-          case 2:
-            memo.errorCount++;
-            break;
+            case 2:
+              memo.errorCount++;
+              break;
+          }
+          return memo;
+        },
+        {
+          errorCount: 0,
+          warningCount: 0
         }
-        return memo;
-      }, {
-        errorCount: 0,
-        warningCount: 0
-      });
+      );
 
       eslintData.errorCount = counts.errorCount;
       eslintData.warningCount = counts.warningCount;
     }
 
-    callback(null, data)
-  })
+    callback(null, data);
+  });
 }
 
 module.exports = {
   filterFiles: filterFiles,
   filterMessages: filterMessages
-}
+};

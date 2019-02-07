@@ -1,15 +1,12 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var highlight = require('../../utils/highlight');
 var behaviourLookup = require('./lookup');
 
 module.exports = (function() {
-
-
   var Behavior = Marionette.Behavior.extend({
-
     modelEvents: {
-      "change:highlights": "onRender"
+      'change:highlights': 'onRender'
     },
 
     onRender: function() {
@@ -29,7 +26,4 @@ module.exports = (function() {
 
   behaviourLookup.register('Highlight', Behavior);
   return Behavior;
-
-
 })();
-

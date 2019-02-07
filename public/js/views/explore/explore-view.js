@@ -14,12 +14,11 @@ var clientEnv = require('gitter-client-env');
 
 require('../behaviors/isomorphic');
 
-
 var TagPillView = Marionette.ItemView.extend({
   template: itemTemplate,
   tagName: 'li',
   events: {
-    'click': 'onClick'
+    click: 'onClick'
   },
   initialize: function() {
     //console.log('tagPillView init');
@@ -36,8 +35,6 @@ var TagPillListView = Marionette.CollectionView.extend({
     //console.log('tagPillListView init');
   }
 });
-
-
 
 var RoomCardView = Marionette.ItemView.extend({
   template: itemTemplate,
@@ -60,7 +57,6 @@ var RoomCardListView = Marionette.CollectionView.extend({
     //console.log('roomCardListView init');
   }
 });
-
 
 var ExploreView = Marionette.LayoutView.extend({
   template: template,
@@ -89,10 +85,10 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   initRoomCardListView: function(optionsForRegion) {
-    return new RoomCardListView(optionsForRegion({ }));
+    return new RoomCardListView(optionsForRegion({}));
   },
   initTagPillListView: function(optionsForRegion) {
-    return new TagPillListView(optionsForRegion({ }));
+    return new TagPillListView(optionsForRegion({}));
   },
 
   initialize: function() {
@@ -109,7 +105,7 @@ var ExploreView = Marionette.LayoutView.extend({
       headlineGitterUsers: headlineNumbers.gitterUsers,
       headlineGitterRooms: headlineNumbers.gitterRooms,
       headlineGitterGroups: headlineNumbers.gitterGroups,
-      headlineGitterCountries: headlineNumbers.gitterCountries,
+      headlineGitterCountries: headlineNumbers.gitterCountries
     };
   },
 
@@ -118,9 +114,11 @@ var ExploreView = Marionette.LayoutView.extend({
   },
 
   setupProfileMenu: function() {
-    if(context.isLoggedIn()) {
+    if (context.isLoggedIn()) {
       //If an instance of the profile menu exists destory it to remove listeners etc
-      if(this.profileMenu) { this.profileMenu.destroy(); }
+      if (this.profileMenu) {
+        this.profileMenu.destroy();
+      }
       //Make a new profile menu
       this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
       //Render it

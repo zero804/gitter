@@ -12,7 +12,7 @@ module.exports = function extractGravatarVersion(avatarUrl) {
     if (GITHUB_AVATARS_HOST_RE.test(parsed.hostname)) {
       return parseInt(parsed.query.v, 10) || undefined;
     }
-  } catch(e) {
+  } catch (e) {
     /* */
   }
 };

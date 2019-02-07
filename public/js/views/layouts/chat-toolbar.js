@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var context = require('../../utils/context');
@@ -18,7 +18,7 @@ module.exports = ChatLayout.extend({
   clickLogin: function(e) {
     e.preventDefault();
     var href = $(e.currentTarget).attr('href');
-    var route = 'login'+href.slice(href.indexOf('?'));
+    var route = 'login' + href.slice(href.indexOf('?'));
     appEvents.trigger('loginClicked', route);
   },
 
@@ -29,7 +29,7 @@ module.exports = ChatLayout.extend({
         init: 'initChatRegion' // Declared in super
       },
       toolbar: {
-        el: "#right-toolbar-layout",
+        el: '#right-toolbar-layout',
         init: 'initToolbarRegion'
       },
       header: {
@@ -40,14 +40,18 @@ module.exports = ChatLayout.extend({
   },
 
   initToolbarRegion: function(optionsForRegion) {
-    return new RightToolbarView(optionsForRegion({
-      model: rightToolbarModel
-    }));
+    return new RightToolbarView(
+      optionsForRegion({
+        model: rightToolbarModel
+      })
+    );
   },
 
   initHeaderRegion: function(optionsForRegion) {
-    return new HeaderView(optionsForRegion({
-      model: context.troupe()
-    }));
+    return new HeaderView(
+      optionsForRegion({
+        model: context.troupe()
+      })
+    );
   }
 });

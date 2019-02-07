@@ -29,112 +29,108 @@ var groupService = require('gitter-web-groups/lib/group-service');
  * 404: access denied
  */
 function findContextForUri(user, uri, options) {
-  debug("findRoomContext %s %s %j", user && user.username, uri, options);
+  debug('findRoomContext %s %s %j', user && user.username, uri, options);
 
   var userId = user && user.id;
 
   if (!uri) throw new StatusError(400, 'uri required');
 
   /* First off, try use local data to figure out what this url is for */
-  return uriResolver(user && user.id, uri, options)
-    .then(function (resolved) {
-      if (!resolved) throw new StatusError(404);
+  return uriResolver(user && user.id, uri, options).then(function(resolved) {
+    if (!resolved) throw new StatusError(404);
 
-      var resolvedUser = resolved.user;
-      var resolvedTroupe = resolved.room;
-      var roomMember = resolved.roomMember;
-      var resolvedGroup = resolved.group;
+    var resolvedUser = resolved.user;
+    var resolvedTroupe = resolved.room;
+    var roomMember = resolved.roomMember;
+    var resolvedGroup = resolved.group;
 
-      // The uri resolved to a user, we need to do a one-to-one
-      if(resolvedUser) {
-        if(!user) {
-          debug("uriResolver returned user for uri=%s", uri);
-          throw new StatusError(401); // Login required
-        }
-
-        if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-          return {
-            uri: resolvedUser.username,
-            ownUrl: true
-          };
-        }
-
-        debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
-
-        return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser.id)
-          .spread(function(troupe, resolvedUser) {
-            return policyFactory.createPolicyForRoom(user, troupe)
-              .then(function(policy) {
-                return {
-                  troupe: troupe,
-                  policy: policy,
-                  roomMember: true,
-                  oneToOneUser: resolvedUser,
-                  uri: resolvedUser.username
-                };
-              });
-          });
+    // The uri resolved to a user, we need to do a one-to-one
+    if (resolvedUser) {
+      if (!user) {
+        debug('uriResolver returned user for uri=%s', uri);
+        throw new StatusError(401); // Login required
       }
 
-      if (resolvedTroupe) {
-        return policyFactory.createPolicyForRoom(user, resolvedTroupe)
-          .then(function(policy) {
-            return policy.canRead()
-              .then(function(access) {
-                if (!access) {
-                  // If the user has reached the org room
-                  // but does not have access, redirect them
-                  // to the group home
-                  if (uri.indexOf('/') < 0 && resolvedTroupe.groupId) {
-                    debug('Redirecting on ORG room permission denied');
+      if (mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
+        return {
+          uri: resolvedUser.username,
+          ownUrl: true
+        };
+      }
 
-                    return groupService.findById(resolvedTroupe.groupId, { lean: true })
-                      .then(function(group) {
-                        if (group && group.homeUri) {
-                          var err = new StatusError(301);
-                          err.path = '/' + group.homeUri;
-                          throw err;
-                        }
+      debug('localUriLookup returned user for uri=%s. Finding or creating one-to-one', uri);
 
-                        throw new StatusError(404);
-                      });
-                  } else {
-                    throw new StatusError(404);
+      return oneToOneRoomService
+        .findOrCreateOneToOneRoom(user, resolvedUser.id)
+        .spread(function(troupe, resolvedUser) {
+          return policyFactory.createPolicyForRoom(user, troupe).then(function(policy) {
+            return {
+              troupe: troupe,
+              policy: policy,
+              roomMember: true,
+              oneToOneUser: resolvedUser,
+              uri: resolvedUser.username
+            };
+          });
+        });
+    }
+
+    if (resolvedTroupe) {
+      return policyFactory.createPolicyForRoom(user, resolvedTroupe).then(function(policy) {
+        return policy.canRead().then(function(access) {
+          if (!access) {
+            // If the user has reached the org room
+            // but does not have access, redirect them
+            // to the group home
+            if (uri.indexOf('/') < 0 && resolvedTroupe.groupId) {
+              debug('Redirecting on ORG room permission denied');
+
+              return groupService
+                .findById(resolvedTroupe.groupId, { lean: true })
+                .then(function(group) {
+                  if (group && group.homeUri) {
+                    var err = new StatusError(301);
+                    err.path = '/' + group.homeUri;
+                    throw err;
                   }
-                }
 
-                return {
-                  group: resolvedGroup,
-                  troupe: resolvedTroupe,
-                  policy: policy,
-                  uri: resolvedTroupe.uri,
-                  roomMember: roomMember
-                };
-              })
-          });
-      }
-
-      if (resolvedGroup) {
-        return policyFactory.createPolicyForGroupId(user, resolvedGroup._id)
-          .then(function(policy) {
-            return policy.canRead()
-              .then(function(access) {
-                if (!access) {
                   throw new StatusError(404);
-                }
+                });
+            } else {
+              throw new StatusError(404);
+            }
+          }
 
-                return {
-                  group: resolvedGroup,
-                  policy: policy,
-                  uri: resolvedGroup.homeUri
-                };
-              })
-          });
-      }
+          return {
+            group: resolvedGroup,
+            troupe: resolvedTroupe,
+            policy: policy,
+            uri: resolvedTroupe.uri,
+            roomMember: roomMember
+          };
+        });
+      });
+    }
 
-      // No user, no room. 404
-      throw new StatusError(404);
-    });
+    if (resolvedGroup) {
+      return policyFactory.createPolicyForGroupId(user, resolvedGroup._id).then(function(policy) {
+        return policy.canRead().then(function(access) {
+          if (!access) {
+            throw new StatusError(404);
+          }
+
+          return {
+            group: resolvedGroup,
+            policy: policy,
+            uri: resolvedGroup.homeUri
+          };
+        });
+      });
+    }
+
+    // No user, no room. 404
+    throw new StatusError(404);
+  });
 }
 
 /**
@@ -143,98 +139,97 @@ function findContextForUri(user, uri, options) {
  * Will only create a room in the case of a one-to-one
  */
 function findContextForRoom(user, uri) {
-  debug("findContextForRoom %s %s %j", user && user.username, uri);
+  debug('findContextForRoom %s %s %j', user && user.username, uri);
 
   var userId = user && user.id;
 
   if (!uri) throw new StatusError(400, 'uri required');
 
   /* First off, try use local data to figure out what this url is for */
-  return uriResolver(user && user.id, uri, { ignoreCase: true })
-    .then(function (resolved) {
-      if (!resolved) throw new StatusError(404);
+  return uriResolver(user && user.id, uri, { ignoreCase: true }).then(function(resolved) {
+    if (!resolved) throw new StatusError(404);
 
-      var resolvedUser = resolved.user;
-      var resolvedTroupe = resolved.room;
+    var resolvedUser = resolved.user;
+    var resolvedTroupe = resolved.room;
 
-      // The uri resolved to a user, we need to do a one-to-one
-      if(resolvedUser) {
-        if(!user) {
-          debug("uriResolver returned user for uri=%s", uri);
-          throw new StatusError(401); // Login required
-        }
-
-        if(mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-          throw new StatusError(404);
-        }
-
-        debug("localUriLookup returned user for uri=%s. Finding or creating one-to-one", uri);
-
-        return oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser.id)
-          .spread(function(troupe/*, resolvedUser*/) {
-            return troupe;
-          });
+    // The uri resolved to a user, we need to do a one-to-one
+    if (resolvedUser) {
+      if (!user) {
+        debug('uriResolver returned user for uri=%s', uri);
+        throw new StatusError(401); // Login required
       }
 
-      if (resolvedTroupe) {
-        return policyFactory.createPolicyForRoom(user, resolvedTroupe)
-          .then(function(policy) {
-            return policy.canRead()
-              .then(function(access) {
-                if (!access) {
-                  throw new StatusError(404);
-                }
-
-                return resolvedTroupe;
-              });
-          });
+      if (mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
+        throw new StatusError(404);
       }
 
-      // No user, no room. 404
-      throw new StatusError(404);
-    });
+      debug('localUriLookup returned user for uri=%s. Finding or creating one-to-one', uri);
+
+      return oneToOneRoomService
+        .findOrCreateOneToOneRoom(user, resolvedUser.id)
+        .spread(function(troupe /*, resolvedUser*/) {
+          return troupe;
+        });
+    }
+
+    if (resolvedTroupe) {
+      return policyFactory.createPolicyForRoom(user, resolvedTroupe).then(function(policy) {
+        return policy.canRead().then(function(access) {
+          if (!access) {
+            throw new StatusError(404);
+          }
+
+          return resolvedTroupe;
+        });
+      });
+    }
+
+    // No user, no room. 404
+    throw new StatusError(404);
+  });
 }
 
 function findContextForGroup(user, uri, options) {
-  debug("findContextForGroup %s %s %j", user && user.username, uri, options);
+  debug('findContextForGroup %s %s %j', user && user.username, uri, options);
   var ignoreCase = options && options.ignoreCase;
 
   if (!uri) throw new StatusError(400, 'uri required');
 
-  return groupService.findByUri(uri, { lean: true })
-    .then(function (group) {
-      if (!group) throw new StatusError(404);
+  return groupService.findByUri(uri, { lean: true }).then(function(group) {
+    if (!group) throw new StatusError(404);
 
-      return policyFactory.createPolicyForGroupId(user, group._id)
-        .then(function(policy) {
-          return policy.canRead()
-            .then(function(access) {
-              if (!access) {
-                throw new StatusError(404);
-              }
-
-              return {
-                group: group,
-                policy: policy,
-                uri: group.uri
-              };
-            });
-        })
-        .tap(function(uriContext) {
-          // URI mismatch? Perhaps we should redirect...
-          if (uriContext.uri !== uri) {
-            if (ignoreCase && uriContext.uri.toLowerCase() === uri.toLowerCase()) {
-              logger.info('Ignoring incorrect case for room', { providedUri: uri, correctUri: uriContext.uri });
-            } else {
-              var redirect = new StatusError(301);
-              redirect.path = '/' + uriContext.uri;
-              throw redirect;
-            }
+    return policyFactory
+      .createPolicyForGroupId(user, group._id)
+      .then(function(policy) {
+        return policy.canRead().then(function(access) {
+          if (!access) {
+            throw new StatusError(404);
           }
-        });
-    });
-}
 
+          return {
+            group: group,
+            policy: policy,
+            uri: group.uri
+          };
+        });
+      })
+      .tap(function(uriContext) {
+        // URI mismatch? Perhaps we should redirect...
+        if (uriContext.uri !== uri) {
+          if (ignoreCase && uriContext.uri.toLowerCase() === uri.toLowerCase()) {
+            logger.info('Ignoring incorrect case for room', {
+              providedUri: uri,
+              correctUri: uriContext.uri
+            });
+          } else {
+            var redirect = new StatusError(301);
+            redirect.path = '/' + uriContext.uri;
+            throw redirect;
+          }
+        }
+      });
+  });
+}
 
 module.exports = {
   findContextForUri: Promise.method(findContextForUri),

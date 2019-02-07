@@ -40,5 +40,4 @@ function resolveRoomUri(room, currentUserId) {
     });
 }
 
-
 module.exports = Promise.method(resolveRoomUri);

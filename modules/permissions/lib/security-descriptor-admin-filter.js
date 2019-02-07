@@ -15,26 +15,34 @@ function securityDescriptorAdminFilter(user, objectsWithSecurityDescriptors) {
   if (!user || !objectsWithSecurityDescriptors.length) return [];
   var userLoader = userLoaderFactory(user._id, user);
 
-  return Promise.map(objectsWithSecurityDescriptors, function(objectsWithSecurityDescriptor) {
+  return Promise.map(
+    objectsWithSecurityDescriptors,
+    function(objectsWithSecurityDescriptor) {
       var securityDescriptor = objectsWithSecurityDescriptor.sd;
 
       var policyDelegate = policyDelegateFactory(user._id, userLoader, securityDescriptor);
       var contextDelegate = null; // No context delegate needed for admin
 
-      var policyEvaluator = new PolicyEvaluator(user._id, securityDescriptor, policyDelegate, contextDelegate);
+      var policyEvaluator = new PolicyEvaluator(
+        user._id,
+        securityDescriptor,
+        policyDelegate,
+        contextDelegate
+      );
 
-      return policyEvaluator.canAdmin()
+      return policyEvaluator
+        .canAdmin()
         .bind(objectsWithSecurityDescriptor)
         .then(function(admin) {
           if (admin) return this;
         });
-
-    }, {
+    },
+    {
       concurrency: MAX_FILTER_CONCURRENCY
-    })
-    .then(function(adminSecurityDescriptors) {
-      return adminSecurityDescriptors.filter(Boolean);
-    });
+    }
+  ).then(function(adminSecurityDescriptors) {
+    return adminSecurityDescriptors.filter(Boolean);
+  });
 }
 
 module.exports = Promise.method(securityDescriptorAdminFilter);

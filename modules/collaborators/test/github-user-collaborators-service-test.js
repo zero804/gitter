@@ -5,9 +5,7 @@ var GitHubUserCollaboratorService = require('../lib/github-user-collaborator-ser
 var assert = require('assert');
 
 describe('github-user-collaborators-service-test #github', function() {
-
   describe('integration #slow', function() {
-
     fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
 
     var fixture = fixtureLoader.setup({
@@ -16,11 +14,9 @@ describe('github-user-collaborators-service-test #github', function() {
 
     it('should return user collabators', function() {
       var underTest = new GitHubUserCollaboratorService(fixture.user1);
-      return underTest.findCollaborators()
-        .then(function(results) {
-          assert(Array.isArray(results));
-        });
+      return underTest.findCollaborators().then(function(results) {
+        assert(Array.isArray(results));
+      });
     });
-
   });
-})
+});

@@ -19,113 +19,126 @@ var GroupHomeView = require('../group-home-control/group-home-control-view');
 require('../../../behaviors/isomorphic');
 
 var PanelView = Marionette.LayoutView.extend({
-
   behaviors: {
     Isomorphic: {
-      header:              { el: '#panel-header', init: 'initHeader' },
-      groupBackControl:    { el: '#group-back-button', init: 'initGroupBackArea' },
-      searchInput:         { el: '#search-input', init: 'initSearchInput' },
+      header: { el: '#panel-header', init: 'initHeader' },
+      groupBackControl: { el: '#group-back-button', init: 'initGroupBackArea' },
+      searchInput: { el: '#search-input', init: 'initSearchInput' },
       favouriteCollection: { el: '#favourite-collection', init: 'initFavouriteCollection' },
-      primaryCollection:   { el: '#primary-collection', init: 'initPrimaryCollection' },
-      groupHomeControl:    { el: '#group-home-button', init: 'initGroupHomeControl' },
+      primaryCollection: { el: '#primary-collection', init: 'initPrimaryCollection' },
+      groupHomeControl: { el: '#group-home-button', init: 'initGroupHomeControl' },
       secondaryCollection: { el: '#secondary-collection', init: 'initSecondaryCollection' },
-      teritaryCollection:  { el: '#tertiary-collection', init: 'initTertiaryCollection' },
-      footer:              { el: '#panel-footer', init: 'initFooter' },
-    },
+      teritaryCollection: { el: '#tertiary-collection', init: 'initTertiaryCollection' },
+      footer: { el: '#panel-footer', init: 'initFooter' }
+    }
   },
 
-
   initHeader: function(optionsForRegion) {
-    return new PanelHeaderView(optionsForRegion({
-      model: this.model,
-      groupsCollection: this.model.groupsCollection,
-    }));
+    return new PanelHeaderView(
+      optionsForRegion({
+        model: this.model,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
   initProfileMenu: function(optionsForRegion) {
     return new ProfileMenuView(optionsForRegion({ model: this.model }));
   },
 
-  initGroupBackArea: function(optionsForRegion){
+  initGroupBackArea: function(optionsForRegion) {
     return new GroupBackControl(optionsForRegion({ model: this.model }));
   },
 
   initSearchInput: function(optionsForRegion) {
-    return new SearchInputView(optionsForRegion({
-      model: this.model,
-      bus: this.bus ,
-      searchFocusModel: this.model.searchFocusModel,
-    }));
+    return new SearchInputView(
+      optionsForRegion({
+        model: this.model,
+        bus: this.bus,
+        searchFocusModel: this.model.searchFocusModel
+      })
+    );
   },
 
-  initFavouriteCollection: function (optionsForRegion) {
-    return new FavouriteCollectionView(optionsForRegion({
-      collection:     this.model.favouriteCollection,
-      model:          this.model.favouriteCollectionModel,
-      roomMenuModel:  this.model,
-      bus:            this.bus,
-      dndCtrl:        this.dndCtrl,
-      roomCollection: this.model._roomCollection,
-      groupsCollection: this.model.groupsCollection,
-    }));
-
+  initFavouriteCollection: function(optionsForRegion) {
+    return new FavouriteCollectionView(
+      optionsForRegion({
+        collection: this.model.favouriteCollection,
+        model: this.model.favouriteCollectionModel,
+        roomMenuModel: this.model,
+        bus: this.bus,
+        dndCtrl: this.dndCtrl,
+        roomCollection: this.model._roomCollection,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
   initPrimaryCollection: function(optionsForRegion) {
-    return new PrimaryCollectionView(optionsForRegion({
-      collection:     this.model.primaryCollection,
-      model:          this.model.primaryCollectionModel,
-      roomMenuModel:  this.model,
-      bus:            this.bus,
-      dndCtrl:        this.dndCtrl,
-      roomCollection: this.model._roomCollection,
-      groupsCollection: this.model.groupsCollection,
-    }));
+    return new PrimaryCollectionView(
+      optionsForRegion({
+        collection: this.model.primaryCollection,
+        model: this.model.primaryCollectionModel,
+        roomMenuModel: this.model,
+        bus: this.bus,
+        dndCtrl: this.dndCtrl,
+        roomCollection: this.model._roomCollection,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
-  initGroupHomeControl: function(optionsForRegion){
-    return new GroupHomeView(optionsForRegion({
-      groupsCollection: this.model.groupsCollection,
-      model: this.model
-    }));
+  initGroupHomeControl: function(optionsForRegion) {
+    return new GroupHomeView(
+      optionsForRegion({
+        groupsCollection: this.model.groupsCollection,
+        model: this.model
+      })
+    );
   },
 
   initSecondaryCollection: function(optionsForRegion) {
-    return new SecondaryCollectionView(optionsForRegion({
-      collection:        this.model.secondaryCollection,
-      model:             this.model.secondaryCollectionModel,
-      roomMenuModel:     this.model,
-      bus:               this.bus,
-      roomCollection:    this.model._roomCollection,
-      primaryCollection: this.model.primaryCollection,
-      userModel:         this.model.userModel,
-      troupeModel:       this.model._troupeModel,
-      groupsCollection: this.model.groupsCollection,
-    }));
+    return new SecondaryCollectionView(
+      optionsForRegion({
+        collection: this.model.secondaryCollection,
+        model: this.model.secondaryCollectionModel,
+        roomMenuModel: this.model,
+        bus: this.bus,
+        roomCollection: this.model._roomCollection,
+        primaryCollection: this.model.primaryCollection,
+        userModel: this.model.userModel,
+        troupeModel: this.model._troupeModel,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
   initTertiaryCollection: function(optionsForRegion) {
-    return new TertiaryCollectionView(optionsForRegion({
-      model:               this.model.tertiaryCollectionModel,
-      collection:          this.model.tertiaryCollection,
-      roomMenuModel:       this.model,
-      bus:                 this.bus,
-      primaryCollection:   this.model.primaryCollection,
-      secondaryCollection: this.model.secondaryCollection,
-      roomCollection:      this.model._roomCollection,
-      groupsCollection: this.model.groupsCollection,
-    }));
+    return new TertiaryCollectionView(
+      optionsForRegion({
+        model: this.model.tertiaryCollectionModel,
+        collection: this.model.tertiaryCollection,
+        roomMenuModel: this.model,
+        bus: this.bus,
+        primaryCollection: this.model.primaryCollection,
+        secondaryCollection: this.model.secondaryCollection,
+        roomCollection: this.model._roomCollection,
+        groupsCollection: this.model.groupsCollection
+      })
+    );
   },
 
   initFooter: function(optionsForRegion) {
-    return new PanelFooterView(optionsForRegion({
-      model: this.model,
-      bus:   this.bus,
-    }));
+    return new PanelFooterView(
+      optionsForRegion({
+        model: this.model,
+        bus: this.bus
+      })
+    );
   },
 
   ui: {
-    profileMenu: '#profile-menu',
+    profileMenu: '#profile-menu'
   },
 
   events: {
@@ -133,12 +146,12 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   modelEvents: {
-    'change:panelOpenState':       'onPanelOpenStateChange',
-    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot',
+    'change:panelOpenState': 'onPanelOpenStateChange',
+    'primary-collection:snapshot': 'onPrimaryCollectionSnapshot'
   },
 
   childEvents: {
-    render: 'onChildViewRender',
+    render: 'onChildViewRender'
   },
 
   initialize: function(attrs) {
@@ -157,15 +170,20 @@ var PanelView = Marionette.LayoutView.extend({
   }, 50),
 
   _initNano: function(params) {
-    fastdom.mutate(function() {
-      this.$el.find('.nano').nanoScroller(params);
-    }.bind(this));
+    fastdom.mutate(
+      function() {
+        this.$el.find('.nano').nanoScroller(params);
+      }.bind(this)
+    );
   },
 
-  onPanelOpenStateChange: function(model, val) { /*jshint unused: true */
-    fastdom.mutate(function() {
-      toggleClass(this.el, 'active', val);
-    }.bind(this));
+  onPanelOpenStateChange: function(model, val) {
+    /*jshint unused: true */
+    fastdom.mutate(
+      function() {
+        toggleClass(this.el, 'active', val);
+      }.bind(this)
+    );
   },
 
   onMouseenter: function() {
@@ -174,7 +192,9 @@ var PanelView = Marionette.LayoutView.extend({
   },
 
   onSwipeLeft: function(e) {
-    if (e.target === this.el) { this.model.set('panelOpenState', false); }
+    if (e.target === this.el) {
+      this.model.set('panelOpenState', false);
+    }
   },
 
   onSearchItemSelected: function() {
@@ -187,7 +207,7 @@ var PanelView = Marionette.LayoutView.extend({
     this.el.classList.add('loading');
   },
 
-  onChildRender: _.debounce(function (){
+  onChildRender: _.debounce(function() {
     this.bus.trigger('panel:render');
   }, 10),
 
@@ -195,7 +215,7 @@ var PanelView = Marionette.LayoutView.extend({
     this.ui.profileMenu[0].setAttribute('aria-hidden', !val);
   },
 
-  onModelChangeState: function (){
+  onModelChangeState: function() {
     var state = this.model.get('state');
     toggleClass(this.el, 'all', state === 'all');
     toggleClass(this.el, 'search', state === 'search');
@@ -205,17 +225,21 @@ var PanelView = Marionette.LayoutView.extend({
 
     this.$el.find('.nano').nanoScroller({ scrollTop: 0 });
 
-    if(!this.neverendingstory) { return; }
-    if(state !== 'search') { return this.neverendingstory.disable(); }
+    if (!this.neverendingstory) {
+      return;
+    }
+    if (state !== 'search') {
+      return this.neverendingstory.disable();
+    }
     return this.neverendingstory.enable();
   },
 
-  scrollBottom: _.debounce(function (){
+  scrollBottom: _.debounce(function() {
     this.queryModel.set('isFetchingMoreSearchMessageResults', true);
   }, 100),
 
   onRender: function() {
-    if(!this.neverendingstory) {
+    if (!this.neverendingstory) {
       this.neverendingstory = new NeverEndingStory(this.$el.find('.nano-content')[0]);
       this.listenTo(this.neverendingstory, 'approaching.bottom', this.scrollBottom, this);
       this.neverendingstory.disable();
@@ -225,9 +249,7 @@ var PanelView = Marionette.LayoutView.extend({
 
   onDestroy: function() {
     this.stopListening(this.bus);
-  },
-
+  }
 });
-
 
 module.exports = PanelView;

@@ -10,28 +10,24 @@ var GitHubUserEmailAddressService = require('gitter-web-github').GitHubUserEmail
 var persistence = require('gitter-web-persistence');
 var identityService = require('gitter-web-identity');
 
-
 var MS_PER_DAY = 24 * 60 * 60 * 1000;
 
 var GITTER_IDENTITY_TYPE = 'gitter';
 var GITHUB_IDENTITY_PROVIDER = identityService.GITHUB_IDENTITY_PROVIDER;
 
 function findExistingGitterUser(username) {
-  return persistence.User.findOne({ username: username })
-          .exec();
+  return persistence.User.findOne({ username: username }).exec();
 }
 
 function findExistingIdentityUsername(provider, username) {
-  return identityService.findUserIdForProviderUsername(provider, username)
-    .then(function(userId) {
-      if (!userId) return;
-      return persistence.User.findById(userId)
-        .exec();
-    })
+  return identityService.findUserIdForProviderUsername(provider, username).then(function(userId) {
+    if (!userId) return;
+    return persistence.User.findById(userId).exec();
+  });
 }
 
 function findExistingUser(type, externalId) {
-  switch(type) {
+  switch (type) {
     case GITTER_IDENTITY_TYPE:
       return findExistingGitterUser(externalId);
 
@@ -82,18 +78,17 @@ function createInvite(roomId, options) {
   externalId = externalId.toLowerCase();
   var secret = uuid.v4();
   return TroupeInvite.create({
-      troupeId: roomId,
-      type: type,
-      externalId: externalId,
-      emailAddress: emailAddress,
-      userId: null,
-      secret: secret,
-      invitedByUserId: invitedByUserId,
-      state: 'PENDING'
-    })
-    .catch(mongoUtils.mongoErrorWithCode(11000), function() {
-      throw new StatusError(409); // Conflict
-    });
+    troupeId: roomId,
+    type: type,
+    externalId: externalId,
+    emailAddress: emailAddress,
+    userId: null,
+    secret: secret,
+    invitedByUserId: invitedByUserId,
+    state: 'PENDING'
+  }).catch(mongoUtils.mongoErrorWithCode(11000), function() {
+    throw new StatusError(409); // Conflict
+  });
 }
 
 /**
@@ -122,88 +117,100 @@ function accept(userId, secret) {
  *
  */
 function markInviteAccepted(inviteId, userId) {
-  return TroupeInvite.update({
+  return TroupeInvite.update(
+    {
       _id: inviteId,
       state: { $ne: 'ACCEPTED' }
-    }, {
+    },
+    {
       $set: {
         state: 'ACCEPTED',
         userId: userId
       }
-    })
-    .exec();
+    }
+  ).exec();
 }
 
 /**
  *
  */
 function markInviteRejected(inviteId, userId) {
-  return TroupeInvite.update({
+  return TroupeInvite.update(
+    {
       _id: inviteId,
       state: { $ne: 'REJECTED' }
-    }, {
+    },
+    {
       $set: {
         state: 'REJECTED',
         userId: userId
       }
-    })
-    .exec();
+    }
+  ).exec();
 }
 
 /**
  *
  */
 function markInviteReminded(inviteId) {
-  return TroupeInvite.update({
+  return TroupeInvite.update(
+    {
       _id: inviteId
-    }, {
+    },
+    {
       $set: {
         reminderSent: new Date()
       }
-    })
-    .exec();
+    }
+  ).exec();
 }
 
 function findInvitesForReminder(timeHorizonDays) {
   var cutoffId = mongoUtils.createIdForTimestamp(Date.now() - timeHorizonDays * MS_PER_DAY);
 
-  return TroupeInvite.aggregate([{
+  return TroupeInvite.aggregate([
+    {
       $match: {
         state: 'PENDING',
         _id: { $lt: cutoffId },
-        reminderSent: null,
+        reminderSent: null
       }
-    }, {
+    },
+    {
       $project: {
         _id: 0,
         invite: '$$ROOT'
       }
-    },{
+    },
+    {
       $lookup: {
         from: 'troupes',
         localField: 'invite.troupeId',
         foreignField: '_id',
         as: 'troupe'
       }
-    },{
+    },
+    {
       $unwind: {
         path: '$troupe',
         preserveNullAndEmptyArrays: true
       }
-    },{
+    },
+    {
       $lookup: {
         from: 'users',
         localField: 'invite.invitedByUserId',
         foreignField: '_id',
         as: 'invitedByUser'
       }
-    },{
+    },
+    {
       $unwind: {
         path: '$invitedByUser',
         preserveNullAndEmptyArrays: true
       }
-    }])
-    .exec();
+    }
+  ]).exec();
 }
 
 module.exports = {
@@ -214,5 +221,5 @@ module.exports = {
   markInviteAccepted: Promise.method(markInviteAccepted),
   markInviteRejected: Promise.method(markInviteRejected),
   findInvitesForReminder: findInvitesForReminder,
-  markInviteReminded: markInviteReminded,
-}
+  markInviteReminded: markInviteReminded
+};

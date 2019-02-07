@@ -22,9 +22,9 @@ function validate(unvalidatedMessage, check, defaultMessage) {
   var salt = p[1];
 
   var calculatedCheck = crypto
-      .createHash('md5')
-      .update(secret + salt + unvalidatedMessage, 'utf8')
-      .digest('base64');
+    .createHash('md5')
+    .update(secret + salt + unvalidatedMessage, 'utf8')
+    .digest('base64');
 
   if (calculatedCheck === checksum) {
     return unvalidatedMessage;
@@ -39,15 +39,14 @@ function getCheck(message) {
   var salt = crypto.randomBytes(6).toString('base64');
 
   var check = crypto
-      .createHash('md5')
-      .update(secret + salt + message, 'utf8')
-      .digest('base64');
+    .createHash('md5')
+    .update(secret + salt + message, 'utf8')
+    .digest('base64');
 
   return check + ':' + salt;
 }
 
-
 module.exports = {
   validate: validate,
   getCheck: getCheck
-}
+};

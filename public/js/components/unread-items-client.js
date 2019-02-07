@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var _ = require('underscore');
 var context = require('../utils/context');
 var realtime = require('./realtime');
@@ -8,13 +8,11 @@ var Backbone = require('backbone');
 var appEvents = require('../utils/appevents');
 var UnreadItemStore = require('./unread-items-client-store');
 var log = require('../utils/log');
-var raf = require('../utils/raf')
+var raf = require('../utils/raf');
 var passiveEventListener = require('../utils/passive-event-listener');
 var eyeballsDetector = require('./eyeballs-detector');
 
 module.exports = (function() {
-
-
   function limit(fn, context, timeout) {
     return _.throttle(fn.bind(context), timeout || 30, { leading: false });
   }
@@ -22,7 +20,7 @@ module.exports = (function() {
   function onceUserIdSet(callback, c) {
     var user = context.user();
 
-    if(user.id) {
+    if (user.id) {
       callback.call(c, user.id);
     } else {
       user.once('change:id', function() {
@@ -63,7 +61,6 @@ module.exports = (function() {
 
   var MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME = 1000;
 
-
   /**
    * Monitor the viewport for activity from lurking users
    * and send it to the server
@@ -79,7 +76,7 @@ module.exports = (function() {
     chatCollection.on('reset', this._onCollectionReset, this);
 
     this._clearActivityBadgeLimited = limit(this._clearActivityBadge, this, 100);
-  }
+  };
 
   LurkActivityMonitor.prototype = {
     _activity: function(itemId) {
@@ -100,23 +97,26 @@ module.exports = (function() {
       this._lastSeenItems[troupeId] = itemId;
       if (this._timers[troupeId]) return;
 
-      this._timers[troupeId] = setTimeout(function() {
-        debug('_updateLastAccess: %s', troupeId);
+      this._timers[troupeId] = setTimeout(
+        function() {
+          debug('_updateLastAccess: %s', troupeId);
 
-        var lastSeen = this._lastSeenItems[troupeId];
-        delete this._timers[troupeId];
+          var lastSeen = this._lastSeenItems[troupeId];
+          delete this._timers[troupeId];
 
-        // Note, we can't use the apiClient.userRoom endpoint
-        // as the room may have changed since the item was read.
-        // For example, after a room switch we don't want to
-        // be marking items as read in another room
+          // Note, we can't use the apiClient.userRoom endpoint
+          // as the room may have changed since the item was read.
+          // For example, after a room switch we don't want to
+          // be marking items as read in another room
 
-        apiClient.user.put('/rooms/' + troupeId + '/unreadItems/' + lastSeen, "", { dataType: 'text' })
-          .then(function() {
-            debug('_updateLastAccess done');
-          });
-
-      }.bind(this), MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME)
+          apiClient.user
+            .put('/rooms/' + troupeId + '/unreadItems/' + lastSeen, '', { dataType: 'text' })
+            .then(function() {
+              debug('_updateLastAccess done');
+            });
+        }.bind(this),
+        MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME
+      );
     },
 
     _findMostRecentId: function() {
@@ -147,8 +147,7 @@ module.exports = (function() {
     _onCollectionReset: function() {
       this._onStoreReset();
     }
-
-  }
+  };
 
   // -----------------------------------------------------
   // This component sends read notifications back to the server
@@ -164,7 +163,6 @@ module.exports = (function() {
     ['unload', 'beforeunload'].forEach(function(e) {
       window.addEventListener(e, bound, false);
     });
-
   };
 
   ReadItemSender.prototype = {
@@ -185,12 +183,11 @@ module.exports = (function() {
     },
 
     _onWindowUnload: function() {
-      if(Object.keys(this._buffer) > 0) {
+      if (Object.keys(this._buffer) > 0) {
         // Beware: This causes mainthread locks in Safari
         this._send({ sync: true });
       }
     },
-
 
     _send: function(options) {
       debug('_send');
@@ -217,7 +214,8 @@ module.exports = (function() {
         // as the room may have changed since the item was read.
         // For example, after a room switch we don't want to
         // be marking items as read in another room
-        apiClient.user.post('/rooms/' + troupeId + '/unreadItems', queue, {
+        apiClient.user
+          .post('/rooms/' + troupeId + '/unreadItems', queue, {
             async: async,
             global: false
           })
@@ -228,9 +226,7 @@ module.exports = (function() {
               // Unable to send messages, requeue them and try again in 5s
               setTimeout(attemptPost, 5000);
             }
-
           });
-
       }
 
       onceUserIdSet(attemptPost);
@@ -254,7 +250,7 @@ module.exports = (function() {
         onMessage: function(message) {
           debug('Realtime: Channel message: %j', message);
 
-          switch(message.notification) {
+          switch (message.notification) {
             // New unread items
             case 'unread_items':
               store.add(message.items);
@@ -272,7 +268,7 @@ module.exports = (function() {
 
             // Lurk mode switched on/off
             case 'lurk_change':
-              if(message.lurk) {
+              if (message.lurk) {
                 store.enableLurkMode();
               } else {
                 store.disableLurkMode();
@@ -299,9 +295,7 @@ module.exports = (function() {
         store.state = 'LOADING';
         store.reset();
       });
-
     }
-
   });
 
   // -----------------------------------------------------
@@ -319,7 +313,7 @@ module.exports = (function() {
     this._store = unreadItemStore;
     this._windowScrollLimited = limit(this._windowScroll, this, 50);
 
-    var foldCountLimited = this._foldCountLimited = limit(this._foldCount, this, 50);
+    var foldCountLimited = (this._foldCountLimited = limit(this._foldCount, this, 50));
 
     eyeballsDetector.events.on('change', this._eyeballStateChange, this);
 
@@ -362,7 +356,6 @@ module.exports = (function() {
           self._store.markItemRead(chat.id);
         }
       });
-
     });
   };
 
@@ -373,7 +366,11 @@ module.exports = (function() {
       var ready = childCollection.models.length === cv.children.length;
 
       if (!ready) {
-        debug("Mismatch: collection.length=%s, collectionView.length=%s", childCollection.models.length, cv.children.length);
+        debug(
+          'Mismatch: collection.length=%s, collectionView.length=%s',
+          childCollection.models.length,
+          cv.children.length
+        );
       }
 
       return ready;
@@ -395,17 +392,17 @@ module.exports = (function() {
       var scrollTop = this._scrollElement.scrollTop;
       var scrollBottom = scrollTop + this._scrollElement.clientHeight;
 
-      if(!this._scrollTop || scrollTop < this._scrollTop) {
+      if (!this._scrollTop || scrollTop < this._scrollTop) {
         this._scrollTop = scrollTop;
       }
 
-      if(!this._scrollBottom || scrollBottom > this._scrollBottom) {
+      if (!this._scrollBottom || scrollBottom > this._scrollBottom) {
         this._scrollBottom = scrollBottom;
       }
     },
 
     _windowScroll: function() {
-      if(!eyeballsDetector.getEyeballs()) {
+      if (!eyeballsDetector.getEyeballs()) {
         return;
       }
 
@@ -451,7 +448,11 @@ module.exports = (function() {
       if (childCollection.models.length === cv.children.length) {
         models = childCollection.models;
       } else {
-        debug("Mismatch between childCollection.models.length (%s) and cv.children.length (%s) resorting to oddness", childCollection.models.length, cv.children.length);
+        debug(
+          'Mismatch between childCollection.models.length (%s) and cv.children.length (%s) resorting to oddness',
+          childCollection.models.length,
+          cv.children.length
+        );
 
         models = childCollection.models.filter(function(model) {
           return cv.children.findByModelCid(model.cid);
@@ -460,7 +461,7 @@ module.exports = (function() {
       /* TEMP TEMP TEMP TEMP TEMP */
 
       var topIndex = _.sortedIndex(models, viewportTop, function(model) {
-        if(typeof model === 'number') return model;
+        if (typeof model === 'number') return model;
         var view = cv.children.findByModelCid(model.cid);
         return view.el.offsetTop;
       });
@@ -472,7 +473,7 @@ module.exports = (function() {
       }
 
       var bottomIndex = _.sortedIndex(remainingChildren, viewportBottom, function(model) {
-        if(typeof model === 'number') return model;
+        if (typeof model === 'number') return model;
         var view = cv.children.findByModelCid(model.cid);
         return view.el.offsetTop;
       });
@@ -481,21 +482,21 @@ module.exports = (function() {
     },
 
     _resetFoldModel: function() {
-       acrossTheFoldModel.set({
-          unreadAbove: 0,
-          unreadBelow: 0,
-          hasUnreadBelow: false,
-          hasUnreadAbove: false,
-          oldestUnreadItemId: null,
-          mostRecentUnreadItemId: null,
+      acrossTheFoldModel.set({
+        unreadAbove: 0,
+        unreadBelow: 0,
+        hasUnreadBelow: false,
+        hasUnreadAbove: false,
+        oldestUnreadItemId: null,
+        mostRecentUnreadItemId: null,
 
-          mentionsAbove: 0,
-          mentionsBelow: 0,
-          hasMentionsAbove: false,
-          hasMentionsBelow: false,
-          oldestMentionId: null,
-          mostRecentMentionId: null
-        });
+        mentionsAbove: 0,
+        mentionsBelow: 0,
+        hasMentionsAbove: false,
+        hasMentionsBelow: false,
+        oldestMentionId: null,
+        mostRecentMentionId: null
+      });
     },
 
     _foldCount: function() {
@@ -508,7 +509,7 @@ module.exports = (function() {
 
       var store = this._store;
       var chats = store.getItems();
-      if(!chats.length) {
+      if (!chats.length) {
         this._resetFoldModel();
         return;
       }
@@ -578,10 +579,9 @@ module.exports = (function() {
         oldestMentionId: oldestMentionId,
         mostRecentMentionId: mostRecentMentionId
       });
-
     },
     _eyeballStateChange: function(newState) {
-      if(newState) {
+      if (newState) {
         this._getBounds();
       }
     }
@@ -654,10 +654,8 @@ module.exports = (function() {
           model.set({ unread: false, mentioned: false }, setOptions);
         }
       });
-
     });
   }
-
 
   var _unreadItemStore;
 
@@ -666,9 +664,9 @@ module.exports = (function() {
    * or throws an error if it's not obtainable
    */
   function getUnreadItemStore() {
-    if(_unreadItemStore) return _unreadItemStore;
+    if (_unreadItemStore) return _unreadItemStore;
 
-    if(context.troupe().id) {
+    if (context.troupe().id) {
       _unreadItemStore = new UnreadItemStore();
 
       // Bridge events to appEvents
@@ -685,7 +683,6 @@ module.exports = (function() {
     }
 
     return null;
-
   }
 
   /**
@@ -694,9 +691,9 @@ module.exports = (function() {
    */
   function getUnreadItemStoreReq() {
     var store = getUnreadItemStore();
-    if(store) return store;
+    if (store) return store;
 
-    throw new Error("Unable to create an unread items store without a user");
+    throw new Error('Unable to create an unread items store without a user');
   }
 
   var acrossTheFoldModel = new Backbone.Model({
@@ -718,17 +715,15 @@ module.exports = (function() {
       var unreadItemStore = getUnreadItemStoreReq();
 
       onceUserIdSet(function() {
-        apiClient.userRoom.delete("/unreadItems/all")
-          .then(function() {
-            unreadItemStore.markAllRead();
-          });
+        apiClient.userRoom.delete('/unreadItems/all').then(function() {
+          unreadItemStore.markAllRead();
+        });
       });
     },
 
     syncCollections: function(collections) {
       var unreadItemStore = getUnreadItemStoreReq();
       new CollectionSync(unreadItemStore, collections.chat);
-
     },
 
     monitorViewForUnreadItems: function($el, collectionView) {
@@ -739,13 +734,13 @@ module.exports = (function() {
   };
 
   // Mainly useful for testing
-  unreadItemsClient.getStore = function() { return _unreadItemStore; };
+  unreadItemsClient.getStore = function() {
+    return _unreadItemStore;
+  };
   unreadItemsClient.UnreadItemStore = UnreadItemStore;
-
 
   /* Expose */
   window._unreadItems = unreadItemsClient;
 
   return unreadItemsClient;
-
 })();

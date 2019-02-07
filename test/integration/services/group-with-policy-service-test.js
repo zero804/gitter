@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var testRequire = require('../test-require');
 var assert = require('assert');
@@ -10,12 +10,11 @@ var securityDescriptorService = require('gitter-web-permissions/lib/security-des
 var groupService = require('gitter-web-groups/lib/group-service');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-
 var isAdminPolicy = {
   canAdmin: function() {
     return Promise.resolve(true);
   },
-  canJoin: function(){
+  canJoin: function() {
     return Promise.resolve(true);
   }
 };
@@ -25,63 +24,97 @@ describe('group-with-policy-service #slow', function() {
   var group2WithPolicyService;
   var group3WithPolicyService;
 
-  var linkPath = fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
+  var linkPath =
+    fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
 
   fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   var fixture = fixtureLoader.setupEach({
-      deleteDocuments: {
-        Group: [
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
-        ],
-        Troupe: [
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-          { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase() },
-        ],
-      },
-      user1: '#integrationUser1',
-      // group1 is a github user backed group
-      group1: {
-        uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-        lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
-        securityDescriptor: {
-          type: 'GH_USER',
-          linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
-          extraAdmins: ['user1']
+    deleteDocuments: {
+      Group: [
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
+        { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() }
+      ],
+      Troupe: [
+        {
+          lcUri:
+            fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() +
+            '/' +
+            fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase()
+        },
+        {
+          lcUri:
+            fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() +
+            '/' +
+            fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase()
+        },
+        {
+          lcUri:
+            fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() +
+            '/' +
+            fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase()
+        },
+        {
+          lcUri:
+            fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() +
+            '/' +
+            fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase()
         }
-      },
-      // group2 is a "normal" group
-      group2: {
-        securityDescriptor: {
-          extraAdmins: ['user1']
-        }
-      },
-      // group3 is a github org backed group
-      group3: {
-        uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-        lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
-        securityDescriptor: {
-          type: 'GH_ORG',
-          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
-          extraAdmins: ['user1']
-        }
+      ]
+    },
+    user1: '#integrationUser1',
+    // group1 is a github user backed group
+    group1: {
+      uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+      lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
+      securityDescriptor: {
+        type: 'GH_USER',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_USERNAME,
+        extraAdmins: ['user1']
       }
-    });
+    },
+    // group2 is a "normal" group
+    group2: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
+    // group3 is a github org backed group
+    group3: {
+      uri: fixtureLoader.GITTER_INTEGRATION_ORG,
+      lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase(),
+      securityDescriptor: {
+        type: 'GH_ORG',
+        linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+        extraAdmins: ['user1']
+      }
+    }
+  });
 
   beforeEach(function() {
-    group1WithPolicyService = new GroupWithPolicyService(fixture.group1, fixture.user1, isAdminPolicy);
-    group2WithPolicyService = new GroupWithPolicyService(fixture.group2, fixture.user1, isAdminPolicy);
-    group3WithPolicyService = new GroupWithPolicyService(fixture.group3, fixture.user1, isAdminPolicy);
+    group1WithPolicyService = new GroupWithPolicyService(
+      fixture.group1,
+      fixture.user1,
+      isAdminPolicy
+    );
+    group2WithPolicyService = new GroupWithPolicyService(
+      fixture.group2,
+      fixture.user1,
+      isAdminPolicy
+    );
+    group3WithPolicyService = new GroupWithPolicyService(
+      fixture.group3,
+      fixture.user1,
+      isAdminPolicy
+    );
   });
 
   // repo rooms
 
   it('should create a repo room (inherited)', function() {
-    return group1WithPolicyService.createRoom({
+    return group1WithPolicyService
+      .createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         security: 'PUBLIC',
@@ -104,7 +137,8 @@ describe('group-with-policy-service #slow', function() {
   });
 
   it('should create a repo room (public)', function() {
-    return group1WithPolicyService.createRoom({
+    return group1WithPolicyService
+      .createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         security: 'PUBLIC',
@@ -124,11 +158,11 @@ describe('group-with-policy-service #slow', function() {
           externalId: fixtureLoader.GITTER_INTEGRATION_REPO_ID
         });
       });
-
   });
 
   it('should create a repo room (private)', function() {
-    return group1WithPolicyService.createRoom({
+    return group1WithPolicyService
+      .createRoom({
         type: 'GH_REPO',
         name: fixtureLoader.GITTER_INTEGRATION_REPO,
         security: 'PRIVATE',
@@ -154,7 +188,8 @@ describe('group-with-policy-service #slow', function() {
 
   it('should create a normal room (public)', function() {
     var topic = 'litter us with puns';
-    return group2WithPolicyService.createRoom({
+    return group2WithPolicyService
+      .createRoom({
         type: null,
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         topic: topic,
@@ -162,8 +197,14 @@ describe('group-with-policy-service #slow', function() {
       })
       .then(function(createRoomResult) {
         var room = createRoomResult.troupe;
-        assert.strictEqual(room.uri, fixture.group2.uri+'/'+fixtureLoader.GITTER_INTEGRATION_ROOM);
-        assert.strictEqual(room.lcUri, fixture.group2.lcUri+'/'+fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase());
+        assert.strictEqual(
+          room.uri,
+          fixture.group2.uri + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM
+        );
+        assert.strictEqual(
+          room.lcUri,
+          fixture.group2.lcUri + '/' + fixtureLoader.GITTER_INTEGRATION_ROOM.toLowerCase()
+        );
         assert.equal(room.topic, topic);
         assert.equal(room.groupId, fixture.group2.id);
 
@@ -181,7 +222,8 @@ describe('group-with-policy-service #slow', function() {
 
   it('should create a normal room (private)', function() {
     var topic = 'should we change the topic?';
-    return group2WithPolicyService.createRoom({
+    return group2WithPolicyService
+      .createRoom({
         type: null,
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         topic: topic,
@@ -202,13 +244,14 @@ describe('group-with-policy-service #slow', function() {
   });
 
   it('should throw an error when validateRoomName fails', function() {
-    return group2WithPolicyService.createRoom({
+    return group2WithPolicyService
+      .createRoom({
         type: null,
         name: '',
         security: 'PUBLIC'
       })
       .then(function() {
-        assert.ok(false, 'expected error')
+        assert.ok(false, 'expected error');
       })
       .catch(StatusError, function(error) {
         assert.strictEqual(error.status, 400);
@@ -222,13 +265,14 @@ describe('group-with-policy-service #slow', function() {
       security: 'PUBLIC'
     };
     // create once
-    return group2WithPolicyService.createRoom(roomOpts)
+    return group2WithPolicyService
+      .createRoom(roomOpts)
       .then(function() {
         // create twice
-        return group2WithPolicyService.createRoom(roomOpts)
+        return group2WithPolicyService.createRoom(roomOpts);
       })
       .then(function() {
-        assert.ok(false, "error expected");
+        assert.ok(false, 'error expected');
       })
       .catch(StatusError, function(err) {
         assert.deepEqual(err.status, 409);
@@ -238,7 +282,8 @@ describe('group-with-policy-service #slow', function() {
   // org rooms
 
   it('should create an org room (public)', function() {
-    return group3WithPolicyService.createRoom({
+    return group3WithPolicyService
+      .createRoom({
         type: 'GH_ORG',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PUBLIC',
@@ -261,7 +306,8 @@ describe('group-with-policy-service #slow', function() {
   });
 
   it('should create an org room (private)', function() {
-    return group3WithPolicyService.createRoom({
+    return group3WithPolicyService
+      .createRoom({
         type: 'GH_ORG',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PRIVATE',
@@ -286,7 +332,8 @@ describe('group-with-policy-service #slow', function() {
   // user rooms
 
   it('should create a user room - public', function() {
-    return group1WithPolicyService.createRoom({
+    return group1WithPolicyService
+      .createRoom({
         type: 'GH_USER',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PUBLIC',
@@ -309,7 +356,8 @@ describe('group-with-policy-service #slow', function() {
   });
 
   it('should create a user room (private)', function() {
-    return group1WithPolicyService.createRoom({
+    return group1WithPolicyService
+      .createRoom({
         type: 'GH_USER',
         name: fixtureLoader.GITTER_INTEGRATION_ROOM,
         security: 'PRIVATE',

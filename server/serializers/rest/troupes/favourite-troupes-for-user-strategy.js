@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 
@@ -9,7 +9,8 @@ function FavouriteTroupesForUserStrategy(options) {
 
 FavouriteTroupesForUserStrategy.prototype = {
   preload: function() {
-    return recentRoomCore.findFavouriteTroupesForUser(this.userId)
+    return recentRoomCore
+      .findFavouriteTroupesForUser(this.userId)
       .bind(this)
       .then(function(favs) {
         this.favs = favs;

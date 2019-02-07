@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true, unused:true */
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var env = require('gitter-web-env');
@@ -17,34 +17,32 @@ function scanEmailNotifications() {
   var count = 0;
   function iter() {
     return Promise.fromCallback(function(callback) {
-        redisClient.scan(cursor, 'COUNT', 1000, callback);
-      })
-      .spread(function(nextCursor, result) {
-        count++;
-        if(count % 100 === 0) {
-          console.log(count++);
-        }
-        if (result) {
-          result.forEach(function(key) {
-            var prefix = key.split(':', 1)[0];
-            if (hashValues[prefix]) {
-              hashValues[prefix]++;
-            } else {
-              hashValues[prefix] = 1;
-            }
-          });
-        }
+      redisClient.scan(cursor, 'COUNT', 1000, callback);
+    }).spread(function(nextCursor, result) {
+      count++;
+      if (count % 100 === 0) {
+        console.log(count++);
+      }
+      if (result) {
+        result.forEach(function(key) {
+          var prefix = key.split(':', 1)[0];
+          if (hashValues[prefix]) {
+            hashValues[prefix]++;
+          } else {
+            hashValues[prefix] = 1;
+          }
+        });
+      }
 
-        if (nextCursor === '0') return;
-        cursor = nextCursor;
-        return iter();
-      });
+      if (nextCursor === '0') return;
+      cursor = nextCursor;
+      return iter();
+    });
   }
 
-  return iter()
-    .then(function() {
-      return hashValues;
-    });
+  return iter().then(function() {
+    return hashValues;
+  });
 }
 
 scanEmailNotifications()

@@ -7,16 +7,17 @@ function renderSecondaryView(req, res, next, options) {
   var uriContext = options.uriContext;
   var troupe = uriContext.troupe;
 
-  if(!troupe) return next('route');
+  if (!troupe) return next('route');
 
-  roomMembershipService.countMembersInRoom(req.troupe._id)
+  roomMembershipService
+    .countMembersInRoom(req.troupe._id)
     .then(function(userCount) {
       if (req.user) {
         return renderChat(req, res, next, {
           uriContext: req.uriContext,
           template: 'chat-embed-template',
           script: 'router-embed-chat',
-          classNames: [ 'embedded' ],
+          classNames: ['embedded'],
           fetchEvents: false,
           fetchUsers: false,
           extras: {
@@ -29,7 +30,7 @@ function renderSecondaryView(req, res, next, options) {
           template: 'chat-nli-embed-template',
           script: 'router-nli-embed-chat',
           unread: false, // Embedded users see chats as read
-          classNames: [ 'embedded' ],
+          classNames: ['embedded'],
           fetchEvents: false,
           fetchUsers: false,
           extras: {
@@ -49,4 +50,4 @@ function hasSecondaryView() {
 module.exports = {
   renderSecondaryView: renderSecondaryView,
   hasSecondaryView: hasSecondaryView
-}
+};

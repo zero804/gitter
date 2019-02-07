@@ -3,7 +3,7 @@
 var apn = require('apn');
 var notificationMessageGenerator = require('../notification-message-generator');
 
-function generateNewChatNotifications(notificationType, notificationDetails/*, device*/) {
+function generateNewChatNotifications(notificationType, notificationDetails /*, device*/) {
   var room = notificationDetails.room;
   var chats = notificationDetails.chats;
   var hasMentions = notificationDetails.hasMentions;
@@ -12,7 +12,7 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
 
   var note = new apn.Notification();
 
-  if(badgeCount >= 0) {
+  if (badgeCount >= 0) {
     note.badge = badgeCount;
   }
 
@@ -21,8 +21,8 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
   note.category = 'NEW_CHAT';
   note.payload = {
     aps: {
-      "content-available": 1,
-      "l": '/mobile/chat#' + room.id
+      'content-available': 1,
+      l: '/mobile/chat#' + room.id
     }
   };
 
@@ -30,7 +30,7 @@ function generateNewChatNotifications(notificationType, notificationDetails/*, d
 }
 
 function generateNotifications(notificationType, notificationDetails, device) {
-  switch(notificationType) {
+  switch (notificationType) {
     case 'new_chat':
       return generateNewChatNotifications(notificationType, notificationDetails, device);
   }

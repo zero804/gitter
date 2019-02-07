@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-"use strict";
+'use strict';
 
 var _ = require('lodash');
 var Promise = require('bluebird');
@@ -26,11 +26,10 @@ var opts = require('yargs')
     required: false
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
 if (!opts.id && !opts.username && !opts.email) {
-  throw new Error("id, username or email required.");
+  throw new Error('id, username or email required.');
 }
 
 function getUserFromMongo(opts) {
@@ -46,19 +45,18 @@ function getUserFromMongo(opts) {
 }
 
 function getRoomsForUserId(userId) {
-  return roomMembershipService.findRoomIdsForUser(userId)
-    .then(function(roomIds) {
-      // NOTE: we'll only need id, lang and oneToOne in normal operation in
-      // order to get the suggestions. The rest is just for debugging.
-      return troupeService.findByIdsLean(roomIds, {
-        uri: 1,
-        lcOwner: 1,
-        lang: 1,
-        name: 1,
-        userCount: 1,
-        oneToOne: 1
-      });
+  return roomMembershipService.findRoomIdsForUser(userId).then(function(roomIds) {
+    // NOTE: we'll only need id, lang and oneToOne in normal operation in
+    // order to get the suggestions. The rest is just for debugging.
+    return troupeService.findByIdsLean(roomIds, {
+      uri: 1,
+      lcOwner: 1,
+      lang: 1,
+      name: 1,
+      userCount: 1,
+      oneToOne: 1
     });
+  });
 }
 
 var user;

@@ -11,7 +11,8 @@ var uriContextAsBrowserState = require('gitter-web-uri-resolver/lib/uri-context-
 function resolve(req, res, next) {
   var uri = req.params[0];
 
-  return roomContextService.findContextForUri(req.user, uri, { ignoreCase: true })
+  return roomContextService
+    .findContextForUri(req.user, uri, { ignoreCase: true })
     .bind({
       uriContext: null
     })

@@ -29,49 +29,63 @@ var MAX_SUGGESTIONS_PER_ORG = 2;
 var HIGHLIGHTED_ROOMS = [
   {
     uri: 'gitterHQ/gitter',
-    localeLanguage: 'en',
-  }, {
+    localeLanguage: 'en'
+  },
+  {
     uri: 'gitterHQ/developers',
-    localeLanguage: 'en',
-  },{
+    localeLanguage: 'en'
+  },
+  {
     uri: 'LaravelRUS/chat',
-    localeLanguage: 'ru',
-  }, {
+    localeLanguage: 'ru'
+  },
+  {
     uri: 'google/material-design-lite',
     localeLanguage: 'en'
-  }, {
+  },
+  {
     uri: 'pydata/pandas',
     localeLanguage: 'en'
-  }, {
+  },
+  {
     uri: 'PerfectlySoft/Perfect',
     localeLanguage: 'en'
-  }, {
+  },
+  {
     uri: 'twbs/bootstrap',
     localeLanguage: 'en'
-  }, {
+  },
+  {
     uri: 'scala-js/scala-js',
     localeLanguage: 'en'
-  }, {
+  },
+  {
     uri: 'gitterHQ/nodejs',
-    localeLanguage: 'en',
-  },{
+    localeLanguage: 'en'
+  },
+  {
     uri: 'FreeCodeCamp/FreeCodeCamp',
-    localeLanguage: 'en',
-  }, {
+    localeLanguage: 'en'
+  },
+  {
     uri: 'webpack/webpack',
-    localeLanguage: 'en',
-  }, {
+    localeLanguage: 'en'
+  },
+  {
     uri: 'angular-ui/ng-grid',
-    localeLanguage: 'en',
-  }, {
+    localeLanguage: 'en'
+  },
+  {
     uri: 'dev-ua/frontend-ua',
-    localeLanguage: 'ua',
-  }, {
+    localeLanguage: 'ua'
+  },
+  {
     uri: 'rus-speaking/android',
-    localeLanguage: 'ru',
-  }, {
+    localeLanguage: 'ru'
+  },
+  {
     uri: 'FreeCodeCamp/Espanol',
-    localeLanguage: 'es',
+    localeLanguage: 'es'
   }
 ];
 
@@ -118,7 +132,7 @@ var starredRepoRooms = Promise.method(function(options) {
     .then(reposToRooms)
     .then(function(rooms) {
       if (debug.enabled) {
-        debug("starredRepoRooms", _.pluck(rooms, "uri"));
+        debug('starredRepoRooms', _.pluck(rooms, 'uri'));
       }
       return rooms;
     });
@@ -155,7 +169,8 @@ var graphRooms = Promise.method(function(options) {
 
   // limit how many we send to neo4j
   var firstTen = existingRooms.slice(0, 10);
-  return graphSuggestions.getSuggestionsForRooms(firstTen, language)
+  return graphSuggestions
+    .getSuggestionsForRooms(firstTen, language)
     .timeout(2000)
     .then(function(roomIds) {
       return troupeService.findByIdsLean(roomIds);
@@ -174,17 +189,17 @@ var graphRooms = Promise.method(function(options) {
           orgTotals[room.groupId] = 1;
         }
 
-        return (orgTotals[room.groupId] > MAX_SUGGESTIONS_PER_ORG);
+        return orgTotals[room.groupId] > MAX_SUGGESTIONS_PER_ORG;
       });
 
       if (debug.enabled) {
-        debug("graphRooms", _.pluck(suggestedRooms, "uri"));
+        debug('graphRooms', _.pluck(suggestedRooms, 'uri'));
       }
 
       return suggestedRooms;
     })
     .catch(function(err) {
-      logger.error("Neo4J error: " + err, {
+      logger.error('Neo4J error: ' + err, {
         exception: err
       });
       return [];
@@ -207,10 +222,11 @@ var siblingRooms = Promise.method(function(options) {
     return !!groupId;
   });
 
-  return groupRoomSuggestions.findUnjoinedRoomsInGroups(userId, _.uniq(groupIds))
+  return groupRoomSuggestions
+    .findUnjoinedRoomsInGroups(userId, _.uniq(groupIds))
     .then(function(results) {
       if (debug.enabled) {
-        debug("siblingRooms", _.pluck(results, "uri"));
+        debug('siblingRooms', _.pluck(results, 'uri'));
       }
 
       return results;
@@ -225,21 +241,20 @@ function hilightedRooms(options) {
 
   var filtered = _.filter(shuffled, function(roomInfo) {
     var roomLang = roomInfo.localeLanguage;
-    return (roomLang === 'en' || roomLang === language);
+    return roomLang === 'en' || roomLang === language;
   });
 
   var uris = _.map(filtered, function(highlighted) {
     return highlighted.uri;
   });
 
-  return troupeService.findByUris(uris)
-    .then(function(suggestedRooms) {
-      if (debug.enabled) {
-        debug("hilightedRooms", _.pluck(suggestedRooms, "uri"));
-      }
+  return troupeService.findByUris(uris).then(function(suggestedRooms) {
+    if (debug.enabled) {
+      debug('hilightedRooms', _.pluck(suggestedRooms, 'uri'));
+    }
 
-      return suggestedRooms;
-    });
+    return suggestedRooms;
+  });
 }
 
 function filterRooms(suggested, existing) {
@@ -258,7 +273,7 @@ function filterRooms(suggested, existing) {
       return false;
     }
     return existingMap[room.id] === undefined;
-  })
+  });
 
   // filter out duplicates
   var roomMap = {};
@@ -328,34 +343,32 @@ function findSuggestionsForRooms(options) {
  * @private
  */
 function findRoomsByUserId(userId) {
-  return roomMembershipService.findRoomIdsForUser(userId)
-    .then(function(roomIds) {
-      return troupeService.findByIdsLean(roomIds, {
-        uri: 1,
-        groupId: 1,
-        lang: 1,
-        oneToOne: 1
-      });
+  return roomMembershipService.findRoomIdsForUser(userId).then(function(roomIds) {
+    return troupeService.findByIdsLean(roomIds, {
+      uri: 1,
+      groupId: 1,
+      lang: 1,
+      oneToOne: 1
     });
+  });
 }
 
 /**
  * Find some suggestions for the current user
  */
 function findSuggestionsForUserId(userId) {
-    return Promise.all([
-      userService.findById(userId),
-      findRoomsByUserId(userId),
-      userSettingsService.getUserSettings(userId, 'lang')
-    ])
-    .spread(function(user, existingRooms, language) {
-      return findSuggestionsForRooms({
-        user: user,
-        rooms: existingRooms,
-        language: language
-      });
-    })
-  }
+  return Promise.all([
+    userService.findById(userId),
+    findRoomsByUserId(userId),
+    userSettingsService.getUserSettings(userId, 'lang')
+  ]).spread(function(user, existingRooms, language) {
+    return findSuggestionsForRooms({
+      user: user,
+      rooms: existingRooms,
+      language: language
+    });
+  });
+}
 
 module.exports = {
   findSuggestionsForUserId: cacheWrapper('findSuggestionsForUserId', findSuggestionsForUserId, {

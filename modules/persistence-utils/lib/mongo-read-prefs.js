@@ -10,11 +10,11 @@ var secondaryPreferred;
 // eventually consistent. So, for that reason, in test-fixtures
 // we only read off primaries
 if (process.env.GITTER_TEST || config.get('mongo:onlyUsePrimary')) {
-  secondaryPreferred = 'primary'
+  secondaryPreferred = 'primary';
 } else {
-  secondaryPreferred = 'secondaryPreferred'
+  secondaryPreferred = 'secondaryPreferred';
 }
 
 module.exports = {
   secondaryPreferred: secondaryPreferred
-}
+};

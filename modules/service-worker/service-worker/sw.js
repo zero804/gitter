@@ -9,9 +9,9 @@ function extractPayload(event) {
     var data = event && event.data && event.data.json();
     if (!data) return;
 
-    data.uniqueId = (++idSeq) + ':' + Date.now();
+    data.uniqueId = ++idSeq + ':' + Date.now();
     return data;
-  } catch(e) {
+  } catch (e) {
     return;
   }
 }
@@ -28,7 +28,7 @@ self.addEventListener('push', function(event) {
 
 self.addEventListener('pushsubscriptionchange', function(/*event*/) {
   // TODO: important: implement this
-})
+});
 
 self.addEventListener('notificationclick', function(event) {
   var promise = handler.onNotificationClick(event);

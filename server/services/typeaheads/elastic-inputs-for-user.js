@@ -9,4 +9,4 @@ module.exports = function(user) {
   }
 
   return input;
-}
+};

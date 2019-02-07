@@ -15,19 +15,16 @@ module.exports = function(server) {
       var clientId = message.clientId;
 
       server._server._engine.clientExists(clientId, function(exists) {
-        if(!exists) return callback(new StatusError(401, "Client does not exist"));
+        if (!exists) return callback(new StatusError(401, 'Client does not exist'));
 
         presenceService.socketExists(clientId, function(err, exists) {
-          if(err) return callback(err);
+          if (err) return callback(err);
 
-          if(!exists) return callback(new StatusError(401, "Socket association does not exist"));
+          if (!exists) return callback(new StatusError(401, 'Socket association does not exist'));
 
           return callback(null, message);
         });
-
       });
-
     }
   });
-
 };

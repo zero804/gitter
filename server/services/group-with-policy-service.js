@@ -60,7 +60,7 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
   assert(security, 'security required');
 
   if (!validateRoomSecurity(type, security)) {
-    throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
+    throw new StatusError(400, 'Invalid room security for ' + type + ': ' + security);
   }
 
   if (!validateRoomName(name)) {
@@ -69,13 +69,13 @@ GroupWithPolicyService.prototype.createRoom = secureMethod([allowAdmin], functio
 
   return this._ensureAccessAndFetchRoomInfo(options)
     .spread(function(roomInfo, securityDescriptor) {
-      debug("Upserting %j", roomInfo);
+      debug('Upserting %j', roomInfo);
 
       return roomService.createGroupRoom(user, group, roomInfo, securityDescriptor, {
         tracking: options.tracking,
         associateWithGitHubRepo: associateWithGitHubRepo,
         addBadge: options.addBadge
-      })
+      });
     })
     .then(function(results) {
       return {
@@ -115,7 +115,7 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
   assert(security, 'security required');
 
   if (!validateRoomSecurity(type, security)) {
-    throw new StatusError(400, 'Invalid room security for ' + type +': '+ security);
+    throw new StatusError(400, 'Invalid room security for ' + type + ': ' + security);
   }
 
   if (!validateRoomName(name)) {
@@ -126,28 +126,29 @@ GroupWithPolicyService.prototype._ensureAccessAndFetchRoomInfo = function(option
     internalId = group._id;
   }
 
-  return troupeService.findByUri(uri)
-    .then(function(room) {
-      if (room) {
-        throw new StatusError(409, 'Room uri already taken: ' + uri);
-      }
+  return troupeService.findByUri(uri).then(function(room) {
+    if (room) {
+      throw new StatusError(409, 'Room uri already taken: ' + uri);
+    }
 
-      return ensureAccessAndFetchDescriptor(user, {
-          type: type,
-          linkPath: linkPath,
-          obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo,
-          internalId: internalId,
-          security: security,
-        })
-        .then(function(securityDescriptor) {
-          return [{
-            topic: topic,
-            uri: uri,
-            providers: providers
-          }, securityDescriptor];
-        });
-    })
-}
+    return ensureAccessAndFetchDescriptor(user, {
+      type: type,
+      linkPath: linkPath,
+      obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo,
+      internalId: internalId,
+      security: security
+    }).then(function(securityDescriptor) {
+      return [
+        {
+          topic: topic,
+          uri: uri,
+          providers: providers
+        },
+        securityDescriptor
+      ];
+    });
+  });
+};
 
 GroupWithPolicyService.prototype.setAvatar = secureMethod([allowAdmin], function(url) {
   return groupService.setAvatarForGroup(this.group._id, url);

@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');
@@ -22,10 +22,12 @@ onready(function() {
   });
 
   var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-  var appView = new MobileNliLayout({ template: false, el: 'body', chatCollection: chatCollection });
+  var appView = new MobileNliLayout({
+    template: false,
+    el: 'body',
+    chatCollection: chatCollection
+  });
   appView.render();
 
   $('html').removeClass('loading');
-
-
 });

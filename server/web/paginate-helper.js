@@ -2,9 +2,9 @@
 
 function requiredBlock(context, page, pageCount, fn) {
   if (page > 1 || pageCount > 1) {
-    return fn(context)
+    return fn(context);
   } else {
-    return "";
+    return '';
   }
 }
 
@@ -22,10 +22,8 @@ function middleBlock(page, pageCount, limit, fn) {
     i = 0;
     var leftCount = Math.ceil(limit / 2) - 1;
     var rightCount = limit - leftCount - 1;
-    if (page + rightCount > pageCount)
-      leftCount = limit - (pageCount - page) - 1;
-    if (page - leftCount < 1)
-      leftCount = page - 1;
+    if (page + rightCount > pageCount) leftCount = limit - (pageCount - page) - 1;
+    if (page - leftCount < 1) leftCount = page - 1;
     var start = page - leftCount;
 
     while (i < limit && i < pageCount) {
@@ -72,7 +70,6 @@ function lastBlock(page, pageCount, fn) {
   } else {
     return fn({ n: pageCount });
   }
-
 }
 
 module.exports = function(pagination, options) {
@@ -98,10 +95,10 @@ module.exports = function(pagination, options) {
       return nextBlock(page, pageCount, fn);
 
     case 'first':
-      return firstBlock(page, pageCount, fn)
+      return firstBlock(page, pageCount, fn);
 
     case 'last':
-      return lastBlock(page, pageCount, fn)
+      return lastBlock(page, pageCount, fn);
   }
 
   return '';

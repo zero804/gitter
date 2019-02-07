@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
@@ -21,10 +21,9 @@ var TopBannerView = Marionette.ItemView.extend({
 
   behaviors: {
     Tooltip: {
-      'button.side': { title: 'Mark as read', placement: 'top' },
+      'button.side': { title: 'Mark as read', placement: 'top' }
     }
   },
-
 
   events: {
     'click button.main': 'onMainButtonClick',
@@ -79,7 +78,7 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   shouldBeVisible: function() {
-    return (!!this.getMentionsCount() || !!this.getUnreadCount() || !!this.actAsScrollHelper);
+    return !!this.getMentionsCount() || !!this.getUnreadCount() || !!this.actAsScrollHelper;
   },
 
   updateMessage: function() {

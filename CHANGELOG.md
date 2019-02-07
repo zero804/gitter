@@ -1,11 +1,25 @@
-# 19.34.0 - *upcoming*
+# 19.35.0 - 2019-1-31
+
+ - Update `@gitterhq/translations@1.8.2` dependency for Chinese(`zh`) translation update
+    - Thanks to [@imba-tjd](https://gitlab.com/imba-tjd) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/66
+
+Developer facing:
+
+ - Add Prettier automatic formatting for simple lint compliance, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1292
+
+
+# 19.34.0 - 2019-1-25
 
  - Update `@gitterhq/translations@1.8.1` dependency for Chinese(`zh`) typo fix
     - Thanks to [@nodexy](https://gitlab.com/nodexy) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/65
+ - Fix `/login/upgrade` CSRF by adding dedicated landing page with "Upgrade" button to `POST` upgrade, https://gitlab.com/gitlab-org/gitter/webapp/issues/2061
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/11
 
 Developer facing:
 
  - Lowercase persisted emails for easier matching, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1316
+ - Remove masked email from `/api/private/check-invite` response, https://gitlab.com/gitlab-org/gitter/webapp/issues/2064
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/10
 
 
 # 19.33.0 - 2019-1-11

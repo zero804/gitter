@@ -15,12 +15,13 @@ describe('user-repos #slow', function() {
     '#integrationCollabUser1',
     'GITTER_INTEGRATION_REPO',
     'GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ',
-    '#oauthTokens');
+    '#oauthTokens'
+  );
 
   before(function() {
-    if(this._skipFixtureSetup) return;
+    if (this._skipFixtureSetup) return;
 
-    request = require("supertest-as-promised")(Promise);
+    request = require('supertest-as-promised')(Promise);
     app = require('../../server/api');
   });
 
@@ -47,9 +48,11 @@ describe('user-repos #slow', function() {
       .then(function(result) {
         var repos = result.body;
 
-        assert(repos.some(function(repo) {
-          return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-        }));
+        assert(
+          repos.some(function(repo) {
+            return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
+          })
+        );
       });
   });
 
@@ -61,20 +64,22 @@ describe('user-repos #slow', function() {
       .then(function(result) {
         var repos = result.body;
 
-        assert(repos.some(function(repo) {
-          return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-        }));
+        assert(
+          repos.some(function(repo) {
+            return repo.name === fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
+          })
+        );
 
         // now try and add one and see if it is still in there
         // (should we do this via the API too? Going with groupService directly
         //  as it is faster to execute and which user took the linkPath is
         //  irrelevant)
         return groupService.createGroup(fixture.user1, {
-            type: 'GH_REPO',
-            name: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
-            uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
-            linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-          })
+          type: 'GH_REPO',
+          name: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
+          uri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
+        });
       })
       .then(function() {
         return request(app)
@@ -85,12 +90,13 @@ describe('user-repos #slow', function() {
       .then(function(result) {
         var repos = result.body;
 
-        assert(repos.every(function(repo) {
-          return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-        }));
+        assert(
+          repos.every(function(repo) {
+            return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
+          })
+        );
       });
   });
-
 
   it('GET /v1/user/:userId/repos?type=admin', function() {
     return request(app)
@@ -100,9 +106,11 @@ describe('user-repos #slow', function() {
       .then(function(result) {
         var repos = result.body;
 
-        assert(repos.some(function(repo) {
-          return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ
-        }));
+        assert(
+          repos.some(function(repo) {
+            return repo.name !== fixtureLoader.GITTER_INTEGRATION_REPO_WITH_COLLAB_ONLY_READ;
+          })
+        );
       });
   });
 });

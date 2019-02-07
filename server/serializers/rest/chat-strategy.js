@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var logger = env.logger;
 var _ = require('lodash');
-var unreadItemService = require("gitter-web-unread-items");
+var unreadItemService = require('gitter-web-unread-items');
 var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -17,16 +17,15 @@ function UnreadItemStrategy(options) {
   var unreadItemsHash;
 
   this.preload = function() {
-    return unreadItemService.getUnreadItems(options.userId, options.roomId)
-      .then(function(ids) {
-        var hash = {};
+    return unreadItemService.getUnreadItems(options.userId, options.roomId).then(function(ids) {
+      var hash = {};
 
-        _.each(ids, function(id) {
-          hash[id] = true;
-        });
-
-        unreadItemsHash = hash;
+      _.each(ids, function(id) {
+        hash[id] = true;
       });
+
+      unreadItemsHash = hash;
+    });
   };
 
   this.map = function(id) {
@@ -54,11 +53,11 @@ function ChatStrategy(options) {
     if (options.lean) {
       // we're breaking users out, but then not returning their displayNames
       // which kinda defeats the purpose
-      logger.warn("ChatStrategy was called with lookups, but also with lean", options);
+      logger.warn('ChatStrategy was called with lookups, but also with lean', options);
     }
   }
 
-  var userStrategy,unreadItemStrategy;
+  var userStrategy, unreadItemStrategy;
 
   var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
 
@@ -71,13 +70,18 @@ function ChatStrategy(options) {
     if (!options.user) {
       userStrategy = new UserIdStrategy({ lean: options.lean });
 
-      var users = items.map(function(i) { return i.fromUserId; });
+      var users = items.map(function(i) {
+        return i.fromUserId;
+      });
       strategies.push(userStrategy.preload(users));
     }
 
     /* If options.unread has been set, we don't need a strategy */
     if (options.currentUserId && options.unread === undefined) {
-      unreadItemStrategy = new UnreadItemStrategy({ userId: options.currentUserId, roomId: options.troupeId });
+      unreadItemStrategy = new UnreadItemStrategy({
+        userId: options.currentUserId,
+        roomId: options.troupeId
+      });
       strategies.push(unreadItemStrategy.preload());
     }
 
@@ -129,21 +133,23 @@ function ChatStrategy(options) {
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),
       initial: initial || undefined,
-      mentions: castArray(item.mentions && _.map(item.mentions, function(m) {
-          return {
-            screenName: m.screenName,
-            userId: m.userId,
-            userIds: m.userIds, // For groups
-            group: m.group || undefined,
-            announcement: m.announcement || undefined
-          };
-        })),
+      mentions: castArray(
+        item.mentions &&
+          _.map(item.mentions, function(m) {
+            return {
+              screenName: m.screenName,
+              userId: m.userId,
+              userIds: m.userIds, // For groups
+              group: m.group || undefined,
+              announcement: m.announcement || undefined
+            };
+          })
+      ),
       issues: castArray(item.issues),
       meta: castArray(item.meta),
       highlights: item.highlights,
       v: getVersion(item)
     };
-
   };
 
   this.postProcess = function(serialized) {

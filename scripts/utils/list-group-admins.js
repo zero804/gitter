@@ -14,11 +14,11 @@ const opts = require('yargs')
     string: true
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-groupService.findByUri(opts.uri)
-  .then((group) => {
+groupService
+  .findByUri(opts.uri)
+  .then(group => {
     if (!group) {
       throw new Error(`Group with URI ${group.uri} does not exist`);
     }

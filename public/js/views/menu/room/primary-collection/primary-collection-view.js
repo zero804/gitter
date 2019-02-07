@@ -13,22 +13,19 @@ var compositeViewRenderTemplate = require('../../../../utils/composite-view-rend
 var domIndexById = require('../../../../utils/dom-index-by-id');
 var toggleClass = require('../../../../utils/toggle-class');
 
-
 var dragClassMap = {
   all: 'dragging-all',
   people: 'dragging-people'
 };
 
-
 var PrimaryCollectionView = BaseCollectionView.extend({
-
   //Ugh, Marionette, get your game together JP 17/2/16
   _renderTemplate: compositeViewRenderTemplate,
   childView: ItemView,
   className: 'primary-collection',
 
   ui: _.extend({}, BaseCollectionView.prototype.ui, {
-    collection:   '#collection-list',
+    collection: '#collection-list'
   }),
 
   reorderOnSort: true,
@@ -77,16 +74,14 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   },
 
   onStateChange: function() {
-    if(this.ui.headerContent.length) {
-      if(this.roomMenuModel.get('state') === 'search') {
+    if (this.ui.headerContent.length) {
+      if (this.roomMenuModel.get('state') === 'search') {
         if (!!this.roomMenuModel.get('searchTerm')) {
           this.ui.headerContent[0].classList.remove('hidden');
-        }
-        else {
+        } else {
           this.ui.headerContent[0].classList.add('hidden');
         }
-      }
-      else {
+      } else {
         this.ui.headerContent[0].classList.add('hidden');
       }
     }
@@ -98,28 +93,29 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.onStateChange();
   },
 
-  onDragStart: function () {
+  onDragStart: function() {
     this.uiModel.set('isDragging', true);
     this.el.classList.add(dragClassMap[this.model.get('state')] || 'dragging');
   },
 
-  onDragEnd: function () {
+  onDragEnd: function() {
     this.uiModel.set('isDragging', false);
     this.el.classList.remove(dragClassMap[this.model.get('state')] || 'dragging');
   },
 
-  onDragStateUpdate: function (model, val) { //jshint unused: true
+  onDragStateUpdate: function(model, val) {
+    //jshint unused: true
     toggleClass(this.el, dragClassMap[this.model.get('state')] || 'dragging', val);
   },
 
   onDndActivateItem: function(id) {
     var itemModel = this.collection.get(id);
-    if(itemModel) {
+    if (itemModel) {
       itemModel.trigger('activated');
     }
-   },
+  },
 
-  getChildContainerToBeIndexed: function () {
+  getChildContainerToBeIndexed: function() {
     return this.el.children[1];
   },
 
@@ -148,7 +144,6 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     this.stopListening(this.dndCtrl);
     this.stopListening(this.collection);
   }
-
 });
 
 module.exports = PrimaryCollectionView;

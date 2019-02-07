@@ -6,7 +6,7 @@ var validateTag = require('gitter-web-shared/validation/validate-tag').validateT
 
 var TagModel = Backbone.Model.extend({
   defaults: {
-    value: '',
+    value: ''
   },
 
   //we get an array of tag strings from the server
@@ -20,22 +20,20 @@ var TagModel = Backbone.Model.extend({
     var isStaff = context.isStaff();
     var result = validateTag(attrs.value, isStaff);
 
-    if(result.messages.length > 0) {
+    if (result.messages.length > 0) {
       return result.messages.join(' ');
     }
   }
-
 });
 
 var TagCollection = Backbone.Collection.extend({
-
   model: TagModel,
 
   addModel: function(model) {
     var val = model.get('value');
 
     //if there is a duplicate fire error
-    if (!!this.where({value: val}).length) {
+    if (!!this.where({ value: val }).length) {
       this.trigger('tag:error:duplicate', val);
     } else {
       this.add(model);
@@ -48,10 +46,10 @@ var TagCollection = Backbone.Collection.extend({
       memo.push(model.get('value'));
       return memo;
     }, []).join(',');
-  },
+  }
 });
 
 module.exports = {
   TagCollection: TagCollection,
-  TagModel: TagModel,
+  TagModel: TagModel
 };

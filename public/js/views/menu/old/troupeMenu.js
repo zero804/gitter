@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
@@ -29,16 +29,14 @@ require('@gitterhq/styleguide/css/components/buttons.css');
 
 var SUGGESTED_ROOMS_THRESHOLD = 10; // non inclusive
 
-module.exports = (function () {
-
+module.exports = (function() {
   // wraps a view to give us more control of when to display it or not
   var CollectionWrapperView = Marionette.LayoutView.extend({
-
-    behaviors: function(){
-      var result ={
+    behaviors: function() {
+      var result = {
         Isomorphic: {
           list: {
-            el: "#list",
+            el: '#list',
             init: function(optionsForRegion) {
               return new this.options.childView(optionsForRegion({ collection: this.collection }));
             }
@@ -49,7 +47,7 @@ module.exports = (function () {
       if (this.options.handleHide) {
         /* Tack a tooltip on too */
         result.Tooltip = {
-            '.js-hide': { title: 'Hide forever' }
+          '.js-hide': { title: 'Hide forever' }
         };
       }
 
@@ -57,7 +55,7 @@ module.exports = (function () {
     },
 
     ui: {
-      hide: '.js-hide',
+      hide: '.js-hide'
     },
 
     events: {
@@ -70,7 +68,7 @@ module.exports = (function () {
       'sync add reset remove': 'display'
     },
 
-    serializeData: function () {
+    serializeData: function() {
       var options = this.options;
       return {
         canHide: typeof options.handleHide === 'function',
@@ -94,7 +92,7 @@ module.exports = (function () {
       if (this.options.handleHide) this.options.handleHide();
     },
 
-    display: function () {
+    display: function() {
       /* Only display when there are items */
       toggle(this.el, !!this.collection.length);
     }
@@ -102,7 +100,7 @@ module.exports = (function () {
 
   var View = Marionette.LayoutView.extend({
     className: 'menu',
-    selectedListIcon: "icon-troupes",
+    selectedListIcon: 'icon-troupes',
 
     ui: {
       nano: '.nano',
@@ -122,44 +120,48 @@ module.exports = (function () {
     behaviors: {
       Isomorphic: {
         profile: {
-          el: "#profile-region",
+          el: '#profile-region',
           init: function(optionsForRegion) {
             return new ProfileView(optionsForRegion({}, { rerender: true }));
           }
         },
         favs: {
-          el: "#favs-region",
+          el: '#favs-region',
           init: function(optionsForRegion) {
             // This listener affects favs and recents...
             this.listenTo(troupeCollections.troupes, 'add remove', this.initNanoScrollerThrottled);
 
-            return new RoomCollectionView(optionsForRegion({
-              collection: troupeCollections.favourites,
-              draggable: true,
-              dropTarget: true,
-              roomsCollection: troupeCollections.troupes
-            }));
+            return new RoomCollectionView(
+              optionsForRegion({
+                collection: troupeCollections.favourites,
+                draggable: true,
+                dropTarget: true,
+                roomsCollection: troupeCollections.troupes
+              })
+            );
           }
         },
         recents: {
-          el: "#recents-region",
+          el: '#recents-region',
           init: function(optionsForRegion) {
-            return new RoomCollectionView(optionsForRegion({
-              collection: troupeCollections.recentRoomsNonFavourites,
-              draggable: true,
-              dropTarget: true,
-              roomsCollection: troupeCollections.troupes,
-            }));
+            return new RoomCollectionView(
+              optionsForRegion({
+                collection: troupeCollections.recentRoomsNonFavourites,
+                draggable: true,
+                dropTarget: true,
+                roomsCollection: troupeCollections.troupes
+              })
+            );
           }
         }
       }
     },
 
     regions: {
-      suggested: "#suggested-region"
+      suggested: '#suggested-region'
     },
 
-    initialize: function () {
+    initialize: function() {
       // this.bindUIElements();
       // this.initHideListeners = _.once(_.bind(this.initHideListeners, this));
       this.repoList = false;
@@ -173,7 +175,7 @@ module.exports = (function () {
       this.listenTo(appEvents, 'context.troupeId', this.troupeContextChanged);
 
       // determining whether we should show the suggested rooms or not
-      var hasItems = troupeCollections.troupes && !!(troupeCollections.troupes.length);
+      var hasItems = troupeCollections.troupes && !!troupeCollections.troupes.length;
 
       if (hasItems) {
         this.showSuggestedRooms();
@@ -186,8 +188,8 @@ module.exports = (function () {
       this.initNanoScrollerThrottled = _.throttle(this.initNanoScroller, 100, { leading: false });
     },
 
-    onNavigation: function (){
-      return (isMobile()) ? this.hideMenu() : this.showMenu();
+    onNavigation: function() {
+      return isMobile() ? this.hideMenu() : this.showMenu();
     },
 
     initNanoScroller: function() {
@@ -199,11 +201,14 @@ module.exports = (function () {
 
       var suggestedRoomsHidden = context().suggestedRoomsHidden;
 
-      if (suggestedRoomsHidden || troupeCollections.troupes.length >= SUGGESTED_ROOMS_THRESHOLD) return;
+      if (suggestedRoomsHidden || troupeCollections.troupes.length >= SUGGESTED_ROOMS_THRESHOLD)
+        return;
 
       var collection = this.suggestedRoomsCollection;
       if (!collection) {
-        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection({ roomsCollection: troupeCollections.troupes });
+        collection = this.suggestedRoomsCollection = new FilteredSuggestedRoomCollection({
+          roomsCollection: troupeCollections.troupes
+        });
 
         // For now, only fetch the suggested rooms once
         if (context.getTroupeId()) {
@@ -221,13 +226,13 @@ module.exports = (function () {
         collection: collection,
         childView: SuggestedCollectionView,
         header: 'Suggested Rooms',
-        handleHide: function () {
+        handleHide: function() {
           apiClient.user
             .put('/settings/suggestedRoomsHidden', { value: true })
-            .then(function () {
+            .then(function() {
               collection.reset();
             })
-            .catch(function (err) {
+            .catch(function(err) {
               log.error(err);
             });
         }
@@ -285,13 +290,13 @@ module.exports = (function () {
       }
     },
 
-    navigateToCurrent: function () {
+    navigateToCurrent: function() {
       var itemElements = this.ui.recentListItems;
       itemElements.removeClass('selected');
       $(itemElements[this.selectedIndex]).click(); // TODO: send a message to the control!
     },
 
-    navigateTo: function (i) {
+    navigateTo: function(i) {
       var itemElements = this.ui.recentListItems;
       if (i >= 0 && i < itemElements.length) {
         this.selectedIndex = i;
@@ -299,9 +304,10 @@ module.exports = (function () {
       }
     },
 
-    navigateToRoom: function (e, handler) { //jshint unused:true
+    navigateToRoom: function(e, handler) {
+      //jshint unused:true
       var keys = handler.key.split('+');
-      var key = keys[ keys.length - 1 ];
+      var key = keys[keys.length - 1];
       if (key === '0') return this.navigateTo(9);
       var index = parseInt(key, 10) - 1;
       this.navigateTo(index);
@@ -315,7 +321,7 @@ module.exports = (function () {
       };
     },
 
-    onRender: function () {
+    onRender: function() {
       this.initNanoScroller();
     }
   });
@@ -323,5 +329,4 @@ module.exports = (function () {
   cocktail.mixin(View, KeyboardEventsMixin);
 
   return View;
-
 })();

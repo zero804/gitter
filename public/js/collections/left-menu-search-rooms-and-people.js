@@ -16,21 +16,19 @@ function roomFilter(roomMenuModel, room) {
   var name = (room.get('name') || '').toLowerCase();
   var uri = (room.get('url') || '').replace(/^\//, '').toLowerCase();
 
-  return searchTerm.length > 0 && (
-      fuzzysearch(searchTerm, name) ||
-      fuzzysearch(searchTerm, uri)
-    );
+  return searchTerm.length > 0 && (fuzzysearch(searchTerm, name) || fuzzysearch(searchTerm, uri));
 }
 
 //take a list of object which have a property of id and return a uniq array
 function uniqByUrl(list) {
-
   var map = {};
 
   //push items into the map such that they are uniq
   list.forEach(function(item) {
     //guard against no url property
-    if(item.url){ map[item.url] = item; }
+    if (item.url) {
+      map[item.url] = item;
+    }
   });
 
   //return the objects not the map
@@ -42,18 +40,26 @@ function uniqByUrl(list) {
 var SearchMessageAndPeople = Backbone.Collection.extend({
   initialize: function(models, attrs) {
     if (!attrs || !attrs.roomMenuModel) {
-      throw new Error('A valid instance of RoomMenuModel should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
+      throw new Error(
+        'A valid instance of RoomMenuModel should be passed to a new LeftMenuSearchRoomsAndPeopleCollection'
+      );
     }
 
     if (!attrs || !attrs.roomCollection) {
-      throw new Error('A valid instance of a roomCollection should be passed to a new LeftMenuSearchRoomsAndPeopleCollection');
+      throw new Error(
+        'A valid instance of a roomCollection should be passed to a new LeftMenuSearchRoomsAndPeopleCollection'
+      );
     }
 
     this.roomMenuModel = attrs.roomMenuModel;
     this.roomCollection = attrs.roomCollection;
 
-    this.searchPeopleCollection = new SearchPeopleCollection(null, { contextModel: this.roomMenuModel });
-    this.searchRoomCollection = new SearchRoomCollection(null, { contextModel: this.roomMenuModel });
+    this.searchPeopleCollection = new SearchPeopleCollection(null, {
+      contextModel: this.roomMenuModel
+    });
+    this.searchRoomCollection = new SearchRoomCollection(null, {
+      contextModel: this.roomMenuModel
+    });
     this.searchRepoCollection = new SearchRepoCollection(null, { contextModel: context.user() });
     this.searchCurrentRooms = new SimpleFilteredCollection([], {
       collection: this.roomCollection,
@@ -61,13 +67,33 @@ var SearchMessageAndPeople = Backbone.Collection.extend({
     });
 
     this.listenTo(this.roomMenuModel, 'change:searchTerm', this.onSearchUpdate, this);
-    this.listenTo(this.searchPeopleCollection, 'change add remove reset update', this.onCollectionChange, this);
-    this.listenTo(this.searchRoomCollection, 'change add remove reset update', this.onCollectionChange, this);
-    this.listenTo(this.searchRepoCollection, 'change add remove reset update', this.onCollectionChange, this);
-    this.listenTo(this.searchCurrentRooms, 'change add remove reset update', this.onCollectionChange, this);
+    this.listenTo(
+      this.searchPeopleCollection,
+      'change add remove reset update',
+      this.onCollectionChange,
+      this
+    );
+    this.listenTo(
+      this.searchRoomCollection,
+      'change add remove reset update',
+      this.onCollectionChange,
+      this
+    );
+    this.listenTo(
+      this.searchRepoCollection,
+      'change add remove reset update',
+      this.onCollectionChange,
+      this
+    );
+    this.listenTo(
+      this.searchCurrentRooms,
+      'change add remove reset update',
+      this.onCollectionChange,
+      this
+    );
   },
 
-  onSearchUpdate: function () {
+  onSearchUpdate: function() {
     if (!this.roomMenuModel.get('searchTerm')) {
       this.searchRoomCollection.reset();
       this.searchRepoCollection.reset();
@@ -81,22 +107,24 @@ var SearchMessageAndPeople = Backbone.Collection.extend({
     this.searchCurrentRooms.setFilter();
   },
 
-  onCollectionChange: function () {
-    var currentRooms = (this.searchCurrentRooms.toJSON() || []);
-    var repos = (this.searchRepoCollection.toJSON() || []);
-    var rooms = (this.searchRoomCollection.toJSON() || []);
-    var people = (this.searchPeopleCollection.toJSON() || []);
+  onCollectionChange: function() {
+    var currentRooms = this.searchCurrentRooms.toJSON() || [];
+    var repos = this.searchRepoCollection.toJSON() || [];
+    var rooms = this.searchRoomCollection.toJSON() || [];
+    var people = this.searchPeopleCollection.toJSON() || [];
 
     //format our results
-    var results = currentRooms.concat(repos).concat(rooms).concat(people);
-    results = uniqByUrl(results).map(function(model){
+    var results = currentRooms
+      .concat(repos)
+      .concat(rooms)
+      .concat(people);
+    results = uniqByUrl(results).map(function(model) {
       model.isHidden = false;
       return model;
     });
 
     this.reset(results);
-  },
-
+  }
 });
 
 var FilteredSearchMessageAndPeople = LimitedCollection.extend({

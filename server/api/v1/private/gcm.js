@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var logger = require('gitter-web-env').logger;
 var pushNotificationService = require('gitter-web-push-notifications');
@@ -10,9 +10,10 @@ module.exports = function(req, res, next) {
   var appVersion = req.body.version;
   var userId = req.user.id;
 
-  logger.info("GCM device registration", { deviceId: deviceId, deviceName: deviceName });
+  logger.info('GCM device registration', { deviceId: deviceId, deviceName: deviceName });
 
-  return pushNotificationService.registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId)
+  return pushNotificationService
+    .registerAndroidDevice(deviceId, deviceName, registrationId, appVersion, userId)
     .then(function() {
       res.send({ success: true });
     })

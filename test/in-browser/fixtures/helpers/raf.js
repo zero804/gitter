@@ -1,3 +1,5 @@
 'use strict';
 
-module.exports = function(fn){ fn(); };
+module.exports = function(fn) {
+  fn();
+};

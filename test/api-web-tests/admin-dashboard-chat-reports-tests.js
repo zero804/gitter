@@ -19,7 +19,7 @@ describe('Admin dashboard: chat message reports', function() {
     userStaff1: {
       staff: true,
       accessToken: 'web-internal'
-    },
+    }
   });
 
   it('GET /-/admin/chat-message-reports unauthorized is forbidden', function() {
@@ -27,7 +27,10 @@ describe('Admin dashboard: chat message reports', function() {
       .get(`/-/admin/chat-message-reports`)
       .expect(403)
       .then(function(result) {
-        assert(!result.text.includes('Admin dashboard: Chat message reports'), 'response does NOT have dashboard heading');
+        assert(
+          !result.text.includes('Admin dashboard: Chat message reports'),
+          'response does NOT have dashboard heading'
+        );
       });
   });
 
@@ -37,7 +40,10 @@ describe('Admin dashboard: chat message reports', function() {
       .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
       .expect(403)
       .then(function(result) {
-        assert(!result.text.includes('Admin dashboard: Chat message reports'), 'response does NOT have dashboard heading');
+        assert(
+          !result.text.includes('Admin dashboard: Chat message reports'),
+          'response does NOT have dashboard heading'
+        );
       });
   });
 
@@ -47,7 +53,10 @@ describe('Admin dashboard: chat message reports', function() {
       .set('Authorization', `Bearer ${fixture.userStaff1.accessToken}`)
       .expect(200)
       .then(function(result) {
-        assert(result.text.includes('Admin dashboard: Chat message reports'), 'response has dashboard heading');
+        assert(
+          result.text.includes('Admin dashboard: Chat message reports'),
+          'response has dashboard heading'
+        );
       });
   });
 });

@@ -1,11 +1,9 @@
-"use strict";
+'use strict';
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var NeverEndingStory = require('../../utils/never-ending-story');
 
 module.exports = (function() {
-
-
   var Behavior = Marionette.Behavior.extend({
     defaults: {
       reverseScrolling: false,
@@ -13,12 +11,13 @@ module.exports = (function() {
       contentWrapperSelector: null
     },
     initialize: function() {
-      var scrollElement = this.options.scrollElement ||
-                          document.querySelector(this.options.scrollElementSelector) ||
-                          this.view.el;
+      var scrollElement =
+        this.options.scrollElement ||
+        document.querySelector(this.options.scrollElementSelector) ||
+        this.view.el;
 
-      var contentWrapper = this.options.contentWrapper ||
-                           document.querySelector(this.options.contentWrapperSelector);
+      var contentWrapper =
+        this.options.contentWrapper || document.querySelector(this.options.contentWrapperSelector);
 
       var reverseScrolling = this.options.reverseScrolling;
 
@@ -44,8 +43,6 @@ module.exports = (function() {
     }
   });
 
-
   behaviourLookup.register('InfiniteScroll', Behavior);
   return Behavior;
-
 })();

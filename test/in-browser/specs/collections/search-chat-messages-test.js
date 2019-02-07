@@ -7,7 +7,6 @@ var sinon = require('sinon');
 var SearchChatMessages = require('public/js/collections/search-chat-messages');
 
 describe('SearchChatMessages', function() {
-
   var model;
   var room;
   var collection;
@@ -17,7 +16,11 @@ describe('SearchChatMessages', function() {
     model = new Backbone.Model({ state: 'all' });
     room = new Backbone.Model({ id: 1 });
     query = new Backbone.Model();
-    collection = new SearchChatMessages(null, { roomMenuModel: model, roomModel: room, queryModel: query });
+    collection = new SearchChatMessages(null, {
+      roomMenuModel: model,
+      roomModel: room,
+      queryModel: query
+    });
     collection.fetch = sinon.spy();
   });
 
@@ -51,5 +54,4 @@ describe('SearchChatMessages', function() {
     model.set({ state: 'search', searchTerm: 'sometestsearch' });
     assert.equal('/v1/rooms/123456/chatMessages', collection.url());
   });
-
 });

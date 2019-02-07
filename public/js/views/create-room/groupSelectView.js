@@ -6,7 +6,6 @@ var Typeahead = require('../controls/typeahead');
 var template = require('./tmpl/groupSelectView.hbs');
 var itemTemplate = require('./tmpl/parentItemView.hbs');
 
-
 var GroupSelectView = Marionette.ItemView.extend({
   events: {
     'focus @ui.input': 'show',
@@ -44,7 +43,7 @@ var GroupSelectView = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    if(!this.typeahead) {
+    if (!this.typeahead) {
       this.typeahead = new Typeahead({
         disableShowOnAdd: true,
         backdropClass: 'group-select-view-dropdown-backdrop',
@@ -93,7 +92,6 @@ var GroupSelectView = Marionette.ItemView.extend({
   refilter: function(query, collection, success) {
     if (success) success();
   }
-
 });
 
 module.exports = GroupSelectView;

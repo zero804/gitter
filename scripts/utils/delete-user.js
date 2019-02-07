@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*jslint node: true */
-"use strict";
+'use strict';
 
 var shutdown = require('shutdown');
 var userRemovalService = require('gitter-web-rooms/lib/user-removal-service');
@@ -20,12 +20,12 @@ var opts = require('yargs')
     default: false
   })
   .help('help')
-  .alias('help', 'h')
-  .argv;
+  .alias('help', 'h').argv;
 
-userRemovalService.removeByUsername(opts.username, {
-  ghost: opts.ghost
-})
+userRemovalService
+  .removeByUsername(opts.username, {
+    ghost: opts.ghost
+  })
   .delay(5000)
   .then(function() {
     shutdown.shutdownGracefully();

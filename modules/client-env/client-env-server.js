@@ -8,7 +8,7 @@ var appVersion = require('gitter-app-version');
 var env = process.env.NODE_ENV;
 
 var cdns;
-if(config.get('cdn:use')) {
+if (config.get('cdn:use')) {
   cdns = config.get('cdn:hosts');
 }
 
@@ -44,9 +44,8 @@ var troupeEnv = {
     gitterUsers: config.get('headlineNumbers:gitterUsers'),
     gitterRooms: config.get('headlineNumbers:gitterRooms'),
     gitterGroups: config.get('headlineNumbers:gitterGroups'),
-    gitterCountries: config.get('headlineNumbers:gitterCountries'),
+    gitterCountries: config.get('headlineNumbers:gitterCountries')
   }
 };
-
 
 module.exports = troupeEnv;

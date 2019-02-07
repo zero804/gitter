@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-"use strict";
+'use strict';
 
 var env = require('gitter-web-env');
 var winston = env.logger;
@@ -10,7 +10,7 @@ var shutdown = require('shutdown');
 var start = Date.now();
 
 presenceService.validateUsers(function(err) {
-  if(err) {
+  if (err) {
     winston.error('presence-user-validation failed: ' + err, { exception: err });
   }
 

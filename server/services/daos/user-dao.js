@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 var persistence = require('gitter-web-persistence');
 var promiseUtils = require('../../utils/promise-utils');
@@ -13,13 +13,11 @@ function create(lean) {
   };
 
   module.findById = function(id, fields) {
-    return persistence.User.findById(id, fields, { lean: lean })
-      .exec();
+    return persistence.User.findById(id, fields, { lean: lean }).exec();
   };
 
   return module;
 }
-
 
 module.exports = {
   lean: create(true), // -> lean: true

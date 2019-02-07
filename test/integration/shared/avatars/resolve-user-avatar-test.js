@@ -4,7 +4,6 @@ var assert = require('assert');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
 
 describe('user avatar url generator', function() {
-
   describe('when passed a user object', function() {
     it('should return a github url for a github gravatarImageUrl', function() {
       var user = {
@@ -18,10 +17,14 @@ describe('user avatar url generator', function() {
     it('should return a GitLab url for a GitLab gravatarImageUrl', function() {
       var user = {
         username: 'MadLittleMods',
-        gravatarImageUrl: 'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=80&d=identicon'
+        gravatarImageUrl:
+          'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=80&d=identicon'
       };
       var result = resolveUserAvatarUrl(user, 60);
-      assert.equal(result, 'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=60&d=identicon');
+      assert.equal(
+        result,
+        'https://secure.gravatar.com/avatar/4d634a2b818e2265fa2924b5f4c2da71?s=60&d=identicon'
+      );
     });
 
     it('should return a GitLab url for a GitLab uploaded image', function() {
@@ -30,23 +33,31 @@ describe('user avatar url generator', function() {
         gravatarImageUrl: 'https://gitlab.com/uploads/-/system/user/avatar/1490805/avatar.png'
       };
       var result = resolveUserAvatarUrl(user, 60);
-      assert.equal(result, 'https://gitlab.com/uploads/-/system/user/avatar/1490805/avatar.png?s=60');
+      assert.equal(
+        result,
+        'https://gitlab.com/uploads/-/system/user/avatar/1490805/avatar.png?s=60'
+      );
     });
 
     it('should return a google url for a google gravatarImageUrl', function() {
       var user = {
-        gravatarImageUrl: 'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'
+        gravatarImageUrl:
+          'https://lh5.googleusercontent.com/-8JzxZyD84qE/AAAAAAAAAAI/AAAAAAAAAN4/_x36v4AaxKo/photo.jpg'
       };
-      var result = resolveUserAvatarUrl(user, 40)
-      assert.equal(result, user.gravatarImageUrl+'?sz=40');
+      var result = resolveUserAvatarUrl(user, 40);
+      assert.equal(result, user.gravatarImageUrl + '?sz=40');
     });
 
     it('should return a twitter url for a twitter gravatarImageUrl', function() {
       var user = {
-        gravatarImageUrl: 'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg'
+        gravatarImageUrl:
+          'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_normal.jpeg'
       };
-      var result = resolveUserAvatarUrl(user, 60)
-      assert.equal(result, 'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_bigger.jpeg');
+      var result = resolveUserAvatarUrl(user, 60);
+      assert.equal(
+        result,
+        'https://pbs.twimg.com/profile_images/378800000308609669/c5cc5261cc55da2dbca442eaf60920cc_bigger.jpeg'
+      );
     });
   });
 
@@ -77,5 +88,4 @@ describe('user avatar url generator', function() {
       assert.equal(result, '/api/private/user-avatar/1234_?s=60');
     });
   });
-
 });

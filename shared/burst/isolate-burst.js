@@ -9,13 +9,13 @@ function findBurstModels(_, collection, model) {
   var result = [model];
   var i;
 
-  if(startIndex < 0) return result;
+  if (startIndex < 0) return result;
 
-  if(!_.get(model, 'burstStart')) {
+  if (!_.get(model, 'burstStart')) {
     startIndex--;
 
     i = _.at(collection, startIndex);
-    while(startIndex >= 0) {
+    while (startIndex >= 0) {
       result.unshift(i);
       if (_.get(i, 'burstStart')) break; // Quit the loop
       startIndex--;
@@ -26,7 +26,11 @@ function findBurstModels(_, collection, model) {
     }
   }
 
-  while(endIndex < collection.length && (i = _.at(collection, endIndex)) && !_.get(i, 'burstStart')) {
+  while (
+    endIndex < collection.length &&
+    (i = _.at(collection, endIndex)) &&
+    !_.get(i, 'burstStart')
+  ) {
     result.push(i);
     endIndex++;
   }

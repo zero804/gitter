@@ -17,7 +17,8 @@ function getModels() {
     });
 }
 
-indexManager.ensureIndices(getModels())
+indexManager
+  .ensureIndices(getModels())
   .then(function() {
     console.log('Complete');
     shutdown.shutdownGracefully();
@@ -25,4 +26,4 @@ indexManager.ensureIndices(getModels())
   .catch(function(err) {
     console.log(err.stack || err);
     shutdown.shutdownGracefully(1);
-  })
+  });

@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
 var avatars = require('gitter-web-avatars');
 
 function UserStrategy(options) {
   options = options ? options : {};
 
-  this.preload = function() { };
+  this.preload = function() {};
 
   this.map = function(user) {
-    if(!user) return null;
+    if (!user) return null;
 
     var avatarUrl = avatars.getForUser(user);
 
@@ -18,7 +18,7 @@ function UserStrategy(options) {
       displayName: user.displayName || user.username,
       avatarUrl: avatarUrl,
       avatarUrlSmall: avatarUrl + '?s=60', // TODO: deprecate
-      avatarUrlMedium: avatarUrl + '?s=128', // TODO: deprecate
+      avatarUrlMedium: avatarUrl + '?s=128' // TODO: deprecate
     };
   };
 }

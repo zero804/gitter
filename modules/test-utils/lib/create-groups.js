@@ -1,11 +1,9 @@
-"use strict";
+'use strict';
 
 var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
-
-
 
 function createGroup(fixtureName, f) {
   debug('Creating %s', fixtureName);
@@ -36,7 +34,6 @@ function createGroup(fixtureName, f) {
     homeUri: homeUri,
     lcHomeUri: lcHomeUri
   };
-
 
   var securityDescriptor = f.securityDescriptor || {};
 
@@ -72,7 +69,7 @@ function createExtraGroups(expected, fixture, key) {
   var group = obj.group;
   if (!group) return;
 
-  if (typeof group !== 'string') throw new Error('Please specify the group as a string id')
+  if (typeof group !== 'string') throw new Error('Please specify the group as a string id');
   if (fixture[group]) {
     // Already specified at the top level
     obj.group = fixture[group];
@@ -81,11 +78,10 @@ function createExtraGroups(expected, fixture, key) {
 
   debug('creating extra group %s', group);
 
-  return createGroup(group, { })
-    .then(function(createdGroup) {
-      obj.group = createdGroup;
-      fixture[group] = createdGroup;
-    });
+  return createGroup(group, {}).then(function(createdGroup) {
+    obj.group = createdGroup;
+    fixture[group] = createdGroup;
+  });
 }
 
 function createGroups(expected, fixture) {
@@ -96,24 +92,26 @@ function createGroups(expected, fixture) {
 
       var expectedSecurityDescriptor = expectedGroup && expectedGroup.securityDescriptor;
       if (expectedSecurityDescriptor) {
-        expectedSecurityDescriptor.extraMembers = expectedSecurityDescriptor.extraMembers && expectedSecurityDescriptor.extraMembers.map(function(user) {
-          return fixture[user]._id;
-        });
+        expectedSecurityDescriptor.extraMembers =
+          expectedSecurityDescriptor.extraMembers &&
+          expectedSecurityDescriptor.extraMembers.map(function(user) {
+            return fixture[user]._id;
+          });
 
-        expectedSecurityDescriptor.extraAdmins = expectedSecurityDescriptor.extraAdmins && expectedSecurityDescriptor.extraAdmins.map(function(user) {
-          return fixture[user]._id;
-        });
+        expectedSecurityDescriptor.extraAdmins =
+          expectedSecurityDescriptor.extraAdmins &&
+          expectedSecurityDescriptor.extraAdmins.map(function(user) {
+            return fixture[user]._id;
+          });
       }
 
-      return createGroup(key, expectedGroup)
-        .then(function(createdGroup) {
-          fixture[key] = createdGroup;
-        });
+      return createGroup(key, expectedGroup).then(function(createdGroup) {
+        fixture[key] = createdGroup;
+      });
     }
 
     return null;
-  })
-  .then(function() {
+  }).then(function() {
     return Promise.map(Object.keys(expected), function(key) {
       if (key.match(/^troupe/)) {
         return createExtraGroups(expected, fixture, key);

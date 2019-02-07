@@ -23,15 +23,15 @@ module.exports = exports = function(options) {
       var uri = options.uri || options.url;
       debug('request: %s %s ', options.method, uri);
 
-      request(options, function (error, response, body) {
+      request(options, function(error, response, body) {
         var duration = Date.now() - start;
         stats.responseTime('github.api.response.time', duration);
 
-        if(error || response.statusCode >= 500) {
+        if (error || response.statusCode >= 500) {
           retry++;
 
-          if(retry <= maxRetries) {
-            logger.error("Error while communicating with GitHub. Retrying in " + backoff + "ms", {
+          if (retry <= maxRetries) {
+            logger.error('Error while communicating with GitHub. Retrying in ' + backoff + 'ms', {
               statusCode: response && response.statusCode,
               uri: options.uri || options.url,
               error: error,

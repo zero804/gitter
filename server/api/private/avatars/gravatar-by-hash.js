@@ -7,4 +7,4 @@ module.exports = function(md5, size) {
     url: gravatar.forChecksum(md5, size),
     longTermCachable: true
   };
-}
+};

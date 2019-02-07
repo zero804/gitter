@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
 var roomContextService = require('gitter-web-rooms/lib/room-context-service');
 var debug = require('debug')('gitter:app:uri-context-resolver-middleware');
 
 function normaliseUrl(params) {
-  if(params.roomPart3) {
+  if (params.roomPart3) {
     return params.roomPart1 + '/' + params.roomPart2 + '/' + params.roomPart3;
   }
 
-  if(params.roomPart2) {
+  if (params.roomPart2) {
     return params.roomPart1 + '/' + params.roomPart2;
   }
 
@@ -17,9 +17,10 @@ function normaliseUrl(params) {
 
 function uriContextResolverMiddleware(req, res, next) {
   var uri = normaliseUrl(req.params);
-  debug("Looking up normalised uri %s", uri);
+  debug('Looking up normalised uri %s', uri);
 
-  return roomContextService.findContextForUri(req.user, uri)
+  return roomContextService
+    .findContextForUri(req.user, uri)
     .then(function(uriContext) {
       if (uriContext.ownUrl) {
         res.relativeRedirect('/home/explore');
@@ -31,7 +32,7 @@ function uriContextResolverMiddleware(req, res, next) {
       req.uriContext = uriContext;
 
       next();
-      return null
+      return null;
     })
     .catch(next);
 }
