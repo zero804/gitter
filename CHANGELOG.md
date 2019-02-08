@@ -4,6 +4,10 @@
   - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
      - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
 
+Developer facing:
+
+ - Remove defunct in-browser tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1326
+
 
 # 19.35.0 - 2019-1-31
 
