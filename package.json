@@ -289,13 +289,7 @@
     "task-validate": "gulp validate",
     "task-watch": "gulp watch",
     "build-android-assets": "gulp --gulpfile gulpfile-embedded.js --android",
-    "build-ios-assets": "gulp --gulpfile gulpfile-embedded.js --ios",
-    "browser-build-tests": "webpack --config ./test/in-browser/webpack.config.js",
-    "browser-run-test": "cd ./test/in-browser/fixtures && devtool -cq runner.js",
-    "browser-test": "npm run browser-build-tests && npm run browser-run-test",
-    "browser-watch-build-tests": "webpack -w --config ./test/in-browser/webpack.config.js",
-    "browser-watch-run-tests": "http-server ./test/in-browser -p 9191 & live-reload ./test/in-browser/fixtures --port 9192",
-    "browser-watch-test": "npm run browser-watch-build-tests & npm run browser-watch-run-tests"
+    "build-ios-assets": "gulp --gulpfile gulpfile-embedded.js --ios"
   },
   "git": {
     "scripts": {

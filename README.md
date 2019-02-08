@@ -196,23 +196,6 @@ You can look at the [issues labeled with ~"test"](https://gitlab.com/gitlab-org/
 
 All unit tests etc can be run with `npm test`
 
-#### Browser testing
-
-Running browser unit tests during development requires this command:
-
-```
-npm run browser-watch-test
-```
-
-Then open your favourite browser and view `http://localhost:9191/fixtures`. This page will live reload with you test changes when required.
-
-To perform an automated test run use the following command:
-
-```
-npm run browser-test
-```
-
-This will run all tests in [devtool](https://www.npmjs.com/package/devtool).
 
 # Contributing
 
