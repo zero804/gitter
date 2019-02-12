@@ -51,7 +51,6 @@ routes.invited = [
   }
 ];
 
-
 routes.upgradeLandingPage = [
   ensureLoggedIn,
   identifyRoute('login-upgrade-landing-page'),
