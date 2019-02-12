@@ -5,6 +5,8 @@
      - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
  - Remove GitHub `/login/explain` page
      - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1330
+ - Trim extra space in invite user input field (email)
+     - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1329
 
 Developer facing:
 
