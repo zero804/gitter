@@ -3,6 +3,8 @@
  - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
   - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
      - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
+ - Remove GitHub `/login/explain` page
+     - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1330
 
 Developer facing:
 
