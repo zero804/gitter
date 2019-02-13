@@ -172,17 +172,6 @@ var View = Marionette.CompositeView.extend({
         });
 
         self.collection.add(model);
-
-        /*
-          Letting the collection grow unboundedly grows the modal with 'user
-          invited' messages until the input box is pushed off-screen. So we only
-          show the last N users invited. The limit of 3 models is arbitrary.
-        */
-        if (self.collection.length > 3) {
-          var oldestModel = self.collection.models.length - 1;
-          self.collection.remove(self.collection.models[oldestModel]);
-        }
-
         self.typeahead.clear();
       })
       .catch(function(e) {
