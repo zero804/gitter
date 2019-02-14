@@ -9,6 +9,8 @@
      - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1329
  - Fix breakpoint for login primary button on homepage so only one shows at a time
      - Thanks to [@gokhanap](https://gitlab.com/gokhanap) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1331
+ - Fix inviting many users pushing invitation input offscreen
+     - Thanks to [@spiffytech](https://gitlab.com/spiffytech) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1327
 
 Developer facing:
 
