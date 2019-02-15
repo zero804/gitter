@@ -5,9 +5,8 @@ function create() {
   var webpackMiddleware = require('webpack-dev-middleware');
 
   return webpackMiddleware(webpack(require('../webpack.config')), {
-    noInfo: false,
-    quiet: true,
-    lazy: true,
+    logLevel: 'warn',
+    lazy: false,
     watchOptions: {
       aggregateTimeout: 400
     },

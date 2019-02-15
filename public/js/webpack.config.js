@@ -11,7 +11,6 @@ const getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
 
 // Default to production unless we know for sure we are in dev
 const IS_PRODUCTION = process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'dev';
-const WEBPACK_DEV_MODE = process.env.WEBPACK_DEV_MODE === '1';
 const WEBPACK_REPORT = process.env.WEBPACK_REPORT;
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
@@ -51,8 +50,8 @@ const webpackConfig = {
   },
   output: {
     path: path.resolve(__dirname, '../../output/assets/js/'),
-    filename: '[name].js',
-    chunkFilename: '[id].chunk.js',
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].chunk.js',
     publicPath: '/_s/l/js/',
     devtoolModuleFilenameTemplate: '[resource-path]',
     devtoolFallbackModuleFilenameTemplate: '[resource-path]?[hash]'
@@ -132,10 +131,6 @@ const webpackConfig = {
     }
   },
   plugins: [
-    // TODO: Use this in the future to for the bootScript in `hbs-helpers.js`
-    // and `sub-resources.js`. See how GitLab does it
-    // https://gitlab.com/gitlab-org/gitlab-ce/blob/dd26a9addc5dd654e3c8eecb58216f1f4449cfc1/lib/gitlab/webpack/manifest.rb
-    // https://gitlab.com/gitlab-org/gitlab-ce/blob/dd26a9addc5dd654e3c8eecb58216f1f4449cfc1/app/helpers/webpack_helper.rb
     new StatsWriterPlugin({
       filename: 'webpack-manifest.json',
       transform: function(data, opts) {
@@ -170,12 +165,12 @@ const webpackConfig = {
   bail: true
 };
 
-if (WEBPACK_DEV_MODE) {
+if (IS_PRODUCTION) {
+  webpackConfig.devtool = 'source-map';
+} else {
   // See http://webpack.github.io/docs/configuration.html#devtool
   webpackConfig.devtool = 'cheap-source-map';
   webpackConfig.cache = true;
-} else {
-  webpackConfig.devtool = 'source-map';
 }
 
 if (process.env.WEBPACK_VISUALIZER) {

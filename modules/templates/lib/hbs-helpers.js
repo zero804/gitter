@@ -8,11 +8,14 @@ var cdn = require('gitter-web-cdn');
 var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
 
-exports.cdn = function(url, parameters) {
-  return cdn(url, parameters ? parameters.hash : null);
-};
+// eslint-disable-next-line node/no-unpublished-require, node/no-missing-require
+const webpackBuildManifest = require('../../../output/assets/js/webpack-manifest.json');
 
-function cdnUrlGenerator(url, options) {
+function cdnHelper(url, parameters) {
+  return cdn(url, parameters ? parameters.hash : null);
+}
+
+function cdnUrlGenerator(url, options = {}) {
   if (options.root) {
     return options.root + url;
   }
@@ -20,29 +23,39 @@ function cdnUrlGenerator(url, options) {
   return cdn(url, {});
 }
 
-exports.bootScript = function(url, parameters) {
-  var options = parameters.hash;
-  var jsRoot = (options && options.jsRoot) || 'js';
-
-  var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
-  var webpackRuntimeScriptUrl = cdnUrlGenerator(jsRoot + '/runtime.js', options);
-  var defaultScriptUrl = cdnUrlGenerator(jsRoot + '/default.chunk.js', options);
-  var vendorScriptUrl = cdnUrlGenerator(jsRoot + '/vendor.chunk.js', options);
-  var bootScriptUrl = cdnUrlGenerator(jsRoot + '/' + url + '.chunk.js', options);
-
-  return util.format(
-    "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
-      "<script type='text/javascript' src='%s'></script>" +
-      "<script type='text/javascript' src='%s'></script>" +
-      "<script type='text/javascript' src='%s'></script>" +
-      "<script type='text/javascript' src='%s'></script>",
-    baseUrl,
-    webpackRuntimeScriptUrl,
-    defaultScriptUrl,
-    vendorScriptUrl,
-    bootScriptUrl
+function generateAssetsForChunk(chunkName) {
+  const defaultAssets = webpackBuildManifest.entrypoints.default.assets || [];
+  const entryAssets = webpackBuildManifest.entrypoints[chunkName].assets;
+  const assets = Object.keys(
+    defaultAssets
+      .concat(entryAssets)
+      .filter(asset => !/.*\.map$/.test(asset))
+      .reduce((assetMap, asset) => {
+        assetMap[asset] = true;
+        return assetMap;
+      }, {})
   );
-};
+
+  return assets;
+}
+
+const bootScript = _.memoize(function(chunkName, parameters) {
+  const options = parameters.hash;
+  const jsRoot = (options && options.jsRoot) || 'js';
+
+  const assets = generateAssetsForChunk(chunkName);
+
+  const baseUrl = cdnUrlGenerator(jsRoot + '/', options);
+  const chunkScriptList = assets.map(asset => {
+    const cdnUrl = cdnUrlGenerator(`${jsRoot}/${asset}`, options);
+    return `<script type="text/javascript" src="${cdnUrl}"></script>`;
+  });
+
+  return `
+    <script type="text/javascript">window.webpackPublicPath = '${baseUrl}';</script>
+    ${chunkScriptList.join('\n')}
+  `;
+});
 
 function createEnv(context, options) {
   if (options) {
@@ -56,7 +69,7 @@ function createEnv(context, options) {
   }
   return clientEnv;
 }
-exports.generateEnv = function(parameters) {
+function generateEnv(parameters) {
   var options = parameters.hash;
   var env = createEnv(this, options);
 
@@ -67,9 +80,9 @@ exports.generateEnv = function(parameters) {
     ';' +
     '</script>'
   );
-};
+}
 
-exports.generateTroupeContext = function(troupeContext, parameters) {
+function generateTroupeContext(troupeContext, parameters) {
   var options = parameters.hash;
 
   var env = createEnv(this, options);
@@ -84,16 +97,13 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
     ';' +
     '</script>'
   );
-};
+}
 
-exports.pluralize = pluralize;
-exports.when = when;
-
-exports.toLowerCase = function(str) {
+function toLowerCase(str) {
   return str.toLowerCase();
-};
+}
 
-exports.pad = function(options) {
+function pad(options) {
   var content = '' + options.fn(this);
   var width = options.hash.width || 40;
   var directionRight = options.hash.direction ? options.hash.direction === 'right' : true;
@@ -106,10 +116,10 @@ exports.pad = function(options) {
     }
   }
   return content;
-};
+}
 
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
-exports.typewriter = function(el, str) {
+function typewriter(el, str) {
   return util.format(
     '<script type="text/javascript">\n' +
       'var text = "%s";' +
@@ -128,25 +138,40 @@ exports.typewriter = function(el, str) {
     str,
     el
   );
-};
+}
 
-exports.formatNumber = function(n) {
+function formatNumber(n) {
   if (n < 1000) return n;
   if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
   return (n / 100000).toFixed(1) + 'm';
-};
+}
 
 /** FIXME we do not yet cover the ONE-TO-ONE case, also need to do better default values
  * githubTypeToClass() takes a GitHub type and provdides a css class
  *
  */
-exports.githubTypeToClass = function(type) {
+function githubTypeToClass(type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
   else if (/ORG/.test(type)) return 'octicon-organization';
   else return 'default';
-};
+}
 
-exports.getRoomName = function(name) {
+function getRoomName(name) {
   return name.split('/')[1] || 'general';
+}
+
+module.exports = {
+  cdn: cdnHelper,
+  bootScript,
+  generateEnv,
+  generateTroupeContext,
+  pluralize,
+  when,
+  toLowerCase,
+  pad,
+  typewriter,
+  formatNumber,
+  githubTypeToClass,
+  getRoomName
 };

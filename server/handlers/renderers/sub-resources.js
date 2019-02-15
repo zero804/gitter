@@ -3,9 +3,9 @@
 var cdn = require('gitter-web-cdn');
 
 function cdnSubResources(resources, jsRoot) {
-  var resourceList = ['runtime', 'default.chunk', 'vendor.chunk'];
+  var resourceList = [];
   if (resources) {
-    resourceList = resourceList.concat(resources.map(resource => `${resource}.chunk`));
+    resourceList = resourceList.concat(resources);
   }
 
   return resourceList
@@ -15,16 +15,7 @@ function cdnSubResources(resources, jsRoot) {
     .concat(cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'));
 }
 
-var SUBRESOURCE_MAPPINGS = {
-  'router-app': ['router-app', 'router-chat'],
-  'mobile-nli-chat': ['mobile-nli-chat', 'router-nli-chat'],
-  'mobile-userhome': ['mobile-userhome'],
-  userhome: ['userhome'],
-  'router-chat': ['router-chat'],
-  'router-nli-chat': ['router-nli-chat'],
-  'mobile-chat': ['mobile-chat'],
-  'router-mobile-app': ['mobile-app']
-};
+var SUBRESOURCE_MAPPINGS = {};
 
 var CACHED_SUBRESOURCES = Object.keys(SUBRESOURCE_MAPPINGS).reduce(function(memo, key) {
   memo[key] = cdnSubResources(SUBRESOURCE_MAPPINGS[key], 'js');
