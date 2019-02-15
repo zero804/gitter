@@ -7,6 +7,7 @@
      - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1330
  - Trim extra space in invite user input field (email)
      - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1329
+     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1333
  - Fix breakpoint for login primary button on homepage so only one shows at a time
      - Thanks to [@gokhanap](https://gitlab.com/gokhanap) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1331
  - Fix inviting many users pushing invitation input offscreen

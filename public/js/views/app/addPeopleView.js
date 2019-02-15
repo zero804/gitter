@@ -154,7 +154,7 @@ var View = Marionette.CompositeView.extend({
     if (username) {
       body = { githubUsername: username };
     } else if (email) {
-      body = { email: email };
+      body = { email: email.trim() };
     }
 
     return apiClient.room
