@@ -6,6 +6,9 @@ var assert = require('assert');
 var GithubContibutorService = require('..').GitHubContributorService;
 
 describe('github-contributor-service #slow #github', function() {
+  // These tests timeout at 10000 sometimes otherwise
+  this.timeout(30000);
+
   it('members should detailed emailed', function(done) {
     var gh = new GithubContibutorService(null);
 

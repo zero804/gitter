@@ -14,6 +14,9 @@ function assertNoDuplicates(collaborators) {
 }
 
 describe('collaborators-service #slow #github', function() {
+  // These tests timeout at 10000 sometimes otherwise
+  this.timeout(30000);
+
   fixtureLoader.ensureIntegrationEnvironment('#integrationUser1');
 
   var fixture = fixtureLoader.setup({
