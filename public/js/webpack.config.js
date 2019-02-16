@@ -46,6 +46,9 @@ const webpackConfig = {
     'chat-message-reports': path.resolve(path.join(__dirname, './chat-message-reports.js')),
 
     'mobile-native-userhome': path.resolve(path.join(__dirname, './mobile-native-userhome')),
+    'mobile-native-embedded-chat': path.resolve(
+      path.join(__dirname, './mobile-native-embedded-chat')
+    ),
     'router-home-learn': path.resolve(path.join(__dirname, './router-home-learn'))
   },
   output: {

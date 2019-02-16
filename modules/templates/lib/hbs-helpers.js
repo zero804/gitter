@@ -7,55 +7,11 @@ var clientEnv = require('gitter-client-env');
 var cdn = require('gitter-web-cdn');
 var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
-
-// eslint-disable-next-line node/no-unpublished-require, node/no-missing-require
-const webpackBuildManifest = require('../../../output/assets/js/webpack-manifest.json');
+const bootScriptUtils = require('./boot-script-utils');
 
 function cdnHelper(url, parameters) {
   return cdn(url, parameters ? parameters.hash : null);
 }
-
-function cdnUrlGenerator(url, options = {}) {
-  if (options.root) {
-    return options.root + url;
-  }
-
-  return cdn(url, {});
-}
-
-function generateAssetsForChunk(chunkName) {
-  const defaultAssets = webpackBuildManifest.entrypoints.default.assets || [];
-  const entryAssets = webpackBuildManifest.entrypoints[chunkName].assets;
-  const assets = Object.keys(
-    defaultAssets
-      .concat(entryAssets)
-      .filter(asset => !/.*\.map$/.test(asset))
-      .reduce((assetMap, asset) => {
-        assetMap[asset] = true;
-        return assetMap;
-      }, {})
-  );
-
-  return assets;
-}
-
-const bootScript = _.memoize(function(chunkName, parameters) {
-  const options = parameters.hash;
-  const jsRoot = (options && options.jsRoot) || 'js';
-
-  const assets = generateAssetsForChunk(chunkName);
-
-  const baseUrl = cdnUrlGenerator(jsRoot + '/', options);
-  const chunkScriptList = assets.map(asset => {
-    const cdnUrl = cdnUrlGenerator(`${jsRoot}/${asset}`, options);
-    return `<script type="text/javascript" src="${cdnUrl}"></script>`;
-  });
-
-  return `
-    <script type="text/javascript">window.webpackPublicPath = '${baseUrl}';</script>
-    ${chunkScriptList.join('\n')}
-  `;
-});
 
 function createEnv(context, options) {
   if (options) {
@@ -163,7 +119,7 @@ function getRoomName(name) {
 
 module.exports = {
   cdn: cdnHelper,
-  bootScript,
+  bootScript: bootScriptUtils.bootScriptHelper,
   generateEnv,
   generateTroupeContext,
   pluralize,
