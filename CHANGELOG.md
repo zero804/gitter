@@ -1,3 +1,10 @@
+# 19.37.0 - *upcoming*
+
+Developer facing:
+
+ - Try larger timeout for flakey GitHub integration tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
+
+
 # 19.36.0 - 2019-2-15
 
  - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
