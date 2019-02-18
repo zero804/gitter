@@ -1,5 +1,8 @@
 # 19.37.0 - *upcoming*
 
+ - Fix inline code blocks showing vertical scrollbar in the dark theme
+    - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1335
+
 Developer facing:
 
  - Try larger timeout for flakey GitHub integration tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
