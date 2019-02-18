@@ -6,6 +6,7 @@
 Developer facing:
 
  - Try larger timeout for flakey GitHub integration tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
+ - Remove extraneous `lodash` from frontend webpack bundles (use `underscore`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1336
 
 
 # 19.36.0 - 2019-2-15
