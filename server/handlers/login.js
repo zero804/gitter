@@ -80,7 +80,6 @@ router.get('/user-agent-revoked', identifyRoute('user-agent-revoked'), function(
 
 router.get('/github', github.login);
 router.get('/invited', github.invited);
-router.get('/explain', github.explain);
 router.get('/upgrade', github.upgradeLandingPage);
 router.post('/upgrade', github.upgrade);
 

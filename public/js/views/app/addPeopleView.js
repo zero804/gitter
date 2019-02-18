@@ -41,7 +41,7 @@ var RowView = Marionette.ItemView.extend({
   invite: function(e) {
     e.preventDefault();
     var model = this.model;
-    var email = this.ui.email.val();
+    var email = this.ui.email.val().trim();
 
     var self = this;
 
@@ -154,7 +154,7 @@ var View = Marionette.CompositeView.extend({
     if (username) {
       body = { githubUsername: username };
     } else if (email) {
-      body = { email: email };
+      body = { email: email.trim() };
     }
 
     return apiClient.room

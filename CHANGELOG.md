@@ -1,3 +1,23 @@
+# 19.36.0 - 2019-2-15
+
+ - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
+  - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
+     - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
+ - Remove GitHub `/login/explain` page
+     - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1330
+ - Trim extra space in invite user input field (email)
+     - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1329
+     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1333
+ - Fix breakpoint for login primary button on homepage so only one shows at a time
+     - Thanks to [@gokhanap](https://gitlab.com/gokhanap) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1331
+ - Fix inviting many users pushing invitation input offscreen
+     - Thanks to [@spiffytech](https://gitlab.com/spiffytech) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1327
+
+Developer facing:
+
+ - Remove defunct in-browser tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1326
+
+
 # 19.35.0 - 2019-1-31
 
  - Update `@gitterhq/translations@1.8.2` dependency for Chinese(`zh`) translation update

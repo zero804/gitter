@@ -38,7 +38,7 @@ Follow these instructions to setup an environment to hack on Gitter.
  1. Run `npm install`
     * Go and make a cup of tea, because this will take a rather long time.
 
-### Troubleshooting 
+### Troubleshooting
 
 #### `npm ERR! Maximum call stack size exceeded`
 
@@ -76,20 +76,20 @@ This process will fetch Docker images from Docker Hub. You might want to make an
 
 ### Configure service secrets
 
-You only need to perform this section once.
-
 Gitter connects to third party APIs. In order to do this, you will need to generate API tokens and add them to your configuration.
+
+You only need to collect the secrets once. But you need to export the environment variables in any new terminal session.
 
 In the future, we hope to streamline this process and skip OAuth providers. You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/1973
 
 #### Mac
 
-To do this automatically, run the following command which will create a `.env` file:
+To do this automatically, run the following command which will create a `.env` file (this only needs to be done once):
 ```shell
 ./obtain-secrets
 ```
 
-Export the environment variables with:
+Export the environment variables with (this needs to be done in any new terminal session):
 
 ```bash
 source .env
@@ -99,7 +99,7 @@ source .env
 
 The `./obtain-secrets` script doesn't support Windows yet.
 
-Create `.env` in the project root and follow the `REM` comments in the snippet below.
+Create `.env` in the project root and follow the `REM` comments in the snippet below (this only needs to be done once):
 
 `.env`
 ```
@@ -130,7 +130,7 @@ REM This can be some random string
 SET tokens__anonymousPassword=xxx
 ```
 
-Export the environment variables with:
+Export the environment variables with (this needs to be done in any new terminal session):
 
 ```powershell
 @FOR /f "tokens=*" %i IN ('cat .env') DO @%i
@@ -180,27 +180,22 @@ docker-compose rm -f
 We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/code-overview.md)
 and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infrastructure/blob/master/README.md).
 
+
+### Submitting a merge request
+
+#### Getting the GitLab CI tests green :white\_check\_mark:
+
+Just add all of the variables from your `.env` file to your forked projects [**Settings** -> **CI/CD** -> **Environment variables**](https://docs.gitlab.com/ee/ci/variables/#variables) section
+
+After adding the variables, just retry the pipeline.
+
+You can look at the [issues labeled with ~"test"](https://gitlab.com/gitlab-org/gitter/webapp/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=test) for any known problems.
+
+
 ### Testing
 
 All unit tests etc can be run with `npm test`
 
-#### Browser testing
-
-Running browser unit tests during development requires this command:
-
-```
-npm run browser-watch-test
-```
-
-Then open your favourite browser and view `http://localhost:9191/fixtures`. This page will live reload with you test changes when required.
-
-To perform an automated test run use the following command:
-
-```
-npm run browser-test
-```
-
-This will run all tests in [devtool](https://www.npmjs.com/package/devtool).
 
 # Contributing
 

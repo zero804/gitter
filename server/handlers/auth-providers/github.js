@@ -51,13 +51,6 @@ routes.invited = [
   }
 ];
 
-routes.explain = [
-  identifyRoute('login-explain'),
-  function(req, res) {
-    res.render('github-explain', {});
-  }
-];
-
 routes.upgradeLandingPage = [
   ensureLoggedIn,
   identifyRoute('login-upgrade-landing-page'),

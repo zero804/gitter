@@ -9,6 +9,7 @@ var ChatCollectionView = require('./views/chat/chatCollectionView');
 var ChatInputView = require('./views/chat/chatInputView');
 var unreadItemsClient = require('./components/unread-items-client');
 var emojiDecorator = require('./views/chat/decorators/emojiDecorator');
+var issuableDecorator = require('./views/chat/decorators/issuableDecorator');
 var mobileDecorator = require('./views/chat/decorators/mobileDecorator');
 var onready = require('././utils/onready');
 var FastClick = require('fastclick');
@@ -30,7 +31,7 @@ onready(function() {
   var chatCollectionView = new ChatCollectionView({
     el: $('#chat-container'),
     collection: chatCollection,
-    decorators: [emojiDecorator, mobileDecorator]
+    decorators: [mobileDecorator, issuableDecorator, emojiDecorator]
   }).render();
 
   unreadItemsClient.syncCollections({

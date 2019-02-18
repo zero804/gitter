@@ -11,6 +11,13 @@
     margin-left: 10px;
     padding-bottom: 15px;
   }
+
+  /*
+   * Keep the invitee list from growing indefinitely so the modal doesn't become
+   * too long and push the user/email input offscreen
+   */
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .gtrPeopleRosterItem__form {

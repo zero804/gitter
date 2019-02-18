@@ -17,21 +17,6 @@ module.exports = (function() {
     decorate: function(view) {
       var roomRepo = getRoomRepo();
 
-      view.$el.find('*[data-link-type="issue"]').each(function() {
-        var $issue = $(this);
-        var repo = $issue.data('issueRepo') || roomRepo;
-        var issueNumber = $issue.data('issue');
-
-        if (repo && issueNumber) {
-          $issue.html(
-            link({
-              href: 'https://github.com/' + repo + '/issues/' + issueNumber,
-              content: '#' + issueNumber
-            })
-          );
-        }
-      });
-
       view.$el.find('*[data-link-type="mention"]').each(function() {
         var $mention = $(this);
         var username = $mention.data('screenName');

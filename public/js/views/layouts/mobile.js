@@ -11,8 +11,10 @@ var TroupeMenu = require('../menu/old/troupeMenu');
 //var appEvents         = require('../../utils/appevents');
 
 /* Decorators */
-var emojiDecorator = require('../chat/decorators/emojiDecorator');
 var mobileDecorator = require('../chat/decorators/mobileDecorator');
+var issuableDecorator = require('../chat/decorators/issuableDecorator');
+var emojiDecorator = require('../chat/decorators/emojiDecorator');
+
 var ChatInputView = require('../chat/chatInputView');
 var JoinRoomView = require('../chat/join-room-view');
 
@@ -80,7 +82,7 @@ module.exports = Marionette.LayoutView.extend({
     var chatCollectionView = new ChatContainerView(
       optionsForRegion({
         collection: this.options.chatCollection,
-        decorators: [emojiDecorator, mobileDecorator],
+        decorators: [mobileDecorator, issuableDecorator, emojiDecorator],
         monitorScrollPane: this.ui.scroll // Monitor the scroll region for unread items
       })
     );
