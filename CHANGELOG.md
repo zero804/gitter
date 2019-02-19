@@ -5,10 +5,13 @@
 
 Developer facing:
 
+ - Upgrade from webpack v1 to latest webpack v4, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1322
+    - JavaScript chunks/bundles are now dynamically loaded based on webpack build manifest/artifact
  - Try larger timeout for flakey GitHub integration tests
     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1337
  - Remove extraneous `lodash` from frontend webpack bundles (use `underscore`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1336
+
 
 
 # 19.36.0 - 2019-2-15
