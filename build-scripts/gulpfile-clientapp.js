@@ -31,26 +31,7 @@ gulp.task('clientapp:compile:copy-files', function() {
 gulp.task('clientapp:compile:webpack', ['clientapp:compile:copy-files'], function() {
   return gulp
     .src('./public/js/webpack.config')
-    .pipe(
-      webpack(require('../public/js/webpack.config'), null, function(err, stats) {
-        if (!stats) return;
-        /*
-      Removed as webpack-bundle-size-analyzer is broken
-      var webpackBundleSizeAnalyzer = require('webpack-bundle-size-analyzer');
-
-      var bundleStats = stats.toJson("normal");
-      var depTrees = webpackBundleSizeAnalyzer.dependencySizeTree(bundleStats);
-
-      gutil.log('-----------------------------------------------');
-      gutil.log('Webpack Bundle Size Report');
-      gutil.log('-----------------------------------------------');
-      depTrees.forEach(function (tree) {
-        return webpackBundleSizeAnalyzer.printDependencySizeTree(tree);
-      });
-      gutil.log('-----------------------------------------------');
-      */
-      })
-    )
+    .pipe(webpack(require('../public/js/webpack.config')))
     .pipe(gulp.dest('output/assets/js'));
 });
 

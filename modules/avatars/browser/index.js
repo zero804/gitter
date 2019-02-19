@@ -4,7 +4,7 @@ var isGitHubUser = require('../shared/is-github-user');
 var avatarCdnResolver = require('../shared/avatar-cdn-resolver');
 var extractTwitterAvatarInfo = require('../shared/extract-twitter-avatar-info');
 
-var DEFAULT = require('url?limit=1024!../../../public/images/default-avatar.png'); // eslint-disable-line
+var DEFAULT = require('url-loader?limit=1024!../../../public/images/default-avatar.png'); // eslint-disable-line
 
 function getForGitHubUsername(githubUsername) {
   return avatarCdnResolver('/gh/u/' + githubUsername);

@@ -101,3 +101,4 @@ unread-notification.out.html
 node_modules_2
 config/overrides
 .env
+webpack-report/

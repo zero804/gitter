@@ -8,17 +8,19 @@ exports.install = function(app) {
   var webpackMiddleware = require('webpack-dev-middleware'); // eslint-disable-line node/no-unpublished-require
   var webpack = require('webpack'); // eslint-disable-line node/no-unpublished-require
 
-  process.env.WEBPACK_DEV_MODE = '1';
-
   app.use(
     webpackMiddleware(webpack(require('../../public/js/webpack.config')), {
-      noInfo: false,
-      quiet: true,
+      logLevel: 'warn',
       lazy: false,
       watchOptions: {
         aggregateTimeout: 400
       },
       publicPath: '/_s/l/js/',
+      writeToDisk: filePath => {
+        // We use the `webpack-manifest.json` in `hbs-helpers`
+        // to determine which dynamic/dependent chunks to serve
+        return /webpack-manifest\.json$/.test(filePath);
+      },
       stats: {
         colors: true
       }

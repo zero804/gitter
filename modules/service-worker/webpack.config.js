@@ -2,7 +2,10 @@
 
 var path = require('path');
 
+const IS_PRODUCTION = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod';
+
 var config = {
+  mode: IS_PRODUCTION ? 'production' : 'development',
   entry: {
     sw: require.resolve('./service-worker/sw')
   },
