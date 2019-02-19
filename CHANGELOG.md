@@ -1,4 +1,4 @@
-# 19.37.0 - 2018-2-19
+# 19.37.0 - 2019-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme
     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1335
