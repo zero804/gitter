@@ -1,4 +1,4 @@
-# 19.37.0 - *upcoming*
+# 19.37.0 - 2018-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme
     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1335
@@ -11,7 +11,6 @@ Developer facing:
     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1337
  - Remove extraneous `lodash` from frontend webpack bundles (use `underscore`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1336
-
 
 
 # 19.36.0 - 2019-2-15
