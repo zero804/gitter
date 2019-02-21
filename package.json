@@ -135,7 +135,7 @@
     "passport-google-oauth2": "^0.1.6",
     "passport-linkedin-oauth2": "^1.4.0",
     "passport-oauth2-client-password": "^0.1.2",
-    "passport-twitter": "^1.0.3",
+    "passport-twitter": "^1.0.4",
     "permessage-deflate": "^0.1.2",
     "readme-badger": "^0.3.0",
     "redis-lock": "0.0.8",
