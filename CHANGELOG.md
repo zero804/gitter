@@ -1,3 +1,9 @@
+# 19.38.0 - *upcoming*
+
+ - Make Gitter markdown readme badge snippet visible for all rooms (share modal)
+    - Thanks to [@jamesgeorge007](https://gitlab.com/jamesgeorge007) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1324
+
+
 # 19.37.0 - 2019-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme
