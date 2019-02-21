@@ -10,7 +10,6 @@
   {{/if}}
 </section>
 
-{{#if isRepo}}
 <h3 class="share-view__heading">
   README badge ( <img class="share-view__badge" src="{{badgeUrl}}"> )
 </h3>
@@ -22,11 +21,12 @@
   <button class="button-jaffa--small js-copy" data-clipboard-text="{{badgeMD}}">Copy</button>
   {{/if}}
 
-  {{#if allowBadgePR}}
-  <button class='button-jaffa--small js-badge'>Send Pull Request</button>
+  {{#if isRepo}}
+    {{#if allowBadgePR}}
+      <button class='button-jaffa--small js-badge'>Send Pull Request</button>
+    {{/if}}
   {{/if}}
 </section>
-{{/if}}
 
 {{#if isPublic}}
 <h3 class="share-view__heading">
