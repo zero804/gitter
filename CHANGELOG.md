@@ -2,6 +2,8 @@
 
  - Make Gitter markdown readme badge snippet visible for all rooms (share modal)
     - Thanks to [@jamesgeorge007](https://gitlab.com/jamesgeorge007) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1324
+  - On the homepage, use green caribbean button style for primary room creation action (just like community creation)
+     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
 
 
 # 19.37.0 - 2019-2-19
