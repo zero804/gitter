@@ -183,6 +183,22 @@ and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infra
 
 ### Submitting a merge request
 
+#### Code style/formatting (lint)
+
+This project uses [Prettier](https://prettier.io/docs/en/install.html) for opinionated automatic formatting.
+You can run the following commands to check and fix the formatting before submitting your merge request.
+
+Checking is done in the `validate` CI job and this should pass regardless of your what project secrets you setup
+
+```
+npm run prettier -- --check "**/*.js"
+
+npm run prettier -- --write "**/*.js"
+```
+
+There are also [Prettier plugins/integrations for your editor](https://prettier.io/docs/en/editors.html) if you prefer to have it built in and format on save.
+
+
 #### Getting the GitLab CI tests green :white\_check\_mark:
 
 Just add all of the variables from your `.env` file to your forked projects [**Settings** -> **CI/CD** -> **Environment variables**](https://docs.gitlab.com/ee/ci/variables/#variables) section
