@@ -6,6 +6,11 @@
      - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
 
 
+Developer facing:
+
+ - Fix mobile(Android/iOS) asset CI build missing `webpack-manifest.json`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1347
+
+
 # 19.37.0 - 2019-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme

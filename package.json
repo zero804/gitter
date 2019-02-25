@@ -281,6 +281,7 @@
     "nodeselektor": "ns",
     "node-gyp": "node-gyp",
     "prettier": "prettier",
+    "task-js": "gulp clientapp:compile:webpack",
     "task-css": "gulp css:compile",
     "task-fasttest": "gulp test:test --test-fast",
     "task-validate-diff": "gulp validate-eslint-diff",
