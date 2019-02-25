@@ -5,10 +5,10 @@
   - On the homepage, use green caribbean button style for primary room creation action (just like community creation)
      - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
 
-
 Developer facing:
 
  - Fix mobile(Android/iOS) asset CI build missing `webpack-manifest.json`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1347
+ - Add docs on how Gitter uses Prettier for styling/formatting(lint), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1348
 
 
 # 19.37.0 - 2019-2-19
