@@ -43,8 +43,8 @@ function getBranch() {
   return branch;
 }
 
-function getGithubLink() {
-  if (commit) return 'https://github.com/troupe/gitter-webapp/commit/' + commit;
+function getGitlabLink() {
+  if (commit) return 'https://gitlab.com/gitlab-org/gitter/webapp/commit/' + commit;
 
   return '';
 }
@@ -54,5 +54,5 @@ module.exports = {
   getAssetTag: getAssetTag,
   getCommit: getCommit,
   getBranch: getBranch,
-  getGithubLink: getGithubLink
+  getGitlabLink: getGitlabLink
 };
