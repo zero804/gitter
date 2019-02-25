@@ -100,5 +100,5 @@ unread-notification.out.html
 /scripts/useful-queries/*.png
 node_modules_2
 config/overrides
-.env
+.env*
 webpack-report/
