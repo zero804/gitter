@@ -1,3 +1,18 @@
+# 19.37.0 - 2019-2-19
+
+ - Fix inline code blocks showing vertical scrollbar in the dark theme
+    - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1335
+
+Developer facing:
+
+ - Upgrade from webpack v1 to latest webpack v4, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1322
+    - JavaScript chunks/bundles are now dynamically loaded based on webpack build manifest/artifact
+ - Try larger timeout for flakey GitHub integration tests
+    - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1334
+    - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1337
+ - Remove extraneous `lodash` from frontend webpack bundles (use `underscore`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1336
+
+
 # 19.36.0 - 2019-2-15
 
  - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321

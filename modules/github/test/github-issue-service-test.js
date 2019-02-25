@@ -7,6 +7,9 @@ var GitHubRepoService = require('..').GitHubRepoService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('github-issue-service #slow #github', function() {
+  // These tests timeout at 10000 sometimes otherwise
+  this.timeout(30000);
+
   fixtureLoader.ensureIntegrationEnvironment(
     'GITTER_INTEGRATION_USERNAME',
     'GITTER_INTEGRATION_REPO_SCOPE_TOKEN',

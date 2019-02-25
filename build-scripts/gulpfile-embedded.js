@@ -10,10 +10,13 @@ const mqpacker = require('css-mqpacker');
 const csswring = require('csswring');
 const styleBuilder = require('./style-builder');
 const getSourceMapOptions = require('./get-sourcemap-options');
-const webpack = require('webpack-stream');
 const uglify = require('gulp-uglify');
 const childProcessPromise = require('./child-process-promise');
 const extractUrls = require('./extract-urls');
+const bootScriptUtils = require('gitter-web-templates/lib/boot-script-utils');
+
+// We need access to the `clientapp:compile:webpack` task
+require('./gulpfile-clientapp');
 
 var opts = require('yargs')
   .option('android', {
@@ -42,14 +45,14 @@ if (opts.android) {
  * Hook into the compile stage
  */
 gulp.task('embedded:compile', [
-  'clientapp:compile:copy-files',
+  'embedded:compile:copy-files',
   'embedded:compile:markup',
   'embedded:compile:css',
-  'embedded:compile:webpack'
+  'embedded:compile:copy-webpack-builds'
 ]);
 
 // We also copy files after the CSS is compiled in `embedded:post-compile:copy-linked-assets`
-gulp.task('clientapp:compile:copy-files', function() {
+gulp.task('embedded:compile:copy-files', function() {
   return gulp
     .src(
       [
@@ -117,10 +120,14 @@ gulp.task('embedded:compile:css', function() {
 });
 
 /* Generate embedded native */
-gulp.task('embedded:compile:webpack', ['clientapp:compile:copy-files'], function() {
+gulp.task('embedded:compile:copy-webpack-builds', ['clientapp:compile:webpack'], function() {
+  const assets = bootScriptUtils.generateAssetsForChunk('mobile-native-embedded-chat');
+
   return gulp
-    .src('./public/js/webpack-mobile-native.config')
-    .pipe(webpack(require('../public/js/webpack-mobile-native.config')))
+    .src(assets.map(asset => path.join('output/assets/js/', asset)), {
+      base: './output/assets/js/',
+      stat: true
+    })
     .pipe(gulp.dest(path.join(buildPath, 'js')));
 });
 

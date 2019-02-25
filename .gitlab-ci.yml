@@ -20,7 +20,6 @@ stages:
       - /npm_cache/
       - npm_cache/
 
-
 validate:
   <<: *node_job
   stage: build_unit_test
@@ -31,7 +30,6 @@ validate:
     # but the prettier API doesn't easily allow glob checking and I want
     # to re-use the scripts that GitLab has, https://gitlab.com/gitlab-org/gitlab-ce/issues/57010
     - npm run prettier -- --check "**/*.js"
-
 
 test:
   <<: *node_job
@@ -67,7 +65,7 @@ mobile-asset-build:
   <<: *node_job
   stage: build_unit_test
   only:
-   - master
+    - master
   script:
     - npm run build-android-assets
     - npm run build-ios-assets
@@ -75,8 +73,6 @@ mobile-asset-build:
     paths:
       - output/android/www
       - output/ios/www
-
-
 
 .distribute_job: &distribute_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
@@ -89,14 +85,12 @@ mobile-asset-build:
 distribute_beta:
   <<: *distribute_job
   only:
-   - develop
+    - develop
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta
 
 distribute_beta_staging:
   <<: *distribute_job
-  only:
-    - /^feature\/.*$/
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
 
@@ -168,13 +162,12 @@ deploy-build-image:
   tags:
     - internal # This has to be within the Gitter network
 
-
 deploy_beta: &deploy_beta
   <<: *deploy_job
   dependencies:
     - distribute_beta
   only:
-   - develop
+    - develop
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
   environment:
@@ -200,6 +193,8 @@ deploy_beta_staging: &deploy_beta_staging
 deploy_beta_staging_manual:
   <<: *deploy_beta_staging
   when: manual
+  only:
+    - /.*/
 
 deploy_staging: &deploy_staging
   <<: *deploy_job
@@ -230,7 +225,6 @@ deploy_prod_manual: &deploy_prod
   environment:
     name: prod
     url: https://gitter.im
-
 
 docker-base:
   image: docker:latest

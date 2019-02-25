@@ -7,36 +7,11 @@ var clientEnv = require('gitter-client-env');
 var cdn = require('gitter-web-cdn');
 var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
+const bootScriptUtils = require('./boot-script-utils');
 
-exports.cdn = function(url, parameters) {
+function cdnHelper(url, parameters) {
   return cdn(url, parameters ? parameters.hash : null);
-};
-
-function cdnUrlGenerator(url, options) {
-  if (options.root) {
-    return options.root + url;
-  }
-
-  return cdn(url, {});
 }
-
-exports.bootScript = function(url, parameters) {
-  var options = parameters.hash;
-  var jsRoot = (options && options.jsRoot) || 'js';
-
-  var baseUrl = cdnUrlGenerator(jsRoot + '/', options);
-  var vendorScriptUrl = cdnUrlGenerator(jsRoot + '/vendor.js', options);
-  var bootScriptUrl = cdnUrlGenerator(jsRoot + '/' + url + '.js', options);
-
-  return util.format(
-    "<script type='text/javascript'>window.webpackPublicPath = '%s';</script>" +
-      "<script type='text/javascript' src='%s'></script>" +
-      "<script type='text/javascript' src='%s'></script>",
-    baseUrl,
-    vendorScriptUrl,
-    bootScriptUrl
-  );
-};
 
 function createEnv(context, options) {
   if (options) {
@@ -50,7 +25,7 @@ function createEnv(context, options) {
   }
   return clientEnv;
 }
-exports.generateEnv = function(parameters) {
+function generateEnv(parameters) {
   var options = parameters.hash;
   var env = createEnv(this, options);
 
@@ -61,9 +36,9 @@ exports.generateEnv = function(parameters) {
     ';' +
     '</script>'
   );
-};
+}
 
-exports.generateTroupeContext = function(troupeContext, parameters) {
+function generateTroupeContext(troupeContext, parameters) {
   var options = parameters.hash;
 
   var env = createEnv(this, options);
@@ -78,16 +53,13 @@ exports.generateTroupeContext = function(troupeContext, parameters) {
     ';' +
     '</script>'
   );
-};
+}
 
-exports.pluralize = pluralize;
-exports.when = when;
-
-exports.toLowerCase = function(str) {
+function toLowerCase(str) {
   return str.toLowerCase();
-};
+}
 
-exports.pad = function(options) {
+function pad(options) {
   var content = '' + options.fn(this);
   var width = options.hash.width || 40;
   var directionRight = options.hash.direction ? options.hash.direction === 'right' : true;
@@ -100,10 +72,10 @@ exports.pad = function(options) {
     }
   }
   return content;
-};
+}
 
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
-exports.typewriter = function(el, str) {
+function typewriter(el, str) {
   return util.format(
     '<script type="text/javascript">\n' +
       'var text = "%s";' +
@@ -122,25 +94,40 @@ exports.typewriter = function(el, str) {
     str,
     el
   );
-};
+}
 
-exports.formatNumber = function(n) {
+function formatNumber(n) {
   if (n < 1000) return n;
   if (n < 1000000) return (n / 1000).toFixed(1) + 'k';
   return (n / 100000).toFixed(1) + 'm';
-};
+}
 
 /** FIXME we do not yet cover the ONE-TO-ONE case, also need to do better default values
  * githubTypeToClass() takes a GitHub type and provdides a css class
  *
  */
-exports.githubTypeToClass = function(type) {
+function githubTypeToClass(type) {
   if (/_CHANNEL/.test(type)) return 'icon-hash';
   else if (/REPO/.test(type)) return 'octicon-repo';
   else if (/ORG/.test(type)) return 'octicon-organization';
   else return 'default';
-};
+}
 
-exports.getRoomName = function(name) {
+function getRoomName(name) {
   return name.split('/')[1] || 'general';
+}
+
+module.exports = {
+  cdn: cdnHelper,
+  bootScript: bootScriptUtils.bootScriptHelper,
+  generateEnv,
+  generateTroupeContext,
+  pluralize,
+  when,
+  toLowerCase,
+  pad,
+  typewriter,
+  formatNumber,
+  githubTypeToClass,
+  getRoomName
 };
