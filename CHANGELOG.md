@@ -6,8 +6,10 @@
      - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
  - Update version badge at the top(`DEV`) to link to the GitLab repo
     - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1345
- - Update create room primary button style in `/home/explore` for better consistency
+ - Update create room primary button(caribbean) style in `/home/explore` for better consistency
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1342
+ - Update left menu explore button style(jaffa) for better consistency
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1350
 
 Developer facing:
 
