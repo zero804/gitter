@@ -18,11 +18,11 @@ switch (nconf.get('NODE_ENV')) {
   case 'beta':
     var branch = appVersion.getBranch();
     stagingText = branch ? branch.split('/').pop() : 'BETA';
-    stagingLink = appVersion.getGithubLink();
+    stagingLink = appVersion.getGitlabLink();
     break;
   case 'dev':
     stagingText = 'DEV';
-    stagingLink = 'https://github.com/troupe/gitter-webapp/tree/develop';
+    stagingLink = 'https://gitlab.com/gitlab-org/gitter/webapp';
     break;
 }
 

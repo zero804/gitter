@@ -1,3 +1,22 @@
+# 19.38.0 - *upcoming*
+
+ - Make Gitter markdown readme badge snippet visible for all rooms (share modal)
+    - Thanks to [@jamesgeorge007](https://gitlab.com/jamesgeorge007) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1324
+  - On the homepage, use green caribbean button style for primary room creation action (just like community creation)
+     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
+ - Update version badge at the top(`DEV`) to link to the GitLab repo
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1345
+ - Update create room primary button style in `/home/explore` for better consistency
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1342
+
+Developer facing:
+
+ - Fix mobile(Android/iOS) asset CI build missing `webpack-manifest.json`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1347
+ - Add docs on how Gitter uses Prettier for styling/formatting(lint), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1348
+ - Update `.gitignore` to ignore anything `.env*` related to avoid leaking mis-named files or backup files created by editors
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1349
+
+
 # 19.37.0 - 2019-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme

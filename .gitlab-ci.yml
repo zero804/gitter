@@ -67,6 +67,7 @@ mobile-asset-build:
   only:
     - master
   script:
+    - npm run task-js
     - npm run build-android-assets
     - npm run build-ios-assets
   artifacts:
