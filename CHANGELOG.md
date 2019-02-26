@@ -10,6 +10,8 @@
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1342
  - Update left menu explore button style(jaffa) for better consistency
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1350
+ - Add "Open Source" link to `webapp` GitLab project repository on the homepage
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1346
 
 Developer facing:
 
