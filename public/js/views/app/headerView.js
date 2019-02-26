@@ -274,7 +274,6 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.model.set('favourite', !this.model.get('favourite'));
     var isFavourite = !!this.model.get('favourite');
-    this.ui.favourite.toggleClass('favourite', isFavourite);
 
     apiClient.userRoom.put('', { favourite: isFavourite });
   },
