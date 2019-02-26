@@ -17,6 +17,8 @@ Developer facing:
  - Add docs on how Gitter uses Prettier for styling/formatting(lint), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1348
  - Update `.gitignore` to ignore anything `.env*` related to avoid leaking mis-named files or backup files created by editors
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1349
+ - Fix `rename-room.js` util scripts so it can move room to a different group/community
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1344
 
 
 # 19.37.1 - 2019-2-26
