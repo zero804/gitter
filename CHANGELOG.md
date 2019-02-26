@@ -17,6 +17,13 @@ Developer facing:
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1349
 
 
+# 19.37.1 - 2019-2-26
+
+ - Fix CSRF to sign in as another user (OAuth callback),
+    - https://gitlab.com/gitlab-org/gitter/webapp/issues/2074
+    - https://gitlab.com/gitlab-org/gitter/webapp/issues/2069
+
+
 # 19.37.0 - 2019-2-19
 
  - Fix inline code blocks showing vertical scrollbar in the dark theme
