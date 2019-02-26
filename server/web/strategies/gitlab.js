@@ -44,6 +44,10 @@ var gitlabStrategy = new GitLabStrategy(
     clientID: config.get('gitlaboauth:client_id'),
     clientSecret: config.get('gitlaboauth:client_secret'),
     callbackURL: callbackUrlBuilder('gitlab'),
+    // Prevent CSRF by adding a state query parameter through the OAuth flow that is connected to the users session.
+    // These options come from the `require('passport-oauth2').Strategy`,
+    // https://github.com/jaredhanson/passport-oauth2/blob/master/lib/strategy.js
+    state: true,
     passReqToCallback: true,
     scope: ['read_user', 'api'],
     scopeSeparator: ' '

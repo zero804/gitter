@@ -3,8 +3,7 @@
 var env = require('gitter-web-env');
 var config = env.config;
 var logger = env.logger;
-var GitHubStrategy = require('@gitterhq/passport-github').Strategy;
-var TokenStateProvider = require('@gitterhq/passport-oauth2').TokenStateProvider;
+var GitHubStrategy = require('passport-github2').Strategy;
 var callbackUrlBuilder = require('./callback-url-builder');
 
 function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile, done) {
@@ -28,14 +27,15 @@ function githubUpgradeCallback(req, accessToken, refreshToken, params, _profile,
   });
 }
 
-var statePassphrase = config.get('github:statePassphrase');
-
 var githubUpgradeStrategy = new GitHubStrategy(
   {
     clientID: config.get('github:client_id'),
     clientSecret: config.get('github:client_secret'),
     callbackURL: callbackUrlBuilder(),
-    stateProvider: statePassphrase && new TokenStateProvider({ passphrase: statePassphrase }),
+    // Prevent CSRF by adding a state query parameter through the OAuth flow that is connected to the users session.
+    // These options come from the `require('passport-oauth2').Strategy`,
+    // https://github.com/jaredhanson/passport-oauth2/blob/master/lib/strategy.js
+    state: true,
     skipUserProfile: true,
     passReqToCallback: true
   },
