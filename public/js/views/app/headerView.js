@@ -168,8 +168,6 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.setupProfileMenu();
 
-    this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
-    this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
     var topicEl = this.ui.topic[0];
     if (topicEl) {
       autolink(topicEl);
