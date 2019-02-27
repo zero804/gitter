@@ -1,4 +1,4 @@
-# 19.38.0 - *upcoming*
+# 19.38.0 - 2019-2-27
 
  - Make Gitter markdown readme badge snippet visible for all rooms (share modal)
     - Thanks to [@jamesgeorge007](https://gitlab.com/jamesgeorge007) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1324
