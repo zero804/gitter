@@ -168,8 +168,6 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.setupProfileMenu();
 
-    this.ui.favourite.css({ visibility: context.isLoggedIn() ? 'visible' : 'hidden' });
-    this.ui.favourite.toggleClass('favourite', !!this.model.get('favourite'));
     var topicEl = this.ui.topic[0];
     if (topicEl) {
       autolink(topicEl);
@@ -274,7 +272,6 @@ var HeaderView = Marionette.ItemView.extend({
 
     this.model.set('favourite', !this.model.get('favourite'));
     var isFavourite = !!this.model.get('favourite');
-    this.ui.favourite.toggleClass('favourite', isFavourite);
 
     apiClient.userRoom.put('', { favourite: isFavourite });
   },

@@ -25,6 +25,7 @@ function getHeaderViewOptions(serializedTroupe) {
     url: serializedTroupe.url,
     oneToOne: serializedTroupe.oneToOne,
     troupeName: serializedTroupe.name,
+    favourite: serializedTroupe.favourite,
     premium: serializedTroupe.premium,
     isPrivate: !serializedTroupe.public,
     troupeTopic: serializedTroupe.topic,
