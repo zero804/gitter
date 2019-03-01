@@ -8,6 +8,7 @@
 Developer facing:
 
  - Add some docs on how to run a subset of tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1356
+ - Add some comments about possible user states, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1355
 
 
 # 19.38.0 - 2019-2-27
