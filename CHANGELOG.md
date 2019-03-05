@@ -1,4 +1,4 @@
-# 19.38.0 - *upcoming*
+# 19.38.0 - 2019-2-27
 
  - Make Gitter markdown readme badge snippet visible for all rooms (share modal)
     - Thanks to [@jamesgeorge007](https://gitlab.com/jamesgeorge007) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1324
@@ -6,8 +6,12 @@
      - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1341
  - Update version badge at the top(`DEV`) to link to the GitLab repo
     - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1345
- - Update create room primary button style in `/home/explore` for better consistency
+ - Update create room primary button(caribbean) style in `/home/explore` for better consistency
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1342
+ - Update left menu explore button style(jaffa) for better consistency
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1350
+ - Add "Open Source" link to `webapp` GitLab project repository on the homepage
+    - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1346
 
 Developer facing:
 
@@ -15,6 +19,16 @@ Developer facing:
  - Add docs on how Gitter uses Prettier for styling/formatting(lint), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1348
  - Update `.gitignore` to ignore anything `.env*` related to avoid leaking mis-named files or backup files created by editors
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1349
+ - Fix `rename-room.js` util scripts so it can move room to a different group/community
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1344
+ - Fix NPE when lowercasing emails on login/new-user, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1352
+
+
+# 19.37.1 - 2019-2-26
+
+ - Fix CSRF to sign in as another user (OAuth callback),
+    - https://gitlab.com/gitlab-org/gitter/webapp/issues/2074
+    - https://gitlab.com/gitlab-org/gitter/webapp/issues/2069
 
 
 # 19.37.0 - 2019-2-19

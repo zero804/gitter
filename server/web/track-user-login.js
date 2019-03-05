@@ -14,7 +14,9 @@ module.exports = function trackUserLogin(req, user, provider) {
 
     const emailList = user.emails || [];
     emailList.unshift(email);
-    const lowerCaseEmailList = emailList.map(email => email.toLowerCase());
+    // We are sanitizing the data a bit here so the database
+    // doesn't store `null` and duplicate case different emails
+    const lowerCaseEmailList = emailList.filter(email => !!email).map(email => email.toLowerCase());
     user.emails = _.uniq(lowerCaseEmailList);
 
     stats.userUpdate(

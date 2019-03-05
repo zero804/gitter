@@ -5,6 +5,8 @@
 var shutdown = require('shutdown');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
+var troupeService = require('gitter-web-rooms/lib/troupe-service');
+var groupService = require('gitter-web-groups/lib/group-service');
 
 var readline = require('readline');
 var Promise = require('bluebird');
@@ -30,10 +32,7 @@ var newUri = opts.new;
 
 var lcOld = oldUri.toLowerCase();
 var lcNew = newUri.toLowerCase();
-
-function findRoom(uri) {
-  return persistence.Troupe.findOne({ lcUri: uri.toLowerCase() }).exec();
-}
+var lcNewGroup = lcNew.split(/\//)[0];
 
 function confirm() {
   var rl = readline.createInterface({
@@ -54,49 +53,57 @@ function confirm() {
   });
 }
 
-return Promise.join(findRoom(lcOld), findRoom(lcNew), function(room, clashRoom) {
-  if (clashRoom) {
-    throw new Error('URI Clash: ' + lcNew);
+return Promise.join(
+  troupeService.findByUri(lcOld),
+  troupeService.findByUri(lcNew),
+  groupService.findByUri(lcNewGroup),
+  function(room, clashRoom, newGroup) {
+    if (clashRoom) {
+      throw new Error('URI Clash: ' + lcNew);
+    }
+    if (!room) {
+      throw new Error('Room does not exist: ' + lcOld);
+    }
+    if (!newGroup) {
+      throw new Error('Attempt to move the room into non-existent group: ' + lcNewGroup);
+    }
+    if (lcNew === lcNewGroup) {
+      throw new Error('Trying to rename room to a group: ' + lcNewGroup);
+    }
+
+    if (room.githubType === 'REPO') {
+      // This has not been tested
+      throw new Error('Do not rename repo rooms using this script');
+    }
+
+    console.log('BEFORE', {
+      uri: room.uri,
+      lcUri: room.lcUri,
+      groupId: room.groupId,
+      renamedLcUris: room.renamedLcUris,
+      githubType: room.githubType
+    });
+
+    room.uri = newUri;
+    room.groupId = newGroup._id;
+    room.lcUri = lcNew;
+
+    /* Only add if it's not a case change */
+    if (lcOld !== lcNew) {
+      room.renamedLcUris.addToSet(lcOld);
+    }
+
+    console.log('AFTER', {
+      uri: room.uri,
+      lcUri: room.lcUri,
+      groupId: room.groupId,
+      renamedLcUris: room.renamedLcUris,
+      githubType: room.githubType
+    });
+
+    return confirm().return(room);
   }
-  if (!room) {
-    throw new Error('Room does not exist: ' + lcOld);
-  }
-
-  if (room.githubType === 'REPO') {
-    // This has not been tested
-    throw new Error('Do not rename repo rooms using this script');
-  }
-
-  console.log('BEFORE', {
-    uri: room.uri,
-    lcUri: room.lcUri,
-    lcOwner: room.lcOwner,
-    renamedLcUris: room.renamedLcUris,
-    githubType: room.githubType
-  });
-
-  room.uri = newUri;
-  if (room.lcOwner) {
-    var newLcOwner = lcNew.split(/\//)[0];
-    room.lcOwner = newLcOwner;
-  }
-  room.lcUri = lcNew;
-
-  /* Only add if it's not a case change */
-  if (lcOld !== lcNew) {
-    room.renamedLcUris.addToSet(lcOld);
-  }
-
-  console.log('AFTER', {
-    uri: room.uri,
-    lcUri: room.lcUri,
-    lcOwner: room.lcOwner,
-    renamedLcUris: room.renamedLcUris,
-    githubType: room.githubType
-  });
-
-  return confirm().return(room);
-})
+)
   .then(function(room) {
     console.log('Updating');
 
