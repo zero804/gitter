@@ -111,7 +111,7 @@ function getRoomsWithMembership(groupId, user, currentPage) {
 
 function renderOrgPage(req, res, next) {
   return Promise.try(function() {
-    var group = req.group || req.uriContext.group;
+    var group = req.uriContext.group;
     if (!group) throw new StatusError(404);
     var groupId = group._id;
     var user = req.user;
@@ -120,12 +120,11 @@ function renderOrgPage(req, res, next) {
     var currentPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
 
     return Promise.join(
-      serializeGroup(group, user),
       getRoomsWithMembership(groupId, user, currentPage),
-      contextGenerator.generateBasicContext(req),
+      contextGenerator.generateOrgContext(req),
       policy.canAdmin(),
       generateUserThemeSnapshot(req),
-      function(serializedGroup, roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
+      function(roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
@@ -145,10 +144,7 @@ function renderOrgPage(req, res, next) {
           return result;
         });
 
-        // This is used to track pageViews in mixpanel
-        troupeContext.isCommunityPage = true;
-
-        var fullUrl = clientEnv.basePath + '/' + serializedGroup.homeUri;
+        var fullUrl = clientEnv.basePath + '/' + troupeContext.group.homeUri;
         var text = encodeURIComponent('Explore our chat community on Gitter:');
         var url =
           'https://twitter.com/share?' +
@@ -169,7 +165,7 @@ function renderOrgPage(req, res, next) {
           orgDirectoryUrl: fullUrl,
           roomCount: roomCount,
           orgUserCount: orgUserCount,
-          group: serializedGroup,
+          group: troupeContext.group,
           rooms: rooms,
           troupeContext: troupeContext,
           pagination: {
