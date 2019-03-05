@@ -213,6 +213,18 @@ You can look at the [issues labeled with ~"test"](https://gitlab.com/gitlab-org/
 All unit tests etc can be run with `npm test`
 
 
+#### Run individual tests
+
+Anything after the `--` is an argument to Mocha itself, see https://mochajs.org/#command-line-usage
+
+```
+npm run mocha -- test/some-test.js
+
+npm run mocha -- test/some-test.js --grep "specific test"
+```
+
+
+
 # Contributing
 
 We use [git-flow](https://danielkummer.github.io/git-flow-cheatsheet/). Merge requests should be made against `develop` not `master`.
