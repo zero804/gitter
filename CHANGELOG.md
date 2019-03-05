@@ -1,7 +1,9 @@
 # 19.39.0 - *upcoming*
 
-- Use filled in star icon for favorite communities/rooms
-   - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1351
+ - Use filled in star icon for favorite communities/rooms
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1351
+ - Fix favorite star on community home
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1354
 
 Developer facing:
 
