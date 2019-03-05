@@ -3,6 +3,10 @@
 - Use filled in star icon for favorite communities/rooms
    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1351
 
+Developer facing:
+
+ - Add some docs on how to run a subset of tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1356
+
 
 # 19.38.0 - 2019-2-27
 
