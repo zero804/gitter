@@ -15,7 +15,7 @@
 	"Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery.": "Gitter-ი არის ჩათისა და ურთიერთკავშირის პლატფორმა, რომელიც ეხმარება გუნდებს მართვაში, განვითარებაში და სხვა გუნდებთან დაკავშირებაში მიმოწერით, კონტენტითა და აღმოჩენების დახმარებით.",
 	"Create your own community": "შექმენი შენი გუნდი",
 	"Explore other communities": "აღმოაჩინე სხვა გუნდები",
-	"By signing up you agree to our <a %s>Terms and Conditions</a>": "რეგისტრაციით ეთანხმებიჩვენს <a %s>წესებსა და პირობებს</a>",
+	"By signing up you agree to our <a %s>Terms and Conditions</a>": "რეგისტრაციით ეთანხმები ჩვენს <a %s>წესებსა და პირობებს</a>",
 	"Free without limits": "უფასო და ულიმიტო",
 	"Enjoy free public and private communities with unlimited people, message history and integrations.": "ისიამოვნე უფასო ღია და დახურული გუნდებით, შეუზღუდავი წევრებით, მიმოწერის ისტორიითა და ინტეგრაციით.",
 	"Simple to create": "შექმენი მარტივად",
