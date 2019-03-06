@@ -4,6 +4,8 @@
     - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1351
  - Fix favorite star on community home
     - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1354
+ - Update `@gitterhq/translations@1.9.1` dependency for Georgian(`ka`) translation fix, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1357
+    - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/69
 
 Developer facing:
 
@@ -62,8 +64,8 @@ Developer facing:
 # 19.36.0 - 2019-2-15
 
  - Fix GitLab issue decorations opening in GitHub (404) on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1321
-  - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
-     - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
+ - Update `@gitterhq/translations@1.9.0` dependency for Georgian(`ka`) translations
+    - Thanks to [@davitperaze](https://gitlab.com/davitperaze) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/68
  - Remove GitHub `/login/explain` page
      - Thanks to [@prajwalm2212](https://gitlab.com/prajwalm2212) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1330
  - Trim extra space in invite user input field (email)
