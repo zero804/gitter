@@ -11,6 +11,8 @@ Developer facing:
 
  - Add some docs on how to run a subset of tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1356
  - Add some comments about possible user states, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1355
+ - Update eslint to use ECMAScript 2018 parser (we already Node.js 10)
+    - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1358
 
 
 # 19.38.0 - 2019-2-27
