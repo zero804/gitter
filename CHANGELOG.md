@@ -1,4 +1,4 @@
-# 19.39.0 - *upcoming*
+# 19.39.0 - 2019-3-12
 
  - Use filled in star icon for favorite communities/rooms
     - Thanks to [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1351
