@@ -62,3 +62,17 @@ exports.removeByUsername = function(username, options = {}) {
       });
   });
 };
+
+// This removes the state of the user when its value is 'REMOVED'.
+// This is typically called when the user just logged in, and is useful after
+// the user deleted their account.
+exports.unremoveUser = async user => {
+  if (user.state === 'REMOVED') {
+    user.state = undefined;
+
+    // Persist the state
+    return await user.save();
+  } else {
+    return user;
+  }
+};
