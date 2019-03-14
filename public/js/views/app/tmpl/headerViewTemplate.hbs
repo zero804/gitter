@@ -55,8 +55,11 @@
 
   {{#unless archives}}
     {{#if user}}
-    <button class="chat-header__favourite js-favourite-button" title="Favourite {{ headerView.troupeName }}">
-      <i class="chat-header__action-icon icon-star-empty {{#if headerView.troupeFavourite }}favourite{{/if}}" aria-hidden="true"></i>
+    <button class="chat-header__favourite js-favourite-button {{#if headerView.favourite }}favourite{{/if}}" title="Favourite {{ headerView.troupeName }}">
+      <i
+        class="chat-header__action-icon {{#if headerView.favourite }}icon-star-1{{^}}icon-star-empty{{/if}}"
+        aria-hidden="true">
+      </i>
     </button>
     <button class="chat-header__settings js-chat-settings" title="Room settings" data-toggle="dropdown">
       <i class="chat-header__action-icon" aria-hidden="true">

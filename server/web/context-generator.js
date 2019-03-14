@@ -58,6 +58,25 @@ function generateMainMenuContext(req, leftMenu) {
   });
 }
 
+async function generateOrgContext(req) {
+  const { user } = req;
+  const { uriContext } = req;
+  assert(uriContext);
+  const { group } = uriContext;
+  assert(group);
+
+  const [basicContext, serializedGroup] = await Promise.all([
+    generateBasicContext(req),
+    serializeGroup(group, user)
+  ]);
+
+  return _.extend({}, basicContext, {
+    group: serializedGroup,
+    // This is used to track pageViews in mixpanel
+    isCommunityPage: true
+  });
+}
+
 function generateBasicContext(req) {
   var user = req.user;
 
@@ -188,8 +207,9 @@ function serializeTroupe(troupe, user) {
 }
 
 module.exports = {
-  generateBasicContext: generateBasicContext,
-  generateMainMenuContext: generateMainMenuContext,
-  generateSocketContext: generateSocketContext,
-  generateTroupeContext: generateTroupeContext
+  generateBasicContext,
+  generateMainMenuContext,
+  generateSocketContext,
+  generateTroupeContext,
+  generateOrgContext
 };

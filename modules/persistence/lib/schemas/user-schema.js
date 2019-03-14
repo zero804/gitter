@@ -28,6 +28,7 @@ var UserSchema = new Schema(
     staff: { type: Boolean },
     hellbanned: { type: Boolean }, // to troll the trolls
     githubScopes: { type: Schema.Types.Mixed },
+    // INVITED, REMOVED, DISABLED
     state: { type: String },
     stripeCustomerId: { type: String },
     tz: {
