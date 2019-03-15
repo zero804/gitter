@@ -1,13 +1,18 @@
 {
+  "web": {
+    "homeurl": "/",
+    "domain": "localhost",
+    "baseserver": "localhost",
+    "baseport": "5000",
+    "basepath": "http://localhost:5000",
+    "apiBasePath": "http://localhost:5000/api"
+  },
   "mongo": {
     "onlyUsePrimary": true,
     "connection": {
-      "hosts": [
-        "registry.gitlab.com-gitlab-org-gitter-webapp-mongo:27017"
-      ],
+      "hosts": ["registry.gitlab.com-gitlab-org-gitter-webapp-mongo:27017"],
       "database": "gitter",
-      "options": {
-      }
+      "options": {}
     },
     "profileSlowQueries": true,
     "logQueries": false,
@@ -35,9 +40,7 @@
   "redis_caching": "redis://redis",
   "elasticsearch": {
     "comment": "Override with GITTER_ES_ENDPOINT (comma separated)",
-    "hosts": [
-      "http://registry.gitlab.com-gitlab-org-gitter-webapp-elasticsearch:9200"
-    ]
+    "hosts": ["http://registry.gitlab.com-gitlab-org-gitter-webapp-elasticsearch:9200"]
   },
   "test": {
     "exposeInBrowserTests": true,

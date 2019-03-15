@@ -27,14 +27,9 @@ module.exports = {
           result.emailAddress
         );
 
-        if (!input.emailAddress && result.emailAddress) {
-          result.emailAddress = inviteValidation.maskEmail(result.emailAddress);
-        }
-
         if (!result.user) {
           return {
             status: result.status,
-            email: result.emailAddress,
             avatarUrl: avatarUrl
           };
         }
@@ -43,7 +38,6 @@ module.exports = {
         return restSerializer.serializeObject(result.user, strategy).then(function(serializedUser) {
           return {
             status: result.status,
-            email: result.emailAddress,
             user: serializedUser,
             avatarUrl: avatarUrl
           };
