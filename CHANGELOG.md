@@ -1,3 +1,11 @@
+# 19.39.1 - 2019-3-15
+
+ - Add character limit to message edit endpoint, https://gitlab.com/gitlab-org/gitter/webapp/issues/2106
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/18
+ - Remove email returned by room invite endpoint, https://gitlab.com/gitlab-org/gitter/webapp/issues/2102
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/17
+
+
 # 19.39.0 - 2019-3-12
 
  - Use filled in star icon for favorite communities/rooms
