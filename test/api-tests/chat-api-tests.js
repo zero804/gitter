@@ -97,6 +97,31 @@ describe('chat-api', function() {
       });
   });
 
+  it('PUT /v1/rooms/:roomId/chatMessages/:chatMessageId updates message', function() {
+    const UPDATED_TEXT = 'updated message';
+    return request(app)
+      .put(`/v1/rooms/${fixture.troupe1.id}/chatMessages/${fixture.message1.id}`)
+      .send({
+        text: UPDATED_TEXT
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(function(result) {
+        var body = result.body;
+        assert.strictEqual(body.text, UPDATED_TEXT);
+      });
+  });
+
+  it('PUT /v1/rooms/:roomId/chatMessages/:chatMessageId rejects message that is too long', function() {
+    return request(app)
+      .put(`/v1/rooms/${fixture.troupe1.id}/chatMessages/${fixture.message1.id}`)
+      .send({
+        text: 'x'.repeat(9000)
+      })
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(400);
+  });
+
   it('DELETE /v1/rooms/:roomId/chatMessages/:chatMessageId - own message', function() {
     return request(app)
       .del('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.message3.id)
