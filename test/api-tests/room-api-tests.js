@@ -154,4 +154,20 @@ describe('room-api', function() {
       .set('x-access-token', fixture.user3.accessToken)
       .expect(200);
   });
+
+  it("POST /v1/rooms/:roomId/invites with a user doesn't leak email", function() {
+    return request(app)
+      .post(`/v1/rooms/${fixture.troupe1.id}/invites`)
+      .send({
+        // A user that has an email listed on their profile, https://github.com/gitter-badger
+        githubUsername: 'gitter-badger'
+      })
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(200)
+      .then(function(result) {
+        const body = result.body;
+        assert.strictEqual(body.status, 'invited');
+        assert.strictEqual(body.email, undefined);
+      });
+  });
 });
