@@ -168,7 +168,7 @@ var View = Marionette.CompositeView.extend({
           timeAdded: Date.now(),
           email: invite.email,
           user: invite.user,
-          username: invite.user && invite.user.username
+          username: (invite.user && invite.user.username) || username
         });
 
         self.collection.add(model);

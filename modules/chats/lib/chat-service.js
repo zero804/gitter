@@ -271,6 +271,10 @@ function updateChatMessage(troupe, chatMessage, user, newText, callback) {
   return Promise.try(function() {
     newText = newText || '';
 
+    if (newText.length > MAX_CHAT_MESSAGE_LENGTH) {
+      throw new StatusError(400, 'Message exceeds maximum size');
+    }
+
     var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
     if (age > MAX_CHAT_EDIT_AGE_SECONDS) {
       throw new StatusError(400, 'You can no longer edit this message');
