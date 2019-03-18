@@ -10,9 +10,6 @@ var userRemovalService = require('../lib/user-removal-service');
 describe('user-removal-service', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
-    user2: {
-      state: 'REMOVED'
-    },
     identity1: {
       user: 'user1',
       provider: 'gitlab',
@@ -51,14 +48,6 @@ describe('user-removal-service', function() {
           assert.strictEqual(identities.length, 0);
         })
         .nodeify(done);
-    });
-  });
-
-  describe('#unremoveUser', () => {
-    it('should clear the status of removed user', async () => {
-      await userRemovalService.unremoveUser(fixture.user2);
-      const user = await User.findOne({ _id: fixture.user2._id });
-      assert.strictEqual(user.state, undefined);
     });
   });
 });

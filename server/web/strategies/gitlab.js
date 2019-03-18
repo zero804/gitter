@@ -7,7 +7,6 @@ var GitLabStrategy = require('passport-gitlab2');
 var userService = require('gitter-web-users');
 var trackSignupOrLogin = require('../track-signup-or-login');
 var updateUserLocale = require('../update-user-locale');
-var { unremoveUser } = require('gitter-web-rooms/lib/user-removal-service');
 var passportLogin = require('../passport-login');
 var identityService = require('gitter-web-identity');
 var callbackUrlBuilder = require('./callback-url-builder');
@@ -36,9 +35,6 @@ function gitlabOauthCallback(req, token, refreshToken, profile, done) {
       updateUserLocale(req, user);
 
       return passportLogin(req, user);
-    })
-    .then(function(user) {
-      return unremoveUser(user);
     })
     .asCallback(done);
 }

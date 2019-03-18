@@ -187,6 +187,9 @@ var userService = {
       .spread(function() {
         return uriLookupService.reserveUriForUsername(user._id, user.username);
       })
+      .then(() => {
+        return this.unremoveUser(user);
+      })
       .then(function() {
         return [user, isNewUser];
       });
@@ -391,6 +394,20 @@ var userService = {
         }
       }
     ).exec();
+  },
+
+  // This removes the state of the user when its value is 'REMOVED'.
+  // This is typically called when the user just logged in, and is useful after
+  // the user deleted their account.
+  unremoveUser: async user => {
+    if (user.state === 'REMOVED') {
+      user.state = undefined;
+
+      // Persist the state
+      return await user.save();
+    } else {
+      return user;
+    }
   }
 };
 
