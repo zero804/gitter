@@ -1,3 +1,10 @@
+# 19.40.0 - *upcoming*
+
+Developer facing:
+
+ - Fix npm install failing on GitHub `backbone-events-standalone` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1364
+
+
 # 19.39.1 - 2019-3-15
 
  - Add character limit to message edit endpoint, https://gitlab.com/gitlab-org/gitter/webapp/issues/2106
