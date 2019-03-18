@@ -79,9 +79,18 @@ function getRoomMembersForRooms(rooms) {
     })
     .then(function(userMap) {
       return rooms.reduce(function(roomMembershipMap, room) {
-        roomMembershipMap[room.id] = (roomMembershipIdMap[room.id] || []).map(function(userId) {
-          return userMap[userId];
-        });
+        roomMembershipMap[room.id] = (roomMembershipIdMap[room.id] || []).reduce(function(
+          membershipList,
+          userId
+        ) {
+          const user = userMap[userId];
+          if (user) {
+            membershipList.push(user);
+          }
+
+          return membershipList;
+        },
+        []);
         return roomMembershipMap;
       }, {});
     });
@@ -179,5 +188,8 @@ function renderOrgPage(req, res, next) {
 }
 
 module.exports = exports = {
-  renderOrgPage: renderOrgPage
+  renderOrgPage: renderOrgPage,
+  testOnly: {
+    getRoomMembersForRooms
+  }
 };
