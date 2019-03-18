@@ -386,11 +386,7 @@ var userService = {
   unremoveUser: async user => {
     if (user.state === 'REMOVED') {
       user.state = undefined;
-
-      // Persist the state
-      return await user.save();
-    } else {
-      return user;
+      await user.save();
     }
   }
 };
