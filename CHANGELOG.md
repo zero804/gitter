@@ -1,5 +1,7 @@
 # 19.40.0 - *upcoming*
 
+ - Fix 500 NPE on community home with `undefined` user still with room membership, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1365
+
 Developer facing:
 
  - Fix npm install failing on GitHub `backbone-events-standalone` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1364
