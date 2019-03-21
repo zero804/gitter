@@ -745,7 +745,7 @@ module.exports = (function() {
         .split(/\r?\n/)
         .map(sentence => `> ${sentence}`)
         .join('\n');
-      appEvents.trigger('input.append', formattedText, { newLine: true });
+      appEvents.trigger('input.append', formattedText + '\n\n', { newLine: true });
     },
 
     delete: function() {
