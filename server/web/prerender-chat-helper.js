@@ -6,6 +6,7 @@
  */
 
 var _ = require('lodash');
+var moment = require('moment');
 var compileTemplate = require('./compile-web-template');
 var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
@@ -34,10 +35,21 @@ function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
   return timeFormat(model.sent, { lang: lang, tzOffset: tzOffset });
 }
 
+const getPermalinkUrl = (basePath, troupeName, model, tzOffset, type) => {
+  if (type === 'archive') {
+    const urlDate = moment(model.sent).format('YYYY/MM/DD');
+    return `${basePath}/${troupeName}/archives/${urlDate}?at=${model.id}`;
+  }
+  return `${basePath}/${troupeName}?at=${model.id}`;
+};
+
 module.exports = exports = function(model, params) {
   var deletedClass;
 
   var root = params.data.root;
+
+  // type of this chat view (archive or chat)
+  const type = params.hash.type || 'chat';
 
   var troupeName = root.troupeName;
   var lang = root.lang;
@@ -69,7 +81,7 @@ module.exports = exports = function(model, params) {
     tz: tz,
     tzOffset: tzOffset,
     showDatesWithoutTimezone: showDatesWithoutTimezone,
-    permalinkUrl: clientEnv['basePath'] + '/' + troupeName + '?at=' + model.id
+    permalinkUrl: getPermalinkUrl(clientEnv['basePath'], troupeName, model, tzOffset, type)
   });
 
   var result;
