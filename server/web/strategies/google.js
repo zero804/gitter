@@ -34,7 +34,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
   var user;
   return userService
     .findOrCreateUserForProvider(googleUser, googleIdentity)
-    .spread(function(_user, isNewUser) {
+    .then(function([_user, isNewUser]) {
       user = _user;
 
       trackSignupOrLogin(req, user, isNewUser, 'google');
@@ -42,7 +42,7 @@ function googleOauth2Callback(req, accessToken, refreshToken, params, profile, d
 
       return passportLogin(req, user);
     })
-    .asCallback(done);
+    .then(result => done(null, result), error => done(error));
 }
 
 var googleStrategy = new GoogleStrategy(

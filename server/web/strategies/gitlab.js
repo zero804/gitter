@@ -30,13 +30,13 @@ function gitlabOauthCallback(req, token, refreshToken, profile, done) {
 
   return userService
     .findOrCreateUserForProvider(gitlabUser, gitlabIdentity)
-    .spread(function(user, isNewUser) {
+    .then(function([user, isNewUser]) {
       trackSignupOrLogin(req, user, isNewUser, 'gitlab');
       updateUserLocale(req, user);
 
       return passportLogin(req, user);
     })
-    .asCallback(done);
+    .then(result => done(null, result), error => done(error));
 }
 
 var gitlabStrategy = new GitLabStrategy(

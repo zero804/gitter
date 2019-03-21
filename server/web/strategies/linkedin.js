@@ -34,13 +34,13 @@ function linkedinOauth2Callback(req, accessToken, refreshToken, profile, done) {
 
   return userService
     .findOrCreateUserForProvider(linkedinUser, linkedinIdentity)
-    .spread(function(user, isNewUser) {
+    .then(function([user, isNewUser]) {
       trackSignupOrLogin(req, user, isNewUser, 'linkedin');
       updateUserLocale(req, user);
 
       return passportLogin(req, user);
     })
-    .asCallback(done);
+    .then(result => done(null, result), error => done(error));
 }
 
 var linkedInStrategy = new LinkedInStrategy(
