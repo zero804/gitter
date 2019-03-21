@@ -1,6 +1,8 @@
 # 19.40.0 - *upcoming*
 
  - Fix 500 NPE on community home with `undefined` user still with room membership, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1365
+ - Restore user state when user signs in again after removing
+    - Thanks to [@green-coder](https://gitlab.com/green-coder) and [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1362
 
 Developer facing:
 
