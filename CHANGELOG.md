@@ -5,6 +5,8 @@
     - Thanks to [@green-coder](https://gitlab.com/green-coder) and [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1362
  - Add new lines to end of quoted text to separate comments
     - Thanks to [@joserenan](https://gitlab.com/joserenan) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1366
+ - Remove Gitter hiring/job link to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1368
+
 
 Developer facing:
 
