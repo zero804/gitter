@@ -38,7 +38,7 @@ function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
 const getPermalinkUrl = (basePath, troupeName, model, tzOffset, type) => {
   if (type === 'archive') {
     const urlDate = moment(model.sent).format('YYYY/MM/DD');
-    return `${basePath}/${troupeName}/archives/${urlDate}?at=${model.id}`;
+    return `${basePath}/${troupeName}/archives/${urlDate}/?at=${model.id}`;
   }
   return `${basePath}/${troupeName}?at=${model.id}`;
 };
