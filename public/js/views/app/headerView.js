@@ -189,9 +189,12 @@ var HeaderView = Marionette.ItemView.extend({
         this.profileMenu.destroy();
       }
       //Make a new profile menu
-      this.profileMenu = new ProfileMenu({ el: '#profile-menu' });
-      //Render it
-      this.profileMenu.render();
+      const profileMenuElement = document.querySelector('#profile-menu');
+      if (profileMenuElement) {
+        this.profileMenu = new ProfileMenu({ el: profileMenuElement });
+        //Render it
+        this.profileMenu.render();
+      }
     }
   },
 

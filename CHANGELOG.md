@@ -1,3 +1,8 @@
+# 19.41.0 - *upcoming*
+
+ - Fix error thrown on archive navigation view by missing profile element so that the rest of the JavaScript runs, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1370
+
+
 # 19.40.0 - 2019-3-21
 
  - Fix 500 NPE on community home with `undefined` user still with room membership, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1365
