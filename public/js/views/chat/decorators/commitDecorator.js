@@ -133,8 +133,6 @@ module.exports = (function() {
           var popover = createPopover(model, e.target);
           popover.show();
           Popover.singleton(view, popover);
-
-          e.preventDefault();
         }
 
         function showPopoverLater(e) {
