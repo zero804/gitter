@@ -5,7 +5,9 @@ var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
 var HeaderView = require('./views/app/headerView');
 var ArchiveNavigationView = require('./views/archive/archive-navigation-view');
+var ArchiveLayout = require('./views/layouts/archive');
 var rightToolbarModel = require('./models/right-toolbar-model');
+var chatCollection = require('./collections/instances/chats-cached');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -46,20 +48,12 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  // TODO: XXX move this across to a layoutview
-  new HeaderView({
-    el: '#header',
+  var appView = new ArchiveLayout({
     model: context.troupe(),
-    rightToolbarModel: rightToolbarModel,
-    archives: true
-  }).render();
+    template: false,
+    el: 'body',
+    chatCollection
+  });
 
-  var archiveContext = context().archive;
-
-  new ArchiveNavigationView({
-    el: '#archive-navigation',
-    archiveDate: archiveContext.archiveDate,
-    nextDate: archiveContext.nextDate,
-    previousDate: archiveContext.previousDate
-  }).render();
+  appView.render();
 });

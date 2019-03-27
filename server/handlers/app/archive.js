@@ -19,6 +19,7 @@ var debug = require('debug')('gitter:app:app-archive');
 var fonts = require('../../web/fonts');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
@@ -258,6 +259,8 @@ exports.chatArchive = [
               nextDate: nextDateUTC,
               previousDate: previousDateUTC
             };
+            const aroundId = fixMongoIdQueryParam(req.query.at);
+            troupeContext.permalinkChatId = aroundId;
 
             var language = req.headers['accept-language'];
             if (language) {
