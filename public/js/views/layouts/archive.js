@@ -26,14 +26,9 @@ module.exports = ChatLayout.extend({
   },
 
   initArchiveNavigation: function(optionsForRegion) {
-    var archiveContext = context().archive;
-
-    // TODO: pass the whole archive context as a model
     return new ArchiveNavigationView(
       optionsForRegion({
-        archiveDate: archiveContext.archiveDate,
-        nextDate: archiveContext.nextDate,
-        previousDate: archiveContext.previousDate
+        archiveContext: context().archive
       })
     );
   },
