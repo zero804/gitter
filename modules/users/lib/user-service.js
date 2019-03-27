@@ -115,7 +115,7 @@ var userService = {
    * that provider for the user whether the user is new or not.
    * @return promise of [user, isNewIdentity]
    */
-  findOrCreateUserForProvider: function(userData, identityData) {
+  findOrCreateUserForProvider: async function(userData, identityData) {
     winston.info('Locating or creating user', {
       userData: userData,
       identityData: identityData
@@ -127,7 +127,7 @@ var userService = {
 
     // TODO: should we assert all the required user and identity fields?
 
-    var userQuery = {
+    const userQuery = {
       identities: {
         $elemMatch: {
           provider: identityData.provider,
@@ -136,10 +136,7 @@ var userService = {
       }
     };
 
-    var user;
-    var isNewUser;
-
-    var userInsertData = _.extend(
+    const userInsertData = _.extend(
       {
         identities: [
           {
@@ -151,45 +148,35 @@ var userService = {
       userData
     );
 
-    return mongooseUtils
-      .upsert(persistence.User, userQuery, {
-        $setOnInsert: userInsertData
-      })
-      .spread(function(_user, _isExistingUser) {
-        if (_user && _user.state === 'DISABLED') {
-          throw new StatusError(
-            403,
-            'Account temporarily disabled. Please contact support@gitter.im'
-          );
-        }
+    const [user, isExistingUser] = await mongooseUtils.upsert(persistence.User, userQuery, {
+      $setOnInsert: userInsertData
+    });
+    if (user && user.state === 'DISABLED') {
+      throw new StatusError(403, 'Account temporarily disabled. Please contact support@gitter.im');
+    }
 
-        user = _user;
-        isNewUser = !_isExistingUser;
-        var identityQuery = {
-          provider: identityData.provider,
-          userId: user._id
-        };
+    const isNewUser = !isExistingUser;
+    const identityQuery = {
+      provider: identityData.provider,
+      userId: user._id
+    };
 
-        var identitySetData = _.extend(
-          {
-            userId: user._id
-          },
-          identityData
-        );
+    const identitySetData = _.extend(
+      {
+        userId: user._id
+      },
+      identityData
+    );
 
-        return mongooseUtils.upsert(persistence.Identity, identityQuery, {
-          // NOTE: set the identity fields regardless, because the tokens and
-          // things could be newer than what we have if this is a login and
-          // not a signup.
-          $set: identitySetData
-        });
-      })
-      .spread(function() {
-        return uriLookupService.reserveUriForUsername(user._id, user.username);
-      })
-      .then(function() {
-        return [user, isNewUser];
-      });
+    await mongooseUtils.upsert(persistence.Identity, identityQuery, {
+      // NOTE: set the identity fields regardless, because the tokens and
+      // things could be newer than what we have if this is a login and
+      // not a signup.
+      $set: identitySetData
+    });
+    await uriLookupService.reserveUriForUsername(user._id, user.username);
+    await this.unremoveUser(user);
+    return [user, isNewUser];
   },
 
   findById: function(id, callback) {
@@ -391,6 +378,16 @@ var userService = {
         }
       }
     ).exec();
+  },
+
+  // This removes the state of the user when its value is 'REMOVED'.
+  // This is typically called when the user just logged in, and is useful after
+  // the user deleted their account.
+  unremoveUser: async user => {
+    if (user.state === 'REMOVED') {
+      user.state = undefined;
+      await user.save();
+    }
   }
 };
 

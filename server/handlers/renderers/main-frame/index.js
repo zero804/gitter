@@ -122,7 +122,6 @@ function renderMainFrame(req, res, next, options) {
         subresources: getSubResources(bootScriptName),
         showFooterButtons: true,
         showUnreadTab: true,
-        showHiringBadge: req.fflip.has('hiring-badge'),
         user: user,
         isPhone: req.isPhone
       });

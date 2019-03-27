@@ -1,3 +1,26 @@
+# 19.40.0 - 2019-3-21
+
+ - Fix 500 NPE on community home with `undefined` user still with room membership, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1365
+ - Restore user state when user signs in again after removing
+    - Thanks to [@green-coder](https://gitlab.com/green-coder) and [@vicek22](https://gitlab.com/vicek22) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1362
+ - Add new lines to end of quoted text to separate comments
+    - Thanks to [@joserenan](https://gitlab.com/joserenan) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1366
+ - Remove Gitter hiring/job link to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1368
+
+
+Developer facing:
+
+ - Fix npm install failing on GitHub `backbone-events-standalone` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1364
+
+
+# 19.39.1 - 2019-3-15
+
+ - Add character limit to message edit endpoint, https://gitlab.com/gitlab-org/gitter/webapp/issues/2106
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/18
+ - Remove email returned by room invite endpoint, https://gitlab.com/gitlab-org/gitter/webapp/issues/2102
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/17
+
+
 # 19.39.0 - 2019-3-12
 
  - Use filled in star icon for favorite communities/rooms

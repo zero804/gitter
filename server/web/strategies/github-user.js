@@ -56,10 +56,10 @@ function updateUser(req, accessToken, user, githubUserProfile) {
     user.gravatarVersion = extractGravatarVersion(githubUserProfile.avatar_url);
   }
   user.githubUserToken = accessToken;
-  user.state = undefined;
 
   return user.save().then(function() {
     trackUserLogin(req, user, 'github');
+    userService.unremoveUser(user);
 
     updateUserLocale(req, user);
 

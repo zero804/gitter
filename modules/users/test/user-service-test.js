@@ -106,4 +106,19 @@ describe('User Service', function() {
         assert(!tz || !tz.iana);
       });
   });
+
+  describe('#unremoveUser', () => {
+    const rmFixture = fixtureLoader.setup({
+      user: {
+        state: 'REMOVED'
+      }
+    });
+
+    it('should clear the status of removed user', async () => {
+      assert.strictEqual(rmFixture.user.state, 'REMOVED');
+      await userService.unremoveUser(rmFixture.user);
+      const user = await persistence.User.findOne({ _id: rmFixture.user._id });
+      assert.strictEqual(user.state, undefined);
+    });
+  });
 });

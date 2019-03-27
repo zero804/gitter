@@ -35,13 +35,13 @@ function twitterOauthCallback(req, token, tokenSecret, profile, done) {
 
   return userService
     .findOrCreateUserForProvider(twitterUser, twitterIdentity)
-    .spread(function(user, isNewUser) {
+    .then(function([user, isNewUser]) {
       trackSignupOrLogin(req, user, isNewUser, 'twitter');
       updateUserLocale(req, user);
 
       return passportLogin(req, user);
     })
-    .asCallback(done);
+    .then(result => done(null, result), error => done(error));
 }
 
 var twitterStrategy = new TwitterStrategy(
