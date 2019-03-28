@@ -257,7 +257,8 @@ exports.chatArchive = [
             troupeContext.archive = {
               archiveDate: startDateUTC,
               nextDate: nextDateUTC,
-              previousDate: previousDateUTC
+              previousDate: previousDateUTC,
+              messages: serialized
             };
             const aroundId = fixMongoIdQueryParam(req.query.at);
             troupeContext.permalinkChatId = aroundId;

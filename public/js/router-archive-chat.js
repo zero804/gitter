@@ -1,13 +1,11 @@
 'use strict';
 var $ = require('jquery');
+const Backbone = require('backbone');
 var context = require('./utils/context');
 var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
-var HeaderView = require('./views/app/headerView');
-var ArchiveNavigationView = require('./views/archive/archive-navigation-view');
-var ArchiveLayout = require('./views/layouts/archive');
-var rightToolbarModel = require('./models/right-toolbar-model');
-var chatCollection = require('./collections/instances/chats-cached');
+const ArchiveLayout = require('./views/layouts/archive');
+const ChatModel = require('./collections/chat.js').ChatModel;
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -48,11 +46,20 @@ onready(function() {
     window.parent.location.href = href;
   });
 
-  var appView = new ArchiveLayout({
+  const ArchiveChatCollection = Backbone.Collection.extend({
+    model: ChatModel,
+    modelName: 'chat',
+    fetchMoreBefore: () => 'nop',
+    ensureLoaded: function(id, callback = () => 'nop') {
+      callback(null, this.get(id));
+    }
+  });
+
+  const appView = new ArchiveLayout({
     model: context.troupe(),
     template: false,
     el: 'body',
-    chatCollection
+    chatCollection: new ArchiveChatCollection(context().archive.messages)
   });
 
   appView.render();
