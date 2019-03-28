@@ -48,30 +48,28 @@ describe('prerenderChatHelper', function() {
       burstStart: true,
       sent: '2019-03-22T09:49:43.939Z'
     };
+
     const params = {
       data: {
         root: { troupeName: 'group/room' }
       },
       hash: {}
     };
-    it('should prerender normal peramalink', () => {
+
+    const archiveLink = /<a class='chat-item__time [^']+' +href='([^']+)'[^>]+><\/a>/;
+
+    it('should prerender normal permalink', () => {
       const result = prerenderChatHelper(chat, params);
-      assert(
-        result.indexOf(
-          `<a class='chat-item__time js-chat-time'  href='${
-            clientEnv['basePath']
-          }/group/room?at=5c94afb8b9552a27a7930fbb' title=""></a>`
-        ) > 0
-      );
+      const [, href] = archiveLink.exec(result);
+      assert.strictEqual(href, `${clientEnv['basePath']}/group/room?at=5c94afb8b9552a27a7930fbb`);
     });
+
     it('should prerender archive permalink', () => {
       const result = prerenderChatHelper(chat, { ...params, hash: { type: 'archive' } });
-      assert(
-        result.indexOf(
-          `<a class='chat-item__time js-chat-time'  href='${
-            clientEnv['basePath']
-          }/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb' title=""></a>`
-        ) > 0
+      const [, href] = archiveLink.exec(result);
+      assert.strictEqual(
+        href,
+        `${clientEnv['basePath']}/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb`
       );
     });
   });
