@@ -56,17 +56,17 @@ describe('prerenderChatHelper', function() {
       hash: {}
     };
 
-    const archiveLink = /<a class='chat-item__time [^']+' +href='([^']+)'[^>]+><\/a>/;
+    const HREF_REGEXP = /href=['"]([^'"]+)['"]/;
 
     it('should prerender normal permalink', () => {
       const result = prerenderChatHelper(chat, params);
-      const [, href] = archiveLink.exec(result);
+      const [, href] = HREF_REGEXP.exec(result);
       assert.strictEqual(href, `${clientEnv['basePath']}/group/room?at=5c94afb8b9552a27a7930fbb`);
     });
 
     it('should prerender archive permalink', () => {
       const result = prerenderChatHelper(chat, { ...params, hash: { type: 'archive' } });
-      const [, href] = archiveLink.exec(result);
+      const [, href] = HREF_REGEXP.exec(result);
       assert.strictEqual(
         href,
         `${clientEnv['basePath']}/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb`
