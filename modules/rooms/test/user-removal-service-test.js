@@ -1,19 +1,43 @@
 'use strict';
 
-var Promise = require('bluebird');
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var assert = require('assert');
-var User = require('gitter-web-persistence').User;
-var Identity = require('gitter-web-persistence').Identity;
-var userRemovalService = require('../lib/user-removal-service');
+const Promise = require('bluebird');
+const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const assert = require('assert');
+const persistence = require('gitter-web-persistence');
+const User = persistence.User;
+const Identity = persistence.Identity;
+const TroupeUser = persistence.TroupeUser;
+const userRemovalService = require('../lib/user-removal-service');
 
 describe('user-removal-service', function() {
   var fixture = fixtureLoader.setup({
     user1: {},
+    userWithRooms1: {},
     identity1: {
       user: 'user1',
       provider: 'gitlab',
       providerKey: 'abcd1234'
+    },
+    group1: {},
+    troupe1: { users: ['userWithRooms1'] },
+    troupe2: { users: ['userWithRooms1'] },
+    troupe3: { users: ['userWithRooms1'] },
+    troupe4: { users: ['userWithRooms1'] },
+    troupe5: { users: ['userWithRooms1'] },
+    troupe6: { users: ['userWithRooms1'] },
+    troupe7: { users: ['userWithRooms1'] },
+    troupe8: { users: ['userWithRooms1'] },
+    troupe1Group1: {
+      group: 'group1',
+      users: ['userWithRooms1']
+    },
+    troupe2Group1: {
+      group: 'group1',
+      users: ['userWithRooms1']
+    },
+    troupe3Group1: {
+      group: 'group1',
+      users: ['userWithRooms1']
     }
   });
 
@@ -48,6 +72,16 @@ describe('user-removal-service', function() {
           assert.strictEqual(identities.length, 0);
         })
         .nodeify(done);
+    });
+
+    it('should remove room membership', async () => {
+      const roomMembershipBefore = await TroupeUser.find({ userId: fixture.userWithRooms1._id });
+      assert.strictEqual(roomMembershipBefore.length, 11);
+
+      await userRemovalService.removeByUsername(fixture.userWithRooms1.username);
+
+      const roomMembershipAfter = await TroupeUser.find({ userId: fixture.userWithRooms1._id });
+      assert.strictEqual(roomMembershipAfter.length, 0);
     });
   });
 });
