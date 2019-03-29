@@ -20,6 +20,7 @@ const isMobile = require('../../utils/is-mobile');
 const isAndroid = require('../../utils/is-android');
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const DoubleTapper = require('../../utils/double-tapper');
 const LoadingCollectionMixin = require('../loading-mixin');
 const FastAttachMixin = require('../fast-attach-mixin');
@@ -570,6 +571,8 @@ module.exports = (function() {
 
     permalink: function(e) {
       if (!this.isPermalinkable) return;
+      // not using app events for archive
+      if (context().archive) return;
 
       // Can't permalink a chat which hasn't been saved to the server yet
       if (!this.model.id) return;
@@ -667,7 +670,9 @@ module.exports = (function() {
       var uri = context.troupe().get('uri');
       if (!uri) return '';
 
-      return clientEnv['basePath'] + '/' + uri + '?at=' + modelId;
+      const sent = this.model.get('sent');
+
+      return generatePermalink(clientEnv['basePath'], uri, modelId, sent, !!context().archive);
     },
 
     getSentTimeTooltip: function() {
