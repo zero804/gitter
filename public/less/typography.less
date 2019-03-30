@@ -1,7 +1,7 @@
-
-@import (less) "../fonts/fontello/css/fontello.css";
-@import (less) "../fonts/octicons/octicons.css";
-@import "./mixins/text/default-fonts";
+@import (less) '../fonts/fontello/css/fontello.css';
+@import (less) '../fonts/fontello/css/animation.css';
+@import (less) '../fonts/octicons/octicons.css';
+@import './mixins/text/default-fonts';
 
 /* THIS HAS INTENTIONALLY BEEN COMMENTED OUT AND WILL BE USED FOR WHEN THE HOME PAGE USES THIS LESS FILE*/
 /*@font-face {
@@ -30,7 +30,11 @@ p {
   margin-bottom: 1.3em;
 }
 
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   margin: 0;
   font-weight: 600;
   line-height: 1.2;
@@ -43,7 +47,9 @@ h1 {
 }
 
 // TODO: Remove because duplicate of `markdown.less`
-h2 {font-size: 1.424em;}
+h2 {
+  font-size: 1.424em;
+}
 
 // TODO: Remove because duplicate of `markdown.less`
 h2 + p {
@@ -51,20 +57,34 @@ h2 + p {
 }
 
 // TODO: Remove because duplicate of `markdown.less`
-h3 {font-size: 1.266em;}
+h3 {
+  font-size: 1.266em;
+}
 
 // TODO: Remove because duplicate of `markdown.less`
-h4 {font-size: 1.125em;}
+h4 {
+  font-size: 1.125em;
+}
 
 // TODO: Remove because duplicate of `markdown.less`
-h5 {font-size: 1em; text-transform: uppercase; margin-bottom: 0.2em; font-weight: 400;}
+h5 {
+  font-size: 1em;
+  text-transform: uppercase;
+  margin-bottom: 0.2em;
+  font-weight: 400;
+}
 
-small, .u-font-smaller {font-size: 0.889em;}
+small,
+.u-font-smaller {
+  font-size: 0.889em;
+}
 // TODO: Remove because duplicate of `markdown.less`
-ul, ol {
+ul,
+ol {
   margin-top: 0;
   margin-bottom: 0.6;
-  ul, ol {
+  ul,
+  ol {
     margin-bottom: 0;
   }
 }
@@ -81,7 +101,6 @@ input {
   color: @error-red;
 }
 
-
 body {
   // This hack appears in an old Chrome issue to fix font rendering similar to what we're experiencing
   // https://bugs.chromium.org/p/chromium/issues/detail?id=336476#c40
@@ -93,6 +112,10 @@ body {
 }
 
 @-webkit-keyframes fontfix {
-  from { opacity: 1; }
-  to   { opacity: 1; }
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+  }
 }

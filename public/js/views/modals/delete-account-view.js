@@ -64,16 +64,40 @@ var Modal = ModalView.extend({
         // Notify others, that they shouldn't redirect while we are trying to logout
         appEvents.trigger('account.delete-start');
 
+        // Disable the button so they can't click it again
+        this.setButtonState('delete', false);
+
+        this.lockModel.set('deletionRequestLoading', true);
+        this.lockModel.set('deletionRequestSucceeded', false);
+        this.lockModel.set('deletionRequestError', undefined);
+
         apiClient.user
           .delete('/', {
             ghost: this.lockModel.get('ghost') || false
           })
           .then(() => {
+            this.lockModel.set('deletionRequestSucceeded', true);
             return logout();
           })
           .catch(err => {
             log.error('Error while deleting account', { exception: err });
-            this.model.set('error', `Error while deleting account: ${err} (status: ${err.status})`);
+
+            if (err.statusText === 'timeout') {
+              this.lockModel.set(
+                'deletionRequestError',
+                `The request timed out but your account is probably still in the process of being deleted on our end (especially if you joined a lot of rooms). Please wait a couple hours before trying again : ${err} (status: ${
+                  err.status
+                })`
+              );
+            } else {
+              this.lockModel.set(
+                'deletionRequestError',
+                `Error while deleting account: ${err} (status: ${err.status})`
+              );
+            }
+          })
+          .then(() => {
+            this.lockModel.set('deletionRequestLoading', false);
           });
         break;
 
