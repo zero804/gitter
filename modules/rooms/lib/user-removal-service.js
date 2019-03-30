@@ -22,13 +22,17 @@ exports.removeByUsername = function(username, options = {}) {
       })
       .then(function(troupes) {
         return Promise.all(
-          troupes.map(function(troupe) {
-            if (troupe.oneToOne) {
-              return roomService.deleteRoom(troupe);
-            } else {
-              return roomService.removeUserFromRoom(troupe, user);
-            }
-          })
+          Promise.map(
+            troupes,
+            function(troupe) {
+              if (troupe.oneToOne) {
+                return roomService.deleteRoom(troupe);
+              } else {
+                return roomService.removeUserFromRoom(troupe, user);
+              }
+            },
+            { concurrency: 1 }
+          )
         );
       })
       .then(function() {

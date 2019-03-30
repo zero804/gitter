@@ -31,8 +31,20 @@ You can sign back in at any time to re-create your account.
 <br>
 Are you sure you want to do this?{{#if locked }} <em>(unlocking in {{secondsLeft }})</em>{{/if}}
 
-{{#if error }}
+{{#if deletionRequestLoading }}
   <br>
   <br>
-  <span class="error-text">{{error}}</span>
+  <i class="icon-spin animate-spin"></i>
+{{/if}}
+
+{{#if deletionRequestSucceeded }}
+  <br>
+  <br>
+  Successfully deleted your account, signing you out
+{{/if}}
+
+{{#if deletionRequestError }}
+  <br>
+  <br>
+  <span class="error-text">{{deletionRequestError}}</span>
 {{/if}}
