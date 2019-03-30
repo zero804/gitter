@@ -1,10 +1,14 @@
-# 19.41.0 - *upcoming*
+# 19.41.0 - 2019-3-29
 
  - Fix error thrown on archive navigation view by missing profile element so that the rest of the JavaScript runs, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1370
  - Fix commit reference short syntax decorations being mangled, `<group>/<project>@<commit sha>`
     - Thanks to [@peterhull90](https://gitlab.com/peterhull90) for the contribution, https://gitlab.com/gitlab-org/gitter/gitter-marked/merge_requests/11
     - https://gitlab.com/gitlab-org/gitter/gitter-markdown-processor/merge_requests/19
     - https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1371
+ - Add better frontend UI feedback around account deletion request, https://gitlab.com/gitlab-com/gl-infra/production/issues/749
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/20
+ - Limit concurrency on removing room membership when deleting account, https://gitlab.com/gitlab-com/gl-infra/production/issues/749
+    - https://gitlab.com/MadLittleMods/webapp/merge_requests/21
 
 
 # 19.40.0 - 2019-3-21
