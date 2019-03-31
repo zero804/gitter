@@ -4,6 +4,9 @@ stages:
   - pre_deploy
   - deploy
 
+variables:
+  DOCKER_DRIVER: overlay2
+
 .node_job: &node_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp
   before_script:
@@ -115,8 +118,6 @@ containerize:
   dependencies:
     - package
   allow_failure: true
-  variables:
-    DOCKER_DRIVER: overlay
   services:
     - docker:dind
   script:
@@ -134,8 +135,6 @@ deploy-build-image:
     - docker:dind
   only:
     - schedules
-  variables:
-    DOCKER_DRIVER: overlay
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
@@ -232,8 +231,6 @@ docker-base:
   stage: docker_images
   only:
     - schedules
-  variables:
-    DOCKER_DRIVER: overlay
   services:
     - docker:dind
   script:
@@ -248,8 +245,6 @@ mongo-base:
   image: docker:latest
   only:
     - schedules
-  variables:
-    DOCKER_DRIVER: overlay
   services:
     - docker:dind
   script:
@@ -264,8 +259,6 @@ elasticsearch-base:
   image: docker:latest
   only:
     - schedules
-  variables:
-    DOCKER_DRIVER: overlay
   services:
     - docker:dind
   script:
