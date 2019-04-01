@@ -354,9 +354,8 @@ onready(function() {
 
         case 'permalink.requested':
           var url = message.url + '?at=' + message.id;
-          var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
           var title = message.url.substring(1);
-          pushState(frameUrl, title, url);
+          appEvents.trigger('navigation', url, message.permalinkType, title);
           break;
 
         case 'toggle-dark-theme':
