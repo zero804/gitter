@@ -57,14 +57,14 @@ automatically by using the **Integrations** menu shown above:
 4. Select one or more repositories from the displayed list
 
 Events occurring in the selected repositories will now be displayed
-in the channel as notifications.
+in the room as notifications.
 
 #### Per-organisation
 
 It may be desirable to automatically receive all notifications for
 all repositories in a given GitHub organisation.  If your GitHub
 organisation frequently adds repositories, and you have a single Gitter
-channel for the entire organisation, it can be rather laborious to
+room for the entire organisation, it can be rather laborious to
 continually add new integrations for each new repository.  Currently,
 receiving notifications for an entire organisation requires manual
 configuration.
@@ -89,5 +89,5 @@ Note that `e07c5162bd8b` should obviously be replaced with the access token
 generated for you in step `2` above.
 
 Confirm the addition of the webhook, and you should now start receiving
-organisation-wide events in the configured Gitter channel.
+organisation-wide events in the configured Gitter room.
 
