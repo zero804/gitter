@@ -190,6 +190,7 @@ module.exports = (function() {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
+      data.showItemActions = !context().archive;
       return data;
     },
 
