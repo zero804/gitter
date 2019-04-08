@@ -8,7 +8,6 @@
 var _ = require('lodash');
 var moment = require('moment');
 var compileTemplate = require('./compile-web-template');
-var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
@@ -42,7 +41,7 @@ module.exports = exports = function(model, params) {
   var root = params.data.root;
 
   // type of this chat view (archive or chat)
-  const type = params.hash.type || 'chat';
+  const itemType = params.hash.type || 'chat';
 
   var troupeName = root.troupeName;
   var lang = root.lang;
@@ -61,7 +60,7 @@ module.exports = exports = function(model, params) {
   }
 
   var sentTimeFormatted = getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone);
-  // TODO: add permalinkUrl and sentTimeFull
+  // TODO: add sentTimeFull
 
   var m = _.extend({}, model, {
     displayName: model.fromUser && model.fromUser.displayName,
@@ -74,14 +73,8 @@ module.exports = exports = function(model, params) {
     tz: tz,
     tzOffset: tzOffset,
     showDatesWithoutTimezone: showDatesWithoutTimezone,
-    permalinkUrl: generatePermalink(
-      clientEnv['basePath'],
-      troupeName,
-      model.id,
-      model.sent,
-      type === 'archive'
-    ),
-    showItemActions: type === 'chat'
+    permalinkUrl: generatePermalink(troupeName, model.id, model.sent, itemType === 'archive'),
+    showItemActions: itemType === 'chat'
   });
 
   var result;

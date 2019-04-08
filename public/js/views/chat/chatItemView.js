@@ -9,7 +9,6 @@ const cocktail = require('backbone.cocktail');
 const urlJoin = require('url-join');
 
 const context = require('../../utils/context');
-const clientEnv = require('gitter-client-env');
 const appEvents = require('../../utils/appevents');
 const apiClient = require('../../components/api-client');
 const dataset = require('../../utils/dataset-shim');
@@ -673,14 +672,14 @@ module.exports = (function() {
 
       const sent = this.model.get('sent');
 
-      return generatePermalink(clientEnv['basePath'], uri, modelId, sent, !!context().archive);
+      return generatePermalink(uri, modelId, sent, !!context().archive);
     },
 
     getSentTimeTooltip: function() {
       var time = this.model.get('sent');
       if (!time) return '';
       var formatted = time.format('LLL');
-      // archive window doesn't have an inputBox so we cant add permalink to it
+      // archive window doesn't have an inputBox so we can't add permalink to it
       if (this.isPermalinkable && formatted && !context().archive) {
         formatted += '  <br>(Alt-click to quote)';
       }
