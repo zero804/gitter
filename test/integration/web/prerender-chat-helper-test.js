@@ -65,7 +65,9 @@ describe('prerenderChatHelper', function() {
       const [, href] = HREF_REGEXP.exec(result);
       assert.strictEqual(
         href,
-        `${clientEnv['basePath']}/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb`
+        `${
+          clientEnv['basePath']
+        }/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb&timestamp=2019-03-22T09:49:43.939Z`
       );
     });
   });
