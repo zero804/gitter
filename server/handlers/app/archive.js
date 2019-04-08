@@ -303,15 +303,9 @@ exports.chatArchive = [
       ordinalPart = '';
     }
 
-    const previousDateFormatted = p && p.locale(language).format('Do MMM YYYY');
     const dayNameFormatted = numericDate;
     const dayOrdinalFormatted = ordinalPart;
     const previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
-    const nextDateFormatted =
-      n &&
-      moment(n.valueOf())
-        .locale(language)
-        .format('Do MMM YYYY');
     const nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
     const monthYearFormatted = startDateLocale.format('MMM YYYY');
 
@@ -352,11 +346,9 @@ exports.chatArchive = [
       isPrivate: isPrivate,
 
       /* For prerendered archive-navigation-view */
-      previousDate: previousDateFormatted,
       dayName: dayNameFormatted,
       dayOrdinal: dayOrdinalFormatted,
       previousDateLink: previousDateLink,
-      nextDate: nextDateFormatted,
       nextDateLink: nextDateLink,
       monthYearFormatted: monthYearFormatted,
 
