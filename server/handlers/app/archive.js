@@ -1,3 +1,4 @@
+/* eslint complexity: ["error", 20] */
 'use strict';
 
 var env = require('gitter-web-env');
@@ -14,6 +15,8 @@ var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var burstCalculator = require('../../utils/burst-calculator');
 var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const clientEnv = require('gitter-client-env');
 var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
 var fonts = require('../../web/fonts');
@@ -220,6 +223,21 @@ exports.chatArchive = [
       .add(1, 'days')
       .toDate();
 
+    const aroundId = fixMongoIdQueryParam(req.query.at);
+    const itemTimestamp = req.query.timestamp && moment(req.query.timestamp);
+
+    // If a permalink was generated in a different timezone, the message might have been
+    // sent on a different day in local timezone. If so, we'll redirect to that day.
+    if (
+      itemTimestamp &&
+      aroundId &&
+      (itemTimestamp.isBefore(startDateLocal) || itemTimestamp.isAfter(endDateLocal))
+    ) {
+      res.redirect(
+        generatePermalink(clientEnv['basePath'], troupe.uri, aroundId, itemTimestamp, true)
+      );
+    }
+
     const today = moment().endOf('day');
     if (
       moment(nextDateUTC)
@@ -263,7 +281,6 @@ exports.chatArchive = [
       previousDate: previousDateUTC,
       messages: serialized
     };
-    const aroundId = fixMongoIdQueryParam(req.query.at);
     troupeContext.permalinkChatId = aroundId;
 
     let language = req.headers['accept-language'];
