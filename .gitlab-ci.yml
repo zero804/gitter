@@ -3,9 +3,18 @@ stages:
   - build_unit_test
   - pre_deploy
   - deploy
+  # For Security include templates
+  - test
+  - dast
 
 variables:
   DOCKER_DRIVER: overlay2
+
+include:
+  - template: SAST.gitlab-ci.yml
+  - template: DAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 
 .node_job: &node_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp
