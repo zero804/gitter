@@ -9,3 +9,10 @@ RUN tar -xvzf /tmp/app.tar.gz -C /app && \
     npm install --production
 
 RUN rm -rf /tmp/* /npm_cache /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=2s --timeout=5s --retries=3 --start-period=20s \
+  CMD npm run health-check
+
+CMD ["/bin/bash", "-c", "node web.js"]
