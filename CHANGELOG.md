@@ -1,3 +1,11 @@
+# 19.42.0 - *upcoming*
+
+Developer facing:
+
+ - Use overlay2 storage driver on Docker build on CI
+    - Thanks to [@tnir](https://gitlab.com/tnir) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1372
+
+
 # 19.41.0 - 2019-3-29
 
  - Fix error thrown on archive navigation view by missing profile element so that the rest of the JavaScript runs, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1370
