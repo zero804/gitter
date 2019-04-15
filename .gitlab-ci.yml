@@ -16,6 +16,11 @@ include:
   - template: Dependency-Scanning.gitlab-ci.yml
   - template: Container-Scanning.gitlab-ci.yml
 
+container_scanning:
+  variables:
+    CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+
 .node_job: &node_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp
   before_script:
