@@ -15,8 +15,15 @@ var fonts = require('../../web/fonts');
 
 var routes = {};
 
+const SCOPE_WHITELIST = {
+  'user:email': true,
+  'read:org': true,
+  repo: true
+};
+
 function getScopesFromReq(req) {
-  const newScopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
+  const inputScopes = req.query.scopes ? req.query.scopes.split(/\s*,\s*/) : [''];
+  const newScopes = inputScopes.filter(scope => SCOPE_WHITELIST[scope]);
   newScopes.push('user:email');
   newScopes.push('read:org');
 
