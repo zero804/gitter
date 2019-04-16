@@ -29,12 +29,12 @@ describe('prerenderChatHelper', function() {
 
   it('should render item actions for normal chat item', () => {
     const result = prerenderChatHelper(baseChat, { data: { root: {} }, hash: {} });
-    assert(result.indexOf('chat-item__icon') > 0);
+    assert(result.indexOf('chat-item__actions') > 0);
   });
 
   it('should not render item actions for archive chat item', () => {
     const result = prerenderChatHelper(baseChat, { data: { root: {} }, hash: { type: 'archive' } });
-    assert(result.indexOf('chat-item__icon') < 0);
+    assert(result.indexOf('chat-item__actions') < 0);
   });
 
   describe('permaLink', () => {
@@ -67,7 +67,7 @@ describe('prerenderChatHelper', function() {
         href,
         `${
           clientEnv['basePath']
-        }/group/room/archives/2019/03/22/?at=5c94afb8b9552a27a7930fbb&timestamp=2019-03-22T09:49:43.939Z`
+        }/group/room/archives/2019/03/22?at=5c94afb8b9552a27a7930fbb&timestamp=2019-03-22T09:49:43.939Z`
       );
     });
   });

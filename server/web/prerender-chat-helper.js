@@ -40,8 +40,7 @@ module.exports = exports = function(model, params) {
 
   var root = params.data.root;
 
-  // type of this chat view (archive or chat)
-  const itemType = params.hash.type || 'chat';
+  const isArchive = params.hash.type === 'archive';
 
   var troupeName = root.troupeName;
   var lang = root.lang;
@@ -73,8 +72,8 @@ module.exports = exports = function(model, params) {
     tz: tz,
     tzOffset: tzOffset,
     showDatesWithoutTimezone: showDatesWithoutTimezone,
-    permalinkUrl: generatePermalink(troupeName, model.id, model.sent, itemType === 'archive'),
-    showItemActions: itemType === 'chat'
+    permalinkUrl: generatePermalink(troupeName, model.id, model.sent, isArchive),
+    showItemActions: !isArchive
   });
 
   var result;

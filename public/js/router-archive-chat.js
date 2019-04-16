@@ -49,8 +49,8 @@ onready(function() {
   const ArchiveChatCollection = Backbone.Collection.extend({
     model: ChatModel,
     modelName: 'chat',
-    fetchMoreBefore: () => 'nop',
-    ensureLoaded: function(id, callback = () => 'nop') {
+    fetchMoreBefore: () => 'noop',
+    ensureLoaded: function(id, callback = () => 'noop') {
       callback(null, this.get(id));
     }
   });
