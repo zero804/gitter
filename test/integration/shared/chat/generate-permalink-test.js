@@ -21,7 +21,7 @@ describe('generate-permalink', () => {
     const permalink = generatePermalink(troupeName, id, sent, true);
     assert.strictEqual(
       permalink,
-      `${basePath}/group/room/archives/2019/03/22?at=5c94afb8b9552a27a7930fbb&timestamp=2019-03-22T09:49:43.939Z`
+      `${basePath}/group/room/archives/2019/03/22?at=5c94afb8b9552a27a7930fbb`
     );
   });
 });

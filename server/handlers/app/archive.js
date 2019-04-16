@@ -223,16 +223,17 @@ exports.chatArchive = [
       .toDate();
 
     const aroundId = fixMongoIdQueryParam(req.query.at);
-    const itemTimestamp = req.query.timestamp && moment(req.query.timestamp);
+    const chatMessage = await chatService.findById(aroundId);
+    const messageSent = chatMessage && moment(chatMessage.sent);
 
     // If a permalink was generated in a different timezone, the message might have been
     // sent on a different day in local timezone. If so, we'll redirect to that day.
     if (
-      itemTimestamp &&
+      messageSent &&
       aroundId &&
-      (itemTimestamp.isBefore(startDateLocal) || itemTimestamp.isAfter(endDateLocal))
+      (messageSent.isBefore(startDateLocal) || messageSent.isAfter(endDateLocal))
     ) {
-      res.redirect(generatePermalink(troupe.uri, aroundId, itemTimestamp, true));
+      res.redirect(generatePermalink(troupe.uri, aroundId, messageSent, true));
     }
 
     const today = moment().endOf('day');

@@ -8,13 +8,7 @@ module.exports = (troupeName, id, sent, isArchive) => {
   const basePath = clientEnv['basePath'];
   if (isArchive) {
     const urlDate = moment(sent).format('YYYY/MM/DD');
-    return urlJoin(
-      basePath,
-      troupeName,
-      'archives',
-      urlDate,
-      `?at=${id}&timestamp=${moment(sent).toISOString()}`
-    );
+    return urlJoin(basePath, troupeName, 'archives', urlDate, `?at=${id}`);
   }
   return urlJoin(basePath, troupeName, `?at=${id}`);
 };
