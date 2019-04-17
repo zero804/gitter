@@ -8,6 +8,7 @@ var Promise = require('bluebird');
 var moment = require('moment');
 var _ = require('underscore');
 var StatusError = require('statuserror');
+var urlParse = require('url-parse');
 
 var chatService = require('gitter-web-chats');
 var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
@@ -224,16 +225,16 @@ exports.chatArchive = [
 
     const aroundId = fixMongoIdQueryParam(req.query.at);
     const chatMessage = await chatService.findById(aroundId);
-    const messageSent = chatMessage && moment(chatMessage.sent);
-
-    // If a permalink was generated in a different timezone, the message might have been
-    // sent on a different day in local timezone. If so, we'll redirect to that day.
-    if (
-      messageSent &&
-      aroundId &&
-      (messageSent.isBefore(startDateLocal) || messageSent.isAfter(endDateLocal))
-    ) {
-      res.redirect(generatePermalink(troupe.uri, aroundId, messageSent, true));
+    if (chatMessage) {
+      // If a permalink was generated in a different timezone, the message might have been
+      // sent on a different day in local timezone. If so, we'll redirect to that day.
+      const messageSent = moment(chatMessage.sent);
+      const permalink = generatePermalink(troupe.uri, aroundId, messageSent, true);
+      const parsedPermalink = urlParse(permalink);
+      const relativePermalink = `${parsedPermalink.pathname}${parsedPermalink.query}`;
+      if (req.url !== relativePermalink) {
+        res.redirect(permalink);
+      }
     }
 
     const today = moment().endOf('day');
