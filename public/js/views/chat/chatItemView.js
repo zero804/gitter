@@ -189,7 +189,7 @@ module.exports = (function() {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
-      data.showItemActions = !context().archive;
+      data.showItemActions = !this.isArchive();
       return data;
     },
 
@@ -405,6 +405,8 @@ module.exports = (function() {
       return context().embedded;
     },
 
+    isArchive: () => !!context().archive,
+
     canEdit: function() {
       return (
         this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded()
@@ -572,7 +574,7 @@ module.exports = (function() {
     permalink: function(e) {
       if (!this.isPermalinkable) return;
       // not using app events for archive
-      if (context().archive) return;
+      if (this.isArchive()) return;
 
       // Can't permalink a chat which hasn't been saved to the server yet
       if (!this.model.id) return;
@@ -672,7 +674,7 @@ module.exports = (function() {
 
       const sent = this.model.get('sent');
 
-      return generatePermalink(uri, modelId, sent, !!context().archive);
+      return generatePermalink(uri, modelId, sent, this.isArchive());
     },
 
     getSentTimeTooltip: function() {
@@ -680,7 +682,7 @@ module.exports = (function() {
       if (!time) return '';
       var formatted = time.format('LLL');
       // archive window doesn't have an inputBox so we can't add permalink to it
-      if (this.isPermalinkable && formatted && !context().archive) {
+      if (this.isPermalinkable && formatted && !this.isArchive()) {
         formatted += '  <br>(Alt-click to quote)';
       }
 
