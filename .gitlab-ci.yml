@@ -69,6 +69,8 @@ mobile-asset-build:
   stage: build_unit_test
   only:
     - master
+  variables:
+    NODE_ENV: prod
   script:
     - npm run task-js
     - npm run build-android-assets
