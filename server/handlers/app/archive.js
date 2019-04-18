@@ -9,6 +9,7 @@ var moment = require('moment');
 var _ = require('underscore');
 var StatusError = require('statuserror');
 var urlParse = require('url-parse');
+const asyncHandler = require('express-async-handler');
 
 var chatService = require('gitter-web-chats');
 var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
@@ -192,16 +193,12 @@ exports.chatArchive = [
   uriContextResolverMiddleware,
   preventClickjackingMiddleware,
   timezoneMiddleware,
-  async (req, res, next) => {
+  asyncHandler(async (req, res, next) => {
     const user = req.user;
     const troupe = req.uriContext.troupe;
     const policy = req.uriContext.policy;
 
-    try {
-      await validateRoomForReadOnlyAccess(user, policy);
-    } catch (e) {
-      next(e);
-    }
+    await validateRoomForReadOnlyAccess(user, policy);
     const troupeId = troupe.id;
 
     // This is where we want non-logged-in users to return
@@ -358,6 +355,6 @@ exports.chatArchive = [
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies)
     });
-  },
+  }),
   redirectErrorMiddleware
 ];
