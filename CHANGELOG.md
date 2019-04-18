@@ -1,3 +1,10 @@
+# 19.43.0 - *upcoming*
+
+Developer facing:
+
+ - Fix mobile asset build not using `prod` env (Android, iOS), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1377
+
+
 # 19.42.0 - 2019-4-16
 
  - Add documentation on how to manually configure of GitHub organisation integration/activity events
