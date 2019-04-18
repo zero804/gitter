@@ -672,7 +672,7 @@ module.exports = (function() {
       var uri = context.troupe().get('uri');
       if (!uri) return '';
 
-      const sent = this.model.get('sent');
+      const sent = moment(this.model.get('sent'), moment.defaultFormat);
 
       return generatePermalink(uri, modelId, sent, this.isArchive());
     },

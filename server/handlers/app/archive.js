@@ -225,8 +225,7 @@ exports.chatArchive = [
     if (chatMessage) {
       // If a permalink was generated in a different timezone, the message might have been
       // sent on a different day in local timezone. If so, we'll redirect to that day.
-      const messageSent = moment(chatMessage.sent);
-      const permalink = generatePermalink(troupe.uri, aroundId, messageSent, true);
+      const permalink = generatePermalink(troupe.uri, aroundId, chatMessage.sent, true);
       const parsedPermalink = urlParse(permalink);
       const relativePermalink = `${parsedPermalink.pathname}${parsedPermalink.query}`;
       if (req.url !== relativePermalink) {
