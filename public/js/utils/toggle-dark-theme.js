@@ -17,5 +17,7 @@ module.exports = function toggleDarkTheme(shouldAdd) {
   }
 
   var darkThemeLink = document.getElementById(scriptID);
-  return darkThemeLink.remove();
+  if (darkThemeLink) {
+    darkThemeLink.remove();
+  }
 };
