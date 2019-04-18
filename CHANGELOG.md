@@ -1,4 +1,4 @@
-# 19.43.0 - *upcoming*
+# 19.43.0 - 2019-4-18
 
 Developer facing:
 
