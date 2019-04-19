@@ -1,3 +1,10 @@
+# 19.44.0 - 2019-4-19
+
+Developer facing:
+
+ - Let mobile asset build exit when running `NODE_ENV=prod`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1380
+
+
 # 19.43.0 - 2019-4-18
 
 Developer facing:
