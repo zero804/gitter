@@ -71,6 +71,8 @@ mobile-asset-build:
     - master
   variables:
     NODE_ENV: prod
+    stats__cube__enabled: 'false'
+    stats__statsd__enabled: 'false'
   script:
     - npm run task-js
     - npm run build-android-assets
