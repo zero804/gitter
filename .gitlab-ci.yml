@@ -303,3 +303,20 @@ elasticsearch-base:
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
   tags:
     - docker
+
+before_dependency_scanning:
+  image: registry.gitlab.com/gitlab-org/gitter/webapp
+  stage: build_unit_test
+  script:
+    - make npm
+  artifacts:
+    expire_in: 31d
+    when: always
+    paths:
+      - node_modules/
+      - modules/*/node_modules
+      - shared/node_modules
+
+dependency_scanning:
+  dependencies:
+    - before_dependency_scanning
