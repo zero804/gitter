@@ -6,7 +6,7 @@ const proxyquireNoCallThru = require('proxyquire').noCallThru();
 //const GitLabIssuableService = require('..').GitLabIssuableService;
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-describe('gitlab-issue-service #slow #gitlab', function() {
+describe('gitlab-issue-service #flakey #slow #gitlab', function() {
   // These tests timeout at 10000 sometimes otherwise
   this.timeout(30000);
 

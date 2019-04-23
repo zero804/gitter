@@ -10,7 +10,7 @@ describe('email-address-service #github', function() {
     'GITTER_INTEGRATION_EMAIL'
   );
 
-  describe('integration #slow', function() {
+  describe('integration #flakey #slow', function() {
     it('should return the validated email address if the user has a token', function() {
       var service = require('../lib/github-email-address-service');
 

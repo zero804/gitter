@@ -6,7 +6,7 @@ var GitHubIssueService = require('..').GitHubIssueService;
 var GitHubRepoService = require('..').GitHubRepoService;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-describe('github-issue-service #slow #github', function() {
+describe('github-issue-service #flakey #slow #github', function() {
   // These tests timeout at 10000 sometimes otherwise
   this.timeout(30000);
 
