@@ -232,8 +232,8 @@ exports.chatArchive = [
        * res.locals.tzOffset is always defined (0 is default), it represents inverted UTC offset (-120 for +02:00)
        * see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
        */
-      const sentWithTimezone = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
-      const permalink = generatePermalink(troupe.uri, aroundId, sentWithTimezone, true);
+      const sentLocal = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
+      const permalink = generatePermalink(troupe.uri, aroundId, sentLocal, true);
       const parsedPermalink = urlParse(permalink);
       const relativePermalink = `${parsedPermalink.pathname}${parsedPermalink.query}`;
       if (req.url !== relativePermalink) {
