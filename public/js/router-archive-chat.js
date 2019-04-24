@@ -49,7 +49,7 @@ onready(function() {
   const ArchiveChatCollection = Backbone.Collection.extend({
     model: ChatModel,
     modelName: 'chat',
-    // When on the archive view, we only show the messages for the given day(no infinite scroll)
+    // When on the archive view, we only show the messages for the given day (no infinite scroll)
     // so we want to avoid loading any more and pass a noop function here
     fetchMoreBefore: () => 'noop',
     ensureLoaded: function(id, callback = () => 'noop') {

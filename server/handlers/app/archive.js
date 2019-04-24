@@ -223,10 +223,16 @@ exports.chatArchive = [
     const aroundId = fixMongoIdQueryParam(req.query.at);
     const chatMessage = await chatService.findById(aroundId);
     if (chatMessage) {
-      // If a permalink was generated in a different timezone, the message might have been
-      // sent on a different day in local timezone. If so, we'll redirect to that day.
-      // The redirect may as well happen if we fixed the message ID from URL.
-      const sentWithTimezone = moment(chatMessage.sent).zone(res.locals.tzOffset);
+      /*
+       * If a permalink was generated in a different timezone, the message might have been
+       * sent on a different day in the local timezone. If so, we'll redirect to that day.
+       *
+       * The redirect may as well happen if we fixed the message ID from URL.
+       *
+       * res.locals.tzOffset is always defined (0 is default), it represents inverted UTC offset (-120 for +02:00)
+       * see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
+       */
+      const sentWithTimezone = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
       const permalink = generatePermalink(troupe.uri, aroundId, sentWithTimezone, true);
       const parsedPermalink = urlParse(permalink);
       const relativePermalink = `${parsedPermalink.pathname}${parsedPermalink.query}`;
