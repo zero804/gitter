@@ -34,11 +34,14 @@ validate:
     # to re-use the scripts that GitLab has, https://gitlab.com/gitlab-org/gitlab-ce/issues/57010
     - npm run prettier -- --check "**/*.js"
 
-test:
+.test_variables: &test_variables
+  BLUEBIRD_DEBUG: 1
+  NEO4J_AUTH: none
+
+.test_job: &test_job
   <<: *node_job
   variables:
-    BLUEBIRD_DEBUG: 1
-    NEO4J_AUTH: none
+    <<: *test_variables
   stage: build_unit_test
   services:
     - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
@@ -47,6 +50,21 @@ test:
     - neo4j:2.3
   script:
     - make ci-test
+
+test:
+  <<: *test_job
+  except:
+    - release/*
+  retry: 1
+
+test-all:
+  <<: *test_job
+  variables:
+    <<: *test_variables
+    ALLOW_FLAKEY_TESTS: 1
+  only:
+    - release/*
+  retry: 2
 
 package:
   <<: *node_job

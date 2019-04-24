@@ -3,6 +3,7 @@
 Developer facing:
 
  - Let mobile asset build exit when running `NODE_ENV=prod`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1380
+ - Only run flakey tests on release, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1382
 
 
 # 19.43.0 - 2019-4-18
