@@ -681,8 +681,8 @@ module.exports = (function() {
       var time = this.model.get('sent');
       if (!time) return '';
       var formatted = time.format('LLL');
-      // archive window doesn't have an inputBox so we can't add permalink to it
-      if (this.isPermalinkable && formatted && !this.isArchive()) {
+      // archive and nli window don't have an inputBox so we can't add permalink to it
+      if (this.isPermalinkable && formatted && !this.isArchive() && context.isLoggedIn()) {
         formatted += '  <br>(Alt-click to quote)';
       }
 
