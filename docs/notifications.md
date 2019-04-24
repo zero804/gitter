@@ -53,4 +53,6 @@ You can toggle email notifications on and off in the "Configure Defaults" secti
 
 Emails are batched up and sent in 1 hour chunks. You can track [this issue](https://gitlab.com/gitlab-org/gitter/webapp/issues/143) for more immediate email notifications.
 
+If you are using the [IRC bridge](https://irc.gitter.im/), it will mark every message as read so you won't receive any emails.
+
 ![](http://imgur.com/uKLeHd6.gif)

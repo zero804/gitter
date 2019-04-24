@@ -1,6 +1,7 @@
 # 19.45.0 - *upcoming*
 
  - Add docs to clarify when email notifications are sent out, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1383
+ - Add docs to clarify why email notifications are not sent when using IRC bridge, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1384
 
 
 # 19.44.0 - 2019-4-19
