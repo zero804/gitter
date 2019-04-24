@@ -6,6 +6,9 @@ var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
 const ArchiveLayout = require('./views/layouts/archive');
 const ChatModel = require('./collections/chat.js').ChatModel;
+const appEvents = require('./utils/appevents');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const moment = require('moment');
 
 /* Set the timezone cookie */
 require('./components/timezone-cookie');
@@ -21,6 +24,16 @@ require('./components/ping');
 require('./views/widgets/avatar');
 
 require('@gitterhq/styleguide/css/components/buttons.css');
+
+function pushState(state, title, url) {
+  if (state === window.history.state) {
+    // Don't repush the same state...
+    return;
+  }
+
+  window.history.pushState(state, title, url);
+  appEvents.trigger('track', url);
+}
 
 onready(function() {
   $(document).on('click', 'a', function(e) {
@@ -44,6 +57,14 @@ onready(function() {
 
     e.preventDefault();
     window.parent.location.href = href;
+  });
+
+  appEvents.on('permalink.requested', function(type, chatItem) {
+    const troupeUrl = context.troupe().get('url');
+    const id = chatItem.id;
+    const sent = moment(chatItem.get('sent'), moment.defaultFormat);
+    const url = generatePermalink(troupeUrl, id, sent, true);
+    pushState(url, troupeUrl, url);
   });
 
   const ArchiveChatCollection = Backbone.Collection.extend({

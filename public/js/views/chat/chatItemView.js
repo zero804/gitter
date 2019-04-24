@@ -573,9 +573,6 @@ module.exports = (function() {
 
     permalink: function(e) {
       if (!this.isPermalinkable) return;
-      // not using app events for archive
-      if (this.isArchive()) return;
-
       // Can't permalink a chat which hasn't been saved to the server yet
       if (!this.model.id) return;
 
