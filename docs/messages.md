@@ -139,6 +139,15 @@ The archive heatmap currently only shows a year but you can manually navigate by
 ![](https://i.imgur.com/L8VrjAn.png)
 
 
+## Permalinks
+
+Click the timestamp in the top-right of any message and copy the URL from the address bar. You can also `Alt + Click` the timestamp to insert a markdown snippet into the message input.
+
+![](https://i.imgur.com/xAiznSp.gif)
+
+![](https://i.imgur.com/AxBF0Ep.png)
+
+
 ## Tips for crafting a great message
 
 Some tips to improve your chances of getting a quick response and a great interaction.
