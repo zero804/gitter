@@ -183,8 +183,9 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   setupProfileMenu: function() {
-    if (context.isLoggedIn()) {
-      //If an instance of the profile menu exists destory it to remove listeners etc
+    // HeaderView is reused for archive view but we don't show profile menu in archvie.
+    if (context.isLoggedIn() && !this.isArchive()) {
+      //If an instance of the profile menu exists destroy it to remove listeners etc
       if (this.profileMenu) {
         this.profileMenu.destroy();
       }
@@ -257,6 +258,9 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   goToOrgRooms: function(e) {
+    // archive router is not ready to handle app events yet.
+    if (this.isArchive()) return;
+
     e.preventDefault();
     var group = this.model.get('group');
     if (!group) return;
@@ -342,6 +346,9 @@ var HeaderView = Marionette.ItemView.extend({
   requestBrowserNotificationsPermission: function() {
     userNotifications.requestAccess();
   },
+
+  // Is HeaderView rendered as a part of archive view?
+  isArchive: () => !!context().archive,
 
   // Look at the attributes that have changed
   // and decide whether to re-render
