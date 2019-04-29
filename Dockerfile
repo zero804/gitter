@@ -1,11 +1,11 @@
-FROM node:10.15.0
+FROM node:10.15.3
 
 RUN mkdir -p /app
 RUN mkdir -p /npm_cache
 
 WORKDIR /app
 
-RUN npm install npm@latest-5 -g
+RUN npm install npm@^6 -g
 
 RUN npm config set cache /npm_cache
 RUN npm config set prefer-offline true
