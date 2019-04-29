@@ -4,6 +4,11 @@
  - Add docs to clarify why email notifications are not sent when using IRC bridge, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1384
  - Add docs about how to get a permalink to a message, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1385
 
+Developer facing:
+
+ - Use npm@6 in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1387
+ - Add security harness git hook to restrict pushing to `dev.gitlab.org`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1388
+
 
 # 19.44.0 - 2019-4-19
 
