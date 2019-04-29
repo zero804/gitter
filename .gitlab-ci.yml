@@ -315,7 +315,7 @@ before_dependency_scanning:
     paths:
       - node_modules/
       - modules/*/node_modules
-      - shared/node_modules
+#      - shared/node_modules
 
 dependency_scanning:
   dependencies:
