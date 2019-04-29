@@ -280,6 +280,7 @@
     "nodeselektor": "ns",
     "node-gyp": "node-gyp",
     "prettier": "prettier",
+    "security-harness": "node scripts/security-harness.js",
     "task-js": "gulp clientapp:compile:webpack",
     "task-css": "gulp css:compile",
     "task-fasttest": "gulp test:test --test-fast",
