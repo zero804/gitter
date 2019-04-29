@@ -99,7 +99,7 @@ function spawnMochaProcess(moduleName, options, files) {
   var args;
 
   var argReporter = 'spec';
-  var argTimeout = (options && options.timeout) || 10000;
+  var argTimeout = (options && options.timeout) || 20000;
   var argGrep = grep;
   var argBail = bail;
   var argInvert = false;
