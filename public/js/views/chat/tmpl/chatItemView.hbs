@@ -9,14 +9,16 @@
     </div>
   </div>
   {{/if}}
-  <div class="chat-item__actions js-chat-item-actions">
-    {{#if readByText}}
-    <i class="chat-item__icon icon-check chat-item__icon--read chat-item__icon--read-by-some js-chat-item-readby"></i>
-    {{else}}
-    <i class="chat-item__icon icon-check chat-item__icon--read js-chat-item-readby"></i>
-    {{/if}}
-    <i class="chat-item__icon icon-ellipsis"></i>
-  </div>
+  {{#if showItemActions }}
+    <div class="chat-item__actions js-chat-item-actions">
+      {{#if readByText}}
+      <i class="chat-item__icon icon-check chat-item__icon--read chat-item__icon--read-by-some js-chat-item-readby"></i>
+      {{else}}
+      <i class="chat-item__icon icon-check chat-item__icon--read js-chat-item-readby"></i>
+      {{/if}}
+      <i class="chat-item__icon icon-ellipsis"></i>
+    </div>
+  {{/if}}
   <div class='chat-item__content'>
     {{#if initial}}
       {{! This is a way of forcing the browser to open at the bottom of the screen }}

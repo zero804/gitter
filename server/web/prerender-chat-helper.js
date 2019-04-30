@@ -6,9 +6,10 @@
  */
 
 var _ = require('lodash');
+var moment = require('moment');
 var compileTemplate = require('./compile-web-template');
-var clientEnv = require('gitter-client-env');
 var timeFormat = require('gitter-web-shared/time/time-format');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var chatWrapper = compileTemplate.compileString(
@@ -39,6 +40,8 @@ module.exports = exports = function(model, params) {
 
   var root = params.data.root;
 
+  const isArchive = params.hash.type === 'archive';
+
   var troupeName = root.troupeName;
   var lang = root.lang;
   var locale = root.locale;
@@ -56,7 +59,7 @@ module.exports = exports = function(model, params) {
   }
 
   var sentTimeFormatted = getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone);
-  // TODO: add permalinkUrl and sentTimeFull
+  // TODO: add sentTimeFull
 
   var m = _.extend({}, model, {
     displayName: model.fromUser && model.fromUser.displayName,
@@ -69,7 +72,8 @@ module.exports = exports = function(model, params) {
     tz: tz,
     tzOffset: tzOffset,
     showDatesWithoutTimezone: showDatesWithoutTimezone,
-    permalinkUrl: clientEnv['basePath'] + '/' + troupeName + '?at=' + model.id
+    permalinkUrl: generatePermalink(troupeName, model.id, model.sent, isArchive),
+    showItemActions: !isArchive
   });
 
   var result;

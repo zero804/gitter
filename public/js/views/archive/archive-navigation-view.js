@@ -17,11 +17,12 @@ module.exports = (function() {
     template: template,
     serializeData: function() {
       var uri = context.troupe().get('uri');
+      const { archiveContext } = this.options;
 
-      var p = this.options.previousDate && moment(this.options.previousDate).utc();
-      var n = this.options.nextDate && moment(this.options.nextDate).utc();
+      const p = archiveContext.previousDate && moment(archiveContext.previousDate).utc();
+      const n = archiveContext.nextDate && moment(archiveContext.nextDate).utc();
 
-      var archiveDate = moment(this.options.archiveDate)
+      const archiveDate = moment(archiveContext.archiveDate)
         .utc()
         .locale(language);
 
@@ -48,7 +49,8 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      var a = moment(this.options.archiveDate).utc();
+      const archiveDate = this.options.archiveContext && this.options.archiveContext.archiveDate;
+      const a = moment(archiveDate).utc();
       var range = 3;
 
       // if the first day of the next month is in the future, subtract one from range

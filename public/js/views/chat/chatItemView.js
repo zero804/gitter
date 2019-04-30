@@ -9,7 +9,6 @@ const cocktail = require('backbone.cocktail');
 const urlJoin = require('url-join');
 
 const context = require('../../utils/context');
-const clientEnv = require('gitter-client-env');
 const appEvents = require('../../utils/appevents');
 const apiClient = require('../../components/api-client');
 const dataset = require('../../utils/dataset-shim');
@@ -20,6 +19,7 @@ const isMobile = require('../../utils/is-mobile');
 const isAndroid = require('../../utils/is-android');
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const DoubleTapper = require('../../utils/double-tapper');
 const LoadingCollectionMixin = require('../loading-mixin');
 const FastAttachMixin = require('../fast-attach-mixin');
@@ -189,6 +189,7 @@ module.exports = (function() {
         data.html = _.escape(data.text);
       }
       data.isPermalinkable = this.isPermalinkable;
+      data.showItemActions = !this.isArchive();
       return data;
     },
 
@@ -404,6 +405,8 @@ module.exports = (function() {
       return context().embedded;
     },
 
+    isArchive: () => !!context().archive,
+
     canEdit: function() {
       return (
         this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded()
@@ -570,7 +573,6 @@ module.exports = (function() {
 
     permalink: function(e) {
       if (!this.isPermalinkable) return;
-
       // Can't permalink a chat which hasn't been saved to the server yet
       if (!this.model.id) return;
 
@@ -667,14 +669,17 @@ module.exports = (function() {
       var uri = context.troupe().get('uri');
       if (!uri) return '';
 
-      return clientEnv['basePath'] + '/' + uri + '?at=' + modelId;
+      const sent = moment(this.model.get('sent'), moment.defaultFormat);
+
+      return generatePermalink(uri, modelId, sent, this.isArchive());
     },
 
     getSentTimeTooltip: function() {
       var time = this.model.get('sent');
       if (!time) return '';
       var formatted = time.format('LLL');
-      if (this.isPermalinkable && formatted) {
+      // archive and nli window don't have an inputBox so we can't add permalink to it
+      if (this.isPermalinkable && formatted && !this.isArchive() && context.isLoggedIn()) {
         formatted += '  <br>(Alt-click to quote)';
       }
 
