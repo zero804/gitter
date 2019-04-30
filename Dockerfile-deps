@@ -1,0 +1,9 @@
+FROM registry.gitlab.com/gitlab-org/gitter/webapp:latest
+
+COPY modules/ /app/modules/
+
+RUN mv package.full.json package.json && mv package-lock.full.json package-lock.json
+
+RUN npm install --loglevel verbose
+
+RUN rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null

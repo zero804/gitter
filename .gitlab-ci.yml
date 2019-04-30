@@ -276,6 +276,20 @@ docker-base:
   tags:
     - docker
 
+docker-deps:
+  image: docker:latest
+  stage: docker_images
+  only:
+    - schedules
+  services:
+    - docker:dind
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deps:latest .
+    - docker push registry.gitlab.com/gitlab-org/gitter/webapp/deps:latest
+  tags:
+    - docker
+
 mongo-base:
   stage: docker_images
   image: docker:latest
@@ -304,24 +318,17 @@ elasticsearch-base:
   tags:
     - docker
 
-before_dependency_scanning:
-  image: registry.gitlab.com/gitlab-org/gitter/webapp
+cache_deps_for_scanning:
+  image: registry.gitlab.com/gitlab-org/gitter/webapp/deps:latest
   stage: build_unit_test
   script:
-    - echo "========== PACKAGE.JSON =========="
-    - cat package.json
-    - echo
-    - echo "========== PACKAGE-LOCK.JSON =========="
-    - cat package-lock.json
-    - echo
+    - echo "Caching node_modules/ dir in artifacts..."
   artifacts:
     expire_in: 31d
     when: always
     paths:
       - node_modules/
-      - modules/*/node_modules
-#      - shared/node_modules
 
 dependency_scanning:
   dependencies:
-    - before_dependency_scanning
+    - cache_deps_for_scanning
