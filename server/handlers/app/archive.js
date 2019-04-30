@@ -18,6 +18,8 @@ var contextGenerator = require('../../web/context-generator');
 var burstCalculator = require('../../utils/burst-calculator');
 var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const urlJoin = require('url-join');
+const clientEnv = require('gitter-client-env');
 var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
 var fonts = require('../../web/fonts');
@@ -234,9 +236,7 @@ exports.chatArchive = [
        */
       const sentLocal = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
       const permalink = generatePermalink(troupe.uri, aroundId, sentLocal, true);
-      const parsedPermalink = urlParse(permalink);
-      const relativePermalink = `${parsedPermalink.pathname}${parsedPermalink.query}`;
-      if (req.url !== relativePermalink) {
+      if (urlJoin(clientEnv['basePath'], req.url) !== permalink) {
         res.redirect(permalink);
         return;
       }
