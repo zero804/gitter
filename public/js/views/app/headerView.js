@@ -183,8 +183,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   setupProfileMenu: function() {
-    // HeaderView is reused for archive view but we don't show profile menu in archvie.
-    if (context.isLoggedIn() && !this.isArchive()) {
+    if (context.isLoggedIn()) {
       //If an instance of the profile menu exists destroy it to remove listeners etc
       if (this.profileMenu) {
         this.profileMenu.destroy();
