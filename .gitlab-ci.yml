@@ -9,7 +9,7 @@ variables:
 
 test-npm-install:
   stage: build_unit_test
-  image: node:10.15.0
+  image: node:11-alpine
   script:
     - node --version
     - npm --version
