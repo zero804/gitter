@@ -165,6 +165,9 @@ You can also install the [Node.js inspector Manager (NiM)](https://chrome.google
 browser extension to automatically keep your devtools up to date when
 Nodemon restarts the Node.js process.
 
+### Browsing local MongoDB
+Docker compose started [mongo-express](https://github.com/mongo-express/mongo-express) container. You can use it to view your local MongoDB content by visiting [http://localhost:8081/](http://localhost:8081/).
+
 ### Shutting down Docker Compose
 
 You can stop the docker containers with:

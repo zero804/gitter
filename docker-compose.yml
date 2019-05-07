@@ -11,8 +11,16 @@ redis1:
 mongo1:
   image: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
   restart: always
+  volumes:
+    - mongodb:/data/db2
   ports:
     - "27017:27017"
+mongo-express:
+  image: mongo-express
+  links:
+    - mongo1:mongo
+  ports:
+    - "8081:8081"
 
 neo4j:
   image: neo4j:2.3
