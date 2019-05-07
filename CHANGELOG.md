@@ -1,8 +1,22 @@
+# 19.45.0 - 2019-05-06
+
+ - Add docs to clarify when email notifications are sent out, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1383
+ - Add docs to clarify why email notifications are not sent when using IRC bridge, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1384
+ - Add docs about how to get a permalink to a message, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1385
+ - Add permalink functionality to chat archive, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1367
+
+Developer facing:
+
+ - Use npm@6 in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1387
+ - Add security harness git hook to restrict pushing to `dev.gitlab.org`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1388
+
+
 # 19.44.0 - 2019-4-19
 
 Developer facing:
 
  - Let mobile asset build exit when running `NODE_ENV=prod`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1380
+ - Only run flakey tests on release, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1382
 
 
 # 19.43.0 - 2019-4-18

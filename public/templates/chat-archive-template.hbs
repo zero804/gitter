@@ -3,10 +3,11 @@
     <div class="trpChatContainer  primary-scroll  chat-container" id="content-frame">
 
       <div id="chat-container">
-
-        {{#each chats}}
-          {{{ chatItemPrerender this }}}
-        {{/each}}
+        <div>
+          {{#each chats}}
+            {{{ chatItemPrerender this type="archive"}}}
+          {{/each}}
+        </div>
       </div>
 
       {{! This is a way of forcing the browser to open at the bottom of the screen }}

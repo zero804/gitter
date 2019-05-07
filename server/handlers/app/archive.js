@@ -1,3 +1,4 @@
+/* eslint complexity: ["error", 20] */
 'use strict';
 
 var env = require('gitter-web-env');
@@ -7,6 +8,8 @@ var Promise = require('bluebird');
 var moment = require('moment');
 var _ = require('underscore');
 var StatusError = require('statuserror');
+var urlParse = require('url-parse');
+const asyncHandler = require('express-async-handler');
 
 var chatService = require('gitter-web-chats');
 var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-aggregator');
@@ -14,11 +17,15 @@ var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var burstCalculator = require('../../utils/burst-calculator');
 var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const urlJoin = require('url-join');
+const clientEnv = require('gitter-client-env');
 var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
 var fonts = require('../../web/fonts');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
@@ -188,164 +195,174 @@ exports.chatArchive = [
   uriContextResolverMiddleware,
   preventClickjackingMiddleware,
   timezoneMiddleware,
-  function(req, res, next) {
-    var user = req.user;
-    var troupe = req.uriContext.troupe;
-    var policy = req.uriContext.policy;
+  asyncHandler(async (req, res, next) => {
+    const user = req.user;
+    const troupe = req.uriContext.troupe;
+    const policy = req.uriContext.policy;
 
-    return validateRoomForReadOnlyAccess(user, policy)
-      .then(function() {
-        var troupeId = troupe.id;
+    await validateRoomForReadOnlyAccess(user, policy);
+    const troupeId = troupe.id;
 
-        // This is where we want non-logged-in users to return
-        if (!user && req.session) {
-          req.session.returnTo = '/' + troupe.uri;
-        }
+    // This is where we want non-logged-in users to return
+    if (!user && req.session) {
+      req.session.returnTo = '/' + troupe.uri;
+    }
 
-        var yyyy = parseInt(req.params.yyyy, 10);
-        var mm = parseInt(req.params.mm, 10);
-        var dd = parseInt(req.params.dd, 10);
+    const yyyy = parseInt(req.params.yyyy, 10);
+    const mm = parseInt(req.params.mm, 10);
+    const dd = parseInt(req.params.dd, 10);
 
-        var startDateUTC = moment({ year: yyyy, month: mm - 1, day: dd });
+    const startDateUTC = moment({ year: yyyy, month: mm - 1, day: dd });
 
-        var nextDateUTC = moment(startDateUTC).add(1, 'days');
-        var previousDateUTC = moment(startDateUTC).subtract(1, 'days');
+    let nextDateUTC = moment(startDateUTC).add(1, 'days');
+    let previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
-        var startDateLocal = dateTZtoUTC(yyyy, mm, dd, res.locals.tzOffset);
-        var endDateLocal = moment(startDateLocal)
-          .add(1, 'days')
-          .toDate();
+    const startDateLocal = dateTZtoUTC(yyyy, mm, dd, res.locals.tzOffset);
+    const endDateLocal = moment(startDateLocal)
+      .add(1, 'days')
+      .toDate();
 
-        var today = moment().endOf('day');
-        if (
-          moment(nextDateUTC)
-            .endOf('day')
-            .isAfter(today)
-        ) {
-          nextDateUTC = null;
-        }
+    const aroundId = fixMongoIdQueryParam(req.query.at);
+    const chatMessage = await chatService.findById(aroundId);
+    if (chatMessage) {
+      /*
+       * If a permalink was generated in a different timezone, the message might have been
+       * sent on a different day in the local timezone. If so, we'll redirect to that day.
+       *
+       * The redirect may as well happen if we fixed the message ID from URL.
+       *
+       * res.locals.tzOffset is always defined (0 is default), it represents inverted UTC offset (-120 for +02:00)
+       * see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
+       */
+      const sentLocal = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
+      const permalink = generatePermalink(troupe.uri, aroundId, sentLocal, true);
+      if (urlJoin(clientEnv['basePath'], req.url) !== permalink) {
+        res.redirect(permalink);
+        return;
+      }
+    }
 
-        if (
-          moment(previousDateUTC)
-            .startOf('day')
-            .isBefore(moment([2013, 11, 1]))
-        ) {
-          previousDateUTC = null;
-        }
+    const today = moment().endOf('day');
+    if (
+      moment(nextDateUTC)
+        .endOf('day')
+        .isAfter(today)
+    ) {
+      nextDateUTC = null;
+    }
 
-        debug(
-          'Archive searching for messages in troupe %s in date range %s-%s',
-          troupeId,
-          startDateLocal,
-          endDateLocal
-        );
-        return chatService
-          .findChatMessagesForTroupeForDateRange(troupeId, startDateLocal, endDateLocal)
-          .then(function(chatMessages) {
-            var strategy = new restSerializer.ChatStrategy({
-              unread: false, // All chats are read in the archive
-              troupeId: troupeId
-            });
+    if (
+      moment(previousDateUTC)
+        .startOf('day')
+        .isBefore(moment([2013, 11, 1]))
+    ) {
+      previousDateUTC = null;
+    }
 
-            return Promise.all([
-              contextGenerator.generateTroupeContext(req),
-              restSerializer.serialize(chatMessages, strategy)
-            ]);
-          })
-          .spread(function(troupeContext, serialized) {
-            troupeContext.archive = {
-              archiveDate: startDateUTC,
-              nextDate: nextDateUTC,
-              previousDate: previousDateUTC
-            };
+    debug(
+      'Archive searching for messages in troupe %s in date range %s-%s',
+      troupeId,
+      startDateLocal,
+      endDateLocal
+    );
+    const chatMessages = await chatService.findChatMessagesForTroupeForDateRange(
+      troupeId,
+      startDateLocal,
+      endDateLocal
+    );
+    const strategy = new restSerializer.ChatStrategy({
+      unread: false, // All chats are read in the archive
+      troupeId: troupeId
+    });
 
-            var language = req.headers['accept-language'];
-            if (language) {
-              language = language.split(';')[0].split(',');
-            } else {
-              language = 'en-uk';
-            }
+    const [troupeContext, serialized] = await Promise.all([
+      contextGenerator.generateTroupeContext(req),
+      restSerializer.serialize(chatMessages, strategy)
+    ]);
+    troupeContext.archive = {
+      archiveDate: startDateUTC,
+      nextDate: nextDateUTC,
+      previousDate: previousDateUTC,
+      messages: serialized
+    };
+    troupeContext.permalinkChatId = aroundId;
 
-            var p = previousDateUTC && moment(previousDateUTC);
-            var n = nextDateUTC && moment(nextDateUTC);
-            var uri = req.uriContext.uri;
+    let language = req.headers['accept-language'];
+    if (language) {
+      language = language.split(';')[0].split(',');
+    } else {
+      language = 'en-uk';
+    }
 
-            var startDateLocale = moment(startDateUTC).locale(language);
+    const p = previousDateUTC && moment(previousDateUTC);
+    const n = nextDateUTC && moment(nextDateUTC);
+    const uri = req.uriContext.uri;
 
-            var ordinalDate = startDateLocale.format('Do');
-            var numericDate = startDateLocale.format('D');
+    const startDateLocale = moment(startDateUTC).locale(language);
 
-            var ordinalPart;
-            if (ordinalDate.indexOf('' + numericDate) === 0) {
-              ordinalPart = ordinalDate.substring(('' + numericDate).length);
-            } else {
-              ordinalPart = '';
-            }
+    const ordinalDate = startDateLocale.format('Do');
+    const numericDate = startDateLocale.format('D');
 
-            var previousDateFormatted = p && p.locale(language).format('Do MMM YYYY');
-            var dayNameFormatted = numericDate;
-            var dayOrdinalFormatted = ordinalPart;
-            var previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
-            var nextDateFormatted =
-              n &&
-              moment(n.valueOf())
-                .locale(language)
-                .format('Do MMM YYYY');
-            var nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
-            var monthYearFormatted = startDateLocale.format('MMM YYYY');
+    let ordinalPart;
+    if (ordinalDate.indexOf('' + numericDate) === 0) {
+      ordinalPart = ordinalDate.substring(('' + numericDate).length);
+    } else {
+      ordinalPart = '';
+    }
 
-            var roomUrl = '/api/v1/rooms/' + troupe.id;
+    const dayNameFormatted = numericDate;
+    const dayOrdinalFormatted = ordinalPart;
+    const previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
+    const nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
+    const monthYearFormatted = startDateLocale.format('MMM YYYY');
 
-            var isPrivate = !securityDescriptorUtils.isPublic(troupe);
+    const roomUrl = '/api/v1/rooms/' + troupe.id;
 
-            /*
-            What I'm trying to do here is: The current day is still in-progress, so
-            it shouldn't be cached because it can still gain more messages.  All
-            past days are done, so they can all safely be cached. But the concept
-            of when the day starts and ends depends on res.locals.tzOffset, so
-            to make 100% sure I'm just adding an extra 12 hours to the utc day
-            (as -12 to +12 are all possible) and then I can avoid doing
-            complicated timezone maths using moment and it should work for all
-            timezones.
-            */
-            if (beforeTodayAnyTimezone(endDateLocal)) {
-              res.setHeader('Cache-Control', 'public, max-age=' + ONE_YEAR_SECONDS);
-              res.setHeader('Expires', new Date(Date.now() + ONE_YEAR_MILLISECONDS).toUTCString());
-            }
+    const isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
-            return res.render('chat-archive-template', {
-              layout: 'archive',
-              archives: true,
-              archiveChats: true,
-              bootScriptName: 'router-archive-chat',
-              cssFileName: 'styles/router-archive-chat.css',
-              githubLink: '/' + req.uriContext.uri,
-              user: user,
-              troupeContext: troupeContext,
-              troupeName: req.uriContext.uri,
-              chats: burstCalculator(serialized),
-              noindex: troupe.noindex,
-              roomUrl: roomUrl,
-              accessToken: req.accessToken,
-              headerView: getHeaderViewOptions(troupeContext.troupe),
-              isPrivate: isPrivate,
+    /*
+    What I'm trying to do here is: The current day is still in-progress, so
+    it shouldn't be cached because it can still gain more messages.  All
+    past days are done, so they can all safely be cached. But the concept
+    of when the day starts and ends depends on res.locals.tzOffset, so
+    to make 100% sure I'm just adding an extra 12 hours to the utc day
+    (as -12 to +12 are all possible) and then I can avoid doing
+    complicated timezone maths using moment and it should work for all
+    timezones.
+    */
+    if (beforeTodayAnyTimezone(endDateLocal)) {
+      res.setHeader('Cache-Control', 'public, max-age=' + ONE_YEAR_SECONDS);
+      res.setHeader('Expires', new Date(Date.now() + ONE_YEAR_MILLISECONDS).toUTCString());
+    }
 
-              /* For prerendered archive-navigation-view */
-              previousDate: previousDateFormatted,
-              dayName: dayNameFormatted,
-              dayOrdinal: dayOrdinalFormatted,
-              previousDateLink: previousDateLink,
-              nextDate: nextDateFormatted,
-              nextDateLink: nextDateLink,
-              monthYearFormatted: monthYearFormatted,
+    return res.render('chat-archive-template', {
+      layout: 'archive',
+      archives: true,
+      archiveChats: true,
+      bootScriptName: 'router-archive-chat',
+      cssFileName: 'styles/router-archive-chat.css',
+      githubLink: '/' + req.uriContext.uri,
+      user: user,
+      troupeContext: troupeContext,
+      troupeName: req.uriContext.uri,
+      chats: burstCalculator(serialized),
+      noindex: troupe.noindex,
+      roomUrl: roomUrl,
+      accessToken: req.accessToken,
+      headerView: getHeaderViewOptions(troupeContext.troupe),
+      isPrivate: isPrivate,
 
-              showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
-              fonts: fonts.getFonts(),
-              hasCachedFonts: fonts.hasCachedFonts(req.cookies)
-            });
-          });
-      })
-      .catch(next);
-  },
+      /* For prerendered archive-navigation-view */
+      dayName: dayNameFormatted,
+      dayOrdinal: dayOrdinalFormatted,
+      previousDateLink: previousDateLink,
+      nextDateLink: nextDateLink,
+      monthYearFormatted: monthYearFormatted,
+
+      showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
+      fonts: fonts.getFonts(),
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies)
+    });
+  }),
   redirectErrorMiddleware
 ];

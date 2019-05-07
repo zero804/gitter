@@ -51,4 +51,8 @@ We understand this can be unexpected and undesirable, you can track, https://git
 
 You can toggle email notifications on and off in the "Configure Defaults" section of the notification modal. There is also an unsubscribe link at the bottom each notification email that does the same thing.
 
+Emails are batched up and sent in 1 hour chunks. You can track [this issue](https://gitlab.com/gitlab-org/gitter/webapp/issues/143) for more immediate email notifications.
+
+If you are using the [IRC bridge](https://irc.gitter.im/), it will mark every message as read so you won't receive any emails.
+
 ![](http://imgur.com/uKLeHd6.gif)

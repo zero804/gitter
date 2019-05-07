@@ -5,7 +5,7 @@ var _ = require('underscore');
 var assert = require('assert');
 var GithubContibutorService = require('..').GitHubContributorService;
 
-describe('github-contributor-service #slow #github', function() {
+describe('github-contributor-service #flakey #slow #github', function() {
   // These tests timeout at 10000 sometimes otherwise
   this.timeout(30000);
 
