@@ -89,3 +89,11 @@ pushing to any remote besides `dev.gitlab.org`, in order to prevent accidental d
  - Security fixes should be made against https://dev.gitlab.org/gitlab/gitter/webapp
  - Once the fix is ready, create a release on `dev.gitlab.org` and deploy to staging/production
  - Backport the same fix to https://gitlab.com/gitlab-org/gitter/webapp
+
+## How to turn on debug messages?
+We are using [`debug`](https://www.npmjs.com/package/debug) module.
+
+- On the server: `DEBUG=faye* npm start`
+- On the client: `window.localStorage.debug = 'app:chat-item-view*,app:router-chat*';`
+
+[The syntax for enabling/disabling debuggers](https://www.npmjs.com/package/debug#wildcards)
