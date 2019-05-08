@@ -74,6 +74,16 @@ function pad(options) {
   return content;
 }
 
+function sanitizeHref(href = '') {
+  const hrefLower = href.toLowerCase();
+  const hasSafeSchema = hrefLower.indexOf('http:') === 0 || hrefLower.indexOf('https:') === 0;
+  if (hasSafeSchema) {
+    return href;
+  }
+
+  return '';
+}
+
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
 function typewriter(el, str) {
   return util.format(
@@ -126,6 +136,7 @@ module.exports = {
   when,
   toLowerCase,
   pad,
+  sanitizeHref,
   typewriter,
   formatNumber,
   githubTypeToClass,
