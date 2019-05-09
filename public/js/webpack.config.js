@@ -1,22 +1,17 @@
 'use strict';
 
 const path = require('path');
-const webpack = require('webpack');
-const ProvidePlugin = require('webpack/lib/ProvidePlugin');
-const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
+const merge = require('webpack-merge');
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin;
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
-const getPostcssStack = require('@gitterhq/styleguide/postcss-stack');
+const baseConfig = require('./webpack.base.config.js');
 
-// Default to production unless we know for sure we are in dev
-const IS_PRODUCTION = process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'dev';
 const WEBPACK_REPORT = process.env.WEBPACK_REPORT;
 
 const ROOT_PATH = path.resolve(__dirname, '../../');
 
-const webpackConfig = {
-  mode: IS_PRODUCTION ? 'production' : 'development',
+const webpackConfig = merge(baseConfig, {
   target: 'web',
 
   entry: {
@@ -52,48 +47,16 @@ const webpackConfig = {
     'router-home-learn': path.resolve(path.join(__dirname, './router-home-learn'))
   },
   output: {
-    path: path.resolve(__dirname, '../../output/assets/js/'),
     filename: '[name].bundle.js',
     chunkFilename: '[name].chunk.js',
     publicPath: '/_s/l/js/',
     devtoolModuleFilenameTemplate: '[resource-path]',
     devtoolFallbackModuleFilenameTemplate: '[resource-path]?[hash]'
   },
-  module: {
-    strictExportPresence: true,
-    rules: [
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: [/node_modules/],
-        options: {
-          presets: ['@babel/preset-env']
-        }
-      },
-      {
-        test: /\.hbs$/,
-        loader: '@gitterhq/handlebars-loader', // disable minify for now + path.resolve(path.join(__dirname, "../../build-scripts/html-min-loader"))
-        query: {
-          helperDirs: [
-            path.dirname(require.resolve('gitter-web-templates/shared/helpers/pluralize'))
-          ],
-          knownHelpers: ['cdn', 'avatarSrcSet'],
-          partialsRootRelative: path.resolve(__dirname, '../templates/partials/') + path.sep
-        }
-      },
-      {
-        test: /.css$/,
-        use: [
-          { loader: 'style-loader', options: { insertAt: 'top' } },
-          { loader: 'css-loader', options: { importLoaders: 1 } },
-          { loader: 'postcss-loader', options: { plugins: getPostcssStack(webpack) } }
-        ]
-      }
-    ]
-  },
   resolve: {
     alias: {
       jquery: require.resolve('jquery'),
+      vue$: 'vue/dist/vue.esm.js',
       mutant: path.resolve(path.join(__dirname, '../repo/mutant/mutant.js')),
       emojify: path.resolve(path.join(__dirname, '../repo/emojify/emojify.js')),
       'jquery-textcomplete': path.resolve(
@@ -148,13 +111,6 @@ const webpackConfig = {
       }
     }),
 
-    new ProvidePlugin({ Promise: 'bluebird' }),
-
-    new ContextReplacementPlugin(
-      /moment[/\\]locale$/,
-      /ar|cs|da|de|en-gb|es|fa|fr|hu|it|ja|ko|lt|nl|pl|pt|ru|sk|sv|ua|zh-cn/
-    ),
-
     // optionally generate webpack bundle analysis
     WEBPACK_REPORT &&
       new BundleAnalyzerPlugin({
@@ -166,15 +122,7 @@ const webpackConfig = {
       })
   ].filter(Boolean),
   bail: true
-};
-
-if (IS_PRODUCTION) {
-  webpackConfig.devtool = 'source-map';
-} else {
-  // See http://webpack.github.io/docs/configuration.html#devtool
-  webpackConfig.devtool = 'cheap-source-map';
-  webpackConfig.cache = true;
-}
+});
 
 if (process.env.WEBPACK_VISUALIZER) {
   var Visualizer = require('webpack-visualizer-plugin');
