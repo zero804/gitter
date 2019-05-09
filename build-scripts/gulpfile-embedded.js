@@ -121,7 +121,7 @@ gulp.task('embedded:compile:css', function() {
 
 /* Generate embedded native */
 gulp.task('embedded:compile:copy-webpack-builds', ['clientapp:compile:webpack'], function() {
-  const assets = bootScriptUtils.generateAssetsForChunk('mobile-native-embedded-chat');
+  const assets = bootScriptUtils.generateAssetsForChunks(['mobile-native-embedded-chat']);
 
   return gulp
     .src(assets.map(asset => path.join('output/assets/js/', asset)), {

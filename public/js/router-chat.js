@@ -1,3 +1,4 @@
+/* eslint-disable max-statements */
 'use strict';
 require('./utils/initial-setup');
 require('./utils/font-setup');
@@ -39,31 +40,71 @@ require('./components/ping');
 const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
 onready(function() {
-  // eslint-disable-line max-statements
+  if (!useVueLeftMenu) {
+    appEvents.on('navigation', function(url, type, title, options) {
+      options = options || {};
 
-  appEvents.on('navigation', function(url, type, title, options) {
-    options = options || {};
-
-    if (!url && options.refresh) {
-      window.location.reload();
-      return;
-    }
-
-    if (frameUtils.hasParentFrameSameOrigin()) {
-      frameUtils.postMessage({
-        type: 'navigation',
-        url: url,
-        urlType: type,
-        title: title
-      });
-    } else {
-      // No pushState here. Open the link directly
-      // Remember that (window.parent === window) when there is no parent frame
-      window.parent.location.href = url;
-    }
-  });
+      if (!url && options.refresh) {
+        window.location.reload();
+        return;
+      }
+      if (frameUtils.hasParentFrameSameOrigin()) {
+        frameUtils.postMessage({
+          type: 'navigation',
+          url: url,
+          urlType: type,
+          title: title
+        });
+      } else {
+        // No pushState here. Open the link directly
+        // Remember that (window.parent === window) when there is no parent frame
+        window.parent.location.href = url;
+      }
+    });
+  }
 
   require('./components/link-handler').installLinkHandler();
+
+  var appView = new ChatToolbarInputLayout({
+    model: context.troupe(),
+    template: false,
+    el: 'body',
+    chatCollection: chatCollection
+  });
+
+  appView.render();
+
+  /* Drag and drop */
+  new DropTargetView({ template: false, el: 'body' }).render();
+
+  var router = new Router({
+    dialogRegion: appView.dialogRegion,
+    routes: [
+      notificationRoutes(),
+      roomRoutes({
+        rosterCollection: itemCollections.roster
+      })
+    ]
+  });
+
+  const changeRoom = (newTroupe, permalinkChatId) => {
+    perfTiming.start('room-switch.render');
+
+    debug('changing room: %j', newTroupe);
+
+    // destroy any modal views
+    router.navigate('', { trigger: true, replace: true });
+
+    //set the context troupe to new troupe
+    context.setTroupe(newTroupe);
+
+    if (permalinkChatId) {
+      appEvents.trigger('chatCollectionView:permalinkHighlight', permalinkChatId);
+    }
+
+    //after the room change is complete, focus on the chat input jp 5/11/15
+    appEvents.trigger('focus.request.chat');
+  };
 
   function parsePostMessage(e) {
     // Shortcut for performance
@@ -125,22 +166,7 @@ onready(function() {
         break;
 
       case 'change:room':
-        perfTiming.start('room-switch.render');
-
-        debug('changing room: %j', message.newTroupe);
-
-        // destroy any modal views
-        router.navigate('', { trigger: true, replace: true });
-
-        //set the context troupe to new troupe
-        context.setTroupe(message.newTroupe);
-
-        if (message.permalinkChatId) {
-          appEvents.trigger('chatCollectionView:permalinkHighlight', message.permalinkChatId);
-        }
-
-        //after the room change is complete, focus on the chat input jp 5/11/15
-        appEvents.trigger('focus.request.chat');
+        changeRoom(message.newTroupe, message.permalinkChatId);
         break;
 
       case 'about.to.leave.current.room':
@@ -154,14 +180,20 @@ onready(function() {
     }
   });
 
-  frameUtils.postMessage({
-    type: 'context.troupeId',
-    troupeId: context.getTroupeId(),
-    name: context.troupe().get('name')
-  });
+  if (!useVueLeftMenu) {
+    frameUtils.postMessage({
+      type: 'context.troupeId',
+      troupeId: context.getTroupeId(),
+      name: context.troupe().get('name')
+    });
+  }
 
   appEvents.on('route', function(hash) {
     frameUtils.postMessage({ type: 'route', hash: hash });
+  });
+
+  appEvents.on('vue:change:room', function(room) {
+    changeRoom(room);
   });
 
   appEvents.on('permalink.requested', function(type, chat, options) {
@@ -199,43 +231,46 @@ onready(function() {
     frameUtils.postMessage({ type: 'clearActivityBadge', troupeId: context.getTroupeId() });
   });
 
-  // Bubble keyboard events
-  appEvents.on('keyboard.all', function(name, event, handler) {
-    // Don't send back events coming from the app frame
-    if (event.origin && event.origin === 'app') return;
-    var message = {
-      type: 'keyboard',
-      name: name,
+  // We already listen for this in the app frame
+  if (!useVueLeftMenu) {
+    // Bubble keyboard events
+    appEvents.on('keyboard.all', function(name, event, handler) {
+      // Don't send back events coming from the app frame
+      if (event.origin && event.origin === 'app') return;
+      var message = {
+        type: 'keyboard',
+        name: name,
 
-      // JSON serialisation makes it not possible to send the event object
-      // Keep track of the origin in case of return
-      event: { origin: event.origin },
-      handler: handler
-    };
-    frameUtils.postMessage(message);
-  });
+        // JSON serialisation makes it not possible to send the event object
+        // Keep track of the origin in case of return
+        event: { origin: event.origin },
+        handler: handler
+      };
+      frameUtils.postMessage(message);
+    });
 
-  // Bubble chat toggle events
-  appEvents.on('chat.edit.show', function() {
-    frameUtils.postMessage({ type: 'chat.edit.show' });
-  });
+    // Bubble chat toggle events
+    appEvents.on('chat.edit.show', function() {
+      frameUtils.postMessage({ type: 'chat.edit.show' });
+    });
 
-  appEvents.on('chat.edit.hide', function() {
-    frameUtils.postMessage({ type: 'chat.edit.hide' });
-  });
+    appEvents.on('chat.edit.hide', function() {
+      frameUtils.postMessage({ type: 'chat.edit.hide' });
+    });
 
-  // Send focus events to app frame
-  appEvents.on('focus.request.app.in', function(event) {
-    frameUtils.postMessage({ type: 'focus', focus: 'in', event: event });
-  });
+    // Send focus events to app frame
+    appEvents.on('focus.request.app.in', function(event) {
+      frameUtils.postMessage({ type: 'focus', focus: 'in', event: event });
+    });
 
-  appEvents.on('focus.request.app.out', function(event) {
-    frameUtils.postMessage({ type: 'focus', focus: 'out', event: event });
-  });
+    appEvents.on('focus.request.app.out', function(event) {
+      frameUtils.postMessage({ type: 'focus', focus: 'out', event: event });
+    });
 
-  appEvents.on('ajaxError', function() {
-    frameUtils.postMessage({ type: 'ajaxError' });
-  });
+    appEvents.on('ajaxError', function() {
+      frameUtils.postMessage({ type: 'ajaxError' });
+    });
+  }
 
   var notifyRemoveError = function(message) {
     appEvents.triggerParent('user_notification', {
@@ -251,28 +286,6 @@ onready(function() {
     apiClient.room.delete('/users/' + username + '?type=username', '').catch(function(e) {
       notifyRemoveError(e.friendlyMessage || 'Unable to remove user');
     });
-  });
-
-  var appView = new ChatToolbarInputLayout({
-    model: context.troupe(),
-    template: false,
-    el: 'body',
-    chatCollection: chatCollection
-  });
-
-  appView.render();
-
-  /* Drag and drop */
-  new DropTargetView({ template: false, el: 'body' }).render();
-
-  var router = new Router({
-    dialogRegion: appView.dialogRegion,
-    routes: [
-      notificationRoutes(),
-      roomRoutes({
-        rosterCollection: itemCollections.roster
-      })
-    ]
   });
 
   var showingHelp = false;
@@ -313,10 +326,6 @@ onready(function() {
   // Listen for changes to the room
   liveContext.syncRoom();
 
+  Backbone.history.stop();
   Backbone.history.start();
-
-  if (useVueLeftMenu) {
-    // Initialize Vue stuff
-    require('./vue/initialize-clientside');
-  }
 });

@@ -16,4 +16,9 @@ var parse = function(qs) {
     }, {});
 };
 
-module.exports = parse(window.location.search);
+let currentWindowSearch = '';
+if (typeof window !== 'undefined') {
+  currentWindowSearch = window.location.search;
+}
+
+module.exports = parse(currentWindowSearch);

@@ -1,4 +1,4 @@
-/* eslint complexity: ["error", 20] */
+/* eslint-disable complexity, max-statements */
 'use strict';
 
 require('./utils/initial-setup');
@@ -6,6 +6,7 @@ require('./utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
+var _ = require('underscore');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
@@ -27,6 +28,9 @@ var roomListGenerator = require('./components/chat-cache/room-list-generator');
 var troupeCollections = require('./collections/instances/troupes');
 var AppLayout = require('./views/layouts/app-layout');
 var LoadingView = require('./views/app/loading-view');
+var RoomMenuModel = require('./models/room-menu-model');
+var modalRegion = require('./components/modal-region');
+var DNDCtrl = require('./components/menu/room/dnd-controller');
 var Router = require('./routes/router');
 var notificationRoutes = require('./routes/notification-routes');
 var createRoutes = require('./routes/create-routes');
@@ -47,44 +51,76 @@ require('./views/widgets/avatar');
 
 userNotifications.initUserNotifications();
 
-onready(function() {
-  // eslint-disable-line max-statements
+const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
-  var appLayout = new AppLayout({
-    template: false,
-    el: 'body',
-    roomCollection: troupeCollections.troupes,
-    //TODO ADD THIS TO MOBILE JP 25/1/16
-    orgCollection: troupeCollections.orgs,
-    groupsCollection: troupeCollections.groups
-  });
-  appLayout.render();
+onready(function() {
+  let dialogRegion;
+  let roomMenuModel;
+  if (useVueLeftMenu) {
+    dialogRegion = modalRegion;
+
+    const dndCtrl = new DNDCtrl();
+    roomMenuModel = new RoomMenuModel(
+      _.extend({}, context.getSnapshot('leftMenu'), {
+        bus: appEvents,
+        roomCollection: troupeCollections.troupes,
+        orgCollection: troupeCollections.orgs,
+        userModel: context.user(),
+        troupeModel: context.troupe(),
+        dndCtrl: dndCtrl,
+        groupsCollection: troupeCollections.groups
+      })
+    );
+  } else {
+    const appLayout = new AppLayout({
+      template: false,
+      el: 'body',
+      roomCollection: troupeCollections.troupes,
+      //TODO ADD THIS TO MOBILE JP 25/1/16
+      orgCollection: troupeCollections.orgs,
+      groupsCollection: troupeCollections.groups
+    });
+    appLayout.render();
+
+    dialogRegion = appLayout.dialogRegion;
+    roomMenuModel = appLayout.getRoomMenuModel();
+  }
 
   var router = new Router({
-    dialogRegion: appLayout.dialogRegion,
+    dialogRegion: dialogRegion,
     routes: [
       userRoutes(),
       notificationRoutes(),
       createRoutes({
         rooms: troupeCollections.troupes,
         groups: troupeCollections.groups,
-        roomMenuModel: appLayout.getRoomMenuModel()
+        roomMenuModel: roomMenuModel
       }),
       upgradeAccessRoutes()
     ]
   });
 
+  Backbone.history.stop();
   Backbone.history.start();
 
-  var chatIFrame = document.getElementById('content-frame');
   var titlebarUpdater = new TitlebarUpdater();
 
-  new LoadingView(chatIFrame, document.getElementById('loading-frame'));
+  let chatIFrame;
+  if (!useVueLeftMenu) {
+    chatIFrame = document.getElementById('content-frame');
 
-  // Send the hash to the child
-  if (window.location.hash) {
-    var noHashSrc = chatIFrame.src.split('#')[0];
-    chatIFrame.src = noHashSrc + window.location.hash;
+    new LoadingView(chatIFrame, document.getElementById('loading-frame'));
+
+    // Send the hash to the child
+    if (window.location.hash) {
+      var noHashSrc = chatIFrame.src.split('#')[0];
+      chatIFrame.src = noHashSrc + window.location.hash;
+    }
+
+    /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
+     * first page of gitter, we know what the original URL was (instead of null)
+     */
+    window.history.replaceState(chatIFrame.src, '', window.location.href);
   }
 
   /* TODO: add the link handler here? */
@@ -93,11 +129,6 @@ onready(function() {
   /*
    * Push State Management
    */
-
-  /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
-   * first page of gitter, we know what the original URL was (instead of null)
-   */
-  window.history.replaceState(chatIFrame.src, '', window.location.href);
 
   function initChatCache() {
     if (troupeCollections.troupes.length) {
@@ -122,62 +153,65 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
-  var roomSwitcher = new SPARoomSwitcher(
-    troupeCollections.troupes,
-    clientEnv.basePath,
-    getContentFrameLocation
-  );
-  roomSwitcher.on('replace', function(href) {
-    debug('Room switch: replace %s', href);
+  let roomSwitcher;
+  if (!useVueLeftMenu) {
+    roomSwitcher = new SPARoomSwitcher(
+      troupeCollections.troupes,
+      clientEnv.basePath,
+      getContentFrameLocation
+    );
+    roomSwitcher.on('replace', function(href) {
+      debug('Room switch: replace %s', href);
 
-    context.setTroupeId(undefined); // TODO: update the title....
-    /*
-     * Use location.replace so as not to affect the history state of the application
-     *
-     * The history has already been pushed via the pushstate, so we don't want to double up
-     */
-    RAF(function() {
-      getContentFrameLocation().replace(href);
+      context.setTroupeId(undefined); // TODO: update the title....
+      /*
+       * Use location.replace so as not to affect the history state of the application
+       *
+       * The history has already been pushed via the pushstate, so we don't want to double up
+       */
+      RAF(function() {
+        getContentFrameLocation().replace(href);
+      });
     });
-  });
 
-  roomSwitcher.on('reload', function() {
-    debug('Room switch: reload');
-    context.setTroupeId(undefined); // TODO: update the title....
-    RAF(function() {
-      getContentFrameLocation().reload(true);
+    roomSwitcher.on('reload', function() {
+      debug('Room switch: reload');
+      context.setTroupeId(undefined); // TODO: update the title....
+      RAF(function() {
+        getContentFrameLocation().reload(true);
+      });
     });
-  });
 
-  roomSwitcher.on('switch', function(troupe, permalinkChatId) {
-    debug('Room switch: switch to %s', troupe.attributes);
+    roomSwitcher.on('switch', function(troupe, permalinkChatId) {
+      debug('Room switch: switch to %s', troupe.attributes);
 
-    context.setTroupeId(troupe.id);
+      context.setTroupeId(troupe.id);
 
-    // turn backbone object to plain one so we don't modify the original
-    var newTroupe = troupe.toJSON();
+      // turn backbone object to plain one so we don't modify the original
+      var newTroupe = troupe.toJSON();
 
-    // Set the last access time immediately to prevent
-    // delay in hidden rooms becoming visible only
-    // once we get the server-side update
-    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
-    if (liveCollectionTroupe) {
-      liveCollectionTroupe.set('lastAccessTime', moment());
-    }
+      // Set the last access time immediately to prevent
+      // delay in hidden rooms becoming visible only
+      // once we get the server-side update
+      var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
+      if (liveCollectionTroupe) {
+        liveCollectionTroupe.set('lastAccessTime', moment());
+      }
 
-    // add the group to the troupe as if it was serialized by the server
-    var groupModel = troupeCollections.groups.get(newTroupe.groupId);
-    if (groupModel) {
-      newTroupe.group = groupModel.toJSON();
-    }
+      // add the group to the troupe as if it was serialized by the server
+      var groupModel = troupeCollections.groups.get(newTroupe.groupId);
+      if (groupModel) {
+        newTroupe.group = groupModel.toJSON();
+      }
 
-    //post a navigation change to the iframe
-    postMessage({
-      type: 'change:room',
-      newTroupe: newTroupe,
-      permalinkChatId: permalinkChatId
+      //post a navigation change to the iframe
+      postMessage({
+        type: 'change:room',
+        newTroupe: newTroupe,
+        permalinkChatId: permalinkChatId
+      });
     });
-  });
+  }
 
   function pushState(state, title, url) {
     if (state === window.history.state) {
@@ -206,7 +240,7 @@ onready(function() {
     titlebarUpdater.setRoomName(pageTitle);
 
     //switch rooms
-    roomSwitcher.change(iframeUrl);
+    roomSwitcher && roomSwitcher.change(iframeUrl);
   };
 
   // Called from the OSX native client for faster page loads
@@ -349,7 +383,7 @@ onready(function() {
 
         case 'childframe:loaded':
           appEvents.trigger('childframe:loaded');
-          roomSwitcher.setIFrameLoadingState(false);
+          roomSwitcher && roomSwitcher.setIFrameLoadingState(false);
           break;
 
         case 'permalink.requested':
@@ -378,7 +412,7 @@ onready(function() {
       var title = 'home';
 
       pushState(newFrame, title, newLocation);
-      roomSwitcher.change(newFrame);
+      roomSwitcher && roomSwitcher.change(newFrame);
     }
   };
 
@@ -391,7 +425,10 @@ onready(function() {
   });
 
   function postMessage(message) {
-    chatIFrame.contentWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
+    if (!useVueLeftMenu) {
+      const targetWindow = chatIFrame.contentWindow;
+      targetWindow.postMessage(JSON.stringify(message), clientEnv.basePath);
+    }
   }
 
   appEvents.on('navigation', function(url, type, title, options) {
@@ -421,8 +458,14 @@ onready(function() {
       return;
     }
 
+    if (useVueLeftMenu) {
+      if (type === 'iframe') {
+        window.location.href = url;
+      }
+    }
+
     //Redirect the App
-    roomSwitcher.change(frameUrl);
+    roomSwitcher && roomSwitcher.change(frameUrl);
   });
 
   // Call preventDefault() on tab events so that we can manage focus as we want
@@ -510,5 +553,10 @@ onready(function() {
         apiClient: require('./components/api-client')
       });
     }, 10000);
+  }
+
+  if (useVueLeftMenu) {
+    // Initialize Vue stuff
+    require('./vue/initialize-clientside');
   }
 });

@@ -2,6 +2,7 @@
 
 const createStore = require('./store').default;
 const renderLeftMenu = require('./left-menu').default;
+const setupDataBridge = require('./store/data-bridge').default;
 
 const store = createStore();
 
@@ -11,6 +12,8 @@ if (window.__INITIAL_STATE__) {
   store.replaceState(window.__INITIAL_STATE__);
   delete window.__INITIAL_STATE__;
 }
+
+setupDataBridge(store);
 
 const leftMenuRootEl = document.querySelector('.js-left-menu-root');
 if (leftMenuRootEl) {

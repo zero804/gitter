@@ -36,11 +36,21 @@
 
   </head>
   <body class="iframe {{classNames}}">
-    {{{leftMenuHtml}}}
+    <div class="layout-app">
+      {{{leftMenuHtml}}}
 
-    {{{body}}}
+      <div class="layout-app-body">
+        {{{body}}}
+      </div>
+    </div>
     <div class="js-drag-overlay drag-frame hide">
       <span class="octicon octicon-arrow-down"></span>
     </div>
+
+
+    {{#if useVueLeftMenu}}
+      {{{ generateTroupeContext troupeContext }}}
+      {{{ bootScript bootScriptName "router-app" jsRoot=jsRoot }}}
+    {{/if}}
   </body>
 </html>

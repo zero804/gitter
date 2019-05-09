@@ -67,7 +67,9 @@
     </section>
   </div>
 
-  {{{ generateTroupeContext troupeContext }}}
-  {{{ bootScript 'router-userhome' jsRoot=jsRoot }}}
+  {{#unless useVueLeftMenu}}
+    {{{ generateTroupeContext troupeContext }}}
+    {{{ bootScript 'router-userhome' jsRoot=jsRoot }}}
+  {{/unless}}
 </body>
 </html>
