@@ -59,6 +59,78 @@ Recreate your secrets using your local network IP, see https://gitlab.com/gitlab
 Restart the server. You should now be able to access Gitter over your local IP from other devices
 
 
+## Debug logging
+
+There are various `debug(...)` statements throughout the code that trace various functions.
+If you want to see these log lines, follow the steps below:
+
+### Backend
+
+For the backend, set the `DEBUG` environment variable,
+
+To show logs for everything you can use `*` [wildcards](https://www.npmjs.com/package/debug#wildcards) in the filter,
+```
+DEBUG="*" npm start
+```
+
+Other examples,
+```
+DEBUG="gitter:app:permissions:pre-creation:gh-repo-policy-evaluator" npm start
+DEBUG="gitter:app:permissions:pre-creation:*" npm start
+DEBUG="gitter:app:permissions:pre-creation*" npm start
+
+DEBUG="gitter:app:push-notification-gateway*, gitter:app:group-creation-service*" npm start
+```
+
+To disable, you can set the filter to an empty string,
+```
+DEBUG="" npm start
+```
+
+### Windows
+
+On Windows, the syntax to set an environment variable is a little different,
+
+```
+set DEBUG="gitter:app:push-notification-gateway*"&&npm start
+```
+
+---
+
+There is also `require('gitter-web-env').logger` which gets logged to file and Kibana(Elasticsearch) in production. These messages are shown in the console/terminal though so you can see them in development.
+
+ - `logger.error(...)`
+ - `logger.warn(...)`
+ - `logger.info(...)`
+
+```
+logging:level=info npm start
+```
+
+### Frontend
+
+For the frontend, use `window.localStorage.debug` in the devtools console
+
+To show logs for everything you can use `*` [wildcards](https://www.npmjs.com/package/debug#wildcards) in the filter,
+```js
+window.localStorage.debug = '*';
+```
+
+Other examples,
+```js
+window.localStorage.debug = 'app:eyeballs:detector';
+window.localStorage.debug = 'app:eyeballs:*';
+window.localStorage.debug = 'app:eyeballs*';
+
+window.localStorage.debug = 'app:eyeballs:*,app:router-chat*';
+```
+
+To disable, you can set the filter to an empty string,
+```js
+window.localStorage.debug = '';
+```
+
+
 ## View `webpack` bundle visualization (webpack report)
 
 Run the webapp with the `WEBPACK_REPORT` environment variable set to generate the HTML report

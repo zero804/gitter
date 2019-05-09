@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:chat-item-view');
 const $ = require('jquery');
 const _ = require('underscore');
 const classnames = require('classnames');
@@ -577,7 +578,9 @@ module.exports = (function() {
       if (!this.model.id) return;
 
       // Holding the Alt key down while clicking adds the permalink to the chat input
-      appEvents.trigger('permalink.requested', 'chat', this.model, { appendInput: !!e.altKey });
+      const permalinkEventAttributes = ['chat', this.model, { appendInput: !!e.altKey }];
+      debug('permalink.requested', ...permalinkEventAttributes);
+      appEvents.trigger('permalink.requested', ...permalinkEventAttributes);
 
       e.preventDefault();
       e.stopPropagation();

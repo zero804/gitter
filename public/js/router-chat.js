@@ -163,6 +163,7 @@ onready(function() {
   });
 
   appEvents.on('permalink.requested', function(type, chat, options) {
+    debug('permalink.requested', type, chat, options);
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
     var url = context.troupe().get('url');
     var id = chat.id;
