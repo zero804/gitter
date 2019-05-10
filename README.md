@@ -167,7 +167,7 @@ Nodemon restarts the Node.js process.
 
 ### Clearing the local MongoDB
 
-Local MongoDB uses a `mongodb` docker volume to persist the DB state even after shutting down the container. You can remove this volume by running `docker volume rm mongodb`. Docker compose will create a new one next time you start MongoDB container.
+Local MongoDB uses a `gitter-mongodb` docker volume to persist the DB state even after shutting down the container. You can remove this volume by running `docker volume rm gitter-mongodb` (you might need to remove containers that use the volume or use `-f` option). Docker compose will create a new volume next time you start MongoDB container.
 
 ### Browsing local MongoDB (GUI)
 
