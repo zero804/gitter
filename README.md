@@ -165,6 +165,14 @@ You can also install the [Node.js inspector Manager (NiM)](https://chrome.google
 browser extension to automatically keep your devtools up to date when
 Nodemon restarts the Node.js process.
 
+### Clearing the local MongoDB
+
+Local MongoDB uses a `gitter-mongodb` docker volume to persist the DB state even after shutting down the container. You can remove this volume by running `docker volume rm gitter-mongodb` (you might need to remove containers that use the volume or use `-f` option). Docker compose will create a new volume next time you start MongoDB container.
+
+### Browsing local MongoDB (GUI)
+
+The Docker compose command we ran above starts a [`mongo-express`](https://github.com/mongo-express/mongo-express) container. You can use it to view content/data in your local MongoDB, see [http://localhost:8081/](http://localhost:8081/).
+
 ### Shutting down Docker Compose
 
 You can stop the docker containers with:

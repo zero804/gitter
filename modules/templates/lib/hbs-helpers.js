@@ -7,6 +7,7 @@ var clientEnv = require('gitter-client-env');
 var cdn = require('gitter-web-cdn');
 var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
+const sanitizeHref = require('../shared/helpers/sanitize-href');
 const bootScriptUtils = require('./boot-script-utils');
 
 function cdnHelper(url, parameters) {
@@ -126,6 +127,7 @@ module.exports = {
   when,
   toLowerCase,
   pad,
+  sanitizeHref,
   typewriter,
   formatNumber,
   githubTypeToClass,

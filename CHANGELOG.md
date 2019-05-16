@@ -1,3 +1,12 @@
+
+# 19.46.0 - *upcoming*
+
+Developer facing:
+
+ - Add docs on how to use debug logging for alt-click key not inserting permalink, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1393
+    - Also adds debug logging for alt-click not inserting permalink
+
+
 # 19.45.0 - 2019-05-06
 
  - Add docs to clarify when email notifications are sent out, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1383
