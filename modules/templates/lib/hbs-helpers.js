@@ -7,6 +7,7 @@ var clientEnv = require('gitter-client-env');
 var cdn = require('gitter-web-cdn');
 var pluralize = require('../shared/helpers/pluralize');
 var when = require('../shared/helpers/when');
+const sanitizeHref = require('../shared/helpers/sanitize-href');
 const bootScriptUtils = require('./boot-script-utils');
 
 function cdnHelper(url, parameters) {
@@ -72,16 +73,6 @@ function pad(options) {
     }
   }
   return content;
-}
-
-function sanitizeHref(href = '') {
-  const hrefLower = href.toLowerCase();
-  const hasSafeSchema = hrefLower.indexOf('http:') === 0 || hrefLower.indexOf('https:') === 0;
-  if (hasSafeSchema) {
-    return href;
-  }
-
-  return '';
 }
 
 // FIXME REMOVE THIS ONCE THE NEW ERRORS PAGES ARE DONE
