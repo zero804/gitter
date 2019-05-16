@@ -1,10 +1,14 @@
+# 19.46.0 - 2019-5-15
 
-# 19.46.0 - *upcoming*
+ - Fix integration activity XSS, https://gitlab.com/gitlab-org/gitter/webapp/issues/2068
+     - Thanks to [@mishre](https://gitlab.com/mishre) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/1
 
 Developer facing:
 
  - Add docs on how to use debug logging for alt-click key not inserting permalink, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1393
     - Also adds debug logging for alt-click not inserting permalink
+ - Adding `mongo-express` container for easy database browsing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1395
 
 
 # 19.45.0 - 2019-05-06
