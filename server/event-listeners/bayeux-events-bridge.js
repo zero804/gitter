@@ -92,7 +92,10 @@ exports.install = function() {
     var userId = options.userId;
     var troupeId = options.troupeId;
 
-    presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
+    presenceService.findAllSocketsForUserInTroupe(userId, troupeId.toString(), function(
+      err,
+      socketIds
+    ) {
       if (err)
         return winston.error('Error while attempting to disconnect user from troupe' + err, {
           exception: err

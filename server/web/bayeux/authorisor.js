@@ -15,6 +15,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var tokenProvider = require('../../services/tokens');
+const bayeux = require('../bayeux'); // FIXME: probably not the best to have cyclic dependency (bayex cluser uses authorisor)
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -88,16 +89,16 @@ function validateUserForSubTroupeSubscription(options) {
 
   var promise = permissionToRead(userId, troupeId);
 
-  if (!ext || !ext.reassociate) {
-    return promise;
-  }
-
   /** Reassociate the socket with a new room */
-  return promise.tap(function(access) {
+  return promise.tap(async function(access) {
     if (!access) return;
-
+    const hasEyeballs = ext && ext.reassociate && !!ext.reassociate.eyeballs;
+    const result = await presenceService.lookupSocketOwnerAndTroupe(options.clientId);
+    const [, previousTroupeId] = result;
+    // TODO: always unsubscribe and resubscribe? Probably not a good idea since unsubscribe removes all 4 channels.
+    await bayeux.unsubscribeFromTroupe(options.clientId, previousTroupeId, () => {});
     return presenceService
-      .socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+      .socketReassociated(options.clientId, userId, troupeId, hasEyeballs)
       .then(function() {
         // Update the lastAccessTime for the room
         if (userId) {

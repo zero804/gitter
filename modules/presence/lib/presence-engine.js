@@ -1142,6 +1142,7 @@ presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnl
 presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
 presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
+presenceService.lookupSocketOwnerAndTroupe = lookupSocketOwnerAndTroupe;
 
 // Eyeball
 presenceService.clientEyeballSignal = clientEyeballSignal;

@@ -332,6 +332,29 @@ BayeuxSingleton.prototype.destroyClient = function(clientId, callback) {
 };
 
 /**
+ *  Unsubscribe socket from all room related channels
+ */
+BayeuxSingleton.prototype.unsubscribeFromTroupe = async function(clientId, troupeId) {
+  if (!clientId || !troupeId) return;
+  logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
+
+  const engine = this.server._server._engine;
+  const p1 = new Promise(resolve => {
+    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}`, resolve);
+  });
+  const p2 = new Promise(resolve => {
+    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/events`, resolve);
+  });
+  const p3 = new Promise(resolve => {
+    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/chatMessages`, resolve);
+  });
+  const p4 = new Promise(resolve => {
+    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/users`, resolve);
+  });
+  return Promise.all([p1, p2, p3, p4]);
+};
+
+/**
  * Attach the faye instance to the server
  */
 BayeuxSingleton.prototype.attach = function(httpServer) {
