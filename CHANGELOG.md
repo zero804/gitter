@@ -1,3 +1,10 @@
+# 19.47.0 - *upcoming*
+
+Developer facing:
+
+ - Update `package.json` `engines` field to specify only Node.js v10 support, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1397
+
+
 # 19.46.0 - 2019-5-15
 
  - Fix integration activity XSS, https://gitlab.com/gitlab-org/gitter/webapp/issues/2068
