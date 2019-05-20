@@ -15,7 +15,6 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var tokenProvider = require('../../services/tokens');
-const bayeux = require('../bayeux'); // FIXME: probably not the best to have cyclic dependency (bayex cluser uses authorisor)
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
