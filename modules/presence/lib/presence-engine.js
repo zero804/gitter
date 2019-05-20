@@ -54,8 +54,8 @@ function keyTroupeUsers(troupeId) {
   return 'tu:' + troupeId;
 }
 
-function keyUserSockets(troupeId) {
-  return 'us:' + troupeId;
+function keyUserSockets(userId) {
+  return 'us:' + userId;
 }
 
 function getUniqueUsersAndTroupes(userTroupes) {

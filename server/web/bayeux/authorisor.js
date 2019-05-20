@@ -90,13 +90,9 @@ function validateUserForSubTroupeSubscription(options) {
   var promise = permissionToRead(userId, troupeId);
 
   /** Reassociate the socket with a new room */
-  return promise.tap(async function(access) {
+  return promise.tap(function(access) {
     if (!access) return;
     const hasEyeballs = ext && ext.reassociate && !!ext.reassociate.eyeballs;
-    const result = await presenceService.lookupSocketOwnerAndTroupe(options.clientId);
-    const [, previousTroupeId] = result;
-    // TODO: always unsubscribe and resubscribe? Probably not a good idea since unsubscribe removes all 4 channels.
-    await bayeux.unsubscribeFromTroupe(options.clientId, previousTroupeId, () => {});
     return presenceService
       .socketReassociated(options.clientId, userId, troupeId, hasEyeballs)
       .then(function() {

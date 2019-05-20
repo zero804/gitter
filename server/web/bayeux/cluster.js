@@ -336,22 +336,15 @@ BayeuxSingleton.prototype.destroyClient = function(clientId, callback) {
  */
 BayeuxSingleton.prototype.unsubscribeFromTroupe = async function(clientId, troupeId) {
   if (!clientId || !troupeId) return;
-  logger.info('bayeux: client ' + clientId + ' intentionally destroyed.');
-
-  const engine = this.server._server._engine;
-  const p1 = new Promise(resolve => {
-    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}`, resolve);
+  var engine = this.server._server._engine;
+  const unsubscribePromises = _.map(['', '/events', '/chatMessages', '/users'], async segment => {
+    const channel = `/api/v1/rooms/${troupeId}${segment}`;
+    await new Promise(resolve => {
+      engine.unsubscribe(clientId, channel, resolve);
+    });
+    logger.info(`bayeux: client ${clientId} unsubscribed from ${channel}`);
   });
-  const p2 = new Promise(resolve => {
-    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/events`, resolve);
-  });
-  const p3 = new Promise(resolve => {
-    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/chatMessages`, resolve);
-  });
-  const p4 = new Promise(resolve => {
-    engine.unsubscribe(clientId, `/api/v1/rooms/${troupeId}/users`, resolve);
-  });
-  return Promise.all([p1, p2, p3, p4]);
+  return Promise.all(unsubscribePromises);
 };
 
 /**

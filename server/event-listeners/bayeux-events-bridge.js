@@ -7,6 +7,7 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') })
 var appEvents = require('gitter-web-appevents');
 var bayeux = require('../web/bayeux');
 var ent = require('ent');
+const _ = require('lodash');
 var presenceService = require('gitter-web-presence');
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
@@ -88,27 +89,11 @@ exports.install = function() {
     publish(url, message, 'tokenRevoked');
   });
 
-  appEvents.onUserRemovedFromTroupe(function(options) {
+  appEvents.onUserRemovedFromTroupe(async function(options) {
     var userId = options.userId;
     var troupeId = options.troupeId;
-
-    presenceService.findAllSocketsForUserInTroupe(userId, troupeId.toString(), function(
-      err,
-      socketIds
-    ) {
-      if (err)
-        return winston.error('Error while attempting to disconnect user from troupe' + err, {
-          exception: err
-        });
-
-      if (!socketIds || !socketIds.length) return;
-
-      socketIds.forEach(function(clientId) {
-        bayeux.destroyClient(clientId, function() {
-          winston.info('Destroyed client ' + clientId + ' as user was disconnected from troupe');
-        });
-      });
-    });
+    const sockets = await presenceService.listAllSocketsForUser(userId);
+    _.map(sockets, socket => bayeux.unsubscribeFromTroupe(socket, troupeId));
   });
 
   appEvents.onUserNotification(function(data) {
