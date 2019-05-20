@@ -3,6 +3,7 @@
 Developer facing:
 
  - Update `package.json` `engines` field to specify only Node.js v10 support, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1397
+ - Introduce [Vue.js](https://vuejs.org/) into the codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1396
 
 
 # 19.46.0 - 2019-5-15
