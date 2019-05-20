@@ -15,6 +15,7 @@ var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
+const vueRenderToString = require('./vue-ssr-renderer');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -70,7 +71,7 @@ function renderChat(req, res, next, options) {
         generateUserThemeSnapshot(req)
 
         // eslint-disable-next-line complexity
-      ]).spread(function(
+      ]).spread(async function(
         troupeContext,
         chats,
         activityEvents,
@@ -120,6 +121,18 @@ function renderChat(req, res, next, options) {
           isRightToolbarPinned = true;
         }
 
+        const useVueLeftMenu = req.fflip.has('vue-left-menu');
+
+        let vueLeftMenuHtmlOutput;
+        if (useVueLeftMenu) {
+          vueLeftMenuHtmlOutput = await vueRenderToString({
+            moduleToRender: 'left-menu',
+            storeData: {
+              // ...
+            }
+          });
+        }
+
         var renderOptions = _.extend(
           {
             hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
@@ -152,7 +165,9 @@ function renderChat(req, res, next, options) {
             headerView: getHeaderViewOptions(troupeContext.troupe),
             canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
             isAdmin: isAdmin,
-            isNativeDesktopApp: troupeContext.isNativeDesktopApp
+            isNativeDesktopApp: troupeContext.isNativeDesktopApp,
+
+            leftMenuHtml: vueLeftMenuHtmlOutput
           },
           options.extras
         );

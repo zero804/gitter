@@ -45,6 +45,7 @@ gulp.task('process:assemble:copy-app:files', function() {
         'preinstall.sh',
         'config/**',
         'output/assets/js/webpack-manifest.json',
+        'output/assets/js/vue-ssr-server-bundle.json',
         'public/templates/**',
         'public/layouts/**',
         'public/js/**',

@@ -28,12 +28,23 @@ gulp.task('clientapp:compile:copy-files', function() {
     .pipe(restoreTimestamps());
 });
 
-gulp.task('clientapp:compile:webpack', ['clientapp:compile:copy-files'], function() {
+gulp.task('clientapp:compile:webpack-server', ['clientapp:compile:copy-files'], function() {
   return gulp
-    .src('./public/js/webpack.config')
-    .pipe(webpack(require('../public/js/webpack.config')))
+    .src('./public/js/webpack.server.config')
+    .pipe(webpack(require('../public/js/webpack.server.config')))
     .pipe(gulp.dest('output/assets/js'));
 });
+
+gulp.task(
+  'clientapp:compile:webpack',
+  ['clientapp:compile:copy-files', 'clientapp:compile:webpack-server'],
+  function() {
+    return gulp
+      .src('./public/js/webpack.config')
+      .pipe(webpack(require('../public/js/webpack.config')))
+      .pipe(gulp.dest('output/assets/js'));
+  }
+);
 
 function getUglifyOptions() {
   if (process.env.FAST_UGLIFY && JSON.parse(process.env.FAST_UGLIFY)) {

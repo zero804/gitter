@@ -36,6 +36,8 @@ require('./components/focus-events');
 // Preload widgets
 require('./components/ping');
 
+const useVueLeftMenu = context.hasFeature('vue-left-menu');
+
 onready(function() {
   // eslint-disable-line max-statements
 
@@ -312,4 +314,9 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
+
+  if (useVueLeftMenu) {
+    // Initialize Vue stuff
+    require('./vue/initialize-clientside');
+  }
 });
