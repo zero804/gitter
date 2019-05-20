@@ -7,7 +7,6 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') })
 var appEvents = require('gitter-web-appevents');
 var bayeux = require('../web/bayeux');
 var ent = require('ent');
-const _ = require('lodash');
 var presenceService = require('gitter-web-presence');
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
@@ -72,7 +71,7 @@ exports.install = function() {
     var userId = options.userId;
     var troupeId = options.troupeId;
     const sockets = await presenceService.listAllSocketsForUser(userId);
-    _.map(sockets, socket => bayeux.unsubscribeFromTroupe(socket, troupeId));
+    sockets.forEach(socket => bayeux.unsubscribeFromTroupe(socket, troupeId));
   });
 
   appEvents.onUserNotification(function(data) {
