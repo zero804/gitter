@@ -60,7 +60,7 @@ const webpackConfig = {
       {
         test: /.css$/,
         use: [
-          { loader: 'vue-style-loader', options: { insertAt: 'top' } },
+          { loader: 'style-loader', options: { insertAt: 'top' } },
           { loader: 'css-loader', options: { importLoaders: 1 } },
           { loader: 'postcss-loader', options: { plugins: getPostcssStack(webpack) } }
         ]
