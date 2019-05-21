@@ -71,6 +71,7 @@ exports.install = function() {
     var userId = options.userId;
     var troupeId = options.troupeId;
     const sockets = await presenceService.listAllSocketsForUser(userId);
+    winston.info(`Unsubscribing all sockets belonging to user ${userId} from room ${troupeId}`);
     sockets.forEach(socket => bayeux.unsubscribeFromTroupe(socket, troupeId));
   });
 
