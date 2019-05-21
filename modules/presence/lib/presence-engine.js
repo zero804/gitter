@@ -577,35 +577,6 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
     .nodeify(callback);
 }
 
-function findAllSocketsForUserInTroupe(userId, troupeId, callback) {
-  return listAllSocketsForUser(userId)
-    .then(function(socketIds) {
-      if (!socketIds || !socketIds.length) return [];
-
-      var multi = redisClient.multi();
-      socketIds.forEach(function(socketId) {
-        multi.hmget(keySocketUser(socketId), 'tid');
-      });
-
-      return multi
-        .exec()
-        .then(checkMultiErrors)
-        .then(function(replies) {
-          var result = replies.reduce(function(memo, reply, index) {
-            var tId = reply[1][0];
-            if (tId === troupeId) {
-              memo.push(socketIds[index]);
-            }
-
-            return memo;
-          }, []);
-
-          return result;
-        });
-    })
-    .nodeify(callback);
-}
-
 function checkMultiErrors(replies) {
   if (replies) {
     replies.forEach(function(reply) {
@@ -1139,7 +1110,6 @@ presenceService.getSockets = getSockets;
 presenceService.listMobileUsers = listMobileUsers;
 presenceService.listOnlineUsersForTroupes = listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
-presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
 presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 
