@@ -339,10 +339,12 @@ BayeuxSingleton.prototype.unsubscribeFromTroupe = async function(clientId, troup
   var engine = this.server._server._engine;
   const unsubscribePromises = _.map(['', '/events', '/chatMessages', '/users'], async segment => {
     const channel = `/api/v1/rooms/${troupeId}${segment}`;
-    await new Promise(resolve => {
-      engine.unsubscribe(clientId, channel, resolve);
+    const error = await new Promise(resolve => {
+      engine.unsubscribe(clientId, channel, (_, error) => resolve(error));
     });
-    logger.info(`bayeux: client ${clientId} unsubscribed from ${channel}`);
+    if (error) {
+      logger.error(`bayeux: error when unsubscribing client ${clientId} from ${channel}, ${error}`);
+    }
   });
   return Promise.all(unsubscribePromises);
 };
