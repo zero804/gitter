@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var _ = require('underscore');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var toggleClass = require('../../utils/toggle-class');
 var itemCollections = require('../../collections/instances/integrated-items');
 var PeopleCollectionView = require('../people/peopleCollectionView');

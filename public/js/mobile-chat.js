@@ -2,7 +2,7 @@
 
 var $ = require('jquery');
 var Backbone = require('backbone');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var appEvents = require('./utils/appevents');
 var onready = require('./utils/onready');
 

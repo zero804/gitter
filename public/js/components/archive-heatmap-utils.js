@@ -5,7 +5,7 @@ var $ = require('jquery');
 var CalHeatMap = require('@gitterhq/cal-heatmap');
 var apiClient = require('./api-client');
 var getTimezoneInfo = require('../utils/detect-timezone');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 
 var SPACEBAR_KEY = 32;
 var ENTER_KEY = 13;

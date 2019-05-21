@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var Marionette = require('backbone.marionette');
 var appEvents = require('../../utils/appevents');
 var apiClient = require('../../components/api-client');

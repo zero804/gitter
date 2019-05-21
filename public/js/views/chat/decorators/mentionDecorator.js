@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../../../utils/context');
+var context = require('gitter-web-client-context');
 var UserPopoverView = require('../../people/userPopoverView');
 var dataset = require('../../../utils/dataset-shim');
 

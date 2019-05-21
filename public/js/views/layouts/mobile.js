@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var Marionette = require('backbone.marionette');
 var $ = require('jquery');
 var modalRegion = require('../../components/modal-region');

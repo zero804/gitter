@@ -5,7 +5,7 @@ var qs = require('gitter-web-qs');
 var _ = require('underscore');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
-var debug = require('debug-proxy')('app:context');
+var debug = require('debug-proxy')('app:client-context');
 
 var ctx = window.troupeContext || {};
 var snapshots = ctx.snapshots || {};

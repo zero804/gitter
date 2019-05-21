@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var validateTag = require('gitter-web-shared/validation/validate-tag').validateTag;
 
 var TagModel = Backbone.Model.extend({

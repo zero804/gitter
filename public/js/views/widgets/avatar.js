@@ -1,7 +1,7 @@
 'use strict';
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var isMobile = require('../../utils/is-mobile');
 var template = require('./tmpl/avatar.hbs');
 var UserPopoverView = require('../people/userPopoverView');

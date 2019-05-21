@@ -10,7 +10,7 @@ var RAF = require('../../utils/raf');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var appEvents = require('../../utils/appevents');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var isMobile = require('../../utils/is-mobile');
 
 require('jquery-textcomplete'); // eslint-disable-line node/no-missing-require

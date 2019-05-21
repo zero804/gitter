@@ -6,7 +6,7 @@ var $ = require('jquery');
 
 var urlParse = require('url-parse');
 var appEvents = require('./utils/appevents');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var mapMessageTemplate = require('./views/homepage/map-message.hbs');
 var roomNameTrimmer = require('gitter-web-shared/room-name-trimmer');
 var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');

@@ -1,7 +1,7 @@
 'use strict';
 
 var isMobile = require('../../../utils/is-mobile');
-var context = require('../../../utils/context');
+var context = require('gitter-web-client-context');
 var apiClient = require('../../../components/api-client');
 var template = require('./tmpl/typeahead.hbs');
 var _ = require('underscore');

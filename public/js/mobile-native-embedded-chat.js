@@ -2,7 +2,7 @@
 
 const debug = require('debug-proxy')('app:mobile-native-embedded-chat');
 var $ = require('jquery');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var liveContext = require('./components/live-context');
 var chatModels = require('./collections/chat');
 var ChatCollectionView = require('./views/chat/chatCollectionView');

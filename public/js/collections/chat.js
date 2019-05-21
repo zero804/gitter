@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var Backbone = require('backbone');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var moment = require('moment');
 var burstCalculator = require('../utils/burst-calculator');
 var InfiniteCollectionMixin = require('./infinite-mixin');

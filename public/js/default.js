@@ -1,7 +1,7 @@
 'use strict';
 
 require('./utils/webpack');
-require('./utils/context');
+require('gitter-web-client-context');
 
 require('./utils/log');
 require('./components/api-client');

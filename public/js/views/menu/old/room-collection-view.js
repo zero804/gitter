@@ -2,7 +2,7 @@
 'use strict';
 var $ = require('jquery');
 var Popover = require('../../popover');
-var context = require('../../../utils/context');
+var context = require('gitter-web-client-context');
 var apiClient = require('../../../components/api-client');
 var roomNameTrimmer = require('gitter-web-shared/room-name-trimmer');
 var Marionette = require('backbone.marionette');

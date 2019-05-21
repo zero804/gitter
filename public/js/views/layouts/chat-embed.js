@@ -7,7 +7,7 @@ var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var unreadItemsClient = require('../../components/unread-items-client');
 var UnreadBannerView = require('../app/unreadBannerView');
 
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var JoinRoomView = require('../chat/join-room-view');
 
 //var ChatToolbarLayout = require('./chat-toolbar');

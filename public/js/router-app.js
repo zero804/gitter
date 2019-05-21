@@ -14,7 +14,7 @@ var onready = require('./utils/onready');
 var urlParser = require('./utils/url-parser');
 var RAF = require('./utils/raf');
 var appEvents = require('./utils/appevents');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var toggleDarkTheme = require('./utils/toggle-dark-theme');
 
 var TitlebarUpdater = require('./components/titlebar');

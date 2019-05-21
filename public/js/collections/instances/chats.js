@@ -1,7 +1,7 @@
 'use strict';
 
 var chatModels = require('../chat');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var unreadItemsClient = require('../../components/unread-items-client');
 var errorHandle = require('../../utils/live-collection-error-handle');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var realtime = require('./realtime');
 var appEvents = require('../utils/appevents');
 var realtimePresenceTracking = require('./realtime-presence-tracking');

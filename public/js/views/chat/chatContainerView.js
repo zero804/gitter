@@ -5,7 +5,7 @@ var hasScrollBars = require('../../utils/scrollbar-detect');
 var appEvents = require('../../utils/appevents');
 var ChatCollectionView = require('../chat/chatCollectionView');
 var ChatConnectionIndicatorView = require('../chat/chatConnectivityIndicatorView');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var unreadItemsClient = require('../../components/unread-items-client');
 
 require('../behaviors/isomorphic');

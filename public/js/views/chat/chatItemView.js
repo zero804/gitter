@@ -9,7 +9,7 @@ const Marionette = require('backbone.marionette');
 const cocktail = require('backbone.cocktail');
 const urlJoin = require('url-join');
 
-const context = require('../../utils/context');
+const context = require('gitter-web-client-context');
 const appEvents = require('../../utils/appevents');
 const apiClient = require('../../components/api-client');
 const dataset = require('../../utils/dataset-shim');

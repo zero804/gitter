@@ -3,7 +3,7 @@
 require('./utils/font-setup');
 
 var $ = require('jquery');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var apiClient = require('./components/api-client');
 var onready = require('./utils/onready');
