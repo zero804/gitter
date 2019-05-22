@@ -1,5 +1,5 @@
 'use strict';
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 
 module.exports = (function() {
   /* Poor mans locale */

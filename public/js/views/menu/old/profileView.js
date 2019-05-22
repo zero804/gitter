@@ -1,5 +1,5 @@
 'use strict';
-var context = require('../../../utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var Marionette = require('backbone.marionette');
 var appEvents = require('../../../utils/appevents');

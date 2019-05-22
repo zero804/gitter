@@ -3,7 +3,7 @@ require('./utils/initial-setup');
 require('./utils/font-setup');
 
 var Backbone = require('backbone');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:router-chat');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');

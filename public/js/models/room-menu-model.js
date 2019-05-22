@@ -9,7 +9,7 @@ var ProxyCollection = require('@gitterhq/backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');
 var apiClient = require('../components/api-client');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var autoModelSave = require('../utils/auto-model-save');
 
 var FilteredMinibarGroupCollection = require('../collections/filtered-minibar-group-collection');

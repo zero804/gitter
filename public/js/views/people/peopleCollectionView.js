@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var ModalView = require('../modals/modal');
 var AvatarView = require('../widgets/avatar');
 var collectionTemplate = require('./tmpl/peopleCollectionView.hbs');

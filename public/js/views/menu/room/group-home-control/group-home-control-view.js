@@ -4,7 +4,7 @@ var Marionette = require('backbone.marionette');
 var template = require('./group-home-control-view.hbs');
 var toggleClass = require('../../../../utils/toggle-class');
 var appEvents = require('../../../../utils/appevents');
-var context = require('../../../../utils/context');
+var context = require('gitter-web-client-context');
 
 module.exports = Marionette.ItemView.extend({
   template: template,

@@ -1,7 +1,7 @@
 'use strict';
 var $ = require('jquery');
 const Backbone = require('backbone');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var onready = require('./utils/onready');
 const ArchiveLayout = require('./views/layouts/archive');

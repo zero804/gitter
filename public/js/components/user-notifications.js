@@ -4,7 +4,7 @@ const debug = require('debug-proxy')('app:user-notifications');
 var appEvents = require('../utils/appevents');
 var urlParser = require('../utils/url-parser');
 var sessionMutex = require('../utils/session-mutex');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var onReady = require('../utils/onready');
 var showDesktopNotification = require('../utils/show-desktop-notification');
 

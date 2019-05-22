@@ -50,6 +50,7 @@
     "gitter-web-cdn": "file:modules/cdn",
     "gitter-web-chat-reports": "file:modules/chat-reports",
     "gitter-web-chats": "file:modules/chats",
+    "gitter-web-client-context": "file:modules/client-context",
     "gitter-web-collaborators": "file:modules/collaborators",
     "gitter-web-elasticsearch": "file:modules/elasticsearch",
     "gitter-web-email-addresses": "file:modules/email-addresses",

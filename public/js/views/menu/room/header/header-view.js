@@ -7,7 +7,7 @@ var toggleClass = require('../../../../utils/toggle-class');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
-var context = require('../../../../utils/context');
+var context = require('gitter-web-client-context');
 
 var HeaderView = Marionette.ItemView.extend({
   template: template,

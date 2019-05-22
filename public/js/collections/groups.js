@@ -5,7 +5,7 @@ var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('../components/realtime');
 var apiClient = require('../components/api-client');
 var SyncMixin = require('./sync-mixin');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 
 var GroupModel = Backbone.Model.extend({
   defaults: {

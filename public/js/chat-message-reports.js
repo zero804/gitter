@@ -7,7 +7,7 @@ const Marionette = require('backbone.marionette');
 require('./views/behaviors/isomorphic');
 const debug = require('debug-proxy')('app:chat-messsage-reports');
 
-const context = require('./utils/context');
+const context = require('gitter-web-client-context');
 
 function getAccountAgeString(user) {
   if (user) {
