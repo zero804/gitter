@@ -359,6 +359,13 @@ BayeuxSingleton.prototype.attach = function(httpServer) {
   this.server.attach(httpServer);
 };
 
+/**
+ * getClient is used to get a new client for automted testing
+ */
+BayeuxSingleton.prototype.getClient = function() {
+  return this.server.getClient();
+};
+
 if (disableLegacyEndpoint) {
   module.exports = BayeuxSingleton;
 } else {

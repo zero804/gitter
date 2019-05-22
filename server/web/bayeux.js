@@ -23,3 +23,8 @@ exports.attach = function(httpServer) {
 exports.unsubscribeFromTroupe = function(clientId, troupeId) {
   return cluster.unsubscribeFromTroupe(clientId, troupeId);
 };
+
+/**
+ * getClient is used to get a new client for automted testing
+ */
+exports.getClient = () => cluster.getClient();
