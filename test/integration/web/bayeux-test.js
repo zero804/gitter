@@ -15,6 +15,8 @@ describe('bayeux', function() {
     });
   });
 
+  xdescribe('publish');
+
   describe('clientExists', function() {
     it('should check client existence #slow', function(done) {
       bayeux.clientExists('abc456', function(exists) {
@@ -24,7 +26,7 @@ describe('bayeux', function() {
     });
   });
 
-  describe('auhtorisor, cluster, bayeux, bayeux-events-bridge integration', () => {
+  describe('authorisor, cluster, bayeux, bayeux-events-bridge integration', () => {
     const fixture = fixtureLoader.setup({
       user1: {},
       troupe1: { users: ['user1'], public: false },
@@ -64,7 +66,7 @@ describe('bayeux', function() {
         text: 'hello'
       });
       await waitForAppEvent(() => {
-        assert(messages.length === 1);
+        assert.equal(messages.length, 1);
       });
       // remove user1 from the room
       appEvents.userRemovedFromTroupe({ userId: fixture.user1.id, troupeId: fixture.troupe1.id });
@@ -76,7 +78,7 @@ describe('bayeux', function() {
       });
       // user hasn't received the message after being removed from the room
       await waitForAppEvent(() => {
-        assert(messages.length === 1);
+        assert.equal(messages.length, 1);
       });
     });
   });
