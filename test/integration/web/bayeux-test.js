@@ -7,6 +7,8 @@ const bayeuxEventsBridge = testRequire('./event-listeners/bayeux-events-bridge')
 const bayeux = testRequire('./web/bayeux');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 const assert = require('assert');
+const http = require('http');
+const Faye = require('faye');
 
 describe('bayeux', function() {
   describe('destroyClient', function(done) {
@@ -15,7 +17,9 @@ describe('bayeux', function() {
     });
   });
 
-  xdescribe('publish');
+  describe('publish', function() {
+    xit('should publish');
+  });
 
   describe('clientExists', function() {
     it('should check client existence #slow', function(done) {
@@ -29,9 +33,11 @@ describe('bayeux', function() {
   describe('authorisor, cluster, bayeux, bayeux-events-bridge integration', () => {
     const fixture = fixtureLoader.setup({
       user1: {},
-      troupe1: { users: ['user1'], public: false },
+      user2: {},
+      troupe1: { users: ['user1', 'user2'], public: false },
       oAuthClient1: {},
-      oAuthAccessToken1: { user: 'user1', client: 'oAuthClient1' }
+      oAuthAccessToken1: { user: 'user1', client: 'oAuthClient1' },
+      oAuthAccessToken2: { user: 'user2', client: 'oAuthClient1' }
     });
 
     /* The thread needs to be interrupted for appEvent to take place */
@@ -40,35 +46,50 @@ describe('bayeux', function() {
         setTimeout(() => {
           callback();
           resolve();
-        }, 10)
+        }, 50)
       );
+
+    const createAuthenticator = token => ({
+      outgoing: (message, callback) => {
+        if (message.channel === '/meta/handshake') {
+          message.ext = { token: token.toString() };
+        }
+        callback(message);
+      }
+    });
 
     it('should not send message to user who has been removed from a room', async () => {
       bayeuxEventsBridge.install();
-      const client = bayeux.getClient();
-      const authentication = {
-        outgoing: (message, callback) => {
-          if (message.channel === '/meta/handshake') {
-            message.ext = { token: fixture.oAuthAccessToken1.token.toString() };
-          }
-          callback(message);
-        }
-      };
-      client.addExtension(authentication);
-      let messages = [];
+
+      var server = http.createServer();
+      bayeux.attach(server);
+      await server.listen(5006);
+
+      const clientToBeBanned = new Faye.Client(`http://localhost:5006/bayeux`);
+      const clientToStay = new Faye.Client(`http://localhost:5006/bayeux`);
+      clientToBeBanned.addExtension(createAuthenticator(fixture.oAuthAccessToken1.token));
+      clientToStay.addExtension(createAuthenticator(fixture.oAuthAccessToken2.token));
+
+      let messagesToBeBanned = [];
+      let messagesToStay = [];
       // waiting for the subscription to be created before going further
-      await client.subscribe(
+      await clientToBeBanned.subscribe(
         `/api/v1/rooms/${fixture.troupe1.id}/chatMessages`,
-        m => (messages = [...messages, m])
+        m => (messagesToBeBanned = [...messagesToBeBanned, m])
+      );
+      await clientToStay.subscribe(
+        `/api/v1/rooms/${fixture.troupe1.id}/chatMessages`,
+        m => (messagesToStay = [...messagesToStay, m])
       );
       // send the first message
       appEvents.dataChange2(`/rooms/${fixture.troupe1.id}/chatMessages`, 'create', {
         text: 'hello'
       });
       await waitForAppEvent(() => {
-        assert.equal(messages.length, 1);
+        assert.equal(messagesToBeBanned.length, 1);
+        assert.equal(messagesToStay.length, 1);
       });
-      // remove user1 from the room
+      // ban user1 (clientToBeBanned)
       appEvents.userRemovedFromTroupe({ userId: fixture.user1.id, troupeId: fixture.troupe1.id });
       // send the second message
       await waitForAppEvent(() => {
@@ -76,9 +97,10 @@ describe('bayeux', function() {
           text: 'hello2'
         });
       });
-      // user hasn't received the message after being removed from the room
+      // clientToBeBanned hasn't received the message after being removed from the room
       await waitForAppEvent(() => {
-        assert.equal(messages.length, 1);
+        assert.equal(messagesToBeBanned.length, 1);
+        assert.equal(messagesToStay.length, 2);
       });
     });
   });

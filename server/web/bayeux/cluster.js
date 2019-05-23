@@ -308,15 +308,6 @@ BayeuxCluster.prototype.attach = function(httpServer) {
   this.serverLegacy.attach(httpServer);
 };
 
-/**
- * getClient is used to get a new client for automted testing
- *
- * since it is only used in tests, it returns only client for the new server
- */
-BayeuxCluster.prototype.getClient = function() {
-  return this.serverLegacy.getClient();
-};
-
 /** Singleton server */
 function BayeuxSingleton(lightweight) {
   this.lightweight = lightweight;
@@ -381,13 +372,6 @@ BayeuxSingleton.prototype.attach = function(httpServer) {
     throw new Error('A lightweight bayeux cluster cannot be attached');
   }
   this.server.attach(httpServer);
-};
-
-/**
- * getClient is used to get a new client for automted testing
- */
-BayeuxSingleton.prototype.getClient = function() {
-  return this.server.getClient();
 };
 
 if (disableLegacyEndpoint) {
