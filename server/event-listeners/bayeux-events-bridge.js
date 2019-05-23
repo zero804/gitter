@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+var Promise = require('bluebird');
 var winston = env.logger;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') });
 var appEvents = require('gitter-web-appevents');
@@ -72,7 +73,10 @@ exports.install = function() {
     var troupeId = options.troupeId;
     const sockets = await presenceService.listAllSocketsForUser(userId);
     winston.info(`Unsubscribing all sockets belonging to user ${userId} from room ${troupeId}`);
-    sockets.forEach(socket => bayeux.unsubscribeFromTroupe(socket, troupeId));
+    await Promise.all(sockets.map(socket => bayeux.unsubscribeFromTroupe(socket, troupeId)));
+    winston.info(
+      `All sockets belonging to user ${userId} have been unsubscribed from room ${troupeId}`
+    );
   });
 
   appEvents.onUserNotification(function(data) {
