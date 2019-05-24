@@ -40,14 +40,35 @@ describe('bayeux', function() {
       oAuthAccessToken2: { user: 'userToStay1', client: 'oAuthClient1' }
     });
 
-    /* The thread needs to be interrupted for appEvent to take place */
-    const waitForAppEvent = callback =>
+    /* Used in test to wait custom amount of time */
+    const wait = time =>
       new Promise(resolve =>
         setTimeout(() => {
-          callback();
           resolve();
-        }, 50)
+        }, time)
       );
+
+    /**
+     * predicate is a function, we'll periodically check (in time increments)
+     * if the predicate evaluates to true. The return promise resolves either when
+     * predicate is true or when maxTime in milliseconds has been reached.
+     */
+    const waitForPredicate = (predicate, increment = 10, maxTime = 500) =>
+      new Promise(resolve => {
+        let maxTimeReached = false;
+        setTimeout(() => {
+          maxTimeReached = true;
+        }, maxTime);
+        const waitForIncrementOrMaxTime = () =>
+          setTimeout(() => {
+            if (predicate() || maxTimeReached) {
+              resolve();
+            } else {
+              waitForIncrementOrMaxTime();
+            }
+          }, increment);
+        waitForIncrementOrMaxTime();
+      });
 
     const createAuthenticator = token => ({
       outgoing: (message, callback) => {
@@ -85,26 +106,23 @@ describe('bayeux', function() {
       appEvents.dataChange2(`/rooms/${fixture.troupe1.id}/chatMessages`, 'create', {
         text: 'hello'
       });
-      await waitForAppEvent(() => {
-        assert.equal(messagesToBeBanned.length, 1);
-        assert.equal(messagesToStay.length, 1);
-      });
+      await waitForPredicate(() => messagesToBeBanned.length === 1);
+      assert.equal(messagesToBeBanned.length, 1);
+      assert.equal(messagesToStay.length, 1);
       // ban userToBeBanned1 (clientToBeBanned)
       appEvents.userRemovedFromTroupe({
         userId: fixture.userToBeBanned1.id,
         troupeId: fixture.troupe1.id
       });
-      // send the second message
-      await waitForAppEvent(() => {
-        appEvents.dataChange2(`/rooms/${fixture.troupe1.id}/chatMessages`, 'create', {
-          text: 'hello2'
-        });
+      // send the second message but make sure the user removal had time to propagate
+      await wait(50);
+      appEvents.dataChange2(`/rooms/${fixture.troupe1.id}/chatMessages`, 'create', {
+        text: 'hello2'
       });
       // clientToBeBanned hasn't received the message after being removed from the room
-      await waitForAppEvent(() => {
-        assert.equal(messagesToBeBanned.length, 1);
-        assert.equal(messagesToStay.length, 2);
-      });
+      await waitForPredicate(() => messagesToStay.length === 2);
+      assert.equal(messagesToBeBanned.length, 1);
+      assert.equal(messagesToStay.length, 2);
     });
   });
 });
