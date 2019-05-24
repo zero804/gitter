@@ -32,12 +32,12 @@ describe('bayeux', function() {
 
   describe('authorisor, cluster, bayeux, bayeux-events-bridge integration', () => {
     const fixture = fixtureLoader.setup({
-      user1: {},
-      user2: {},
-      troupe1: { users: ['user1', 'user2'], public: false },
+      userToBeBanned1: {},
+      userToStay1: {},
+      troupe1: { users: ['userToBeBanned1', 'userToStay1'], public: false },
       oAuthClient1: {},
-      oAuthAccessToken1: { user: 'user1', client: 'oAuthClient1' },
-      oAuthAccessToken2: { user: 'user2', client: 'oAuthClient1' }
+      oAuthAccessToken1: { user: 'userToBeBanned1', client: 'oAuthClient1' },
+      oAuthAccessToken2: { user: 'userToStay1', client: 'oAuthClient1' }
     });
 
     /* The thread needs to be interrupted for appEvent to take place */
@@ -89,8 +89,11 @@ describe('bayeux', function() {
         assert.equal(messagesToBeBanned.length, 1);
         assert.equal(messagesToStay.length, 1);
       });
-      // ban user1 (clientToBeBanned)
-      appEvents.userRemovedFromTroupe({ userId: fixture.user1.id, troupeId: fixture.troupe1.id });
+      // ban userToBeBanned1 (clientToBeBanned)
+      appEvents.userRemovedFromTroupe({
+        userId: fixture.userToBeBanned1.id,
+        troupeId: fixture.troupe1.id
+      });
       // send the second message
       await waitForAppEvent(() => {
         appEvents.dataChange2(`/rooms/${fixture.troupe1.id}/chatMessages`, 'create', {
