@@ -45,7 +45,8 @@
   },
   "test": {
     "exposeInBrowserTests": true,
-    "exposeDataForTestingPurposes": true
+    "exposeDataForTestingPurposes": true,
+    "wsPort": 5006
   },
   "gitlaboauth": {
     "consumer_key": "",

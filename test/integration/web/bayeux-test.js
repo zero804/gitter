@@ -3,6 +3,8 @@
 const testRequire = require('../test-require');
 const Promise = require('bluebird');
 const appEvents = require('gitter-web-appevents');
+var env = require('gitter-web-env');
+var nconf = env.config;
 const bayeuxEventsBridge = testRequire('./event-listeners/bayeux-events-bridge');
 const bayeux = testRequire('./web/bayeux');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -84,10 +86,11 @@ describe('bayeux', function() {
 
       var server = http.createServer();
       bayeux.attach(server);
-      await server.listen(5006);
+      const testPort = nconf.get('test:wsPort');
+      await server.listen(testPort);
 
-      const clientToBeBanned = new Faye.Client(`http://localhost:5006/bayeux`);
-      const clientToStay = new Faye.Client(`http://localhost:5006/bayeux`);
+      const clientToBeBanned = new Faye.Client(`http://localhost:${testPort}/bayeux`);
+      const clientToStay = new Faye.Client(`http://localhost:${testPort}/bayeux`);
       clientToBeBanned.addExtension(createAuthenticator(fixture.oAuthAccessToken1.token));
       clientToStay.addExtension(createAuthenticator(fixture.oAuthAccessToken2.token));
 
