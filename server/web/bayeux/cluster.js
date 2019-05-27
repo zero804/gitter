@@ -136,6 +136,23 @@ function makeServer(options) {
   return server;
 }
 
+/**\
+ * Uses given engine to unsubscribe socket with clientId from all room related channels.
+ */
+const unsubscribeFromTroupe = async function(engine, clientId, troupeId) {
+  if (!clientId || !troupeId) return;
+  const unsubscribePromises = _.map(['', '/events', '/chatMessages', '/users'], async segment => {
+    const channel = `/api/v1/rooms/${troupeId}${segment}`;
+    const error = await new Promise(resolve => {
+      engine.unsubscribe(clientId, channel, (_, error) => resolve(error));
+    });
+    if (error) {
+      logger.error(`bayeux: error when unsubscribing client ${clientId} from ${channel}, ${error}`);
+    }
+  });
+  return Promise.all(unsubscribePromises);
+};
+
 /* This function is used a lot, this version excludes try-catch so that it can be optimised */
 function stringifyInternal(object) {
   if (typeof object !== 'object') return JSON.stringify(object);
@@ -272,6 +289,14 @@ BayeuxCluster.prototype.destroyClient = function(clientId, callback) {
   return Promise.all([p1, p2]).nodeify(callback);
 };
 
+BayeuxCluster.prototype.unsubscribeFromTroupe = function(clientId, troupeId) {
+  var engineNew = this.serverNew._server._engine;
+  var engineLegacy = this.serverLegacy._server._engine;
+  const newUnsubscribes = unsubscribeFromTroupe(engineNew, clientId, troupeId);
+  const legacyUnsubscribes = unsubscribeFromTroupe(engineLegacy, clientId, troupeId);
+  return Promise.all(newUnsubscribes, legacyUnsubscribes);
+};
+
 /**
  * Attach the faye instance to the server
  */
@@ -329,6 +354,14 @@ BayeuxSingleton.prototype.destroyClient = function(clientId, callback) {
 
   var engine = this.server._server._engine;
   engine.destroyClient(clientId, callback);
+};
+
+/**
+ *  Unsubscribe socket from all room related channels
+ */
+BayeuxSingleton.prototype.unsubscribeFromTroupe = function(clientId, troupeId) {
+  var engine = this.server._server._engine;
+  return unsubscribeFromTroupe(engine, clientId, troupeId);
 };
 
 /**

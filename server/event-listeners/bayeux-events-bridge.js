@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+var Promise = require('bluebird');
 var winston = env.logger;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') });
 var appEvents = require('gitter-web-appevents');
@@ -10,18 +11,6 @@ var ent = require('ent');
 var presenceService = require('gitter-web-presence');
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-
-var useDeprecatedChannels = nconf.get('ws:useDeprecatedChannels');
-
-function findFailbackChannel(channel) {
-  var res = [/^\/api\/v1\/rooms\//, /^\/api\/v1\/user\/\w+\/rooms\//];
-
-  for (var i = 0; i < res.length; i++) {
-    var m = channel.match(res[i]);
-    if (m) return channel.replace(/\/rooms\//, '/troupes/'); // Consider dropping this soon
-  }
-}
 
 var installed = false;
 
@@ -42,15 +31,6 @@ exports.install = function() {
     statsd.increment('bayeux.publish', 1, 0.1, tags);
 
     bayeux.publish(channel, message);
-
-    if (useDeprecatedChannels) {
-      // TODO: remove this fallback channel
-      var failbackChannel = findFailbackChannel(channel);
-
-      if (failbackChannel) {
-        bayeux.publish(failbackChannel, message);
-      }
-    }
   }
 
   appEvents.onDataChange2(function(data) {
@@ -88,24 +68,15 @@ exports.install = function() {
     publish(url, message, 'tokenRevoked');
   });
 
-  appEvents.onUserRemovedFromTroupe(function(options) {
+  appEvents.onUserRemovedFromTroupe(async function(options) {
     var userId = options.userId;
     var troupeId = options.troupeId;
-
-    presenceService.findAllSocketsForUserInTroupe(userId, troupeId, function(err, socketIds) {
-      if (err)
-        return winston.error('Error while attempting to disconnect user from troupe' + err, {
-          exception: err
-        });
-
-      if (!socketIds || !socketIds.length) return;
-
-      socketIds.forEach(function(clientId) {
-        bayeux.destroyClient(clientId, function() {
-          winston.info('Destroyed client ' + clientId + ' as user was disconnected from troupe');
-        });
-      });
-    });
+    const sockets = await presenceService.listAllSocketsForUser(userId);
+    winston.info(`Unsubscribing all sockets belonging to user ${userId} from room ${troupeId}`);
+    await Promise.all(sockets.map(socket => bayeux.unsubscribeFromTroupe(socket, troupeId)));
+    winston.info(
+      `All sockets belonging to user ${userId} have been unsubscribed from room ${troupeId}`
+    );
   });
 
   appEvents.onUserNotification(function(data) {
