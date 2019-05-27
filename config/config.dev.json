@@ -97,7 +97,8 @@
   },
   "test": {
     "exposeInBrowserTests": true,
-    "exposeDataForTestingPurposes": true
+    "exposeDataForTestingPurposes": true,
+    "wsPort": 5006
   },
   "gitlaboauth": {
     "consumer_key": "",
@@ -135,6 +136,7 @@
     "clientKey": "irc-dev"
   },
   "redis": "redis://localhost",
+  "redis_faye": "redis://localhost?db=3",
   "redis_nopersist": "redis://localhost?db=1",
   "redis_caching": "redis://localhost?db=2",
   "elasticsearch": {

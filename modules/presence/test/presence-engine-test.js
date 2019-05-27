@@ -725,55 +725,30 @@ describe('presenceService', function() {
       });
   });
 
-  it('user sockets list should be correctly maintained', function() {
-    var userId = 'TESTUSER1' + Date.now();
-    var socketId = 'TESTSOCKET1' + Date.now();
-    var troupeId = 'TESTTROUPE1' + Date.now();
+  it('user sockets list should be correctly maintained', async () => {
+    const userId = 'TESTUSER1' + Date.now();
+    const socketId = 'TESTSOCKET1' + Date.now();
 
     // Connect the socket
-    return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
-      .then(function() {
-        return presenceService.findAllSocketsForUserInTroupe(userId, troupeId);
-      })
-      .then(function(socketIds) {
-        assert.equal(socketIds.length, 1);
-        assert.equal(socketIds[0], socketId);
+    await presenceService.userSocketConnected(
+      userId,
+      socketId,
+      'online',
+      'test',
+      'faye',
+      null,
+      null,
+      null,
+      null
+    );
+    const socketIds = await presenceService.listAllSocketsForUser(userId);
+    assert.equal(socketIds.length, 1);
+    assert.equal(socketIds[0], socketId);
 
-        // Disconnect the socket
-        return presenceService.socketDisconnected(socketId);
-      })
-      .then(function() {
-        return presenceService.findAllSocketsForUserInTroupe(userId, troupeId);
-      })
-      .then(function(socketIds) {
-        assert.equal(socketIds.length, 0);
-      });
-  });
-
-  it('findAllSocketsForUserInTroupe should work correctly', function() {
-    var userId = 'TESTUSER1' + Date.now();
-    var socketId = 'TESTSOCKET1' + Date.now();
-
-    // Connect the socket
-    return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
-      .then(function() {
-        return presenceService.listAllSocketsForUser(userId);
-      })
-      .then(function(socketIds) {
-        assert.equal(socketIds.length, 1);
-        assert.equal(socketIds[0], socketId);
-
-        // Disconnect the socket
-        return presenceService.socketDisconnected(socketId);
-      })
-      .then(function() {
-        return presenceService.listAllSocketsForUser(userId);
-      })
-      .then(function(socketIds) {
-        assert.equal(socketIds.length, 0);
-      });
+    // Disconnect the socket
+    await presenceService.socketDisconnected(socketId);
+    const emptySocketIds = await presenceService.listAllSocketsForUser(userId);
+    assert.equal(emptySocketIds.length, 0);
   });
 
   it('socketExists should work correctly', function() {
