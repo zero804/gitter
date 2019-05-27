@@ -1,4 +1,7 @@
 # 19.47.0 - *upcoming*
+ - Fix the Stream API so it doesn't send messages to a user who was removed from a room, https://gitlab.com/gitlab-org/gitter/webapp/issues/2044
+   - Thanks to @favicon for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+   - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/3
 
 Developer facing:
 
