@@ -4,14 +4,13 @@
     "browser": true
   },
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2018,
     "sourceType": "script"
   },
-  "plugins": [
-    "jquery"
-  ],
+  "plugins": ["jquery"],
   "rules": {
     "node/no-unpublished-require": "off",
+    "node/no-unsupported-features": "off",
     "jquery/no-ajax": "off",
     "jquery/no-animate": "off",
     "jquery/no-attr": "off",
@@ -50,6 +49,20 @@
     "jquery/no-trigger": "off",
     "jquery/no-trim": 2,
     "jquery/no-val": "off",
-    "jquery/no-wrap": 2
+    "jquery/no-wrap": 2,
+
+    "vue/html-self-closing": [
+      "error",
+      {
+        "html": {
+          "void": "any",
+          "normal": "never",
+          "component": "always"
+        },
+        "svg": "always",
+        "math": "always"
+      }
+    ],
+    "vue/component-name-in-template-casing": "off"
   }
 }

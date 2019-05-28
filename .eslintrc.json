@@ -8,7 +8,7 @@
     "sourceType": "script"
   },
   "plugins": ["node"],
-  "extends": ["eslint:recommended", "prettier"],
+  "extends": ["eslint:recommended", "plugin:vue/recommended", "prettier", "prettier/vue"],
   "rules": {
     "indent": "off",
     "comma-dangle": "off",

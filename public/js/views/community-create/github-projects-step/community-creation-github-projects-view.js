@@ -2,7 +2,7 @@
 
 var _ = require('underscore');
 var toggleClass = require('../../../utils/toggle-class');
-var context = require('../../../utils/context');
+var context = require('gitter-web-client-context');
 var slugger = require('../../../utils/slugger');
 
 var fuzzysearch = require('fuzzysearch');

@@ -1,5 +1,5 @@
 'use strict';
-var context = require('./context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 
 (function() {

@@ -38,13 +38,15 @@
   "redis": "redis://redis?db=1",
   "redis_nopersist": "redis://redis?db=1",
   "redis_caching": "redis://redis",
+  "redis_faye": "redis://redis?db=2",
   "elasticsearch": {
     "comment": "Override with GITTER_ES_ENDPOINT (comma separated)",
     "hosts": ["http://registry.gitlab.com-gitlab-org-gitter-webapp-elasticsearch:9200"]
   },
   "test": {
     "exposeInBrowserTests": true,
-    "exposeDataForTestingPurposes": true
+    "exposeDataForTestingPurposes": true,
+    "wsPort": 5006
   },
   "gitlaboauth": {
     "consumer_key": "",

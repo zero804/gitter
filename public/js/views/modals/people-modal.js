@@ -9,7 +9,7 @@ var apiClient = require('../../components/api-client');
 var template = require('./tmpl/people-modal.hbs');
 var SyncMixin = require('../../collections/sync-mixin');
 var InfiniteScrollBehavior = require('../behaviors/infinite-scroll');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 
 require('../behaviors/widgets');
 

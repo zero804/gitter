@@ -26,17 +26,17 @@ if (survivalMode) {
 // Strategies for authenticating that a user can subscribe to the given URL
 var routes = [
   {
-    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)$/,
+    re: /^\/api\/v1\/rooms\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateTroupe
   },
   {
-    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)$/,
+    re: /^\/api\/v1\/rooms\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubTroupeCollection
   },
   {
-    re: /^\/api\/v1\/(?:troupes|rooms)\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
+    re: /^\/api\/v1\/rooms\/(\w+)\/(\w+)\/(\w+)\/(\w+)$/,
     validator: validateUserForSubTroupeSubscription,
     populator: populateSubSubTroupeCollection
   },
@@ -46,7 +46,7 @@ var routes = [
     populator: populateSubUserCollection
   },
   {
-    re: /^\/api\/v1\/user\/(\w+)\/(?:troupes|rooms)\/(\w+)\/unreadItems$/,
+    re: /^\/api\/v1\/user\/(\w+)\/rooms\/(\w+)\/unreadItems$/,
     validator: validateUserForUserSubscription,
     populator: populateUserUnreadItemsCollection
   },
@@ -88,16 +88,12 @@ function validateUserForSubTroupeSubscription(options) {
 
   var promise = permissionToRead(userId, troupeId);
 
-  if (!ext || !ext.reassociate) {
-    return promise;
-  }
-
   /** Reassociate the socket with a new room */
   return promise.tap(function(access) {
     if (!access) return;
-
+    const hasEyeballs = ext && ext.reassociate && !!ext.reassociate.eyeballs;
     return presenceService
-      .socketReassociated(options.clientId, userId, troupeId, !!ext.reassociate.eyeballs)
+      .socketReassociated(options.clientId, userId, troupeId, hasEyeballs)
       .then(function() {
         // Update the lastAccessTime for the room
         if (userId) {

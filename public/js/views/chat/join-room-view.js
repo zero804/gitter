@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/join-room-view.hbs');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var apiClient = require('../../components/api-client');
 var urlParse = require('url-parse');
 var frameUtils = require('gitter-web-frame-utils');

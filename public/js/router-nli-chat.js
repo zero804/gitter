@@ -3,7 +3,7 @@
 require('./utils/font-setup');
 
 var appEvents = require('./utils/appevents');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var Backbone = require('backbone');
 var itemCollections = require('./collections/instances/integrated-items');
 var chatCollection = require('./collections/instances/chats');

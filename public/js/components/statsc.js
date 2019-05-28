@@ -3,7 +3,7 @@ var _ = require('underscore');
 var appEvents = require('../utils/appevents');
 var apiClient = require('./api-client');
 var log = require('../utils/log');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var debug = require('debug-proxy')('app:stats');
 
 module.exports = (function() {

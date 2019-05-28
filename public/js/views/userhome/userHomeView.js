@@ -1,7 +1,7 @@
 'use strict';
 var $ = require('jquery');
 var Marionette = require('backbone.marionette');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var troupeCollections = require('../../collections/instances/troupes');
 var FilteredSuggestedRoomsCollection = require('../../collections/suggested-rooms').Filtered;

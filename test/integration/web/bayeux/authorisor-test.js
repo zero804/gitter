@@ -132,6 +132,16 @@ describe('authorisor', function() {
             return Promise.resolve([meta.userId, true]);
           });
 
+        mockito
+          .when(presenceServiceMock)
+          .socketReassociated()
+          .then((clientId, userId, troupeId) => {
+            assert.equal(clientId, meta.clientId);
+            assert.equal(userId, meta.userId);
+            assert.equal(troupeId, meta.troupeId);
+            return Promise.resolve();
+          });
+
         authorisor.incoming(message, null, function(message) {
           if (meta.expectedError) {
             assert(!!message.error, 'Expected an error');

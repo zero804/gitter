@@ -19,3 +19,7 @@ exports.destroyClient = function(clientId, callback) {
 exports.attach = function(httpServer) {
   return cluster.attach(httpServer);
 };
+
+exports.unsubscribeFromTroupe = function(clientId, troupeId) {
+  return cluster.unsubscribeFromTroupe(clientId, troupeId);
+};

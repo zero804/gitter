@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var ChatLayout = require('./chat');
 var HeaderView = require('../app/headerView');
 var ArchiveNavigationView = require('../archive/archive-navigation-view');

@@ -54,8 +54,8 @@ function keyTroupeUsers(troupeId) {
   return 'tu:' + troupeId;
 }
 
-function keyUserSockets(troupeId) {
-  return 'us:' + troupeId;
+function keyUserSockets(userId) {
+  return 'us:' + userId;
 }
 
 function getUniqueUsersAndTroupes(userTroupes) {
@@ -573,35 +573,6 @@ function categorizeUserTroupesByOnlineStatus(userTroupes, callback) {
         online: online,
         offline: offline
       };
-    })
-    .nodeify(callback);
-}
-
-function findAllSocketsForUserInTroupe(userId, troupeId, callback) {
-  return listAllSocketsForUser(userId)
-    .then(function(socketIds) {
-      if (!socketIds || !socketIds.length) return [];
-
-      var multi = redisClient.multi();
-      socketIds.forEach(function(socketId) {
-        multi.hmget(keySocketUser(socketId), 'tid');
-      });
-
-      return multi
-        .exec()
-        .then(checkMultiErrors)
-        .then(function(replies) {
-          var result = replies.reduce(function(memo, reply, index) {
-            var tId = reply[1][0];
-            if (tId === troupeId) {
-              memo.push(socketIds[index]);
-            }
-
-            return memo;
-          }, []);
-
-          return result;
-        });
     })
     .nodeify(callback);
 }
@@ -1139,7 +1110,6 @@ presenceService.getSockets = getSockets;
 presenceService.listMobileUsers = listMobileUsers;
 presenceService.listOnlineUsersForTroupes = listOnlineUsersForTroupes;
 presenceService.categorizeUserTroupesByOnlineStatus = categorizeUserTroupesByOnlineStatus;
-presenceService.findAllSocketsForUserInTroupe = findAllSocketsForUserInTroupe;
 presenceService.listAllSocketsForUser = listAllSocketsForUser;
 presenceService.isUserConnectedWithClientType = isUserConnectedWithClientType;
 

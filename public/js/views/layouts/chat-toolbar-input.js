@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var appEvents = require('../../utils/appevents');
 var ChatInputView = require('../chat/chatInputView');
 var cocktail = require('backbone.cocktail');

@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var context = require('../../utils/context');
+var context = require('gitter-web-client-context');
 var social = require('../../utils/social');
 var apiClient = require('../../components/api-client');
 var template = require('./tmpl/collaboratorsView.hbs');

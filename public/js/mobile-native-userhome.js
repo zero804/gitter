@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var UserHomeView = require('./views/userhome/userHomeView');
 var $ = require('jquery');
 var appEvents = require('./utils/appevents');

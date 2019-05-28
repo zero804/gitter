@@ -3,7 +3,7 @@ require('./utils/initial-setup');
 require('./utils/font-setup');
 
 var Backbone = require('backbone');
-var context = require('./utils/context');
+var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:router-chat');
 var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
@@ -35,6 +35,8 @@ require('./components/focus-events');
 
 // Preload widgets
 require('./components/ping');
+
+const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
 onready(function() {
   // eslint-disable-line max-statements
@@ -312,4 +314,9 @@ onready(function() {
   liveContext.syncRoom();
 
   Backbone.history.start();
+
+  if (useVueLeftMenu) {
+    // Initialize Vue stuff
+    require('./vue/initialize-clientside');
+  }
 });

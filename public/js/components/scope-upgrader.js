@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 
 /**
  * Perform a scope upgrade operation for a user

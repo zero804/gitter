@@ -1,6 +1,6 @@
 'use strict';
 
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 
 function presentCreateRoomDialog(options) {
   var roomCollection = options.roomCollection;

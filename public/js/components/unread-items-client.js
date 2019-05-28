@@ -1,6 +1,6 @@
 'use strict';
 var _ = require('underscore');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var realtime = require('./realtime');
 var apiClient = require('./api-client');
 var debug = require('debug-proxy')('app:unread-items-client');

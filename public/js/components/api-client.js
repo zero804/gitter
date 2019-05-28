@@ -1,7 +1,7 @@
 'use strict';
 
 var clientEnv = require('gitter-client-env');
-var context = require('../utils/context');
+var context = require('gitter-web-client-context');
 var appEvents = require('../utils/appevents');
 var ApiClient = require('gitter-web-api-client');
 
