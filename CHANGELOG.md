@@ -1,4 +1,4 @@
-# 19.47.0 - *upcoming*
+# 19.47.0 - 2019-5-28
  - Fix the Stream API so it doesn't send messages to a user who was removed from a room, https://gitlab.com/gitlab-org/gitter/webapp/issues/2044
    - Thanks to @favicon for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/3
@@ -22,7 +22,7 @@ Developer facing:
  - Adding `mongo-express` container for easy database browsing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1395
 
 
-# 19.45.0 - 2019-05-06
+# 19.45.0 - 2019-5-6
 
  - Add docs to clarify when email notifications are sent out, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1383
  - Add docs to clarify why email notifications are not sent when using IRC bridge, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1384
