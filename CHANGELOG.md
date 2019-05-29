@@ -1,5 +1,13 @@
+# 19.47.0 - *upcoming*
+
+Developer facing:
+
+ - Refactor `chat-internal` renderer to use async/await, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1401
+
+
 # 19.47.0 - 2019-5-28
- - Fix the Stream API so it doesn't send messages to a user who was removed from a room, https://gitlab.com/gitlab-org/gitter/webapp/issues/2044
+
+ - Fix the Faye/Bayeux and stream API so it doesn't send messages to a user who was removed from a room, https://gitlab.com/gitlab-org/gitter/webapp/issues/2044
    - Thanks to @favicon for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/3
 
