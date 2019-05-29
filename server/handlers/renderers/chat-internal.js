@@ -3,12 +3,14 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
+var _ = require('lodash');
+const asyncHandler = require('express-async-handler');
+
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
 var unreadItemService = require('gitter-web-unread-items');
-var _ = require('lodash');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
@@ -21,7 +23,8 @@ const vueRenderToString = require('./vue-ssr-renderer');
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
-function renderChat(req, res, next, options) {
+// eslint-disable-next-line max-statements, complexity
+async function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
 
   var troupe = uriContext.troupe;
@@ -31,151 +34,146 @@ function renderChat(req, res, next, options) {
   var userId = user && user.id;
 
   // It's ok if there's no user (logged out), unreadItems will be 0
-  return unreadItemService
-    .getUnreadItemsForUser(userId, troupe.id)
-    .then(function(unreadItems) {
-      var limit =
-        unreadItems.chat.length > INITIAL_CHAT_COUNT
-          ? unreadItems.chat.length + 20
-          : INITIAL_CHAT_COUNT;
+  const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupe.id);
 
-      var snapshotOptions = {
-        limit: limit,
-        aroundId: aroundId,
-        unread: options.unread // Unread can be true, false or undefined
-      };
+  var limit =
+    unreadItems.chat.length > INITIAL_CHAT_COUNT
+      ? unreadItems.chat.length + 20
+      : INITIAL_CHAT_COUNT;
 
-      var chatSerializerOptions = _.defaults({}, snapshotOptions);
+  var snapshotOptions = {
+    limit: limit,
+    aroundId: aroundId,
+    unread: options.unread // Unread can be true, false or undefined
+  };
 
-      var userSerializerOptions = _.defaults(
-        {
-          lean: true,
-          limit: ROSTER_SIZE
-        },
-        snapshotOptions
-      );
+  var chatSerializerOptions = _.defaults({}, snapshotOptions);
 
-      return Promise.all([
-        options.generateContext === false
-          ? {}
-          : contextGenerator.generateTroupeContext(req, {
-              snapshots: { chat: snapshotOptions },
-              permalinkChatId: aroundId
-            }),
-        restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
-        options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
-        options.fetchUsers === false
-          ? null
-          : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
-        generateRightToolbarSnapshot(req),
-        generateUserThemeSnapshot(req)
+  var userSerializerOptions = _.defaults(
+    {
+      lean: true,
+      limit: ROSTER_SIZE
+    },
+    snapshotOptions
+  );
 
-        // eslint-disable-next-line complexity
-      ]).spread(async function(
-        troupeContext,
-        chats,
-        activityEvents,
-        users,
-        rightToolbarSnapshot,
-        userThemeSnapshot
-      ) {
-        var initialChat = _.find(chats, function(chat) {
-          return chat.initial;
-        });
-        var initialBottom = !initialChat;
-        var classNames = options.classNames || [];
-        var isStaff = req.user && req.user.staff;
+  const [
+    troupeContext,
+    chats,
+    activityEvents,
+    users,
+    rightToolbarSnapshot,
+    userThemeSnapshot
+  ] = await Promise.all([
+    options.generateContext === false
+      ? {}
+      : contextGenerator.generateTroupeContext(req, {
+          snapshots: { chat: snapshotOptions },
+          permalinkChatId: aroundId
+        }),
+    restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
+    options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
+    options.fetchUsers === false
+      ? null
+      : restful.serializeUsersForTroupe(troupe.id, userId, userSerializerOptions),
+    generateRightToolbarSnapshot(req),
+    generateUserThemeSnapshot(req)
+  ]);
 
-        var snapshots = rightToolbarSnapshot;
-        troupeContext.snapshots = snapshots;
+  var initialChat = _.find(chats, function(chat) {
+    return chat.initial;
+  });
+  var initialBottom = !initialChat;
+  var classNames = options.classNames || [];
+  var isStaff = req.user && req.user.staff;
 
-        if (!user) classNames.push('logged-out');
+  troupeContext.snapshots = {
+    rightToolbar: rightToolbarSnapshot
+  };
 
-        var integrationsUrl;
+  if (!user) classNames.push('logged-out');
 
-        if (troupeContext && troupeContext.isNativeDesktopApp) {
-          integrationsUrl =
-            nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
-        } else {
-          integrationsUrl = '#integrations';
-        }
+  var integrationsUrl;
 
-        var cssFileName = options.stylesheet
-          ? 'styles/' + options.stylesheet + '.css'
-          : 'styles/' + script + '.css'; // css filename matches bootscript
+  if (troupeContext && troupeContext.isNativeDesktopApp) {
+    integrationsUrl = nconf.get('web:basepath') + '/' + troupeContext.troupe.uri + '#integrations';
+  } else {
+    integrationsUrl = '#integrations';
+  }
 
-        var chatsWithBurst = burstCalculator(chats);
-        if (options.filterChats) {
-          chatsWithBurst = options.filterChats(chatsWithBurst);
-        }
+  var cssFileName = options.stylesheet
+    ? 'styles/' + options.stylesheet + '.css'
+    : 'styles/' + script + '.css'; // css filename matches bootscript
 
-        /* This is less than ideal way of checking if the user is the admin */
-        var isAdmin =
-          troupeContext.troupe &&
-          troupeContext.troupe.permissions &&
-          troupeContext.troupe.permissions.admin;
+  var chatsWithBurst = burstCalculator(chats);
+  if (options.filterChats) {
+    chatsWithBurst = options.filterChats(chatsWithBurst);
+  }
 
-        var isRightToolbarPinned =
-          snapshots && snapshots.rightToolbar && snapshots.rightToolbar.isPinned;
-        if (isRightToolbarPinned === undefined) {
-          isRightToolbarPinned = true;
-        }
+  /* This is less than ideal way of checking if the user is the admin */
+  var isAdmin =
+    troupeContext.troupe &&
+    troupeContext.troupe.permissions &&
+    troupeContext.troupe.permissions.admin;
 
-        const useVueLeftMenu = req.fflip.has('vue-left-menu');
+  var isRightToolbarPinned = rightToolbarSnapshot && rightToolbarSnapshot.isPinned;
+  if (isRightToolbarPinned === undefined) {
+    isRightToolbarPinned = true;
+  }
 
-        let vueLeftMenuHtmlOutput;
-        if (useVueLeftMenu) {
-          vueLeftMenuHtmlOutput = await vueRenderToString({
-            moduleToRender: 'left-menu',
-            storeData: {
-              // ...
-            }
-          });
-        }
+  const useVueLeftMenu = req.fflip.has('vue-left-menu');
 
-        var renderOptions = _.extend(
-          {
-            hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-            fonts: fonts.getFonts(),
-            isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
-            bootScriptName: script,
-            cssFileName: cssFileName,
-            troupeName: uriContext.uri,
-            oneToOne: troupe.oneToOne, // Used by the old left menu
-            user: user,
-            troupeContext: troupeContext,
-            initialBottom: initialBottom,
-            chats: chatsWithBurst,
-            classNames: classNames.join(' '),
-            subresources: getSubResources(script),
-            activityEvents: activityEvents,
-            users: users && users.sort(userSort),
-            userCount: troupe.userCount,
-            hasHiddenMembers: troupe.userCount > 25,
-            integrationsUrl: integrationsUrl,
-            isMobile: options.isMobile,
-            roomMember: uriContext.roomMember,
-            isRightToolbarPinned: isRightToolbarPinned,
+  let vueLeftMenuHtmlOutput;
+  if (useVueLeftMenu) {
+    vueLeftMenuHtmlOutput = await vueRenderToString({
+      moduleToRender: 'left-menu',
+      storeData: {
+        // ...
+      }
+    });
+  }
 
-            //Feature Switch Left Menu
-            troupeTopic: troupeContext.troupe.topic,
-            premium: troupeContext.troupe.premium,
-            troupeFavourite: troupeContext.troupe.favourite,
-            headerView: getHeaderViewOptions(troupeContext.troupe),
-            canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
-            isAdmin: isAdmin,
-            isNativeDesktopApp: troupeContext.isNativeDesktopApp,
+  var renderOptions = _.extend(
+    {
+      hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
+      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+      fonts: fonts.getFonts(),
+      isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
+      bootScriptName: script,
+      cssFileName: cssFileName,
+      troupeName: uriContext.uri,
+      oneToOne: troupe.oneToOne, // Used by the old left menu
+      user: user,
+      troupeContext: troupeContext,
+      initialBottom: initialBottom,
+      chats: chatsWithBurst,
+      classNames: classNames.join(' '),
+      subresources: getSubResources(script),
+      activityEvents: activityEvents,
+      users: users && users.sort(userSort),
+      userCount: troupe.userCount,
+      hasHiddenMembers: troupe.userCount > 25,
+      integrationsUrl: integrationsUrl,
+      isMobile: options.isMobile,
+      roomMember: uriContext.roomMember,
+      isRightToolbarPinned: isRightToolbarPinned,
 
-            leftMenuHtml: vueLeftMenuHtmlOutput
-          },
-          options.extras
-        );
+      //Feature Switch Left Menu
+      troupeTopic: troupeContext.troupe.topic,
+      premium: troupeContext.troupe.premium,
+      troupeFavourite: troupeContext.troupe.favourite,
+      headerView: getHeaderViewOptions(troupeContext.troupe),
+      canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
+      isAdmin: isAdmin,
+      isNativeDesktopApp: troupeContext.isNativeDesktopApp,
 
-        res.render(options.template, renderOptions);
-      });
-    })
-    .catch(next);
+      useVueLeftMenu: useVueLeftMenu,
+      leftMenuHtml: vueLeftMenuHtmlOutput
+    },
+    options.extras
+  );
+
+  res.render(options.template, renderOptions);
 }
 
-module.exports = renderChat;
+module.exports = asyncHandler(renderChat);
