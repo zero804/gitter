@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`left-menu index matches snapshot 1`] = `
+<div
+  class="root js-left-menu-root"
+>
+  
+  left menu root
+  
+  <div>
+    
+    initialTestValue
+  
+  </div>
+</div>
+`;
