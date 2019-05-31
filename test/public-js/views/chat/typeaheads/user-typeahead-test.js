@@ -4,9 +4,8 @@
 'use strict';
 
 var assert = require('assert');
-var proxyquire = require('proxyquire').noCallThru();
 
-describe.skip('user-typeahead', function() {
+describe('user-typeahead', function() {
   it('suggests the latest message senders, most recent first', function() {
     var typeahead = generateTypeahead({
       chatSenders: [
@@ -107,27 +106,37 @@ function generateTypeahead(options) {
     };
   });
 
-  var context = function() {
-    return { permissions: { admin: !!options.isAdmin } };
-  };
+  jest.mock('../../../../../public/js/utils/is-mobile', () => {
+    return function() {
+      return false;
+    };
+  });
 
-  context.user = function() {
+  jest.mock('gitter-web-client-context');
+  const context = require('gitter-web-client-context');
+  context.isTroupeAdmin.mockImplementation(() => !!options.isAdmin);
+  context.user.mockImplementation(function() {
     return {
       get: function() {
         return 'test-user';
       }
     };
-  };
+  });
+  context.troupe.mockImplementation(function() {
+    return {
+      on: () => {}
+    };
+  });
 
-  return proxyquire('../../../../../public/js/views/chat/typeaheads/user-typeahead', {
-    'utils/is-mobile': function() {
-      return false;
-    },
-    'utils/context': context,
-    'components/api-client': {},
-    'collections/instances/integrated-items': { chats: chats },
-    './tmpl/typeahead.hbs': function() {}
-  })();
+  jest.mock('../../../../../public/js/components/api-client', () => ({}));
+
+  jest.mock('../../../../../public/js/views/chat/typeaheads/tmpl/typeahead.hbs', () => {
+    return function() {};
+  });
+
+  const createUserTypeahead = require('../../../../../public/js/views/chat/typeaheads/user-typeahead');
+  createUserTypeahead.testOnly.clearPrevResults();
+  return createUserTypeahead(chats);
 }
 
 function usernames(users) {

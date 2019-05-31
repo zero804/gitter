@@ -94,11 +94,7 @@ testModules['api-tests'] = {
 };
 
 testModules.integration = {
-  files: [
-    './test/integration/',
-    // We run tests in `test/public-js/vue` with Jest so we should not try to run in Mocha
-    './test/public-js/{,!(vue)/**/}*.js'
-  ],
+  files: ['./test/integration/'],
   isCritical: true
 };
 

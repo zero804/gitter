@@ -1,23 +1,5 @@
 'use strict';
 
-var BASE_PATH = 'https://gitter.im';
-
-var SPARoomSwitcher = require('proxyquire').noCallThru()(
-  '../../../public/js/components/spa-room-switcher',
-  {
-    '../utils/url-parser': {
-      parse: function(href) {
-        return parseUrl(href);
-      },
-      format: function(options) {
-        var partial = url.format(options);
-        var full = url.resolve(BASE_PATH, partial);
-        return full;
-      }
-    }
-  }
-);
-
 var Backbone = require('backbone');
 var assert = require('assert');
 var url = require('url');
@@ -51,6 +33,20 @@ function locationDelegate(location) {
     return parseUrl(location);
   };
 }
+
+const BASE_PATH = 'https://gitter.im';
+
+jest.mock('../../../public/js/utils/url-parser');
+const urlParser = require('../../../public/js/utils/url-parser');
+urlParser.parse.mockImplementation(function(href) {
+  return parseUrl(href);
+});
+urlParser.format.mockImplementation(function(options) {
+  var partial = url.format(options);
+  var full = url.resolve(BASE_PATH, partial);
+  return full;
+});
+const SPARoomSwitcher = require('../../../public/js/components/spa-room-switcher');
 
 describe('spa-room-switcher', function() {
   it('should switch rooms from one chat room to another', function() {

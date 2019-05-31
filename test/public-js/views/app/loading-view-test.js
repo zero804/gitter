@@ -4,12 +4,12 @@
 'use strict';
 
 var assert = require('assert');
-var LoadingView = require('proxyquire').noCallThru()(
-  '../../../../public/js/views/app/loading-view',
-  {
-    '../../utils/appevents': { on: function() {} }
-  }
-);
+
+jest.mock('../../../../public/js/utils/appevents');
+const appEvents = require('../../../../public/js/utils/appevents');
+appEvents.on.mockImplementation(() => {});
+
+const LoadingView = require('../../../../public/js/views/app/loading-view');
 
 describe('loading-view', function() {
   it('hides when page is already loaded', function(done) {
