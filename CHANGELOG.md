@@ -5,6 +5,7 @@ Developer facing:
  - Refactor `chat-internal` renderer to use async/await, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1401
  - Add Jest for Vue testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1404
  - Update all `test/public-js`(frontend) tests to use Jest, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1405
+ - Add utility script to ban user from room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1402
 
 
 # 19.47.0 - 2019-5-28
