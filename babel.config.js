@@ -9,4 +9,13 @@ if (isJest) {
   plugins.push('@babel/plugin-transform-modules-commonjs');
 }
 
-module.exports = { plugins, presets };
+module.exports = {
+  plugins,
+  presets,
+  env: {
+    test: {
+      // from https://github.com/facebook/jest/issues/3126#issuecomment-465926747
+      plugins: ['@babel/plugin-transform-runtime']
+    }
+  }
+};

@@ -17,7 +17,7 @@ var fonts = require('../../web/fonts');
 var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot');
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
-const vueRenderToString = require('./vue-ssr-renderer');
+const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 
 /* How many chats to send back */
 var INITIAL_CHAT_COUNT = 50;
@@ -121,56 +121,44 @@ async function renderChat(req, res, next, options) {
     isRightToolbarPinned = true;
   }
 
-  const useVueLeftMenu = req.fflip.has('vue-left-menu');
+  var renderOptions = await mixinHbsDataForVueLeftMenu(
+    req,
+    _.extend(
+      {
+        hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+        fonts: fonts.getFonts(),
+        isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
+        bootScriptName: script,
+        cssFileName: cssFileName,
+        troupeName: uriContext.uri,
+        oneToOne: troupe.oneToOne, // Used by the old left menu
+        user: user,
+        troupeContext: troupeContext,
+        initialBottom: initialBottom,
+        chats: chatsWithBurst,
+        classNames: classNames.join(' '),
+        subresources: getSubResources(script),
+        activityEvents: activityEvents,
+        users: users && users.sort(userSort),
+        userCount: troupe.userCount,
+        hasHiddenMembers: troupe.userCount > 25,
+        integrationsUrl: integrationsUrl,
+        isMobile: options.isMobile,
+        roomMember: uriContext.roomMember,
+        isRightToolbarPinned: isRightToolbarPinned,
 
-  let vueLeftMenuHtmlOutput;
-  if (useVueLeftMenu) {
-    vueLeftMenuHtmlOutput = await vueRenderToString({
-      moduleToRender: 'left-menu',
-      storeData: {
-        // ...
-      }
-    });
-  }
-
-  var renderOptions = _.extend(
-    {
-      hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-      fonts: fonts.getFonts(),
-      isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
-      bootScriptName: script,
-      cssFileName: cssFileName,
-      troupeName: uriContext.uri,
-      oneToOne: troupe.oneToOne, // Used by the old left menu
-      user: user,
-      troupeContext: troupeContext,
-      initialBottom: initialBottom,
-      chats: chatsWithBurst,
-      classNames: classNames.join(' '),
-      subresources: getSubResources(script),
-      activityEvents: activityEvents,
-      users: users && users.sort(userSort),
-      userCount: troupe.userCount,
-      hasHiddenMembers: troupe.userCount > 25,
-      integrationsUrl: integrationsUrl,
-      isMobile: options.isMobile,
-      roomMember: uriContext.roomMember,
-      isRightToolbarPinned: isRightToolbarPinned,
-
-      //Feature Switch Left Menu
-      troupeTopic: troupeContext.troupe.topic,
-      premium: troupeContext.troupe.premium,
-      troupeFavourite: troupeContext.troupe.favourite,
-      headerView: getHeaderViewOptions(troupeContext.troupe),
-      canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
-      isAdmin: isAdmin,
-      isNativeDesktopApp: troupeContext.isNativeDesktopApp,
-
-      useVueLeftMenu: useVueLeftMenu,
-      leftMenuHtml: vueLeftMenuHtmlOutput
-    },
-    options.extras
+        //Feature Switch Left Menu
+        troupeTopic: troupeContext.troupe.topic,
+        premium: troupeContext.troupe.premium,
+        troupeFavourite: troupeContext.troupe.favourite,
+        headerView: getHeaderViewOptions(troupeContext.troupe),
+        canChangeGroupAvatar: !!troupe.groupId && (isStaff || isAdmin),
+        isAdmin: isAdmin,
+        isNativeDesktopApp: troupeContext.isNativeDesktopApp
+      },
+      options.extras
+    )
   );
 
   res.render(options.template, renderOptions);

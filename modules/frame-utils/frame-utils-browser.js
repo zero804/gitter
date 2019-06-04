@@ -3,6 +3,9 @@
 
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:frame-utils');
+const context = require('gitter-web-client-context');
+
+const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
 function hasParentFrameSameOrigin() {
   if (window.parent === window) return false; // This is the top window
@@ -19,7 +22,13 @@ function postMessage(message) {
   try {
     var json = JSON.stringify(message);
     debug('post: %j to origin %s', json, clientEnv['basePath']);
-    window.parent.postMessage(json, clientEnv['basePath']);
+
+    let targetWindow = window.parent;
+    if (useVueLeftMenu) {
+      targetWindow = window;
+    }
+
+    targetWindow.postMessage(json, clientEnv['basePath']);
   } catch (e) {
     debug('Unable to post message: %j', e);
   }

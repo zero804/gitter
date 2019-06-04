@@ -2,8 +2,10 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
+const asyncHandler = require('express-async-handler');
 var contextGenerator = require('../../web/context-generator');
 var fonts = require('../../web/fonts');
+const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 
 var WELCOME_MESSAGES = [
   'Code for people',
@@ -28,10 +30,10 @@ var WELCOME_MESSAGES = [
   'Welcome home'
 ];
 
-function renderHomePage(req, res, next) {
+async function renderHomePage(req, res, next) {
   contextGenerator
     .generateBasicContext(req)
-    .then(function(troupeContext) {
+    .then(async function(troupeContext) {
       var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
 
       var osName = req.getParsedUserAgent().os.family.toLowerCase();
@@ -45,16 +47,20 @@ function renderHomePage(req, res, next) {
       var showWindowsApp = !isLinux && !isOsx;
       var showLinuxApp = !isOsx && !isWindows;
 
-      res.render(page, {
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
-        showOsxApp: showOsxApp,
-        showWindowsApp: showWindowsApp,
-        showLinuxApp: showLinuxApp,
-        troupeContext: troupeContext,
-        isNativeDesktopApp: troupeContext.isNativeDesktopApp
-      });
+      res.render(
+        page,
+        await mixinHbsDataForVueLeftMenu(req, {
+          bootScriptName: 'router-userhome',
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          fonts: fonts.getFonts(),
+          welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
+          showOsxApp: showOsxApp,
+          showWindowsApp: showWindowsApp,
+          showLinuxApp: showLinuxApp,
+          troupeContext: troupeContext,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp
+        })
+      );
     })
     .catch(next);
 }
@@ -87,7 +93,7 @@ function renderMobileNativeUserhome(req, res) {
 }
 
 module.exports = exports = {
-  renderHomePage: renderHomePage,
+  renderHomePage: asyncHandler(renderHomePage),
   renderMobileUserHome: renderMobileUserHome,
   renderMobileNativeUserhome: renderMobileNativeUserhome
 };

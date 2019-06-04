@@ -1,7 +1,22 @@
-html { font-size: 62.5%;}
-body { font-size:  16px;}
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 16px;
+}
 
 // THIS IS A STOPGAP.. eventually we should
 // get rid of this and replace it with the
 // exact definitions that we need
-@import "trp3.less";
+@import 'trp3.less';
+
+.layout-app {
+  display: flex;
+  height: 100%;
+}
+
+.layout-app-body {
+  position: relative;
+  flex: 1;
+  height: 100%;
+}

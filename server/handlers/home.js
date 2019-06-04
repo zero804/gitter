@@ -22,14 +22,19 @@ router.get(
   isPhoneMiddleware,
   timezoneMiddleware,
   function(req, res, next) {
-    if (req.isPhone) {
-      userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
+    const useVueLeftMenu = req.fflip.has('vue-left-menu');
+    if (useVueLeftMenu) {
+      userHomeRenderer.renderHomePage(req, res, next);
     } else {
-      mainFrameRenderer.renderMainFrame(req, res, next, {
-        subFrameLocation: '/home/~home',
-        title: 'Home',
-        suggestedMenuState: 'search'
-      });
+      if (req.isPhone) {
+        userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
+      } else {
+        mainFrameRenderer.renderMainFrame(req, res, next, {
+          subFrameLocation: '/home/~home',
+          title: 'Home',
+          suggestedMenuState: 'search'
+        });
+      }
     }
   }
 );

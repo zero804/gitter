@@ -1,0 +1,113 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`list-item community room matches snapshot 1`] = `
+<li
+  class="list-item"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/my-community/community"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        my-community
+      </span>
+    </h2>
+     
+    <!---->
+  </a>
+</li>
+`;
+
+exports[`list-item one to one room matches snapshot 1`] = `
+<li
+  class="list-item"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/EricGitterTester"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/gh/uv/4/EricGitterTester"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        EricGitterTester
+      </span>
+    </h2>
+     
+    <!---->
+  </a>
+</li>
+`;
+
+exports[`list-item room with long name matches snapshot 1`] = `
+<li
+  class="list-item"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/abcdefghijklmnop/qrstuvwxyz"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        qrstuvwxyz
+      </span>
+    </h2>
+     
+    <!---->
+  </a>
+</li>
+`;
+
+exports[`list-item room with short name matches snapshot 1`] = `
+<li
+  class="list-item"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/foo/bar"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        foo/bar
+      </span>
+    </h2>
+     
+    <!---->
+  </a>
+</li>
+`;
