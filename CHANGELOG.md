@@ -1,4 +1,6 @@
-# 19.47.0 - *upcoming*
+# 19.47.0 - 2019-6-4
+
+ - Introduce Vue left-menu v1 (behind [`vue-left-menu` feature flag](https://next.gitter.im/)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1360
 
 Developer facing:
 
