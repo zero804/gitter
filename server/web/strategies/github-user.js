@@ -36,17 +36,6 @@ function ageInHours(date) {
 }
 
 function updateUser(req, accessToken, user, githubUserProfile) {
-  // If the user was in the DB already but was invited, notify stats services
-  if (user.isInvited()) {
-    stats.event('new_user', {
-      userId: user.id,
-      method: 'github_oauth',
-      username: user.username,
-      source: 'invited',
-      googleAnalyticsUniqueId: gaCookieParser(req)
-    });
-  }
-
   user.username = githubUserProfile.login;
   user.displayName = githubUserProfile.name || githubUserProfile.login;
   user.gravatarImageUrl = githubUserProfile.avatar_url;
@@ -140,7 +129,7 @@ function githubUserCallback(req, accessToken, refreshToken, params, _profile, do
         );
       }
 
-      if (req.session && (!user || user.isInvited())) {
+      if (req.session && !user) {
         var events = req.session.events;
         if (!events) {
           events = [];

@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 
 function OneToOneUnconnectionPolicyEvalator(user, toUser) {
-  this._isValid = !user.state && !toUser.state;
+  this._isValid = user.isActive() && toUser.isActive();
 }
 
 OneToOneUnconnectionPolicyEvalator.prototype = {
