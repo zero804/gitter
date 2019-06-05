@@ -3,7 +3,7 @@
 /**
  * URI lookup service is a supersimple service for managing who owns what URIs
  *
- * It is seperate from uri-service as that would create circular dependencies
+ * It is separate from uri-service as that would create circular dependencies
  */
 
 var persistence = require('gitter-web-persistence');

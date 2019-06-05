@@ -73,7 +73,7 @@ function logProgress() {
   console.log('[PROGRESS]', '\tprocessed:', totalProcessed, '\tsuccess:', success);
 }
 
-// reponsible for running the procedure
+// responsible for running the procedure
 function run(chatMessages) {
   // increment stuff
   runCalled += 1;

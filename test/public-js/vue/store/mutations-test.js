@@ -82,10 +82,10 @@ describe('mutations', () => {
     expect(state.search.searchInputValue).toEqual(newValue);
   });
 
-  describe('RECEIVE_MESSAGE_SEARCH_SUCESS', () => {
+  describe('RECEIVE_MESSAGE_SEARCH_SUCCESS', () => {
     const searchResults = [1, 2];
     beforeEach(() => {
-      mutations[types.RECEIVE_MESSAGE_SEARCH_SUCESS](state, searchResults);
+      mutations[types.RECEIVE_MESSAGE_SEARCH_SUCCESS](state, searchResults);
     });
 
     it('clears error state', () => {

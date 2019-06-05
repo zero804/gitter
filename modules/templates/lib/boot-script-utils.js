@@ -20,7 +20,7 @@ function generateAssetsForChunks(chunks /*, options*/) {
       webpackBuildManifest || require('../../../output/assets/js/webpack-manifest.json');
   } catch (err) {
     throw new Error(
-      `You probably need to wait for the Gitter webpack build to finish. Error occured while requiring \`output/assets/js/webpack-manifest.json\`: ${err}\n${
+      `You probably need to wait for the Gitter webpack build to finish. Error occurred while requiring \`output/assets/js/webpack-manifest.json\`: ${err}\n${
         err.stack
       }`
     );

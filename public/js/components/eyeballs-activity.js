@@ -45,7 +45,7 @@ EyeballsActivity.prototype._registerInteraction = function() {
 };
 
 /**
- * This timer occassionally checks whether the user has performed any
+ * This timer occasionally checks whether the user has performed any
  * interactions since the last time it was called.
  * While being careful to deal with the computer sleeping
  */

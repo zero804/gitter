@@ -4,7 +4,7 @@ var ItemView = require('backbone.marionette').ItemView;
 var _super = ItemView.prototype;
 
 module.exports = ItemView.extend({
-  //Put everything in the constructo so it can't be overridden
+  //Put everything in the constructor so it can't be overridden
   //also won't get in the way of any modelEvents hashes
   constructor: function(attrs, options) {
     var model = this.model || attrs.model;

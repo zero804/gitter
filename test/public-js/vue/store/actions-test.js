@@ -103,7 +103,7 @@ describe('actions', () => {
         state,
         [
           { type: types.REQUEST_MESSAGE_SEARCH },
-          { type: types.RECEIVE_MESSAGE_SEARCH_SUCESS, payload: null }
+          { type: types.RECEIVE_MESSAGE_SEARCH_SUCCESS, payload: null }
         ],
         [],
         done
