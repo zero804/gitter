@@ -2,6 +2,7 @@
 
  - Fix typos throughout codebase
     - Thanks to [@yo](https://gitlab.com/yo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1409
+ - Fix production issue caused by code concerned with users in `invited` state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1406
 
 
 # 19.48.0 - 2019-6-4
