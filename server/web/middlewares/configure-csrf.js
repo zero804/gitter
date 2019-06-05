@@ -48,7 +48,7 @@ module.exports = function(req, res, next) {
 
   return validateUserAgentFromReq(req)
     .then(() => {
-      /* OAuth clients have req.authInfo. Propogate their access token to their entire session
+      /* OAuth clients have req.authInfo. Propagate their access token to their entire session
        * so that all related web-requests are made by the same client
        */
       if (req.authInfo && req.authInfo.accessToken) {

@@ -71,7 +71,7 @@ async function banUser() {
   try {
     await banUser();
     console.log(
-      `Sucessfully ${opts.unban ? 'unbanned' : 'banned'} ${opts.targetUsername} from ${
+      `Successfully ${opts.unban ? 'unbanned' : 'banned'} ${opts.targetUsername} from ${
         opts.roomUri
       } (via admin ${opts.adminUsername})`
     );

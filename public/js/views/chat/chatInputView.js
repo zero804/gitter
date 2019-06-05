@@ -26,7 +26,7 @@ var ChatInputView = Marionette.LayoutView.extend({
   },
 
   initialize: function() {
-    // clean up old compose mode persistance in the next event loop.
+    // clean up old compose mode persistence in the next event loop.
     // Remove this by 1 December 2015
     setTimeout(function() {
       window.localStorage.removeItem('compose_mode_enabled');

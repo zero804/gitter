@@ -20,7 +20,7 @@ function getVariantFromRequest(req, testName) {
 function configure(req, res, testName, disableSet) {
   var cookieName = 'variant_' + testName;
 
-  // Allow the value to be overriden
+  // Allow the value to be overridden
   var forcedParam = getVariantFromRequest(req, testName);
 
   // If cookies are not enabled in the current environment use the set value

@@ -31,7 +31,7 @@ export const fetchSearchResults = ({ state, commit }) => {
         limit: 30
       })
       .then(result => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_SUCESS, result);
+        commit(types.RECEIVE_MESSAGE_SEARCH_SUCCESS, result);
       })
       .catch(err => {
         commit(types.RECEIVE_MESSAGE_SEARCH_ERROR, err);

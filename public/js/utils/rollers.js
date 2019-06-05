@@ -99,7 +99,7 @@ module.exports = (function() {
       // nothing to stabilize (no content)
       if (!this._stableElement) return;
 
-      // TODO: check that the element is within the targets DOM heirachy
+      // TODO: check that the element is within the targets DOM hierarchy
       var scrollBottom = target.scrollTop + target.clientHeight;
       var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
 
@@ -233,7 +233,7 @@ module.exports = (function() {
 
         if (!this._stableElement) return;
 
-        // TODO: check that the element is within the targets DOM heirachy
+        // TODO: check that the element is within the targets DOM hierarchy
         var scrollBottom = target.scrollTop + target.clientHeight;
         var stableElementTop = this._stableElement.offsetTop - target.offsetTop;
 

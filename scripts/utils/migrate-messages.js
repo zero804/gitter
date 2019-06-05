@@ -3,7 +3,7 @@
 'use strict';
 
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
-var persistance = require('gitter-web-persistence');
+var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var assert = require('assert');
 var shutdown = require('shutdown');
@@ -27,7 +27,7 @@ Promise.all([troupeService.findByUri(opts.from), troupeService.findByUri(opts.to
     assert(fromRoom && fromRoom.id, 'lookup failed for ' + opts.from);
     assert(toRoom && fromRoom.id, 'lookup failed for ' + opts.to);
 
-    return persistance.ChatMessage.update(
+    return persistence.ChatMessage.update(
       { toTroupeId: fromRoom.id },
       { $set: { toTroupeId: toRoom.id } },
       { multi: true }

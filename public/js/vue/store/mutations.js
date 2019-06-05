@@ -29,7 +29,7 @@ export default {
     state.search.messageSearchError = false;
     state.search.messageSearchLoading = true;
   },
-  [types.RECEIVE_MESSAGE_SEARCH_SUCESS](state, searchResults) {
+  [types.RECEIVE_MESSAGE_SEARCH_SUCCESS](state, searchResults) {
     state.search.messageSearchError = false;
     state.search.messageSearchLoading = false;
     state.search.messageSearchResults = searchResults;

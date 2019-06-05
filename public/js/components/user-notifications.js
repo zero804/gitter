@@ -36,7 +36,7 @@ function getDesktopNotificationAccess() {
 }
 
 /**
- * Returns true if propogation should be cancelled
+ * Returns true if propagation should be cancelled
  */
 function onNotificationMessageClicked(message) {
   if (message.click) {

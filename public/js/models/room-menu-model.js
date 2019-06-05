@@ -143,7 +143,7 @@ module.exports = Backbone.Model.extend({
     });
     this.minibarCloseModel = new MinibarItemModel({ name: 'close', type: 'close' });
 
-    //Setup an inital active group model
+    //Setup an initial active group model
     this.groupsCollection.forEach(
       function(model) {
         if (state === 'org' && model.id === this.get('groupId')) {

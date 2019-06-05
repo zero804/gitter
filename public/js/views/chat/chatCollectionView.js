@@ -420,7 +420,7 @@ module.exports = (function() {
      * There appears to be a race condition,
      * possibly caused by issuing multiple resets
      * in quick succession, whereby child
-     * elements are cleaned up, but occassionally
+     * elements are cleaned up, but occasionally
      * stranded. See https://github.com/troupe/gitter-webapp/issues/615
      *
      * Although the views have been destroyed, the

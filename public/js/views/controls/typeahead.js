@@ -156,7 +156,7 @@ var TypeaheadView = Marionette.ItemView.extend({
 
       case 27:
         if (!this.dropdown.active()) {
-          // Propogate
+          // Propagate
           return;
         }
 
