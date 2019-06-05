@@ -18,7 +18,7 @@ module.exports = (function() {
     },
     serializeData: function() {
       var data = this.model.toJSON();
-      data.inactive = data.invited || data.removed;
+      data.inactive = data.removed;
       data.avatarUrl = avatars.getForUser(data);
       return data;
     }
@@ -49,7 +49,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       var isntSelf = data.username !== context.user().get('username');
-      var inactive = data.invited || data.removed;
+      var inactive = data.removed;
       var chatPrivately = data.has_gitter_login && isntSelf && !inactive;
       var mentionable = isntSelf;
       var removable = isntSelf && context.isTroupeAdmin();
@@ -62,7 +62,7 @@ module.exports = (function() {
       }
 
       data.avatarUrl = avatars.getForUser(data);
-      data.inactive = data.invited || data.removed;
+      data.inactive = data.removed;
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
       data.removable = removable;

@@ -19,7 +19,6 @@ module.exports = function(req, res, next) {
         body.has_gitter_login = user ? true : undefined;
 
         if (user) {
-          body.invited = user.isInvited() ? true : undefined;
           body.removed = user.isRemoved() ? true : undefined;
         }
 
