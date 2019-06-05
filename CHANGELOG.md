@@ -1,3 +1,9 @@
+# 19.49.0 - *upcoming*
+
+ - Fix typos throughout codebase
+    - Thanks to [@yo](https://gitlab.com/yo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1409
+
+
 # 19.48.0 - 2019-6-4
 
  - Introduce Vue left-menu v1 (behind [`vue-left-menu` feature flag](https://next.gitter.im/)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1360
