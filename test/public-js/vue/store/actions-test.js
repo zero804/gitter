@@ -2,14 +2,21 @@
 
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
+
+jest.mock('gitter-web-client-context');
+
 const actions = require('../../../../public/js/vue/store/actions');
 const testAction = require('./vuex-action-helper');
+const context = require('gitter-web-client-context');
 const appEvents = require('../../../../public/js/utils/appevents');
+
+const { createSerializedRoomFixture } = require('../fixture-helpers');
 
 describe('actions', () => {
   let state;
   beforeEach(() => {
     state = createState();
+    context.troupe.mockReset();
   });
 
   it('setInitialData', done => {
@@ -150,12 +157,12 @@ describe('actions', () => {
       expect(appEventTriggered).toEqual(false);
     });
 
-    it('fires appEvents to change rooms in the legacy part of the app', async () => {
-      const roomObject = {
-        id: '5cf8efbc4dfb4240048b768e',
-        uri: 'foo/bar',
-        unreads: 4
-      };
+    it('when router-chat loaded, fires appEvents to change rooms in the legacy part of the app', async () => {
+      const roomObject = createSerializedRoomFixture('community/room1');
+
+      context.troupe.mockImplementation(function() {
+        return roomObject;
+      });
 
       state.roomMap[roomObject.id] = roomObject;
 
@@ -180,6 +187,24 @@ describe('actions', () => {
 
       await navigationEventFiredPromise;
       await vueChangeRoomEventFiredPromise;
+    });
+
+    it('when on non-router-chat page, just redirects the page', async () => {
+      const roomObject = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[roomObject.id] = roomObject;
+
+      window.location.assign = jest.fn();
+
+      await testAction(
+        actions.changeDisplayedRoom,
+        roomObject.id,
+        state,
+        [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
+        []
+      );
+
+      expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);
     });
   });
 
