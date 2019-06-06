@@ -42,7 +42,12 @@ export default {
 
   [types.CHANGE_DISPLAYED_ROOM](state, newRoomId) {
     state.displayedRoomId = newRoomId;
+    state.hightLightedMessageId = null;
   },
+  [types.CHANGE_HIGHLIGHTED_MESSAGE_ID](state, newMessageId) {
+    state.hightLightedMessageId = newMessageId;
+  },
+
   [types.UPDATE_ROOM](state, newRoomState) {
     if (newRoomState.id) {
       const resultantRoomState = Object.assign(

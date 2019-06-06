@@ -119,10 +119,27 @@ describe('mutations', () => {
     });
   });
 
-  it('CHANGE_DISPLAYED_ROOM', () => {
-    const newRoomId = 123456;
-    mutations[types.CHANGE_DISPLAYED_ROOM](state, newRoomId);
-    expect(state.displayedRoomId).toEqual(newRoomId);
+  describe('CHANGE_DISPLAYED_ROOM', () => {
+    it('changed displayed room', () => {
+      const newRoomId = '123456';
+      mutations[types.CHANGE_DISPLAYED_ROOM](state, newRoomId);
+      expect(state.displayedRoomId).toEqual(newRoomId);
+    });
+
+    it('clears highlighted message', () => {
+      const messageId = '5c1234';
+      state.hightLightedMessageId = messageId;
+      expect(state.hightLightedMessageId).toBeDefined();
+
+      mutations[types.CHANGE_DISPLAYED_ROOM](state, '123456');
+      expect(state.hightLightedMessageId).toEqual(null);
+    });
+  });
+
+  it('CHANGE_HIGHLIGHTED_MESSAGE_ID', () => {
+    const newMessageId = '5c1234';
+    mutations[types.CHANGE_HIGHLIGHTED_MESSAGE_ID](state, newMessageId);
+    expect(state.hightLightedMessageId).toEqual(newMessageId);
   });
 
   describe('UPDATE_ROOM', () => {

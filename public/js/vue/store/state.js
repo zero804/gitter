@@ -8,6 +8,7 @@ function state() {
     roomMap: {},
 
     displayedRoomId: null,
+    hightLightedMessageId: null,
 
     leftMenuState: leftMenuConstants.LEFT_MENU_ALL_STATE,
     leftMenuPinnedState: true,
