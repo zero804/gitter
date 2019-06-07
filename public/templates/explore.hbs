@@ -23,9 +23,11 @@
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-    {{{ generateTroupeContext troupeContext }}}
-    {{{ generateEnv }}}
-    {{{ bootScript 'explore' }}}
+    {{#unless useVueLeftMenu}}
+      {{{ generateTroupeContext troupeContext }}}
+      {{{ generateEnv }}}
+      {{{ bootScript 'explore' }}}
+    {{/unless}}
     {{> live_reload}}
   </body>
 </html>

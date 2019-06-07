@@ -3,8 +3,11 @@
 var env = require('gitter-web-env');
 var express = require('express');
 var urlJoin = require('url-join');
+const identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+const featureToggles = require('../web/middlewares/feature-toggles');
 var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
 var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
+const exploreRenderer = require('./renderers/explore-renderer');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -13,19 +16,20 @@ router.use('/logout', preventClickjackingMiddleware, require('./logout'));
 router.use('/login', preventClickjackingMiddleware, require('./login'));
 
 // Double route mounting for explore onto /explore and /home/~explore
-router.use(
-  '/explore',
+router.get(
+  new RegExp('^/explore(.*)?'),
+  identifyRoute('root-explore'),
   preventClickjackingMiddleware,
-  function(req, res, next) {
+  featureToggles,
+  function(req, res) {
     // If logged in and trying to go to `/explore`, redirect to `/home/explore`
     if (req.user) {
-      var userHomeExploreUrl = urlJoin('/home/explore', req.url);
+      var userHomeExploreUrl = urlJoin('/home/explore', req.url.replace(/explore\/?/, ''));
       res.redirect(userHomeExploreUrl);
     } else {
-      next();
+      exploreRenderer.renderExplorePage(req, res);
     }
-  },
-  require('./explore')
+  }
 );
 
 // The route for the inner frame
