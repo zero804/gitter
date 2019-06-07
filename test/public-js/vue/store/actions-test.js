@@ -132,7 +132,7 @@ describe('actions', () => {
 
   describe('changeDisplayedRoom', () => {
     it('room we do not know about will not send appEvents', async () => {
-      const payload = 900009;
+      const payload = '5cf8efbc4dfb4240048b768e';
 
       let appEventTriggered = false;
       appEvents.once('*', () => {
@@ -152,7 +152,7 @@ describe('actions', () => {
 
     it('fires appEvents to change rooms in the legacy part of the app', async () => {
       const roomObject = {
-        id: 123456,
+        id: '5cf8efbc4dfb4240048b768e',
         uri: 'foo/bar',
         unreads: 4
       };
@@ -183,8 +183,30 @@ describe('actions', () => {
     });
   });
 
+  describe('jumpToMessageId', () => {
+    it('updates highlighted message ID and sends off appevent for legacy chat view backbone to consume', async () => {
+      const payload = '5cf8efbc4dfb4240048b768e';
+
+      const vuehightLightedMessageIdEventFiredPromise = new Promise(resolve => {
+        appEvents.on('vue:hightLightedMessageId', () => {
+          resolve();
+        });
+      });
+
+      await testAction(
+        actions.jumpToMessageId,
+        payload,
+        state,
+        [{ type: types.CHANGE_HIGHLIGHTED_MESSAGE_ID, payload: payload }],
+        []
+      );
+
+      await vuehightLightedMessageIdEventFiredPromise;
+    });
+  });
+
   it('updateRoom', done => {
-    const payload = { id: 123456, unreads: 5 };
+    const payload = { id: '5cf8efbc4dfb4240048b768e', unreads: 5 };
     testAction(
       actions.updateRoom,
       payload,

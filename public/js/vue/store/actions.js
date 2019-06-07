@@ -49,4 +49,9 @@ export const changeDisplayedRoom = ({ state, commit }, newRoomId) => {
   }
 };
 
+export const jumpToMessageId = ({ commit }, messageId) => {
+  commit(types.CHANGE_HIGHLIGHTED_MESSAGE_ID, messageId);
+  appEvents.trigger('vue:hightLightedMessageId', messageId);
+};
+
 export const updateRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);

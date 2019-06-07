@@ -8,6 +8,10 @@ function sortRooms(a, b) {
   return sortsAndFilters.recents.sort(a, b);
 }
 
+export const displayedRoom = state => {
+  return state.roomMap[state.displayedRoomId];
+};
+
 export const displayedRooms = state => {
   let resultantRooms = [];
 
