@@ -94,7 +94,7 @@ testModules['api-tests'] = {
 };
 
 testModules.integration = {
-  files: ['./test/integration/', './test/public-js/'],
+  files: ['./test/integration/'],
   isCritical: true
 };
 
@@ -216,6 +216,11 @@ Object.keys(testModules).forEach(function(moduleName) {
       testingErrors.push(err);
     });
   });
+});
+
+subTasks.push('test:test:jest');
+gulp.task('test:test:jest', function() {
+  return childProcessPromise.spawn('npm', ['run', 'jest']);
 });
 
 gulp.task('test:pre-test', function() {

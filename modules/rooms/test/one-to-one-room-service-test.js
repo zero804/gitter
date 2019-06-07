@@ -19,9 +19,6 @@ describe('one-to-one-room-service', function() {
       user1: {},
       user2: {},
       user3: {},
-      userInvited: {
-        state: 'INVITED'
-      },
       userRemoved: {
         state: 'REMOVED'
       }
@@ -108,19 +105,6 @@ describe('one-to-one-room-service', function() {
         .then(function(userIds) {
           assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
           assert(_.find(userIds, findUserIdPredicate(fixture.user3.id)));
-        });
-    });
-
-    it('should not allow a user to create a room with an INVITED user', function() {
-      var userId2 = fixture.userInvited._id;
-
-      return oneToOneRoomService
-        .findOrCreateOneToOneRoom(fixture.user1, userId2)
-        .then(function() {
-          assert.ok(false);
-        })
-        .catch(StatusError, function(err) {
-          assert(err.status, 403);
         });
     });
 

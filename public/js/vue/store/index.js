@@ -7,12 +7,14 @@ import state from './state';
 
 Vue.use(Vuex);
 
-function createStore() {
+function createStore(overrides) {
   return new Vuex.Store({
     actions,
     getters,
     mutations,
-    state: state()
+    state: state(),
+
+    ...overrides
   });
 }
 

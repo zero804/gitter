@@ -95,10 +95,10 @@ context.troupe().on('change:id', function() {
   prevResults = [];
 });
 
-module.exports = function(chatCollection) {
+function createUserTypeahead(chatCollection) {
   var maxCount = isMobile() ? 3 : 10;
   return {
-    match: /(^|\s)@(\/?[a-zA-Z0-9_\-]*)$/,
+    match: /(^|\s)@(\/?[a-zA-Z0-9_-]*)$/,
     maxCount: maxCount,
     search: function(term, callback) {
       var lcTerm = term.toLowerCase();
@@ -150,7 +150,7 @@ module.exports = function(chatCollection) {
       });
     },
     template: function(user) {
-      if (user.username == '/all') {
+      if (user.username === '/all') {
         return template({
           name: user.username,
           description: user.displayName
@@ -166,4 +166,12 @@ module.exports = function(chatCollection) {
       return '$1@' + user.username + ' ';
     }
   };
+}
+
+createUserTypeahead.testOnly = {
+  clearPrevResults() {
+    prevResults = [];
+  }
 };
+
+module.exports = createUserTypeahead;

@@ -1,6 +1,9 @@
-@import "typography.less";
-@import "colors.less";
-@import "logo.less";
+@import 'typography.less';
+@import 'colors.less';
+@import 'logo.less';
+@import 'base-web';
+@import 'community-create.less';
+@import '../js/views/modals/create-room-view.less';
 
 body {
   margin: 0;
@@ -37,7 +40,7 @@ body {
 }
 
 .userhome-header__nav {
-  background-color: rgba(255, 255, 255 ,0.3);
+  background-color: rgba(255, 255, 255, 0.3);
   width: 100%;
   height: 2em;
   margin-top: 4em;
@@ -128,7 +131,7 @@ body {
   font-size: 0.8em;
 
   &:hover {
-    background-color: darken(#ea9448, 5%)
+    background-color: darken(#ea9448, 5%);
   }
 }
 
@@ -148,7 +151,7 @@ body {
 }
 
 .userhome-apps__button {
-  color: rgb(132,129,123);
+  color: rgb(132, 129, 123);
   text-decoration: none;
 
   padding: 0.5rem 1.8rem;
@@ -165,7 +168,7 @@ body {
   border: rgb(226, 224, 223) 2px solid;
 
   &:hover {
-    background-color: darken(white, 5%)
+    background-color: darken(white, 5%);
   }
 }
 
@@ -222,4 +225,3 @@ body {
   display: inline-block;
   margin-right: 1em;
 }
-

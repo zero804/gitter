@@ -1,0 +1,218 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`search-body error matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div>
+    
+    Error fetching messages
+  
+  </div>
+</div>
+`;
+
+exports[`search-body loading matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <loading-spinner-stub />
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body search results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="message-search-list"
+  >
+    <li
+      class="message-search-item"
+    >
+      <span
+        class="message-search-item-detail"
+      >
+        <a
+          class="message-search-item-detail-author-link"
+          href="#0"
+        >
+          Andrew Backer
+          
+          <span>
+            @awbacker
+          </span>
+        </a>
+         
+        <span>
+          ●
+        </span>
+         
+        <a
+          class="message-search-item-detail-permalink"
+          href="#0"
+        >
+          May 17th 7:48 PM
+        </a>
+      </span>
+       
+      <span
+        class="message-search-item-text"
+      >
+        
+        @MadLittleMods For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
+      
+      </span>
+    </li>
+    <li
+      class="message-search-item"
+    >
+      <span
+        class="message-search-item-detail"
+      >
+        <a
+          class="message-search-item-detail-author-link"
+          href="#0"
+        >
+          Borek Bernard
+          
+          <span>
+            @borekb
+          </span>
+        </a>
+         
+        <span>
+          ●
+        </span>
+         
+        <a
+          class="message-search-item-detail-permalink"
+          href="#0"
+        >
+          Jan 13th 1:44 PM
+        </a>
+      </span>
+       
+      <span
+        class="message-search-item-text"
+      >
+        
+        but I were offline for a day and there we new message, I would get an email notification / digest for them, right?
+      
+      </span>
+    </li>
+  </ul>
+</div>
+`;

@@ -115,7 +115,7 @@ var ExploreView = Marionette.LayoutView.extend({
 
   setupProfileMenu: function() {
     if (context.isLoggedIn()) {
-      //If an instance of the profile menu exists destory it to remove listeners etc
+      //If an instance of the profile menu exists destroy it to remove listeners etc
       if (this.profileMenu) {
         this.profileMenu.destroy();
       }

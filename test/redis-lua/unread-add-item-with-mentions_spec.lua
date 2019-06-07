@@ -124,7 +124,7 @@ describe("unread-add-item-with-mentions", function()
 
   end)
 
-  it("should add mutliple mentions items", function()
+  it("should add multiple mentions items", function()
     local result = add_item(ROOM_1, ITEM_1, TIME_NOW, { USER_1 }, { USER_1 });
     assert.are.same({ 1, 1, 1 }, result)
 

@@ -5,6 +5,7 @@ var mailer = env.mailer;
 var Promise = require('bluebird');
 var cdn = require('gitter-web-cdn');
 var mailerTemplate = require('./mailer-template');
+var debug = require('debug')('gitter:app:mailer');
 
 var VALID_TEMPLATES = {
   'added-to-room': addedToRoomMapping,
@@ -23,6 +24,7 @@ exports.sendEmail = function(options) {
   options.templateName = mandrillTemplateName;
   options.data = mapper(options.data);
 
+  debug('Invoking mailer with options: %O', options);
   return mailer(options);
 };
 

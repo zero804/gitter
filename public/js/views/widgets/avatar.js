@@ -186,9 +186,8 @@ module.exports = (function() {
       online: online,
       offline: !online,
       role: user.role,
-      invited: user.invited,
       removed: user.removed,
-      inactive: user.removed || user.invited
+      inactive: user.removed
     };
   }
 

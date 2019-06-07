@@ -181,14 +181,6 @@ function findOrCreateOneToOneRoom(fromUser, toUserId) {
 
       var toUser = this.toUser;
 
-      // Do not allow new rooms to be created for REMOVED users
-      if (toUser.state === 'REMOVED') {
-        var err = new StatusError(404);
-        err.githubType = 'ONETOONE';
-        err.uri = toUser.username;
-        throw err;
-      }
-
       // TODO: in future we need to add request one-to-one here...
       return policyFactory
         .createPolicyForOneToOne(fromUser, toUser)

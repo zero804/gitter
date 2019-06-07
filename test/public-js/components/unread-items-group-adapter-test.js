@@ -1,13 +1,11 @@
 'use strict';
 
-var unreadItemsGroupAdapter = require('proxyquire').noCallThru()(
-  '../../../public/js/components/unread-items-group-adapter',
-  {
-    '../utils/raf': function(fn) {
-      setImmediate(fn);
-    }
-  }
-);
+jest.mock('../../../public/js/utils/raf');
+const raf = require('../../../public/js/utils/raf');
+raf.mockImplementation(function(fn) {
+  setImmediate(fn);
+});
+const unreadItemsGroupAdapter = require('../../../public/js/components/unread-items-group-adapter');
 
 var assert = require('assert');
 var Promise = require('bluebird');

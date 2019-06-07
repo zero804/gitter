@@ -85,7 +85,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
       });
     });
 
-    it("shouldn't fetch issue in unauthroized private project", () => {
+    it("shouldn't fetch issue in unauthorized private project", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
       return glService
         .getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)
@@ -148,7 +148,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
         });
     });
 
-    it("shouldn't fetch issue in unauthroized private project", () => {
+    it("shouldn't fetch issue in unauthorized private project", () => {
       const glService = new GitLabIssuableService(FAKE_USER, 'issues');
       return glService
         .getIssue(fixtureLoader.GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI, 1)

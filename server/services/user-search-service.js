@@ -137,7 +137,7 @@ function searchForUsersInLargeRoom(queryText, roomId, options) {
   options = options || {};
   var limit = options.limit || 30;
 
-  // no guarentee that these users are in the room
+  // no guarantee that these users are in the room
   // so we get a decent chunk and then filter by membership
   return userSearch
     .elasticsearchUserTypeahead(queryText, { limit: 500 })

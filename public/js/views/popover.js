@@ -3,7 +3,10 @@
 var $ = require('jquery');
 var _ = require('underscore');
 var Marionette = require('backbone.marionette');
-var Mutant = require('mutantjs');
+let Mutant;
+if (typeof window !== 'undefined') {
+  Mutant = require('mutantjs');
+}
 var popoverTemplate = require('./tmpl/popover.hbs');
 
 var ARROW_WIDTH_PX = 10;
@@ -186,15 +189,17 @@ var Popover = Marionette.ItemView.extend({
 
     $e.removeClass('popover-hidden');
 
-    this.mutant = new Mutant(e, this.reposition, {
-      scope: this,
-      timeout: 20,
-      transitions: true,
-      observers: {
-        attributes: true,
-        characterData: true
-      }
-    });
+    if (Mutant && Mutant.prototype && Mutant.prototype.constructor) {
+      this.mutant = new Mutant(e, this.reposition, {
+        scope: this,
+        timeout: 20,
+        transitions: true,
+        observers: {
+          attributes: true,
+          characterData: true
+        }
+      });
+    }
   },
 
   reposition: function() {

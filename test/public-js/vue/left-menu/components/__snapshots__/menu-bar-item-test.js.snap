@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`menu-bar-item all matches snapshot 1`] = `
+<button
+  class="item item-all active"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;
+
+exports[`menu-bar-item create matches snapshot 1`] = `
+<button
+  class="item item-create"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;
+
+exports[`menu-bar-item people matches snapshot 1`] = `
+<button
+  class="item item-people"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;
+
+exports[`menu-bar-item search matches snapshot 1`] = `
+<button
+  class="item item-search"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;
+
+exports[`menu-bar-item toggle matches snapshot 1`] = `
+<button
+  class="item item-toggle"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;
+
+exports[`menu-bar-item when all state, all item has highlight matches snapshot 1`] = `
+<button
+  class="item item-all active"
+  type="button"
+>
+  <span
+    class="icon-wrapper"
+  />
+</button>
+`;

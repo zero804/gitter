@@ -34,7 +34,7 @@ Gitter uses a number of backend peristence services:
     - **redis-persist**: Persistent Redis instant. If the cluster went down, ideally we should not lose any data.
     - **redis-nonpersist**: Non-persistent Redis. If the cluster went down and we lost all data in this cluster, it would not affect the operation of Gitter.
     - **redis-caching**: Similar to redis-nonpersist, but capped in size. Used for caching, particularly the **GitHub API**, which we cache using the [`request-http-cache`](https://github.com/gitterHQ/request-http-cache) module.
-    - **redis-faye**: Used by [Faye](https://github.com/faye/faye) as a peristent backend.
+    - **redis-faye**: Used by [Faye](https://github.com/faye/faye) as a persistent backend.
  - **elasticsearch**
  - **neo4j**:
 
