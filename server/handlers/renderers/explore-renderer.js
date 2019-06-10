@@ -160,6 +160,7 @@ async function renderExplorePage(req, res) {
       req,
       _.extend({}, snapshots, {
         bootScriptName: 'explore',
+        cssFileName: 'styles/explore.css',
         hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
         isMobile: isMobile(req),
         exploreBaseUrl: getExploreBaseUrl(req),
