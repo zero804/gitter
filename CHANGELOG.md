@@ -4,7 +4,8 @@
     - Thanks to [@yo](https://gitlab.com/yo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1409
     - And another thanks to [@yo](https://gitlab.com/yo) :) for fixing one more typo, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1410
  - Fix production issue caused by code concerned with users in `invited` state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1406
- - Add jump to message(permalinks) for search in the Vue left menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1411
+ - Add jump to message(permalinks) for search in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1411
+ - Add redirect for room switches for non-chat pages with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1412
 
 
 # 19.48.0 - 2019-6-4
