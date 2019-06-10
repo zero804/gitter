@@ -6,6 +6,7 @@
  - Fix production issue caused by code concerned with users in `invited` state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1406
  - Add jump to message(permalinks) for search in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1411
  - Add redirect for room switches for non-chat pages with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1412
+ - Move message timestamp next to username, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1415
 
 
 # 19.48.0 - 2019-6-4
