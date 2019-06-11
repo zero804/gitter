@@ -2,6 +2,9 @@
 
 process.env.DISABLE_API_LISTEN = '1';
 
+const env = require('gitter-web-env');
+const config = env.config;
+
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
@@ -156,18 +159,23 @@ describe('room-api', function() {
   });
 
   it("POST /v1/rooms/:roomId/invites with a user doesn't leak email", function() {
-    return request(app)
-      .post(`/v1/rooms/${fixture.troupe1.id}/invites`)
-      .send({
-        // A user that has an email listed on their profile, https://github.com/gitter-badger
-        githubUsername: 'gitter-badger'
-      })
-      .set('x-access-token', fixture.user2.accessToken)
-      .expect(200)
-      .then(function(result) {
-        const body = result.body;
-        assert.strictEqual(body.status, 'invited');
-        assert.strictEqual(body.email, undefined);
-      });
+    // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+    // This test is under a conditional instead of skipped
+    // so we don't accidentaly forget to unskip it in the future
+    if (!config.get('email:disableInviteEmails')) {
+      return request(app)
+        .post(`/v1/rooms/${fixture.troupe1.id}/invites`)
+        .send({
+          // A user that has an email listed on their profile, https://github.com/gitter-badger
+          githubUsername: 'gitter-badger'
+        })
+        .set('x-access-token', fixture.user2.accessToken)
+        .expect(200)
+        .then(function(result) {
+          const body = result.body;
+          assert.strictEqual(body.status, 'invited');
+          assert.strictEqual(body.email, undefined);
+        });
+    }
   });
 });
