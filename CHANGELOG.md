@@ -7,6 +7,12 @@
  - Add jump to message(permalinks) for search in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1411
  - Add redirect for room switches for non-chat pages with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1412
  - Move message timestamp next to username, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1415
+ - Add Vue left-menu to `/home/explore`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1413
+
+
+# 19.48.1 - 2019-6-11
+
+ - Disable invite/add emails until we add anti-spam measures, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1416
 
 
 # 19.48.0 - 2019-6-4
