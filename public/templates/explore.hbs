@@ -7,7 +7,9 @@
     <link id="favicon" rel="shortcut icon" href="{{ cdn 'images/favicon-normal.ico' }}">
     {{> fonts}}
     {{!-- <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,100"> --}}
-    <link rel="stylesheet" type="text/css" href="{{ cdn 'styles/explore.css' }}">
+    {{#unless useVueLeftMenu}}
+      <link rel="stylesheet" type="text/css" href="{{ cdn 'styles/explore.css' }}">
+    {{/unless}}
 
     {{#if hasDarkTheme}}
     <link rel="stylesheet" href='{{cdn "styles/dark-theme.css" }}' id="gitter-dark" media="all" type="text/css">
@@ -23,9 +25,11 @@
     <script type="text/javascript" src="//use.typekit.net/ohh4mcl.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-    {{{ generateTroupeContext troupeContext }}}
-    {{{ generateEnv }}}
-    {{{ bootScript 'explore' }}}
+    {{#unless useVueLeftMenu}}
+      {{{ generateTroupeContext troupeContext }}}
+      {{{ generateEnv }}}
+      {{{ bootScript 'explore' }}}
+    {{/unless}}
     {{> live_reload}}
   </body>
 </html>
