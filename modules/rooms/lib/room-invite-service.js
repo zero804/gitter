@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
+const config = env.config;
 var Promise = require('bluebird');
 var isValidEmail = require('email-validator').validate;
 var StatusError = require('statuserror');
@@ -89,6 +90,11 @@ function createInvite(room, invitingUser, options) {
         };
       });
     } else {
+      // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+      if (config.get('email:disableInviteEmails')) {
+        throw new StatusError(501, 'Inviting a user by email has been disabled, see #2153');
+      }
+
       // The user doesn't exist. We'll try invite them
       return createInviteForNewUser(room, invitingUser, type, externalId, emailAddress).then(
         function(resolvedEmailAddress) {
