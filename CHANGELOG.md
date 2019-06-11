@@ -19,6 +19,8 @@ Developer facing:
  - Add Jest for Vue testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1404
  - Update all `test/public-js`(frontend) tests to use Jest, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1405
  - Add utility script to ban user from room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1402
+ - Fix missing `backbone.marionette` dependency when Vue server side rendering (SSR) in production, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1417
+    - Move frontend dependencies from `devDependencies` to `dependencies` in `package.json`
 
 
 # 19.47.0 - 2019-5-28
