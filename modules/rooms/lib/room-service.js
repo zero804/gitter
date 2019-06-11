@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
+const config = env.config;
 
 var appEvents = require('gitter-web-appevents');
 var assert = require('assert');
@@ -407,11 +408,14 @@ async function notifyInvitedUser(fromUser, invitedUser, room) {
     return;
   }
 
-  await emailNotificationService
-    .addedToRoomNotification(fromUser, invitedUser, room)
-    .catch(function(err) {
-      logger.error('Unable to send added to room notification: ' + err, { exception: err });
-    });
+  // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+  if (!config.get('email:disableInviteEmails')) {
+    await emailNotificationService
+      .addedToRoomNotification(fromUser, invitedUser, room)
+      .catch(function(err) {
+        logger.error('Unable to send added to room notification: ' + err, { exception: err });
+      });
+  }
 
   var metrics = {
     notification: 'email_notification_sent',
