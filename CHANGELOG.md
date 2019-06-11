@@ -27,7 +27,7 @@ Developer facing:
 # 19.47.1 - 2019-6-11
 
  - Disable invite/add emails until we add anti-spam measures, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1416
-
+    - Disabling so we can ask Mandrill to unpause emails and get unread notifications flowing again, https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
 
 # 19.47.0 - 2019-5-28
 
