@@ -10,11 +10,6 @@
  - Add Vue left-menu to `/home/explore`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1413
 
 
-# 19.48.1 - 2019-6-11
-
- - Disable invite/add emails until we add anti-spam measures, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1416
-
-
 # 19.48.0 - 2019-6-4
 
  - Introduce Vue left-menu v1 (behind [`vue-left-menu` feature flag](https://next.gitter.im/)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1360
@@ -27,6 +22,11 @@ Developer facing:
  - Add utility script to ban user from room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1402
  - Fix missing `backbone.marionette` dependency when Vue server side rendering (SSR) in production, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1417
     - Move frontend dependencies from `devDependencies` to `dependencies` in `package.json`
+
+
+# 19.47.1 - 2019-6-11
+
+ - Disable invite/add emails until we add anti-spam measures, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1416
 
 
 # 19.47.0 - 2019-5-28
