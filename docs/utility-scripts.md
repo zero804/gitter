@@ -3,25 +3,10 @@
 These are scripts that can help you answer questions like "What's this user's eyeball state?" and "What's the userId for mydigitalself?". They can be found in `scripts/utils`.
 
 
-## SSH into a box
-
-For `gitter.im` production,
-
- - Connect to the Gitter VPN
- - Add your Gitter SSH key
-
-You can use any box but the beta box works well,
-
-```
-ssh deployer@gitter-beta.beta.gitter
-```
-
-Also see https://gitlab.com/gl-infra/gitter-infrastructure#ssh-to-boxes
-
-
-## Setup secrets
-
-See https://gitlab.com/gl-infra/gitter-infrastructure#configure-secrets
+## :wrench: Before you can run a script :wrench:
+1. [SSH into a box](https://gitlab.com/gl-infra/gitter-infrastructure#ssh-to-boxes) if you are running the script in beta or prod
+1. [Setup secrets](https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets)
+1.  **IMPORTANT:** Adjust the `NODE_ENV=prod` environment variable to the desired environment, `prod`, `beta`, `dev`
 
 
 ## Spam on Gitter (fighting abuse)
@@ -30,9 +15,6 @@ See https://gitlab.com/gitlab-com/gl-security/runbooks/blob/master/gitter_spam.m
 
 
 ## Utility scripts
-
-**IMPORTANT:** Adjust the `NODE_ENV=prod` environment variable to the desired environment, `prod`, `beta`, `dev`
-
 
 ### `auto-lurk-room.js`
 

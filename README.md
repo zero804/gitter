@@ -140,6 +140,9 @@ Export the environment variables with (this needs to be done in any new terminal
 @FOR /f "tokens=*" %i IN ('cat .env') DO @%i
 ```
 
+#### Remote machines
+If you've got an access to gitter beta and produciton environments, you can [follow the infrastructure instructions](https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure#configure-secrets) to set up the secrets.
+
 ### Start Gitter services
 
 Only proceed once [dependent services](#start-dependent-services) (Docker containers) have started.
