@@ -4,7 +4,7 @@
     "domain": "gitter.im",
     "secureCookies": false,
     "staticContent": "public",
-    "staticContentExpiryDays" : 365,
+    "staticContentExpiryDays": 365,
     "minified": true,
     "cacheTemplates": false,
     "cookiePrefix": "d_",
@@ -40,7 +40,7 @@
   "vapid": {
     "contact": "",
     "publicKey": "",
-    "privateKey":""
+    "privateKey": ""
   },
   "notifications": {
     "minimumUserAlertInterval": 57600,
@@ -74,7 +74,8 @@
   },
   "email": {
     "emailBasePath": "http://localhost:5000",
-    "unsubscribeNotificationsSecret": ""
+    "unsubscribeNotificationsSecret": "",
+    "disableInviteEmails": true
   },
   "amazon": {
     "accessKey": "",
@@ -126,8 +127,7 @@
     "get-rough-message-count-cache-timeout": 86400
   },
   "revokedUserAgents": [],
-  "irc": {
-  },
+  "irc": {},
   "errorReporting": {
     "enabled": false
   },
@@ -136,7 +136,7 @@
     "sharedKey": ""
   },
   "facebook": {
-    "appId" : ""
+    "appId": ""
   },
   "twitterbadger": {
     "consumer_key": "",
@@ -162,9 +162,7 @@
   },
   "avatar": {
     "officialHost": "http://localhost:5000/api/private/avatars",
-    "dnsPreloadHosts": [
-      "localhost"
-    ],
+    "dnsPreloadHosts": ["localhost"],
     "hosts": [
       "http://localhost:5000/api/private/avatars",
       "http://localhost:5000/api/private/avatars"
