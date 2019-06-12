@@ -8,6 +8,7 @@
  - Add redirect for room switches for non-chat pages with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1412
  - Move message timestamp next to username, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1415
  - Add Vue left-menu to `/home/explore`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1413
+ - Add Vue left-menu to `/home/learn`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1422
 
 
 # 19.48.0 - 2019-6-4
