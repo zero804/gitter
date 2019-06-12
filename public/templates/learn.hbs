@@ -1,14 +1,16 @@
 <!doctype html>
 <html class="{{#if hasCachedFonts}}fonts-loaded{{/if}}" lang="en">
 <head>
-	<meta charset="utf-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1"/>
   <link id="favicon" rel="shortcut icon" href="{{cdn 'images/favicon-normal.ico' }}">
 
-	<title>Learn</title>
+  <title>Learn</title>
 
   {{> fonts}}
-  <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
+  {{#unless useVueLeftMenu}}
+    <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
+  {{/unless}}
   <base target="_blank">
 </head>
 <body>
@@ -60,7 +62,9 @@
     </section>
   </div>
 
-  {{{ generateTroupeContext troupeContext }}}
-  {{{ bootScript bootScriptName }}}
+  {{#unless useVueLeftMenu}}
+    {{{ generateTroupeContext troupeContext }}}
+    {{{ bootScript bootScriptName }}}
+  {{/unless}}
 </body>
 </html>

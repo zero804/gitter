@@ -2,17 +2,18 @@
 
 var express = require('express');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
+const featureToggles = require('../web/middlewares/feature-toggles');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
-var fonts = require('../web/fonts');
+const learnRenderer = require('./renderers/learn-renderer');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
-router.get('/~learn', ensureLoggedIn, identifyRoute('learn-frame'), function(req, res) {
-  res.render('learn', {
-    bootScriptName: 'router-home-learn',
-    fonts: fonts.getFonts(),
-    hasCachedFonts: fonts.hasCachedFonts(req.cookies)
-  });
-});
+router.get(
+  '/~learn',
+  ensureLoggedIn,
+  featureToggles,
+  identifyRoute('learn-frame'),
+  learnRenderer.renderLearnPage
+);
 
 module.exports = router;
