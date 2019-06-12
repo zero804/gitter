@@ -1,42 +1,43 @@
-@import "base-web.less";
-@import "typography.less";
-@import "components/tag-list-edit.less";
-@import "components/tag-modal";
-@import "components/tag-error";
+@import 'base-web.less';
+@import 'typography.less';
+@import 'components/tag-list-edit.less';
+@import 'components/tag-modal';
+@import 'components/tag-error';
 
-@import "trpModals.less";
-@import "trpButtons.less";
-@import "trp3.less";
+@import 'trpModals.less';
+@import 'trpButtons.less';
+@import 'trp3.less';
 
 @import 'components/room-card';
-@import "bootstrap/mixins";
+@import 'bootstrap/mixins';
 
-@import "colors.less";
-@import "bootstrap/pagination";
-@import "../js/views/profile-menu/profile-menu-view";
+@import 'colors.less';
+@import 'bootstrap/pagination';
+@import '../js/views/profile-menu/profile-menu-view';
 
 @large-breakpoint: 1200px;
 @medium-breakpoint: 767px;
 @small-breakpoint: 600px;
 @xsmall-breakpoint: 400px;
 
-@tag-vertical-padding: .75rem;
+@tag-vertical-padding: 0.75rem;
 
 @subdued-border-color: @menu-border-color;
 @subdued-text-color: fade(@dark, 60%);
-
 
 html {
   box-sizing: border-box;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
 body {
   margin: 0;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .hidden {
@@ -44,9 +45,6 @@ body {
 }
 
 .org-page__header {
-  z-index: 1;
-  position: fixed;
-  top: 0;
   width: 100%;
   display: flex;
   padding: 0 4rem;
@@ -54,7 +52,7 @@ body {
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
 
   @media (max-width: @medium-breakpoint) {
-    padding: .5em;
+    padding: 0.5em;
   }
 }
 
@@ -71,8 +69,8 @@ body {
   height: auto;
   margin-right: 1.7rem;
   margin-top: 1.7rem;
-  padding: .3rem;
-  border-radius: .4rem;
+  padding: 0.3rem;
+  border-radius: 0.4rem;
   background-color: white;
 }
 
@@ -90,7 +88,9 @@ body {
   font-size: 2.4rem;
   font-weight: 300;
 
-  a { color: white; }
+  a {
+    color: white;
+  }
 }
 
 .org-page__header-body-actions {
@@ -120,9 +120,9 @@ body {
   margin-right: 10px;
 }
 
-
 .org-page-main {
-  margin-top: 6rem;
+  height: 100%;
+  overflow: scroll;
   padding: 65px 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
   background-color: @main-application-bg-color;
   @excess-card-margin: 0.5em;
@@ -131,7 +131,6 @@ body {
     padding: 30px 1em-@excess-card-margin;
   }
 }
-
 
 .org-page__room-list-header {
   display: flex;
@@ -158,12 +157,10 @@ body {
   }
 }
 
-
 .org-page__room-list {
   margin-left: 0;
   list-style: none;
 }
-
 
 .org-page__list-item(@highlight-color) {
   display: flex;
@@ -208,15 +205,15 @@ body {
 .org-page__room-item-heading-name-piece {
   overflow: hidden;
   flex-shrink: 1000;
-  max-width: calc(100% ~"-" 5ch);
+  max-width: calc(100% ~'-' 5ch);
   text-overflow: ellipsis;
 
-  transition: flex-shrink .3s ease-in-out;
+  transition: flex-shrink 0.3s ease-in-out;
 
   &:last-child,
   &:only-child,
   &:hover {
-    flex-shrink: .01;
+    flex-shrink: 0.01;
   }
 }
 
@@ -250,7 +247,7 @@ body {
   flex: 1;
   display: flex;
   flex-wrap: wrap;
-  height: calc(1em ~"+" (2 * @tag-vertical-padding));
+  height: calc(1em ~'+' (2 * @tag-vertical-padding));
 
   margin-left: 2rem;
   list-style: none;
@@ -265,11 +262,11 @@ body {
   margin-right: 1rem;
   padding: @tag-vertical-padding 2rem;
   background-color: @pampas;
-  border-radius: .4rem;
+  border-radius: 0.4rem;
 
   color: @thunder;
   font-size: 1.2rem;
-  letter-spacing: .1em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -282,10 +279,10 @@ body {
 }
 
 .org-page__room-item-people-list-item {
-  margin-right: .4rem;
+  margin-right: 0.4rem;
 
   @media (max-width: @small-breakpoint) {
-    &:nth-child(-n+2) {
+    &:nth-child(-n + 2) {
       display: none;
     }
   }
@@ -301,7 +298,6 @@ body {
     display: none;
   }
 }
-
 
 .org-page__pagination {
   display: flex;
