@@ -30,8 +30,7 @@ GhRepoPolicyDelegate.prototype = {
         }
 
         return this._userLoader()
-          .bind(this)
-          .then(function(user) {
+          .then(user => {
             return this._fetch(user);
           })
           .then(function(repoInfo) {
@@ -49,8 +48,7 @@ GhRepoPolicyDelegate.prototype = {
         }
 
         return this._userLoader()
-          .bind(this)
-          .then(function(user) {
+          .then(user => {
             // Non-github users will never have push access
             if (!isGitHubUser(user)) return null;
 
