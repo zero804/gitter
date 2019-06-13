@@ -4,6 +4,8 @@ const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
 const mutations = require('../../../../public/js/vue/store/mutations').default;
 
+const { createSerializedRoomFixture } = require('../fixture-helpers');
+
 describe('mutations', () => {
   let state;
   beforeEach(() => {
@@ -76,46 +78,165 @@ describe('mutations', () => {
     });
   });
 
-  it('UPDATE_SEARCH_INPUT_VALUE', () => {
-    const newValue = 'newTestValue';
-    mutations[types.UPDATE_SEARCH_INPUT_VALUE](state, newValue);
-    expect(state.search.searchInputValue).toEqual(newValue);
-  });
+  describe('Search', () => {
+    function generateSearchTests(
+      type,
+      requestType,
+      receiveSuccessType,
+      recieveErrorType,
+      searchKey
+    ) {
+      describe(`${type}`, () => {
+        describe(`${requestType}`, () => {
+          beforeEach(() => {
+            state.search[searchKey].error = true;
+            state.search[searchKey].loading = true;
 
-  describe('RECEIVE_MESSAGE_SEARCH_SUCCESS', () => {
-    const searchResults = [1, 2];
-    beforeEach(() => {
-      mutations[types.RECEIVE_MESSAGE_SEARCH_SUCCESS](state, searchResults);
+            mutations[requestType](state);
+          });
+
+          it('clears error state', () => {
+            expect(state.search[searchKey].error).toEqual(false);
+          });
+
+          it('sets loading state', () => {
+            expect(state.search[searchKey].loading).toEqual(true);
+          });
+        });
+
+        describe(`${receiveSuccessType}`, () => {
+          const searchResults = [1, 2];
+          beforeEach(() => {
+            mutations[receiveSuccessType](state, searchResults);
+          });
+
+          it('clears error state', () => {
+            expect(state.search[searchKey].error).toEqual(false);
+          });
+
+          it('clears loading state', () => {
+            expect(state.search[searchKey].loading).toEqual(false);
+          });
+
+          it('sets search results', () => {
+            expect(state.search[searchKey].results).toEqual(searchResults);
+          });
+        });
+
+        describe(`${recieveErrorType}`, () => {
+          beforeEach(() => {
+            mutations[recieveErrorType](state);
+          });
+
+          it('sets error state', () => {
+            expect(state.search[searchKey].error).toEqual(true);
+          });
+
+          it('clears loading state', () => {
+            expect(state.search[searchKey].loading).toEqual(false);
+          });
+
+          it('clears search results', () => {
+            expect(state.search[searchKey].results).toEqual([]);
+          });
+        });
+      });
+    }
+
+    it('UPDATE_SEARCH_INPUT_VALUE', () => {
+      const newValue = 'newTestValue';
+      mutations[types.UPDATE_SEARCH_INPUT_VALUE](state, newValue);
+      expect(state.search.searchInputValue).toEqual(newValue);
     });
 
-    it('clears error state', () => {
-      expect(state.search.messageSearchError).toEqual(false);
+    it('SEARCH_CLEARED', () => {
+      state.search.current = { results: [{ id: 1 }] };
+      state.search.repo = { loading: true, error: true, results: [{ id: 1 }] };
+      state.search.room = { loading: true, error: true, results: [{ id: 1 }] };
+      state.search.people = { loading: true, error: true, results: [{ id: 1 }] };
+      state.search.message = { loading: true, error: true, results: [{ id: 1 }] };
+
+      mutations[types.SEARCH_CLEARED](state);
+      expect(state.search.current.results).toEqual([]);
+
+      expect(state.search.repo).toEqual({ loading: false, error: false, results: [] });
+      expect(state.search.room).toEqual({ loading: false, error: false, results: [] });
+      expect(state.search.people).toEqual({ loading: false, error: false, results: [] });
+      expect(state.search.message).toEqual({ loading: false, error: false, results: [] });
     });
 
-    it('clears loading state', () => {
-      expect(state.search.messageSearchLoading).toEqual(false);
+    describe('Room search', () => {
+      describe('UPDATE_ROOM_SEARCH_CURRENT', () => {
+        it('searching nothing, finds nothing', () => {
+          state.search.searchInputValue = '';
+
+          const room1 = createSerializedRoomFixture('community/special-room1');
+          state.roomMap = {
+            [room1.id]: room1
+          };
+
+          mutations[types.UPDATE_ROOM_SEARCH_CURRENT](state);
+          expect(state.search.current.results).toEqual([]);
+        });
+
+        it('searching for room, finds room', () => {
+          state.search.searchInputValue = 'special';
+
+          const room1 = createSerializedRoomFixture('community/special-room1');
+          state.roomMap = {
+            [room1.id]: room1
+          };
+
+          mutations[types.UPDATE_ROOM_SEARCH_CURRENT](state);
+          expect(state.search.current.results).toEqual([room1]);
+        });
+
+        it('searching for some other room not in your list, finds nothing', () => {
+          state.search.searchInputValue = 'not-in-my-room-list';
+
+          const room1 = createSerializedRoomFixture('community/special-room1');
+          state.roomMap = {
+            [room1.id]: room1
+          };
+
+          mutations[types.UPDATE_ROOM_SEARCH_CURRENT](state);
+          expect(state.search.current.results).toEqual([]);
+        });
+      });
+
+      generateSearchTests(
+        'Repo',
+        types.REQUEST_ROOM_SEARCH_REPO,
+        types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS,
+        types.RECEIVE_ROOM_SEARCH_REPO_ERROR,
+        'repo'
+      );
+
+      generateSearchTests(
+        'Room',
+        types.REQUEST_ROOM_SEARCH_ROOM,
+        types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS,
+        types.RECEIVE_ROOM_SEARCH_ROOM_ERROR,
+        'room'
+      );
+
+      generateSearchTests(
+        'People',
+        types.REQUEST_ROOM_SEARCH_PEOPLE,
+        types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS,
+        types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR,
+        'people'
+      );
     });
 
-    it('sets search results', () => {
-      expect(state.search.messageSearchResults).toEqual(searchResults);
-    });
-  });
-
-  describe('RECEIVE_MESSAGE_SEARCH_ERROR', () => {
-    beforeEach(() => {
-      mutations[types.RECEIVE_MESSAGE_SEARCH_ERROR](state);
-    });
-
-    it('sets error state', () => {
-      expect(state.search.messageSearchError).toEqual(true);
-    });
-
-    it('clears loading state', () => {
-      expect(state.search.messageSearchLoading).toEqual(false);
-    });
-
-    it('clears search results', () => {
-      expect(state.search.messageSearchResults).toEqual([]);
+    describe('Message search', () => {
+      generateSearchTests(
+        'People',
+        types.REQUEST_MESSAGE_SEARCH,
+        types.RECEIVE_MESSAGE_SEARCH_SUCCESS,
+        types.RECEIVE_MESSAGE_SEARCH_ERROR,
+        'message'
+      );
     });
   });
 
