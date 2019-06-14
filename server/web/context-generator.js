@@ -116,8 +116,7 @@ function generateSocketContext(userId, troupeId) {
 function generateTroupeContext(req, extras) {
   var user = req.user;
   var uriContext = req.uriContext;
-  assert(uriContext);
-  var troupe = uriContext.troupe;
+  var troupe = uriContext && uriContext.troupe;
   var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([

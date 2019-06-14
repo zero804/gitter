@@ -16,9 +16,7 @@ function getSnapshotsForPageContext(req) {
         isPinned = rightToolbarUserSettings.isPinned;
       }
       return {
-        rightToolbar: {
-          isPinned: isPinned
-        }
+        isPinned: isPinned
       };
     });
 }

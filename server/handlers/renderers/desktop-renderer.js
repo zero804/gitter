@@ -129,7 +129,17 @@ function hasSecondaryView() {
 }
 
 module.exports = {
-  renderPrimaryView: renderPrimaryView,
+  renderPrimaryView: (...options) => {
+    const [req] = options;
+    const useVueLeftMenu = req.fflip.has('vue-left-menu');
+
+    let view = renderPrimaryView;
+    if (useVueLeftMenu) {
+      view = renderSecondaryView;
+    }
+
+    return view(...options);
+  },
   renderSecondaryView: renderSecondaryView,
   hasSecondaryView: hasSecondaryView
 };

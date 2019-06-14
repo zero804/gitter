@@ -410,11 +410,6 @@ function notifyInvitedUser(fromUser, invitedUser, room) {
     .then(function(emailAddress) {
       var notification;
 
-      if (invitedUser.state === 'REMOVED') {
-        stats.event('user_added_removed_user');
-        return null; // This has been removed
-      }
-
       if (invitedUser.state === 'INVITED') {
         if (emailAddress) {
           notification = 'email_invite_sent';

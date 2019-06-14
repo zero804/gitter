@@ -12,7 +12,13 @@ var github = require('gulp-github');
 var eslintFilter = require('./eslint-filter');
 var del = require('del');
 
-const JS_GLOBS = ['**/*.js', '!node_modules/**', '!node_modules_linux/**', '!public/repo/**'];
+const JS_GLOBS = [
+  '**/*.js',
+  '**/*.vue',
+  '!node_modules/**',
+  '!node_modules_linux/**',
+  '!public/repo/**'
+];
 
 function guessBaseBranch() {
   var branch = process.env.CI_COMMIT_REF_NAME || process.env.GIT_BRANCH;
@@ -40,7 +46,7 @@ gulp.task('linter:validate:eslint', function() {
       eslint({
         quiet: argv.quiet,
         fix: argv.fix,
-        extensions: ['.js']
+        extensions: ['.js', '.vue']
       })
     )
     .pipe(eslint.format('unix'))
