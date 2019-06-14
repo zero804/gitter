@@ -1,4 +1,4 @@
-# 19.49.0 - *upcoming*
+# 19.49.0 - 2019-6-14
 
  - Fix typos throughout codebase
     - Thanks to [@yo](https://gitlab.com/yo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1409
