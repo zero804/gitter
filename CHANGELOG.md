@@ -9,6 +9,7 @@
  - Move message timestamp next to username, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1415
  - Add Vue left-menu to `/home/explore`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1413
  - Add Vue left-menu to `/home/learn`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1422
+ - Add Vue left-menu to `/<community>/home`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1421
 
 
 # 19.48.0 - 2019-6-4
