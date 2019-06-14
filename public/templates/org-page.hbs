@@ -3,7 +3,9 @@
 	  <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{> fonts}}
-    <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
+    {{#unless useVueLeftMenu}}
+      <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
+    {{/unless}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
 
     {{#if hasDarkTheme}}
@@ -36,7 +38,7 @@
       <ul class="org-page__room-list">
         {{#each rooms}}
           <li class="org-page__room-item">
-            <a href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1" class="org-page__room-item-heading-link">
+            <a href="/{{ uri }}?source=orgpage" target="_parent" tabindex="-1" class="org-page__room-item-heading-link" data-disable-routing="true">
               <h3 class="org-page__room-item-heading">
                 {{#each roomNameParts}}
                   {{#unless @first}}
@@ -103,8 +105,9 @@
       {{/paginate}}
     </main>
 
-
-    {{{ generateTroupeContext troupeContext }}}
-    {{{ bootScript 'router-org-page' }}}
+    {{#unless useVueLeftMenu}}
+      {{{ generateTroupeContext troupeContext }}}
+      {{{ bootScript 'router-org-page' }}}
+    {{/unless}}
   </body>
 </html>
