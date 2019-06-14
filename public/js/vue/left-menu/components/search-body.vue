@@ -105,6 +105,7 @@ export default {
 }
 
 .search-input {
+  box-sizing: initial;
   width: 100%;
 }
 

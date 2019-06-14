@@ -1,18 +1,18 @@
-@import "../../../less/colors";
-@import "../widgets/avatar";
-@import "../popover";
-@import "chatInputView";
-@import "chatConnectivityIndicatorView";
+@import '../../../less/colors';
+@import '../widgets/avatar';
+@import '../popover';
+@import 'chatInputView';
+@import 'chatConnectivityIndicatorView';
 @import 'markdown.less';
 
 // Other items required by this library
-@import "../../../less/highlight.less";
+@import '../../../less/highlight.less';
 
 /* KaTeX for LaTeX */
-@import "../repo/katex/katex";
-@import "../repo/katex/fonts";
+@import '../repo/katex/katex';
+@import '../repo/katex/fonts';
 
-@import (reference) "../../../less/colors.less";
+@import (reference) '../../../less/colors.less';
 
 @chat-spacing: 0.2em;
 @chat-item__action-item__color: rgba(170, 170, 170, 1);
@@ -35,7 +35,7 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
   body:not(.mobile) &:not(.syncerror):hover {
-      background-color: rgba(240,240,240,.3);
+    background-color: rgba(240, 240, 240, 0.3);
   }
 
   &.chat-item__highlighted {
@@ -43,15 +43,25 @@
   }
 
   &.synced {
-    opacity: 1.0;
+    opacity: 1;
   }
 
   @keyframes sync-keyframes {
-    0% { opacity: 0.8 }
-    10% { opacity: 0.4 }
-    20% { opacity: 0.8 }
-    30% { opacity: 0.4 }
-    100% { opacity: 0.6 }
+    0% {
+      opacity: 0.8;
+    }
+    10% {
+      opacity: 0.4;
+    }
+    20% {
+      opacity: 0.8;
+    }
+    30% {
+      opacity: 0.4;
+    }
+    100% {
+      opacity: 0.6;
+    }
   }
 
   &.fast {
@@ -91,11 +101,9 @@
       margin-top: 6px;
     }
 
-
     .chat-item__actions {
       margin-top: 2px;
     }
-
   }
 
   &.burstContinued {
@@ -131,15 +139,16 @@
 
   &.unread .chat-item__container {
     border-right: 2px solid @green;
-    background-color: rgba(46, 204, 113,0.08);
+    background-color: rgba(46, 204, 113, 0.08);
   }
 
   &.unread.mentioned .chat-item__container {
     border-right: 2px solid @orange;
-    background-color: rgba(230, 126, 34,0.08);
+    background-color: rgba(230, 126, 34, 0.08);
   }
 
-  &.mentioned .chat-item__text .mention,   &.mentioned .chat-item__text .groupmention  {
+  &.mentioned .chat-item__text .mention,
+  &.mentioned .chat-item__text .groupmention {
     color: @orange;
     background-color: lighten(@orange, 40%);
     border-radius: 2px;
@@ -150,7 +159,9 @@
   }
 
   &:last-child {
-    &.burstStart { padding-bottom: @chat-spacing*2; }
+    &.burstStart {
+      padding-bottom: @chat-spacing*2;
+    }
   }
 }
 
@@ -167,28 +178,6 @@
 
 body.mobile .chat-item__actions {
   display: none;
-}
-
-
-
-.chat-item__action, .chat-item__action-disabled {
-  border-radius: 4px;
-  padding: 0px 5px;
-}
-
-.chat-item__action:hover {
-  cursor: pointer;
-  background: #08c;
-  color: white;
-}
-
-.chat-item__action-disabled {
-  color: #CCC;
-}
-
-.chat-item__action-disabled:hover {
-  background: #08c;
-  cursor: default;
 }
 
 &.fast .chat-item__container {
@@ -246,7 +235,8 @@ body.mobile .chat-item__username {
 
   color: fade(@chat-item__action-item__color, 70%);
 
-  &, &:hover {
+  &,
+  &:hover {
     text-decoration: none;
   }
 
@@ -261,9 +251,7 @@ body.mobile .chat-item__username {
 
   cursor: pointer;
 
-  transition:
-    visibility .2s ease,
-    color .2s ease;
+  transition: visibility 0.2s ease, color 0.2s ease;
 
   &:hover {
     &,
@@ -296,7 +284,6 @@ body.mobile .chat-item__username {
     color: @chat-item__action-item__color;
   }
 }
-
 
 body.mobile .chat-item__icon--read {
   display: none;
@@ -331,7 +318,8 @@ body.mobile .chat-item__icon--read {
     margin: 0;
   }
 
-  td, th {
+  td,
+  th {
     border: 1px solid #ddd;
     padding: 6px;
   }
@@ -346,7 +334,7 @@ body.mobile .chat-item__icon--read {
     background-color: #f8f8f8;
   }
 
-/*  p:last-child {
+  /*  p:last-child {
     margin-bottom: 0;
   }*/
 
@@ -384,7 +372,6 @@ body.mobile .chat-item__icon--read {
     &.animateOut {
       max-height: 0;
     }
-
   }
 }
 
@@ -419,7 +406,7 @@ body.mobile .chat-item__content {
 
 .search-container {
   .chat-item {
-    cursor: hand
+    cursor: hand;
   }
 }
 
@@ -427,9 +414,8 @@ body.mobile .chat-item__content {
   border-top: 1px solid @homepage-green;
 }
 
-
 .lastMessageSeen::before {
-  content: "New messages";
+  content: 'New messages';
   font-size: 10px;
   background: white;
   color: @homepage-green;
