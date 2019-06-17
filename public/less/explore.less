@@ -43,7 +43,7 @@ html {
 }
 
 body {
-  overflow: auto;
+  overflow: hidden;
   height: 100%;
   margin: 0;
   background-color: @page-bg-color;
@@ -59,7 +59,7 @@ body {
 .explore-page-wrap {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  height: 100%;
 }
 
 .explore-primary-header-innner {
@@ -89,14 +89,12 @@ body {
 
 .explore-header {
   z-index: 2;
-  position: fixed;
   display: flex;
   align-items: center;
   width: 100%;
   height: @desktop-header-height;
   margin-top: 0;
   margin-left: auto;
-  margin-bottom: 10px;
   margin-right: auto;
   padding-top: 0;
   padding-left: @page-wrapper-horizontal-padding;
@@ -110,6 +108,11 @@ body {
   color: white;
   font-weight: 300;
   font-size: 24px;
+}
+
+.explore-main {
+  overflow: auto;
+  flex: 1;
 }
 
 .explore-header-section {
