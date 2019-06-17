@@ -1,3 +1,8 @@
+# 19.50.0 - *upcoming*
+
+ - Fix profile menu missing on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1427
+
+
 # 19.49.0 - 2019-6-14
 
  - Fix typos throughout codebase
