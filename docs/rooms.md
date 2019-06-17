@@ -36,7 +36,18 @@ You can leave a room via **Room settings dropdown** -> **Leave this room**
 
 If you have mad skillz, you can also type "/leave" in the chat room (slash command).
 
+It's not possible to leave a one to one room, only hide it(see below)
+
 ![](https://i.imgur.com/Rc4EVnV.png)
+
+
+### Hide a room
+
+You can hide a room via **Room settings dropdown** -> **Hide this room**
+
+Hiding a room with keep it from appearing in your left-menu room list. If you receive a notification for the room again, it will reappear. If you no longer wish to receive notifications from that room, you should either leave that room (`/leave` slash command) or change notifications to mentions only. You cannot leave a one to one room.
+
+![](https://i.imgur.com/ceIVTNd.png)
 
 
 ## Room admin

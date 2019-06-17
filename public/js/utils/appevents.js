@@ -17,7 +17,12 @@ var appEvents = {
   triggerParent: function() {
     var args = Array.prototype.slice.call(arguments, 0);
     if (typeof window !== 'undefined') {
-      window.parent.postMessage(
+      let targetWindow = window.parent;
+      if (useVueLeftMenu) {
+        targetWindow = window;
+      }
+
+      targetWindow.postMessage(
         JSON.stringify({
           child_window_event: args
         }),
@@ -29,7 +34,7 @@ var appEvents = {
 
 _.extend(appEvents, Backbone.Events);
 
-if (!useVueLeftMenu && typeof window !== 'undefined') {
+if (typeof window !== 'undefined') {
   window.addEventListener(
     'message',
     function(e) {

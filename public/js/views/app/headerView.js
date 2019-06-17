@@ -7,6 +7,7 @@ var cocktail = require('backbone.cocktail');
 var autolink = require('autolink'); // eslint-disable-line node/no-missing-require
 var clientEnv = require('gitter-client-env');
 var context = require('gitter-web-client-context');
+const log = require('../../utils/log');
 var toggleClass = require('../../utils/toggle-class');
 var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
@@ -118,6 +119,8 @@ var HeaderView = Marionette.ItemView.extend({
         var href = e.get('href');
         if (href === '#leave') {
           this.leaveRoom();
+        } else if (href === '#hide') {
+          this.hideRoom();
         } else if (href === '#notifications') {
           this.requestBrowserNotificationsPermission();
         }
@@ -247,6 +250,8 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.addConditional(isRoomMember, { title: 'Leave this room', href: '#leave' });
     }
 
+    menuBuilder.addConditional(isRoomMember, { title: 'Hide this room', href: '#hide' });
+
     return menuBuilder.getItems();
   },
 
@@ -256,6 +261,19 @@ var HeaderView = Marionette.ItemView.extend({
     apiClient.room.delete('/users/' + context.getUserId(), {}).then(function() {
       appEvents.trigger('navigation', '/home', 'home', ''); // TODO: figure out a title
       //context.troupe().set('roomMember', false);
+    });
+  },
+
+  hideRoom: function() {
+    // Hide the room in the UI immediately
+    this.model.set('lastAccessTime', null);
+
+    apiClient.user.delete(`/rooms/${this.model.id}`).catch(err => {
+      log.error('Error hiding room', { exception: err });
+      appEvents.triggerParent('user_notification', {
+        title: 'Error hiding room',
+        text: `Check the devtools console for more details: ${err.message}`
+      });
     });
   },
 
