@@ -4,7 +4,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import * as leftMenuConstants from '../constants';
 import MenuBarBody from './menu-bar-body.vue';
 import SearchBody from './search-body.vue';
-import ListItem from './list-item.vue';
+import RoomList from './room-list.vue';
 import iconLogoText from '../../../../images/svg/gitter-logos/logo-white-lettering.svg';
 
 export default {
@@ -12,7 +12,7 @@ export default {
   components: {
     MenuBarBody,
     SearchBody,
-    ListItem
+    RoomList
   },
   iconLogoText,
   computed: {
@@ -85,9 +85,7 @@ export default {
           <h2 v-if="isAllState" class="room-list-title">All conversations</h2>
           <h2 v-if="isPeopleState" class="room-list-title">People</h2>
 
-          <ul class="room-list">
-            <list-item v-for="room in displayedRooms" :key="room.id" :item="room" />
-          </ul>
+          <room-list :rooms="displayedRooms" />
         </template>
       </section>
     </section>
@@ -190,10 +188,5 @@ export default {
 
 .room-list-title {
   .m-header-title();
-}
-
-.room-list {
-  margin-left: 0;
-  list-style: none;
 }
 </style>

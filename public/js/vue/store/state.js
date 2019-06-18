@@ -13,6 +13,7 @@ function state() {
     leftMenuState: leftMenuConstants.LEFT_MENU_ALL_STATE,
     leftMenuPinnedState: true,
     leftMenuExpandedState: false,
+    favouriteDraggingInProgress: false,
 
     search: {
       searchInputValue: '',

@@ -103,7 +103,8 @@
                       class="{{#if isNotOneToOne}}room-item--favourite{{else}}room-item--favourite-one2one{{/if}} {{#if isHidden}}hidden{{/if}}"
                       id="{{id}}"
                       data-id="{{id}}"
-                      data-type="room">
+                      data-type="room"
+                      data-favourite="{{favourite}}">
                       {{{ prerenderView "js/views/menu/room/primary-collection/primary-collection-item-view" }}}
                     </div>
                   {{/each}}

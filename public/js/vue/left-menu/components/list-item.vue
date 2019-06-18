@@ -1,9 +1,13 @@
 <script>
 import { mapActions } from 'vuex';
+import LoadingSpinner from '../../components/loading-spinner.vue';
 import parseForTemplate from 'gitter-web-shared/parse/left-menu-primary-item';
 
 export default {
   name: 'ListItem',
+  components: {
+    LoadingSpinner
+  },
   props: {
     item: {
       type: Object,
@@ -37,7 +41,11 @@ export default {
 </script>
 
 <template>
-  <li class="list-item" :class="{ 'is-favourited': item.favourite }">
+  <li
+    class="list-item"
+    :class="{ 'is-favourited': item.favourite }"
+    :data-favourite="item.favourite"
+  >
     <a
       ref="link"
       class="list-item-link"
@@ -55,6 +63,8 @@ export default {
         <span v-else-if="nameData.displayName" class="name-piece">{{ nameData.displayName }}</span>
         <span v-else class="name-piece">{{ nameData.name }}</span>
       </h2>
+
+      <loading-spinner v-if="item.loading" />
 
       <div v-if="item.mentions" class="mention-indicator">@</div>
       <div v-else-if="item.unreadItems" class="unread-indicator">

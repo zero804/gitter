@@ -41,19 +41,6 @@ describe('left-menu index', () => {
       });
       expect(wrapper.element).toMatchSnapshot();
     });
-
-    it('matches snapshot with some rooms', () => {
-      factory({}, store => {
-        store.state.leftMenuState = 'all';
-
-        store.state.roomMap = {
-          1: { id: 1, lastAccessTime: 1 },
-          2: { id: 2, lastAccessTime: 1 },
-          3: { id: 3, lastAccessTime: 1 }
-        };
-      });
-      expect(wrapper.element).toMatchSnapshot();
-    });
   });
 
   describe('people state', () => {

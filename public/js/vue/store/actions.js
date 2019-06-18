@@ -3,6 +3,7 @@ import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
 import * as leftMenuConstants from '../left-menu/constants';
+import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 export const setTest = ({ commit }, testValue) => commit(types.SET_TEST, testValue);
@@ -21,6 +22,49 @@ export const toggleLeftMenuPinnedState = ({ commit }, toggleState) =>
 
 export const toggleLeftMenu = ({ commit }, toggleState) =>
   commit(types.TOGGLE_LEFT_MENU, toggleState);
+
+export const updatefavouriteDraggingInProgress = ({ commit }, toggleState) =>
+  commit(types.UPDATE_FAVOURITE_DRAGGING_STATE, toggleState);
+
+export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite }) => {
+  dispatch('updateRoom', {
+    id,
+    favourite
+  });
+
+  const roomIdFavouritePositionPairs = Object.values(state.roomMap).map(room => {
+    return [room.id, room.favourite];
+  });
+
+  // After we update the item in question, we probably need to increment
+  // subsequent items in the list so everything stays in order
+  //
+  // This shares the same logic on the backend for calculating the new favourite indexes
+  const updates = calculateFavouriteUpdates(id, favourite, roomIdFavouritePositionPairs);
+  updates.forEach(([id, favourite]) => {
+    dispatch('updateRoom', {
+      id,
+      favourite
+    });
+  });
+
+  commit(types.REQUEST_ROOM_FAVOURITE, id);
+  apiClient.user
+    .patch(`/rooms/${id}`, {
+      favourite
+    })
+    .then(result => {
+      commit(types.RECEIVE_ROOM_FAVOURITE_SUCCESS, result.id);
+      dispatch('updateRoom', result);
+    })
+    .catch(err => {
+      commit(types.RECEIVE_ROOM_FAVOURITE_ERROR, { id, error: err });
+      appEvents.triggerParent('user_notification', {
+        title: 'Error favouriting room',
+        text: err.message
+      });
+    });
+};
 
 export const updateSearchInputValue = ({ commit }, newSearchInputValue) => {
   commit(types.UPDATE_SEARCH_INPUT_VALUE, newSearchInputValue);

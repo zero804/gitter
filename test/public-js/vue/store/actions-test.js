@@ -93,6 +93,78 @@ describe('actions', () => {
     );
   });
 
+  it('updatefavouriteDraggingInProgress', done => {
+    const payload = true;
+    testAction(
+      actions.updatefavouriteDraggingInProgress,
+      payload,
+      state,
+      [{ type: types.UPDATE_FAVOURITE_DRAGGING_STATE, payload: payload }],
+      [],
+      done
+    );
+  });
+
+  describe('updateRoomFavourite', () => {
+    it('updates lone room to favourite', done => {
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[room1.id] = room1;
+
+      // TODO: Mock apiClient
+
+      const payload = { id: room1.id, favourite: 1 };
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [{ type: types.REQUEST_ROOM_FAVOURITE, payload: room1.id }],
+        [{ type: 'updateRoom', payload }],
+        done
+      );
+    });
+
+    it('updates subsequent favourites', done => {
+      const favouriteRoom1 = {
+        ...createSerializedRoomFixture('community/favourite-room1'),
+        favourite: 1
+      };
+      const favouriteRoom2 = {
+        ...createSerializedRoomFixture('community/favourite-room2'),
+        favourite: 2
+      };
+      const favouriteRoom3 = {
+        ...createSerializedRoomFixture('community/favourite-room3'),
+        favourite: 3
+      };
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap = {
+        [favouriteRoom1.id]: favouriteRoom1,
+        [favouriteRoom2.id]: favouriteRoom2,
+        [favouriteRoom3.id]: favouriteRoom3,
+        [room1.id]: room1
+      };
+
+      // TODO: Mock apiClient
+
+      const payload = { id: room1.id, favourite: 1 };
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [{ type: types.REQUEST_ROOM_FAVOURITE, payload: room1.id }],
+        [
+          { type: 'updateRoom', payload },
+          { type: 'updateRoom', payload: { id: favouriteRoom1.id, favourite: 2 } },
+          { type: 'updateRoom', payload: { id: favouriteRoom2.id, favourite: 3 } },
+          { type: 'updateRoom', payload: { id: favouriteRoom3.id, favourite: 4 } }
+        ],
+        done
+      );
+    });
+  });
+
   it('updateSearchInputValue', done => {
     const payload = 'newSearchValue';
     testAction(
