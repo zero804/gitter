@@ -43,16 +43,30 @@ describe('actions', () => {
     );
   });
 
-  it('setLeftMenuState', done => {
-    const payload = 'people';
-    testAction(
-      actions.setLeftMenuState,
-      payload,
-      state,
-      [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-      [],
-      done
-    );
+  describe('setLeftMenuState', () => {
+    it('sets the state', done => {
+      const payload = 'people';
+      testAction(
+        actions.setLeftMenuState,
+        payload,
+        state,
+        [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
+        [],
+        done
+      );
+    });
+
+    it('when switching to search tab, re-searches for messages in the current room', done => {
+      const payload = 'search';
+      testAction(
+        actions.setLeftMenuState,
+        payload,
+        state,
+        [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
+        [{ type: 'fetchMessageSearchResults' }],
+        done
+      );
+    });
   });
 
   it('toggleLeftMenuPinnedState', done => {
@@ -91,11 +105,29 @@ describe('actions', () => {
     );
   });
 
-  describe('fetchSearchResults', () => {
+  describe('fetchRoomSearchResults', () => {
     it('action fired but no search input', done => {
       state.search.searchInputValue = '';
 
-      testAction(actions.fetchSearchResults, null, state, [], [], done);
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [{ type: types.SEARCH_CLEARED, payload: undefined }],
+        [],
+        done
+      );
+    });
+
+    it.skip('searches value success', () => {});
+    it.skip('searches value error', () => {});
+  });
+
+  describe('fetchMessageSearchResults', () => {
+    it('action fired but no search input', done => {
+      state.search.searchInputValue = '';
+
+      testAction(actions.fetchMessageSearchResults, null, state, [], [], done);
     });
 
     // FIXME: Waiting until we switch over to Axios for requests in the apiClient so we can mock

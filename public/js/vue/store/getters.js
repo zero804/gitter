@@ -1,3 +1,4 @@
+import _ from 'underscore';
 import { pojo as sortsAndFilters } from 'gitter-realtime-client/lib/sorts-filters';
 
 function sortRooms(a, b) {
@@ -27,4 +28,17 @@ export const displayedRooms = state => {
   resultantRooms.sort(sortRooms);
 
   return resultantRooms;
+};
+
+export const displayedRoomSearchResults = state => {
+  const allResults = [
+    ...state.search.current.results,
+    ...state.search.repo.results,
+    ...state.search.room.results,
+    ...state.search.people.results
+  ];
+
+  const uniqueResults = _.uniq(allResults, false, 'url');
+
+  return uniqueResults.slice(0, 6);
 };

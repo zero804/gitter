@@ -75,4 +75,32 @@ describe('getters', () => {
       expect(displayedRooms).toEqual([oneToOneRoom1]);
     });
   });
+
+  describe('displayedRoomSearchResults', () => {
+    it('deduplicates room search combined results matches snapshot', () => {
+      const room1 = createSerializedRoomFixture('community/repo1');
+      state.search.current.results = [room1];
+      state.search.repo.results = [room1];
+      state.search.room.results = [room1];
+
+      const displayedRoomSearchResults = getters.displayedRoomSearchResults(state);
+      expect(displayedRoomSearchResults).toEqual([room1]);
+    });
+
+    it('displays a maximum of 6 rooms', () => {
+      state.search.current.results = [
+        createSerializedRoomFixture('community/room1'),
+        createSerializedRoomFixture('community/room2'),
+        createSerializedRoomFixture('community/room3'),
+        createSerializedRoomFixture('community/room4'),
+        createSerializedRoomFixture('community/room6'),
+        createSerializedRoomFixture('community/room7'),
+        createSerializedRoomFixture('community/room8'),
+        createSerializedRoomFixture('community/room9')
+      ];
+
+      const displayedRoomSearchResults = getters.displayedRoomSearchResults(state);
+      expect(displayedRoomSearchResults.length).toEqual(6);
+    });
+  });
 });

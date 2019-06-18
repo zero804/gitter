@@ -1,9 +1,10 @@
 <script>
 import _ from 'underscore';
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 import LoadingSpinner from '../../components/loading-spinner.vue';
 import SearchBodyMessageResultItem from './search-body-message-result-item.vue';
+import ListItem from './list-item.vue';
 
 const SEARCH_DEBOUNCE_INTERVAL = 1000;
 
@@ -11,7 +12,8 @@ export default {
   name: 'SearchBody',
   components: {
     LoadingSpinner,
-    SearchBodyMessageResultItem
+    SearchBodyMessageResultItem,
+    ListItem
   },
   props: {
     // We use this in tests so we don't have to wait for the search to happen
@@ -23,10 +25,23 @@ export default {
   computed: {
     ...mapState({
       searchInputValue: state => state.search.searchInputValue,
-      messageSearchLoading: state => state.search.messageSearchLoading,
-      messageSearchError: state => state.search.messageSearchError,
-      messageSearchResults: state => state.search.messageSearchResults
+
+      roomSearchLoading: state => {
+        return (
+          state.search.repo.loading || state.search.room.loading || state.search.people.loading
+        );
+      },
+
+      repoSearchError: state => state.search.repo.error,
+      roomSearchError: state => state.search.room.error,
+      peopleSearchError: state => state.search.people.error,
+
+      messageSearchLoading: state => state.search.message.loading,
+      messageSearchError: state => state.search.message.error,
+      messageSearchResults: state => state.search.message.results
     }),
+    ...mapGetters(['displayedRoomSearchResults']),
+
     searchInputModel: {
       get() {
         return this.searchInputValue;
@@ -36,13 +51,25 @@ export default {
         this.debouncedFetchSearchResults();
       }
     },
+    hasRoomSearchResults() {
+      return !_.isEmpty(this.displayedRoomSearchResults);
+    },
     hasMessageSearchResults() {
-      return this.messageSearchResults && this.messageSearchResults.length > 0;
+      return !_.isEmpty(this.messageSearchResults);
     }
   },
 
   methods: {
-    ...mapActions(['updateSearchInputValue', 'fetchSearchResults']),
+    ...mapActions([
+      'updateSearchInputValue',
+      'fetchRoomSearchResults',
+      'fetchMessageSearchResults'
+    ]),
+
+    fetchSearchResults() {
+      this.fetchRoomSearchResults();
+      this.fetchMessageSearchResults();
+    },
 
     _debouncedFetchSearchResults: _.debounce(function() {
       this.fetchSearchResults();
@@ -64,7 +91,36 @@ export default {
     <h2 class="search-body-title">Search</h2>
 
     <div class="search-input-wrapper">
-      <input ref="search-input" v-model="searchInputModel" class="search-input" />
+      <input
+        ref="search-input"
+        v-model="searchInputModel"
+        class="search-input"
+        placeholder="What are you looking for?"
+      />
+    </div>
+
+    <h2 class="search-body-title">
+      ROOMS & PEOPLE
+      <loading-spinner v-if="roomSearchLoading" />
+    </h2>
+
+    <ul v-if="hasRoomSearchResults" class="room-search-list">
+      <list-item v-for="room in displayedRoomSearchResults" :key="room.id" :item="room" />
+    </ul>
+    <div v-else class="search-result-empty-message">
+      No room search results...
+    </div>
+
+    <div v-if="repoSearchError" class="search-result-error-message">
+      Error fetching repos
+    </div>
+
+    <div v-if="roomSearchError" class="search-result-error-message">
+      Error fetching rooms
+    </div>
+
+    <div v-if="peopleSearchError" class="search-result-error-message">
+      Error fetching people
     </div>
 
     <h2 class="search-body-title">
@@ -72,7 +128,7 @@ export default {
       <loading-spinner v-if="messageSearchLoading" />
     </h2>
 
-    <div v-if="messageSearchError">
+    <div v-if="messageSearchError" class="search-result-error-message">
       Error fetching messages
     </div>
     <ul v-else-if="hasMessageSearchResults" class="message-search-list">
@@ -114,6 +170,18 @@ export default {
   padding-right: @desktop-menu-left-padding;
 
   color: @menu-item-color;
+}
+
+.search-result-error-message {
+  padding-left: @desktop-menu-left-padding;
+  padding-right: @desktop-menu-left-padding;
+
+  color: @menu-item-color;
+}
+
+.room-search-list {
+  margin-left: 0;
+  list-style: none;
 }
 
 .message-search-list {

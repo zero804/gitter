@@ -17,13 +17,11 @@ function state() {
     search: {
       searchInputValue: '',
 
-      roomSearchLoading: false,
-      roomSearchError: false,
-      roomSearchResults: [],
-
-      messageSearchLoading: false,
-      messageSearchError: false,
-      messageSearchResults: []
+      current: { results: [] },
+      repo: { loading: false, error: false, results: [] },
+      room: { loading: false, error: false, results: [] },
+      people: { loading: false, error: false, results: [] },
+      message: { loading: false, error: false, results: [] }
     }
   };
 }
