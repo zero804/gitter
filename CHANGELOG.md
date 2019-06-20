@@ -6,6 +6,7 @@
  - Add room search to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1423
  - Removed links to unavailable 3rd party apps
     - Thanks to [@schwedenmut](https://gitlab.com/schwedenmut) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1432
+ - Add 10 per day rate-limit to email invites, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1433
 
 
 # 19.49.0 - 2019-6-14
