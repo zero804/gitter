@@ -409,7 +409,7 @@ async function notifyInvitedUser(fromUser, invitedUser, room) {
   }
 
   // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
-  if (!config.get('email:disableInviteEmails')) {
+  if (!config.get('email:limitInviteEmails')) {
     await emailNotificationService
       .addedToRoomNotification(fromUser, invitedUser, room)
       .catch(function(err) {

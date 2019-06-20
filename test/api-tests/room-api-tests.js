@@ -162,7 +162,7 @@ describe('room-api', function() {
     // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
     // This test is under a conditional instead of skipped
     // so we don't accidentaly forget to unskip it in the future
-    if (!config.get('email:disableInviteEmails')) {
+    if (!config.get('email:limitInviteEmails')) {
       return request(app)
         .post(`/v1/rooms/${fixture.troupe1.id}/invites`)
         .send({

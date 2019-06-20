@@ -45,7 +45,8 @@ var troupeEnv = {
     gitterRooms: config.get('headlineNumbers:gitterRooms'),
     gitterGroups: config.get('headlineNumbers:gitterGroups'),
     gitterCountries: config.get('headlineNumbers:gitterCountries')
-  }
+  },
+  inviteEmailAbuseThresholdPerDay: config.get('email:inviteEmailAbuseThresholdPerDay')
 };
 
 module.exports = troupeEnv;
