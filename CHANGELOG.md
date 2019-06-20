@@ -1,4 +1,4 @@
-# 19.50.0 - *upcoming*
+# 19.50.0 - 2019-6-20
 
  - Fix profile menu missing on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1427
  - Fix create room redirection to newly created room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1428
