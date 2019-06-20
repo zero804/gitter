@@ -140,7 +140,7 @@ var View = Marionette.CompositeView.extend({
   },
 
   /**
-   * addUserToRoom() sends request and handles reponse of adding an user to a room
+   * addUserToRoom() sends request and handles response of adding an user to a room
    *
    * m    BackboneModel - the user to be added to the room
    */

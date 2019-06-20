@@ -45,7 +45,7 @@ var port = process.env.PORT || 5001;
 
 server.listen(port, function(err) {
   if (err) {
-    winston.error('An error occured during static server startup: ' + err, { exception: err });
+    winston.error('An error occurred during static server startup: ' + err, { exception: err });
   }
 
   winston.info('Listening on ' + port);

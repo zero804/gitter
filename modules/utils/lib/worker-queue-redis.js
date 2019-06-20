@@ -21,7 +21,7 @@ function getConnection() {
   if (typeof redisConfiguration === 'string') {
     redisConfiguration = env.redis.parse(redisConfiguration);
   }
-  // Explicitely use db0 for resque, see reasons below
+  // Explicitly use db0 for resque, see reasons below
   // WARNING! Don't use the main client as
   // node-resque selects database 0.
   // Using the main client will wreak havoc
@@ -34,7 +34,7 @@ function getConnection() {
 
   var result = {
     redis: redis,
-    database: 0 // In case the wierd behaviour in node-resque is ever removed,
+    database: 0 // In case the weird behaviour in node-resque is ever removed,
   };
 
   if (config.get('resque:namespace')) {
@@ -120,7 +120,7 @@ Queue.prototype.invoke = function(data, options, callback) {
 
         // TODO: change 'echo' to 'invoke' 1 September 2015
         // This change needs to happen at least a several releases
-        // before the echo queue is removed (see other TODO futher
+        // before the echo queue is removed (see other TODO further
         // down in this file for details of that change)
         var operationName = 'echo';
 

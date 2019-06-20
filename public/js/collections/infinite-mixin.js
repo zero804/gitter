@@ -53,7 +53,7 @@ module.exports = (function() {
           self.trigger('fetch:latest:complete');
           self.setAtBottom(true);
 
-          // Accomodate
+          // Accommodate
           // - `response.items` which happens with lookups
           // - `response` which happens with no extra params
           var responseIds = ((response && response.items) || response || []).map(utils.idTransform);
@@ -201,7 +201,7 @@ module.exports = (function() {
           // jshint unused:true
           self.trigger('fetch:at:complete');
 
-          // Accomodate
+          // Accommodate
           // - `response.items` which happens with lookups
           // - `response` which happens with no extra params
           var responseIds = ((response && response.items) || response || []).map(utils.idTransform);

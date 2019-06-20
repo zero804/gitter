@@ -31,7 +31,7 @@ export const fetchSearchResults = ({ state, commit }) => {
         limit: 30
       })
       .then(result => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_SUCESS, result);
+        commit(types.RECEIVE_MESSAGE_SEARCH_SUCCESS, result);
       })
       .catch(err => {
         commit(types.RECEIVE_MESSAGE_SEARCH_ERROR, err);
@@ -43,10 +43,24 @@ export const changeDisplayedRoom = ({ state, commit }, newRoomId) => {
   commit(types.CHANGE_DISPLAYED_ROOM, newRoomId);
 
   const newRoom = state.roomMap[newRoomId];
+
   if (newRoom) {
-    appEvents.trigger('navigation', newRoom.url, 'chat', newRoom.name);
-    appEvents.trigger('vue:change:room', newRoom);
+    // If there is a current room, it means that the router-chat routing is in place to switch to other rooms
+    const currentRoom = context.troupe();
+    if (currentRoom && currentRoom.id) {
+      appEvents.trigger('navigation', newRoom.url, 'chat', newRoom.name);
+      appEvents.trigger('vue:change:room', newRoom);
+    } else {
+      // Otherwise, we need to redirect
+      // We are using `window.location.assign` so we can easily mock/spy in the tests
+      window.location.assign(newRoom.url);
+    }
   }
+};
+
+export const jumpToMessageId = ({ commit }, messageId) => {
+  commit(types.CHANGE_HIGHLIGHTED_MESSAGE_ID, messageId);
+  appEvents.trigger('vue:hightLightedMessageId', messageId);
 };
 
 export const updateRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);

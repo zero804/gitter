@@ -117,7 +117,7 @@ GitHubUserEmailAddressService.prototype._getEmailFromCommit = function(username)
               return null;
             }
 
-            // If we found mutliple email addresses, check that theyre all
+            // If we found multiple email addresses, check that theyre all
             // the same, as an additional confirmation
             var first = emails[0];
             var allEqual = emails.every(function(e) {

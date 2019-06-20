@@ -26,7 +26,9 @@
     {{> fonts}}
 
     <link rel="stylesheet" href='{{cdn "sprites/services.css" }}'>
-    <link rel="stylesheet" href='{{cdn cssFileName }}'>
+    {{#if cssFileName}}
+      <link rel="stylesheet" href='{{cdn cssFileName }}'>
+    {{/if}}
 
     {{#if hasDarkTheme}}
     <link rel="stylesheet" href='{{cdn "styles/dark-theme.css" }}' id="gitter-dark" media="all" type="text/css">
@@ -43,6 +45,11 @@
         {{{body}}}
       </div>
     </div>
+
+    {{#if useVueLeftMenu}}
+      {{> staging_marker}}
+    {{/if}}
+
     <div class="js-drag-overlay drag-frame hide">
       <span class="octicon octicon-arrow-down"></span>
     </div>

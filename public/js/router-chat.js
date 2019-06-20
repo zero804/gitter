@@ -196,6 +196,10 @@ onready(function() {
     changeRoom(room);
   });
 
+  appEvents.on('vue:hightLightedMessageId', function(messageId) {
+    appEvents.trigger('chatCollectionView:permalinkHighlight', messageId);
+  });
+
   appEvents.on('permalink.requested', function(type, chat, options) {
     debug('permalink.requested', type, chat, options);
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats

@@ -395,53 +395,36 @@ function createRoomByUri(user, uri, options) {
 }
 
 /**
- * notifyInvitedUser() informs an invited user
+ * notifyInvitedUser() informs existing user that they were invited to a room
  *
  * fromUser       User - the inviter
  * invitedUser    User - the invited user
  * room           Room - the room in context
- * opts           Object - token & others
- *
- * returns        User - the invited user
  */
-function notifyInvitedUser(fromUser, invitedUser, room) {
+async function notifyInvitedUser(fromUser, invitedUser, room) {
   // get the email address
-  return emailAddressService(invitedUser, { attemptDiscovery: true })
-    .then(function(emailAddress) {
-      var notification;
+  if (invitedUser.state === 'REMOVED') {
+    stats.event('user_added_removed_user');
+    return;
+  }
 
-      if (invitedUser.state === 'INVITED') {
-        if (emailAddress) {
-          notification = 'email_invite_sent';
-          emailNotificationService.sendInvitation(fromUser, invitedUser, room).catch(function(err) {
-            logger.error('Unable to send invitation: ' + err, { exception: err });
-          });
-        } else {
-          notification = 'unreachable_for_invite';
-        }
-      } else {
-        // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
-        if (!config.get('email:disableInviteEmails')) {
-          emailNotificationService
-            .addedToRoomNotification(fromUser, invitedUser, room)
-            .catch(function(err) {
-              logger.error('Unable to send added to room notification: ' + err, { exception: err });
-            });
-          notification = 'email_notification_sent';
-        }
-      }
+  // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+  if (!config.get('email:disableInviteEmails')) {
+    await emailNotificationService
+      .addedToRoomNotification(fromUser, invitedUser, room)
+      .catch(function(err) {
+        logger.error('Unable to send added to room notification: ' + err, { exception: err });
+      });
+  }
 
-      var metrics = {
-        notification: notification,
-        troupeId: room.id,
-        to: invitedUser.username,
-        from: fromUser.username
-      };
+  var metrics = {
+    notification: 'email_notification_sent',
+    troupeId: room.id,
+    to: invitedUser.username,
+    from: fromUser.username
+  };
 
-      stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
-      return null;
-    })
-    .thenReturn(invitedUser);
+  stats.event('user_added_someone', _.extend(metrics, { userId: fromUser.id }));
 }
 
 function updateUserDateAdded(userId, roomId, date) {

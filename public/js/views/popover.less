@@ -2,3 +2,24 @@ body.embedded .popover-footer-content,
 body.logged-out .popover-footer-content {
   display: none;
 }
+
+.popover-item__action,
+.popover-item__action-disabled {
+  border-radius: 4px;
+  padding: 0px 5px;
+}
+
+.popover-item__action:hover {
+  cursor: pointer;
+  background: #08c;
+  color: white;
+}
+
+.popover-item__action-disabled {
+  color: #ccc;
+}
+
+.popover-item__action-disabled:hover {
+  background: #08c;
+  cursor: default;
+}

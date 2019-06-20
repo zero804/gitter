@@ -53,7 +53,7 @@ function getDefaultFlagsForUserId(userId) {
 function useOneToOneDefaultWhenMute(flags) {
   flags = roomMembershipFlags.removeDefaultFlag(flags);
 
-  // Beware `===` has higher operator precendence than `&`!
+  // Beware `===` has higher operator precedence than `&`!
   if ((flags & roomMembershipFlags.MODES.mute) === flags) {
     return roomMembershipFlags.DEFAULT_ONE_TO_ONE_FLAGS_WHEN_MUTE;
   } else {

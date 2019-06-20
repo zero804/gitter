@@ -147,7 +147,7 @@ function logProgress() {
   console.log('[PROGRESS]', '\tprocessed:', PROCESSED, '\ttagged:', TAGGED);
 }
 
-// reponsible for running the procedure
+// responsible for running the procedure
 function run(rooms) {
   // increment stuff
   CALLED_RUN += 1;

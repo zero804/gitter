@@ -911,7 +911,7 @@ function validateUsersSubset(userIds, callback) {
 
       // This can't be done in the script manager
       // as that is using a different redis connection
-      // and besides we don't know the semanitcs of WATCH
+      // and besides we don't know the semantics of WATCH
       // in Lua :)
 
       sockets.forEach(function(socket) {

@@ -59,7 +59,48 @@ function createSerializedOneToOneRoomFixture(username) {
   };
 }
 
+// We use this to make the ID unique
+let messageSearchResultIncrement = 0;
+function createSerializedMessageSearchResultFixture() {
+  messageSearchResultIncrement++;
+
+  return {
+    id: `573bd813e2996a5a42c95899-${messageSearchResultIncrement}`,
+    text:
+      "@MadLittleMods For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design",
+    html:
+      '<span data-link-type="mention" data-screen-name="MadLittleMods" class="mention">@MadLittleMods</span> For some groups it might not matter much, but for others a lot.  Kinda like stack overflows &#39;take this offline&#39; thing when you start doing a conversation in the comments.  Im&#39; sure it&#39;s not simple to design',
+    sent: '2016-05-18T02:48:51.386Z',
+    fromUser: {
+      id: '5716e949187bb6f0eae04dd7',
+      username: 'awbacker',
+      displayName: 'Andrew Backer',
+      url: '/awbacker',
+      avatarUrl: 'https://avatars-03.gitter.im/gh/uv/4/awbacker',
+      avatarUrlSmall: 'https://avatars0.githubusercontent.com/u/103330?v=4&s=60',
+      avatarUrlMedium: 'https://avatars0.githubusercontent.com/u/103330?v=4&s=128',
+      v: 2,
+      gv: '4'
+    },
+    unread: false,
+    readBy: 40,
+    urls: [],
+    mentions: [
+      {
+        screenName: 'MadLittleMods',
+        userId: '553d437215522ed4b3df8c50',
+        userIds: []
+      }
+    ],
+    issues: [],
+    meta: [],
+    highlights: ['offline'],
+    v: 1
+  };
+}
+
 module.exports = {
   createSerializedRoomFixture,
-  createSerializedOneToOneRoomFixture
+  createSerializedOneToOneRoomFixture,
+  createSerializedMessageSearchResultFixture
 };

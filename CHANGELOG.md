@@ -1,3 +1,22 @@
+# 19.49.0 - 2019-6-14
+
+ - Fix typos throughout codebase
+    - Thanks to [@yo](https://gitlab.com/yo) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1409
+    - And another thanks to [@yo](https://gitlab.com/yo) :) for fixing one more typo, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1410
+ - Fix production issue caused by code concerned with users in `invited` state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1406
+ - Add jump to message(permalinks) for search in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1411
+ - Add redirect for room switches for non-chat pages with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1412
+ - Move message timestamp next to username, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1415
+ - Add Vue left-menu to `/home/explore`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1413
+ - Add Vue left-menu to `/home/learn`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1422
+ - Add Vue left-menu to `/<community>/home`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1421
+ - Add necessary styles for views presented by Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1425
+
+Developer facing:
+
+ - Cleanup `user-loader-factory` in `permissions` module, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1424
+
+
 # 19.48.0 - 2019-6-4
 
  - Introduce Vue left-menu v1 (behind [`vue-left-menu` feature flag](https://next.gitter.im/)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1360
@@ -8,7 +27,14 @@ Developer facing:
  - Add Jest for Vue testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1404
  - Update all `test/public-js`(frontend) tests to use Jest, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1405
  - Add utility script to ban user from room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1402
+ - Fix missing `backbone.marionette` dependency when Vue server side rendering (SSR) in production, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1417
+    - Move frontend dependencies from `devDependencies` to `dependencies` in `package.json`
 
+
+# 19.47.1 - 2019-6-11
+
+ - Disable invite/add emails until we add anti-spam measures, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1416
+    - Disabling so we can ask Mandrill to unpause emails and get unread notifications flowing again, https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
 
 # 19.47.0 - 2019-5-28
 

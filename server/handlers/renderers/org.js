@@ -4,6 +4,7 @@ var assert = require('assert');
 var clientEnv = require('gitter-client-env');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
+const asyncHandler = require('express-async-handler');
 var avatars = require('gitter-web-avatars');
 var fonts = require('../../web/fonts');
 var restSerializer = require('../../serializers/rest-serializer');
@@ -14,6 +15,7 @@ var userService = require('gitter-web-users');
 var groupBrowserService = require('gitter-web-groups/lib/group-browser-service');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
+const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 
 var ROOMS_PER_PAGE = 15;
 
@@ -133,7 +135,7 @@ function renderOrgPage(req, res, next) {
       contextGenerator.generateOrgContext(req),
       policy.canAdmin(),
       generateUserThemeSnapshot(req),
-      function(roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
+      async function(roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
         var isStaff = req.user && req.user.staff;
         var editAccess = isOrgAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
@@ -164,31 +166,36 @@ function renderOrgPage(req, res, next) {
           '&related=gitchat' +
           '&via=gitchat';
 
-        res.render('org-page', {
-          hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
-          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-          fonts: fonts.getFonts(),
-          socialUrl: url,
-          isLoggedIn: !!req.user,
-          exploreBaseUrl: '/home/~explore',
-          orgDirectoryUrl: fullUrl,
-          roomCount: roomCount,
-          orgUserCount: orgUserCount,
-          group: troupeContext.group,
-          rooms: rooms,
-          troupeContext: troupeContext,
-          pagination: {
-            page: currentPage,
-            pageCount: pageCount
-          }
-        });
+        res.render(
+          'org-page',
+          await mixinHbsDataForVueLeftMenu(req, {
+            bootScriptName: 'router-org-page',
+            cssFileName: 'styles/org-page.css',
+            hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+            fonts: fonts.getFonts(),
+            socialUrl: url,
+            isLoggedIn: !!req.user,
+            exploreBaseUrl: '/home/~explore',
+            orgDirectoryUrl: fullUrl,
+            roomCount: roomCount,
+            orgUserCount: orgUserCount,
+            group: troupeContext.group,
+            rooms: rooms,
+            troupeContext: troupeContext,
+            pagination: {
+              page: currentPage,
+              pageCount: pageCount
+            }
+          })
+        );
       }
     );
   }).catch(next);
 }
 
 module.exports = exports = {
-  renderOrgPage: renderOrgPage,
+  renderOrgPage: asyncHandler(renderOrgPage),
   testOnly: {
     getRoomMembersForRooms
   }

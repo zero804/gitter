@@ -458,7 +458,7 @@ ul.roster {
 
 // TODO: as we progress with the css refactoring this will have to be changed. Walter.
 .popover-content {
-  .invited {
+  .inactive {
     box-sizing: border-box;
     background-color: hsl(0, 60%, 70%);
     padding: 10px;
@@ -476,8 +476,8 @@ ul.roster {
   }
 }
 
-.popover-content .invited ~ .trpPopoverDetails,
-.popover-content .invited ~ div img.avatar-l {
+.popover-content .inactive ~ .trpPopoverDetails,
+.popover-content .inactive ~ div img.avatar-l {
   opacity: 0.70;
   filter: alpha(opacity=70);
 }

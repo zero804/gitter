@@ -28,7 +28,7 @@ var UserSchema = new Schema(
     staff: { type: Boolean },
     hellbanned: { type: Boolean }, // to troll the trolls
     githubScopes: { type: Schema.Types.Mixed },
-    // INVITED, REMOVED, DISABLED
+    // possible values: REMOVED
     state: { type: String },
     stripeCustomerId: { type: String },
     tz: {
@@ -54,13 +54,13 @@ UserSchema.schemaTypeName = 'UserSchema';
 
 installVersionIncMiddleware(UserSchema);
 
-// Returns true if the user is not INVITED or REMOVED
+// Returns true if the user is active
 UserSchema.methods.isActive = function() {
-  return !this.state;
-};
-
-UserSchema.methods.isInvited = function() {
-  return this.state === 'INVITED';
+  // There is a lot of frontend code that replicates this check
+  // To decide rendering of the user. Please if you change this
+  // condition, revisit UI code and change all conditions
+  // `user.inactive = user.removed`
+  return this.state !== 'REMOVED';
 };
 
 UserSchema.methods.isRemoved = function() {

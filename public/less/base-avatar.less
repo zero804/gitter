@@ -79,14 +79,14 @@
     border-bottom: 1px solid white;
   }
 
-  &.invited {
+  &.inactive {
 
-    @invitedGray: 0;
-    @invitedOpacity: 0.3;
-    @MSinvitedOpacity: @invitedOpacity * 100; /* DO NOT CHANGE */ /* OH YEAH? WHY NOT? */
+    @inactiveGray: 0;
+    @inactiveOpacity: 0.3;
+    @MSinactiveOpacity: @inactiveOpacity * 100; /* DO NOT CHANGE */ /* OH YEAH? WHY NOT? */
 
-    opacity: @invitedOpacity;
-    filter: grayscale(@invitedGray);
+    opacity: @inactiveOpacity;
+    filter: grayscale(@inactiveGray);
 
     .trpStatus {
       display: none;

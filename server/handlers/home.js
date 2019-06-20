@@ -8,6 +8,8 @@ var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var featureToggles = require('../web/middlewares/feature-toggles');
 var userHomeRenderer = require('./renderers/userhome');
 var mainFrameRenderer = require('./renderers/main-frame');
+const exploreRenderer = require('./renderers/explore-renderer');
+const learnRenderer = require('./renderers/learn-renderer');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
 var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
@@ -70,23 +72,27 @@ router.get(
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
+    const useVueLeftMenu = req.fflip.has('vue-left-menu');
+
     if (!req.user) {
       return res.redirect('/explore');
+    } else if (useVueLeftMenu) {
+      return exploreRenderer.renderExplorePage(req, res);
+    } else {
+      var exploreParam = req.params[0] || '';
+      var subFrameLocation = urlJoin('/home/~explore', exploreParam);
+
+      var renderer = mainFrameRenderer.renderMainFrame;
+      if (req.isPhone) {
+        renderer = mainFrameRenderer.renderMobileMainFrame;
+      }
+
+      return renderer(req, res, next, {
+        subFrameLocation: subFrameLocation,
+        title: 'Explore',
+        suggestedMenuState: 'search'
+      });
     }
-
-    var exploreParam = req.params[0] || '';
-    var subFrameLocation = urlJoin('/home/~explore', exploreParam);
-
-    var renderer = mainFrameRenderer.renderMainFrame;
-    if (req.isPhone) {
-      renderer = mainFrameRenderer.renderMobileMainFrame;
-    }
-
-    renderer(req, res, next, {
-      subFrameLocation: subFrameLocation,
-      title: 'Explore',
-      suggestedMenuState: 'search'
-    });
   }
 );
 
@@ -98,16 +104,21 @@ router.get(
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-    var renderer = mainFrameRenderer.renderMainFrame;
-    if (req.isPhone) {
-      renderer = mainFrameRenderer.renderMobileMainFrame;
-    }
+    const useVueLeftMenu = req.fflip.has('vue-left-menu');
+    if (useVueLeftMenu) {
+      learnRenderer.renderLearnPage(req, res, next);
+    } else {
+      var renderer = mainFrameRenderer.renderMainFrame;
+      if (req.isPhone) {
+        renderer = mainFrameRenderer.renderMobileMainFrame;
+      }
 
-    renderer(req, res, next, {
-      subFrameLocation: '/learn/~learn',
-      title: 'Learn',
-      suggestedMenuState: 'search'
-    });
+      renderer(req, res, next, {
+        subFrameLocation: '/learn/~learn',
+        title: 'Learn',
+        suggestedMenuState: 'search'
+      });
+    }
   }
 );
 
