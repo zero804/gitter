@@ -5,6 +5,7 @@ const Vuex = require('vuex');
 
 const createStore = require('../../../../../public/js/vue/store').default;
 const actions = require('../../../../../public/js/vue/store/actions');
+const leftMenuConstants = require('../../../../../public/js/vue/left-menu/constants');
 const MenuBarItem = require('../../../../../public/js/vue/left-menu/components/menu-bar-item.vue');
 
 let wrapper;
@@ -44,10 +45,10 @@ describe('menu-bar-item', () => {
   it('when all state, all item has highlight matches snapshot', () => {
     factory(
       {
-        type: 'all'
+        type: leftMenuConstants.LEFT_MENU_ALL_STATE
       },
       store => {
-        store.state.leftMenuState = 'all';
+        store.state.leftMenuState = leftMenuConstants.LEFT_MENU_ALL_STATE;
       }
     );
     expect(wrapper.element).toMatchSnapshot();
@@ -55,29 +56,80 @@ describe('menu-bar-item', () => {
 
   it('search matches snapshot', () => {
     factory({
-      type: 'search'
+      type: leftMenuConstants.LEFT_MENU_SEARCH_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('people matches snapshot', () => {
     factory({
-      type: 'people'
+      type: leftMenuConstants.LEFT_MENU_PEOPLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('create matches snapshot', () => {
     factory({
-      type: 'create'
+      type: leftMenuConstants.LEFT_MENU_CREATE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('toggle matches snapshot', () => {
     factory({
-      type: 'toggle'
+      type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('calls store action "setLeftMenuState" when item is clicked', () => {
+    factory({
+      type: leftMenuConstants.LEFT_MENU_ALL_STATE
+    });
+
+    wrapper.find({ ref: 'root' }).trigger('click');
+
+    expect(stubbedActions.setLeftMenuState).toHaveBeenCalledWith(
+      expect.anything(),
+      leftMenuConstants.LEFT_MENU_ALL_STATE,
+      undefined
+    );
+  });
+
+  it('calls store action "toggleLeftMenu" with toggled state when active item is clicked', () => {
+    const beforeExpandedState = true;
+    factory(
+      {
+        type: leftMenuConstants.LEFT_MENU_ALL_STATE
+      },
+      store => {
+        store.state.leftMenuState = leftMenuConstants.LEFT_MENU_ALL_STATE;
+        store.state.leftMenuExpandedState = beforeExpandedState;
+      }
+    );
+
+    wrapper.find({ ref: 'root' }).trigger('click');
+
+    expect(stubbedActions.toggleLeftMenu).toHaveBeenCalledWith(
+      expect.anything(),
+      !beforeExpandedState,
+      undefined
+    );
+  });
+
+  it('calls store action "toggleLeftMenu" with expanded state when new item is clicked', () => {
+    factory(
+      {
+        type: leftMenuConstants.LEFT_MENU_ALL_STATE
+      },
+      store => {
+        store.state.leftMenuState = leftMenuConstants.LEFT_MENU_SEARCH_STATE;
+        store.state.leftMenuExpandedState = false;
+      }
+    );
+
+    wrapper.find({ ref: 'root' }).trigger('click');
+
+    expect(stubbedActions.toggleLeftMenu).toHaveBeenCalledWith(expect.anything(), true, undefined);
   });
 });

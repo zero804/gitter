@@ -29,8 +29,10 @@ export const toggleLeftMenuPinnedState = ({ commit, dispatch }, toggleState) => 
   dispatch('trackStat', `left-menu.pinned.${toggleState}`);
 };
 
-export const toggleLeftMenu = ({ commit }, toggleState) =>
+export const toggleLeftMenu = ({ commit, dispatch }, toggleState) => {
   commit(types.TOGGLE_LEFT_MENU, toggleState);
+  dispatch('trackStat', `left-menu.toggle.${toggleState}`);
+};
 
 export const updatefavouriteDraggingInProgress = ({ commit }, toggleState) =>
   commit(types.UPDATE_FAVOURITE_DRAGGING_STATE, toggleState);

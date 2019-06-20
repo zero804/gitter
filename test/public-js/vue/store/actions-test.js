@@ -100,7 +100,7 @@ describe('actions', () => {
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU, payload: payload }],
-      [],
+      [{ type: 'trackStat', payload: `left-menu.toggle.${payload}` }],
       done
     );
   });
