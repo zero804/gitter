@@ -90,6 +90,128 @@ exports[`left-menu index all state matches snapshot 1`] = `
 </div>
 `;
 
+exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
+<div
+  class="root js-left-menu-root"
+>
+  <header
+    class="header"
+  >
+    <section
+      class="header-minibar layout-minibar"
+    >
+      <svg
+        class="logo-gitter-sign"
+        version="1.1"
+        viewBox="0 0 18 25"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+      >
+        <rect
+          height="10"
+          width="2"
+          x="15"
+          y="5"
+        />
+         
+        <rect
+          height="20"
+          width="2"
+          x="10"
+          y="5"
+        />
+         
+        <rect
+          height="20"
+          width="2"
+          x="5"
+          y="5"
+        />
+         
+        <rect
+          height="15"
+          width="2"
+        />
+      </svg>
+    </section>
+     
+    <section
+      class="header-main-menu layout-main-menu"
+    >
+      <span
+        class="logo-text"
+      />
+    </section>
+  </header>
+   
+  <section
+    class="nli-body"
+  >
+    <h2
+      class="nli-primary-heading"
+    >
+      Where communities thrive
+    </h2>
+     
+    <br />
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
+      >
+        Join over 
+        <strong>
+          1.5M+ people
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Join over 
+        <strong>
+          100K+ communities
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Free 
+        <strong>
+          without limits
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Create 
+        <strong>
+          your own community
+        </strong>
+      </li>
+    </ul>
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
+      >
+        <a
+          href="/explore"
+        >
+          Explore more communities
+        </a>
+      </li>
+    </ul>
+  </section>
+</div>
+`;
+
 exports[`left-menu index people state matches snapshot 1`] = `
 <div
   class="root js-left-menu-root"

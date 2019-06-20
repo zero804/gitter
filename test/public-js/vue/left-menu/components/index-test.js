@@ -34,6 +34,15 @@ describe('left-menu index', () => {
     wrapper.destroy();
   });
 
+  describe('nli (not logged in)', () => {
+    it('matches snapshot', () => {
+      factory({}, store => {
+        store.state.isLoggedIn = false;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
+
   describe('all state', () => {
     it('matches snapshot', () => {
       factory({}, store => {
