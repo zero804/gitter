@@ -26,7 +26,9 @@ export const toggleLeftMenu = ({ commit }, toggleState) =>
 export const updatefavouriteDraggingInProgress = ({ commit }, toggleState) =>
   commit(types.UPDATE_FAVOURITE_DRAGGING_STATE, toggleState);
 
-export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite }) => {
+// Only meant to be used internally by other actions
+// This does all the favouriting but doesn't persist anything
+export const _localUpdateRoomFavourite = ({ state, dispatch }, { id, favourite }) => {
   dispatch('updateRoom', {
     id,
     favourite
@@ -47,6 +49,16 @@ export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite
       favourite
     });
   });
+};
+
+export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite }) => {
+  const room = state.roomMap[id];
+  const oldFavourite = room && room.favourite;
+
+  dispatch('_localUpdateRoomFavourite', {
+    id,
+    favourite
+  });
 
   commit(types.REQUEST_ROOM_FAVOURITE, id);
   apiClient.user
@@ -59,6 +71,27 @@ export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite
     })
     .catch(err => {
       commit(types.RECEIVE_ROOM_FAVOURITE_ERROR, { id, error: err });
+
+      // Rollback to the previous state
+      //
+      // Note: This is flawed in the fact that if multiple rooms are favourited before
+      // the request finishes, the rollback position may not be correct
+      let rollbackFavourite;
+      // Moving item up in the list
+      if (oldFavourite > favourite) {
+        // We need to increment by 1 because the itemBeingMoved already moved and is taking up space
+        // so we want to get the new index that represents where the itemBeingMoved was before
+        rollbackFavourite = oldFavourite + 1;
+      }
+      // Otherwise item moving down in the list
+      else {
+        rollbackFavourite = oldFavourite;
+      }
+      dispatch('_localUpdateRoomFavourite', {
+        id,
+        favourite: rollbackFavourite
+      });
+
       appEvents.triggerParent('user_notification', {
         title: 'Error favouriting room',
         text: err.message
