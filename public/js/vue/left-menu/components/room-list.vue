@@ -19,7 +19,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['favouriteDraggingInProgress']),
+    ...mapState(['displayedRoomId', 'favouriteDraggingInProgress']),
 
     favouriteRooms() {
       return this.rooms.filter(sortsAndFilters.favourites.filter);
@@ -94,11 +94,21 @@ export default {
       @remove="favouriteRemoved"
       @update="favouriteMoved"
     >
-      <list-item v-for="room in favouriteRooms" :key="room.id" :item="room" />
+      <list-item
+        v-for="room in favouriteRooms"
+        :key="room.id"
+        :item="room"
+        :active="room.id === displayedRoomId"
+      />
     </draggable>
 
     <draggable tag="ul" class="room-list" group="rooms" @start="dragStart" @end="dragEnd">
-      <list-item v-for="room in normalRooms" :key="room.id" :item="room" />
+      <list-item
+        v-for="room in normalRooms"
+        :key="room.id"
+        :item="room"
+        :active="room.id === displayedRoomId"
+      />
     </draggable>
   </div>
 </template>

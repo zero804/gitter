@@ -77,6 +77,14 @@ describe('list-item', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('active room matches snapshot', () => {
+    factory({
+      item: createSerializedRoomFixture('my-community/room1'),
+      active: true
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('favourite loading room matches snapshot', () => {
     factory({
       item: {

@@ -44,13 +44,19 @@ describe('room-list', () => {
   });
 
   it('matches snapshot with some rooms', () => {
-    factory({
-      rooms: [
-        createSerializedRoomFixture('community/room1'),
-        createSerializedRoomFixture('community/room2'),
-        createSerializedRoomFixture('community/room3')
-      ]
-    });
+    const activeRoom = createSerializedRoomFixture('community/room2');
+    factory(
+      {
+        rooms: [
+          createSerializedRoomFixture('community/room1'),
+          activeRoom,
+          createSerializedRoomFixture('community/room3')
+        ]
+      },
+      store => {
+        store.state.displayedRoomId = activeRoom.id;
+      }
+    );
     expect(wrapper.element).toMatchSnapshot();
   });
 
