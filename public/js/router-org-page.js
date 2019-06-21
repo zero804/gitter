@@ -63,6 +63,7 @@ onReady(function() {
   });
 
   new Router();
+  Backbone.history.stop();
   Backbone.history.start({ silent: true });
 
   var group = context.group();
