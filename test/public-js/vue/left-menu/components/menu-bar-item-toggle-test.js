@@ -5,6 +5,7 @@ const Vuex = require('vuex');
 
 const createStore = require('../../../../../public/js/vue/store').default;
 const actions = require('../../../../../public/js/vue/store/actions');
+const leftMenuConstants = require('../../../../../public/js/vue/left-menu/constants');
 const MenuBarItemToggle = require('../../../../../public/js/vue/left-menu/components/menu-bar-item-toggle.vue');
 
 let wrapper;
@@ -36,19 +37,19 @@ describe('menu-bar-item-toggle', () => {
 
   it('toggle matches snapshot', () => {
     factory({
-      type: 'toggle'
+      type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('calls store action "toggleLeftMenuPinnedState" when item is clicked', () => {
-    const beforePinnedState = true;
+    const beforePinnedState = false;
     factory(
       {
-        type: 'toggle'
+        type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
       },
-      state => {
-        state.leftMenuPinnedState = beforePinnedState;
+      store => {
+        store.state.leftMenuPinnedState = beforePinnedState;
       }
     );
 

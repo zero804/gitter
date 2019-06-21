@@ -168,11 +168,12 @@ export default {
   display: block;
   width: 7rem;
 
-  /* Because there is some specific styles in the SVG itself for the legacy menu */
+  // Because there is some specific styles in the SVG itself for the legacy menu
   opacity: 0.5;
 }
 
 .body {
+  position: relative;
   flex: 1;
   display: flex;
 }

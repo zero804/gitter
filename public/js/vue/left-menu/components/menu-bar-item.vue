@@ -25,7 +25,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['leftMenuState']),
+    ...mapState(['leftMenuState', 'leftMenuExpandedState']),
     itemTypeClass() {
       return `item-${this.type}`;
     },
@@ -37,10 +37,16 @@ export default {
   methods: {
     ...mapActions(['setLeftMenuState', 'toggleLeftMenu']),
     onClick(type) {
+      if (this.isActive) {
+        // If you're clicking on the same item, toggle the left menu if it isn't pinned
+        this.toggleLeftMenu(!this.leftMenuExpandedState);
+      } else {
+        // Expand the left menu if it isn't pinned so you can see the new state you switched to
+        this.toggleLeftMenu(true);
+      }
+
       // Change the left menu view
       this.setLeftMenuState(type);
-      // Expand the left menu if it isn't pinned so you can see the room list
-      this.toggleLeftMenu(true);
     }
   }
 };

@@ -34,7 +34,11 @@ async function renderHomePage(req, res, next) {
   contextGenerator
     .generateBasicContext(req)
     .then(async function(troupeContext) {
-      var page = req.isPhone ? 'mobile/mobile-userhome' : 'userhome-template';
+      const useVueLeftMenu = req.fflip.has('vue-left-menu');
+      var page = 'userhome-template';
+      if (!useVueLeftMenu && req.isPhone) {
+        page = 'mobile/mobile-userhome';
+      }
 
       var osName = req.getParsedUserAgent().os.family.toLowerCase();
 

@@ -4,6 +4,8 @@ function state() {
   return {
     test: 'initialTestValue',
 
+    isMobile: false,
+
     groupMap: {},
     roomMap: {},
 

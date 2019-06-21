@@ -26,11 +26,17 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const uriContext = req.uriContext;
   const room = uriContext && uriContext.troupe;
 
+  const isMobile = req.isPhone;
+
   const vueLeftMenuHtmlOutput = await vueRenderToString({
     moduleToRender: 'left-menu',
     storeData: {
+      isMobile,
       roomMap,
-      displayedRoomId: room && room.id
+      displayedRoomId: room && room.id,
+
+      leftMenuPinnedState: !isMobile,
+      leftMenuExpandedState: false
     }
   });
 
@@ -38,6 +44,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     ...existingData,
 
     layout: 'chat-layout',
+    isMobile,
     useVueLeftMenu: useVueLeftMenu,
     leftMenuHtml: vueLeftMenuHtmlOutput,
 

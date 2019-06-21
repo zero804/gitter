@@ -7,13 +7,18 @@ export default {
   extends: MenuBarItem,
 
   computed: {
-    ...mapState(['leftMenuPinnedState'])
+    ...mapState(['isMobile', 'leftMenuPinnedState', 'leftMenuExpandedState'])
   },
 
   methods: {
-    ...mapActions(['toggleLeftMenuPinnedState']),
+    ...mapActions(['toggleLeftMenuPinnedState', 'toggleLeftMenu']),
     onClick() {
-      this.toggleLeftMenuPinnedState(!this.leftMenuPinnedState);
+      // Always unpinned on mobile, so you can only expand/collapse
+      if (this.isMobile) {
+        this.toggleLeftMenu(!this.leftMenuExpandedState);
+      } else {
+        this.toggleLeftMenuPinnedState(!this.leftMenuPinnedState);
+      }
     }
   }
 };
