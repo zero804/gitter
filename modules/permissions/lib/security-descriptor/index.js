@@ -35,16 +35,21 @@ SecurityDescriptorService.prototype.findById = function(id, userId) {
     // TODO: selectively elemMath var elemMatch = { $elemMatch: { $eq: userId } };
     projection['sd.extraMembers'] = 1;
     projection['sd.extraAdmins'] = 1;
+    projection['providers'] = 1;
   }
 
   return this.Model.findById(id, projection, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd) return null; // TODO: throw 404?
-      var sd = doc.sd;
+      const sd = doc.sd;
       if (doc.bans) {
         // Move the bans onto sd
         sd.bans = doc.bans;
+      }
+      if (doc.providers) {
+        // TODO: move providers onto sd
+        sd.providers = doc.providers;
       }
       securityDescriptorValidator(sd);
       return sd;
@@ -55,17 +60,22 @@ SecurityDescriptorService.prototype.findByIdAll = function(id) {
   var projection = {
     _id: 0,
     sd: 1,
-    bans: 1
+    bans: 1,
+    providers: 1
   };
 
   return this.Model.findById(id, projection, { lean: true })
     .exec()
     .then(function(doc) {
       if (!doc || !doc.sd) return null; // TODO: throw 404?
-      var sd = doc.sd;
+      const sd = doc.sd;
       if (doc.bans) {
         // Move the bans onto sd
         sd.bans = doc.bans;
+      }
+      if (doc.providers) {
+        // TODO: move providers onto sd
+        sd.providers = doc.providers;
       }
       securityDescriptorValidator(sd);
       return sd;
