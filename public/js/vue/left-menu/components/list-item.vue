@@ -20,6 +20,10 @@ export default {
         // The value must match one of these strings
         return ['all', 'org'].indexOf(value) !== -1;
       }
+    },
+    active: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -49,6 +53,7 @@ export default {
     <a
       ref="link"
       class="list-item-link"
+      :class="{ 'is-active': active }"
       :href="item.absoluteRoomUri"
       @click.stop.prevent="roomClick(item)"
     >
@@ -114,6 +119,7 @@ export default {
 
   text-decoration: none;
 
+  &.is-active,
   &:hover,
   &:focus {
     cursor: pointer;

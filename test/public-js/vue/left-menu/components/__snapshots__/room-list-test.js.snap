@@ -105,6 +105,7 @@ exports[`room-list matches snapshot with some rooms 1`] = `
       type="all"
     />
     <list-item-stub
+      active="true"
       item="[object Object]"
       type="all"
     />
