@@ -25,10 +25,11 @@ function getName(meta, index) {
 
 var FIXTURES = [
   {
-    name: 'Anonymous user accessing INVITE/MANUAL room',
+    name: 'Anonymous user accessing PUBLIC/MANUAL room',
     anonymous: true,
     inRoom: false,
     membersPolicy: 'PUBLIC',
+    public: true,
     adminPolicy: 'MANUAL',
     read: true,
     write: false,
@@ -52,6 +53,7 @@ var FIXTURES = [
     name: 'Authed user accessing PUBLIC/MANUAL room',
     inRoom: false,
     membersPolicy: 'PUBLIC',
+    public: true,
     adminPolicy: 'MANUAL',
     read: true,
     write: true,
@@ -63,6 +65,7 @@ var FIXTURES = [
     name: 'Authed user accessing PUBLIC/MANUAL room, in extraMembers',
     inRoom: false,
     membersPolicy: 'PUBLIC',
+    public: true,
     adminPolicy: 'MANUAL',
     isInExtraMembers: true,
     read: true,
@@ -188,89 +191,6 @@ var FIXTURES = [
     expectedPolicy2: undefined,
     expectedPolicyResult2: undefined,
     join: true
-  },
-  {
-    name: 'Anonymous user accessing X/Y room, with recent success',
-    hasPolicyDelegate: true,
-    recentSuccess: true,
-    expectRecordSuccessfulCheck: false,
-    anonymous: true,
-    membersPolicy: 'X',
-    adminPolicy: 'Y',
-    isInExtraMembers: false,
-    isInExtraAdmins: false,
-    expectedPolicy1: undefined,
-    expectedPolicyResult1: undefined,
-    expectedPolicy2: undefined,
-    expectedPolicyResult2: undefined,
-    read: true,
-    write: false,
-    join: false,
-    admin: false,
-    addUser: false
-  },
-  {
-    name: 'Anonymous user accessing X/Y room, without recent success',
-    hasPolicyDelegate: true,
-    recentSuccess: false,
-    expectRecordSuccessfulCheck: false,
-    anonymous: true,
-    membersPolicy: 'X',
-    adminPolicy: 'Y',
-    isInExtraMembers: false,
-    isInExtraAdmins: false,
-    expectedPolicy1: 'X',
-    expectedPolicyResult1: false,
-    expectedPolicy2: undefined,
-    expectedPolicyResult2: undefined,
-    read: false,
-    write: false,
-    join: false,
-    admin: false,
-    addUser: false
-  },
-  {
-    name: 'Anonymous user accessing X/Y room, without recent success',
-    hasPolicyDelegate: true,
-    recentSuccess: false,
-    expectRecordSuccessfulCheck: true,
-    anonymous: true,
-    membersPolicy: 'X',
-    adminPolicy: 'Y',
-    isInExtraMembers: false,
-    isInExtraAdmins: false,
-    expectedPolicy1: 'X',
-    expectedPolicyResult1: true,
-    expectedPolicy2: undefined,
-    expectedPolicyResult2: undefined,
-    read: true
-  },
-  {
-    name: 'Anonymous user accessing X/Y public room, without recent success and with backend fail',
-    hasPolicyDelegate: true,
-    recentSuccess: false,
-    expectRecordSuccessfulCheck: false,
-    anonymous: true,
-    membersPolicy: 'X',
-    adminPolicy: 'Y',
-    expectedPolicy1: 'X',
-    expectedPolicyResult1: 'throw',
-    public: true,
-    read: true
-  },
-  {
-    name:
-      'Anonymous user accessing X/Y non-public room, without recent success and with backend fail',
-    hasPolicyDelegate: true,
-    recentSuccess: false,
-    expectRecordSuccessfulCheck: false,
-    anonymous: true,
-    membersPolicy: 'X',
-    adminPolicy: 'Y',
-    expectedPolicy1: 'X',
-    expectedPolicyResult1: 'throw',
-    public: false,
-    read: false
   },
   {
     name: 'Authed user accessing X/Y public room, without recent success and with backend fail',
@@ -449,10 +369,34 @@ var FIXTURES = [
     admin: true,
     addUser: true,
     expectRecordSuccessfulCheck: true
+  },
+  {
+    name: 'User for PUBLIC room with required provider',
+    public: true,
+    roomProviders: ['github'],
+    userProviders: ['github'],
+    inRoom: false,
+    read: true,
+    write: true,
+    join: true,
+    admin: false,
+    addUser: true
+  },
+  {
+    name: 'User for PUBLIC room without required provider',
+    public: true,
+    roomProviders: ['github'],
+    userProviders: ['gitlab'],
+    inRoom: false,
+    read: true,
+    write: false,
+    join: false,
+    admin: false,
+    addUser: false
   }
 ];
 
-describe('policy-evaluator', function() {
+describe('create-base-policy', function() {
   // All the attributes:
   // name: String,
   // hasPolicyDelegate: true,
@@ -474,6 +418,7 @@ describe('policy-evaluator', function() {
   // addUser: true
   FIXTURES.forEach(function(meta, index) {
     var name = getName(meta, index);
+    /* eslint complexity: ["error", 13] */
     it(name, function() {
       var stubRateLimiter = {
         checkForRecentSuccess: Promise.method(function() {
@@ -494,11 +439,25 @@ describe('policy-evaluator', function() {
       var didCallHandleReadAccessFailure = 0;
       var didRemoveUserFromRoom = false;
 
-      var PolicyEvaluator = proxyquireNoCallThru('../../lib/policies/policy-evaluator', {
-        './policy-check-rate-limiter': stubRateLimiter
-      });
-
       var userId = meta.anonymous ? null : new ObjectID(1);
+
+      let stubUserLoaderFactory = {};
+      let stubIdentityService = {};
+
+      // if securityDescriptor specifies providers, base policy is going to be checking them for user
+      if (meta.roomProviders || meta.userProviders) {
+        const fixtureUser = { _id: userId };
+        stubUserLoaderFactory = id => async () =>
+          id === fixtureUser._id ? fixtureUser : undefined;
+        stubIdentityService = {
+          listProvidersForUser: async user => (user === fixtureUser ? meta.userProviders : [])
+        };
+      }
+      var createBasePolicy = proxyquireNoCallThru('../../lib/policies/create-base-policy', {
+        './policy-check-rate-limiter': stubRateLimiter,
+        'gitter-web-identity': stubIdentityService,
+        '../user-loader-factory': stubUserLoaderFactory
+      });
 
       var contextDelegate;
 
@@ -522,7 +481,8 @@ describe('policy-evaluator', function() {
       var securityDescriptor = {
         members: meta.membersPolicy,
         admins: meta.adminPolicy,
-        public: meta.public
+        public: meta.public,
+        providers: meta.roomProviders
       };
 
       if (meta.isInExtraMembers) {
@@ -569,19 +529,20 @@ describe('policy-evaluator', function() {
         };
       }
 
-      var evaluator = new PolicyEvaluator(
+      const basePolicy = createBasePolicy(
         userId,
+        null,
         securityDescriptor,
         policyDelegate,
         contextDelegate
       );
 
       return Promise.all([
-        meta.read !== undefined && evaluator.canRead(),
-        meta.write !== undefined && evaluator.canWrite(),
-        meta.join !== undefined && evaluator.canJoin(),
-        meta.admin !== undefined && evaluator.canAdmin(),
-        meta.addUser !== undefined && evaluator.canAddUser()
+        meta.read !== undefined && basePolicy.canRead(),
+        meta.write !== undefined && basePolicy.canWrite(),
+        meta.join !== undefined && basePolicy.canJoin(),
+        meta.admin !== undefined && basePolicy.canAdmin(),
+        meta.addUser !== undefined && basePolicy.canAddUser()
       ]).spread(function(read, write, join, admin, addUser) {
         var expected = {};
         var results = {};

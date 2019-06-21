@@ -32,7 +32,8 @@ describe('add-invite-policy-factory', function() {
         expectedCanJoin: true,
         sd: {
           type: null,
-          members: 'PUBLIC'
+          members: 'PUBLIC',
+          public: true
         }
       },
       {
