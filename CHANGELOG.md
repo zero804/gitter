@@ -1,3 +1,4 @@
+
 # 19.51.0 - 2019-06-21
 
  - Add stats/metrics for the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
