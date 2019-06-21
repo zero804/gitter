@@ -1,3 +1,8 @@
+# 19.51.0 - *upcoming*
+
+ - Add stats/metrics for Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
+ 
+
 # 19.50.0 - 2019-6-20
 
  - Fix profile menu missing on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1427
