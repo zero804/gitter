@@ -6,6 +6,7 @@
  - Add highlight for current room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1439
  - Fix overflow scroll in Firefox with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1440
  - Fix SPA room switcher to always just fallback to redirecting the window with the Vue left-menu (navigation, history), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1441
+ - Add NLI support to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1436
 
 
 # 19.50.0 - 2019-6-20
