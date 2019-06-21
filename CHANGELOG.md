@@ -1,10 +1,13 @@
-# 19.51.0 - *upcoming*
+# 19.51.0 - 2019-06-21
 
  - Add stats/metrics for the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
  - Add room favourite drag and drop to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1431
  - Add mobile support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1435
  - Add highlight for current room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1439
  - Fix overflow scroll in Firefox with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1440
+ - Fix room security policy to enforce the "Only GitHub users are allowed to join this room." rule, https://gitlab.com/gitlab-org/gitter/webapp/issues/2041
+   - Thanks to @cache-money for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+   - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/7
 
 
 # 19.50.0 - 2019-6-20
