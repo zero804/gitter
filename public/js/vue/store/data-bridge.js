@@ -9,7 +9,7 @@ function setupDataBridge(store) {
   });
   /* */
 
-  troupeCollections.troupes.on('change', newRoom => {
+  troupeCollections.troupes.on('add change', newRoom => {
     //console.log('change troupes', newRoom);
     store.dispatch('updateRoom', newRoom.attributes);
   });
