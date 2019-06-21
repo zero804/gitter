@@ -51,7 +51,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-        [],
+        [{ type: 'trackStat', payload: 'left-menu.minibar.activated.people' }],
         done
       );
     });
@@ -63,7 +63,10 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-        [{ type: 'fetchMessageSearchResults' }],
+        [
+          { type: 'trackStat', payload: 'left-menu.minibar.activated.search' },
+          { type: 'fetchMessageSearchResults' }
+        ],
         done
       );
     });
@@ -76,7 +79,7 @@ describe('actions', () => {
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU_PINNED_STATE, payload: payload }],
-      [],
+      [{ type: 'trackStat', payload: 'left-menu.pinned.false' }],
       done
     );
   });
@@ -214,7 +217,7 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
       );
 
       await navigationEventFiredPromise;
@@ -233,7 +236,7 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
       );
 
       expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);
@@ -255,7 +258,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.CHANGE_HIGHLIGHTED_MESSAGE_ID, payload: payload }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.search.messageNavigate' }]
       );
 
       await vuehightLightedMessageIdEventFiredPromise;
