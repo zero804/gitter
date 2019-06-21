@@ -5,6 +5,7 @@ var lazy = require('lazy.js');
 var persistence = require('gitter-web-persistence');
 var _ = require('underscore');
 var debug = require('debug')('gitter:app:recent-room-core');
+const calculateFavouriteUpdates = require('./calculate-favourite-updates');
 
 exports.updateFavourite = updateFavourite;
 exports.clearFavourite = clearFavourite;
@@ -47,30 +48,11 @@ function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
   return findFavouriteTroupesForUser(userId).then(function(userTroupeFavourites) {
     var values = lazy(userTroupeFavourites)
       .pairs()
-      .filter(function(a) {
-        return a[1] >= position && a[0] !== troupeId;
-      })
-      .sortBy(function(a) {
-        return a[1];
-      })
-      .toArray();
+      .value();
 
-    var next = position;
-    // NB: used to be i = 1
-    for (var i = 0; i < values.length; i++) {
-      var item = values[i];
+    const newValues = calculateFavouriteUpdates(troupeId, position, values);
 
-      if (item[1] > next) {
-        /* Only increment those values before this one */
-        values.splice(i, values.length);
-        break;
-      }
-      /* This dude needs an increment */
-      item[1]++;
-      next = item[1];
-    }
-
-    var inc = lazy(values)
+    var inc = lazy(newValues)
       .map(function(a) {
         return ['favs.' + a[0], 1];
       })

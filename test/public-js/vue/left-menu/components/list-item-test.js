@@ -67,6 +67,27 @@ describe('list-item', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('favourite room matches snapshot', () => {
+    factory({
+      item: {
+        ...createSerializedRoomFixture('my-community/community'),
+        favourite: 1
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('favourite loading room matches snapshot', () => {
+    factory({
+      item: {
+        ...createSerializedRoomFixture('my-community/community'),
+        favourite: 1,
+        loading: true
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('calls store action "changeDisplayedRoom" and "toggleLeftMenu" when item is clicked', () => {
     const room = createSerializedRoomFixture('my-community/community');
     factory({

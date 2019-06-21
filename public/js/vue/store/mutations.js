@@ -32,6 +32,22 @@ export default {
     state.leftMenuExpandedState = newToggleState;
   },
 
+  [types.UPDATE_FAVOURITE_DRAGGING_STATE](state, newToggleState) {
+    state.favouriteDraggingInProgress = newToggleState;
+  },
+  [types.REQUEST_ROOM_FAVOURITE](state, roomId) {
+    const resultantRoomState = { ...state.roomMap[roomId], error: false, loading: true };
+    Vue.set(state.roomMap, roomId, resultantRoomState);
+  },
+  [types.RECEIVE_ROOM_FAVOURITE_SUCCESS](state, roomId) {
+    const resultantRoomState = { ...state.roomMap[roomId], error: false, loading: false };
+    Vue.set(state.roomMap, roomId, resultantRoomState);
+  },
+  [types.RECEIVE_ROOM_FAVOURITE_ERROR](state, { id: roomId, error = true }) {
+    const resultantRoomState = { ...state.roomMap[roomId], error, loading: false };
+    Vue.set(state.roomMap, roomId, resultantRoomState);
+  },
+
   [types.UPDATE_SEARCH_INPUT_VALUE](state, newSearchInputValue) {
     state.search.searchInputValue = newSearchInputValue;
   },

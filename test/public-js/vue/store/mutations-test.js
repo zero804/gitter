@@ -78,6 +78,75 @@ describe('mutations', () => {
     });
   });
 
+  it('UPDATE_FAVOURITE_DRAGGING_STATE', () => {
+    const newValue = true;
+    mutations[types.UPDATE_FAVOURITE_DRAGGING_STATE](state, newValue);
+    expect(state.favouriteDraggingInProgress).toEqual(newValue);
+  });
+
+  describe('REQUEST_ROOM_FAVOURITE', () => {
+    it('sets loading state', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: room1
+      };
+
+      mutations[types.REQUEST_ROOM_FAVOURITE](state, room1.id);
+      expect(state.roomMap[room1.id].loading).toEqual(true);
+    });
+
+    it('clears error state', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: { ...room1, error: true }
+      };
+
+      expect(state.roomMap[room1.id].error).toEqual(true);
+
+      mutations[types.REQUEST_ROOM_FAVOURITE](state, room1.id);
+      expect(state.roomMap[room1.id].error).toEqual(false);
+    });
+  });
+
+  describe('RECEIVE_ROOM_FAVOURITE_SUCCESS', () => {
+    it('clears loading state', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: { ...room1, loading: true }
+      };
+
+      expect(state.roomMap[room1.id].loading).toEqual(true);
+
+      mutations[types.RECEIVE_ROOM_FAVOURITE_SUCCESS](state, room1.id);
+      expect(state.roomMap[room1.id].loading).toEqual(false);
+    });
+
+    it('clears error state', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: { ...room1, error: true }
+      };
+
+      expect(state.roomMap[room1.id].error).toEqual(true);
+
+      mutations[types.RECEIVE_ROOM_FAVOURITE_SUCCESS](state, room1.id);
+      expect(state.roomMap[room1.id].error).toEqual(false);
+    });
+  });
+
+  it('RECEIVE_ROOM_FAVOURITE_ERROR ', () => {
+    const room1 = createSerializedRoomFixture('community/room1');
+    state.roomMap = {
+      [room1.id]: { ...room1, loading: true }
+    };
+
+    expect(state.roomMap[room1.id].loading).toEqual(true);
+
+    mutations[types.RECEIVE_ROOM_FAVOURITE_ERROR](state, { id: room1.id, error: true });
+    expect(state.roomMap[room1.id].loading).toEqual(false);
+    expect(state.roomMap[room1.id].error).toEqual(true);
+  });
+
   describe('Search', () => {
     function generateSearchTests(
       type,
