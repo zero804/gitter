@@ -71,33 +71,36 @@ describe('security-descriptor-admin-filter', function() {
       var securityDescriptorAdminFilter = proxyquireNoCallThru(
         '../lib/security-descriptor-admin-filter',
         {
-          './policies/policy-evaluator': function(
+          './policies/create-base-policy': function(
             userId,
+            user,
             securityDescriptor,
             policyDelegate,
             contextDelegate
           ) {
             assert.strictEqual(userId, META.user._id);
+            assert.strictEqual(user, META.user);
             assert.ok(securityDescriptor);
             assert.strictEqual(policyDelegate, mockPolicyDelegate);
             assert.strictEqual(contextDelegate, null);
+            return {
+              canAdmin: function() {
+                if (!META.responses || !META.responses) {
+                  assert.ok(false, 'Unexpected call');
+                }
+                var index;
+                if (securityDescriptor === DESCRIPTOR_1.sd) {
+                  index = 1;
+                } else if (securityDescriptor === DESCRIPTOR_2.sd) {
+                  index = 2;
+                }
 
-            this.canAdmin = function() {
-              if (!META.responses || !META.responses) {
-                assert.ok(false, 'Unexpected call');
-              }
-              var index;
-              if (securityDescriptor === DESCRIPTOR_1.sd) {
-                index = 1;
-              } else if (securityDescriptor === DESCRIPTOR_2.sd) {
-                index = 2;
-              }
+                if (!META.responses.hasOwnProperty(index)) {
+                  assert.ok(false, 'No response in fixture');
+                }
 
-              if (!META.responses.hasOwnProperty(index)) {
-                assert.ok(false, 'No response in fixture');
+                return Promise.resolve(META.responses[index]);
               }
-
-              return Promise.resolve(META.responses[index]);
             };
           },
           './policy-delegate-factory': function(pUserId, pUserLoader, pSecurityDescriptor) {
