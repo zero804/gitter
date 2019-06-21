@@ -16,7 +16,14 @@ export default {
   },
   iconLogoText,
   computed: {
-    ...mapState(['test', 'leftMenuState', 'leftMenuPinnedState', 'leftMenuExpandedState']),
+    ...mapState([
+      'test',
+      'isMobile',
+      'isLoggedIn',
+      'leftMenuState',
+      'leftMenuPinnedState',
+      'leftMenuExpandedState'
+    ]),
     ...mapGetters(['displayedRooms']),
     isPinned() {
       return this.leftMenuPinnedState === true;
@@ -48,7 +55,7 @@ export default {
   <div
     ref="root"
     class="root js-left-menu-root"
-    :class="{ unpinned: !isPinned, expanded: isExpanded }"
+    :class="{ mobile: isMobile, unpinned: !isPinned, expanded: isExpanded }"
     @mouseleave="onMouseleave"
   >
     <header class="header">
@@ -71,7 +78,7 @@ export default {
       </section>
     </header>
 
-    <section class="body">
+    <section v-if="isLoggedIn" class="body">
       <section class="layout-minibar">
         <menu-bar-body />
       </section>
@@ -88,6 +95,22 @@ export default {
           <room-list :rooms="displayedRooms" />
         </template>
       </section>
+    </section>
+    <section v-else class="nli-body">
+      <h2 class="nli-primary-heading">Where communities thrive</h2>
+
+      <br />
+
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
+        <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
+        <li class="nli-info-block-item">Free <strong>without limits</strong></li>
+        <li class="nli-info-block-item">Create <strong>your own community</strong></li>
+      </ul>
+
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
+      </ul>
     </section>
   </div>
 </template>
@@ -108,6 +131,10 @@ export default {
   *:before,
   *:after {
     box-sizing: inherit;
+  }
+
+  &.mobile {
+    display: none;
   }
 }
 
@@ -199,5 +226,48 @@ export default {
 
 .room-list-title {
   .m-header-title();
+}
+
+.room-list {
+  margin-left: 0;
+  list-style: none;
+}
+
+.nli-body {
+  flex: 1;
+  width: 34rem;
+  padding: 20px;
+
+  background-color: @header-base-bg-color;
+
+  color: #ffffff;
+
+  & a {
+    color: #ffffff;
+  }
+}
+
+.nli-primary-heading {
+  font-family: 'source-sans-pro';
+  font-weight: 200;
+  font-size: 47px;
+  line-height: 43px;
+}
+
+.nli-info-block {
+  padding: 1vh 15px;
+  margin: 10px 0px;
+  list-style: none;
+
+  background-color: rgba(255, 255, 255, 0.1);
+
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nli-info-block-item {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 </style>

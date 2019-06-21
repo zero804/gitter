@@ -32,6 +32,8 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     moduleToRender: 'left-menu',
     storeData: {
       isMobile,
+      isLoggedIn: !!user,
+
       roomMap,
       displayedRoomId: room && room.id,
 

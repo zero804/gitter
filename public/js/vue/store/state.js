@@ -5,6 +5,8 @@ function state() {
     test: 'initialTestValue',
 
     isMobile: false,
+    // `true` just for the sake of easy tests
+    isLoggedIn: true,
 
     groupMap: {},
     roomMap: {},
