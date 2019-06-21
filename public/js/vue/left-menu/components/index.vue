@@ -176,6 +176,16 @@ export default {
   position: relative;
   flex: 1;
   display: flex;
+  // Fix overflow in Firefox
+  //
+  // > Whenever you've got an element with overflow: [hidden|scroll|auto] inside of a flex item,
+  // > you need to give its ancestor flex item min-width:0 (in a horizontal flex container) or
+  // > min-height:0 (in a vertical flex container), to disable this min-sizing behavior, or
+  // > else the flex item will refuse to shrink smaller than the child's min-content size.
+  //
+  // https://stackoverflow.com/a/28639686/796832
+  // <- https://stackoverflow.com/a/44948507/796832
+  min-height: 0;
 }
 
 .body-main-menu {
