@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
 
@@ -25,6 +26,8 @@ describe('actions', () => {
   beforeEach(() => {
     state = createState();
     context.troupe.mockReset();
+    apiClient.user.get.mockReset();
+    apiClient.get.mockReset();
     apiClient.user.patch.mockReset();
   });
 
@@ -322,8 +325,86 @@ describe('actions', () => {
       );
     });
 
-    it.skip('searches value success', () => {});
-    it.skip('searches value error', () => {});
+    it('searches value success', done => {
+      state.search.searchInputValue = 'special';
+
+      const repoRoomResult1 = _.omit(createSerializedRoomFixture('github-org/repo1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const roomResult1 = _.omit(createSerializedRoomFixture('community/not-joined1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const oneToOneResult1 = {
+        avatarUrl: 'https://avatars-04.gitter.im/gh/uv/4/JORGE-ASDF',
+        avatarUrlMedium: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=128',
+        avatarUrlSmall: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=60',
+        displayName: 'some-buddy1',
+        gv: '4',
+        id: '5cf6a2f5d72222ce4fc22a22',
+        url: '/some-buddy1',
+        username: 'some-buddy1',
+        v: 1
+      };
+
+      apiClient.user.get.mockImplementation(() => Promise.resolve({ results: [repoRoomResult1] }));
+      apiClient.get.mockImplementation(endpoint => {
+        if (endpoint === '/v1/rooms') {
+          return Promise.resolve({ results: [roomResult1] });
+        } else if (endpoint === '/v1/user') {
+          return Promise.resolve({ results: [oneToOneResult1] });
+        }
+      });
+
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [
+          { type: types.UPDATE_ROOM_SEARCH_CURRENT },
+          { type: types.REQUEST_ROOM_SEARCH_REPO },
+          { type: types.REQUEST_ROOM_SEARCH_ROOM },
+          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [repoRoomResult1] },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1] },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1] }
+        ],
+        [
+          { type: 'trackStat', payload: 'left-menu.search.input' },
+          { type: 'updateRoom', payload: repoRoomResult1 },
+          { type: 'updateRoom', payload: roomResult1 },
+          { type: 'updateRoom', payload: oneToOneResult1 }
+        ],
+        done
+      );
+    });
+
+    it('searches value error', done => {
+      state.search.searchInputValue = 'special';
+
+      apiClient.user.get.mockImplementation(() => Promise.reject(true));
+      apiClient.get.mockImplementation(() => Promise.reject(true));
+
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [
+          { type: types.UPDATE_ROOM_SEARCH_CURRENT },
+          { type: types.REQUEST_ROOM_SEARCH_REPO },
+          { type: types.REQUEST_ROOM_SEARCH_ROOM },
+          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_ERROR, payload: true },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, payload: true },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, payload: true }
+        ],
+        [{ type: 'trackStat', payload: 'left-menu.search.input' }],
+        done
+      );
+    });
   });
 
   describe('fetchMessageSearchResults', () => {

@@ -130,7 +130,11 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         limit: 3
       })
       .then(result => {
-        commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, result && result.results);
+        const rooms = (result && result.results) || [];
+        commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, rooms);
+        rooms.forEach(room => {
+          dispatch('updateRoom', room);
+        });
       })
       .catch(err => {
         commit(types.RECEIVE_ROOM_SEARCH_REPO_ERROR, err);
@@ -144,7 +148,11 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         limit: 3
       })
       .then(result => {
-        commit(types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, result && result.results);
+        const rooms = (result && result.results) || [];
+        commit(types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, rooms);
+        rooms.forEach(room => {
+          dispatch('updateRoom', room);
+        });
       })
       .catch(err => {
         commit(types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, err);
@@ -158,7 +166,11 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         limit: 3
       })
       .then(result => {
-        commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, result && result.results);
+        const rooms = (result && result.results) || [];
+        commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, rooms);
+        rooms.forEach(room => {
+          dispatch('updateRoom', room);
+        });
       })
       .catch(err => {
         commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, err);
