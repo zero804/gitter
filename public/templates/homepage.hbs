@@ -302,20 +302,7 @@
           </div>
 
           <h1>{{ __ "Get Gitter now!"}}</h1>
-          <p>{{ __ "Gitter is available in all modern browsers as well as apps for desktops and mobile phones."}}</p>
-          <p>{{{ __ "We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>" "href='https://irc.gitter.im' target='_blank'" }}}.</p>
-
-          <p>
-            <a class="btn outline" href="https://update.gitter.im/osx/latest" id="osx-download"><i class="icon-apple"></i>{{ __ "Mac"}}</a>
-            <a class="btn outline" href="https://update.gitter.im/win/latest" id="windows-download"><i class="icon-windows"></i>{{ __ "Windows" }}</a>
-            <a class="btn outline" href="https://update.gitter.im/linux32/latest"><i class="icon-linux"></i>{{ __ "Linux 32" }}</a>
-            <a class="btn outline" href="https://update.gitter.im/linux64/latest"><i class="icon-linux"></i>{{ __ "Linux 64" }}</a>
-          </p>
-          <p>
-            <a class="btn outline" href="https://appstore.com/gitter" target="_blank"><i class="icon-apple"></i>{{ __ "iPhone" }}</a>
-            <a class="btn outline" href="https://play.google.com/store/apps/details?id=im.gitter.gitter" target="_blank"><i class="icon-android"></i>{{ __ "Android" }}</a>
-          </p>
-          </div>
+          {{> apps_content }}
       </section>
 
     </div>
