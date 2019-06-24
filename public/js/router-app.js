@@ -153,65 +153,62 @@ onready(function() {
     return contentFrame.contentWindow.location;
   }
 
-  let roomSwitcher;
-  if (!useVueLeftMenu) {
-    roomSwitcher = new SPARoomSwitcher(
-      troupeCollections.troupes,
-      clientEnv.basePath,
-      getContentFrameLocation
-    );
-    roomSwitcher.on('replace', function(href) {
-      debug('Room switch: replace %s', href);
+  const roomSwitcher = new SPARoomSwitcher(
+    troupeCollections.troupes,
+    clientEnv.basePath,
+    getContentFrameLocation
+  );
+  roomSwitcher.on('replace', function(href) {
+    debug('Room switch: replace %s', href);
 
-      context.setTroupeId(undefined); // TODO: update the title....
-      /*
-       * Use location.replace so as not to affect the history state of the application
-       *
-       * The history has already been pushed via the pushstate, so we don't want to double up
-       */
-      RAF(function() {
-        getContentFrameLocation().replace(href);
-      });
+    context.setTroupeId(undefined); // TODO: update the title....
+    /*
+     * Use location.replace so as not to affect the history state of the application
+     *
+     * The history has already been pushed via the pushstate, so we don't want to double up
+     */
+    RAF(function() {
+      getContentFrameLocation().replace(href);
     });
+  });
 
-    roomSwitcher.on('reload', function() {
-      debug('Room switch: reload');
-      context.setTroupeId(undefined); // TODO: update the title....
-      RAF(function() {
-        getContentFrameLocation().reload(true);
-      });
+  roomSwitcher.on('reload', function() {
+    debug('Room switch: reload');
+    context.setTroupeId(undefined); // TODO: update the title....
+    RAF(function() {
+      getContentFrameLocation().reload(true);
     });
+  });
 
-    roomSwitcher.on('switch', function(troupe, permalinkChatId) {
-      debug('Room switch: switch to %s', troupe.attributes);
+  roomSwitcher.on('switch', function(troupe, permalinkChatId) {
+    debug('Room switch: switch to %s', troupe.attributes);
 
-      context.setTroupeId(troupe.id);
+    context.setTroupeId(troupe.id);
 
-      // turn backbone object to plain one so we don't modify the original
-      var newTroupe = troupe.toJSON();
+    // turn backbone object to plain one so we don't modify the original
+    var newTroupe = troupe.toJSON();
 
-      // Set the last access time immediately to prevent
-      // delay in hidden rooms becoming visible only
-      // once we get the server-side update
-      var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
-      if (liveCollectionTroupe) {
-        liveCollectionTroupe.set('lastAccessTime', moment());
-      }
+    // Set the last access time immediately to prevent
+    // delay in hidden rooms becoming visible only
+    // once we get the server-side update
+    var liveCollectionTroupe = troupeCollections.troupes.get(troupe.id);
+    if (liveCollectionTroupe) {
+      liveCollectionTroupe.set('lastAccessTime', moment());
+    }
 
-      // add the group to the troupe as if it was serialized by the server
-      var groupModel = troupeCollections.groups.get(newTroupe.groupId);
-      if (groupModel) {
-        newTroupe.group = groupModel.toJSON();
-      }
+    // add the group to the troupe as if it was serialized by the server
+    var groupModel = troupeCollections.groups.get(newTroupe.groupId);
+    if (groupModel) {
+      newTroupe.group = groupModel.toJSON();
+    }
 
-      //post a navigation change to the iframe
-      postMessage({
-        type: 'change:room',
-        newTroupe: newTroupe,
-        permalinkChatId: permalinkChatId
-      });
+    //post a navigation change to the iframe
+    postMessage({
+      type: 'change:room',
+      newTroupe: newTroupe,
+      permalinkChatId: permalinkChatId
     });
-  }
+  });
 
   function pushState(state, title, url) {
     if (state === window.history.state) {

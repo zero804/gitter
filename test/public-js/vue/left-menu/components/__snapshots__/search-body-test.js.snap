@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`search-body error matches snapshot 1`] = `
+exports[`search-body deduplicates room search combined results matches snapshot 1`] = `
 <div
   class="search-body-root"
 >
@@ -15,8 +15,33 @@ exports[`search-body error matches snapshot 1`] = `
   >
     <input
       class="search-input"
+      placeholder="What are you looking for?"
     />
   </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="room-search-list"
+  >
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+  </ul>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
    
   <h2
     class="search-body-title"
@@ -25,41 +50,6 @@ exports[`search-body error matches snapshot 1`] = `
     Chat messages
     
     <!---->
-  </h2>
-   
-  <div>
-    
-    Error fetching messages
-  
-  </div>
-</div>
-`;
-
-exports[`search-body loading matches snapshot 1`] = `
-<div
-  class="search-body-root"
->
-  <h2
-    class="search-body-title"
-  >
-    Search
-  </h2>
-   
-  <div
-    class="search-input-wrapper"
-  >
-    <input
-      class="search-input"
-    />
-  </div>
-   
-  <h2
-    class="search-body-title"
-  >
-    
-    Chat messages
-    
-    <loading-spinner-stub />
   </h2>
    
   <div
@@ -87,7 +77,354 @@ exports[`search-body matches snapshot 1`] = `
   >
     <input
       class="search-input"
+      placeholder="What are you looking for?"
     />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body message search error matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-error-message"
+  >
+    
+    Error fetching messages
+  
+  </div>
+</div>
+`;
+
+exports[`search-body message search loading matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <loading-spinner-stub />
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body message search results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="message-search-list"
+  >
+    <search-body-message-result-item-stub
+      messagesearchresult="[object Object]"
+    />
+    <search-body-message-result-item-stub
+      messagesearchresult="[object Object]"
+    />
+  </ul>
+</div>
+`;
+
+exports[`search-body room search combined results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="room-search-list"
+  >
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+  </ul>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search people error matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <div
+    class="search-result-error-message"
+  >
+    
+    Error fetching people
+  
   </div>
    
   <h2
@@ -109,7 +446,7 @@ exports[`search-body matches snapshot 1`] = `
 </div>
 `;
 
-exports[`search-body search results matches snapshot 1`] = `
+exports[`search-body room search people loading matches snapshot 1`] = `
 <div
   class="search-body-root"
 >
@@ -124,8 +461,32 @@ exports[`search-body search results matches snapshot 1`] = `
   >
     <input
       class="search-input"
+      placeholder="What are you looking for?"
     />
   </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <loading-spinner-stub />
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
    
   <h2
     class="search-body-title"
@@ -136,15 +497,466 @@ exports[`search-body search results matches snapshot 1`] = `
     <!---->
   </h2>
    
-  <ul
-    class="message-search-list"
+  <div
+    class="search-result-empty-message"
   >
-    <search-body-message-result-item-stub
-      messagesearchresult="[object Object]"
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search people results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
     />
-    <search-body-message-result-item-stub
-      messagesearchresult="[object Object]"
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="room-search-list"
+  >
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+    <list-item-stub
+      item="[object Object]"
+      type="all"
     />
   </ul>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search repo error matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <div
+    class="search-result-error-message"
+  >
+    
+    Error fetching repos
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search repo loading matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <loading-spinner-stub />
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search repo results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="room-search-list"
+  >
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+  </ul>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search room error matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <div
+    class="search-result-error-message"
+  >
+    
+    Error fetching rooms
+  
+  </div>
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search room loading matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <loading-spinner-stub />
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No room search results...
+  
+  </div>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
+</div>
+`;
+
+exports[`search-body room search room results matches snapshot 1`] = `
+<div
+  class="search-body-root"
+>
+  <h2
+    class="search-body-title"
+  >
+    Search
+  </h2>
+   
+  <div
+    class="search-input-wrapper"
+  >
+    <input
+      class="search-input"
+      placeholder="What are you looking for?"
+    />
+  </div>
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    ROOMS & PEOPLE
+    
+    <!---->
+  </h2>
+   
+  <ul
+    class="room-search-list"
+  >
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+    <list-item-stub
+      item="[object Object]"
+      type="all"
+    />
+  </ul>
+   
+  <!---->
+   
+  <!---->
+   
+  <!---->
+   
+  <h2
+    class="search-body-title"
+  >
+    
+    Chat messages
+    
+    <!---->
+  </h2>
+   
+  <div
+    class="search-result-empty-message"
+  >
+    
+    No message search results...
+  
+  </div>
 </div>
 `;

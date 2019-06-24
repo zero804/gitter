@@ -8,3 +8,4 @@ require('./components/api-client');
 
 // Polyfills
 require('core-js/fn/object/assign');
+require('core-js/fn/object/values');

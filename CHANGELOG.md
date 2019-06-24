@@ -1,3 +1,14 @@
+# 19.50.0 - 2019-6-20
+
+ - Fix profile menu missing on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1427
+ - Fix create room redirection to newly created room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1428
+ - Add hide room functionality to room settings dropdown, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1430
+ - Add room search to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1423
+ - Removed links to unavailable 3rd party apps
+    - Thanks to [@schwedenmut](https://gitlab.com/schwedenmut) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1432
+ - Add 10 per day rate-limit to email invites, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1433
+
+
 # 19.49.0 - 2019-6-14
 
  - Fix typos throughout codebase

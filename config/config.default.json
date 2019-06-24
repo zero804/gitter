@@ -75,7 +75,8 @@
   "email": {
     "emailBasePath": "http://localhost:5000",
     "unsubscribeNotificationsSecret": "",
-    "disableInviteEmails": true
+    "limitInviteEmails": true,
+    "inviteEmailAbuseThresholdPerDay": 10
   },
   "amazon": {
     "accessKey": "",

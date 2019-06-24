@@ -186,7 +186,9 @@ var View = Marionette.CompositeView.extend({
         self.typeahead.clear();
         switch (e.status) {
           case 501:
-            message = 'Inviting a user by email has been disabled, see #2153';
+            message = `Inviting a user by email is limited to ${
+              clientEnv['inviteEmailAbuseThresholdPerDay']
+            } per day, see #2153`;
             break;
           case 409:
             message = model.get('username') + ' has already been invited';
