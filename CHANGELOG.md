@@ -9,6 +9,10 @@
  - Add NLI support to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1436
  - Fix room search redirecting to non-joined rooms with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1438
 
+ Developer facing:
+
+  - Add execution permissions to `scripts/utils/email-for-user.js`, `scripts/utils/list-group-admins.js` utility scripts (so we can run them on the server), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1442
+
 
 # 19.50.0 - 2019-6-20
 
