@@ -9,6 +9,7 @@
  - Add NLI support to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1436
  - Fix room search redirecting to non-joined rooms with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1438
  - Fix mention in non-joined room so it shows up in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1443
+ - Be upfront about bugs in the mobile/desktop apps and transparent about what the Gitter team is focusing on, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1444
 
  Developer facing:
 
