@@ -1,4 +1,4 @@
-# 19.51.0 - *upcoming*
+# 19.51.0 - 2019-6-24
 
  - Add stats/metrics for the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
  - Add room favourite drag and drop to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1431
