@@ -1,5 +1,6 @@
 'use strict';
 
+const _ = require('lodash');
 const createState = require('../../../../public/js/vue/store/state').default;
 const getters = require('../../../../public/js/vue/store/getters');
 
@@ -73,6 +74,49 @@ describe('getters', () => {
 
       const displayedRooms = getters.displayedRooms(state);
       expect(displayedRooms).toEqual([oneToOneRoom1]);
+    });
+
+    it('does not show rooms that came from search results', () => {
+      state.leftMenuState = 'all';
+
+      const room1 = createSerializedRoomFixture('community/room1');
+      const room2 = createSerializedRoomFixture('community/room2');
+      const oneToOneRoom1 = createSerializedOneToOneRoomFixture('onetoone/room1');
+
+      const repoRoomResult1 = _.omit(createSerializedRoomFixture('github-org/repo1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const roomResult1 = _.omit(createSerializedRoomFixture('community/not-joined1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const oneToOneResult1 = {
+        avatarUrl: 'https://avatars-04.gitter.im/gh/uv/4/JORGE-ASDF',
+        avatarUrlMedium: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=128',
+        avatarUrlSmall: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=60',
+        displayName: 'some-buddy1',
+        gv: '4',
+        id: '5cf6a2f5d72222ce4fc22a22',
+        url: '/some-buddy1',
+        username: 'some-buddy1',
+        v: 1
+      };
+
+      state.roomMap = {
+        [room1.id]: room1,
+        [room2.id]: room2,
+        [oneToOneRoom1.id]: oneToOneRoom1,
+
+        [repoRoomResult1.id]: repoRoomResult1,
+        [roomResult1.id]: roomResult1,
+        [oneToOneResult1.id]: oneToOneResult1
+      };
+
+      const displayedRooms = getters.displayedRooms(state);
+      expect(displayedRooms).toEqual([room1, room2, oneToOneRoom1]);
     });
   });
 
