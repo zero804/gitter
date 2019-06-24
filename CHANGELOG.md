@@ -8,6 +8,7 @@
  - Fix SPA room switcher to always just fallback to redirecting the window with the Vue left-menu (navigation, history), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1441
  - Add NLI support to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1436
  - Fix room search redirecting to non-joined rooms with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1438
+ - Fix mention in non-joined room so it shows up in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1443
 
  Developer facing:
 
