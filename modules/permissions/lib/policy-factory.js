@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var PolicyEvaluator = require('./policies/policy-evaluator');
+const createBasePolicy = require('./policies/create-base-policy');
 var StaticPolicyEvaluator = require('./policies/static-policy-evaluator');
 var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var OneToOneUnconnectionPolicyEvalator = require('./policies/one-to-one-unconnected-policy-evaluator');
@@ -40,7 +40,7 @@ function createPolicyFromDescriptor(userId, user, securityDescriptor, roomId) {
     contextDelegate = new RoomContextDelegate(userId, roomId);
   }
 
-  return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+  return createBasePolicy(userId, user, securityDescriptor, policyDelegate, contextDelegate);
 }
 
 function createPolicyForRoomId(user, roomId) {
@@ -77,7 +77,7 @@ function createPolicyForGroupId(user, groupId) {
       var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+      return createBasePolicy(userId, user, securityDescriptor, policyDelegate, contextDelegate);
     });
 }
 
@@ -90,7 +90,7 @@ function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
       var policyDelegate = policyDelegateFactory(userId, userLoader, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+      return createBasePolicy(userId, null, securityDescriptor, policyDelegate, contextDelegate);
     });
 }
 
@@ -106,8 +106,9 @@ function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
       var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
       var contextDelegate = null; // No group context yet
 
-      var primary = new PolicyEvaluator(
+      var primary = createBasePolicy(
         userId,
+        user,
         securityDescriptor,
         policyDelegate,
         contextDelegate

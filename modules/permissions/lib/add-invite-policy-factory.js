@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var PolicyEvaluator = require('./policies/policy-evaluator');
+var createBasePolicy = require('./policies/create-base-policy');
 var RoomContextDelegate = require('./context-delegates/room-context-delegate');
 var RoomInviteContextDelegate = require('./context-delegates/room-invite-context-delegate');
 var DisjunctionContextDelegate = require('./context-delegates/disjunction-context-delegate');
@@ -64,7 +64,7 @@ function createPolicyForRoomInvite(user, room, inviteSecret) {
       new RoomInviteContextDelegate(userId, roomId, inviteSecret)
     ]);
 
-    return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+    return createBasePolicy(userId, user, securityDescriptor, policyDelegate, contextDelegate);
   });
 }
 
@@ -96,7 +96,7 @@ function createPolicyForRoomAdd(user, room) {
     // For 'add' we treat the user as already being in the room
     var contextDelegate = new StaticContextDelegate(true);
 
-    return new PolicyEvaluator(userId, securityDescriptor, policyDelegate, contextDelegate);
+    return createBasePolicy(userId, user, securityDescriptor, policyDelegate, contextDelegate);
   });
 }
 
