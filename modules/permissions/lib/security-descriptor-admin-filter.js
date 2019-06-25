@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var policyDelegateFactory = require('./policy-delegate-factory');
-var PolicyEvaluator = require('./policies/policy-evaluator');
+var createBasePolicy = require('./policies/create-base-policy');
 var userLoaderFactory = require('./user-loader-factory');
 
 /**
@@ -23,19 +23,17 @@ function securityDescriptorAdminFilter(user, objectsWithSecurityDescriptors) {
       var policyDelegate = policyDelegateFactory(user._id, userLoader, securityDescriptor);
       var contextDelegate = null; // No context delegate needed for admin
 
-      var policyEvaluator = new PolicyEvaluator(
+      const basePolicy = createBasePolicy(
         user._id,
+        user,
         securityDescriptor,
         policyDelegate,
         contextDelegate
       );
 
-      return policyEvaluator
-        .canAdmin()
-        .bind(objectsWithSecurityDescriptor)
-        .then(function(admin) {
-          if (admin) return this;
-        });
+      return basePolicy.canAdmin().then(function(admin) {
+        if (admin) return objectsWithSecurityDescriptor;
+      });
     },
     {
       concurrency: MAX_FILTER_CONCURRENCY
