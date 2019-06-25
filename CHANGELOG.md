@@ -23,6 +23,10 @@ Developer facing:
 
   - Add execution permissions to `scripts/utils/email-for-user.js`, `scripts/utils/list-group-admins.js` utility scripts (so we can run them on the server), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1442
 
+# 19.50.1 - 2019-6-25
+ - Fix room security policy to enforce the "Only GitHub users are allowed to join this room." rule, https://gitlab.com/gitlab-org/gitter/webapp/issues/2041
+   - Thanks to @cache-money for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+   - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/7
 
 # 19.50.0 - 2019-6-20
 
