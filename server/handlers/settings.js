@@ -10,6 +10,7 @@ var crypto = require('crypto');
 var request = require('request');
 var StatusError = require('statuserror');
 var jwt = require('jwt-simple');
+const asyncHandler = require('express-async-handler');
 
 var userSettingsService = require('gitter-web-user-settings');
 var cdn = require('gitter-web-cdn');
@@ -148,17 +149,15 @@ function createIntegration(req, res, next) {
   );
 }
 
-function adminAccessCheck(req, res, next) {
-  var uriContext = req.uriContext;
-  var policy = uriContext.policy;
+const adminAccessCheck = asyncHandler(async (req, res, next) => {
+  const uriContext = req.uriContext;
+  const policy = uriContext.policy;
 
-  return policy
-    .canAdmin()
-    .then(function(access) {
-      if (!access) throw new StatusError(403);
-    })
-    .nodeify(next);
-}
+  const access = await policy.canAdmin();
+  if (!access) throw new StatusError(403);
+
+  next();
+});
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
