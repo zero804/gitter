@@ -3,12 +3,12 @@
 var persistence = require('gitter-web-persistence');
 
 function listFeatures() {
-  return persistence.FeatureToggle.find({}, { name: 1, description: 1 })
+  return persistence.FeatureToggle.find({}, { name: 1, description: 1, hidden: 1 })
     .lean()
     .exec()
     .then(function(togglesList) {
       return togglesList.map(function(f) {
-        return { name: f.name, description: f.description };
+        return { name: f.name, description: f.description, hidden: f.hidden };
       });
     });
 }
@@ -20,7 +20,8 @@ module.exports = function(req, res, next) {
         return {
           name: feature.name,
           description: feature.description,
-          enabled: req.fflip.has(feature.name)
+          enabled: req.fflip.has(feature.name),
+          hidden: feature.hidden
         };
       });
 
