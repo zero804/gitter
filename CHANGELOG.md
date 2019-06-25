@@ -1,3 +1,10 @@
+# 19.52.0 - *upcoming*
+
+Developer facing:
+
+ - Also deploy to Next/staging with a `hotfix/` branch(git flow), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1449
+
+
 # 19.51.0 - 2019-6-24
 
  - Add stats/metrics for the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
