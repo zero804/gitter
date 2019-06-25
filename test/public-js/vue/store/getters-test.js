@@ -120,6 +120,114 @@ describe('getters', () => {
     });
   });
 
+  describe('hasAnyUnreads', () => {
+    it('no unreads returns false', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: room1
+      };
+
+      const hasAnyUnreads = getters.hasAnyUnreads(state);
+      expect(hasAnyUnreads).toEqual(false);
+    });
+
+    it('some unreads returns true', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      const room2 = {
+        ...createSerializedRoomFixture('community/room2'),
+        unreadItems: 3
+      };
+      const room3 = createSerializedRoomFixture('community/room3');
+      state.roomMap = {
+        [room1.id]: room1,
+        [room2.id]: room2,
+        [room3.id]: room3
+      };
+
+      const hasAnyUnreads = getters.hasAnyUnreads(state);
+      expect(hasAnyUnreads).toEqual(true);
+    });
+  });
+
+  describe('hasAnyMentions', () => {
+    it('no mentions returns false', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      state.roomMap = {
+        [room1.id]: room1
+      };
+
+      const hasAnyMentions = getters.hasAnyMentions(state);
+      expect(hasAnyMentions).toEqual(false);
+    });
+
+    it('some mentions returns true', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      const room2 = {
+        ...createSerializedRoomFixture('community/room2'),
+        mentions: 3
+      };
+      const room3 = createSerializedRoomFixture('community/room3');
+      state.roomMap = {
+        [room1.id]: room1,
+        [room2.id]: room2,
+        [room3.id]: room3
+      };
+
+      const hasAnyMentions = getters.hasAnyMentions(state);
+      expect(hasAnyMentions).toEqual(true);
+    });
+  });
+
+  describe('hasPeopleUnreads', () => {
+    it('no unreads returns false', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      const oneToOneRoom1 = {
+        ...createSerializedOneToOneRoomFixture('some-person1')
+      };
+      state.roomMap = {
+        [room1.id]: room1,
+        [oneToOneRoom1.id]: oneToOneRoom1
+      };
+
+      const hasPeopleUnreads = getters.hasPeopleUnreads(state);
+      expect(hasPeopleUnreads).toEqual(false);
+    });
+
+    it('some unreads returns true', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      const oneToOneRoom1 = {
+        ...createSerializedOneToOneRoomFixture('some-person1'),
+        unreadItems: 3
+      };
+      const room3 = createSerializedRoomFixture('community/room3');
+      state.roomMap = {
+        [room1.id]: room1,
+        [oneToOneRoom1.id]: oneToOneRoom1,
+        [room3.id]: room3
+      };
+
+      const hasPeopleUnreads = getters.hasPeopleUnreads(state);
+      expect(hasPeopleUnreads).toEqual(true);
+    });
+
+    it('some mentions returns true', () => {
+      const room1 = createSerializedRoomFixture('community/room1');
+      const oneToOneRoom1 = {
+        ...createSerializedOneToOneRoomFixture('some-person1'),
+        mentions: 3
+      };
+      const room3 = createSerializedRoomFixture('community/room3');
+      state.roomMap = {
+        [room1.id]: room1,
+        [oneToOneRoom1.id]: oneToOneRoom1,
+        [room3.id]: room3
+      };
+
+      const hasPeopleUnreads = getters.hasPeopleUnreads(state);
+      expect(hasPeopleUnreads).toEqual(true);
+    });
+  });
+
   describe('displayedRoomSearchResults', () => {
     it('deduplicates room search combined results matches snapshot', () => {
       const room1 = createSerializedRoomFixture('community/repo1');

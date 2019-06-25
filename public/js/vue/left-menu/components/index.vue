@@ -127,9 +127,9 @@ export default {
   flex-direction: column;
   height: 100%;
 
-  *,
-  *:before,
-  *:after {
+  &::v-deep *,
+  &::v-deep *:before,
+  &::v-deep *:after {
     box-sizing: inherit;
   }
 

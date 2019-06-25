@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapActions } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 import * as leftMenuConstants from '../constants';
 
@@ -26,11 +26,28 @@ export default {
   },
   computed: {
     ...mapState(['leftMenuState', 'leftMenuExpandedState']),
+    ...mapGetters(['hasAnyUnreads', 'hasAnyMentions', 'hasPeopleUnreads']),
     itemTypeClass() {
       return `item-${this.type}`;
     },
     isActive() {
       return this.type === this.leftMenuState;
+    },
+    hasUnreads() {
+      if (this.type === leftMenuConstants.LEFT_MENU_ALL_STATE) {
+        return this.hasAnyUnreads;
+      } else if (this.type === leftMenuConstants.LEFT_MENU_PEOPLE_STATE) {
+        return this.hasPeopleUnreads;
+      }
+
+      return false;
+    },
+    hasMentions() {
+      if (this.type === leftMenuConstants.LEFT_MENU_ALL_STATE) {
+        return this.hasAnyMentions;
+      }
+
+      return false;
     }
   },
 
@@ -63,6 +80,13 @@ export default {
     type="button"
     @click.prevent="onClick(type)"
   >
+    <div
+      class="unread-indicator"
+      :class="{
+        'has-unreads': hasUnreads,
+        'has-mentions': hasMentions
+      }"
+    ></div>
     <span class="icon-wrapper">
       <slot name="icon"></slot>
     </span>
@@ -137,6 +161,36 @@ export default {
     & > svg {
       stroke-width: 1px;
     }
+  }
+}
+
+.unread-indicator {
+  visibility: hidden;
+
+  &.has-unreads,
+  &.has-mentions {
+    visibility: visible;
+
+    position: absolute;
+    top: 38%;
+    left: 63%;
+    transform: translateX(-50%) translateY(-50%);
+
+    display: block;
+    width: 1.4rem;
+    height: 1.4rem;
+
+    border: 2px solid @main-application-bg-color;
+    border-radius: 100%;
+    color: transparent;
+  }
+
+  &.has-unreads {
+    background-color: @caribbean;
+  }
+
+  &.has-mentions {
+    background-color: @jaffa;
   }
 }
 
