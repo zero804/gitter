@@ -83,5 +83,6 @@ onready(function() {
   // // Listen for changes to the room
   // liveContext.syncRoom();
 
+  Backbone.history.stop();
   Backbone.history.start();
 });

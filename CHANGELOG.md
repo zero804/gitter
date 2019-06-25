@@ -1,3 +1,22 @@
+# 19.51.0 - 2019-6-24
+
+ - Add stats/metrics for the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1434
+ - Add room favourite drag and drop to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1431
+ - Add mobile support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1435
+ - Add highlight for current room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1439
+ - Fix overflow scroll in Firefox with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1440
+ - Fix SPA room switcher to always just fallback to redirecting the window with the Vue left-menu (navigation, history), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1441
+ - Add NLI support to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1436
+ - Fix room search redirecting to non-joined rooms with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1438
+ - Fix mention in non-joined room so it shows up in the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1443
+ - Be upfront about bugs in the mobile/desktop apps and transparent about what the Gitter team is focusing on, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1444
+ - Add ability to hide feature toggles from the [next.gitter.im]](https://next.gitter.im/) UI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1446
+
+ Developer facing:
+
+  - Add execution permissions to `scripts/utils/email-for-user.js`, `scripts/utils/list-group-admins.js` utility scripts (so we can run them on the server), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1442
+
+
 # 19.50.0 - 2019-6-20
 
  - Fix profile menu missing on explore page, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1427

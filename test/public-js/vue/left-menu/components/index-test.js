@@ -34,23 +34,19 @@ describe('left-menu index', () => {
     wrapper.destroy();
   });
 
+  describe('nli (not logged in)', () => {
+    it('matches snapshot', () => {
+      factory({}, store => {
+        store.state.isLoggedIn = false;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
+
   describe('all state', () => {
     it('matches snapshot', () => {
       factory({}, store => {
         store.state.leftMenuState = 'all';
-      });
-      expect(wrapper.element).toMatchSnapshot();
-    });
-
-    it('matches snapshot with some rooms', () => {
-      factory({}, store => {
-        store.state.leftMenuState = 'all';
-
-        store.state.roomMap = {
-          1: { id: 1, lastAccessTime: 1 },
-          2: { id: 2, lastAccessTime: 1 },
-          3: { id: 3, lastAccessTime: 1 }
-        };
       });
       expect(wrapper.element).toMatchSnapshot();
     });

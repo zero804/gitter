@@ -14,6 +14,10 @@ var opts = require('yargs')
     type: 'string',
     description: 'Description of feature'
   })
+  .option('hidden', {
+    type: 'boolean',
+    description: 'Whether the feature toggle should be hidden from the UI on next.gitter.im'
+  })
   .option('include-user', {
     type: 'array',
     description: 'Username of user to allow'
@@ -174,6 +178,8 @@ function runWithOpts(opts) {
   if (opts.description) {
     set['description'] = opts.description;
   }
+
+  set['hidden'] = opts.hidden;
 
   var update = {
     $setOnInsert: {

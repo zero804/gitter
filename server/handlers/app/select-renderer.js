@@ -5,7 +5,9 @@ var mobileNotLoggedInRenderer = require('../renderers/mobile-not-logged-in-rende
 var desktopRenderer = require('../renderers/desktop-renderer');
 
 function selectRenderer(req) {
-  if (req.isPhone) {
+  const useVueLeftMenu = req.fflip.has('vue-left-menu');
+
+  if (!useVueLeftMenu && req.isPhone) {
     if (req.user) {
       return mobileLoggedInRenderer;
     } else {

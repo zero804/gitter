@@ -82,15 +82,15 @@ exports[`left-menu index all state matches snapshot 1`] = `
        
       <!---->
        
-      <ul
-        class="room-list"
+      <room-list-stub
+        rooms=""
       />
     </section>
   </section>
 </div>
 `;
 
-exports[`left-menu index all state matches snapshot with some rooms 1`] = `
+exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
 <div
   class="root js-left-menu-root"
 >
@@ -145,50 +145,69 @@ exports[`left-menu index all state matches snapshot with some rooms 1`] = `
   </header>
    
   <section
-    class="body"
+    class="nli-body"
   >
-    <section
-      class="layout-minibar"
+    <h2
+      class="nli-primary-heading"
     >
-      <menu-bar-body-stub />
-    </section>
+      Where communities thrive
+    </h2>
      
-    <section
-      class="body-main-menu layout-main-menu"
+    <br />
+     
+    <ul
+      class="nli-info-block"
     >
-      <div
-        class="hide"
+      <li
+        class="nli-info-block-item"
       >
-        
-        initialTestValue
-      
-      </div>
+        Join over 
+        <strong>
+          1.5M+ people
+        </strong>
+      </li>
        
-      <h2
-        class="room-list-title"
+      <li
+        class="nli-info-block-item"
       >
-        All conversations
-      </h2>
+        Join over 
+        <strong>
+          100K+ communities
+        </strong>
+      </li>
        
-      <!---->
-       
-      <ul
-        class="room-list"
+      <li
+        class="nli-info-block-item"
       >
-        <list-item-stub
-          item="[object Object]"
-          type="all"
-        />
-        <list-item-stub
-          item="[object Object]"
-          type="all"
-        />
-        <list-item-stub
-          item="[object Object]"
-          type="all"
-        />
-      </ul>
-    </section>
+        Free 
+        <strong>
+          without limits
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Create 
+        <strong>
+          your own community
+        </strong>
+      </li>
+    </ul>
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
+      >
+        <a
+          href="/explore"
+        >
+          Explore more communities
+        </a>
+      </li>
+    </ul>
   </section>
 </div>
 `;
@@ -275,8 +294,8 @@ exports[`left-menu index people state matches snapshot 1`] = `
         People
       </h2>
        
-      <ul
-        class="room-list"
+      <room-list-stub
+        rooms=""
       />
     </section>
   </section>
@@ -365,8 +384,8 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
        
       <!---->
        
-      <ul
-        class="room-list"
+      <room-list-stub
+        rooms=""
       />
     </section>
   </section>
@@ -455,8 +474,8 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
        
       <!---->
        
-      <ul
-        class="room-list"
+      <room-list-stub
+        rooms=""
       />
     </section>
   </section>

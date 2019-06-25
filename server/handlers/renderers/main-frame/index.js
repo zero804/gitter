@@ -36,6 +36,7 @@ function getTroupeContextAndDerivedInfo(req, leftMenu, socialMetadataGenerator) 
 }
 
 function renderMainFrame(req, res, next, options) {
+  const useVueLeftMenu = req.fflip.has('vue-left-menu');
   var user = req.user;
   var userId = user && user.id;
   var socialMetadataGenerator = options.socialMetadataGenerator;
@@ -64,7 +65,7 @@ function renderMainFrame(req, res, next, options) {
 
       var template, bootScriptName;
 
-      if (req.user) {
+      if (useVueLeftMenu || req.user) {
         template = 'app-template';
         bootScriptName = 'router-app';
       } else {

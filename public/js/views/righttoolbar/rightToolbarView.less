@@ -1,12 +1,12 @@
-@import (reference) "trp3Vars";
-@import "../../../less/colors";
+@import (reference) 'trp3Vars';
+@import '../../../less/colors';
 
 // Base
-@import "../../../less/base-avatar.less";
+@import '../../../less/base-avatar.less';
 
 // Required views
-@import "../people/peopleCollectionView";
-@import "activity.less";
+@import '../people/peopleCollectionView';
+@import 'activity.less';
 
 .right-toolbar-region {
   box-sizing: border-box;
@@ -39,6 +39,10 @@
 
     transition: width 200ms ease-in-out;
 
+    body.mobile & {
+      display: none;
+    }
+
     &.collapsed {
       .collapsed-breakpoint();
     }
@@ -63,7 +67,6 @@
     .oneToOne {
       max-height: 300px;
     }
-
 
     .trpRepoInfoContainer {
       padding-left: 5px;
@@ -97,8 +100,6 @@
     }
   }
 
-
-
   // this is bad, but until the margins/padding is done properly
   // for all <h1>, <p> etc tags in the toolbar, we have to style
   // the individual elements :(
@@ -122,16 +123,14 @@
     background-color: transparent;
     border: 0;
 
-    transition: background-color .2s ease;
+    transition: background-color 0.2s ease;
 
     &:hover,
     &:focus {
-      background-color: rgba(0, 0, 0, .05);
+      background-color: rgba(0, 0, 0, 0.05);
       outline: none;
     }
   }
-
-
 
   .right-toolbar__search-header {
     height: 74px;
@@ -149,13 +148,11 @@
     padding-top: 10px;
   }
 
-
   .remaining-region {
     margin-top: 1rem;
   }
 
   .remaining-view {
-
   }
 
   .remaining-view-button,
@@ -169,14 +166,10 @@
     color: rgba(51, 51, 51, 0.5);
   }
 
-
-
   .right-toolbar-activity-area {
-
   }
 
   .right-toolbar-activity-area-inner {
-
   }
 
   .right-toolbar-activity-list {
@@ -193,19 +186,18 @@
   }
 }
 
-
-
-
 .collapsed-breakpoint() {
   width: @right-toolbar-collapsed-width;
   padding-right: 0px;
-
 
   #activity-header {
     opacity: 0;
   }
 
-  #people-header, #top-header, #repo-info, #activity-tip {
+  #people-header,
+  #top-header,
+  #repo-info,
+  #activity-tip {
     display: none;
   }
 
@@ -215,7 +207,6 @@
     padding-right: 20px;
     padding-left: 14px;
   }
-
 
   .right-toolbar {
     .trpToolbarList {
@@ -238,8 +229,6 @@
   }
 }
 
-
-
 .right-toolbar-region__footer {
   box-sizing: border-box;
   position: absolute;
@@ -249,11 +238,7 @@
   padding-top: 21px;
   padding-right: 21px;
 
-  background: linear-gradient(
-    top,
-    rgba(255, 255, 255, 0),
-    @main-application-bg-color 35%
-  );
+  background: linear-gradient(top, rgba(255, 255, 255, 0), @main-application-bg-color 35%);
 
   text-align: right;
   .menu-toggle-icon {
@@ -266,7 +251,6 @@
     cursor: pointer;
     transition: transform 0.2s ease;
     &:hover,
-
     .menu-toggle-button:hover > & {
       transform: translateZ(0) rotateZ(-90deg);
       stroke: black;

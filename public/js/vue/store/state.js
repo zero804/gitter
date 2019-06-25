@@ -4,6 +4,10 @@ function state() {
   return {
     test: 'initialTestValue',
 
+    isMobile: false,
+    // `true` just for the sake of easy tests
+    isLoggedIn: true,
+
     groupMap: {},
     roomMap: {},
 
@@ -13,6 +17,7 @@ function state() {
     leftMenuState: leftMenuConstants.LEFT_MENU_ALL_STATE,
     leftMenuPinnedState: true,
     leftMenuExpandedState: false,
+    favouriteDraggingInProgress: false,
 
     search: {
       searchInputValue: '',

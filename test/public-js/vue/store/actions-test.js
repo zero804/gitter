@@ -1,14 +1,23 @@
 'use strict';
 
+const _ = require('lodash');
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
 
 jest.mock('gitter-web-client-context');
+jest.mock('../../../../public/js/utils/appevents', () => {
+  return {
+    ...require.requireActual('../../../../public/js/utils/appevents'),
+    triggerParent: jest.fn()
+  };
+});
+jest.mock('../../../../public/js/components/api-client');
 
 const actions = require('../../../../public/js/vue/store/actions');
 const testAction = require('./vuex-action-helper');
 const context = require('gitter-web-client-context');
 const appEvents = require('../../../../public/js/utils/appevents');
+const apiClient = require('../../../../public/js/components/api-client');
 
 const { createSerializedRoomFixture } = require('../fixture-helpers');
 
@@ -17,6 +26,9 @@ describe('actions', () => {
   beforeEach(() => {
     state = createState();
     context.troupe.mockReset();
+    apiClient.user.get.mockReset();
+    apiClient.get.mockReset();
+    apiClient.user.patch.mockReset();
   });
 
   it('setInitialData', done => {
@@ -51,7 +63,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-        [],
+        [{ type: 'trackStat', payload: 'left-menu.minibar.activated.people' }],
         done
       );
     });
@@ -63,7 +75,10 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-        [{ type: 'fetchMessageSearchResults' }],
+        [
+          { type: 'trackStat', payload: 'left-menu.minibar.activated.search' },
+          { type: 'fetchMessageSearchResults' }
+        ],
         done
       );
     });
@@ -76,7 +91,7 @@ describe('actions', () => {
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU_PINNED_STATE, payload: payload }],
-      [],
+      [{ type: 'trackStat', payload: 'left-menu.pinned.false' }],
       done
     );
   });
@@ -88,9 +103,200 @@ describe('actions', () => {
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU, payload: payload }],
+      [{ type: 'trackStat', payload: `left-menu.toggle.${payload}` }],
+      done
+    );
+  });
+
+  it('updatefavouriteDraggingInProgress', done => {
+    const payload = true;
+    testAction(
+      actions.updatefavouriteDraggingInProgress,
+      payload,
+      state,
+      [{ type: types.UPDATE_FAVOURITE_DRAGGING_STATE, payload: payload }],
       [],
       done
     );
+  });
+
+  describe('_localUpdateRoomFavourite', () => {
+    it('updates lone room to favourite', done => {
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[room1.id] = room1;
+
+      const payload = { id: room1.id, favourite: 1 };
+      testAction(
+        actions._localUpdateRoomFavourite,
+        payload,
+        state,
+        [],
+        [{ type: 'updateRoom', payload }],
+        done
+      );
+    });
+
+    it('updates subsequent favourites', done => {
+      const favouriteRoom1 = {
+        ...createSerializedRoomFixture('community/favourite-room1'),
+        favourite: 1
+      };
+      const favouriteRoom2 = {
+        ...createSerializedRoomFixture('community/favourite-room2'),
+        favourite: 2
+      };
+      const favouriteRoom3 = {
+        ...createSerializedRoomFixture('community/favourite-room3'),
+        favourite: 3
+      };
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap = {
+        [favouriteRoom1.id]: favouriteRoom1,
+        [favouriteRoom2.id]: favouriteRoom2,
+        [favouriteRoom3.id]: favouriteRoom3,
+        [room1.id]: room1
+      };
+
+      const payload = { id: room1.id, favourite: 1 };
+      testAction(
+        actions._localUpdateRoomFavourite,
+        payload,
+        state,
+        [],
+        [
+          { type: 'updateRoom', payload },
+          { type: 'updateRoom', payload: { id: favouriteRoom1.id, favourite: 2 } },
+          { type: 'updateRoom', payload: { id: favouriteRoom2.id, favourite: 3 } },
+          { type: 'updateRoom', payload: { id: favouriteRoom3.id, favourite: 4 } }
+        ],
+        done
+      );
+    });
+  });
+
+  describe('updateRoomFavourite', () => {
+    it('updates lone room to favourite', done => {
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[room1.id] = room1;
+
+      const payload = { id: room1.id, favourite: 1 };
+
+      const updatedRoom1 = {
+        ...room1,
+        ...payload
+      };
+      apiClient.user.patch.mockImplementation(() => Promise.resolve(updatedRoom1));
+
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [
+          { type: types.REQUEST_ROOM_FAVOURITE, payload: room1.id },
+          { type: types.RECEIVE_ROOM_FAVOURITE_SUCCESS, payload: room1.id }
+        ],
+        [
+          { type: '_localUpdateRoomFavourite', payload },
+          { type: 'updateRoom', payload: updatedRoom1 }
+        ],
+        done
+      );
+    });
+
+    it('rollsback favourite on error', done => {
+      const room1 = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[room1.id] = room1;
+
+      apiClient.user.patch.mockImplementation(() => Promise.reject(true));
+
+      const payload = { id: room1.id, favourite: 1 };
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [
+          { type: types.REQUEST_ROOM_FAVOURITE, payload: room1.id },
+          { type: types.RECEIVE_ROOM_FAVOURITE_ERROR, payload: { id: room1.id, error: true } }
+        ],
+        [
+          { type: '_localUpdateRoomFavourite', payload },
+          { type: '_localUpdateRoomFavourite', payload: { id: room1.id, favourite: undefined } }
+        ],
+        done
+      );
+    });
+
+    it('rollsback favourite move up on error', done => {
+      const favouriteRoom1 = {
+        ...createSerializedRoomFixture('community/favourite-room1'),
+        favourite: 5
+      };
+
+      state.roomMap[favouriteRoom1.id] = favouriteRoom1;
+
+      apiClient.user.patch.mockImplementation(() => Promise.reject(true));
+
+      const payload = { id: favouriteRoom1.id, favourite: 1 };
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [
+          { type: types.REQUEST_ROOM_FAVOURITE, payload: favouriteRoom1.id },
+          {
+            type: types.RECEIVE_ROOM_FAVOURITE_ERROR,
+            payload: { id: favouriteRoom1.id, error: true }
+          }
+        ],
+        [
+          { type: '_localUpdateRoomFavourite', payload },
+          {
+            type: '_localUpdateRoomFavourite',
+            // We need to increment by 1 because the itemBeingMoved already moved and is taking up space
+            // so we want to get the new index that represents where the itemBeingMoved was before
+            payload: { id: favouriteRoom1.id, favourite: favouriteRoom1.favourite + 1 }
+          }
+        ],
+        done
+      );
+    });
+
+    it('rollsback favourite move down on error', done => {
+      const favouriteRoom1 = {
+        ...createSerializedRoomFixture('community/favourite-room1'),
+        favourite: 1
+      };
+
+      state.roomMap[favouriteRoom1.id] = favouriteRoom1;
+
+      apiClient.user.patch.mockImplementation(() => Promise.reject(true));
+
+      const payload = { id: favouriteRoom1.id, favourite: 5 };
+      testAction(
+        actions.updateRoomFavourite,
+        payload,
+        state,
+        [
+          { type: types.REQUEST_ROOM_FAVOURITE, payload: favouriteRoom1.id },
+          {
+            type: types.RECEIVE_ROOM_FAVOURITE_ERROR,
+            payload: { id: favouriteRoom1.id, error: true }
+          }
+        ],
+        [
+          { type: '_localUpdateRoomFavourite', payload },
+          {
+            type: '_localUpdateRoomFavourite',
+            payload: { id: favouriteRoom1.id, favourite: favouriteRoom1.favourite }
+          }
+        ],
+        done
+      );
+    });
   });
 
   it('updateSearchInputValue', done => {
@@ -119,8 +325,86 @@ describe('actions', () => {
       );
     });
 
-    it.skip('searches value success', () => {});
-    it.skip('searches value error', () => {});
+    it('searches value success', done => {
+      state.search.searchInputValue = 'special';
+
+      const repoRoomResult1 = _.omit(createSerializedRoomFixture('github-org/repo1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const roomResult1 = _.omit(createSerializedRoomFixture('community/not-joined1'), [
+        'lastAccessTime',
+        'roomMember'
+      ]);
+
+      const oneToOneResult1 = {
+        avatarUrl: 'https://avatars-04.gitter.im/gh/uv/4/JORGE-ASDF',
+        avatarUrlMedium: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=128',
+        avatarUrlSmall: 'https://avatars2.githubusercontent.com/u/51345323?v=4&s=60',
+        displayName: 'some-buddy1',
+        gv: '4',
+        id: '5cf6a2f5d72222ce4fc22a22',
+        url: '/some-buddy1',
+        username: 'some-buddy1',
+        v: 1
+      };
+
+      apiClient.user.get.mockImplementation(() => Promise.resolve({ results: [repoRoomResult1] }));
+      apiClient.get.mockImplementation(endpoint => {
+        if (endpoint === '/v1/rooms') {
+          return Promise.resolve({ results: [roomResult1] });
+        } else if (endpoint === '/v1/user') {
+          return Promise.resolve({ results: [oneToOneResult1] });
+        }
+      });
+
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [
+          { type: types.UPDATE_ROOM_SEARCH_CURRENT },
+          { type: types.REQUEST_ROOM_SEARCH_REPO },
+          { type: types.REQUEST_ROOM_SEARCH_ROOM },
+          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [repoRoomResult1] },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1] },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1] }
+        ],
+        [
+          { type: 'trackStat', payload: 'left-menu.search.input' },
+          { type: 'updateRoom', payload: repoRoomResult1 },
+          { type: 'updateRoom', payload: roomResult1 },
+          { type: 'updateRoom', payload: oneToOneResult1 }
+        ],
+        done
+      );
+    });
+
+    it('searches value error', done => {
+      state.search.searchInputValue = 'special';
+
+      apiClient.user.get.mockImplementation(() => Promise.reject(true));
+      apiClient.get.mockImplementation(() => Promise.reject(true));
+
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [
+          { type: types.UPDATE_ROOM_SEARCH_CURRENT },
+          { type: types.REQUEST_ROOM_SEARCH_REPO },
+          { type: types.REQUEST_ROOM_SEARCH_ROOM },
+          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_ERROR, payload: true },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, payload: true },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, payload: true }
+        ],
+        [{ type: 'trackStat', payload: 'left-menu.search.input' }],
+        done
+      );
+    });
   });
 
   describe('fetchMessageSearchResults', () => {
@@ -214,7 +498,7 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
       );
 
       await navigationEventFiredPromise;
@@ -233,7 +517,7 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
       );
 
       expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);
@@ -255,7 +539,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.CHANGE_HIGHLIGHTED_MESSAGE_ID, payload: payload }],
-        []
+        [{ type: 'trackStat', payload: 'left-menu.search.messageNavigate' }]
       );
 
       await vuehightLightedMessageIdEventFiredPromise;

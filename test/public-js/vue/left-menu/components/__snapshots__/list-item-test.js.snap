@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`list-item active room matches snapshot 1`] = `
+<li
+  class="list-item"
+>
+  <a
+    class="list-item-link is-active"
+    href="http://localhost:5000/my-community/room1"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        room1
+      </span>
+    </h2>
+     
+    <!---->
+     
+    <!---->
+  </a>
+</li>
+`;
+
 exports[`list-item community room matches snapshot 1`] = `
 <li
   class="list-item"
@@ -22,6 +52,70 @@ exports[`list-item community room matches snapshot 1`] = `
         my-community
       </span>
     </h2>
+     
+    <!---->
+     
+    <!---->
+  </a>
+</li>
+`;
+
+exports[`list-item favourite loading room matches snapshot 1`] = `
+<li
+  class="list-item is-favourited"
+  data-favourite="1"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/my-community/community"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        my-community
+      </span>
+    </h2>
+     
+    <loading-spinner-stub />
+     
+    <!---->
+  </a>
+</li>
+`;
+
+exports[`list-item favourite room matches snapshot 1`] = `
+<li
+  class="list-item is-favourited"
+  data-favourite="1"
+>
+  <a
+    class="list-item-link"
+    href="http://localhost:5000/my-community/community"
+  >
+    <img
+      class="list-item-avatar"
+      src="http://localhost:5000/api/private/avatars/group/i/5a8739841543b98772a686a8"
+    />
+     
+    <h2
+      class="list-item-name"
+    >
+      <span
+        class="name-piece"
+      >
+        my-community
+      </span>
+    </h2>
+     
+    <!---->
      
     <!---->
   </a>
@@ -52,6 +146,8 @@ exports[`list-item one to one room matches snapshot 1`] = `
     </h2>
      
     <!---->
+     
+    <!---->
   </a>
 </li>
 `;
@@ -80,6 +176,8 @@ exports[`list-item room with long name matches snapshot 1`] = `
     </h2>
      
     <!---->
+     
+    <!---->
   </a>
 </li>
 `;
@@ -106,6 +204,8 @@ exports[`list-item room with short name matches snapshot 1`] = `
         foo/bar
       </span>
     </h2>
+     
+    <!---->
      
     <!---->
   </a>

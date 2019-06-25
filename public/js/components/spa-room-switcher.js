@@ -42,11 +42,12 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       // Try find the room in the collection
       var newTroupe = this._troupes.findWhere({ url: targetInfo.roomUrl });
       if (newTroupe) {
-        this.trigger('switch', newTroupe);
-      } else {
-        window.location = targetInfo.roomUrl;
+        return this.trigger('switch', newTroupe);
       }
     }
+
+    // Else fallback to just redirecting
+    window.location = targetInfo.roomUrl;
   },
 
   _changeLegacy: function(iframeUrl) {

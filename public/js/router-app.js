@@ -116,12 +116,19 @@ onready(function() {
       var noHashSrc = chatIFrame.src.split('#')[0];
       chatIFrame.src = noHashSrc + window.location.hash;
     }
-
-    /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
-     * first page of gitter, we know what the original URL was (instead of null)
-     */
-    window.history.replaceState(chatIFrame.src, '', window.location.href);
   }
+
+  let state;
+  if (useVueLeftMenu) {
+    state = window.location.href;
+  } else {
+    state = chatIFrame.src;
+  }
+
+  /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
+   * first page of gitter, we know what the original URL was (instead of null)
+   */
+  window.history.replaceState(state, '', window.location.href);
 
   /* TODO: add the link handler here? */
   require('./components/link-handler').installLinkHandler();

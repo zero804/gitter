@@ -4,7 +4,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import * as leftMenuConstants from '../constants';
 import MenuBarBody from './menu-bar-body.vue';
 import SearchBody from './search-body.vue';
-import ListItem from './list-item.vue';
+import RoomList from './room-list.vue';
 import iconLogoText from '../../../../images/svg/gitter-logos/logo-white-lettering.svg';
 
 export default {
@@ -12,11 +12,18 @@ export default {
   components: {
     MenuBarBody,
     SearchBody,
-    ListItem
+    RoomList
   },
   iconLogoText,
   computed: {
-    ...mapState(['test', 'leftMenuState', 'leftMenuPinnedState', 'leftMenuExpandedState']),
+    ...mapState([
+      'test',
+      'isMobile',
+      'isLoggedIn',
+      'leftMenuState',
+      'leftMenuPinnedState',
+      'leftMenuExpandedState'
+    ]),
     ...mapGetters(['displayedRooms']),
     isPinned() {
       return this.leftMenuPinnedState === true;
@@ -48,7 +55,7 @@ export default {
   <div
     ref="root"
     class="root js-left-menu-root"
-    :class="{ unpinned: !isPinned, expanded: isExpanded }"
+    :class="{ mobile: isMobile, unpinned: !isPinned, expanded: isExpanded }"
     @mouseleave="onMouseleave"
   >
     <header class="header">
@@ -71,7 +78,7 @@ export default {
       </section>
     </header>
 
-    <section class="body">
+    <section v-if="isLoggedIn" class="body">
       <section class="layout-minibar">
         <menu-bar-body />
       </section>
@@ -85,11 +92,25 @@ export default {
           <h2 v-if="isAllState" class="room-list-title">All conversations</h2>
           <h2 v-if="isPeopleState" class="room-list-title">People</h2>
 
-          <ul class="room-list">
-            <list-item v-for="room in displayedRooms" :key="room.id" :item="room" />
-          </ul>
+          <room-list :rooms="displayedRooms" />
         </template>
       </section>
+    </section>
+    <section v-else class="nli-body">
+      <h2 class="nli-primary-heading">Where communities thrive</h2>
+
+      <br />
+
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
+        <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
+        <li class="nli-info-block-item">Free <strong>without limits</strong></li>
+        <li class="nli-info-block-item">Create <strong>your own community</strong></li>
+      </ul>
+
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
+      </ul>
     </section>
   </div>
 </template>
@@ -110,6 +131,10 @@ export default {
   *:before,
   *:after {
     box-sizing: inherit;
+  }
+
+  &.mobile {
+    display: none;
   }
 }
 
@@ -170,13 +195,24 @@ export default {
   display: block;
   width: 7rem;
 
-  /* Because there is some specific styles in the SVG itself for the legacy menu */
+  // Because there is some specific styles in the SVG itself for the legacy menu
   opacity: 0.5;
 }
 
 .body {
+  position: relative;
   flex: 1;
   display: flex;
+  // Fix overflow in Firefox
+  //
+  // > Whenever you've got an element with overflow: [hidden|scroll|auto] inside of a flex item,
+  // > you need to give its ancestor flex item min-width:0 (in a horizontal flex container) or
+  // > min-height:0 (in a vertical flex container), to disable this min-sizing behavior, or
+  // > else the flex item will refuse to shrink smaller than the child's min-content size.
+  //
+  // https://stackoverflow.com/a/28639686/796832
+  // <- https://stackoverflow.com/a/44948507/796832
+  min-height: 0;
 }
 
 .body-main-menu {
@@ -195,5 +231,43 @@ export default {
 .room-list {
   margin-left: 0;
   list-style: none;
+}
+
+.nli-body {
+  flex: 1;
+  width: 34rem;
+  padding: 20px;
+
+  background-color: @header-base-bg-color;
+
+  color: #ffffff;
+
+  & a {
+    color: #ffffff;
+  }
+}
+
+.nli-primary-heading {
+  font-family: 'source-sans-pro';
+  font-weight: 200;
+  font-size: 47px;
+  line-height: 43px;
+}
+
+.nli-info-block {
+  padding: 1vh 15px;
+  margin: 10px 0px;
+  list-style: none;
+
+  background-color: rgba(255, 255, 255, 0.1);
+
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.nli-info-block-item {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 </style>

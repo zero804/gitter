@@ -110,7 +110,9 @@ module.exports = Backbone.Model.extend({
       contextModel: this,
       roomCollection: this._roomCollection
     });
-    this.userSuggestions = new UserSuggestions(null, { contextModel: context.user() });
+    this.userSuggestions = context.isAuthed()
+      ? new UserSuggestions(null, { contextModel: context.user() })
+      : new Backbone.Collection();
     this._suggestedRoomCollection = new SuggestedRoomsByRoomCollection({
       roomMenuModel: this,
       troupeModel: this._troupeModel,
