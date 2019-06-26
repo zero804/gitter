@@ -14,7 +14,6 @@ const appEvents = require('../../utils/appevents');
 const apiClient = require('../../components/api-client');
 const dataset = require('../../utils/dataset-shim');
 const toggleClass = require('../../utils/toggle-class');
-const toggle = require('../../utils/toggle');
 const RAF = require('../../utils/raf');
 const isMobile = require('../../utils/is-mobile');
 const isAndroid = require('../../utils/is-android');
@@ -32,6 +31,8 @@ const chatItemTemplate = require('./tmpl/chatItemView.hbs');
 const statusItemTemplate = require('./tmpl/statusItemView.hbs');
 const actionsTemplate = require('./tmpl/actionsView.hbs');
 const ChatEditView = require('../chat/chat-edit-view');
+
+const threadedConversations = context.hasFeature('threaded-conversations');
 
 require('../behaviors/unread-items');
 require('../behaviors/widgets');
@@ -549,7 +550,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: '100px'
+        width: threadedConversations ? '115px' : '100px'
       });
 
       this.listenTo(actions, 'render', function() {
@@ -568,6 +569,10 @@ module.exports = (function() {
     },
 
     mentionUser: function() {
+      // TODO: Remove mentionUser tracking after [threaded-conversations] ships
+      appEvents.trigger('stats.event', 'chatItem.actions.mentionUser');
+      appEvents.trigger('track-event', 'chatItem.actions.mentionUser');
+
       var mention = '@' + this.model.get('fromUser').username + ' ';
       appEvents.trigger('input.append', mention);
     },
@@ -743,6 +748,9 @@ module.exports = (function() {
     },
 
     reply: function() {
+      appEvents.trigger('stats.event', 'chatItem.actions.reply');
+      appEvents.trigger('track-event', 'chatItem.actions.reply');
+
       var mention = '@' + this.model.get('fromUser').username + ' ';
       appEvents.trigger('input.append', mention);
     },
@@ -804,19 +812,27 @@ module.exports = (function() {
       const messageAuthor = this.model.get('fromUser');
       const isOwnMessage = messageAuthor && currentUser && messageAuthor.id === currentUser.id;
 
-      var data = {
-        actions: [{ name: 'reply', description: 'Reply', disabled: !isPersisted }]
-      };
+      const actions = [];
 
-      if (!deleted) {
-        data.actions.push({ name: 'quote', description: 'Quote', disabled: !isPersisted });
+      if (threadedConversations) {
+        actions.push({
+          name: 'threadReply',
+          description: 'Start a thread',
+          disabled: !isPersisted
+        });
+      } else {
+        actions.push({ name: 'reply', description: 'Reply', disabled: !isPersisted });
       }
 
-      data.actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
-      data.actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
-      data.actions.push({ name: 'report', description: 'Report', disabled: isOwnMessage });
+      if (!deleted) {
+        actions.push({ name: 'quote', description: 'Quote', disabled: !isPersisted });
+      }
 
-      return data;
+      actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
+      actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
+      actions.push({ name: 'report', description: 'Report', disabled: isOwnMessage });
+
+      return { actions };
     }
   });
 
