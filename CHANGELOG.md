@@ -1,4 +1,6 @@
-# 19.52.0 - *upcoming*
+# 19.52.0 - 2019-6-25
+
+ - Fix integration settings throwing 500 error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1451
 
 Developer facing:
 
