@@ -5,9 +5,33 @@ process.env.DISABLE_API_WEB_LISTEN = '1';
 process.env.TEST_EXPORT_RATE_LIMIT = 100;
 
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const request = require('supertest-as-promised')(Promise);
 
-const app = require('../../server/web');
+//const app = require('../../server/web');
+
+const mockedRequest = require('request');
+mockedRequest.get = async function(requestData, callback) {
+  callback(
+    null,
+    {
+      statusCode: 200
+    },
+    []
+  );
+};
+
+const app = proxyquireNoCallThru('../../server/web', {
+  request: mockedRequest
+});
+
+proxyquireNoCallThru('../../server/handlers/settings', {
+  request: {
+    get: async function(requestData, callback) {
+      callback(null, {}, []);
+    }
+  }
+});
 
 describe('Integration settings', () => {
   const fixture = fixtureLoader.setup({
