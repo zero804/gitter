@@ -98,7 +98,8 @@
   "test": {
     "exposeInBrowserTests": true,
     "exposeDataForTestingPurposes": true,
-    "wsPort": 5006
+    "wsPort": 5006,
+    "webhooksPort": 3001
   },
   "gitlaboauth": {
     "consumer_key": "",

@@ -7,6 +7,9 @@
     "basepath": "http://localhost:5000",
     "apiBasePath": "http://localhost:5000/api"
   },
+  "webhooks": {
+    "basepath": "http://localhost:3001"
+  },
   "mongo": {
     "onlyUsePrimary": true,
     "connection": {
@@ -46,7 +49,8 @@
   "test": {
     "exposeInBrowserTests": true,
     "exposeDataForTestingPurposes": true,
-    "wsPort": 5006
+    "wsPort": 5006,
+    "webhooksPort": 3001
   },
   "gitlaboauth": {
     "consumer_key": "",
