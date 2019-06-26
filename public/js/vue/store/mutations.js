@@ -59,8 +59,8 @@ export default {
     state.search.message = { loading: false, error: false, results: [] };
   },
   [types.UPDATE_ROOM_SEARCH_CURRENT](state) {
-    state.search.current.results = Object.values(state.roomMap).filter(room =>
-      roomFilter(state.search.searchInputValue, room)
+    state.search.current.results = Object.keys(state.roomMap).filter(roomId =>
+      roomFilter(state.search.searchInputValue, state.roomMap[roomId])
     );
   },
 

@@ -50,7 +50,6 @@ export const displayedRoomSearchResults = state => {
     ...state.search.people.results
   ];
 
-  const uniqueResults = _.uniq(allResults, false, 'url');
-
-  return uniqueResults.slice(0, 6);
+  const uniqueResults = _.uniq(allResults);
+  return uniqueResults.slice(0, 6).map(roomId => state.roomMap[roomId]);
 };
