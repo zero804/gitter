@@ -3,6 +3,7 @@
  - Update `halley@0.7.0` -> `gitter-realtime-client@2.1.0` so `websocket` transport is chosen over `long-polling`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1453
     - https://gitlab.com/gitlab-org/gitter/realtime-client/merge_requests/24
     - https://gitlab.com/gitlab-org/gitter/halley/merge_requests/10
+ - Add unread indicators to all/people menu bar items with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1447
 
 
 # 19.52.0 - 2019-6-25
