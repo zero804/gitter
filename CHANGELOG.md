@@ -4,6 +4,7 @@
     - https://gitlab.com/gitlab-org/gitter/realtime-client/merge_requests/24
     - https://gitlab.com/gitlab-org/gitter/halley/merge_requests/10
  - Add unread indicators to all/people menu bar items with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1447
+ - Add 'Start a thread' option to the chat context menu (threaded conversations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1448
 
 
 # 19.52.0 - 2019-6-25
