@@ -12,30 +12,30 @@ function renderSecondaryView(req, res, next, options) {
   roomMembershipService
     .countMembersInRoom(req.troupe._id)
     .then(function(userCount) {
+      const baseOptions = {
+        embedded: true,
+        uriContext: req.uriContext,
+        classNames: ['embedded'],
+        fetchEvents: false,
+        fetchUsers: false,
+        extras: {
+          usersOnline: userCount
+        }
+      };
+
       if (req.user) {
         return renderChat(req, res, next, {
-          uriContext: req.uriContext,
+          ...baseOptions,
           template: 'chat-embed-template',
-          script: 'router-embed-chat',
-          classNames: ['embedded'],
-          fetchEvents: false,
-          fetchUsers: false,
-          extras: {
-            usersOnline: userCount
-          }
+          script: 'router-embed-chat'
         });
       } else {
         return renderChat(req, res, next, {
-          uriContext: req.uriContext,
+          ...baseOptions,
           template: 'chat-nli-embed-template',
           script: 'router-nli-embed-chat',
-          unread: false, // Embedded users see chats as read
-          classNames: ['embedded'],
-          fetchEvents: false,
-          fetchUsers: false,
-          extras: {
-            usersOnline: userCount
-          }
+          // Embedded users see chats as read
+          unread: false
         });
       }
     })
