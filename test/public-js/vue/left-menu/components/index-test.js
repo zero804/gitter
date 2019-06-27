@@ -34,15 +34,6 @@ describe('left-menu index', () => {
     wrapper.destroy();
   });
 
-  describe('nli (not logged in)', () => {
-    it('matches snapshot', () => {
-      factory({}, store => {
-        store.state.isLoggedIn = false;
-      });
-      expect(wrapper.element).toMatchSnapshot();
-    });
-  });
-
   describe('all state', () => {
     it('matches snapshot', () => {
       factory({}, store => {
@@ -99,6 +90,32 @@ describe('left-menu index', () => {
         false,
         undefined
       );
+    });
+  });
+
+  describe('mobile', () => {
+    it('mobile matches snapshot', () => {
+      factory({}, store => {
+        store.state.isMobile = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
+
+  describe('nli (not logged in)', () => {
+    it('matches snapshot', () => {
+      factory({}, store => {
+        store.state.isLoggedIn = false;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('mobile matches snapshot', () => {
+      factory({}, store => {
+        store.state.isMobile = true;
+        store.state.isLoggedIn = false;
+      });
+      expect(wrapper.element).toMatchSnapshot();
     });
   });
 });
