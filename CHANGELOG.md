@@ -1,4 +1,4 @@
-# 19.53.0 - *upcoming*
+# 19.53.0 - 2019-6-27
 
  - Update `halley@0.7.0` -> `gitter-realtime-client@2.1.0` so `websocket` transport is chosen over `long-polling`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1453
     - https://gitlab.com/gitlab-org/gitter/realtime-client/merge_requests/24
