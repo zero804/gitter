@@ -7,6 +7,7 @@
  - Add 'Start a thread' option to the chat context menu (threaded conversations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1448
  - Remove Vue left-menu from `/~embed` view used in Sidecar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1457
  - Fix room search updating unread count with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1456
+ - Only hide Vue left-menu when mobile NLI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1458
 
 
 # 19.52.0 - 2019-6-25
