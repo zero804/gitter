@@ -55,7 +55,12 @@ export default {
   <div
     ref="root"
     class="root js-left-menu-root"
-    :class="{ mobile: isMobile, unpinned: !isPinned, expanded: isExpanded }"
+    :class="{
+      mobile: isMobile,
+      'logged-in': isLoggedIn,
+      unpinned: !isPinned,
+      expanded: isExpanded
+    }"
     @mouseleave="onMouseleave"
   >
     <header class="header">
@@ -133,7 +138,7 @@ export default {
     box-sizing: inherit;
   }
 
-  &.mobile {
+  &:not(.logged-in).mobile {
     display: none;
   }
 }
