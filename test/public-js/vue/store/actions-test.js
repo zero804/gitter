@@ -368,9 +368,9 @@ describe('actions', () => {
           { type: types.REQUEST_ROOM_SEARCH_REPO },
           { type: types.REQUEST_ROOM_SEARCH_ROOM },
           { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
-          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [repoRoomResult1] },
-          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1] },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1] }
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [repoRoomResult1.id] },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1.id] },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1.id] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
