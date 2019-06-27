@@ -123,9 +123,7 @@ function handleUploadToGroup(transloadit, metadata) {
 
       const hasFilteredResults =
         transloadit.results['files_filtered'] && transloadit.results['files_filtered'].length;
-      const hasOriginalResults =
-        transloadit.results[':original'] && transloadit.results[':original'].length;
-      if (!hasFilteredResults && !hasOriginalResults) {
+      if (!hasFilteredResults) {
         throw new StatusError(
           500,
           'Transloadit upload failed' + transloadit.message
@@ -134,16 +132,7 @@ function handleUploadToGroup(transloadit, metadata) {
         );
       }
 
-      // This is to support the old and new way we handle group avatar uploads
-      // TODO: After we ship this change to production, and update the transloadit `avatar_thumbnails_prod`,
-      // we can remove the `:original` path
-      // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2192#note_185884135
-      let upload;
-      if (hasFilteredResults) {
-        upload = transloadit.results['files_filtered'][0];
-      } else if (hasOriginalResults) {
-        upload = transloadit.results[':original'][0];
-      }
+      let upload = transloadit.results['files_filtered'][0];
 
       // TODO: should we delete the existing image if there is one?
 
