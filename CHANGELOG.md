@@ -6,6 +6,7 @@
  - Add unread indicators to all/people menu bar items with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1447
  - Add 'Start a thread' option to the chat context menu (threaded conversations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1448
  - Remove Vue left-menu from `/~embed` view used in Sidecar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1457
+ - Fix room search updating unread count with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1456
 
 
 # 19.52.0 - 2019-6-25
