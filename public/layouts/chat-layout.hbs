@@ -39,7 +39,9 @@
   </head>
   <body class="{{#if isMobile}}mobile{{/if}} iframe {{classNames}}">
     <div class="layout-app">
-      {{{leftMenuHtml}}}
+      {{#unless embedded}}
+        {{{leftMenuHtml}}}
+      {{/unless}}
 
       <div class="layout-app-body">
         {{{body}}}

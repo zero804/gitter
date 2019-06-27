@@ -125,6 +125,7 @@ async function renderChat(req, res, next, options) {
     req,
     _.extend(
       {
+        embedded: options.embedded || false,
         hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
