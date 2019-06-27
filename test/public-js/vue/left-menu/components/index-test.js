@@ -118,4 +118,13 @@ describe('left-menu index', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
   });
+
+  describe('dark-theme', () => {
+    it('matches snapshot', () => {
+      factory({}, store => {
+        store.state.darkTheme = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
 });

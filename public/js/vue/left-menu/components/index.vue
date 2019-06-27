@@ -20,6 +20,7 @@ export default {
       'test',
       'isMobile',
       'isLoggedIn',
+      'darkTheme',
       'leftMenuState',
       'leftMenuPinnedState',
       'leftMenuExpandedState'
@@ -58,6 +59,7 @@ export default {
     :class="{
       mobile: isMobile,
       'logged-in': isLoggedIn,
+      'dark-theme': darkTheme,
       unpinned: !isPinned,
       expanded: isExpanded
     }"
@@ -124,6 +126,7 @@ export default {
 @import (reference) 'trp3Vars';
 @import (reference) 'base-zindex-levels';
 @import (reference) 'components/menu/room/header-title';
+@import (reference) 'dark-theme';
 
 .root {
   box-sizing: border-box;
@@ -179,6 +182,10 @@ export default {
   height: 100%;
 
   background-color: @header-base-bg-color;
+
+  .dark-theme & {
+    background-color: @dark-theme-app-header-bg-color;
+  }
 }
 
 .header-main-menu {
@@ -187,6 +194,10 @@ export default {
   height: 100%;
 
   background-color: @header-base-bg-color;
+
+  .dark-theme & {
+    background-color: @dark-theme-app-header-bg-color;
+  }
 }
 
 .logo-gitter-sign {
@@ -227,6 +238,11 @@ export default {
 
   background-color: @main-application-bg-color;
   border-right: 1px solid @menu-border-color;
+
+  .dark-theme & {
+    background-color: @dark-theme-left-menu-bg-color;
+    border-right-color: @dark-theme-left-menu-minibar-border-color;
+  }
 }
 
 .room-list-title {

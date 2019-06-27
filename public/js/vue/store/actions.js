@@ -13,6 +13,9 @@ export const trackStat = (actionMeta, statName) => {
   appEvents.trigger('track-event', statName);
 };
 
+export const toggleDarkTheme = ({ commit }, toggleState) =>
+  commit(types.TOGGLE_DARK_THEME, toggleState);
+
 export const setLeftMenuState = ({ commit, dispatch }, newLeftMenuState) => {
   commit(types.SWITCH_LEFT_MENU_STATE, newLeftMenuState);
 

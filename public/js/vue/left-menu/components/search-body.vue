@@ -147,6 +147,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) 'components/menu/room/header-title';
+@import (reference) 'dark-theme';
 
 .search-body-root {
 }
@@ -163,6 +164,13 @@ export default {
 .search-input {
   box-sizing: initial;
   width: 100%;
+  height: 28px;
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
+    background-color: @dark-theme-left-menu-active-item-bg-color;
+    border-color: darken(@dark-theme-left-menu-text-color, 40%);
+  }
 }
 
 .search-result-empty-message {
@@ -170,6 +178,10 @@ export default {
   padding-right: @desktop-menu-left-padding;
 
   color: @menu-item-color;
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
+  }
 }
 
 .search-result-error-message {
@@ -177,6 +189,10 @@ export default {
   padding-right: @desktop-menu-left-padding;
 
   color: @menu-item-color;
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
+  }
 }
 
 .room-search-list {

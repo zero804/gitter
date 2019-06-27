@@ -1,5 +1,4 @@
-import Vue from 'vue';
-
+const appEvents = require('../../utils/appevents');
 import troupeCollections from '../../collections/instances/troupes';
 
 function setupDataBridge(store) {
@@ -12,6 +11,10 @@ function setupDataBridge(store) {
   troupeCollections.troupes.on('add change', newRoom => {
     //console.log('change troupes', newRoom);
     store.dispatch('updateRoom', newRoom.attributes);
+  });
+
+  appEvents.on('toggleDarkTheme', newState => {
+    store.dispatch('toggleDarkTheme', newState);
   });
 }
 
