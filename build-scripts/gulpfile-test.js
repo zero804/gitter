@@ -84,8 +84,8 @@ modulesWithTest.forEach(function(testDir) {
   };
 });
 
-testModules['api-tests'] = {
-  files: ['./test/api-tests/', './test/api-web-tests/'],
+testModules['request-tests'] = {
+  files: ['./test/request-api-tests/', './test/request-web-tests/'],
   options: {
     // These tests load the entire app, so mocha will sometimes timeout before it even runs the tests
     timeout: 30000
