@@ -1,3 +1,9 @@
+# 19.54.0 - *upcoming*
+
+Developer facing:
+
+ - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
+
 # 19.53.0 - 2019-6-27
 
  - Update `halley@0.7.0` -> `gitter-realtime-client@2.1.0` so `websocket` transport is chosen over `long-polling`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1453
