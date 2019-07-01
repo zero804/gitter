@@ -1,5 +1,7 @@
 # 19.54.0 - *upcoming*
 
+ - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
+
 Developer facing:
 
  - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
