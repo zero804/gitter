@@ -19,6 +19,10 @@ export default {
     state.test = testValue;
   },
 
+  [types.TOGGLE_DARK_THEME](state, newState) {
+    state.darkTheme = newState;
+  },
+
   [types.SWITCH_LEFT_MENU_STATE](state, newLeftMenuState) {
     state.leftMenuState = newLeftMenuState;
   },

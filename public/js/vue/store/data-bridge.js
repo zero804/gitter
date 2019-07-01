@@ -1,8 +1,11 @@
-import Vue from 'vue';
-
+const appEvents = require('../../utils/appevents');
 import troupeCollections from '../../collections/instances/troupes';
 
 function setupDataBridge(store) {
+  appEvents.on('dispatchVueAction', (actionName, ...args) => {
+    store.dispatch(actionName, ...args);
+  });
+
   /* * /
   troupeCollections.troupes.on('all', (...args) => {
     console.log('all troupes', args);

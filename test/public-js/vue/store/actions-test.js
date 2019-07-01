@@ -55,6 +55,20 @@ describe('actions', () => {
     );
   });
 
+  describe('toggleDarkTheme', () => {
+    it('sets the state', done => {
+      const payload = true;
+      testAction(
+        actions.toggleDarkTheme,
+        payload,
+        state,
+        [{ type: types.TOGGLE_DARK_THEME, payload: payload }],
+        [],
+        done
+      );
+    });
+  });
+
   describe('setLeftMenuState', () => {
     it('sets the state', done => {
       const payload = 'people';

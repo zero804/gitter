@@ -7,6 +7,7 @@ function state() {
     isMobile: false,
     // `true` just for the sake of easy tests
     isLoggedIn: true,
+    darkTheme: false,
 
     groupMap: {},
     roomMap: {},

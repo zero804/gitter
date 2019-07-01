@@ -72,6 +72,7 @@ export default {
 
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
+@import (reference) 'dark-theme';
 
 .menu-bar-root {
   overflow: auto;
@@ -82,6 +83,11 @@ export default {
 
   background-color: @main-application-bg-color;
   border-right: 1px solid @menu-border-color;
+
+  .dark-theme & {
+    background-color: @dark-theme-left-menu-bg-color;
+    border-right-color: @dark-theme-left-menu-minibar-border-color;
+  }
 }
 
 .menu-bar-top {

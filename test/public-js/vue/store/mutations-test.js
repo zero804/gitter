@@ -26,6 +26,12 @@ describe('mutations', () => {
     expect(state.test).toEqual(newValue);
   });
 
+  it('TOGGLE_DARK_THEME', () => {
+    const newValue = true;
+    mutations[types.TOGGLE_DARK_THEME](state, newValue);
+    expect(state.darkTheme).toEqual(newValue);
+  });
+
   it('SWITCH_LEFT_MENU_STATE', () => {
     const newValue = 'newTestValue';
     mutations[types.SWITCH_LEFT_MENU_STATE](state, newValue);
