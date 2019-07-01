@@ -33,7 +33,7 @@ var TagCollection = Backbone.Collection.extend({
     var val = model.get('value');
 
     //if there is a duplicate fire error
-    if (!!this.where({ value: val }).length) {
+    if (this.where({ value: val }).length) {
       this.trigger('tag:error:duplicate', val);
     } else {
       this.add(model);
