@@ -6,7 +6,7 @@ const appEvents = require('./appevents');
 var scriptID = 'gitter-dark';
 
 module.exports = function toggleDarkTheme(shouldAdd) {
-  appEvents.trigger('toggleDarkTheme', shouldAdd);
+  appEvents.trigger('dispatchVueAction', 'toggleDarkTheme', shouldAdd);
 
   if (shouldAdd) {
     //Build a new link element
