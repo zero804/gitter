@@ -91,7 +91,7 @@ describe('left-menu index', () => {
 
   describe('dark-theme', () => {
     it('matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.darkTheme = true;
       });
       expect(wrapper.element).toMatchSnapshot();
