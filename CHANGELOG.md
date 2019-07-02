@@ -6,6 +6,7 @@ Developer facing:
 
  - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
  - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
+ - Update security release process, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1450
 
 
 # 19.53.0 - 2019-6-27
