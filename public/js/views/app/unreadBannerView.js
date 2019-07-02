@@ -40,12 +40,12 @@ var TopBannerView = Marionette.ItemView.extend({
   },
 
   applyStyles: function() {
-    if (!!this.getMentionsCount()) {
+    if (this.getMentionsCount()) {
       this.ui.buttons.removeClass('unread');
       this.ui.buttons.addClass('mention');
       return;
     }
-    if (!!this.getUnreadCount()) {
+    if (this.getUnreadCount()) {
       this.ui.buttons.addClass('unread');
       return;
     }

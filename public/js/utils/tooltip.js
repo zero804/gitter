@@ -85,7 +85,7 @@ module.exports = (function() {
       getOptions: function(options) {
         options = $.extend({}, $.fn[this.type].defaults, this.$element.data(), options);
 
-        if (options.delay && typeof options.delay == 'number') {
+        if (options.delay && typeof options.delay === 'number') {
           options.delay = {
             show: options.delay,
             hide: options.delay
@@ -174,7 +174,7 @@ module.exports = (function() {
           }
 
           placement =
-            typeof this.options.placement == 'function'
+            typeof this.options.placement === 'function'
               ? this.options.placement.call(this, $tip[0], this.$element[0])
               : this.options.placement;
 
@@ -325,7 +325,7 @@ module.exports = (function() {
         var el = this.$element[0];
         return $.extend(
           {},
-          typeof el.getBoundingClientRect == 'function'
+          typeof el.getBoundingClientRect === 'function'
             ? el.getBoundingClientRect()
             : {
                 width: el.offsetWidth,
@@ -340,7 +340,7 @@ module.exports = (function() {
           $e = this.$element,
           o = this.options;
 
-        title = typeof o.title == 'function' ? o.title.call($e[0]) : o.title;
+        title = typeof o.title === 'function' ? o.title.call($e[0]) : o.title;
 
         return title;
       },
@@ -402,9 +402,9 @@ module.exports = (function() {
       return this.each(function() {
         var $this = $(this),
           data = $this.data('tooltip'),
-          options = typeof option == 'object' && option;
+          options = typeof option === 'object' && option;
         if (!data) $this.data('tooltip', (data = new Tooltip(this, options)));
-        if (typeof option == 'string') data[option]();
+        if (typeof option === 'string') data[option]();
       });
     };
 

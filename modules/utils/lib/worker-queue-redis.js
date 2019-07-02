@@ -104,7 +104,7 @@ var Queue = function(name, options, loaderFn) {
 };
 
 Queue.prototype.invoke = function(data, options, callback) {
-  if (arguments.length == 2 && typeof options == 'function') {
+  if (arguments.length == 2 && typeof options === 'function') {
     callback = options;
     options = {};
   }
