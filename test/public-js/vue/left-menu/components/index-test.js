@@ -1,42 +1,12 @@
 'use strict';
 
-const { createLocalVue, shallowMount } = require('@vue/test-utils');
-const Vuex = require('vuex');
-
-const createStore = require('../../../../../public/js/vue/store').default;
-const actions = require('../../../../../public/js/vue/store/actions');
-const Index = require('../../../../../public/js/vue/left-menu/components/index.vue');
-
-let wrapper;
-let stubbedActions = {};
-function factory(propsData = {}, extendStore = () => {}) {
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
-
-  Object.keys(actions).forEach(actionKey => {
-    stubbedActions[actionKey] = jest.fn();
-  });
-
-  const store = createStore({
-    actions: stubbedActions
-  });
-  extendStore(store);
-
-  wrapper = shallowMount(Index.default, {
-    localVue,
-    store,
-    propsData
-  });
-}
+const mount = require('../../vuex-mount');
+const { default: Index } = require('../../../../../public/js/vue/left-menu/components/index.vue');
 
 describe('left-menu index', () => {
-  afterEach(() => {
-    wrapper.destroy();
-  });
-
   describe('all state', () => {
     it('matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.leftMenuState = 'all';
       });
       expect(wrapper.element).toMatchSnapshot();
@@ -45,7 +15,7 @@ describe('left-menu index', () => {
 
   describe('people state', () => {
     it('matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.leftMenuState = 'people';
       });
       expect(wrapper.element).toMatchSnapshot();
@@ -54,7 +24,7 @@ describe('left-menu index', () => {
 
   describe('search state', () => {
     it('matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.leftMenuState = 'search';
       });
       expect(wrapper.element).toMatchSnapshot();
@@ -63,7 +33,7 @@ describe('left-menu index', () => {
 
   describe('pinning and expanding', () => {
     it('not pinned and collapse', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.leftMenuPinnedState = false;
         store.state.leftMenuExpandedState = false;
       });
@@ -71,7 +41,7 @@ describe('left-menu index', () => {
     });
 
     it('not pinned and expanded', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.leftMenuPinnedState = false;
         store.state.leftMenuExpandedState = true;
       });
@@ -79,7 +49,7 @@ describe('left-menu index', () => {
     });
 
     it('calls store action "toggleLeftMenu" after mouse leaves', () => {
-      factory({}, store => {
+      const { wrapper, stubbedActions } = mount(Index, {}, store => {
         store.state.leftMenuPinnedState = false;
         store.state.leftMenuExpandedState = true;
       });
@@ -95,7 +65,7 @@ describe('left-menu index', () => {
 
   describe('mobile', () => {
     it('mobile matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.isMobile = true;
       });
       expect(wrapper.element).toMatchSnapshot();
@@ -104,14 +74,14 @@ describe('left-menu index', () => {
 
   describe('nli (not logged in)', () => {
     it('matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.isLoggedIn = false;
       });
       expect(wrapper.element).toMatchSnapshot();
     });
 
     it('mobile matches snapshot', () => {
-      factory({}, store => {
+      const { wrapper } = mount(Index, {}, store => {
         store.state.isMobile = true;
         store.state.isLoggedIn = false;
       });
