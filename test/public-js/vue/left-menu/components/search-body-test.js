@@ -12,10 +12,13 @@ const {
   createSerializedMessageSearchResultFixture
 } = require('../../fixture-helpers');
 
-const ROOM_SEARCH_RESULT_FIXTURE = [
-  createSerializedRoomFixture('community/room1'),
-  createSerializedRoomFixture('community/room2')
-];
+const ROOM_SEARCH_RESULT_ROOM1 = createSerializedRoomFixture('community/room1');
+const ROOM_SEARCH_RESULT_ROOM2 = createSerializedRoomFixture('community/room2');
+const ROOM_SEARCH_ROOM_MAP_FIXTURE = {
+  [ROOM_SEARCH_RESULT_ROOM1.id]: ROOM_SEARCH_RESULT_ROOM1,
+  [ROOM_SEARCH_RESULT_ROOM2.id]: ROOM_SEARCH_RESULT_ROOM2
+};
+const ROOM_SEARCH_RESULT_FIXTURE = [ROOM_SEARCH_RESULT_ROOM1.id, ROOM_SEARCH_RESULT_ROOM2.id];
 
 const MESSAGE_SEARCH_RESULT_FIXTURE = [
   createSerializedMessageSearchResultFixture(),
@@ -70,6 +73,7 @@ describe('search-body', () => {
 
   it('room search repo results matches snapshot', () => {
     factory({}, store => {
+      store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
       store.state.search.repo.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -91,6 +95,7 @@ describe('search-body', () => {
 
   it('room search room results matches snapshot', () => {
     factory({}, store => {
+      store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
       store.state.search.room.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -112,6 +117,7 @@ describe('search-body', () => {
 
   it('room search people results matches snapshot', () => {
     factory({}, store => {
+      store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
       store.state.search.people.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -119,9 +125,19 @@ describe('search-body', () => {
 
   it('room search combined results matches snapshot', () => {
     factory({}, store => {
-      store.state.search.repo.results = [createSerializedRoomFixture('community/repo1')];
-      store.state.search.room.results = [createSerializedRoomFixture('community/room1')];
-      store.state.search.people.results = [createSerializedRoomFixture('person1')];
+      const repo1 = createSerializedRoomFixture('community/repo1');
+      const room1 = createSerializedRoomFixture('community/room1');
+      const person1 = createSerializedRoomFixture('person1');
+
+      store.state.roomMap = {
+        [repo1.id]: repo1,
+        [room1.id]: room1,
+        [person1.id]: person1
+      };
+
+      store.state.search.repo.results = [repo1.id];
+      store.state.search.room.results = [room1.id];
+      store.state.search.people.results = [person1.id];
     });
     expect(wrapper.element).toMatchSnapshot();
   });
@@ -129,9 +145,14 @@ describe('search-body', () => {
   it('deduplicates room search combined results matches snapshot', () => {
     factory({}, store => {
       const room1 = createSerializedRoomFixture('community/repo1');
-      store.state.search.current.results = [room1];
-      store.state.search.repo.results = [room1];
-      store.state.search.room.results = [room1];
+
+      store.state.roomMap = {
+        [room1.id]: room1
+      };
+
+      store.state.search.current.results = [room1.id];
+      store.state.search.repo.results = [room1.id];
+      store.state.search.room.results = [room1.id];
     });
     expect(wrapper.element).toMatchSnapshot();
   });

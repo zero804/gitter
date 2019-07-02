@@ -1,3 +1,22 @@
+# 19.53.0 - 2019-6-27
+
+ - Update `halley@0.7.0` -> `gitter-realtime-client@2.1.0` so `websocket` transport is chosen over `long-polling`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1453
+    - https://gitlab.com/gitlab-org/gitter/realtime-client/merge_requests/24
+    - https://gitlab.com/gitlab-org/gitter/halley/merge_requests/10
+ - Add unread indicators to all/people menu bar items with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1447
+ - Add 'Start a thread' option to the chat context menu (threaded conversations), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1448
+ - Remove Vue left-menu from `/~embed` view used in Sidecar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1457
+ - Fix room search updating unread count with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1456
+ - Only hide Vue left-menu when mobile NLI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1458
+
+
+# 19.52.1 - 2019-6-27
+
+ - Fix arbitrary file upload via community avatar upload, https://gitlab.com/gitlab-org/gitter/webapp/issues/2192
+    - Thanks to `u3mur4` for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/10
+
+
 # 19.52.0 - 2019-6-25
 
  - Fix integration settings throwing 500 error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1451

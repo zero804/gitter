@@ -30,6 +30,18 @@ export const displayedRooms = state => {
   return resultantRooms;
 };
 
+export const hasAnyUnreads = state => {
+  return Object.values(state.roomMap).some(room => room.unreadItems > 0);
+};
+export const hasAnyMentions = state => {
+  return Object.values(state.roomMap).some(room => room.mentions > 0);
+};
+export const hasPeopleUnreads = state => {
+  return Object.values(state.roomMap).some(
+    room => room.oneToOne && (room.unreadItems > 0 || room.mentions > 0)
+  );
+};
+
 export const displayedRoomSearchResults = state => {
   const allResults = [
     ...state.search.current.results,
@@ -38,7 +50,6 @@ export const displayedRoomSearchResults = state => {
     ...state.search.people.results
   ];
 
-  const uniqueResults = _.uniq(allResults, false, 'url');
-
-  return uniqueResults.slice(0, 6);
+  const uniqueResults = _.uniq(allResults);
+  return uniqueResults.slice(0, 6).map(roomId => state.roomMap[roomId]);
 };

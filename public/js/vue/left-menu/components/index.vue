@@ -55,7 +55,12 @@ export default {
   <div
     ref="root"
     class="root js-left-menu-root"
-    :class="{ mobile: isMobile, unpinned: !isPinned, expanded: isExpanded }"
+    :class="{
+      mobile: isMobile,
+      'logged-in': isLoggedIn,
+      unpinned: !isPinned,
+      expanded: isExpanded
+    }"
     @mouseleave="onMouseleave"
   >
     <header class="header">
@@ -127,13 +132,13 @@ export default {
   flex-direction: column;
   height: 100%;
 
-  *,
-  *:before,
-  *:after {
+  &::v-deep *,
+  &::v-deep *:before,
+  &::v-deep *:after {
     box-sizing: inherit;
   }
 
-  &.mobile {
+  &:not(.logged-in).mobile {
     display: none;
   }
 }

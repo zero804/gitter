@@ -219,11 +219,11 @@ describe('mutations', () => {
     });
 
     it('SEARCH_CLEARED', () => {
-      state.search.current = { results: [{ id: 1 }] };
-      state.search.repo = { loading: true, error: true, results: [{ id: 1 }] };
-      state.search.room = { loading: true, error: true, results: [{ id: 1 }] };
-      state.search.people = { loading: true, error: true, results: [{ id: 1 }] };
-      state.search.message = { loading: true, error: true, results: [{ id: 1 }] };
+      state.search.current = { results: [123] };
+      state.search.repo = { loading: true, error: true, results: [123] };
+      state.search.room = { loading: true, error: true, results: [123] };
+      state.search.people = { loading: true, error: true, results: [123] };
+      state.search.message = { loading: true, error: true, results: [123] };
 
       mutations[types.SEARCH_CLEARED](state);
       expect(state.search.current.results).toEqual([]);
@@ -257,7 +257,7 @@ describe('mutations', () => {
           };
 
           mutations[types.UPDATE_ROOM_SEARCH_CURRENT](state);
-          expect(state.search.current.results).toEqual([room1]);
+          expect(state.search.current.results).toEqual([room1.id]);
         });
 
         it('searching for some other room not in your list, finds nothing', () => {
