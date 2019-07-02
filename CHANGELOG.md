@@ -8,6 +8,7 @@ Developer facing:
  - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
  - Update security release process, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1450
  - Using eslint autofix on our codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1465
+ - Extract common mounting code from tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1464
 
 
 # 19.53.0 - 2019-6-27
