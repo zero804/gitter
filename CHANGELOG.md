@@ -1,3 +1,12 @@
+# 19.55.0 - *upcoming*
+
+ - .
+
+Developer facing:
+
+ - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
+
+
 # 19.54.0 - 2019-7-2
 
  - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
