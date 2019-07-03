@@ -146,7 +146,7 @@ describe('actions', () => {
         payload,
         state,
         [],
-        [{ type: 'updateRoom', payload }],
+        [{ type: 'upsertRoom', payload }],
         done
       );
     });
@@ -180,10 +180,10 @@ describe('actions', () => {
         state,
         [],
         [
-          { type: 'updateRoom', payload },
-          { type: 'updateRoom', payload: { id: favouriteRoom1.id, favourite: 2 } },
-          { type: 'updateRoom', payload: { id: favouriteRoom2.id, favourite: 3 } },
-          { type: 'updateRoom', payload: { id: favouriteRoom3.id, favourite: 4 } }
+          { type: 'upsertRoom', payload },
+          { type: 'upsertRoom', payload: { id: favouriteRoom1.id, favourite: 2 } },
+          { type: 'upsertRoom', payload: { id: favouriteRoom2.id, favourite: 3 } },
+          { type: 'upsertRoom', payload: { id: favouriteRoom3.id, favourite: 4 } }
         ],
         done
       );
@@ -214,7 +214,7 @@ describe('actions', () => {
         ],
         [
           { type: '_localUpdateRoomFavourite', payload },
-          { type: 'updateRoom', payload: updatedRoom1 }
+          { type: 'upsertRoom', payload: updatedRoom1 }
         ],
         done
       );
@@ -388,9 +388,9 @@ describe('actions', () => {
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
-          { type: 'updateRoom', payload: repoRoomResult1 },
-          { type: 'updateRoom', payload: roomResult1 },
-          { type: 'updateRoom', payload: oneToOneResult1 }
+          { type: 'upsertRoom', payload: repoRoomResult1 },
+          { type: 'upsertRoom', payload: roomResult1 },
+          { type: 'upsertRoom', payload: oneToOneResult1 }
         ],
         done
       );
@@ -560,10 +560,10 @@ describe('actions', () => {
     });
   });
 
-  it('updateRoom', done => {
+  it('upsertRoom', done => {
     const payload = { id: '5cf8efbc4dfb4240048b768e', unreads: 5 };
     testAction(
-      actions.updateRoom,
+      actions.upsertRoom,
       payload,
       state,
       [{ type: types.UPDATE_ROOM, payload: payload }],

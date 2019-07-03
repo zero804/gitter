@@ -43,7 +43,7 @@ export const updatefavouriteDraggingInProgress = ({ commit }, toggleState) =>
 // Only meant to be used internally by other actions
 // This does all the favouriting but doesn't persist anything
 export const _localUpdateRoomFavourite = ({ state, dispatch }, { id, favourite }) => {
-  dispatch('updateRoom', {
+  dispatch('upsertRoom', {
     id,
     favourite
   });
@@ -58,7 +58,7 @@ export const _localUpdateRoomFavourite = ({ state, dispatch }, { id, favourite }
   // This shares the same logic on the backend for calculating the new favourite indexes
   const updates = calculateFavouriteUpdates(id, favourite, roomIdFavouritePositionPairs);
   updates.forEach(([id, favourite]) => {
-    dispatch('updateRoom', {
+    dispatch('upsertRoom', {
       id,
       favourite
     });
@@ -81,7 +81,7 @@ export const updateRoomFavourite = ({ state, commit, dispatch }, { id, favourite
     })
     .then(result => {
       commit(types.RECEIVE_ROOM_FAVOURITE_SUCCESS, result.id);
-      dispatch('updateRoom', result);
+      dispatch('upsertRoom', result);
     })
     .catch(err => {
       commit(types.RECEIVE_ROOM_FAVOURITE_ERROR, { id, error: err });
@@ -135,7 +135,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
       .then(result => {
         const rooms = (result && result.results) || [];
         rooms.forEach(room => {
-          dispatch('updateRoom', room);
+          dispatch('upsertRoom', room);
         });
         commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, rooms.map(room => room.id));
       })
@@ -153,7 +153,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
       .then(result => {
         const rooms = (result && result.results) || [];
         rooms.forEach(room => {
-          dispatch('updateRoom', room);
+          dispatch('upsertRoom', room);
         });
         commit(types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, rooms.map(room => room.id));
       })
@@ -171,7 +171,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
       .then(result => {
         const rooms = (result && result.results) || [];
         rooms.forEach(room => {
-          dispatch('updateRoom', room);
+          dispatch('upsertRoom', room);
         });
         commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, rooms.map(room => room.id));
       })
@@ -231,4 +231,4 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
   dispatch('trackStat', 'left-menu.search.messageNavigate');
 };
 
-export const updateRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
+export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
