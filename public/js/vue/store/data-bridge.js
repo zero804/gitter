@@ -14,7 +14,7 @@ function setupDataBridge(store) {
 
   troupeCollections.troupes.on('add change', newRoom => {
     //console.log('change troupes', newRoom);
-    store.dispatch('updateRoom', newRoom.attributes);
+    store.dispatch('upsertRoom', newRoom.attributes);
   });
 }
 
