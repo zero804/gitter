@@ -32,7 +32,7 @@ const statusItemTemplate = require('./tmpl/statusItemView.hbs');
 const actionsTemplate = require('./tmpl/actionsView.hbs');
 const ChatEditView = require('../chat/chat-edit-view');
 
-const threadedConversations = context.hasFeature('threaded-conversations');
+const useThreadedConversations = context.hasFeature('threaded-conversations');
 
 require('../behaviors/unread-items');
 require('../behaviors/widgets');
@@ -550,7 +550,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: threadedConversations ? '115px' : '100px'
+        width: useThreadedConversations ? '115px' : '100px'
       });
 
       this.listenTo(actions, 'render', function() {
@@ -735,7 +735,9 @@ module.exports = (function() {
     },
     events: {
       'click .js-chat-action-edit': 'edit',
+      // TODO: Remove reply event after [threaded-conversations] ships
       'click .js-chat-action-reply': 'reply',
+      'click .js-chat-action-threadReply': 'threadReply',
       'click .js-chat-action-quote': 'quote',
       'click .js-chat-action-delete': 'delete',
       'click .js-chat-action-report': 'report',
@@ -747,12 +749,17 @@ module.exports = (function() {
       this.chatItemView.triggerMethod('toggleEdit');
     },
 
+    // TODO: Remove reply event handler after [threaded-conversations] ships
     reply: function() {
       appEvents.trigger('stats.event', 'chatItem.actions.reply');
       appEvents.trigger('track-event', 'chatItem.actions.reply');
 
       var mention = '@' + this.model.get('fromUser').username + ' ';
       appEvents.trigger('input.append', mention);
+    },
+
+    threadReply: function() {
+      appEvents.trigger('dispatchVueAction', 'threadMessageFeed/toggle', true);
     },
 
     quote: function() {
@@ -814,7 +821,7 @@ module.exports = (function() {
 
       const actions = [];
 
-      if (threadedConversations) {
+      if (useThreadedConversations) {
         actions.push({
           name: 'threadReply',
           description: 'Start a thread',

@@ -11,6 +11,7 @@ var ActivityCompositeView = require('./activityCompositeView');
 var RepoInfoModel = require('../../collections/repo-info');
 var cocktail = require('backbone.cocktail');
 var closeViewMixin = require('../menu/room/minibar/close-view/close-view-mixin');
+const appEvents = require('../../utils/appevents');
 
 require('../behaviors/isomorphic');
 
@@ -63,6 +64,8 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     this.iconOpts = _.extend({}, this.defaults, attrs.icon || {});
     this.iconHover = false;
     this.listenTo(context.troupe(), 'change:id', this.onRoomChange, this);
+    appEvents.on('vue:right-toolbar:toggle', isVisible => this.toggleToolbar(isVisible));
+    toggleClass(this.el, 'collapsed', !this.model.get('isPinned'));
   },
 
   initRepo_infoRegion: function(optionsForRegion) {
@@ -129,6 +132,10 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
 
   toggleMenu: function() {
     this.model.set('isPinned', !this.model.get('isPinned'));
+  },
+
+  toggleToolbar: function(newVisibleState) {
+    toggleClass(this.el, 'hidden', !newVisibleState);
   },
 
   getPinnedState: function() {

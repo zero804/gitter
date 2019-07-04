@@ -68,6 +68,8 @@
 @dark-theme-app-header-bg-color: #2d2c2c;
 @dark-theme-app-header-text-color: #bbb7b7;
 @dark-theme-app-header-icon-color: #aaaaaa;
+@dark-theme-app-layout-panel-bg-color: #383736;
+@dark-theme-app-layout-border-color: #2d2c2c;
 
 @app-single-line-code-color: #23241f;
 
@@ -77,8 +79,8 @@
 
 // LEFT MENU
 // --------------------------------------------
-@dark-theme-left-menu-bg-color: #383736;
-@dark-theme-left-menu-minibar-border-color: #2d2c2c;
+@dark-theme-left-menu-bg-color: @dark-theme-app-layout-panel-bg-color;
+@dark-theme-left-menu-minibar-border-color: @dark-theme-app-layout-border-color;
 @dark-theme-left-menu-minibar-icon-color: #aeaeae;
 @dark-theme-left-menu-text-color: #bbb;
 @dark-theme-left-menu-active-item-bg-color: #2d2c2c;
@@ -92,10 +94,10 @@
 @chat-main-text-color: #ccc;
 @chat-details-text-color: @dark-theme-app-header-icon-color;
 @chat-mention-color: lighten(@jaffa, @hover-highlight-percentage);
-@chat-connectivity-indicator-bg: @dark-theme-left-menu-bg-color;
+@chat-connectivity-indicator-bg: @dark-theme-app-layout-panel-bg-color;
 
-@chat-right-toolbar-bg-color: @dark-theme-left-menu-bg-color;
-@chat-right-toolbar-left-border-color: @dark-theme-left-menu-minibar-border-color;
+@chat-right-toolbar-bg-color: @dark-theme-app-layout-panel-bg-color;
+@chat-right-toolbar-left-border-color: @dark-theme-app-layout-border-color;
 @chat-right-toolbar-text-color: @chat-main-text-color;
 @chat-right-toolbar-activity-hover-color: white;
 @chat-right-toolbar-issue-open-color: @caribbean;
@@ -103,12 +105,15 @@
 @chat-right-toolbar-commit-color: #d0abff;
 @chat-right-toolbar-issue-background: #222;
 
+@dark-theme-thread-message-feed-bg-color: @dark-theme-app-layout-panel-bg-color;
+@dark-theme-thread-message-feed-left-border-color: @dark-theme-app-layout-border-color;
+
 @chat-loading-frame-bg-color: rgba(0, 0, 0, 0.5);
 
 // ORG DIRECTORY
 // --------------------------------------------
 @org-page-main-bg-color: @dark-theme-app-main-bg-color;
-@org-page-list-item-border-color: @dark-theme-left-menu-minibar-border-color;
+@org-page-list-item-border-color: @dark-theme-app-layout-border-color;
 @org-page-list-item-heading-color: #dedddc;
 @org-page-list-item-description-color: @dark-theme-left-menu-text-color;
 @org-page-list-item-details-color: @org-page-list-item-description-color;

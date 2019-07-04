@@ -1,6 +1,6 @@
 # 19.55.0 - *upcoming*
 
- - .
+ - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
 
 Developer facing:
 

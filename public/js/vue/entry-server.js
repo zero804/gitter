@@ -1,7 +1,8 @@
 import createStore from './store';
 
 const AVAILABLE_SSR_MODULES = {
-  'left-menu': require('./left-menu').default
+  'left-menu': require('./left-menu').default,
+  'thread-message-feed': require('./thread-message-feed').default
 };
 
 export default context => {

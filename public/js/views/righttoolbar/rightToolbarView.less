@@ -1,34 +1,31 @@
 @import (reference) 'trp3Vars';
+@import (reference) 'trp3';
 @import '../../../less/colors';
 
 // Base
 @import '../../../less/base-avatar.less';
+
+@import '../../../less/components/right-toolbar.less';
 
 // Required views
 @import '../people/peopleCollectionView';
 @import 'activity.less';
 
 .right-toolbar-region {
+  .right-toolbar-position();
   box-sizing: border-box;
-  position: relative;
-  top: 0;
-  bottom: 0;
-  right: 0;
-
-  order: 2;
   flex-shrink: 0;
-  display: flex;
-
-  color: #333;
+  color: @trpDarkGrey;
   text-align: left;
 
   & > .right-toolbar {
+    box-sizing: inherit;
     position: relative;
-    color: #333;
+    color: @trpDarkGrey;
     display: inline-block;
     flex-shrink: 0;
     order: 2;
-    width: 300px;
+    width: @right-toolbar-full-width;
     text-align: left;
     vertical-align: top;
     right: 0;
@@ -45,6 +42,11 @@
 
     &.collapsed {
       .collapsed-breakpoint();
+    }
+
+    // Used to hide the toolbar when the thread message feed is open
+    &.hidden {
+      display: none;
     }
 
     .trpToolbarHeader {
