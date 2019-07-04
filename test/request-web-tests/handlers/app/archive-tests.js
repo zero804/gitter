@@ -8,7 +8,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var request = require('supertest-as-promised');
 
-var app = require('../../server/web');
+var app = require('../../../../server/web');
 
 describe('handlers/app/archive', () => {
   var fixture = fixtureLoader.setup({

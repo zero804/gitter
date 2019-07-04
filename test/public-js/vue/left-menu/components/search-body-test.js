@@ -1,11 +1,9 @@
 'use strict';
 
-const { createLocalVue, shallowMount } = require('@vue/test-utils');
-const Vuex = require('vuex');
-
-const createStore = require('../../../../../public/js/vue/store').default;
-const actions = require('../../../../../public/js/vue/store/actions');
-const SearchBody = require('../../../../../public/js/vue/left-menu/components/search-body.vue');
+const mount = require('../../vuex-mount');
+const {
+  default: SearchBody
+} = require('../../../../../public/js/vue/left-menu/components/search-body.vue');
 
 const {
   createSerializedRoomFixture,
@@ -25,54 +23,28 @@ const MESSAGE_SEARCH_RESULT_FIXTURE = [
   createSerializedMessageSearchResultFixture()
 ];
 
-let wrapper;
-let stubbedActions = {};
-function factory(propsData = {}, extendStore = () => {}) {
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
-
-  Object.keys(actions).forEach(actionKey => {
-    stubbedActions[actionKey] = jest.fn();
-  });
-
-  const store = createStore({
-    actions: stubbedActions
-  });
-  extendStore(store);
-
-  wrapper = shallowMount(SearchBody.default, {
-    localVue,
-    store,
-    propsData
-  });
-}
-
 describe('search-body', () => {
-  afterEach(() => {
-    wrapper.destroy();
-  });
-
   it('matches snapshot', () => {
-    factory({});
+    const { wrapper } = mount(SearchBody);
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search repo loading matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.repo.loading = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search repo error matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.repo.error = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search repo results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
       store.state.search.repo.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
@@ -80,51 +52,53 @@ describe('search-body', () => {
   });
 
   it('room search room loading matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.room.loading = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search room error matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.room.error = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search room results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
+
       store.state.search.room.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search people loading matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.people.loading = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search people error matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.people.error = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search people results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.roomMap = ROOM_SEARCH_ROOM_MAP_FIXTURE;
+
       store.state.search.people.results = ROOM_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room search combined results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       const repo1 = createSerializedRoomFixture('community/repo1');
       const room1 = createSerializedRoomFixture('community/room1');
       const person1 = createSerializedRoomFixture('person1');
@@ -143,7 +117,7 @@ describe('search-body', () => {
   });
 
   it('deduplicates room search combined results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       const room1 = createSerializedRoomFixture('community/repo1');
 
       store.state.roomMap = {
@@ -158,21 +132,21 @@ describe('search-body', () => {
   });
 
   it('message search loading matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.message.loading = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('message search error matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.message.error = true;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('message search results matches snapshot', () => {
-    factory({}, store => {
+    const { wrapper } = mount(SearchBody, {}, store => {
       store.state.search.message.results = MESSAGE_SEARCH_RESULT_FIXTURE;
     });
     expect(wrapper.element).toMatchSnapshot();
@@ -180,7 +154,7 @@ describe('search-body', () => {
 
   it('calls store action "fetchRoomSearchResults" and "fetchMessageSearchResults" after inputting', () => {
     const searchValue = 'needtofindthisthing';
-    factory({ searchImmediately: true }, store => {
+    const { wrapper, stubbedActions } = mount(SearchBody, { searchImmediately: true }, store => {
       store.state.search.searchInputValue = searchValue;
     });
 

@@ -1,74 +1,46 @@
 'use strict';
 
-const { createLocalVue, shallowMount } = require('@vue/test-utils');
-const Vuex = require('vuex');
-
-const createStore = require('../../../../../public/js/vue/store').default;
-const actions = require('../../../../../public/js/vue/store/actions');
-const ListItem = require('../../../../../public/js/vue/left-menu/components/list-item.vue');
+const mount = require('../../vuex-mount');
+const {
+  default: ListItem
+} = require('../../../../../public/js/vue/left-menu/components/list-item.vue');
 
 const {
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture
 } = require('../../fixture-helpers');
 
-let wrapper;
-let stubbedActions = {};
-function factory(propsData = {}, extendStore = () => {}) {
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
-
-  Object.keys(actions).forEach(actionKey => {
-    stubbedActions[actionKey] = jest.fn();
-  });
-
-  const store = createStore({
-    actions: stubbedActions
-  });
-  extendStore(store);
-
-  wrapper = shallowMount(ListItem.default, {
-    localVue,
-    store,
-    propsData
-  });
-}
-
 describe('list-item', () => {
-  afterEach(() => {
-    wrapper.destroy();
-  });
-
   it('community room matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: createSerializedRoomFixture('my-community/community')
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room with short name matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: createSerializedRoomFixture('foo/bar')
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('room with long name matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: createSerializedRoomFixture('abcdefghijklmnop/qrstuvwxyz')
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('one to one room matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: createSerializedOneToOneRoomFixture('EricGitterTester')
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('favourite room matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: {
         ...createSerializedRoomFixture('my-community/community'),
         favourite: 1
@@ -78,7 +50,7 @@ describe('list-item', () => {
   });
 
   it('active room matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: createSerializedRoomFixture('my-community/room1'),
       active: true
     });
@@ -86,7 +58,7 @@ describe('list-item', () => {
   });
 
   it('favourite loading room matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(ListItem, {
       item: {
         ...createSerializedRoomFixture('my-community/community'),
         favourite: 1,
@@ -98,7 +70,7 @@ describe('list-item', () => {
 
   it('calls store action "changeDisplayedRoom" and "toggleLeftMenu" when item is clicked', () => {
     const room = createSerializedRoomFixture('my-community/community');
-    factory({
+    const { wrapper, stubbedActions } = mount(ListItem, {
       item: room
     });
 

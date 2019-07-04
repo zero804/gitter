@@ -33,7 +33,7 @@ var View = Marionette.ItemView.extend({
       .then(
         function(welcomeMessage) {
           welcomeMessage = welcomeMessage || { text: '', html: '' };
-          if (!!welcomeMessage.text.length) {
+          if (welcomeMessage.text.length) {
             return this.initWithMessage(welcomeMessage);
           }
           return this.initEmptyTextArea();

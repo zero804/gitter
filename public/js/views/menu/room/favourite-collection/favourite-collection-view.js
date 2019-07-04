@@ -50,7 +50,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   onFavouritesSorted: function(targetID, siblingID, position) {
     var target = this.roomCollection.get(targetID);
     var sibling = this.roomCollection.get(siblingID);
-    var index = !!sibling ? sibling.get('favourite') : this.getHighestFavourite() + 1;
+    var index = sibling ? sibling.get('favourite') : this.getHighestFavourite() + 1;
     var max = this.roomCollection.max('favourite');
     var min = this.roomCollection.min('favourite');
 
@@ -93,7 +93,7 @@ var FavouriteCollection = PrimaryCollectionView.extend({
   onFavouriteAdded: function(id) {
     var newFavModel = this.roomCollection.get(id);
     var max = this.roomCollection.max('favourite');
-    var favIndex = !!max.get ? max.get('favourite') + 1 : true;
+    var favIndex = max.get ? max.get('favourite') + 1 : true;
     newFavModel.save({ favourite: favIndex }, { patch: true });
   }
 });

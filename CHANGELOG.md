@@ -1,3 +1,16 @@
+# 19.54.0 - 2019-7-2
+
+ - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
+
+Developer facing:
+
+ - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
+ - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
+ - Update security release process, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1450
+ - Using eslint autofix on our codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1465
+ - Extract common mounting code from tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1464
+
+
 # 19.53.0 - 2019-6-27
 
  - Update `halley@0.7.0` -> `gitter-realtime-client@2.1.0` so `websocket` transport is chosen over `long-polling`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1453

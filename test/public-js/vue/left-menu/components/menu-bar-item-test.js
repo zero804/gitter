@@ -1,49 +1,22 @@
 'use strict';
 
-const { createLocalVue, shallowMount } = require('@vue/test-utils');
-const Vuex = require('vuex');
-
-const createStore = require('../../../../../public/js/vue/store').default;
-const actions = require('../../../../../public/js/vue/store/actions');
+const mount = require('../../vuex-mount');
 const leftMenuConstants = require('../../../../../public/js/vue/left-menu/constants');
-const MenuBarItem = require('../../../../../public/js/vue/left-menu/components/menu-bar-item.vue');
-
-let wrapper;
-let stubbedActions = {};
-function factory(propsData = {}, extendStore = () => {}) {
-  const localVue = createLocalVue();
-  localVue.use(Vuex);
-
-  Object.keys(actions).forEach(actionKey => {
-    stubbedActions[actionKey] = jest.fn();
-  });
-
-  const store = createStore({
-    actions: stubbedActions
-  });
-  extendStore(store);
-
-  wrapper = shallowMount(MenuBarItem.default, {
-    localVue,
-    store,
-    propsData
-  });
-}
+const {
+  default: MenuBarItem
+} = require('../../../../../public/js/vue/left-menu/components/menu-bar-item.vue');
 
 describe('menu-bar-item', () => {
-  afterEach(() => {
-    wrapper.destroy();
-  });
-
   it('all matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(MenuBarItem, {
       type: 'all'
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('when all state, all item has highlight matches snapshot', () => {
-    factory(
+    const { wrapper } = mount(
+      MenuBarItem,
       {
         type: leftMenuConstants.LEFT_MENU_ALL_STATE
       },
@@ -55,35 +28,35 @@ describe('menu-bar-item', () => {
   });
 
   it('search matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_SEARCH_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('people matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_PEOPLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('create matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_CREATE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('toggle matches snapshot', () => {
-    factory({
+    const { wrapper } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('calls store action "setLeftMenuState" when item is clicked', () => {
-    factory({
+    const { wrapper, stubbedActions } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_ALL_STATE
     });
 
@@ -98,7 +71,8 @@ describe('menu-bar-item', () => {
 
   it('calls store action "toggleLeftMenu" with toggled state when active item is clicked', () => {
     const beforeExpandedState = true;
-    factory(
+    const { wrapper, stubbedActions } = mount(
+      MenuBarItem,
       {
         type: leftMenuConstants.LEFT_MENU_ALL_STATE
       },
@@ -118,7 +92,8 @@ describe('menu-bar-item', () => {
   });
 
   it('calls store action "toggleLeftMenu" with expanded state when new item is clicked', () => {
-    factory(
+    const { wrapper, stubbedActions } = mount(
+      MenuBarItem,
       {
         type: leftMenuConstants.LEFT_MENU_ALL_STATE
       },

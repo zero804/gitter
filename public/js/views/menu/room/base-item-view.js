@@ -15,7 +15,7 @@ module.exports = ItemView.extend({
   },
 
   onModelChangeFocus: function(model, val) {
-    return !!val ? this.focusElement() : this.blurElement();
+    return val ? this.focusElement() : this.blurElement();
   },
 
   focusElement: function() {

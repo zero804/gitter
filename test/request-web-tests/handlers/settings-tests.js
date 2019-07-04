@@ -21,11 +21,11 @@ mockedRequest.get = async function(requestData, callback) {
   );
 };
 
-const app = proxyquireNoCallThru('../../server/web', {
+const app = proxyquireNoCallThru('../../../server/web', {
   request: mockedRequest
 });
 
-proxyquireNoCallThru('../../server/handlers/settings', {
+proxyquireNoCallThru('../../../server/handlers/settings', {
   request: {
     get: async function(requestData, callback) {
       callback(null, {}, []);

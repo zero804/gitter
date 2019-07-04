@@ -48,7 +48,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
     baseOptions.model = model;
     var id = model.get('id');
     var element = this.domMap[id];
-    return !!element ? _.extend(baseOptions, { el: element }) : baseOptions;
+    return element ? _.extend(baseOptions, { el: element }) : baseOptions;
   },
 
   initialize: function(options) {
@@ -76,7 +76,7 @@ var PrimaryCollectionView = BaseCollectionView.extend({
   onStateChange: function() {
     if (this.ui.headerContent.length) {
       if (this.roomMenuModel.get('state') === 'search') {
-        if (!!this.roomMenuModel.get('searchTerm')) {
+        if (this.roomMenuModel.get('searchTerm')) {
           this.ui.headerContent[0].classList.remove('hidden');
         } else {
           this.ui.headerContent[0].classList.add('hidden');

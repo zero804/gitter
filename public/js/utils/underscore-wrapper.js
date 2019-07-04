@@ -49,7 +49,7 @@ function eq(a, b, aStack, bStack) {
       return +a === +b;
   }
 
-  if (typeof a != 'object' || typeof b != 'object') return false;
+  if (typeof a !== 'object' || typeof b !== 'object') return false;
   // Assume equality for cyclic structures. The algorithm for detecting cyclic
   // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
   var length = aStack.length;

@@ -82,6 +82,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) '../../../../less/components/menu/room/menu-text.less';
+@import (reference) 'dark-theme';
 
 .list-item {
   position: relative;
@@ -126,6 +127,14 @@ export default {
     background-color: @room-item-active-bg;
     color: black;
     outline: none;
+
+    .dark-theme & {
+      background-color: @dark-theme-left-menu-active-item-bg-color;
+
+      .list-item-name {
+        color: @dark-theme-left-menu-active-item-text-color;
+      }
+    }
   }
 }
 
@@ -149,6 +158,10 @@ export default {
 
   &:first-child {
     margin-left: @desktop-menu-left-padding / 2;
+  }
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
   }
 }
 
