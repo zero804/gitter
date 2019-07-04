@@ -1,3 +1,8 @@
+# 19.55.0 - *upcoming*
+
+  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
+
+
 # 19.54.0 - 2019-7-2
 
  - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
