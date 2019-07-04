@@ -30,20 +30,30 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
 
   const isMobile = req.isPhone;
 
+  const storeData = {
+    isMobile,
+    isLoggedIn: !!user,
+    darkTheme: userThemeSnapshot.theme === 'gitter-dark',
+
+    roomMap,
+    displayedRoomId: room && room.id,
+
+    leftMenuPinnedState: !isMobile,
+    leftMenuExpandedState: false
+  };
+
   const vueLeftMenuHtmlOutput = await vueRenderToString({
     moduleToRender: 'left-menu',
-    storeData: {
-      isMobile,
-      isLoggedIn: !!user,
-      darkTheme: userThemeSnapshot.theme === 'gitter-dark',
-
-      roomMap,
-      displayedRoomId: room && room.id,
-
-      leftMenuPinnedState: !isMobile,
-      leftMenuExpandedState: false
-    }
+    storeData
   });
+
+  const useThreadedConversations = req.fflip.has('threaded-conversations');
+  const threadMessageFeedHtmlOutput = useThreadedConversations
+    ? await vueRenderToString({
+        moduleToRender: 'thread-message-feed',
+        storeData
+      })
+    : null;
 
   return {
     ...existingData,
@@ -52,6 +62,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     isMobile,
     useVueLeftMenu: useVueLeftMenu,
     leftMenuHtml: vueLeftMenuHtmlOutput,
+    threadMessageFeedHtml: threadMessageFeedHtmlOutput,
 
     troupeContext: {
       ...baseTroupeContext,
