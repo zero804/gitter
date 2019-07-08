@@ -123,9 +123,7 @@ function handleUploadToGroup(transloadit, metadata) {
 
       const hasOriginalFinalResults =
         transloadit.results['original_final'] && transloadit.results['original_final'].length;
-      const hasFilteredResults =
-        transloadit.results['files_filtered'] && transloadit.results['files_filtered'].length;
-      if (!hasOriginalFinalResults && !hasFilteredResults) {
+      if (!hasOriginalFinalResults) {
         throw new StatusError(
           500,
           'Transloadit upload failed' + transloadit.message
@@ -134,12 +132,7 @@ function handleUploadToGroup(transloadit, metadata) {
         );
       }
 
-      let upload;
-      if (hasOriginalFinalResults) {
-        upload = transloadit.results['original_final'][0];
-      } else {
-        upload = transloadit.results['files_filtered'][0];
-      }
+      const upload = transloadit.results['original_final'][0];
 
       // TODO: should we delete the existing image if there is one?
 
