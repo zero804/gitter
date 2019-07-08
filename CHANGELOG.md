@@ -6,6 +6,7 @@ Developer facing:
 
  - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
  - Documenting implementation of sending and receiving messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1459
+ - Only support new style Transloadit template with `original_final` (community avatar uploads), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1470
 
 
 # 19.54.1 - 2019-7-7
@@ -22,7 +23,7 @@ Developer facing:
 Developer facing:
 
  - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
- - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
+ - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template (community avatar uploads), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
  - Update security release process, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1450
  - Using eslint autofix on our codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1465
  - Extract common mounting code from tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1464
