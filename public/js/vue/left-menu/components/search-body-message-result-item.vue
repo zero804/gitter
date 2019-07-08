@@ -59,6 +59,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) 'components/menu/room/header-title';
+@import (reference) 'dark-theme';
 
 .message-search-item {
   display: block;
@@ -74,6 +75,10 @@ export default {
     color: black;
     outline: none;
     text-decoration: none;
+
+    .dark-theme & {
+      background-color: @dark-theme-left-menu-active-item-bg-color;
+    }
   }
 }
 
@@ -88,6 +93,10 @@ export default {
   text-overflow: ellipsis;
   color: @search-message-detail-color;
   font-size: 1.3rem;
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
+  }
 }
 
 .message-search-item-detail-author-link {
@@ -112,6 +121,10 @@ export default {
   .fonts-loaded & {
     font-size: 1.5rem;
     font-weight: 400;
+  }
+
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
   }
 }
 </style>
