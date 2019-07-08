@@ -25,3 +25,4 @@
  - [Code overview](./code-overview.md)
  - [Utility scripts](./utility-scripts.md)
  - [`gitter.im` production infrastructure docs](https://gitlab.com/gl-infra/gitter-infrastructure)
+ - [Sending and receiving messages explained](./send-receive-messages.md)
