@@ -7,6 +7,13 @@ Developer facing:
  - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
 
 
+# 19.54.1 - 2019-7-7
+
+ - Strip exif metadata from community avatars when uploaded, https://gitlab.com/gitlab-org/gitter/webapp/issues/2035
+    - Thanks to [`apocalyptik`](https://hackerone.com/apocalyptik) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/12
+
+
 # 19.54.0 - 2019-7-2
 
  - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
