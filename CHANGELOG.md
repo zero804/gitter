@@ -5,6 +5,7 @@
 Developer facing:
 
  - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
+ - Documenting implementation of sending and receiving messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1459
 
 
 # 19.54.1 - 2019-7-7
