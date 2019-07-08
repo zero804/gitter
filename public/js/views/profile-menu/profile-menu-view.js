@@ -176,12 +176,14 @@ module.exports = Marionette.CompositeView.extend({
   },
 
   ui: {
-    menu: '#profile-menu-items'
+    menu: '#profile-menu-items',
+    menuBackdrop: '#profile-menu-items-backdrop'
   },
 
   events: {
     'click #profile-menu-avatar': 'onAvatarClicked',
-    'mouseleave @ui.menu': 'onMouseLeave'
+    'mouseleave @ui.menu': 'onMouseLeave',
+    'click @ui.menuBackdrop': 'onBackdropClicked'
   },
 
   modelEvents: {
@@ -197,7 +199,11 @@ module.exports = Marionette.CompositeView.extend({
     });
   },
 
-  onMouseLeave: function() {
+  onMouseLeave() {
+    this.model.set('active', false);
+  },
+
+  onBackdropClicked() {
     this.model.set('active', false);
   },
 
@@ -209,5 +215,6 @@ module.exports = Marionette.CompositeView.extend({
   onActiveStateChange: function() {
     var state = this.model.get('active');
     toggleClass(this.ui.menu[0], 'hidden', !state);
+    toggleClass(this.ui.menuBackdrop[0], 'hidden', !state);
   }
 });
