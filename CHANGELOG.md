@@ -42,7 +42,7 @@ Developer facing:
 # 19.52.1 - 2019-6-27
 
  - Fix arbitrary file upload via community avatar upload, https://gitlab.com/gitlab-org/gitter/webapp/issues/2192
-    - Thanks to `u3mur4` for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - Thanks to [`u3mur4`](https://hackerone.com/u3mur4) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/10
 
 
