@@ -41,6 +41,28 @@ exports[`room-list matches snapshot 1`] = `
 </div>
 `;
 
+exports[`room-list matches snapshot when mobile 1`] = `
+<div>
+  <draggable-stub
+    class="favourite-room-list"
+    clone="function(t){return t}"
+    disabled="true"
+    element="div"
+    group="rooms"
+    tag="ul"
+  />
+   
+  <draggable-stub
+    class="room-list"
+    clone="function(t){return t}"
+    disabled="true"
+    element="div"
+    group="rooms"
+    tag="ul"
+  />
+</div>
+`;
+
 exports[`room-list matches snapshot with some favourite rooms 1`] = `
 <div>
   <draggable-stub
