@@ -3,6 +3,7 @@
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
  - Fix Vue left-menu search results being too dark with dark theme (contrast), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1471
  - Fix room list scrolling on mobile with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1473
+ - Fix clicking outside profile menu should close it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1472
 
 Developer facing:
 
