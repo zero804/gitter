@@ -1,13 +1,14 @@
 # 19.55.0 - *upcoming*
 
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
+ - Fix Vue left-menu search results being too dark with dark theme (contrast), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1471
+ - Fix room list scrolling on mobile with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1473
 
 Developer facing:
 
  - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
  - Documenting implementation of sending and receiving messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1459
  - Only support new style Transloadit template with `original_final` (community avatar uploads), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1470
- - Fix Vue left-menu search results being too dark with dark theme (contrast), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1471
 
 
 # 19.54.1 - 2019-7-7
