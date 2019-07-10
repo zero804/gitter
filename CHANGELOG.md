@@ -1,4 +1,4 @@
-# 19.55.0 - *upcoming*
+# 19.55.0 - 2019-7-10
 
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
  - Fix Vue left-menu search results being too dark with dark theme (contrast), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1471
