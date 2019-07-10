@@ -19,13 +19,17 @@ export default {
     }
   },
   computed: {
-    ...mapState(['displayedRoomId', 'favouriteDraggingInProgress']),
+    ...mapState(['isMobile', 'displayedRoomId', 'favouriteDraggingInProgress']),
 
     favouriteRooms() {
       return this.rooms.filter(sortsAndFilters.favourites.filter);
     },
     normalRooms() {
       return this.rooms.filter(sortsAndFilters.recents.filter);
+    },
+    favouriteDragDropDisabled() {
+      // Disable room favourite drag and drop on mobile so they can scroll the room list
+      return this.isMobile;
     }
   },
 
@@ -87,6 +91,7 @@ export default {
       tag="ul"
       class="favourite-room-list"
       :class="{ 'is-dragging': favouriteDraggingInProgress }"
+      :disabled="favouriteDragDropDisabled"
       group="rooms"
       @start="dragStart"
       @end="dragEnd"
@@ -102,7 +107,14 @@ export default {
       />
     </draggable>
 
-    <draggable tag="ul" class="room-list" group="rooms" @start="dragStart" @end="dragEnd">
+    <draggable
+      tag="ul"
+      class="room-list"
+      :disabled="favouriteDragDropDisabled"
+      group="rooms"
+      @start="dragStart"
+      @end="dragEnd"
+    >
       <list-item
         v-for="room in normalRooms"
         :key="room.id"
