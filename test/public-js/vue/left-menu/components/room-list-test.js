@@ -15,6 +15,13 @@ describe('room-list', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('matches snapshot when mobile', () => {
+    const { wrapper } = mount(RoomList, { rooms: [] }, store => {
+      store.state.isMobile = true;
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('matches snapshot with some rooms', () => {
     const activeRoom = createSerializedRoomFixture('community/room2');
     const { wrapper } = mount(
