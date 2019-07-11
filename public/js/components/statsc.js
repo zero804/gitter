@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var appEvents = require('../utils/appevents');
 var apiClient = require('./api-client');
 var log = require('../utils/log');

@@ -1,6 +1,5 @@
 'use strict';
 // var $ = require('jquery');
-// var _ = require('underscore');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var matchesSelector = require('../../utils/matches-selector');

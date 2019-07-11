@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var ModalView = require('./modal');
 var itemTemplate = require('./tmpl/people-modal-result.hbs');
 var apiClient = require('../../components/api-client');

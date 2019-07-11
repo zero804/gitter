@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 13] */
 'use strict';
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 let Mutant;
 if (typeof window !== 'undefined') {
@@ -359,7 +359,9 @@ var Popover = Marionette.ItemView.extend({
   getTargetPosition: function() {
     var el = this.targetElement;
 
-    var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
+    const pos = {};
+    _.forIn(el.getBoundingClientRect(), (v, k) => (pos[k] = v));
+    _.forIn(this.$targetElement.offset(), (v, k) => (pos[k] = v));
 
     return pos;
   },

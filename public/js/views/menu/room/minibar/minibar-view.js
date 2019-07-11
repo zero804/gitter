@@ -9,7 +9,7 @@ var GroupView = require('./group-view/group-view');
 var CloseView = require('./close-view/close-view');
 var CollectionView = require('./minibar-collection-view');
 var CommunityCreateView = require('./minibar-community-create-item-view');
-var _ = require('underscore');
+var _ = require('lodash');
 
 require('../../../behaviors/isomorphic');
 

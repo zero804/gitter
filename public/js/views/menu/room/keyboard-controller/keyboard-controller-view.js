@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var cocktail = require('backbone.cocktail');
 var KeyboardEventMixin = require('../../../keyboard-events-mixin');
 

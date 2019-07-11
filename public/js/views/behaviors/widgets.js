@@ -1,7 +1,7 @@
 /* eslint max-statements: ["error", 41] */
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
 var unsafeParseHtml = require('../../utils/unsafe-parse-html');

@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var qs = require('gitter-web-qs');
-var _ = require('underscore');
+var _ = require('lodash');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
 var debug = require('debug-proxy')('app:client-context');

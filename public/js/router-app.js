@@ -6,7 +6,7 @@ require('./utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');

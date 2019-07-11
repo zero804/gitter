@@ -43,7 +43,7 @@
  */
 
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 var Backbone = require('backbone');
 var Resource = require('./resource');
 

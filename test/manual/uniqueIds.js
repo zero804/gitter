@@ -2,7 +2,7 @@
 
 var speedy = require('speedy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var sets = {
   tinyUniqueObjectIds: _.range(1).map(function() {

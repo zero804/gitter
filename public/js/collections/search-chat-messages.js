@@ -3,7 +3,7 @@
 //TODO This is too specialised, abstract jp 2/2/16
 
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var BaseResolverCollection = require('./base-resolver-collection');
 var context = require('gitter-web-client-context');
 

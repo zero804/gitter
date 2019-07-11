@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var classnames = require('classnames');
 var appEvents = require('../../utils/appevents');

@@ -1,7 +1,7 @@
 /* eslint complexity: ["error", 18] */
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
 var roomNameShortener = require('../room-name-shortener');

@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var ItemView = require('./primary-collection-item-view');
 var BaseCollectionView = require('../base-collection/base-collection-view');
 var EmptyAllView = require('./primary-collection-item-all-empty-view');

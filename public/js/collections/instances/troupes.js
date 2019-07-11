@@ -10,7 +10,7 @@ var appEvents = require('../../utils/appevents');
 var errorHandle = require('../../utils/live-collection-error-handle');
 var context = require('gitter-web-client-context');
 var moment = require('moment');
-var _ = require('underscore');
+var _ = require('lodash');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 
 var roomsSnapshot = context.getSnapshot('allRooms') || [];

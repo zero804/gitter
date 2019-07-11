@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var context = require('gitter-web-client-context');
 var toggleClass = require('../../utils/toggle-class');
 var itemCollections = require('../../collections/instances/integrated-items');

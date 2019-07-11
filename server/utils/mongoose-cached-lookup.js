@@ -3,7 +3,7 @@
 var LRU = require('lru-cache');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var _ = require('underscore');
+var _ = require('lodash');
 
 function MongooseCachedLookup(options) {
   var model = options.model;

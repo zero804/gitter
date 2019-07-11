@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');

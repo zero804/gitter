@@ -1,6 +1,5 @@
 'use strict';
 
-var _ = require('underscore');
 var urlJoin = require('url-join');
 var roomNameShortener = require('gitter-web-shared/room-name-shortener');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');

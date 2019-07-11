@@ -4,7 +4,7 @@
 
 var debug = require('debug-proxy')('app:room-menu-model');
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var ProxyCollection = require('@gitterhq/backbone-proxy-collection');
 var RecentSearchesCollection = require('../collections/recent-searches');
 var SuggestedOrgCollection = require('../collections/org-suggested-rooms');

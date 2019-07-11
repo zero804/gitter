@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var toggleClass = require('../../../utils/toggle-class');
-var _ = require('underscore');
+var _ = require('lodash');
 
 module.exports = Marionette.LayoutView.extend({
   template: false,

@@ -7,7 +7,7 @@ var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var unreadService = require('gitter-web-unread-items');
 var Promise = require('bluebird');
 var shutdown = require('shutdown');
-var _ = require('underscore');
+var _ = require('lodash');
 
 /** THIS SCRIPT WILL TRASH OUR REDIS ENVIRONMENT */
 process.exit();
