@@ -3,7 +3,6 @@
 'use strict';
 
 var shutdown = require('shutdown');
-var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var groupService = require('gitter-web-groups/lib/group-service');

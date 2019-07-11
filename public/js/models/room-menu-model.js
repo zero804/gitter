@@ -2,7 +2,6 @@
 
 //TODO This has basically turned into a controller, refactor it JP 2/2/16
 
-var debug = require('debug-proxy')('app:room-menu-model');
 var Backbone = require('backbone');
 var _ = require('lodash');
 var ProxyCollection = require('@gitterhq/backbone-proxy-collection');

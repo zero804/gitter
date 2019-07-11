@@ -19,17 +19,6 @@ const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 
 var ROOMS_PER_PAGE = 15;
 
-function serializeGroup(group, user) {
-  var userId = user && user._id;
-
-  var strategy = new restSerializer.GroupStrategy({
-    currentUser: user,
-    currentUserId: userId
-  });
-
-  return restSerializer.serializeObject(group, strategy);
-}
-
 function findRooms(groupId, user, currentPage) {
   assert(ROOMS_PER_PAGE <= 15, 'Querying for more than 15 rooms can slow things down too much');
   var userId = user && user._id;

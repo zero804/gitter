@@ -22,7 +22,6 @@ var opts = require('yargs')
   .alias('help', 'h').argv;
 
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
-var persistenceService = require('gitter-web-persistence');
 
 function dedupe(item, index, arr) {
   return arr.indexOf(item) === index;
@@ -53,6 +52,7 @@ function tagRoom(uri, tags, opts) {
     .then(function(room) {
       return addTag(room, tags, opts);
     })
+    // eslint-disable-next-line no-unused-vars
     .then(function(room) {
       console.log('done.');
       process.exit();

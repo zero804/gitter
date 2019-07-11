@@ -46,7 +46,7 @@ persistence.User.find(function(err, users) {
                 created_at: created_at,
                 username: user.username
               },
-              function(err, res) {
+              function(err /*, res */) {
                 if (err) console.log(err);
                 console.log('Successfully updated: ' + user.username);
                 callback();
@@ -64,6 +64,8 @@ persistence.User.find(function(err, users) {
         callback();
       }
     },
+    // FIXME: Don't swallow an error
+    // eslint-disable-next-line no-unused-vars
     function(err) {
       console.log('Shutting down gracefully');
       shutdown.shutdownGracefully();

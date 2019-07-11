@@ -46,8 +46,6 @@ module.exports = (function() {
     return 'model-id-' + id;
   };
 
-  /* @const */
-  var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes

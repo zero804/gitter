@@ -11,7 +11,6 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var userService = require('gitter-web-users');
 var shimPositionOption = require('../yargs-shim-position-option');
 
-var argv = yargs.argv;
 var opts = yargs
   .option(
     'username',

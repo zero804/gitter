@@ -208,13 +208,11 @@ var bulkUpdate = Promise.method(function(updates) {
 
 function migrateTroupeUsers(userId, notificationSettings) {
   return new Promise(function(resolve, reject) {
-    var count = 0;
     getTroupeUsersBatchedStream(userId)
       .pipe(
         through2Concurrent.obj({ maxConcurrency: 10 }, function(troupeUsers, enc, callback) {
           console.log('## Updating batch');
 
-          count += troupeUsers.length;
           var updates = getTroupeUserBatchUpdates(troupeUsers, notificationSettings);
           return bulkUpdate(updates).asCallback(callback);
         })

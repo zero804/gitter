@@ -5,7 +5,6 @@ var context = require('gitter-web-client-context');
 var appEvents = require('../../utils/appevents');
 var apiClient = require('../../components/api-client');
 var unreadItemsClient = require('../../components/unread-items-client');
-var isMobile = require('../../utils/is-mobile');
 
 function updateNotifications(mode) {
   apiClient.userRoom.put('/settings/notifications', { mode: mode }).then(function() {

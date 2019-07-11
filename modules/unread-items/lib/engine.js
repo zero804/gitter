@@ -262,7 +262,6 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
 
   var troupeIdsMap = {};
   var userIdsMap = {};
-  var lackingValueCount = 0;
   var oldestValue = Infinity;
 
   /* Filter out values which are too recent */
@@ -299,9 +298,7 @@ function selectTroupeUserBatchForEmails(troupeUserHash, horizonTime) {
     userIdsMap[userId] = true;
 
     var value = troupeUserHash[key];
-    if (value === 'null' || !value) {
-      lackingValueCount++;
-    } else {
+    if (!(value === 'null' || !value)) {
       var time = parseInt(value, 10);
       if (time < oldestValue) {
         oldestValue = time;

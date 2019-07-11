@@ -1,7 +1,6 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var context = require('gitter-web-client-context');
 var modalRegion = require('../../components/modal-region');
 var ChatContainerView = require('../chat/chatContainerView');
 

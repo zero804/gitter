@@ -7,8 +7,6 @@ var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var GroupWithPolicyService = testRequire('./services/group-with-policy-service');
 var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
-var groupService = require('gitter-web-groups/lib/group-service');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var isAdminPolicy = {
   canAdmin: function() {

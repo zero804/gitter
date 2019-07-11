@@ -7,7 +7,6 @@ var GitHubIssueService = require('gitter-web-github').GitHubIssueService;
 var processText = require('gitter-web-text-processor');
 var StatusError = require('statuserror');
 var loadTroupeFromParam = require('./load-troupe-param');
-var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 var roomRepoService = require('gitter-web-rooms/lib/room-repo-service');
 
 function getEightSuggestedIssues(issues, includeRepo) {

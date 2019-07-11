@@ -2,8 +2,6 @@
 /*jslint node: true */
 'use strict';
 
-var env = require('gitter-web-env');
-var winston = env.logger;
 var presenceService = require('gitter-web-presence');
 var userService = require('gitter-web-users');
 var shutdown = require('shutdown');

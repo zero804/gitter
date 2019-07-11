@@ -1,6 +1,6 @@
 'use strict';
 
-function createRoutes(options = {}) {
+function createRoutes(/* options */) {
   return {
     'delete-account': function() {
       var dialogRegion = this.dialogRegion;

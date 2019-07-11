@@ -1,7 +1,6 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var Backbone = require('backbone');
 var ModalView = require('./modal');
 var context = require('gitter-web-client-context');
 var apiClient = require('../../components/api-client');

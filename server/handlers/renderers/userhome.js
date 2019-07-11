@@ -1,7 +1,5 @@
 'use strict';
 
-var env = require('gitter-web-env');
-var nconf = env.config;
 const asyncHandler = require('express-async-handler');
 var contextGenerator = require('../../web/context-generator');
 var fonts = require('../../web/fonts');
