@@ -206,9 +206,9 @@ You can run the following commands to check and fix the formatting before submit
 Checking is done in the `validate` CI job and this should pass regardless of your what project secrets you setup
 
 ```
-npm run prettier -- --check "**/*.js"
+npm run prettier -- --check "**/*.{js,vue}"
 
-npm run prettier -- --write "**/*.js"
+npm run prettier -- --write "**/*.{js,vue}"
 ```
 
 There are also [Prettier plugins/integrations for your editor](https://prettier.io/docs/en/editors.html) if you prefer to have it built in and format on save.

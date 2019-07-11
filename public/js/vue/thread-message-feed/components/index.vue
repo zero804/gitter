@@ -16,7 +16,10 @@ export default {
 </script>
 
 <template>
-  <div class="js-thread-message-feed-root root" :class="{ opened: isVisible, 'dark-theme': darkTheme }">
+  <div
+    class="js-thread-message-feed-root root"
+    :class="{ opened: isVisible, 'dark-theme': darkTheme }"
+  >
     <section class="body">
       <h2 class="title">Thread</h2>
       <button class="close-button" @click="toggle(false)">
