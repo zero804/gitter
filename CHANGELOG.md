@@ -1,3 +1,24 @@
+# 19.55.0 - 2019-7-10
+
+ - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
+ - Fix Vue left-menu search results being too dark with dark theme (contrast), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1471
+ - Fix room list scrolling on mobile with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1473
+ - Fix clicking outside profile menu should close it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1472
+
+Developer facing:
+
+ - Rename `updateRoom` to `upsertRoom` (VueX action), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1468
+ - Documenting implementation of sending and receiving messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1459
+ - Only support new style Transloadit template with `original_final` (community avatar uploads), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1470
+
+
+# 19.54.1 - 2019-7-7
+
+ - Strip exif metadata from community avatars when uploaded, https://gitlab.com/gitlab-org/gitter/webapp/issues/2035
+    - Thanks to [`apocalyptik`](https://hackerone.com/apocalyptik) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/12
+
+
 # 19.54.0 - 2019-7-2
 
  - Add dark-theme support to the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1463
@@ -5,7 +26,7 @@
 Developer facing:
 
  - Restructure `supertest` tests that are running against the app, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1455
- - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
+ - Only support the new style Transloadit `files_filtered` `avatar_thumnails_xxx` template (community avatar uploads), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1462
  - Update security release process, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1450
  - Using eslint autofix on our codebase, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1465
  - Extract common mounting code from tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1464
@@ -26,7 +47,7 @@ Developer facing:
 # 19.52.1 - 2019-6-27
 
  - Fix arbitrary file upload via community avatar upload, https://gitlab.com/gitlab-org/gitter/webapp/issues/2192
-    - Thanks to `u3mur4` for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - Thanks to [`u3mur4`](https://hackerone.com/u3mur4) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/10
 
 
