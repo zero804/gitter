@@ -7,7 +7,7 @@ var userService = require('gitter-web-users');
 var githubSearchService = require('gitter-web-github').GitHubFastSearch;
 var extractGravatarVersion = require('gitter-web-avatars/server/extract-gravatar-version');
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 
 function cleanQuery(query) {
   query = query ? ('' + query).trim() : '';
@@ -81,7 +81,7 @@ module.exports = function(searchQuery, user, options, callback) {
       var noSelfMentions = merged.filter(function(user) {
         return user.username !== excludedUsername;
       });
-      var deduplicated = _.uniq(noSelfMentions, false, function(user) {
+      var deduplicated = _.uniq(noSelfMentions, function(user) {
         return user.username;
       });
       var limited = deduplicated.slice(0, options.limit);

@@ -3,7 +3,7 @@
 'use strict';
 
 var format = require('stringformat');
-var _ = require('underscore');
+var _ = require('lodash');
 var yargs = require('yargs');
 
 var CliOutput = function(columns, extraOpts) {

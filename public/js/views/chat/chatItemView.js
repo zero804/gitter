@@ -2,7 +2,7 @@
 
 const debug = require('debug-proxy')('app:chat-item-view');
 const $ = require('jquery');
-const _ = require('underscore');
+const _ = require('lodash');
 const classnames = require('classnames');
 const moment = require('moment');
 const Marionette = require('backbone.marionette');

@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 var context = require('gitter-web-client-context');
 var Marionette = require('backbone.marionette');

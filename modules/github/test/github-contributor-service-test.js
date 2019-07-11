@@ -1,7 +1,7 @@
 /*global describe:true, it:true */
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var assert = require('assert');
 var GithubContibutorService = require('..').GitHubContributorService;
 

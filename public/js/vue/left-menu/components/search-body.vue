@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import _ from 'lodash';
 import { mapState, mapGetters, mapActions } from 'vuex';
 
 import LoadingSpinner from '../../components/loading-spinner.vue';

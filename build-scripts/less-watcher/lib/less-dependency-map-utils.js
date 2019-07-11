@@ -6,7 +6,7 @@ var readFile = Promise.promisify(fs.readFile);
 var stat = Promise.promisify(fs.stat);
 var path = require('path');
 var pathUtils = require('./path-parse-format-utils');
-var _ = require('underscore');
+var _ = require('lodash');
 var memoize = require('memoize-promise');
 
 var extendDepMaps = function(/*n-number of depMaps*/) {

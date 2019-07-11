@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var compileTemplate = require('./compile-web-template');
 var activityDecorators = require('gitter-web-shared/activity/activity-decorators');
 var prerenderWrapper = require('./prerender-wrapper');

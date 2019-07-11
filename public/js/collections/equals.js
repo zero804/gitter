@@ -1,6 +1,6 @@
 /* eslint complexity: ["error", 31], max-depth: ["error", 5] */
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 
 module.exports = (function() {
   var ObjProto = Object.prototype;

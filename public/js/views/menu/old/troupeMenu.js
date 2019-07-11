@@ -1,6 +1,6 @@
 'use strict';
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var context = require('gitter-web-client-context');
 var appEvents = require('../../../utils/appevents');

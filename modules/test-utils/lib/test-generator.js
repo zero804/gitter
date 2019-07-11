@@ -3,7 +3,7 @@
 
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 module.exports = function generateTests(fixtures, generator, meta) {
   if (!meta) meta = {};

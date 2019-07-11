@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var apiClient = require('../../components/api-client');
 var ModalView = require('./modal');
 var template = require('./tmpl/notification-settings-view.hbs');

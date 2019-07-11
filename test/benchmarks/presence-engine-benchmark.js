@@ -3,7 +3,7 @@
 var makeBenchmark = require('../make-benchmark');
 
 var presenceService = require('gitter-web-presence');
-var _ = require('underscore');
+var _ = require('lodash');
 var assert = require('assert');
 var Promise = require('bluebird');
 

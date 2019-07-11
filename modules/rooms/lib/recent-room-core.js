@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var lazy = require('lazy.js');
 var persistence = require('gitter-web-persistence');
-var _ = require('underscore');
+var _ = require('lodash');
 var debug = require('debug')('gitter:app:recent-room-core');
 const calculateFavouriteUpdates = require('./calculate-favourite-updates');
 

@@ -1,7 +1,7 @@
 'use strict';
 
 const $ = require('jquery');
-const _ = require('underscore');
+const _ = require('lodash');
 const Backbone = require('backbone');
 const Marionette = require('backbone.marionette');
 require('./views/behaviors/isomorphic');

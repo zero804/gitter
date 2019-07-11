@@ -5,7 +5,7 @@ var logger = env.logger;
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var _ = require('underscore');
+var _ = require('lodash');
 var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var groupMembershipService = require('gitter-web-groups/lib/group-membership-service');

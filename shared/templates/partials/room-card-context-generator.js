@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var validateTag = require('../../validation/validate-tag').validateTag;
 var getRoomNameFromTroupeName = require('../../get-room-name-from-troupe-name');
 

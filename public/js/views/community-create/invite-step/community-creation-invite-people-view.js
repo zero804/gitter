@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var Backbone = require('backbone');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-invite-people-view.hbs');

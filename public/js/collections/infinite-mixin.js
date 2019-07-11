@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var utils = require('../utils/utils');
 var context = require('gitter-web-client-context');
 var appEvents = require('../utils/appevents');

@@ -2,7 +2,7 @@
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var oneToOneRoomService = require('../lib/one-to-one-room-service');

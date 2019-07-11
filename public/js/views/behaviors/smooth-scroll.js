@@ -1,7 +1,7 @@
 'use strict';
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
-var _ = require('underscore');
+var _ = require('lodash');
 var rafUtils = require('../../utils/raf-utils');
 var passiveEventListener = require('../../utils/passive-event-listener');
 

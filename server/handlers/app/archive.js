@@ -6,7 +6,7 @@ var identifyRoute = env.middlewares.identifyRoute;
 
 var Promise = require('bluebird');
 var moment = require('moment');
-var _ = require('underscore');
+var _ = require('lodash');
 var StatusError = require('statuserror');
 var urlParse = require('url-parse');
 const asyncHandler = require('express-async-handler');
