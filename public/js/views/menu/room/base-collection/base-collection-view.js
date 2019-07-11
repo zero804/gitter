@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var fastdom = require('fastdom');
 var template = require('./base-collection-view.hbs');
 var context = require('gitter-web-client-context');

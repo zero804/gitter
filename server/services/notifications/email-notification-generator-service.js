@@ -5,7 +5,7 @@ var logger = env.logger;
 var config = env.config;
 var stats = env.stats;
 
-var _ = require('underscore');
+var _ = require('lodash');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var userService = require('gitter-web-users');
 var unreadItemService = require('gitter-web-unread-items');

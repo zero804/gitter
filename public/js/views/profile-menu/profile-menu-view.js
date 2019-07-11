@@ -2,7 +2,7 @@
 
 var Marionette = require('backbone.marionette');
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var log = require('../../utils/log');
 var appEvents = require('../../utils/appevents');
 var template = require('./profile-menu-view.hbs');

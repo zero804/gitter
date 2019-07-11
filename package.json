@@ -178,7 +178,6 @@
     "through2-concurrent": "^1.1.0",
     "tiny-cookie": "^0.5.5",
     "transloadit": "^1.5.0",
-    "underscore": "^1.8.3",
     "url-join": "0.0.1",
     "url-parse": "^1.0.5",
     "useragent": "2.0.6",

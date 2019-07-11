@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 
 var liveSearch = function(view, $el, method, options) {
   var lastValue;

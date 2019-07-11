@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var moment = require('moment');
 var urlJoin = require('url-join');
 var searchTemplate = require('./secondary-collection-item-search-view.hbs');

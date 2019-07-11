@@ -4,7 +4,7 @@ var gulp = require('gulp');
 var sourcemaps = require('gulp-sourcemaps');
 var less = require('gulp-less');
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var lessWatcher = require('./less-watcher');
 

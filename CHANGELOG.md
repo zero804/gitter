@@ -1,3 +1,8 @@
+# 19.56.0 - *upcoming*
+
+ - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
+
+
 # 19.55.0 - 2019-7-10
 
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460

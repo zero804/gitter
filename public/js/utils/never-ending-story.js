@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var Backbone = require('backbone');
 var debug = require('debug-proxy')('app:nes');
 var isMobile = require('./is-mobile');
