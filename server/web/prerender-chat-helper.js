@@ -6,7 +6,6 @@
  */
 
 var _ = require('lodash');
-var moment = require('moment');
 var compileTemplate = require('./compile-web-template');
 var timeFormat = require('gitter-web-shared/time/time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');

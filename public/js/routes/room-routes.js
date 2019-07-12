@@ -2,7 +2,6 @@
 
 var Backbone = require('backbone');
 var context = require('gitter-web-client-context');
-var clientEnv = require('gitter-client-env');
 var apiClient = require('../components/api-client');
 var presentPermissionsDialog = require('../ensured/present-permissions-dialog');
 

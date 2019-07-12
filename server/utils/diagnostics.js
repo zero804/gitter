@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var winston = env.logger;
-var nconf = env.config;
 var path = require('path');
 var util = require('util');
 var os = require('os');

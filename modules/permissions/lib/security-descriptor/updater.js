@@ -3,7 +3,6 @@
 var Troupe = require('gitter-web-persistence').Troupe;
 var Group = require('gitter-web-persistence').Group;
 var assert = require('assert');
-var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
 function updatePublicFlagForRepo(linkPath, isPublic) {

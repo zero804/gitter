@@ -86,6 +86,7 @@ onready(function() {
     roomMenuModel = appLayout.getRoomMenuModel();
   }
 
+  // eslint-disable-next-line no-unused-vars
   var router = new Router({
     dialogRegion: dialogRegion,
     routes: [

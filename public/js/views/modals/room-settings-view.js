@@ -134,6 +134,8 @@ var View = Marionette.ItemView.extend({
       .catch(this.showError.bind(this));
   },
 
+  // FIXME: Don't swallow an error
+  // eslint-disable-next-line no-unused-vars
   showError: function(err) {
     this.ui.errorMessage[0].classList.remove('hidden');
     this.ui.welcomeMessage.attr('disabled', true);

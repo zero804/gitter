@@ -6,7 +6,7 @@ var _super = ItemView.prototype;
 module.exports = ItemView.extend({
   //Put everything in the constructor so it can't be overridden
   //also won't get in the way of any modelEvents hashes
-  constructor: function(attrs, options) {
+  constructor: function(attrs /*, options */) {
     var model = this.model || attrs.model;
     this.listenTo(model, 'change:focus', this.onModelChangeFocus, this);
     //Manually listen to the render event to guard against onRender being overridden

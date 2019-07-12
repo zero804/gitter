@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 'use strict';
 
-var _ = require('lodash');
 var shutdown = require('shutdown');
 var intercom = require('gitter-web-intercom');
 var getIntercomStream = require('intercom-stream');

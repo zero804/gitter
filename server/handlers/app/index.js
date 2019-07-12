@@ -1,6 +1,5 @@
 'use strict';
 
-const env = require('gitter-web-env');
 var express = require('express');
 var uriContextResolverMiddleware = require('../uri-context/uri-context-resolver-middleware');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');

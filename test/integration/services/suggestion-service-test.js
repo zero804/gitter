@@ -5,11 +5,6 @@ var suggestionService = testRequire('./services/suggestions-service');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
-function serialize(f) {
-  var s = JSON.stringify(f);
-  return JSON.parse(s);
-}
-
 describe('suggestion-service', function() {
   describe('integration #slow', function() {
     var fixture = fixtureLoader.setup({

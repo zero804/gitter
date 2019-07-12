@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var stats = env.stats;
-var mixpanel = require('../../web/mixpanelUtils');
 
 /** TODO move onto its own method once we find the need for it elsewhere
  * isRelativeURL() checks if the URL is relative

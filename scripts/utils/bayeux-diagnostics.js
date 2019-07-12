@@ -2,8 +2,6 @@
 /*jslint node: true */
 'use strict';
 
-var env = require('gitter-web-env');
-var winston = env.logger;
 var bayeux = require('../../server/web/bayeux');
 
 var opts = require('yargs')

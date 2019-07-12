@@ -5,7 +5,6 @@ const sinon = require('sinon');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-const persistence = require('gitter-web-persistence');
 const vanillaChatReportService = require('../');
 
 const ONE_DAY_TIME = 24 * 60 * 60 * 1000; // One day

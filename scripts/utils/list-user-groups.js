@@ -9,7 +9,6 @@ var shimPositionOption = require('../yargs-shim-position-option');
 var restful = require('../../server/services/restful');
 var cliff = require('cliff');
 
-var argv = yargs.argv;
 var opts = yargs
   .option(
     'username',

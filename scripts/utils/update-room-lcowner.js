@@ -2,10 +2,8 @@
 'use strict';
 
 var persistence = require('gitter-web-persistence');
-var assert = require('assert');
 var shutdown = require('shutdown');
 var BatchStream = require('batch-stream');
-var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
 // @const
@@ -75,14 +73,18 @@ var updateOwner = function(rooms) {
 var saveRooms = function(rooms) {
   return Promise.all(
     rooms.map(function(room) {
-      return room
-        .save()
-        .then(function() {
-          UPDATED += 1;
-        })
-        .catch(function(err) {
-          return null;
-        });
+      return (
+        room
+          .save()
+          .then(function() {
+            UPDATED += 1;
+          })
+          // FIXME: Don't swallow an error
+          // eslint-disable-next-line no-unused-vars
+          .catch(function(err) {
+            return null;
+          })
+      );
     })
   );
 };

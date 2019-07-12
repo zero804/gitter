@@ -14,7 +14,6 @@ var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('../../keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
-var OrgCollectionView = require('./orgCollectionView');
 var dataSet = require('../../../utils/dataset-shim');
 var toggle = require('../../../utils/toggle');
 

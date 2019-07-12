@@ -9,7 +9,6 @@ var exploreService = require('../../server/services/explore-service');
 var shimPositionOption = require('../yargs-shim-position-option');
 var debug = require('debug')('gitter:infra:rooms-by-tag');
 
-var argv = yargs.argv;
 var opts = yargs
   .option(
     'tag',

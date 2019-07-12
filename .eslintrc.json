@@ -15,7 +15,7 @@
     "quotes": "off",
     "eqeqeq": ["warn", "allow-null"],
     "strict": ["error", "safe"],
-    "no-unused-vars": ["warn"],
+    "no-unused-vars": ["error"],
     "no-extra-boolean-cast": ["warn"],
     "complexity": [
       "error",
