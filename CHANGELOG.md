@@ -2,6 +2,9 @@
 
  - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
 
+Developer facing:
+
+ - Validate Vue code style in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1476
 
 # 19.55.0 - 2019-7-10
 
