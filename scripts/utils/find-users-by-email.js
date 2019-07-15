@@ -2,12 +2,14 @@
 /*jslint node: true */
 'use strict';
 
+// default log level is error
+// can be changed with `env "logging:level=info" ./scripts/utils/find-users-by-email.js`
+process.env['logging:level'] = process.env['logging:level'] || 'error';
+
 var shutdown = require('shutdown');
 var userService = require('gitter-web-users');
 
-require('../../server/event-listeners').install();
-
-var opts = require('yargs')
+const opts = require('yargs')
   .option('email', {
     alias: 'e',
     required: true,
@@ -16,23 +18,24 @@ var opts = require('yargs')
   .help('help')
   .alias('help', 'h').argv;
 
-userService
-  .findAllByEmail(opts.email)
-  .delay(5000)
-  .then(function(users) {
-    if (users.length > 0) {
-      console.log('Found ' + users.length + ' users');
-      users.forEach(function(user, index) {
-        console.log('[' + index + '] ' + user.username);
-      });
-    } else {
-      console.log('No user found!');
-    }
+const findUsers = email => userService.findAllByEmail(email).delay(5000);
 
-    shutdown.shutdownGracefully();
-  })
-  .catch(function(err) {
+const prepareOutput = users => {
+  const initialMessage = users.length ? `Found ${users.length} users` : 'No user found!';
+  const userList = users.map((user, index) => `[${index}] ${user._id} - ${user.username}`);
+  return [initialMessage, ...userList].join('\n');
+};
+
+const performSearch = async () => {
+  try {
+    const users = await findUsers(opts.email);
+    const output = prepareOutput(users);
+    console.log(output);
+    shutdown.shutdownGracefully(0);
+  } catch (err) {
     console.error('Error: ' + err, err);
     shutdown.shutdownGracefully(1);
-  })
-  .done();
+  }
+};
+
+performSearch();
