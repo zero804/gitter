@@ -1,6 +1,7 @@
 # 19.56.0 - *upcoming*
 
  - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
+ - Add chat input to the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1469
 
 Developer facing:
 
