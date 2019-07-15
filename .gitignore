@@ -57,6 +57,11 @@ redis-lua/unread/tests/luacov.report.out
 redis-lua/unread/tests/luacov.stats.out
 test/redis-lua/luacov.report.out
 test/redis-lua/luacov.stats.out
+cypress/screenshots/
+cypress/videos/
+cypress/logs/
+test/e2e/screenshots/
+test/e2e/videos/
 luacov.report.out
 sentinel.dev.conf
 numbers.csv

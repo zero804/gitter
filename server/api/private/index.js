@@ -2,7 +2,9 @@
 
 var express = require('express');
 var authMiddleware = require('../../web/middlewares/auth-api');
-var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
+const env = require('gitter-web-env');
+const identifyRoute = env.middlewares.identifyRoute;
+const logger = env.logger;
 var skipTokenErrorHandler = require('../../web/middlewares/skip-token-error-handler');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -16,6 +18,17 @@ router.get(
   identifyRoute('api-private-health-check-full'),
   require('./health-check-full')
 );
+
+// No auth
+if (
+  process.env.ENABLE_FIXTURE_ENDPOINTS &&
+  (process.env.NODE_ENV === 'dev' ||
+    process.env.NODE_ENV === 'test' ||
+    process.env.NODE_ENV === 'test-docker')
+) {
+  logger.warn('Fixtures endpoint is enabled!');
+  router.use('/fixtures', require('./fixtures'));
+}
 
 router.get(
   '/gh/repos/*',

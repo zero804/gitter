@@ -11,6 +11,7 @@ var integrationFixtures = require('./integration-fixtures');
 
 var fixtureSteps = [
   require('./delete-documents'),
+  require('./create-feature-toggles'),
   require('./create-users'),
   require('./create-oauth-clients'),
   require('./create-oauth-codes'),
