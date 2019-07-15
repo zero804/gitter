@@ -6,30 +6,30 @@ const {
 } = require('../../../../../public/js/vue/thread-message-feed/components/index.vue');
 
 describe('thread-message-feed index', () => {
-  describe('closed', () => {
-    it('matches snapshot', () => {
-      const { wrapper } = mount(Index, {}, store => {
-        store.state.threadMessageFeed.opened = false;
-      });
-      expect(wrapper.element).toMatchSnapshot();
+  const addDefaultUser = state => (state.user = { displayName: 'John Smith' });
+
+  it('closed - matches snapshot', () => {
+    const { wrapper } = mount(Index, {}, store => {
+      store.state.threadMessageFeed.isVisible = false;
+      addDefaultUser(store.state);
     });
+    expect(wrapper.element).toMatchSnapshot();
   });
 
-  describe('opened', () => {
-    it('matches snapshot', () => {
-      const { wrapper } = mount(Index, {}, store => {
-        store.state.threadMessageFeed.opened = true;
-      });
-      expect(wrapper.element).toMatchSnapshot();
+  it('opened - matches snapshot', () => {
+    const { wrapper } = mount(Index, {}, store => {
+      store.state.threadMessageFeed.isVisible = true;
+      addDefaultUser(store.state);
     });
+    expect(wrapper.element).toMatchSnapshot();
+  });
 
-    it('close button calls toggleThreadMessageFeed action', () => {
-      const { wrapper, stubbedActions } = mount(Index, {}, store => {
-        store.state.threadMessageFeed.opened = true;
-      });
-      wrapper.find('button').trigger('click');
-
-      expect(stubbedActions.threadMessageFeed.toggle).toHaveBeenCalled();
+  it('dark theme - matches snapshot', () => {
+    const { wrapper } = mount(Index, {}, store => {
+      store.state.threadMessageFeed.isVisible = true;
+      store.state.darkTheme = true;
+      addDefaultUser(store.state);
     });
+    expect(wrapper.element).toMatchSnapshot();
   });
 });
