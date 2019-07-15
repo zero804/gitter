@@ -8,7 +8,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('login-utils', function() {
   var fixture = fixtureLoader.setup({
-    troupe1: { users: 'user1' },
+    troupe1: { users: 'user1', lastAccessTime: false },
     user3: { username: true }
   });
 

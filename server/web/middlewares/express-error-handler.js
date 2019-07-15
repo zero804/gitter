@@ -48,7 +48,8 @@ function getTemplateForStatus(status) {
 }
 
 /* Has to have four args */
-module.exports = function(err, req, res /*, next */) {
+// eslint-disable-next-line no-unused-vars
+module.exports = function(err, req, res, next) {
   // eslint-disable-line no-unused-vars
   var status = res.statusCode;
 
@@ -78,7 +79,7 @@ module.exports = function(err, req, res /*, next */) {
   }
 
   var template = getTemplateForStatus(status);
-  var message = res.locals.errorMessage || 'An unknown error occurred';
+  var message = (res.locals && res.locals.errorMessage) || `An unknown error occurred ${err}`;
   var extraTemplateValues = {
     title: message
   };

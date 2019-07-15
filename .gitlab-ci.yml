@@ -44,10 +44,14 @@ validate:
     <<: *test_variables
   stage: build_unit_test
   services:
-    - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-    - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-    - redis:3.0
-    - neo4j:2.3
+    - name: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+      alias: mongo
+    - name: redis:3.0.3
+      alias: redis
+    - name: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+      alias: elasticsearch
+    - name: neo4j:2.3
+      alias: neo4j
   script:
     - make ci-test
 
@@ -64,6 +68,32 @@ test-all:
     ALLOW_FLAKEY_TESTS: 1
   only:
     - release/*
+  retry: 2
+
+test-e2e:
+  <<: *test_job
+  stage: build_unit_test
+  variables:
+    <<: *test_variables
+    ENABLE_FIXTURE_ENDPOINTS: 1
+    DISABLE_GITHUB_API: 1
+    NODE_ENV: test-docker
+  script:
+    # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
+    - apt-get update -q -y
+    - apt-get --yes install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+    # Create `output/assets/js/vue-ssr-server-bundle.json`
+    - npm run task-js
+    # Start the server and wait for it to come up
+    - npm start & node test/e2e/support/wait-for-server.js http://localhost:5000
+    # Run the tests
+    - npm run cypress -- run --env baseUrl=http://localhost:5000,apiBaseUrl=http://localhost:5000/api
+  artifacts:
+    when: always
+    paths:
+      - test/e2e/videos/**/*.mp4
+      - test/e2e/screenshots/**/*.png
+    expire_in: 1 day
   retry: 2
 
 package:

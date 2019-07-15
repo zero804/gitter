@@ -7,10 +7,18 @@
     "basepath": "http://localhost:5000",
     "apiBasePath": "http://localhost:5000/api"
   },
+  "express": {
+    "viewCache": false,
+    "showStack": true
+  },
+  "cdn": {
+    "use": false,
+    "hosts": ["localhost:5001"]
+  },
   "mongo": {
     "onlyUsePrimary": true,
     "connection": {
-      "hosts": ["registry.gitlab.com-gitlab-org-gitter-webapp-mongo:27017"],
+      "hosts": ["mongo:27017"],
       "database": "gitter",
       "options": {}
     },
@@ -21,7 +29,6 @@
   "logging": {
     "logToFile": false,
     "level": "error",
-    "disableConsole": true,
     "colorize": false,
     "prettyPrint": true,
     "access": false,
@@ -41,7 +48,7 @@
   "redis_faye": "redis://redis?db=2",
   "elasticsearch": {
     "comment": "Override with GITTER_ES_ENDPOINT (comma separated)",
-    "hosts": ["http://registry.gitlab.com-gitlab-org-gitter-webapp-elasticsearch:9200"]
+    "hosts": ["http://elasticsearch:9200"]
   },
   "test": {
     "exposeInBrowserTests": true,

@@ -9,6 +9,7 @@ var StatusError = require('statuserror');
 var escapeRegExp = require('../../utils/escape-regexp');
 
 var WHITELIST = [
+  '/api/private/fixtures',
   '/api/private/hook/',
   '/api/private/transloadit/',
   '/api/private/statsc',
