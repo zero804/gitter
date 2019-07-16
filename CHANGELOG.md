@@ -7,6 +7,7 @@ Developer facing:
 
  - Validate Vue code style in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1476
  - Make unused variable in the code an error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1477
+ - Add test for deleting integrations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1479
 
 # 19.55.0 - 2019-7-10
 
