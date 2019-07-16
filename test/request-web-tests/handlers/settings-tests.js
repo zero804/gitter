@@ -8,10 +8,9 @@ const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const request = require('supertest-as-promised')(Promise);
 
-//const app = require('../../server/web');
-
 const mockedRequest = require('request');
-mockedRequest.get = async function(requestData, callback) {
+
+const returnSuccess = async function(_requestData, callback) {
   callback(
     null,
     {
@@ -20,17 +19,11 @@ mockedRequest.get = async function(requestData, callback) {
     []
   );
 };
+mockedRequest.get = returnSuccess;
+mockedRequest.del = returnSuccess;
 
 const app = proxyquireNoCallThru('../../../server/web', {
   request: mockedRequest
-});
-
-proxyquireNoCallThru('../../../server/handlers/settings', {
-  request: {
-    get: async function(requestData, callback) {
-      callback(null, {}, []);
-    }
-  }
 });
 
 describe('Integration settings', () => {
@@ -70,5 +63,13 @@ describe('Integration settings', () => {
       .get(`/settings/integrations/${fixture.troupe1.uri}`)
       .set('Authorization', `Bearer ${fixture.userAdmin1.accessToken}`)
       .expect(200);
+  });
+
+  it('DELETE /settings/integrations/<community>/<room> as normal user is forbidden', async () => {
+    await request(app)
+      .post(`/settings/integrations/${fixture.troupe1.uri}`)
+      .send(`_method=delete&accessToken=${fixture.user1.accessToken}&id=5d25cc4b18d95bf6119570ed`)
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(403);
   });
 });
