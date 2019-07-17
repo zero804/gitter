@@ -81,23 +81,20 @@ function serializeChatsForTroupe(troupeId, userId, options, callback) {
     .nodeify(callback);
 }
 
-function serializeUsersForTroupe(troupeId, userId, options) {
-  if (!options) options = {};
-
-  var skip = options.skip;
-  if (!skip || isNaN(skip)) {
-    skip = 0;
-  }
-
-  var limit = options.limit;
-  var searchTerm = options.searchTerm;
-
-  if (!limit || isNaN(limit)) {
-    limit = DEFAULT_USERS_LIMIT;
-  } else if (limit > MAX_USERS_LIMIT) {
-    limit = MAX_USERS_LIMIT;
-  }
-
+/**
+ *
+ * @param {*} options Options can be:
+ *      - `limit` - maximum amount of records retrieved
+ *      - `searchTerm` - query used to match users
+ *      - `lean` - if true, the result is not full mongoose model, just plain object
+ *      - `skip` - how many first records should be omitted (used for pagination)
+ */
+function serializeUsersForTroupe(
+  troupeId,
+  userId,
+  { limit = DEFAULT_USERS_LIMIT, searchTerm, lean, skip = 0 }
+) {
+  // TODO: extract the if into a separate function - the searchTerm branch of this function is completely separate
   if (typeof searchTerm === 'string') {
     if (survivalMode || searchTerm.length < 1) {
       return Promise.resolve([]);
@@ -109,14 +106,17 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     });
   }
 
+  if (limit > MAX_USERS_LIMIT) {
+    limit = MAX_USERS_LIMIT;
+  }
   return roomMembershipService
-    .findMembersForRoom(troupeId, { limit: limit, skip: skip })
+    .findMembersForRoom(troupeId, { limit, skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
         includeRolesForTroupeId: troupeId,
         currentUserId: userId,
-        lean: !!options.lean
+        lean: !!lean
       });
 
       return restSerializer.serialize(userIds, strategy);

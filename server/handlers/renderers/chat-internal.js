@@ -42,21 +42,16 @@ async function renderChat(req, res, next, options) {
       ? unreadItems.chat.length + 20
       : INITIAL_CHAT_COUNT;
 
-  var snapshotOptions = {
+  const chatSnapshotOptions = {
     limit: limit,
     aroundId: permalinkMessageId(req),
     unread: options.unread // Unread can be true, false or undefined
   };
 
-  var chatSerializerOptions = _.defaults({}, snapshotOptions);
-
-  var userSerializerOptions = _.defaults(
-    {
-      lean: true,
-      limit: ROSTER_SIZE
-    },
-    snapshotOptions
-  );
+  const userSerializerOptions = {
+    lean: true,
+    limit: ROSTER_SIZE
+  };
 
   const [
     troupeContext,
@@ -69,10 +64,10 @@ async function renderChat(req, res, next, options) {
     options.generateContext === false
       ? {}
       : contextGenerator.generateTroupeContext(req, {
-          snapshots: { chat: snapshotOptions },
+          snapshots: { chat: chatSnapshotOptions },
           permalinkChatId: permalinkMessageId(req)
         }),
-    restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
+    restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
     options.fetchUsers === false
       ? null
