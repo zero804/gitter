@@ -23,12 +23,13 @@ const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
+const permalinkMessageId = req => fixMongoIdQueryParam(req.query.at);
+
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
 
   var troupe = uriContext.troupe;
-  var aroundId = fixMongoIdQueryParam(req.query.at);
   var script = options.script;
   var user = req.user;
   var userId = user && user.id;
@@ -43,7 +44,7 @@ async function renderChat(req, res, next, options) {
 
   var snapshotOptions = {
     limit: limit,
-    aroundId: aroundId,
+    aroundId: permalinkMessageId(req),
     unread: options.unread // Unread can be true, false or undefined
   };
 
@@ -69,7 +70,7 @@ async function renderChat(req, res, next, options) {
       ? {}
       : contextGenerator.generateTroupeContext(req, {
           snapshots: { chat: snapshotOptions },
-          permalinkChatId: aroundId
+          permalinkChatId: permalinkMessageId(req)
         }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
