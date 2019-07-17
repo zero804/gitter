@@ -10,7 +10,6 @@ var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
-var unreadItemService = require('gitter-web-unread-items');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
@@ -18,29 +17,11 @@ var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot'
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
+const { getChatSnapshotOptions } = require('./chat/chat-snapshot-options');
 
-/* How many chats to send back */
-var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
 
 const permalinkMessageId = req => fixMongoIdQueryParam(req.query.at);
-
-/* which messages and how many of them should be fetched */
-const getChatSnapshotOptions = async (userId, troupeId, req, unread) => {
-  // It's ok if there's no user (logged out), unreadItems will be 0
-  const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupeId);
-
-  var limit =
-    unreadItems.chat.length > INITIAL_CHAT_COUNT
-      ? unreadItems.chat.length + 20
-      : INITIAL_CHAT_COUNT;
-
-  return {
-    limit,
-    aroundId: permalinkMessageId(req),
-    unread // Unread can be true, false or undefined
-  };
-};
 
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
