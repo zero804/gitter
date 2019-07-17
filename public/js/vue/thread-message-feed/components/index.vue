@@ -1,15 +1,18 @@
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
+import ChatItem from './chat-item.vue';
 
 export default {
   name: 'ThreadMessageFeed',
   components: {
     ChatInput,
-    ThreadHeader
+    ThreadHeader,
+    ChatItem
   },
   computed: {
+    ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
       user: 'user',
@@ -24,10 +27,12 @@ export default {
     class="js-thread-message-feed-root root"
     :class="{ opened: isVisible, 'dark-theme': darkTheme }"
   >
-    <section class="body">
+    <section v-if="isVisible" class="body">
       <thread-header />
       <section class="content">
-        <div class="chat-messages"></div>
+        <div class="chat-messages">
+          <chat-item :message="parentMessage" />
+        </div>
         <chat-input :user="user" thread />
       </section>
     </section>
