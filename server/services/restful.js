@@ -5,7 +5,6 @@ var logger = env.logger;
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var _ = require('lodash');
 var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
@@ -50,35 +49,25 @@ function serializeTroupesForUser(userId, callback) {
     .nodeify(callback);
 }
 
-function serializeChatsForTroupe(troupeId, userId, options, callback) {
-  options = _.extend(
-    {},
-    {
-      skip: 0,
-      limit: DEFAULT_CHAT_COUNT_LIMIT,
-      userId: userId // This may also be appearing through in options
-    },
-    options
-  );
-
-  var initialId = options.aroundId;
-
+function serializeChatsForTroupe(
+  troupeId,
+  userId,
+  { limit = DEFAULT_CHAT_COUNT_LIMIT, aroundId, unread, lookups }
+) {
   return chatService
-    .findChatMessagesForTroupe(troupeId, options)
+    .findChatMessagesForTroupe(troupeId, { limit, aroundId })
     .then(function(chatMessages) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
-        initialId: initialId,
+        initialId: aroundId,
         currentUserId: userId,
         troupeId: troupeId,
-        unread: options.unread,
-        lean: options.lean,
-        lookups: options.lookups
+        unread: unread,
+        lookups: lookups
       });
 
       return restSerializer.serialize(chatMessages, strategy);
-    })
-    .nodeify(callback);
+    });
 }
 
 /**

@@ -214,7 +214,7 @@ function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
       }
 
       return restful
-        .serializeChatsForTroupe(troupeId, userId, snapshot)
+        .serializeChatsForTroupe(troupeId, userId, { lookups: snapshot.lookups })
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
@@ -222,9 +222,13 @@ function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
-      return restful
-        .serializeUsersForTroupe(troupeId, userId, snapshot)
-        .then(dataToSnapshot('room.users'));
+      return (
+        restful
+          // TODO: snapshot most likely contains only { lean, limit } parameters
+          // (see line 350) make that clear in the argument
+          .serializeUsersForTroupe(troupeId, userId, snapshot)
+          .then(dataToSnapshot('room.users'))
+      );
 
     case 'events':
       if (survivalMode) {
@@ -343,6 +347,17 @@ module.exports = bayeuxExtension({
     var clientId = message.clientId;
 
     var state = message._private && message._private.authorisor;
+    /**
+     * This snapshot comes from extra metadata in bayeux message (`message.ext.snapshot`).
+     * Client can set it up to whatever they want. Our own application is using methods `getSnapshotState`
+     * which are defined on LiveCollections like `public/js/collections/infinite-mixin.js`. This mechanism
+     * is defined in `realtime-client`.
+     * It can have following values:
+     *  - `{ lean: true, limit: 25 }` `public/js/collections/users`
+     *  - `false` `public/js/components/live-context`
+     *  - `true/false` `public/js/components/realtime-troupe-listener`
+     *  - `{ lookups: ['user'] }` `public/js/collections/chat.js`
+     */
     var snapshot = state && state.snapshot;
     var userId = state && state.userId;
 
