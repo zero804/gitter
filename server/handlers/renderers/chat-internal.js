@@ -30,7 +30,6 @@ async function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
 
   var troupe = uriContext.troupe;
-  var script = options.script;
   var user = req.user;
   var userId = user && user.id;
 
@@ -97,6 +96,7 @@ async function renderChat(req, res, next, options) {
     integrationsUrl = '#integrations';
   }
 
+  const script = options.script;
   var cssFileName = options.stylesheet
     ? 'styles/' + options.stylesheet + '.css'
     : 'styles/' + script + '.css'; // css filename matches bootscript
