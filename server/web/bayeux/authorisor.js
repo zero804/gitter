@@ -155,9 +155,7 @@ function dataToSnapshot(type) {
   };
 }
 
-function populateSubUserCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
+function populateSubUserCollection({ userId, match }) {
   var subscribeUserId = match[1];
   var collection = match[2];
 
@@ -183,10 +181,7 @@ function populateSubUserCollection(options) {
   return Promise.resolve();
 }
 
-function populateTroupe(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var snapshotOptions = options.snapshot || false;
+function populateTroupe({ userId, match, snapshot = false }) {
   var troupeId = match[1];
 
   /**
@@ -194,7 +189,7 @@ function populateTroupe(options) {
    * then we return the current troupe to the user
    */
 
-  if (!snapshotOptions) return Promise.resolve();
+  if (!snapshot) return Promise.resolve();
 
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: userId,
@@ -208,10 +203,7 @@ function populateTroupe(options) {
   return restSerializer.serializeObject(troupeId, strategy).then(dataToSnapshot('room'));
 }
 
-function populateSubTroupeCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var snapshotOptions = options.snapshot || {}; // Details of the snapshot
+function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
   var troupeId = match[1];
   var collection = match[2];
 
@@ -222,7 +214,7 @@ function populateSubTroupeCollection(options) {
       }
 
       return restful
-        .serializeChatsForTroupe(troupeId, userId, snapshotOptions)
+        .serializeChatsForTroupe(troupeId, userId, snapshot)
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
@@ -231,7 +223,7 @@ function populateSubTroupeCollection(options) {
       }
 
       return restful
-        .serializeUsersForTroupe(troupeId, userId, snapshotOptions)
+        .serializeUsersForTroupe(troupeId, userId, snapshot)
         .then(dataToSnapshot('room.users'));
 
     case 'events':
@@ -248,8 +240,7 @@ function populateSubTroupeCollection(options) {
   return Promise.resolve();
 }
 
-function populateSubSubTroupeCollection(options) {
-  var match = options.match;
+function populateSubSubTroupeCollection({ match }) {
   var troupeId = match[1];
   var collection = match[2];
   var subId = match[3];
@@ -268,9 +259,7 @@ function populateSubSubTroupeCollection(options) {
   return Promise.resolve();
 }
 
-function populateUserUnreadItemsCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
+function populateUserUnreadItemsCollection({ userId, match }) {
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
