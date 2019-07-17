@@ -7,12 +7,16 @@ const fonts = require('../../web/fonts');
 async function renderLearnPage(req, res) {
   res.render(
     'learn',
-    await mixinHbsDataForVueLeftMenu(req, {
-      bootScriptName: 'router-home-learn',
-      cssFileName: 'styles/userhome.css',
-      fonts: fonts.getFonts(),
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies)
-    })
+    await mixinHbsDataForVueLeftMenu(
+      req,
+      {},
+      {
+        bootScriptName: 'router-home-learn',
+        cssFileName: 'styles/userhome.css',
+        fonts: fonts.getFonts(),
+        hasCachedFonts: fonts.hasCachedFonts(req.cookies)
+      }
+    )
   );
 }
 

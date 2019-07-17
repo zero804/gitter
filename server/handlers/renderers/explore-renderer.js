@@ -158,6 +158,7 @@ async function renderExplorePage(req, res) {
     'explore',
     await mixinHbsDataForVueLeftMenu(
       req,
+      {},
       _.extend({}, snapshots, {
         bootScriptName: 'explore',
         cssFileName: 'styles/explore.css',

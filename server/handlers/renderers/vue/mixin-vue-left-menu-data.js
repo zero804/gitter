@@ -5,7 +5,7 @@ const restful = require('../../../services/restful');
 var contextGenerator = require('../../../web/context-generator');
 var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
-async function mixinHbsDataForVueLeftMenu(req, existingData) {
+async function mixinHbsDataForVueLeftMenu(req, routeSpecificStoreData, existingData) {
   const useVueLeftMenu = req.fflip.has('vue-left-menu');
   if (!useVueLeftMenu) {
     return existingData;
@@ -40,7 +40,8 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     displayedRoomId: room && room.id,
 
     leftMenuPinnedState: !isMobile,
-    leftMenuExpandedState: false
+    leftMenuExpandedState: false,
+    ...routeSpecificStoreData
   };
 
   const vueLeftMenuHtmlOutput = await vueRenderToString({
