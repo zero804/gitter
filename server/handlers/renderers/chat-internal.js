@@ -25,6 +25,23 @@ var ROSTER_SIZE = 25;
 
 const permalinkMessageId = req => fixMongoIdQueryParam(req.query.at);
 
+/* which messages and how many of them should be fetched */
+const getChatSnapshotOptions = async (userId, troupeId, req, unread) => {
+  // It's ok if there's no user (logged out), unreadItems will be 0
+  const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupeId);
+
+  var limit =
+    unreadItems.chat.length > INITIAL_CHAT_COUNT
+      ? unreadItems.chat.length + 20
+      : INITIAL_CHAT_COUNT;
+
+  return {
+    limit,
+    aroundId: permalinkMessageId(req),
+    unread // Unread can be true, false or undefined
+  };
+};
+
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
@@ -33,24 +50,11 @@ async function renderChat(req, res, next, options) {
   var user = req.user;
   var userId = user && user.id;
 
-  // It's ok if there's no user (logged out), unreadItems will be 0
-  const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupe.id);
-
-  var limit =
-    unreadItems.chat.length > INITIAL_CHAT_COUNT
-      ? unreadItems.chat.length + 20
-      : INITIAL_CHAT_COUNT;
-
-  const chatSnapshotOptions = {
-    limit: limit,
-    aroundId: permalinkMessageId(req),
-    unread: options.unread // Unread can be true, false or undefined
-  };
-
   const userSerializerOptions = {
     lean: true,
     limit: ROSTER_SIZE
   };
+  const chatSnapshotOptions = await getChatSnapshotOptions(userId, troupe.id, req, options.unread);
 
   const [
     troupeContext,
