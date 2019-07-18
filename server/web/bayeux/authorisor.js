@@ -15,6 +15,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var tokenProvider = require('../../services/tokens');
+const { createOptionsValidator } = require('../../utils/options-validator');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -207,32 +208,42 @@ function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
   var troupeId = match[1];
   var collection = match[2];
 
+  const validateChatSnapshot = createOptionsValidator(
+    'authorisor.populateSubTroupeCollection.chat',
+    ['limit', 'lookups', 'beforeInclId']
+  );
+
+  const validateUserSnapshot = createOptionsValidator(
+    'authorisor.populateSubTroupeCollection.user',
+    ['limit', 'lean']
+  );
+
   switch (collection) {
     case 'chatMessages':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
+      // TODO: check production logs for warnings with unexpected options
+      // then refactor this method to only accept the expected names
+      // the refactor can be done by reverting the commit responsible for this comment
+      validateChatSnapshot(snapshot);
+
       return restful
-        .serializeChatsForTroupe(troupeId, userId, {
-          lookups: snapshot.lookups,
-          limit: snapshot.limit,
-          beforeInclId: snapshot.beforeInclId
-        })
+        .serializeChatsForTroupe(troupeId, userId, snapshot)
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
-
-      return (
-        restful
-          // TODO: snapshot most likely contains only { lean, limit } parameters
-          // (see line 350) make that clear in the argument
-          .serializeUsersForTroupe(troupeId, userId, snapshot)
-          .then(dataToSnapshot('room.users'))
-      );
+      // TODO: check production logs for warnings with unexpected options
+      // then refactor this method to only accept the expected names
+      // the refactor can be done by reverting the commit responsible for this comment
+      validateUserSnapshot(snapshot);
+      return restful
+        .serializeUsersForTroupe(troupeId, userId, snapshot)
+        .then(dataToSnapshot('room.users'));
 
     case 'events':
       if (survivalMode) {

@@ -19,6 +19,7 @@ var roomMembershipService = require('gitter-web-rooms/lib/room-membership-servic
 var orgService = require('./org-service');
 var repoService = require('./repo-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+const { createOptionsValidator } = require('../utils/options-validator');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -49,21 +50,33 @@ function serializeTroupesForUser(userId, callback) {
     .nodeify(callback);
 }
 
-function serializeChatsForTroupe(
-  troupeId,
-  userId,
-  { limit = DEFAULT_CHAT_COUNT_LIMIT, aroundId, unread, lookups, beforeInclId }
-) {
+function serializeChatsForTroupe(troupeId, userId, options) {
+  // TODO: check production logs for warnings with unexpected options
+  // then refactor this method to only accept the following options
+  // the refactor can be done by reverting the commit responsible for this comment
+  const expectedOptionNames = ['limit', 'aroundId', 'unread', 'lookups', 'beforeInclId'];
+  const validateChatOptions = createOptionsValidator(
+    'restful.serializeChatsForTroupe',
+    expectedOptionNames
+  );
+  validateChatOptions(options);
+
+  const defaultOptions = {
+    skip: 0,
+    limit: DEFAULT_CHAT_COUNT_LIMIT,
+    userId // userId is only needed by `findChatMessagesForTroupe` when `options.marker` is present
+  };
   return chatService
-    .findChatMessagesForTroupe(troupeId, { limit, aroundId, beforeInclId })
+    .findChatMessagesForTroupe(troupeId, { ...defaultOptions, ...options })
     .then(function(chatMessages) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
-        initialId: aroundId,
+        initialId: options.aroundId,
         currentUserId: userId,
         troupeId: troupeId,
-        unread: unread,
-        lookups: lookups
+        unread: options.unread,
+        lean: options.lean,
+        lookups: options.lookups
       });
 
       return restSerializer.serialize(chatMessages, strategy);
