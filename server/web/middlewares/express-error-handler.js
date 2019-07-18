@@ -48,7 +48,8 @@ function getTemplateForStatus(status) {
 }
 
 /* Has to have four args */
-module.exports = function(err, req, res /*, next */) {
+// eslint-disable-next-line no-unused-vars
+module.exports = function(err, req, res, next) {
   // eslint-disable-line no-unused-vars
   var status = res.statusCode;
 
