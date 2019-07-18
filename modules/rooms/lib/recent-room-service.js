@@ -84,10 +84,10 @@ function findInitialRoomUrlForUser(user) {
       .then(function(url) {
         if (url) return url;
 
-        return findMostRecentRoomUrlForUser(user.id);
+        return findMostRecentRoomUrlForUser(user._id);
       });
   } else {
-    return findMostRecentRoomUrlForUser(user.id);
+    return findMostRecentRoomUrlForUser(user._id);
   }
 }
 
