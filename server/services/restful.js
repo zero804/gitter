@@ -78,11 +78,7 @@ function serializeChatsForTroupe(
  *      - `lean` - if true, the result is not full mongoose model, just plain object
  *      - `skip` - how many first records should be omitted (used for pagination)
  */
-function serializeUsersForTroupe(
-  troupeId,
-  userId,
-  { limit = DEFAULT_USERS_LIMIT, searchTerm, lean, skip = 0 }
-) {
+function serializeUsersForTroupe(troupeId, userId, { limit, searchTerm, lean, skip }) {
   // TODO: extract the if into a separate function - the searchTerm branch of this function is completely separate
   if (typeof searchTerm === 'string') {
     if (survivalMode || searchTerm.length < 1) {
@@ -95,6 +91,8 @@ function serializeUsersForTroupe(
     });
   }
 
+  limit = isNaN(limit) ? DEFAULT_USERS_LIMIT : limit;
+  skip = isNaN(skip) ? 0 : skip;
   if (limit > MAX_USERS_LIMIT) {
     limit = MAX_USERS_LIMIT;
   }
