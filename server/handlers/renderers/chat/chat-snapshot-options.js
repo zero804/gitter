@@ -5,7 +5,7 @@ const unreadItemService = require('gitter-web-unread-items');
 /* How many chats to send back */
 const INITIAL_CHAT_COUNT = 50;
 
-const permalinkMessageId = req => fixMongoIdQueryParam(req.query.at);
+const getPermalinkMessageId = request => fixMongoIdQueryParam(request.query.at);
 
 /* which messages and how many of them should be fetched */
 const getChatSnapshotOptions = async (userId, troupeId, req, unread) => {
@@ -19,7 +19,7 @@ const getChatSnapshotOptions = async (userId, troupeId, req, unread) => {
 
   return {
     limit,
-    aroundId: permalinkMessageId(req),
+    aroundId: getPermalinkMessageId(req),
     unread // Unread can be true, false or undefined
   };
 };

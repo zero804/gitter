@@ -21,7 +21,7 @@ const getChatSnapshotOptions = require('./chat/chat-snapshot-options');
 
 var ROSTER_SIZE = 25;
 
-const permalinkMessageId = req => fixMongoIdQueryParam(req.query.at);
+const getPermalinkMessageId = request => fixMongoIdQueryParam(request.query.at);
 
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
@@ -49,7 +49,7 @@ async function renderChat(req, res, next, options) {
       ? {}
       : contextGenerator.generateTroupeContext(req, {
           snapshots: { chat: chatSnapshotOptions },
-          permalinkChatId: permalinkMessageId(req)
+          permalinkChatId: getPermalinkMessageId(req)
         }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
