@@ -28,9 +28,7 @@ function cdnPassthroughFactory(cdnOptions) {
 
       if (options && options.email) {
         throw new Error(
-          `emailBasePath:${cdnOptions.emailBasePath} or webBasepath:${
-            cdnOptions.webBasepath
-          } not supplied`
+          `emailBasePath:${cdnOptions.emailBasePath} or webBasepath:${cdnOptions.webBasepath} not supplied`
         );
       }
 
