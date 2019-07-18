@@ -14,9 +14,9 @@ describe('thread-message-feed thread-header', () => {
     const { wrapper, stubbedActions } = mount(ThreadHeader);
     wrapper.find({ ref: 'close-button' }).trigger('click');
 
-    expect(stubbedActions.threadMessageFeed.toggle).toHaveBeenCalledWith(
+    expect(stubbedActions.threadMessageFeed.close).toHaveBeenCalledWith(
       expect.anything(),
-      false,
+      undefined,
       undefined
     );
   });

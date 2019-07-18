@@ -1,0 +1,64 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`thread-message-feed chat-item matches snapshot 1`] = `
+<div
+  class="chat-item"
+>
+  <div
+    class="chat-item__container"
+  >
+    <div
+      class="chat-item__aside"
+    >
+      <div
+        class="chat-item__avatar"
+      >
+        <avatar-stub
+          size="s"
+          user="[object Object]"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <div
+      class="chat-item__content"
+    >
+      <div
+        class="chat-item__details"
+      >
+        <div
+          class="chat-item__from js-chat-item-from"
+        >
+          Tomas Vik
+        </div>
+         
+        <div
+          class="chat-item__username js-chat-item-from"
+        >
+          @viktomas_gitlab
+        </div>
+      </div>
+       
+      <div
+        class="chat-item__text js-chat-item-text"
+      >
+        Example message using a bit of  
+        <code>
+          code
+        </code>
+         and 
+        <strong>
+          bold
+        </strong>
+         to show how 
+        <em>
+          markdown
+        </em>
+         is stored.
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -37,7 +37,7 @@ export default {
       <a class='chat-item__time js-chat-time' {{#if permalinkUrl}} href='{{permalinkUrl}}'{{/if}} title="{{ sentTimeFormattedFull }}">{{ sentTimeFormatted }}</a>
       -->
         </div>
-        <div v-html="message.html" class="chat-item__text js-chat-item-text"></div>
+        <div class="chat-item__text js-chat-item-text" v-html="message.html"></div>
       </div>
     </div>
   </div>

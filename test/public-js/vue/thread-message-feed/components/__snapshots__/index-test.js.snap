@@ -4,25 +4,7 @@ exports[`thread-message-feed index closed - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root"
 >
-  <section
-    class="body"
-  >
-    <thread-header-stub />
-     
-    <section
-      class="content"
-    >
-      <div
-        class="chat-messages"
-      />
-       
-      <chat-input-stub
-        roommember="true"
-        thread="true"
-        user="[object Object]"
-      />
-    </section>
-  </section>
+  <!---->
 </div>
 `;
 
@@ -40,7 +22,11 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
     >
       <div
         class="chat-messages"
-      />
+      >
+        <chat-item-stub
+          message="[object Object]"
+        />
+      </div>
        
       <chat-input-stub
         roommember="true"
@@ -66,7 +52,11 @@ exports[`thread-message-feed index opened - matches snapshot 1`] = `
     >
       <div
         class="chat-messages"
-      />
+      >
+        <chat-item-stub
+          message="[object Object]"
+        />
+      </div>
        
       <chat-input-stub
         roommember="true"

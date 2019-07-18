@@ -28,7 +28,7 @@ export default {
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
-      return rootState.messageMap[state.parentId] || {};
+      return rootState.messageMap[state.parentId];
     }
   },
   actions: {
