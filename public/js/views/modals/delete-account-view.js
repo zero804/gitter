@@ -85,9 +85,7 @@ var Modal = ModalView.extend({
             if (err.statusText === 'timeout') {
               this.lockModel.set(
                 'deletionRequestError',
-                `The request timed out but your account is probably still in the process of being deleted on our end (especially if you joined a lot of rooms). Please wait a couple hours before trying again : ${err} (status: ${
-                  err.status
-                })`
+                `The request timed out but your account is probably still in the process of being deleted on our end (especially if you joined a lot of rooms). Please wait a couple hours before trying again : ${err} (status: ${err.status})`
               );
             } else {
               this.lockModel.set(

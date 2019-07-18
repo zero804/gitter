@@ -130,9 +130,7 @@ function newReport(fromUser, messageId) {
 
         checkUserPromise = getReportSumForUser(report.messageUserId).then(function(sum) {
           logger.info(
-            `Report from ${report.reporterUserId} with weight=${report.weight} made against user ${
-              report.messageUserId
-            }, sum=${sum}/${BAD_USER_THRESHOLD}`
+            `Report from ${report.reporterUserId} with weight=${report.weight} made against user ${report.messageUserId}, sum=${sum}/${BAD_USER_THRESHOLD}`
           );
           if (sum >= BAD_USER_THRESHOLD) {
             stats.event('new_bad_user_from_reports', {
@@ -160,11 +158,7 @@ function newReport(fromUser, messageId) {
 
         checkMessagePromise = getReportSumForMessage(report.messageId).then(function(sum) {
           logger.info(
-            `Report from ${report.reporterUserId} with weight=${
-              report.weight
-            } made against message ${
-              report.messageId
-            }, sum is now, sum=${sum}/${BAD_MESSAGE_THRESHOLD}`
+            `Report from ${report.reporterUserId} with weight=${report.weight} made against message ${report.messageId}, sum is now, sum=${sum}/${BAD_MESSAGE_THRESHOLD}`
           );
 
           if (sum >= BAD_MESSAGE_THRESHOLD) {
@@ -174,9 +168,7 @@ function newReport(fromUser, messageId) {
             });
 
             logger.info(
-              `Bad message ${
-                report.messageId
-              } detected (removing) sum=${sum}/${BAD_MESSAGE_THRESHOLD}`
+              `Bad message ${report.messageId} detected (removing) sum=${sum}/${BAD_MESSAGE_THRESHOLD}`
             );
             chatService.deleteMessageFromRoom(room, chatMessage);
           }
