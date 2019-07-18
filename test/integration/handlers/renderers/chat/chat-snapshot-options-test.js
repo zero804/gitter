@@ -14,23 +14,17 @@ const getChatSnapshotOptions = testRequire.withProxies(
 );
 
 describe('chat-snapshot-options', function() {
-  const whenUnreadItemsAre = unreadItems =>
+  function mockUnreadItems(unreadItems) {
     mockito
       .when(unreadItemServiceMock)
       .getUnreadItemsForUser()
       .then(() => {
         return Promise.resolve({ chat: unreadItems });
       });
+  }
 
   it('returns default and passed values', async () => {
-    mockito
-      .when(unreadItemServiceMock)
-      .getUnreadItemsForUser()
-      .then((userId, troupeId) => {
-        assert.equal(userId, 'user-id-1');
-        assert.equal(troupeId, 'troupe-id-1');
-        return Promise.resolve({ chat: [] });
-      });
+    mockUnreadItems([]);
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, false);
     assert.deepEqual(result, {
       limit: 50,
@@ -39,14 +33,26 @@ describe('chat-snapshot-options', function() {
     });
   });
 
+  it('passes correct arguments to unreadItemsService', async () => {
+    mockito
+      .when(unreadItemServiceMock)
+      .getUnreadItemsForUser()
+      .then((userId, troupeId) => {
+        assert.equal(userId, 'user-id-1');
+        assert.equal(troupeId, 'troupe-id-1');
+        return Promise.resolve({ chat: [] });
+      });
+    await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, false);
+  });
+
   it('returns unread items count + 20', async () => {
-    whenUnreadItemsAre(_.range(60));
+    mockUnreadItems(_.range(60));
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, false);
     assert.equal(result.limit, 80);
   });
 
   it('passes through aroundId', async () => {
-    whenUnreadItemsAre([]);
+    mockUnreadItems([]);
     const result = await getChatSnapshotOptions(
       'user-id-1',
       'troupe-id-1',
@@ -57,7 +63,7 @@ describe('chat-snapshot-options', function() {
   });
 
   it('passes through unread', async () => {
-    whenUnreadItemsAre([]);
+    mockUnreadItems([]);
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, true);
     assert.equal(result.unread, true);
   });
