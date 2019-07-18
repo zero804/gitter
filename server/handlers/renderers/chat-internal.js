@@ -17,7 +17,7 @@ var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot'
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
-const { getChatSnapshotOptions } = require('./chat/chat-snapshot-options');
+const getChatSnapshotOptions = require('./chat/chat-snapshot-options');
 
 var ROSTER_SIZE = 25;
 

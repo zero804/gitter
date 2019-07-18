@@ -24,6 +24,4 @@ const getChatSnapshotOptions = async (userId, troupeId, req, unread) => {
   };
 };
 
-module.exports = {
-  getChatSnapshotOptions
-};
+module.exports = getChatSnapshotOptions;

@@ -6,7 +6,7 @@ const testRequire = require('../../../test-require');
 const mockito = require('jsmockito').JsMockito;
 const underlyingUnreadItemService = require('gitter-web-unread-items');
 const unreadItemServiceMock = mockito.spy(underlyingUnreadItemService);
-const { getChatSnapshotOptions } = testRequire.withProxies(
+const getChatSnapshotOptions = testRequire.withProxies(
   './handlers/renderers/chat/chat-snapshot-options',
   {
     'gitter-web-unread-items': unreadItemServiceMock
