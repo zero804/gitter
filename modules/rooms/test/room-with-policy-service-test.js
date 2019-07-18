@@ -2,6 +2,7 @@
 
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
@@ -136,13 +137,13 @@ describe('room-with-policy-service', function() {
           return r
             .banUserFromRoom(fixture.userBan.username, {})
             .then(function(ban) {
-              assert.equal(ban.userId, fixture.userBan.id);
-              assert.equal(ban.bannedBy, fixture.userBanAdmin.id);
+              assert(mongoUtils.objectIDsEqual(ban.userId, fixture.userBan._id));
+              assert.equal(ban.bannedBy, fixture.userBanAdmin._id);
               assert(ban.dateBanned);
 
               return roomMembershipService.checkRoomMembership(
                 fixture.troupeBan._id,
-                fixture.userBan.id
+                fixture.userBan._id
               );
             })
             .then(function(bannedUserIsInRoom) {
@@ -183,7 +184,7 @@ describe('room-with-policy-service', function() {
       var RoomWithPolicyService = proxyquireNoCallThru('../lib/room-with-policy-service', {
         'gitter-web-permissions/lib/policy-factory': {
           createPolicyForRoom: function(user, room) {
-            assert.strictEqual(user.id, fixture.userBan.id);
+            assert(mongoUtils.objectIDsEqual(user.id, fixture.userBan._id));
             assert.strictEqual(room.id, fixture.troupeBan2.id);
             return Promise.resolve({
               canAdmin: function() {

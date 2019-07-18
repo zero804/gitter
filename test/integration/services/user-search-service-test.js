@@ -61,7 +61,7 @@ describe('User Search Service', function() {
 
   describe('#searchForUsers', function() {
     it('should find both test users', function(done) {
-      var userId = fixture.user1.id;
+      var userId = fixture.user1._id;
 
       userSearchService.searchForUsers(userId, 'tEst', {}, function(err, searchResults) {
         if (err) return done(err);
@@ -91,7 +91,7 @@ describe('User Search Service', function() {
     });
 
     it('should find one Test Users 2 and 3', function(done) {
-      var userId = fixture.user1.id;
+      var userId = fixture.user1._id;
 
       userSearchService.searchForUsers(userId, 'tEst user 2', {}, function(err, searchResults) {
         if (err) return done(err);
@@ -112,7 +112,7 @@ describe('User Search Service', function() {
     });
 
     it('should not find test user three when a testtroupe3 is excluded', function(done) {
-      var userId = fixture.user1.id;
+      var userId = fixture.user1._id;
 
       userSearchService.searchForUsers(
         userId,
@@ -140,7 +140,7 @@ describe('User Search Service', function() {
     });
 
     it('should not find an unknown users', function(done) {
-      var userId = fixture.user1.id;
+      var userId = fixture.user1._id;
 
       userSearchService.searchForUsers(userId, 'Noddy Obama McBigbones', {}, function(
         err,

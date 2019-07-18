@@ -42,7 +42,7 @@ describe('user-repos #slow', function() {
 
   it('GET /v1/user/:userId/repos', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/repos')
+      .get('/v1/user/' + fixture.user1._id + '/repos')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -58,7 +58,7 @@ describe('user-repos #slow', function() {
 
   it('GET /v1/user/:userId/repos?type=unused', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/repos?type=unused')
+      .get('/v1/user/' + fixture.user1._id + '/repos?type=unused')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -83,7 +83,7 @@ describe('user-repos #slow', function() {
       })
       .then(function() {
         return request(app)
-          .get('/v1/user/' + fixture.user1.id + '/repos?type=unused')
+          .get('/v1/user/' + fixture.user1._id + '/repos?type=unused')
           .set('x-access-token', fixture.user1.accessToken)
           .expect(200);
       })
@@ -100,7 +100,7 @@ describe('user-repos #slow', function() {
 
   it('GET /v1/user/:userId/repos?type=admin', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user2.id + '/repos?type=admin')
+      .get('/v1/user/' + fixture.user2._id + '/repos?type=admin')
       .set('x-access-token', fixture.user2.accessToken)
       .expect(200)
       .then(function(result) {

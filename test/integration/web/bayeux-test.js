@@ -114,7 +114,7 @@ describe('bayeux', function() {
       assert.equal(messagesToStay.length, 1);
       // ban userToBeBanned1 (clientToBeBanned)
       appEvents.userRemovedFromTroupe({
-        userId: fixture.userToBeBanned1.id,
+        userId: fixture.userToBeBanned1._id,
         troupeId: fixture.troupe1.id
       });
       // send the second message but make sure the user removal had time to propagate

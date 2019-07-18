@@ -46,7 +46,7 @@ describe('user-group-api', function() {
 
   it('GET /v1/user/:userId/groups', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/groups')
+      .get('/v1/user/' + fixture.user1._id + '/groups')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -70,7 +70,7 @@ describe('user-group-api', function() {
 
   it('PATCH /v1/user/:userId/groups/:groupId', function() {
     return request(app)
-      .patch('/v1/user/' + fixture.user1.id + '/groups/' + fixture.group1.id)
+      .patch('/v1/user/' + fixture.user1._id + '/groups/' + fixture.group1.id)
       .send({
         favourite: 1
       })

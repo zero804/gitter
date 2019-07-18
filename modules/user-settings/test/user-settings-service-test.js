@@ -12,7 +12,7 @@ describe('User Settings Service', function() {
   });
 
   it('should be able to set user settings', function() {
-    var userId = fixture.user1.id;
+    var userId = fixture.user1._id;
 
     return userSettingsService
       .setUserSettings(userId, 'test', { value1: 1, value2: true, value3: 'string' })
@@ -27,7 +27,7 @@ describe('User Settings Service', function() {
   });
 
   it('should be able to set multiple keys', function() {
-    var userId = fixture.user1.id;
+    var userId = fixture.user1._id;
 
     return userSettingsService
       .setUserSettings(userId, 'test', { value1: 1, value2: true, value3: 'string' })
@@ -61,7 +61,7 @@ describe('User Settings Service', function() {
   });
 
   it('should be able to get multiple keys', function() {
-    var userId = fixture.user1.id;
+    var userId = fixture.user1._id;
     var V1 = { value1: 1, value2: true, value3: 'string' };
     var V2 = { human: 1, monkey: 0 };
 
@@ -94,8 +94,8 @@ describe('User Settings Service', function() {
   });
 
   it('should be able to fetch keys for multiple usertroupes', function() {
-    var user1Id = fixture.user1.id;
-    var user2Id = fixture.user2.id;
+    var user1Id = fixture.user1._id;
+    var user2Id = fixture.user2._id;
 
     return userSettingsService
       .setUserSettings(user1Id, 'test3', { bob: 1 })

@@ -39,7 +39,7 @@ describe('user-orgs #slow', function() {
 
   it('GET /v1/user/:userId/orgs', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/orgs')
+      .get('/v1/user/' + fixture.user1._id + '/orgs')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -55,7 +55,7 @@ describe('user-orgs #slow', function() {
 
   it('GET /v1/user/:userId/orgs?type=unused', function() {
     return request(app)
-      .get('/v1/user/' + fixture.user1.id + '/orgs?type=unused')
+      .get('/v1/user/' + fixture.user1._id + '/orgs?type=unused')
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -80,7 +80,7 @@ describe('user-orgs #slow', function() {
       })
       .then(function() {
         return request(app)
-          .get('/v1/user/' + fixture.user1.id + '/orgs?type=unused')
+          .get('/v1/user/' + fixture.user1._id + '/orgs?type=unused')
           .set('x-access-token', fixture.user1.accessToken)
           .expect(200);
       })

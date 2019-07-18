@@ -42,40 +42,42 @@ makeBenchmark({
 
   tests: {
     serializeChatsForTroupe: function(done) {
-      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, {}).nodeify(done);
+      restful.serializeChatsForTroupe(fixture.troupe1.id, fixture.user0._id, {}).nodeify(done);
     },
 
     'serializeChatsForTroupe#lean1': function(done) {
       restful
-        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: true })
+        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0._id, { lean: true })
         .nodeify(done);
     },
 
     'serializeChatsForTroupe#lean2': function(done) {
       restful
-        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0.id, { lean: 2 })
+        .serializeChatsForTroupe(fixture.troupe1.id, fixture.user0._id, { lean: 2 })
         .nodeify(done);
     },
 
     'serializeTroupesForUser#oneRoom': function(done) {
-      restful.serializeTroupesForUser(fixture.userOnlyOne.id).nodeify(done);
+      restful.serializeTroupesForUser(fixture.userOnlyOne._id).nodeify(done);
     },
 
     'serializeTroupesForUser#withLargeRooms': function(done) {
-      restful.serializeTroupesForUser(fixture.user0.id).nodeify(done);
+      restful.serializeTroupesForUser(fixture.user0._id).nodeify(done);
     },
 
     'serializeUsersForTroupe#smallRoom': function(done) {
-      restful.serializeUsersForTroupe(fixture.troupe4.id, fixture.userOnlyOne.id, {}).nodeify(done);
+      restful
+        .serializeUsersForTroupe(fixture.troupe4.id, fixture.userOnlyOne._id, {})
+        .nodeify(done);
     },
 
     'serializeUsersForTroupe#largeRoom': function(done) {
-      restful.serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, {}).nodeify(done);
+      restful.serializeUsersForTroupe(fixture.troupe1.id, fixture.user0._id, {}).nodeify(done);
     },
 
     'serializeUsersForTroupe#largeRoomLimit': function(done) {
       restful
-        .serializeUsersForTroupe(fixture.troupe1.id, fixture.user0.id, { limit: 25 })
+        .serializeUsersForTroupe(fixture.troupe1.id, fixture.user0._id, { limit: 25 })
         .nodeify(done);
     }
   }

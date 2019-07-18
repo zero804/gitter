@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var uriLookupService = require('../lib/uri-lookup-service');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -27,7 +28,7 @@ describe('uri-lookup-service', function() {
         assert(!uriLookup.troupeId);
         assert(!uriLookup.groupId);
 
-        assert.equal(uriLookup.userId, fixture.user2.id);
+        assert(mongoUtils.objectIDsEqual(uriLookup.userId, fixture.user2._id));
 
         return uriLookupService.lookupUri(uri);
       })
@@ -36,7 +37,7 @@ describe('uri-lookup-service', function() {
         assert(!uriLookup.troupeId);
         assert(!uriLookup.groupId);
 
-        assert.equal(uriLookup.userId, fixture.user2.id);
+        assert(mongoUtils.objectIDsEqual(uriLookup.userId, fixture.user2._id));
       });
   });
 

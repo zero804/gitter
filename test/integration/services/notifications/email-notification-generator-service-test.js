@@ -61,14 +61,14 @@ describe('email-notification-generator-service', function() {
       .when(emailNotificationServiceMock)
       .sendUnreadItemsNotification()
       .then(function(user, troupeWithCounts) {
-        if (user.id === fixture.user2.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user2._id)) {
           u++;
           assert.equal(u, 1);
           assert.equal(troupeWithCounts.length, 1);
           assert.equal(troupeWithCounts[0].troupe.id, troupeId);
         }
 
-        if (user.id === fixture.user3.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user3._id)) {
           v++;
           assert.equal(v, 1);
           assert.equal(troupeWithCounts.length, 1);
@@ -79,13 +79,13 @@ describe('email-notification-generator-service', function() {
       });
 
     return Promise.all([
-      userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false)
+      userSettingsService.setUserSettings(fixture.user2._id, 'unread_notifications_optout', false)
     ])
       .then(function() {
         return unreadEngine.newItemWithMentions(
           troupeId,
           itemId1,
-          makeNotifyList([fixture.user2.id, fixture.user3.id], [])
+          makeNotifyList([fixture.user2._id, fixture.user3._id], [])
         );
       })
       .then(function() {
@@ -117,9 +117,9 @@ describe('email-notification-generator-service', function() {
       .when(emailNotificationServiceMock)
       .sendUnreadItemsNotification()
       .then(function(user, troupeWithCounts) {
-        assert(user.id !== fixture.user2.id);
+        assert(user.id !== fixture.user2._id);
 
-        if (user.id === fixture.user3.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user3._id)) {
           v++;
           assert.equal(v, 1);
           assert.equal(troupeWithCounts.length, 1);
@@ -130,13 +130,13 @@ describe('email-notification-generator-service', function() {
       });
 
     return Promise.all([
-      userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true)
+      userSettingsService.setUserSettings(fixture.user2._id, 'unread_notifications_optout', true)
     ])
       .then(function() {
         return unreadEngine.newItemWithMentions(
           troupeId,
           itemId1,
-          makeNotifyList([fixture.user2.id, fixture.user3.id], [])
+          makeNotifyList([fixture.user2._id, fixture.user3._id], [])
         );
       })
       .then(function() {
@@ -169,9 +169,9 @@ describe('email-notification-generator-service', function() {
       .when(emailNotificationServiceMock)
       .sendUnreadItemsNotification()
       .then(function(user, troupeWithCounts) {
-        assert(user.id !== fixture.user2.id);
+        assert(user.id !== fixture.user2._id);
 
-        if (user.id === fixture.user3.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user3._id)) {
           v++;
           assert.equal(v, 1);
           assert.equal(troupeWithCounts.length, 1);
@@ -182,27 +182,27 @@ describe('email-notification-generator-service', function() {
       });
 
     return Promise.all([
-      userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', true),
-      roomMembershipService.setMembershipMode(fixture.user2.id, troupeId, 'all')
+      userSettingsService.setUserSettings(fixture.user2._id, 'unread_notifications_optout', true),
+      roomMembershipService.setMembershipMode(fixture.user2._id, troupeId, 'all')
     ])
       .then(function() {
         return unreadEngine.newItemWithMentions(
           troupeId,
           itemId1,
-          makeNotifyList([fixture.user2.id, fixture.user3.id], [])
+          makeNotifyList([fixture.user2._id, fixture.user3._id], [])
         );
       })
       .then(function() {
         return Promise.all([
-          underlyingUnreadItemService.markAllChatsRead(fixture.user1.id, fixture.troupe1.id),
-          underlyingUnreadItemService.markAllChatsRead(fixture.user3.id, fixture.troupe1.id)
+          underlyingUnreadItemService.markAllChatsRead(fixture.user1._id, fixture.troupe1.id),
+          underlyingUnreadItemService.markAllChatsRead(fixture.user3._id, fixture.troupe1.id)
         ]);
       })
       .then(function() {
         return unreadEngine.newItemWithMentions(
           troupeId,
           itemId2,
-          makeNotifyList([fixture.user2.id, fixture.user3.id], [])
+          makeNotifyList([fixture.user2._id, fixture.user3._id], [])
         );
       })
       .then(function() {
@@ -232,9 +232,9 @@ describe('email-notification-generator-service', function() {
       .when(emailNotificationServiceMock)
       .sendUnreadItemsNotification()
       .then(function(user, troupeWithCounts) {
-        assert.notEqual(user.id, fixture.user2.id);
+        assert.notEqual(user.id, fixture.user2._id);
 
-        if (user.id === fixture.user3.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user3._id)) {
           v++;
           assert.equal(v, 1);
           assert.equal(troupeWithCounts.length, 1);
@@ -245,15 +245,15 @@ describe('email-notification-generator-service', function() {
       });
 
     return Promise.all([
-      underlyingUnreadItemService.markAllChatsRead(fixture.user2.id, fixture.troupe1.id),
-      userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'announcement')
+      underlyingUnreadItemService.markAllChatsRead(fixture.user2._id, fixture.troupe1.id),
+      userSettingsService.setUserSettings(fixture.user2._id, 'unread_notifications_optout', false),
+      roomMembershipService.setMembershipMode(fixture.user2._id, fixture.troupe1.id, 'announcement')
     ])
       .then(function() {
         return unreadEngine.newItemWithMentions(
           troupeId,
           itemId1,
-          makeNotifyList([fixture.user3.id], [])
+          makeNotifyList([fixture.user3._id], [])
         );
       })
       .then(function() {
@@ -286,14 +286,14 @@ describe('email-notification-generator-service', function() {
       .when(emailNotificationServiceMock)
       .sendUnreadItemsNotification()
       .then(function(user, troupeWithCounts) {
-        if (user.id === fixture.user2.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user2._id)) {
           u++;
           assert.equal(u, 1);
           assert.equal(troupeWithCounts.length, 1);
           assert.equal(troupeWithCounts[0].troupe.id, fixture.troupe1.id);
         }
 
-        if (user.id === fixture.user3.id) {
+        if (mongoUtils.objectIDsEqual(user.id, fixture.user3._id)) {
           v++;
           assert.equal(v, 1);
           assert.equal(troupeWithCounts.length, 1);
@@ -303,12 +303,12 @@ describe('email-notification-generator-service', function() {
       });
 
     return Promise.all([
-      userSettingsService.setUserSettings(fixture.user2.id, 'unread_notifications_optout', false),
-      roomMembershipService.setMembershipMode(fixture.user2.id, fixture.troupe1.id, 'all'),
+      userSettingsService.setUserSettings(fixture.user2._id, 'unread_notifications_optout', false),
+      roomMembershipService.setMembershipMode(fixture.user2._id, fixture.troupe1.id, 'all'),
       unreadEngine.newItemWithMentions(
         troupeId,
         itemId1,
-        makeNotifyList([fixture.user2.id, fixture.user3.id], [])
+        makeNotifyList([fixture.user2._id, fixture.user3._id], [])
       )
     ])
       .then(function() {

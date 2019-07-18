@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var autoRemovalService = require('../lib/auto-removal-service');
@@ -24,10 +25,10 @@ describe('auto-removal-service', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
 
       return Promise.join(
-        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, {
+        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id, {
           lastAccessTime: tenDaysAgo
         }),
-        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2.id, fixture.troupe1.id, {
+        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2._id, fixture.troupe1.id, {
           lastAccessTime: Date.now()
         }),
         function() {
@@ -36,7 +37,7 @@ describe('auto-removal-service', function() {
       ).then(function(candidates) {
         assert.strictEqual(candidates.length, 1);
 
-        assert.equal(candidates[0].userId, fixture.user1.id);
+        assert.equal(candidates[0].userId, fixture.user1._id);
         assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
       });
     });
@@ -55,15 +56,15 @@ describe('auto-removal-service', function() {
       var itemId = new ObjectID();
       var userWithMentions = lazy([
         {
-          userId: fixture.user1.id
+          userId: fixture.user1._id
         },
         {
-          userId: fixture.user2.id
+          userId: fixture.user2._id
         }
       ]);
 
       return Promise.join(
-        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2.id, fixture.troupe1.id, {
+        recentRoomService.saveLastVisitedTroupeforUserId(fixture.user2._id, fixture.troupe1.id, {
           lastAccessTime: Date.now()
         }),
         unreadItemsEngine.newItemWithMentions(fixture.troupe1.id, itemId, userWithMentions),
@@ -73,22 +74,20 @@ describe('auto-removal-service', function() {
           return autoRemovalService.bulkRemoveUsersFromRoom(
             fixture.troupe1.id,
             fixture.troupe1.groupId,
-            [fixture.user1.id]
+            [fixture.user1._id]
           );
         })
         .then(function() {
           return roomMembershipService.findMembershipForUsersInRoom(fixture.troupe1.id, [
-            fixture.user1.id,
-            fixture.user2.id
+            fixture.user1._id,
+            fixture.user2._id
           ]);
         })
         .then(function(membership) {
-          var mString = membership.map(function(f) {
-            return String(f);
-          });
-          assert.deepEqual(mString, [fixture.user2.id]);
+          assert.strictEqual(membership.length, 1);
+          assert(mongoUtils.objectIDsEqual(membership[0], fixture.user2._id));
 
-          return roomMembershipService.findRoomIdsForUser(fixture.user1.id);
+          return roomMembershipService.findRoomIdsForUser(fixture.user1._id);
         })
         .then(function(roomIds) {
           var rString = roomIds.map(function(f) {
@@ -100,7 +99,7 @@ describe('auto-removal-service', function() {
         })
         .then(function(url) {
           assert.strictEqual(url, null);
-          return unreadItemsService.getAllUnreadItemCounts(fixture.user1.id);
+          return unreadItemsService.getAllUnreadItemCounts(fixture.user1._id);
         })
         .then(function(unreadItems) {
           assert.deepEqual(unreadItems, [

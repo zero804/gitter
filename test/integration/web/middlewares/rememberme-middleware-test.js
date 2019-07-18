@@ -3,6 +3,7 @@
 var testRequire = require('../../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var ObjectID = require('mongodb').ObjectID;
 
 var rememberMeMiddleware = testRequire('./web/middlewares/rememberme-middleware');
@@ -18,7 +19,7 @@ describe('rememberme-middleware #slow', function() {
 
   it('should generate a token for a user', function() {
     return rememberMeMiddleware.testOnly
-      .generateAuthToken(fixture.user1.id)
+      .generateAuthToken(fixture.user1._id)
       .then(function(cookieValue) {
         assert(cookieValue);
       });
@@ -26,14 +27,14 @@ describe('rememberme-middleware #slow', function() {
 
   it('should validate a token for a user', function() {
     return rememberMeMiddleware.testOnly
-      .generateAuthToken(fixture.user1.id)
+      .generateAuthToken(fixture.user1._id)
       .then(function(cookieValue) {
         assert(cookieValue);
 
         return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
       })
       .then(function(userId) {
-        assert.strictEqual(userId, fixture.user1.id);
+        assert(mongoUtils.objectIDsEqual(userId, fixture.user1._id));
       });
   });
 
@@ -41,19 +42,19 @@ describe('rememberme-middleware #slow', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     return rememberMeMiddleware.testOnly
-      .generateAuthToken(fixture.user1.id)
+      .generateAuthToken(fixture.user1._id)
       .then(function(cookieValue) {
         assert(cookieValue);
 
         return rememberMeMiddleware.testOnly
           .validateAuthToken(cookieValue)
           .then(function(userId) {
-            assert.strictEqual(userId, fixture.user1.id);
+            assert(mongoUtils.objectIDsEqual(userId, fixture.user1._id));
 
             return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
           })
           .then(function(userId) {
-            assert.strictEqual(userId, fixture.user1.id);
+            assert(mongoUtils.objectIDsEqual(userId, fixture.user1._id));
           })
           .delay(110) /* Wait for the token to expire */
           .then(function() {
@@ -69,7 +70,7 @@ describe('rememberme-middleware #slow', function() {
     rememberMeMiddleware.testOnly.setTokenGracePeriodMillis(100);
 
     return rememberMeMiddleware.testOnly
-      .generateAuthToken(fixture.user1.id)
+      .generateAuthToken(fixture.user1._id)
       .bind({
         cookieValue: null
       })
@@ -80,7 +81,7 @@ describe('rememberme-middleware #slow', function() {
         return rememberMeMiddleware.testOnly.validateAuthToken(cookieValue);
       })
       .then(function(userId) {
-        assert.strictEqual(userId, fixture.user1.id);
+        assert(mongoUtils.objectIDsEqual(userId, fixture.user1._id));
 
         return rememberMeMiddleware.testOnly.deleteAuthToken(this.cookieValue);
       })
@@ -114,7 +115,7 @@ describe('rememberme-middleware #slow', function() {
 
     it('should cope with a user without tokens', function() {
       return rememberMeMiddleware.testOnly
-        .generateAuthToken(fixture.userNoTokens.id)
+        .generateAuthToken(fixture.userNoTokens._id)
         .then(function(cookieValue) {
           return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
         })
@@ -125,17 +126,17 @@ describe('rememberme-middleware #slow', function() {
 
     it('should authenticate with genuine tokens', function() {
       return rememberMeMiddleware.testOnly
-        .generateAuthToken(fixture.user1.id)
+        .generateAuthToken(fixture.user1._id)
         .then(function(cookieValue) {
           return rememberMeMiddleware.testOnly.processRememberMeToken(cookieValue);
         })
         .then(function(loginInfo) {
-          assert.strictEqual(loginInfo.user.id, fixture.user1.id);
+          assert(mongoUtils.objectIDsEqual(loginInfo.user.id, fixture.user1._id));
           assert(loginInfo.newCookieValue);
           return rememberMeMiddleware.testOnly.processRememberMeToken(loginInfo.newCookieValue);
         })
         .then(function(loginInfo) {
-          assert.strictEqual(loginInfo.user.id, fixture.user1.id);
+          assert(mongoUtils.objectIDsEqual(loginInfo.user.id, fixture.user1._id));
           assert(loginInfo.newCookieValue);
         });
     });

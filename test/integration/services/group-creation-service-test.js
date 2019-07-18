@@ -3,6 +3,7 @@
 var testRequire = require('../test-require');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var groupCreationService = testRequire('./services/group-creation-service');
 
 describe('group-creation-service', function() {
@@ -29,7 +30,8 @@ describe('group-creation-service', function() {
         assert.strictEqual(group.name, uri);
         assert.strictEqual(group.sd.members, 'PUBLIC');
         assert.strictEqual(group.sd.admins, 'MANUAL');
-        assert.deepEqual(group.sd.extraAdmins.map(String), [fixture.user1.id]);
+        assert.strictEqual(group.sd.extraAdmins.length, 1);
+        assert(mongoUtils.objectIDsEqual(group.sd.extraAdmins[0], fixture.user1._id));
         assert.deepEqual(group.sd.extraMembers.map(String), []);
 
         assert.strictEqual(defaultRoom.uri, uri + '/community');
@@ -67,7 +69,7 @@ describe('group-creation-service', function() {
         var defaultRoom = result.defaultRoom;
         assert.strictEqual(result.invitesReport.length, 2);
         assert.strictEqual(result.invitesReport[0].status, 'added');
-        assert.strictEqual(result.invitesReport[0].user.id, fixture.user2.id);
+        assert(mongoUtils.objectIDsEqual(result.invitesReport[0].user.id, fixture.user2._id));
 
         assert.strictEqual(result.invitesReport[1].status, 'error');
 
@@ -76,7 +78,8 @@ describe('group-creation-service', function() {
         assert.strictEqual(group.name, uri);
         assert.strictEqual(group.sd.members, 'PUBLIC');
         assert.strictEqual(group.sd.admins, 'MANUAL');
-        assert.deepEqual(group.sd.extraAdmins.map(String), [fixture.user1.id]);
+        assert.strictEqual(group.sd.extraAdmins.length, 1);
+        assert(mongoUtils.objectIDsEqual(group.sd.extraAdmins[0], fixture.user1._id));
         assert.deepEqual(group.sd.extraMembers.map(String), []);
 
         assert.strictEqual(defaultRoom.uri, uri + '/community');

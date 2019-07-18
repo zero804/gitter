@@ -25,7 +25,7 @@ describe('user-strategy-test', function() {
   beforeEach(function() {
     expected1 = [
       {
-        id: fixture.user1.id,
+        id: fixture.user1._id,
         username: fixture.user1.username,
         displayName: fixture.user1.displayName,
         url: '/' + fixture.user1.username,
@@ -39,7 +39,7 @@ describe('user-strategy-test', function() {
 
     expectedLean = [
       {
-        id: fixture.user1.id,
+        id: fixture.user1._id,
         username: fixture.user1.username,
         v: 1
       }
@@ -88,7 +88,7 @@ describe('user-strategy-test', function() {
       return serialize([fixture.user2], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, [
           {
-            id: fixture.user2.id,
+            id: fixture.user2._id,
             username: fixture.user2.username,
             displayName: fixture.user2.displayName,
             url: '/' + fixture.user2.username,
@@ -107,35 +107,35 @@ describe('user-strategy-test', function() {
   describe('user-id-serializer', function() {
     it('should serialize a user', function() {
       var strategy = new UserIdStrategy({});
-      return serialize([fixture.user1.id], strategy).then(function(s) {
+      return serialize([fixture.user1._id], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
       });
     });
 
     it('should serialize a user with lean=true', function() {
       var strategy = new UserIdStrategy({ lean: true });
-      return serialize([fixture.user1.id], strategy).then(function(s) {
+      return serialize([fixture.user1._id], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expectedLean);
       });
     });
 
     it('should serialize a user with includeRolesForTroupeId', function() {
       var strategy = new UserIdStrategy({ includeRolesForTroupeId: fixture.troupe1.id });
-      return serialize([fixture.user1.id], strategy).then(function(s) {
+      return serialize([fixture.user1._id], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
       });
     });
 
     it('should serialize a user with showPresenceForTroupeId', function() {
       var strategy = new UserIdStrategy({ showPresenceForTroupeId: fixture.troupe1.id });
-      return serialize([fixture.user1.id], strategy).then(function(s) {
+      return serialize([fixture.user1._id], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
       });
     });
 
     it('should serialize a user with showPremiumStatus', function() {
       var strategy = new UserIdStrategy({ showPremiumStatus: true });
-      return serialize([fixture.user1.id], strategy).then(function(s) {
+      return serialize([fixture.user1._id], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
       });
     });

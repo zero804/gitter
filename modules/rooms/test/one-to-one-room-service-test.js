@@ -4,6 +4,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var StatusError = require('statuserror');
 var oneToOneRoomService = require('../lib/one-to-one-room-service');
 var roomMembershipService = require('../lib/room-membership-service');
@@ -26,26 +27,26 @@ describe('one-to-one-room-service', function() {
 
     it('should handle the creation of a oneToOneTroupe single', function() {
       return oneToOneRoomService
-        .findOrCreateOneToOneRoom(fixture.user1, fixture.user2.id)
+        .findOrCreateOneToOneRoom(fixture.user1, fixture.user2._id)
         .spread(function(troupe, otherUser) {
           assert(troupe);
           assert(troupe.oneToOne);
           assert.strictEqual(troupe.githubType, 'ONETOONE');
-          assert.strictEqual(otherUser.id, fixture.user2.id);
+          assert(mongoUtils.objectIDsEqual(otherUser._id, fixture.user2._id));
           assert.strictEqual(troupe.oneToOneUsers.length, 2);
 
           return roomMembershipService.findMembersForRoom(troupe.id);
         })
         .then(function(userIds) {
-          assert(_.find(userIds, findUserIdPredicate(fixture.user1.id)));
-          assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user1._id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user2._id)));
         });
     });
 
     it('should handle the creation of a oneToOneTroupe atomicly', function() {
       return Promise.all([
-        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3.id),
-        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2.id)
+        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3._id),
+        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2._id)
       ])
         .spread(function(r1, r2) {
           var troupe1 = r1[0];
@@ -57,28 +58,28 @@ describe('one-to-one-room-service', function() {
           assert(troupe1.oneToOne);
           assert.strictEqual(troupe1.githubType, 'ONETOONE');
           assert.strictEqual(troupe1.oneToOneUsers.length, 2);
-          assert.strictEqual(otherUser1.id, fixture.user3.id);
+          assert(mongoUtils.objectIDsEqual(otherUser1._id, fixture.user3._id));
 
           assert(troupe2);
           assert(troupe2.oneToOne);
           assert.strictEqual(troupe2.githubType, 'ONETOONE');
           assert.strictEqual(troupe2.oneToOneUsers.length, 2);
-          assert.strictEqual(otherUser2.id, fixture.user2.id);
+          assert(mongoUtils.objectIDsEqual(otherUser2.id, fixture.user2._id));
 
           assert.strictEqual(troupe1.id, troupe2.id);
 
           return roomMembershipService.findMembersForRoom(troupe1.id);
         })
         .then(function(userIds) {
-          assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
-          assert(_.find(userIds, findUserIdPredicate(fixture.user3.id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user2._id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user3._id)));
         });
     });
 
     it('should handle the creation of a oneToOneTroupe atomicly', function() {
       return Promise.all([
-        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3.id),
-        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2.id)
+        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user2, fixture.user3._id),
+        oneToOneRoomService.findOrCreateOneToOneRoom(fixture.user3, fixture.user2._id)
       ])
         .spread(function(r1, r2) {
           var troupe1 = r1[0];
@@ -90,21 +91,21 @@ describe('one-to-one-room-service', function() {
           assert(troupe1.oneToOne);
           assert.strictEqual(troupe1.githubType, 'ONETOONE');
           assert.strictEqual(troupe1.oneToOneUsers.length, 2);
-          assert.strictEqual(otherUser1.id, fixture.user3.id);
+          assert(mongoUtils.objectIDsEqual(otherUser1._id, fixture.user3._id));
 
           assert(troupe2);
           assert(troupe2.oneToOne);
           assert.strictEqual(troupe2.githubType, 'ONETOONE');
           assert.strictEqual(troupe2.oneToOneUsers.length, 2);
-          assert.strictEqual(otherUser2.id, fixture.user2.id);
+          assert(mongoUtils.objectIDsEqual(otherUser2._id, fixture.user2._id));
 
           assert.strictEqual(troupe1.id, troupe2.id);
 
           return roomMembershipService.findMembersForRoom(troupe1.id);
         })
         .then(function(userIds) {
-          assert(_.find(userIds, findUserIdPredicate(fixture.user2.id)));
-          assert(_.find(userIds, findUserIdPredicate(fixture.user3.id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user2._id)));
+          assert(_.find(userIds, findUserIdPredicate(fixture.user3._id)));
         });
     });
 

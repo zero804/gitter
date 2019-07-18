@@ -21,17 +21,17 @@ describe('recent-room-core', function() {
       this.timeout(10000);
 
       function getFavs() {
-        return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+        return recentRoomCore.findFavouriteTroupesForUser(fixture.user1._id);
       }
 
       return recentRoomCore
-        .updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+        .updateFavourite(fixture.user1._id, fixture.troupe1.id, 1)
         .then(getFavs)
         .then(function(favs) {
           assert.equal(favs[fixture.troupe1.id], 1);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe2.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -39,7 +39,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe2.id], 1);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe2.id, 3);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -47,7 +47,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe3.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -56,7 +56,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe2.id, 2);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -65,7 +65,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe1.id], 3);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe1.id, 4);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe1.id, 4);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -74,7 +74,7 @@ describe('recent-room-core', function() {
           assert.equal(favs[fixture.troupe1.id], 4);
         })
         .then(function() {
-          return recentRoomCore.updateFavourite(fixture.user1.id, fixture.troupe4.id, 1);
+          return recentRoomCore.updateFavourite(fixture.user1._id, fixture.troupe4.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -95,9 +95,9 @@ describe('recent-room-core', function() {
     it('should add a troupe to favourites', function() {
       function fav(val) {
         return recentRoomCore
-          .updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+          .updateFavourite(fixture.user1._id, fixture.troupe1.id, val)
           .then(function() {
-            return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+            return recentRoomCore.findFavouriteTroupesForUser(fixture.user1._id);
           })
           .then(function(favs) {
             var isInTroupe = !!favs[fixture.troupe1.id];
@@ -122,29 +122,29 @@ describe('recent-room-core', function() {
     it('should handle default values', function() {
       return recentRoomCore
         .findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [
-          fixture.user1.id,
+          fixture.user1._id,
           fixture.user2._id
         ])
         .then(function(result) {
-          assert(result[fixture.user1.id]);
-          assert(result[fixture.user2.id]);
+          assert(result[fixture.user1._id]);
+          assert(result[fixture.user2._id]);
         });
     });
 
     it('should handle non default values', function() {
       return Promise.all([
-        recentRoomCore.saveUserTroupeLastAccess(fixture.user1.id, fixture.troupe1.id),
-        recentRoomCore.saveUserTroupeLastAccess(fixture.user2.id, fixture.troupe1.id)
+        recentRoomCore.saveUserTroupeLastAccess(fixture.user1._id, fixture.troupe1.id),
+        recentRoomCore.saveUserTroupeLastAccess(fixture.user2._id, fixture.troupe1.id)
       ])
         .then(function() {
           return recentRoomCore.findLastAccessTimesForUsersInRoom(fixture.troupe1.id, [
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.user2._id
           ]);
         })
         .then(function(result) {
-          var d1 = Date.now() - result[fixture.user1.id];
-          var d2 = Date.now() - result[fixture.user2.id];
+          var d1 = Date.now() - result[fixture.user1._id];
+          var d2 = Date.now() - result[fixture.user2._id];
           assert(d1 >= 0);
           assert(d1 < 5000);
 

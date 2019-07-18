@@ -37,7 +37,7 @@ describe('user-rooms-api', function() {
 
   it('GET /v1/user/:userId/rooms', function() {
     return request(app)
-      .get(`/v1/user/${fixture.user1.id}/rooms`)
+      .get(`/v1/user/${fixture.user1._id}/rooms`)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {
@@ -61,7 +61,7 @@ describe('user-rooms-api', function() {
 
   it('GET /v1/user/:userId/rooms/:roomId/unreadItems', function() {
     return request(app)
-      .get(`/v1/user/${fixture.user1.id}/rooms/${fixture.troupe1.id}/unreadItems`)
+      .get(`/v1/user/${fixture.user1.id}/rooms/${fixture.troupe1._id}/unreadItems`)
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(result) {

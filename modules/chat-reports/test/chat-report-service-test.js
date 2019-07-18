@@ -132,7 +132,7 @@ describe('chatReportService', function() {
 
   describe('getReportSumForUser', function() {
     it('sum reports across all of their messages from many users', function() {
-      return chatReportService.getReportSumForUser(fixture.userBad1.id).then(function(sum) {
+      return chatReportService.getReportSumForUser(fixture.userBad1._id).then(function(sum) {
         assert.strictEqual(sum, 3);
       });
     });

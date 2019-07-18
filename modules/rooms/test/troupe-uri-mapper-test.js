@@ -19,7 +19,7 @@ describe('troupe-uri-mapper', function() {
 
     it('#01 should return null when a user has no troupes', function() {
       return troupeUriMapper
-        .getUrlOfFirstAccessibleRoom([fixture.userNoTroupes.id], fixture.user1.id)
+        .getUrlOfFirstAccessibleRoom([fixture.userNoTroupes._id], fixture.user1._id)
         .then(function(url) {
           assert(!url);
         });
@@ -28,8 +28,8 @@ describe('troupe-uri-mapper', function() {
     it('#02 should return the first room that allows access', function() {
       return troupeUriMapper
         .getUrlOfFirstAccessibleRoom(
-          [fixture.userNoTroupes.id, fixture.troupe1.id],
-          fixture.user1.id
+          [fixture.userNoTroupes._id, fixture.troupe1.id],
+          fixture.user1._id
         )
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.troupe1.uri);
@@ -39,8 +39,8 @@ describe('troupe-uri-mapper', function() {
     it('#03 should return the one to one rooms', function() {
       return troupeUriMapper
         .getUrlOfFirstAccessibleRoom(
-          [fixture.userNoTroupes.id, fixture.troupeOneToOne.id, fixture.troupe1.id],
-          fixture.user1.id
+          [fixture.userNoTroupes._id, fixture.troupeOneToOne.id, fixture.troupe1.id],
+          fixture.user1._id
         )
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.user2.username);
@@ -50,8 +50,8 @@ describe('troupe-uri-mapper', function() {
     it('#04 should return the other user in a one-to-one room', function() {
       return troupeUriMapper
         .getUrlOfFirstAccessibleRoom(
-          [fixture.userNoTroupes.id, fixture.troupeOneToOne.id],
-          fixture.user2.id
+          [fixture.userNoTroupes._id, fixture.troupeOneToOne.id],
+          fixture.user2._id
         )
         .then(function(url) {
           assert.strictEqual(url, '/' + fixture.user1.username);

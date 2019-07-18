@@ -2,6 +2,7 @@
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var sinon = require('sinon');
 var roomMembershipFlags = require('../lib/room-membership-flags');
@@ -29,9 +30,9 @@ describe('room-membership-service', function() {
     describe('addRoomMember', function() {
       beforeEach(function() {
         return roomMembershipService.removeRoomMembers(fixture.troupe3._id, [
-          fixture.user1.id,
-          fixture.user2.id,
-          fixture.user3.id
+          fixture.user1._id,
+          fixture.user2._id,
+          fixture.user3._id
         ]);
       });
 
@@ -111,15 +112,15 @@ describe('room-membership-service', function() {
         var flags = roomMembershipFlags.MODES.all;
 
         return Promise.join(
-          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user1.id, flags),
-          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user2.id, flags)
+          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user1._id, flags),
+          roomMembershipService.addRoomMember(fixture.troupe2.id, fixture.user2._id, flags)
         )
           .then(function() {
             return persistence.Troupe.findById(fixture.troupe2.id).exec();
           })
           .then(function(troupe) {
             assert.strictEqual(troupe.userCount, 2);
-            return roomMembershipService.removeRoomMembers(fixture.troupe2.id, [fixture.user1.id]);
+            return roomMembershipService.removeRoomMembers(fixture.troupe2.id, [fixture.user1._id]);
           })
           .then(function() {
             return roomMembershipService.countMembersInRoom(fixture.troupe2.id);
@@ -131,11 +132,11 @@ describe('room-membership-service', function() {
           .then(function(troupe) {
             assert.strictEqual(troupe.userCount, 1);
 
-            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user2.id);
+            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user2._id);
           })
           .then(function(member) {
             assert(member);
-            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user1.id);
+            return roomMembershipService.checkRoomMembership(fixture.troupe2.id, fixture.user1._id);
           })
           .then(function(member) {
             assert(!member);
@@ -159,7 +160,7 @@ describe('room-membership-service', function() {
 
       it('should handle lurk status alongside membership mode mute', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return roomMembershipService
           .removeRoomMember(troupeId2, userId1)
@@ -207,7 +208,7 @@ describe('room-membership-service', function() {
 
       it('should handle lurk status alongside membership mode announcement', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return roomMembershipService
           .removeRoomMember(troupeId2, userId1)
@@ -289,7 +290,7 @@ describe('room-membership-service', function() {
 
       it('should handle lurk status alongside membership mode all', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return roomMembershipService
           .removeRoomMember(troupeId2, userId1)
@@ -335,7 +336,7 @@ describe('room-membership-service', function() {
 
       it('should handle transitions to and from lurk mode', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return roomMembershipService
           .removeRoomMember(troupeId2, userId1)
@@ -423,8 +424,8 @@ describe('room-membership-service', function() {
     describe('findMembersForRoom', function() {
       it('findMembersForRoom should handle skip and limit', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
 
         var flags = roomMembershipFlags.MODES.all;
 
@@ -456,9 +457,9 @@ describe('room-membership-service', function() {
     describe('findRoomIdsForUserWithLurk', function() {
       it('should return the correct values', function() {
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
-        var userId3 = fixture.user3.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
+        var userId3 = fixture.user3._id;
 
         return Promise.join(
           roomMembershipService.addRoomMember(troupeId2, userId1, roomMembershipFlags.MODES.all),
@@ -500,7 +501,7 @@ describe('room-membership-service', function() {
         var troupeId1 = fixture.troupe1.id;
         var troupeId2 = fixture.troupe2.id;
         var troupeId3 = fixture.troupe3.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId1, userId1),
@@ -539,7 +540,7 @@ describe('room-membership-service', function() {
     describe('addRoomMember', function() {
       it('should add a new member to a room', function() {
         var troupeId = fixture.troupe2.id;
-        var userId = fixture.user1.id;
+        var userId = fixture.user1._id;
 
         var called = 0;
         function listener(pTroupeId, members) {
@@ -569,7 +570,7 @@ describe('room-membership-service', function() {
 
       it('should be idempotent', function() {
         var troupeId = fixture.troupe2.id;
-        var userId = fixture.user1.id;
+        var userId = fixture.user1._id;
 
         var called = 0;
         function listener() {
@@ -600,7 +601,7 @@ describe('room-membership-service', function() {
       it('should return some users', function() {
         var troupeId1 = fixture.troupe1.id;
         var troupeId2 = fixture.troupe2.id;
-        var userId = fixture.user1.id;
+        var userId = fixture.user1._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId1, userId),
@@ -618,8 +619,8 @@ describe('room-membership-service', function() {
     describe('findMembershipForUsersInRoom', function() {
       it('should return some users', function() {
         var troupeId = fixture.troupe1.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId, userId1),
@@ -630,14 +631,14 @@ describe('room-membership-service', function() {
         ).then(function(result) {
           assert(Array.isArray(result));
           assert.strictEqual(result.length, 1);
-          assert.equal(result[0], userId2);
+          assert(mongoUtils.objectIDsEqual(result[0], userId2));
         });
       });
 
       it('should return some users when a single user is added', function() {
         var troupeId = fixture.troupe1.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId, userId1),
@@ -648,7 +649,7 @@ describe('room-membership-service', function() {
         ).then(function(result) {
           assert(Array.isArray(result));
           assert.strictEqual(result.length, 1);
-          assert.equal(result[0], userId2);
+          assert(mongoUtils.objectIDsEqual(result[0], userId2));
         });
       });
     });
@@ -656,9 +657,9 @@ describe('room-membership-service', function() {
     describe('findMembersForRoomWithLurk', function() {
       it('should return some users with lurk', function() {
         var troupeId = fixture.troupe1.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
-        var userId3 = fixture.user3.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
+        var userId3 = fixture.user3._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId, userId1),
@@ -690,7 +691,7 @@ describe('room-membership-service', function() {
     describe('removeRoomMember', function() {
       it('should remove a member from a room', function() {
         var troupeId = fixture.troupe2.id;
-        var userId = fixture.user1.id;
+        var userId = fixture.user1._id;
 
         var called = 0;
         function listener(pTroupeId, members) {
@@ -717,7 +718,7 @@ describe('room-membership-service', function() {
 
       it('should be idempotent', function() {
         var troupeId = fixture.troupe2.id;
-        var userId = fixture.user1.id;
+        var userId = fixture.user1._id;
 
         var called = 0;
         function listener() {
@@ -744,9 +745,9 @@ describe('room-membership-service', function() {
       it('should return some users', function() {
         var troupeId1 = fixture.troupe1.id;
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
-        var userId3 = fixture.user3.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
+        var userId3 = fixture.user3._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId1, userId3),
@@ -774,9 +775,9 @@ describe('room-membership-service', function() {
       it('should return some users', function() {
         var troupeId1 = fixture.troupe1.id;
         var troupeId2 = fixture.troupe2.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
-        var userId3 = fixture.user3.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
+        var userId3 = fixture.user3._id;
 
         return Promise.join(
           roomMembershipService.removeRoomMember(troupeId1, userId3),
@@ -813,8 +814,8 @@ describe('room-membership-service', function() {
     describe('setMembershipModeForUsersInRoom', function() {
       it('should return some users', function() {
         var troupeId1 = fixture.troupe1.id;
-        var userId1 = fixture.user1.id;
-        var userId2 = fixture.user2.id;
+        var userId1 = fixture.user1._id;
+        var userId2 = fixture.user2._id;
 
         return Promise.join(
           roomMembershipService.addRoomMember(troupeId1, userId1, roomMembershipFlags.MODES.mute),
@@ -1202,7 +1203,7 @@ describe('room-membership-service', function() {
       }
 
       it('should find private rooms', function() {
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
 
         return roomMembershipService.findPrivateRoomIdsForUser(userId1).then(function(roomIds) {
           assert.strictEqual(roomIds.length, 2);
@@ -1211,7 +1212,7 @@ describe('room-membership-service', function() {
       });
 
       it('should handle users without private rooms', function() {
-        var userId1 = fixture.user2.id;
+        var userId1 = fixture.user2._id;
 
         return roomMembershipService.findPrivateRoomIdsForUser(userId1).then(function(roomIds) {
           assert.deepEqual(roomIds, []);

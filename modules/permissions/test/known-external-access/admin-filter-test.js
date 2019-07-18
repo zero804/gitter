@@ -2,6 +2,7 @@
 
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('admin-filter', function() {
   describe('integration tests #slow', function() {
@@ -63,10 +64,11 @@ describe('admin-filter', function() {
       });
 
       it('should return extra admin results', function() {
-        return adminFilter(fixture.group1, [fixture.user1.id, fixture.user2._id]).then(function(
+        return adminFilter(fixture.group1, [fixture.user1._id, fixture.user2._id]).then(function(
           filtered
         ) {
-          assert.deepEqual(filtered.map(String), [fixture.user1.id]);
+          assert.strictEqual(filtered.length, 1);
+          assert(mongoUtils.objectIDsEqual(filtered[0], fixture.user1._id));
         });
       });
 

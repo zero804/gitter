@@ -18,7 +18,7 @@ function getUrlForTroupeForUserId(troupe, userId) {
   }
 
   var otherTroupeUser = troupe.oneToOneUsers.filter(function(troupeUser) {
-    return troupeUser.userId != userId;
+    return !mongoUtils.objectIDsEqual(troupeUser.userId, userId);
   })[0];
 
   if (!otherTroupeUser)

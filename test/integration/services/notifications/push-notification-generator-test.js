@@ -160,7 +160,7 @@ describe('push notification generator service', function() {
 
     it('should serialize for troupe, user and chats', function() {
       var troupeId = fixture.troupe1.id;
-      var recipientUserId = fixture.user1.id;
+      var recipientUserId = fixture.user1._id;
       var chatIds = [fixture.message1.id, fixture.message2.id];
 
       // bring in a fresh service so we don't get the stubbed serializer

@@ -43,7 +43,7 @@ describe('chat-strategy-test', function() {
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
         fromUser: {
-          id: fixture.user1.id,
+          id: fixture.user1._id,
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
@@ -69,7 +69,7 @@ describe('chat-strategy-test', function() {
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
         fromUser: {
-          id: fixture.user1.id,
+          id: fixture.user1._id,
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
@@ -94,7 +94,7 @@ describe('chat-strategy-test', function() {
         id: fixture.message1.id,
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
-        fromUser: { id: fixture.user1.id, username: fixture.user1.username, v: 1 },
+        fromUser: { id: fixture.user1._id, username: fixture.user1.username, v: 1 },
         unread: false,
         readBy: 0,
         v: 1
@@ -107,7 +107,7 @@ describe('chat-strategy-test', function() {
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
         fromUser: {
-          id: fixture.user1.id,
+          id: fixture.user1._id,
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
@@ -134,7 +134,7 @@ describe('chat-strategy-test', function() {
           id: fixture.message1.id,
           text: 'old_message',
           sent: '2014-01-01T00:00:00.000Z',
-          fromUser: fixture.user1.id,
+          fromUser: fixture.user1._id,
           unread: false,
           readBy: 0,
           urls: [],
@@ -145,8 +145,8 @@ describe('chat-strategy-test', function() {
         }
       ],
       lookups: {
-        users: makeHash(fixture.user1.id, {
-          id: fixture.user1.id,
+        users: makeHash(fixture.user1._id, {
+          id: fixture.user1._id,
           username: fixture.user1.username,
           displayName: fixture.user1.displayName,
           url: '/' + fixture.user1.username,
@@ -163,7 +163,7 @@ describe('chat-strategy-test', function() {
   describe('chat-serializer', function() {
     it('should serialize a message', function() {
       var strategy = new ChatStrategy({
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1], strategy).then(function(s) {
@@ -181,7 +181,7 @@ describe('chat-strategy-test', function() {
     it('should serialize a message with lean=true', function() {
       var strategy = new ChatStrategy({
         lean: true,
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1], strategy).then(function(s) {
@@ -199,7 +199,7 @@ describe('chat-strategy-test', function() {
     it("should serialize a message with lookups=['user']", function() {
       var strategy = new ChatStrategy({
         lookups: ['user'],
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1], strategy).then(function(s) {
@@ -211,7 +211,7 @@ describe('chat-strategy-test', function() {
   describe('chat-id-serializer', function() {
     it('should serialize a message', function() {
       var strategy = new ChatIdStrategy({
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1.id], strategy).then(function(s) {
@@ -229,7 +229,7 @@ describe('chat-strategy-test', function() {
     it('should serialize a message with lean=true', function() {
       var strategy = new ChatIdStrategy({
         lean: true,
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1.id], strategy).then(function(s) {
@@ -247,7 +247,7 @@ describe('chat-strategy-test', function() {
     it("should serialize a message with lookups=['user']", function() {
       var strategy = new ChatIdStrategy({
         lookups: ['user'],
-        currentUserId: fixture.user1.id,
+        currentUserId: fixture.user1._id,
         troupeId: fixture.troupe1.id
       });
       return serialize([fixture.message1.id], strategy).then(function(s) {

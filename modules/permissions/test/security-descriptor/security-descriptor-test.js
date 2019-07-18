@@ -3,6 +3,7 @@
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var securityDescriptorService = require('../../lib/security-descriptor');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('data-access-test', function() {
   describe('integration tests #slow', function() {
@@ -62,7 +63,7 @@ describe('data-access-test', function() {
 
       it('should findById with a user', function() {
         var groupId1 = fixture.group1.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
         return securityDescriptorService.group.findById(groupId1, userId1).then(function(sd) {
           assert.strictEqual(sd.type, null);
           assert.strictEqual(sd.members, 'PUBLIC');
@@ -78,7 +79,8 @@ describe('data-access-test', function() {
         return securityDescriptorService.group
           .findExtraAdmins(groupId1)
           .then(function(extraAdmins) {
-            assert.deepEqual(extraAdmins.map(String), [fixture.user2.id]);
+            assert.strictEqual(extraAdmins.length, 1);
+            mongoUtils.objectIDsEqual(extraAdmins[0], fixture.user2._id);
           });
       });
 
@@ -98,7 +100,8 @@ describe('data-access-test', function() {
         return securityDescriptorService.group
           .findExtraMembers(groupId1)
           .then(function(extraAdmins) {
-            assert.deepEqual(extraAdmins.map(String), [fixture.user1.id]);
+            assert.strictEqual(extraAdmins.length, 1);
+            mongoUtils.objectIDsEqual(extraAdmins[0], fixture.user1._id);
           });
       });
 
@@ -115,7 +118,7 @@ describe('data-access-test', function() {
     describe('addExtraAdminForModel', function() {
       it('should add a user not in extraAdmins', function() {
         var groupId3 = fixture.group3.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
         return securityDescriptorService.group
           .addExtraAdmin(groupId3, userId1)
           .then(function(modified) {
@@ -140,7 +143,7 @@ describe('data-access-test', function() {
     describe('removeExtraAdmin', function() {
       it('should remove a user in extraAdmins', function() {
         var groupId4 = fixture.group4.id;
-        var userId1 = fixture.user1.id;
+        var userId1 = fixture.user1._id;
         return securityDescriptorService.group
           .removeExtraAdmin(groupId4, userId1)
           .then(function(modified) {

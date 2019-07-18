@@ -5,6 +5,7 @@ process.env.DISABLE_API_LISTEN = '1';
 var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('group-security-api', function() {
   var app, request;
@@ -91,7 +92,7 @@ describe('group-security-api', function() {
       .put('/v1/groups/' + groupId + '/security')
       .send({
         type: null,
-        extraAdmins: [fixture.user1.id, fixture.user2.id]
+        extraAdmins: [fixture.user1._id, fixture.user2._id]
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
@@ -114,7 +115,7 @@ describe('group-security-api', function() {
         var users = res.body;
         assert(Array.isArray(users));
         assert.strictEqual(users.length, 1);
-        assert.strictEqual(users[0].id, fixture.user1.id);
+        assert(mongoUtils.objectIDsEqual(users[0].id, fixture.user1._id));
       });
   });
 
@@ -123,20 +124,20 @@ describe('group-security-api', function() {
     return request(app)
       .post('/v1/groups/' + groupId + '/security/extraAdmins')
       .send({
-        id: fixture.user2.id
+        id: fixture.user2._id
       })
       .set('x-access-token', fixture.user1.accessToken)
       .expect(200)
       .then(function(res) {
         var user = res.body;
 
-        assert.strictEqual(user.id, fixture.user2.id);
+        assert(mongoUtils.objectIDsEqual(user.id, fixture.user2._id));
       });
   });
 
   it('DELETE /v1/groups/:groupId/security/extraAdmins/:userId', function() {
     var groupId = fixture.group1.id;
-    var userId = fixture.user2.id;
+    var userId = fixture.user2._id;
     return request(app)
       .del('/v1/groups/' + groupId + '/security/extraAdmins/' + userId)
       .set('x-access-token', fixture.user1.accessToken)

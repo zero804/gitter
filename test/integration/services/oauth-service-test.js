@@ -170,7 +170,7 @@ describe('oauth-service', function() {
   });
 
   it('should reuse cached tokens', function() {
-    var userId = fixture.user1.id;
+    var userId = fixture.user1._id;
 
     return oauthService.findOrGenerateWebToken(userId).spread(function(token1, client) {
       assert(token1);

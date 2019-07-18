@@ -765,9 +765,9 @@ describe('room-service', function() {
         createPolicyForRoom: function(user /*, room*/) {
           return Promise.resolve({
             canAdmin: function() {
-              if (user.id === fixture.userRemoveNonAdmin.id) {
+              if (user.id === fixture.userRemoveNonAdmin._id) {
                 return Promise.resolve(false);
-              } else if (user.id === fixture.userRemoveAdmin.id) {
+              } else if (user.id === fixture.userRemoveAdmin._id) {
                 return Promise.resolve(true);
               } else {
                 assert(false, 'Unknown user');
@@ -871,12 +871,12 @@ describe('room-service', function() {
         var roomService = require('../lib/room-service');
 
         var getFavs = function() {
-          return recentRoomCore.findFavouriteTroupesForUser(fixture.userFavourite.id);
+          return recentRoomCore.findFavouriteTroupesForUser(fixture.userFavourite._id);
         };
 
         var createFav = function() {
           return recentRoomService
-            .updateFavourite(fixture.userFavourite.id, fixture.troupeCanRemove.id, true)
+            .updateFavourite(fixture.userFavourite._id, fixture.troupeCanRemove.id, true)
             .then(getFavs)
             .then(function(favs) {
               assert(favs[fixture.troupeCanRemove.id]); // Favourite is created
@@ -898,7 +898,7 @@ describe('room-service', function() {
 
         it('should remove favourite', function() {
           var checkEvent = appEvents.addListener('dataChange2', {
-            url: '/user/' + fixture.userFavourite.id + '/rooms',
+            url: '/user/' + fixture.userFavourite._id + '/rooms',
             operation: 'patch',
             model: {
               id: fixture.troupeCanRemove.id,
@@ -911,7 +911,7 @@ describe('room-service', function() {
           });
 
           return roomService
-            .hideRoomFromUser(fixture.troupeCanRemove, fixture.userFavourite.id)
+            .hideRoomFromUser(fixture.troupeCanRemove, fixture.userFavourite._id)
             .then(checkEvent) // Ensure event was emitted
             .then(getFavs)
             .then(function(favs) {
@@ -926,13 +926,13 @@ describe('room-service', function() {
         it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
           return roomMembershipService
-            .setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
+            .setMembershipMode(fixture.userFavourite._id, fixture.troupeCanRemove.id, 'mute', false)
             .then(function() {
               // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
-              return roomService.hideRoomFromUser(troupe, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(troupe, fixture.userFavourite._id);
             })
             .then(getFavs)
             .then(function(favs) {
@@ -947,13 +947,13 @@ describe('room-service', function() {
         it('should remove user from the room if mode=mute', function() {
           // Set user as lurking
           return roomMembershipService
-            .setMembershipMode(fixture.userFavourite.id, fixture.troupeCanRemove.id, 'mute', false)
+            .setMembershipMode(fixture.userFavourite._id, fixture.troupeCanRemove.id, 'mute', false)
             .then(function() {
               // Get updated troupe
               return troupeService.findById(fixture.troupeCanRemove.id);
             })
             .then(function(troupe) {
-              return roomService.hideRoomFromUser(troupe, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(troupe, fixture.userFavourite._id);
             })
             .then(getFavs)
             .then(function(favs) {
@@ -967,7 +967,7 @@ describe('room-service', function() {
 
         it('should check if the proper event is emitted when the favourite is removed', function() {
           var checkEvent = appEvents.addListener('dataChange2', {
-            url: '/user/' + fixture.userFavourite.id + '/rooms',
+            url: '/user/' + fixture.userFavourite._id + '/rooms',
             operation: 'remove',
             model: { id: fixture.troupeEmpty.id }
           });
@@ -978,7 +978,7 @@ describe('room-service', function() {
               assert(!here); // Check that user is not in the room
             })
             .then(function() {
-              return roomService.hideRoomFromUser(fixture.troupeEmpty, fixture.userFavourite.id);
+              return roomService.hideRoomFromUser(fixture.troupeEmpty, fixture.userFavourite._id);
             })
             .then(checkEvent) // Ensure event was emitted
             .then(getFavs)
@@ -1583,7 +1583,7 @@ describe('room-service', function() {
           .then(function() {
             return roomMembershipService.checkRoomMembership(
               fixture.troupeOrg1.id,
-              fixture.user1.id
+              fixture.user1._id
             );
           })
           .then(function(isMember) {
@@ -1599,7 +1599,7 @@ describe('room-service', function() {
           .then(function() {
             return roomMembershipService.checkRoomMembership(
               fixture.troupeOrg1.id,
-              fixture.user1.id
+              fixture.user1._id
             );
           })
           .then(function(isMember) {
@@ -1609,7 +1609,7 @@ describe('room-service', function() {
           .then(function() {
             return roomMembershipService.checkRoomMembership(
               fixture.troupeOrg1.id,
-              fixture.user1.id
+              fixture.user1._id
             );
           })
           .then(function(isMember) {

@@ -124,16 +124,16 @@ describe('restful #slow', function() {
   });
 
   it('serializes orgs', function() {
-    return restful.serializeOrgsForUserId(fixture.user1.id);
+    return restful.serializeOrgsForUserId(fixture.user1._id);
   });
 
   it('serializes orgs', function() {
-    return restful.serializeOrgsForUserId(fixture.user1.id);
+    return restful.serializeOrgsForUserId(fixture.user1._id);
   });
 
   describe('serializeGroupsForUserId', function() {
     it('should do what it says on the tin', function() {
-      return restful.serializeGroupsForUserId(fixture.user1.id).then(function(result) {
+      return restful.serializeGroupsForUserId(fixture.user1._id).then(function(result) {
         var group1 = fixture.group1;
 
         assert.deepEqual(result, [

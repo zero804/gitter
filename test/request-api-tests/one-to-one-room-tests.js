@@ -75,10 +75,10 @@ describe('one-to-one-rooms', function() {
       })
       .then(function(result) {
         // User2 has email notifications
-        assert(result[fixture.user2.id]);
+        assert(result[fixture.user2._id]);
 
         // User2 will be notified of the new chat in the one-to-one
-        assert.deepEqual(result[fixture.user2.id][this.roomId], [this.chatId]);
+        assert.deepEqual(result[fixture.user2._id][this.roomId], [this.chatId]);
       });
   });
 

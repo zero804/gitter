@@ -21,7 +21,7 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, {
+        .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id, {
           lastAccessTime: tenDaysAgo
         })
         .then(function() {
@@ -30,7 +30,7 @@ describe('auto-lurker-service', function() {
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
 
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
@@ -38,10 +38,10 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate with notify settings', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomMembershipService
-        .setMembershipMode(fixture.user1.id, fixture.troupe1.id, 'all')
+        .setMembershipMode(fixture.user1._id, fixture.troupe1.id, 'all')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe1.id,
             { lastAccessTime: tenDaysAgo }
           );
@@ -52,7 +52,7 @@ describe('auto-lurker-service', function() {
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
 
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
@@ -60,10 +60,10 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate with notify settings', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomMembershipService
-        .setMembershipMode(fixture.user1.id, fixture.troupe1.id, 'all')
+        .setMembershipMode(fixture.user1._id, fixture.troupe1.id, 'all')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe1.id,
             { lastAccessTime: tenDaysAgo }
           );
@@ -74,7 +74,7 @@ describe('auto-lurker-service', function() {
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
 
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
@@ -82,10 +82,10 @@ describe('auto-lurker-service', function() {
     it('should not return fully lurked candidates', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomMembershipService
-        .setMembershipMode(fixture.user1.id, fixture.troupe1.id, 'mention')
+        .setMembershipMode(fixture.user1._id, fixture.troupe1.id, 'mention')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe1.id,
             { lastAccessTime: tenDaysAgo }
           );
@@ -96,7 +96,7 @@ describe('auto-lurker-service', function() {
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
 
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.equal(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
@@ -104,13 +104,13 @@ describe('auto-lurker-service', function() {
     it('should identify users for lurk based on the date they were added to the room if they have not logged in', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomService.testOnly
-        .updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
+        .updateUserDateAdded(fixture.user1._id, fixture.troupe2.id, tenDaysAgo)
         .then(function() {
           return autoLurkerService.findLurkCandidates(fixture.troupe2, { minTimeInDays: 1 });
         })
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.strictEqual(candidates[0].lastAccessTime.valueOf(), tenDaysAgo.valueOf());
         });
     });
@@ -120,10 +120,10 @@ describe('auto-lurker-service', function() {
       var twoDaysAgo = new Date(Date.now() - 86400000 * 2);
 
       return roomService.testOnly
-        .updateUserDateAdded(fixture.user1.id, fixture.troupe2.id, tenDaysAgo)
+        .updateUserDateAdded(fixture.user1._id, fixture.troupe2.id, tenDaysAgo)
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe2.id,
             { lastAccessTime: twoDaysAgo }
           );
@@ -133,7 +133,7 @@ describe('auto-lurker-service', function() {
         })
         .then(function(candidates) {
           assert.strictEqual(candidates.length, 1);
-          assert.equal(candidates[0].userId, fixture.user1.id);
+          assert.equal(candidates[0].userId, fixture.user1._id);
           assert.strictEqual(candidates[0].lastAccessTime.valueOf(), twoDaysAgo.valueOf());
         });
     });
@@ -148,7 +148,7 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id, {
+        .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id, {
           lastAccessTime: tenDaysAgo
         })
         .then(function() {
@@ -156,8 +156,8 @@ describe('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe1.id),
-            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
+            roomMembershipService.getMembershipMode(fixture.user1._id, fixture.troupe1.id),
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1._id)
           ];
         })
         .spread(function(settings, lurkStatus) {
@@ -169,10 +169,10 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate with notify settings', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomMembershipService
-        .setMembershipMode(fixture.user1.id, fixture.troupe1.id, 'mention')
+        .setMembershipMode(fixture.user1._id, fixture.troupe1.id, 'mention')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe1.id,
             { lastAccessTime: tenDaysAgo }
           );
@@ -182,8 +182,8 @@ describe('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe1.id),
-            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
+            roomMembershipService.getMembershipMode(fixture.user1._id, fixture.troupe1.id),
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1._id)
           ];
         })
         .spread(function(settings, lurkStatus) {
@@ -195,10 +195,10 @@ describe('auto-lurker-service', function() {
     it('should return a lurk candidate with notify settings', function() {
       var tenDaysAgo = new Date(Date.now() - 86400000 * 10);
       return roomMembershipService
-        .setMembershipMode(fixture.user1.id, fixture.troupe1.id, 'mute')
+        .setMembershipMode(fixture.user1._id, fixture.troupe1.id, 'mute')
         .then(function() {
           return recentRoomService.saveLastVisitedTroupeforUserId(
-            fixture.user1.id,
+            fixture.user1._id,
             fixture.troupe1.id,
             { lastAccessTime: tenDaysAgo }
           );
@@ -208,8 +208,8 @@ describe('auto-lurker-service', function() {
         })
         .then(function() {
           return [
-            roomMembershipService.getMembershipMode(fixture.user1.id, fixture.troupe1.id),
-            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1.id)
+            roomMembershipService.getMembershipMode(fixture.user1._id, fixture.troupe1.id),
+            roomMembershipService.getMemberLurkStatus(fixture.troupe1.id, fixture.user1._id)
           ];
         })
         .spread(function(settings, lurkStatus) {

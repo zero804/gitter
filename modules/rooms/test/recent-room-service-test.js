@@ -24,17 +24,17 @@ describe('recent-room-service', function() {
       this.timeout(10000);
 
       function getFavs() {
-        return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+        return recentRoomCore.findFavouriteTroupesForUser(fixture.user1._id);
       }
 
       return recentRoomService
-        .updateFavourite(fixture.user1.id, fixture.troupe1.id, 1)
+        .updateFavourite(fixture.user1._id, fixture.troupe1.id, 1)
         .then(getFavs)
         .then(function(favs) {
           assert.equal(favs[fixture.troupe1.id], 1);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 1);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe2.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -42,7 +42,7 @@ describe('recent-room-service', function() {
           assert.equal(favs[fixture.troupe2.id], 1);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 3);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe2.id, 3);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -50,7 +50,7 @@ describe('recent-room-service', function() {
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe3.id, 1);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe3.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -59,7 +59,7 @@ describe('recent-room-service', function() {
           assert.equal(favs[fixture.troupe2.id], 3);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe2.id, 2);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe2.id, 2);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -68,7 +68,7 @@ describe('recent-room-service', function() {
           assert.equal(favs[fixture.troupe1.id], 3);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe1.id, 4);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe1.id, 4);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -77,7 +77,7 @@ describe('recent-room-service', function() {
           assert.equal(favs[fixture.troupe1.id], 4);
         })
         .then(function() {
-          return recentRoomService.updateFavourite(fixture.user1.id, fixture.troupe4.id, 1);
+          return recentRoomService.updateFavourite(fixture.user1._id, fixture.troupe4.id, 1);
         })
         .then(getFavs)
         .then(function(favs) {
@@ -98,9 +98,9 @@ describe('recent-room-service', function() {
     it('should add a troupe to favourites', function() {
       function fav(val) {
         return recentRoomService
-          .updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
+          .updateFavourite(fixture.user1._id, fixture.troupe1.id, val)
           .then(function() {
-            return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+            return recentRoomCore.findFavouriteTroupesForUser(fixture.user1._id);
           })
           .then(function(favs) {
             var isInTroupe = !!favs[fixture.troupe1.id];
@@ -123,14 +123,14 @@ describe('recent-room-service', function() {
 
     it('should record the time each troupe was last accessed by a user', function() {
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+        .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id)
         .then(function() {
-          return persistenceService.User.findById(fixture.user1.id).exec();
+          return persistenceService.User.findById(fixture.user1._id).exec();
         })
         .then(function(user) {
           assert.equal(user.lastTroupe, fixture.troupe1.id);
 
-          return recentRoomCore.getTroupeLastAccessTimesForUser(fixture.user1.id);
+          return recentRoomCore.getTroupeLastAccessTimesForUser(fixture.user1._id);
         })
         .then(function(times) {
           var troupeId = '' + fixture.troupe1.id;
@@ -139,9 +139,9 @@ describe('recent-room-service', function() {
           assert(after, 'Expected a value for last access time');
 
           return recentRoomService
-            .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+            .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id)
             .then(function() {
-              return recentRoomCore.getTroupeLastAccessTimesForUser(fixture.user1.id);
+              return recentRoomCore.getTroupeLastAccessTimesForUser(fixture.user1._id);
             })
             .then(function(times) {
               assert(
@@ -167,7 +167,7 @@ describe('recent-room-service', function() {
 
     it('#01 should return null when a user has no troupes', function() {
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.userNoTroupes.id, fixture.troupe1.id)
+        .saveLastVisitedTroupeforUserId(fixture.userNoTroupes._id, fixture.troupe1.id)
         .then(function() {
           fixture.userNoTroupes.lastTroupe = fixture.troupe1.id;
           return recentRoomService.findInitialRoomUrlForUser(fixture.userNoTroupes);
@@ -179,7 +179,7 @@ describe('recent-room-service', function() {
 
     it('#02 should return return the users last troupe when they have one', function() {
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupe1.id)
+        .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupe1.id)
         .then(function() {
           return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
         })
@@ -196,7 +196,7 @@ describe('recent-room-service', function() {
 
     it('#04 should return one to one rooms', function() {
       return recentRoomService
-        .saveLastVisitedTroupeforUserId(fixture.user1.id, fixture.troupeOneToOne.id)
+        .saveLastVisitedTroupeforUserId(fixture.user1._id, fixture.troupeOneToOne.id)
         .then(function() {
           return recentRoomService.findInitialRoomUrlForUser(fixture.user1);
         })

@@ -7,6 +7,7 @@ var _ = require('lodash');
 var userService = require('gitter-web-users');
 var roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 var userSearch = require('gitter-web-elasticsearch/lib/user-search');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 var LARGE_ROOM_SIZE_THRESHOLD = 200;
 
@@ -196,7 +197,7 @@ exports.searchForUsers = function(userId, queryText, options, callback) {
         return roomMembershipService.findAllMembersForRooms(troupeIds).then(function(userIds) {
           // Remove the user doing the search
           userIds = userIds.filter(function(t) {
-            return t != userId;
+            return !mongoUtils.objectIDsEqual(t, userId);
           });
 
           if (!userIds.length) return emptyResponse;

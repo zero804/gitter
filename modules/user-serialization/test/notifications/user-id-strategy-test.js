@@ -1,6 +1,7 @@
 'use strict';
 
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var UserIdStrategy = require('../../lib/notifications/user-id-strategy');
 var serialize = require('gitter-web-serialization/lib/serialize');
@@ -16,7 +17,7 @@ describe('user-id-strategy', function() {
       return serialize([fixture.user1._id], strategy).then(function(result) {
         assert.strictEqual(result.length, 1);
         var r0 = result[0];
-        assert.strictEqual(r0.id, fixture.user1.id);
+        assert(mongoUtils.objectIDsEqual(r0.id, fixture.user1._id));
         assert.strictEqual(r0.username, fixture.user1.username);
         assert.strictEqual(r0.displayName, fixture.user1.displayName);
         assert(r0.avatarUrl);
