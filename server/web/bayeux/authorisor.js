@@ -214,7 +214,11 @@ function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
       }
 
       return restful
-        .serializeChatsForTroupe(troupeId, userId, { lookups: snapshot.lookups })
+        .serializeChatsForTroupe(troupeId, userId, {
+          lookups: snapshot.lookups,
+          limit: snapshot.limit,
+          beforeInclId: snapshot.beforeInclId
+        })
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
@@ -357,6 +361,7 @@ module.exports = bayeuxExtension({
      *  - `false` `public/js/components/live-context`
      *  - `true/false` `public/js/components/realtime-troupe-listener`
      *  - `{ lookups: ['user'] }` `public/js/collections/chat.js`
+     *  - `{ limit, beforeInclId }` `public/js/collections/infinite-mixin.js`
      */
     var snapshot = state && state.snapshot;
     var userId = state && state.userId;

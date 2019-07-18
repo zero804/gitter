@@ -52,10 +52,10 @@ function serializeTroupesForUser(userId, callback) {
 function serializeChatsForTroupe(
   troupeId,
   userId,
-  { limit = DEFAULT_CHAT_COUNT_LIMIT, aroundId, unread, lookups }
+  { limit = DEFAULT_CHAT_COUNT_LIMIT, aroundId, unread, lookups, beforeInclId }
 ) {
   return chatService
-    .findChatMessagesForTroupe(troupeId, { limit, aroundId })
+    .findChatMessagesForTroupe(troupeId, { limit, aroundId, beforeInclId })
     .then(function(chatMessages) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
