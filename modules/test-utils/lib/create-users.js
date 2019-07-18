@@ -94,8 +94,11 @@ function createUser(fixtureName, f) {
     if (preremove) {
       return preremove();
     }
-  }).then(function() {
-    return User.create(doc);
+  }).then(async function() {
+    const user = await User.create(doc);
+    // We convert to a plain object so when we add properties like accessToken below,
+    // it properly serializes in our `/api/private/seed` endpoint
+    return user.toJSON();
   });
 
   if (f.accessToken) {
