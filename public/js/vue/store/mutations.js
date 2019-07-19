@@ -145,5 +145,8 @@ export default {
       );
       Vue.set(state.roomMap, newRoomState.id, resultantRoomState);
     }
+  },
+  [types.REPLACE_MESSAGE_MAP](state, newMessageMap) {
+    state.messageMap = newMessageMap;
   }
 };
