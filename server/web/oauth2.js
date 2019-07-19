@@ -7,12 +7,15 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var errorReporter = env.errorReporter;
 var stats = env.stats;
+const url = require('url');
 
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
 var oauthService = require('../services/oauth-service');
 var random = require('../utils/random');
 var ensureLoggedIn = require('./middlewares/ensure-logged-in');
+
+const OauthAuthorizationError = require('./oauth-authorization-error');
 
 // create OAuth 2.0 server
 var server = oauth2orize.createServer();
@@ -127,22 +130,39 @@ exports.authorization = [
       }
 
       if (!client) {
-        var e1 = new Error('Invalid clientKey');
-        e1.clientMismatch = true;
-        return done(e1);
+        return done(new OauthAuthorizationError('Provided clientKey does not exist.'));
       }
 
+      const urlData = url.parse(client.registeredRedirectUri);
+      const hasBadProtocol =
+        !urlData.protocol || urlData.protocol === 'javascript:' || urlData.protocol === 'data:';
+
       if (client.registeredRedirectUri !== redirectUri) {
-        logger.warn('Provided redirectUri does not match registered URI for clientKey ', {
+        logger.warn('Provided redirectUri does not match registered URI for client_id/clientKey ', {
           redirectUri: redirectUri,
           registeredUri: client.registeredRedirectUri,
           clientKey: clientKey
         });
 
-        var e2 = new Error('URI mismatch');
-        e2.clientMismatch = true;
-        return done(e2);
+        return done(
+          new OauthAuthorizationError(
+            'Provided redirectUri does not match registered URI for client_id/clientKey'
+          )
+        );
+      } else if (hasBadProtocol) {
+        logger.warn('Provided redirectUri is using disallowed bad protocol ', {
+          redirectUri: redirectUri,
+          registeredUri: client.registeredRedirectUri,
+          clientKey: clientKey
+        });
+
+        return done(
+          new OauthAuthorizationError(
+            'Provided redirectUri is using disallowed bad protocol (no javascript:// or data://)'
+          )
+        );
       }
+
       return done(null, client, redirectUri);
     });
   }),
@@ -171,9 +191,10 @@ exports.authorization = [
 
     var incorrectResponseType = req.query.response_type && req.query.response_type !== 'code';
 
-    if (err.clientMismatch || missingParams.length || incorrectResponseType) {
+    if (err instanceof OauthAuthorizationError || missingParams.length || incorrectResponseType) {
+      res.status(401);
       res.render('oauth_authorize_failed', {
-        clientMismatch: !!err.clientMismatch,
+        errorMessage: err.message,
         missingParams: missingParams.length && missingParams,
         incorrectResponseType: incorrectResponseType
       });

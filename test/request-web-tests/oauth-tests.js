@@ -13,13 +13,46 @@ var app = require('../../server/web');
 
 describe('OAuth tests', function() {
   var fixture = fixtureLoader.setup({
-    user1: {},
+    user1: {
+      accessToken: 'web-internal'
+    },
     oAuthClient1: {
       registeredRedirectUri: 'http://localhost:3434/callback'
     },
     oAuthCode1: {
       user: 'user1',
       client: 'oAuthClient1'
+    },
+    oAuthClientGoodProtocol1: {
+      registeredRedirectUri: 'https://gitter.im/login/desktop/callback'
+    },
+    oAuthClientGoodProtocol2: {
+      registeredRedirectUri: 'app://gitter/oauth.html'
+    },
+
+    oAuthClientNoProtocol1: {
+      registeredRedirectUri: 'noprotocol'
+    },
+    oAuthClientBadDataProtocol1: {
+      registeredRedirectUri: 'data:text/html,<script>alert(1)</script>;;?sss'
+    },
+    oAuthClientBadDataProtocol2: {
+      registeredRedirectUri: '%0Adata:text/html,<script>alert(1)</script>;;?sss'
+    },
+    oAuthClientBadJavascriptProtocol1: {
+      registeredRedirectUri: `javascript:alert('xss')`
+    },
+    oAuthClientBadJavascriptProtocol2: {
+      registeredRedirectUri: `\njavascript:alert('xss')`
+    },
+    oAuthClientBadJavascriptProtocol3: {
+      registeredRedirectUri: `%0Ajavascript:alert('xss')`
+    },
+    oAuthClientBadXss1: {
+      registeredRedirectUri: `"onmouseover="alert(1) "`
+    },
+    oAuthClientBadXss2: {
+      registeredRedirectUri: `&quot;&gt;&lt;img src=x onerror=confirm(1);&gt;`
     }
   });
 
@@ -56,5 +89,69 @@ describe('OAuth tests', function() {
           error_description: 'Invalid authorization code'
         });
       });
+  });
+
+  const goodFixtureKeys = ['oAuthClientGoodProtocol1', 'oAuthClientGoodProtocol2'];
+
+  goodFixtureKeys.forEach(goodFixtureKey => {
+    it(`GET /login/oauth/authorize with bad protocol(${goodFixtureKey}) shows approval authorization page`, async () => {
+      this.timeout(8000);
+
+      const goodOauthClient = fixture[goodFixtureKey];
+
+      const goodRedirectUri = encodeURIComponent(goodOauthClient.registeredRedirectUri);
+
+      await request(app)
+        .get(
+          `/login/oauth/authorize?response_type=code&redirect_uri=${goodRedirectUri}&client_id=${
+            goodOauthClient.clientKey
+          }`
+        )
+        .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+        .expect(200)
+        .then(function(result) {
+          assert(result.text.includes('Do you approve?'), 'has approval question text');
+        });
+    });
+  });
+
+  const badFixtureKeys = [
+    'oAuthClientNoProtocol1',
+    'oAuthClientBadDataProtocol1',
+    'oAuthClientBadDataProtocol2',
+    'oAuthClientBadJavascriptProtocol1',
+    'oAuthClientBadJavascriptProtocol2',
+    'oAuthClientBadJavascriptProtocol3',
+    'oAuthClientBadXss1',
+    'oAuthClientBadXss2'
+  ];
+
+  badFixtureKeys.forEach(badFixtureKey => {
+    it(`GET /login/oauth/authorize with bad protocol(${badFixtureKey}) shows invalid error page`, async () => {
+      this.timeout(8000);
+
+      const badOauthClient = fixture[badFixtureKey];
+
+      const badRedirectUri = encodeURIComponent(badOauthClient.registeredRedirectUri);
+
+      await request(app)
+        .get(
+          `/login/oauth/authorize?response_type=code&redirect_uri=${badRedirectUri}&client_id=${
+            badOauthClient.clientKey
+          }`
+        )
+        .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+        .expect(401)
+        .then(function(result) {
+          assert(
+            result.text.includes('Your OAuth request is incorrect'),
+            'has incorrect OAuth request page'
+          );
+          assert(
+            result.text.includes('Provided redirectUri is using disallowed bad protocol'),
+            'tells you what is wrong with the redirect URI'
+          );
+        });
+    });
   });
 });

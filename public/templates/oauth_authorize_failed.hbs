@@ -13,8 +13,8 @@
   <body>
     <div class="center-panel">
       <h1>Your OAuth request is incorrect</h1>
-      {{#if clientMismatch}}
-      <p>The supplied client credentials don't match: either the <code>client_id</code> or the <code>redirect_uri</code> wasn't <em>exactly</em> right.</p>
+      {{#if errorMessage}}
+      <p>{{errorMessage}}</p>
       {{/if}}
       {{#if missingParams}}
       <p>Your request didn&apos;t include some of the required OAuth parameters:</p>
