@@ -12,6 +12,13 @@ Developer facing:
  - Update `prettier@1.18.2` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1484
 
 
+# 19.55.1 - 2019-7-18
+
+ - Fix XSS on OAuth app authorize page, https://gitlab.com/gitlab-org/gitter/webapp/issues/2043
+    - Thanks to [`yipman`](https://hackerone.com/yipman) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/14
+
+
 # 19.55.0 - 2019-7-10
 
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460
