@@ -373,6 +373,7 @@ module.exports = bayeuxExtension({
      *  - `true/false` `public/js/components/realtime-troupe-listener`
      *  - `{ lookups: ['user'] }` `public/js/collections/chat.js`
      *  - `{ limit, beforeInclId }` `public/js/collections/infinite-mixin.js`
+     *  - and possibly more coming from clients implemented outside of `webapp`
      */
     var snapshot = state && state.snapshot;
     var userId = state && state.userId;
