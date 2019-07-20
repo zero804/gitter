@@ -7,6 +7,7 @@ Developer facing:
 
  - Validate Vue code style in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1476
  - Make unused variable in the code an error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1477
+    - Fix Express error handler middleware (needs 4 arguments), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1485
  - Add test for deleting integrations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1479
  - Add user ID to find-users-by-email script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1478
  - Update `prettier@1.18.2` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1484
