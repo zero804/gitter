@@ -57,6 +57,37 @@ describe('list-item', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
+  it('room with unread matches snapshot', () => {
+    const { wrapper } = mount(ListItem, {
+      item: {
+        ...createSerializedRoomFixture('my-community/community'),
+        unreadItems: 7
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('room with mentions matches snapshot', () => {
+    const { wrapper } = mount(ListItem, {
+      item: {
+        ...createSerializedRoomFixture('my-community/community'),
+        mentions: 7
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
+  it('muted room with activity matches snapshot', () => {
+    const { wrapper } = mount(ListItem, {
+      item: {
+        ...createSerializedRoomFixture('my-community/community'),
+        lurk: true,
+        activity: true
+      }
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
+
   it('favourite loading room matches snapshot', () => {
     const { wrapper } = mount(ListItem, {
       item: {

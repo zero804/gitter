@@ -48,6 +48,7 @@ export default {
   <li
     class="list-item"
     :class="{ 'is-favourited': item.favourite }"
+    :data-id="item.id"
     :data-favourite="item.favourite"
   >
     <a
@@ -75,6 +76,7 @@ export default {
       <div v-else-if="item.unreadItems" class="unread-indicator">
         {{ item.unreadItems }}
       </div>
+      <div v-else-if="item.activity" class="activity-indicator"></div>
     </a>
   </li>
 </template>
@@ -207,5 +209,16 @@ export default {
 .mention-indicator {
   .indicator-base();
   background-color: @jaffa;
+}
+
+.activity-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 0.8rem;
+  height: 0.8rem;
+
+  border: 2px solid @caribbean;
+  border-radius: 100%;
 }
 </style>
