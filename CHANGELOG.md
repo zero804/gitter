@@ -1,6 +1,5 @@
 # 19.57.0 - *upcoming*
 
- - Add new message activity indicator for muted room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1486
 
 Developer facing:
 
@@ -11,6 +10,7 @@ Developer facing:
 
  - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
  - Add chat input to the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1469
+ - Add new message activity indicator for muted room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1486
 
 Developer facing:
 
