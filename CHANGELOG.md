@@ -1,8 +1,11 @@
 # 19.57.0 - *upcoming*
-  
+
+ - Add new message activity indicator for muted room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1486
+
 Developer facing:
+
  -  Clean up server side code before placing chat messages to Vuex store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1481
- 
+
 
 # 19.56.0 - 2019-7-21
 
