@@ -5,7 +5,6 @@ var logger = env.logger;
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var _ = require('lodash');
 var gitHubProfileService = require('gitter-web-github-backend/lib/github-profile-service');
 var groupService = require('gitter-web-groups/lib/group-service');
 var groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
@@ -20,6 +19,7 @@ var roomMembershipService = require('gitter-web-rooms/lib/room-membership-servic
 var orgService = require('./org-service');
 var repoService = require('./repo-service');
 var userScopes = require('gitter-web-identity/lib/user-scopes');
+const { createOptionsValidator } = require('../utils/options-validator');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -50,25 +50,34 @@ function serializeTroupesForUser(userId, callback) {
     .nodeify(callback);
 }
 
-function serializeChatsForTroupe(troupeId, userId, options, callback) {
-  options = _.extend(
-    {},
-    {
-      skip: 0,
-      limit: DEFAULT_CHAT_COUNT_LIMIT,
-      userId: userId // This may also be appearing through in options
-    },
-    options
+function serializeChatsForTroupe(troupeId, userId, options) {
+  // TODO: check production logs for warnings with unexpected options
+  // then refactor this method to only accept the following options
+  // the refactor can be done by reverting the commit responsible for this comment
+  const expectedOptionNames = {
+    limit: true,
+    aroundId: true,
+    unread: true,
+    lookups: true,
+    beforeInclId: true
+  };
+  const validateChatOptions = createOptionsValidator(
+    'restful.serializeChatsForTroupe',
+    expectedOptionNames
   );
+  validateChatOptions(options);
 
-  var initialId = options.aroundId;
-
+  const defaultOptions = {
+    skip: 0,
+    limit: DEFAULT_CHAT_COUNT_LIMIT,
+    userId // userId is only needed by `findChatMessagesForTroupe` when `options.marker` is present
+  };
   return chatService
-    .findChatMessagesForTroupe(troupeId, options)
+    .findChatMessagesForTroupe(troupeId, { ...defaultOptions, ...options })
     .then(function(chatMessages) {
       var strategy = new restSerializer.ChatStrategy({
         notLoggedIn: !userId,
-        initialId: initialId,
+        initialId: options.aroundId,
         currentUserId: userId,
         troupeId: troupeId,
         unread: options.unread,
@@ -77,27 +86,19 @@ function serializeChatsForTroupe(troupeId, userId, options, callback) {
       });
 
       return restSerializer.serialize(chatMessages, strategy);
-    })
-    .nodeify(callback);
+    });
 }
 
-function serializeUsersForTroupe(troupeId, userId, options) {
-  if (!options) options = {};
-
-  var skip = options.skip;
-  if (!skip || isNaN(skip)) {
-    skip = 0;
-  }
-
-  var limit = options.limit;
-  var searchTerm = options.searchTerm;
-
-  if (!limit || isNaN(limit)) {
-    limit = DEFAULT_USERS_LIMIT;
-  } else if (limit > MAX_USERS_LIMIT) {
-    limit = MAX_USERS_LIMIT;
-  }
-
+/**
+ *
+ * @param {*} options Options can be:
+ *      - `limit` - maximum amount of records retrieved
+ *      - `searchTerm` - query used to match users
+ *      - `lean` - if true, the result is not full mongoose model, just plain object
+ *      - `skip` - how many first records should be omitted (used for pagination)
+ */
+function serializeUsersForTroupe(troupeId, userId, { limit, searchTerm, lean, skip }) {
+  // TODO: extract the if into a separate function - the searchTerm branch of this function is completely separate
   if (typeof searchTerm === 'string') {
     if (survivalMode || searchTerm.length < 1) {
       return Promise.resolve([]);
@@ -109,14 +110,19 @@ function serializeUsersForTroupe(troupeId, userId, options) {
     });
   }
 
+  limit = isNaN(limit) ? DEFAULT_USERS_LIMIT : limit;
+  skip = isNaN(skip) ? 0 : skip;
+  if (limit > MAX_USERS_LIMIT) {
+    limit = MAX_USERS_LIMIT;
+  }
   return roomMembershipService
-    .findMembersForRoom(troupeId, { limit: limit, skip: skip })
+    .findMembersForRoom(troupeId, { limit, skip })
     .then(function(userIds) {
       var strategy = new restSerializer.UserIdStrategy({
         showPresenceForTroupeId: troupeId,
         includeRolesForTroupeId: troupeId,
         currentUserId: userId,
-        lean: !!options.lean
+        lean: !!lean
       });
 
       return restSerializer.serialize(userIds, strategy);

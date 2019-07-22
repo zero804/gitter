@@ -10,7 +10,6 @@ var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
 var userSort = require('../../../public/js/utils/user-sort');
-var unreadItemService = require('gitter-web-unread-items');
 var getSubResources = require('./sub-resources');
 var fixMongoIdQueryParam = require('../../web/fix-mongo-id-query-param');
 var fonts = require('../../web/fonts');
@@ -18,44 +17,25 @@ var generateRightToolbarSnapshot = require('../snapshots/right-toolbar-snapshot'
 var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
+const getChatSnapshotOptions = require('./chat/chat-snapshot-options');
 
-/* How many chats to send back */
-var INITIAL_CHAT_COUNT = 50;
 var ROSTER_SIZE = 25;
+
+const getPermalinkMessageId = request => fixMongoIdQueryParam(request.query.at);
 
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
   var uriContext = options.uriContext;
 
   var troupe = uriContext.troupe;
-  var aroundId = fixMongoIdQueryParam(req.query.at);
-  var script = options.script;
   var user = req.user;
   var userId = user && user.id;
 
-  // It's ok if there's no user (logged out), unreadItems will be 0
-  const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupe.id);
-
-  var limit =
-    unreadItems.chat.length > INITIAL_CHAT_COUNT
-      ? unreadItems.chat.length + 20
-      : INITIAL_CHAT_COUNT;
-
-  var snapshotOptions = {
-    limit: limit,
-    aroundId: aroundId,
-    unread: options.unread // Unread can be true, false or undefined
+  const userSerializerOptions = {
+    lean: true,
+    limit: ROSTER_SIZE
   };
-
-  var chatSerializerOptions = _.defaults({}, snapshotOptions);
-
-  var userSerializerOptions = _.defaults(
-    {
-      lean: true,
-      limit: ROSTER_SIZE
-    },
-    snapshotOptions
-  );
+  const chatSnapshotOptions = await getChatSnapshotOptions(userId, troupe.id, req, options.unread);
 
   const [
     troupeContext,
@@ -68,10 +48,10 @@ async function renderChat(req, res, next, options) {
     options.generateContext === false
       ? {}
       : contextGenerator.generateTroupeContext(req, {
-          snapshots: { chat: snapshotOptions },
-          permalinkChatId: aroundId
+          snapshots: { chat: chatSnapshotOptions },
+          permalinkChatId: getPermalinkMessageId(req)
         }),
-    restful.serializeChatsForTroupe(troupe.id, userId, chatSerializerOptions),
+    restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
     options.fetchUsers === false
       ? null
@@ -101,6 +81,7 @@ async function renderChat(req, res, next, options) {
     integrationsUrl = '#integrations';
   }
 
+  const script = options.script;
   var cssFileName = options.stylesheet
     ? 'styles/' + options.stylesheet + '.css'
     : 'styles/' + script + '.css'; // css filename matches bootscript
