@@ -1,3 +1,9 @@
+# 19.57.0 - *upcoming*
+  
+Developer facing:
+ -  Clean up server side code before placing chat messages to Vuex store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1481
+ 
+
 # 19.56.0 - 2019-7-21
 
  - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
