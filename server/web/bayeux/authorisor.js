@@ -210,12 +210,12 @@ function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
 
   const validateChatSnapshot = createOptionsValidator(
     'authorisor.populateSubTroupeCollection.chat',
-    ['limit', 'lookups', 'beforeInclId']
+    { limit: true, lookups: true, beforeInclId: true }
   );
 
   const validateUserSnapshot = createOptionsValidator(
     'authorisor.populateSubTroupeCollection.user',
-    ['limit', 'lean']
+    { limit: true, lean: true }
   );
 
   switch (collection) {

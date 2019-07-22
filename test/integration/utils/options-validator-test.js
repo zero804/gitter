@@ -10,7 +10,12 @@ const { createOptionsValidator } = testRequire.withProxies('./utils/options-vali
 
 describe('option-validator', function() {
   it('finds unexpected options and logs warning', () => {
-    const validator = createOptionsValidator('validator-name', ['a', 'b', 'd', 'x']);
+    const validator = createOptionsValidator('validator-name', {
+      a: true,
+      b: true,
+      d: true,
+      x: true
+    });
     // stub the real warn so we don't see it in test output
     mockito
       .when(loggerMock)

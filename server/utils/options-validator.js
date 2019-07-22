@@ -7,13 +7,19 @@ const logger = require('gitter-web-env').logger;
  * log out all unexpected key-value pairs in those options
  *
  * @param {String} validatorName unique name for identifying log messages
- * @param {Array<String>} expectedOptionNames allowed options, all other
- *     options are going to be warnings in logs
+ * @param {Map<String,Boolean>} expectedOptionNames allowed options as keys with true as value,
+ * all other options are going to be warnings in logs
+ *
+ * @example
+ * createOptionsValidator(
+ *   'restful.serializeChatsForTroupe',
+ *   {limit: true, unread: true}
+ * )(options)
  */
 const createOptionsValidator = (validatorName, expectedOptionNames) => options => {
   const allOptionNames = Object.keys(options);
   const unexpectedOptionNames = allOptionNames.filter(
-    optionName => !expectedOptionNames.includes(optionName)
+    optionName => !expectedOptionNames[optionName]
   );
 
   if (unexpectedOptionNames.length === 0) {

@@ -54,7 +54,13 @@ function serializeChatsForTroupe(troupeId, userId, options) {
   // TODO: check production logs for warnings with unexpected options
   // then refactor this method to only accept the following options
   // the refactor can be done by reverting the commit responsible for this comment
-  const expectedOptionNames = ['limit', 'aroundId', 'unread', 'lookups', 'beforeInclId'];
+  const expectedOptionNames = {
+    limit: true,
+    aroundId: true,
+    unread: true,
+    lookups: true,
+    beforeInclId: true
+  };
   const validateChatOptions = createOptionsValidator(
     'restful.serializeChatsForTroupe',
     expectedOptionNames
