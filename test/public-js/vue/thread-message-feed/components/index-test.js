@@ -11,8 +11,7 @@ describe('thread-message-feed index', () => {
     const parentMessage = {
       id: '5d147ea84dad9dfbc522317a'
     };
-    state.messageMap = { [parentMessage.id]: parentMessage };
-    state.threadMessageFeed.parentId = parentMessage.id;
+    state.threadMessageFeed.parentMessage = parentMessage;
   };
 
   it('closed - matches snapshot', async () => {

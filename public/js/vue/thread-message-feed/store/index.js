@@ -4,7 +4,7 @@ import apiClient from '../../../components/api-client';
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
-  SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
+  SET_PARENT_MESSAGE: 'SET_PARENT_MESSAGE',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE'
 };
 
@@ -13,33 +13,28 @@ export default {
   state: {
     isVisible: false,
     draftMessage: '',
-    parentId: null
+    parentMessage: null
   },
   mutations: {
     [types.TOGGLE_THREAD_MESSAGE_FEED](state, isVisible) {
       state.isVisible = isVisible;
     },
-    [types.SET_PARENT_MESSAGE_ID](state, parentId) {
-      state.parentId = parentId;
+    [types.SET_PARENT_MESSAGE](state, parentMessage) {
+      state.parentMessage = parentMessage;
     },
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     }
   },
-  getters: {
-    parentMessage: (state, getters, rootState) => {
-      return rootState.messageMap[state.parentId];
-    }
-  },
   actions: {
-    open: ({ commit }, parentId) => {
+    open: ({ commit, rootState }, parentId) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
-      commit(types.SET_PARENT_MESSAGE_ID, parentId);
+      commit(types.SET_PARENT_MESSAGE, rootState.messageMap[parentId]);
       appEvents.trigger('vue:right-toolbar:toggle', false);
     },
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
-      commit(types.SET_PARENT_MESSAGE_ID, null);
+      commit(types.SET_PARENT_MESSAGE, null);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {

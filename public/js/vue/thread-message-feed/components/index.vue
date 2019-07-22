@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
@@ -12,9 +12,9 @@ export default {
     ChatItem
   },
   computed: {
-    ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
+      parentMessage: state => state.threadMessageFeed.parentMessage,
       user: 'user',
       darkTheme: 'darkTheme'
     })
