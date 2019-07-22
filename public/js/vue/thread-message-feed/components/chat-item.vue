@@ -18,7 +18,7 @@ export default {
 </script>
 
 <template>
-  <div class="chat-item">
+  <div class="chat-item burstStart">
     <div class="chat-item__container">
       <div class="chat-item__aside">
         <div class="chat-item__avatar">
@@ -49,4 +49,13 @@ export default {
 @import (reference) 'colors';
 @import (reference) 'typography';
 @import 'public/js/views/chat/chatItemView.less';
+
+.chat-item__container {
+  padding-left: 0px;
+}
+
+.chat-item__content {
+  margin-left: 40px;
+  margin-right: 10px;
+}
 </style>
