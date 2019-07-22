@@ -1,9 +1,6 @@
 # 19.57.0 - *upcoming*
 
-
-Developer facing:
-
- -  Clean up server side code before placing chat messages to Vuex store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1481
+ - 
 
 
 # 19.56.0 - 2019-7-21
@@ -20,7 +17,7 @@ Developer facing:
  - Add test for deleting integrations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1479
  - Add user ID to find-users-by-email script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1478
  - Update `prettier@1.18.2` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1484
-
+ -  Clean up server side code before placing chat messages to Vuex store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1481
 
 # 19.55.1 - 2019-7-18
 
