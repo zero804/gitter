@@ -1,5 +1,7 @@
 <script>
 import Avatar from './avatar.vue';
+const timeFormat = require('gitter-web-shared/time/time-format');
+const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 export default {
   name: 'ChatItem',
@@ -12,6 +14,14 @@ export default {
     message: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    sentTimeFormatted: function() {
+      return timeFormat(this.message.sent);
+    },
+    sentTimeFormattedFull: function() {
+      return fullTimeFormat(this.message.sent);
     }
   }
 };
@@ -33,9 +43,10 @@ export default {
         <div class="chat-item__details">
           <div class="chat-item__from js-chat-item-from">{{ message.fromUser.displayName }}</div>
           <div class="chat-item__username js-chat-item-from">@{{ message.fromUser.username }}</div>
-          <!--
-      <a class='chat-item__time js-chat-time' {{#if permalinkUrl}} href='{{permalinkUrl}}'{{/if}} title="{{ sentTimeFormattedFull }}">{{ sentTimeFormatted }}</a>
-      -->
+          <!-- TODO add permalink -->
+          <a class="chat-item__time js-chat-time" :title="sentTimeFormattedFull">{{
+            sentTimeFormatted
+          }}</a>
         </div>
         <div class="chat-item__text js-chat-item-text" v-html="message.html"></div>
       </div>
