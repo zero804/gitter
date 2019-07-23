@@ -31,7 +31,7 @@ export default {
       <thread-header />
       <section class="content">
         <div class="chat-messages">
-          <chat-item :message="parentMessage" />
+          <chat-item :message="parentMessage" :thread-message-feed="true" />
         </div>
         <chat-input :user="user" thread />
       </section>

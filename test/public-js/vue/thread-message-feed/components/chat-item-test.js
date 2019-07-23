@@ -25,7 +25,8 @@ describe('thread-message-feed chat-item', () => {
           'https://secure.gravatar.com/avatar/6042a9152ada74d9fb6a0cdce895337e?s=128&d=identicon',
         v: 29
       }
-    }
+    },
+    threadMessageFeed: true
   };
 
   it('matches snapshot', () => {

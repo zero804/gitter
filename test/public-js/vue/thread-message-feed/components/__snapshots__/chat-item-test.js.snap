@@ -2,7 +2,7 @@
 
 exports[`thread-message-feed chat-item matches snapshot 1`] = `
 <div
-  class="chat-item burstStart"
+  class="chat-item burstStart thread-message-feed"
 >
   <div
     class="chat-item__container"

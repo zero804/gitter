@@ -14,6 +14,10 @@ export default {
     message: {
       type: Object,
       required: true
+    },
+    threadMessageFeed: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -28,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <div class="chat-item burstStart">
+  <div class="chat-item burstStart" :class="{ 'thread-message-feed': threadMessageFeed }">
     <div class="chat-item__container">
       <div class="chat-item__aside">
         <div class="chat-item__avatar">
@@ -59,6 +63,7 @@ export default {
 @import (reference) 'trp3Chat';
 @import (reference) 'colors';
 @import (reference) 'typography';
+@import (reference) 'dark-theme';
 @import 'public/js/views/chat/chatItemView.less';
 
 @item-detail-margin: 2px;
@@ -81,12 +86,16 @@ export default {
   margin-right: @item-detail-margin;
 }
 
-.chat-item__container {
+.thread-message-feed .chat-item__container {
   padding-left: 0px;
 }
 
-.chat-item__content {
+.thread-message-feed .chat-item__content {
   margin-left: 40px;
   margin-right: 10px;
+}
+
+.dark-theme .chat-item__text {
+  color: @dark-theme-chat-main-text-color;
 }
 </style>
