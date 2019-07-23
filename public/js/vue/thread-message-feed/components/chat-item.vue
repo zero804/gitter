@@ -61,6 +61,26 @@ export default {
 @import (reference) 'typography';
 @import 'public/js/views/chat/chatItemView.less';
 
+@item-detail-margin: 2px;
+
+.chat-item__details {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  // inspired by https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
+  margin-left: -@item-detail-margin;
+  margin-right: -@item-detail-margin;
+}
+.chat-item__from,
+.chat-item__username,
+.chat-item__time {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-left: @item-detail-margin;
+  margin-right: @item-detail-margin;
+}
+
 .chat-item__container {
   padding-left: 0px;
 }
