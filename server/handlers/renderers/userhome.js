@@ -51,22 +51,18 @@ async function renderHomePage(req, res, next) {
 
       res.render(
         page,
-        await mixinHbsDataForVueLeftMenu(
-          req,
-          {},
-          {
-            bootScriptName: 'router-userhome',
-            cssFileName: 'styles/userhome.css',
-            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-            fonts: fonts.getFonts(),
-            welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
-            showOsxApp: showOsxApp,
-            showWindowsApp: showWindowsApp,
-            showLinuxApp: showLinuxApp,
-            troupeContext: troupeContext,
-            isNativeDesktopApp: troupeContext.isNativeDesktopApp
-          }
-        )
+        await mixinHbsDataForVueLeftMenu(req, {
+          bootScriptName: 'router-userhome',
+          cssFileName: 'styles/userhome.css',
+          hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+          fonts: fonts.getFonts(),
+          welcomeMessage: WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)],
+          showOsxApp: showOsxApp,
+          showWindowsApp: showWindowsApp,
+          showLinuxApp: showLinuxApp,
+          troupeContext: troupeContext,
+          isNativeDesktopApp: troupeContext.isNativeDesktopApp
+        })
       );
     })
     .catch(next);

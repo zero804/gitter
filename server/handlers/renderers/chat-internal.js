@@ -102,9 +102,8 @@ async function renderChat(req, res, next, options) {
     isRightToolbarPinned = true;
   }
 
-  const renderOptions = await mixinHbsDataForVueLeftMenu(
+  var renderOptions = await mixinHbsDataForVueLeftMenu(
     req,
-    { messageMap: _.indexBy(chats, 'id') },
     _.extend(
       {
         embedded: options.embedded || false,

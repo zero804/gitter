@@ -157,30 +157,26 @@ function renderOrgPage(req, res, next) {
 
         res.render(
           'org-page',
-          await mixinHbsDataForVueLeftMenu(
-            req,
-            {},
-            {
-              bootScriptName: 'router-org-page',
-              cssFileName: 'styles/org-page.css',
-              hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
-              hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-              fonts: fonts.getFonts(),
-              socialUrl: url,
-              isLoggedIn: !!req.user,
-              exploreBaseUrl: '/home/~explore',
-              orgDirectoryUrl: fullUrl,
-              roomCount: roomCount,
-              orgUserCount: orgUserCount,
-              group: troupeContext.group,
-              rooms: rooms,
-              troupeContext: troupeContext,
-              pagination: {
-                page: currentPage,
-                pageCount: pageCount
-              }
+          await mixinHbsDataForVueLeftMenu(req, {
+            bootScriptName: 'router-org-page',
+            cssFileName: 'styles/org-page.css',
+            hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
+            hasCachedFonts: fonts.hasCachedFonts(req.cookies),
+            fonts: fonts.getFonts(),
+            socialUrl: url,
+            isLoggedIn: !!req.user,
+            exploreBaseUrl: '/home/~explore',
+            orgDirectoryUrl: fullUrl,
+            roomCount: roomCount,
+            orgUserCount: orgUserCount,
+            group: troupeContext.group,
+            rooms: rooms,
+            troupeContext: troupeContext,
+            pagination: {
+              page: currentPage,
+              pageCount: pageCount
             }
-          )
+          })
         );
       }
     );
