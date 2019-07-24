@@ -8,6 +8,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var persistence = require('gitter-web-persistence');
 var ChatMessage = persistence.ChatMessage;
 var ChatMessageBackup = persistence.ChatMessageBackup;
+var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var chatService = require('../lib/chat-service');
 
 describe('chatService', function() {
@@ -18,7 +19,92 @@ describe('chatService', function() {
   var fixture = fixtureLoader.setupEach({
     user1: {},
     troupe1: { users: ['user1'] },
-    troupe2: { users: ['user1'] }
+    troupe2: {
+      users: ['user1'],
+      securityDescriptor: {
+        public: false
+      }
+    }
+  });
+
+  describe('creating message', () => {
+    it('should validate room argument', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(null, fixture.user1, { text: 'Hello' }),
+        /StatusError: Unknown room/
+      );
+    });
+    it('should validate non empty message', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: null }),
+        /StatusError: Text is required/
+      );
+    });
+    it('should validate that message length does not exceed 400 characters', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          text: 'x'.repeat(4097)
+        }),
+        /StatusError: Message exceeds maximum size/
+      );
+    });
+    it('should set pub attribute based on whether the room is public', async () => {
+      const publicMessage = await chatService.newChatMessageToTroupe(
+        fixture.troupe1,
+        fixture.user1,
+        {
+          text: 'x'
+        }
+      );
+      const privateMessage = await chatService.newChatMessageToTroupe(
+        fixture.troupe2,
+        fixture.user1,
+        {
+          text: 'x'
+        }
+      );
+      assert(publicMessage.pub, 'troupe1 is public and so should be the message');
+      assert(!privateMessage.pub, 'troupe2 is not public and neither should be the message');
+    });
+  });
+
+  describe('spam', () => {
+    it('should not store a message from hellbanned user', async () => {
+      fixture.user1.hellbanned = true;
+      const message = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+        text: 'I am spamming'
+      });
+      assert(message.id, 'A message model should be created and have an id assigned');
+      const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        aroundId: message.id
+      });
+      assert(messages.length === 0, 'Expecting no messages with the id were found');
+    });
+
+    it('should not store a spam message', async () => {
+      const chatServiceDetectingSpam = proxyquireNoCallThru('../lib/chat-service', {
+        'gitter-web-spam-detection/lib/chat-spam-detection': {
+          detect: () => Promise.resolve(true)
+        }
+      });
+      const message = await chatServiceDetectingSpam.newChatMessageToTroupe(
+        fixture.troupe1,
+        fixture.user1,
+        {
+          text: 'I am spamming'
+        }
+      );
+      assert(message.id, 'A message model should be created and have an id assigned');
+      const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        aroundId: message.id
+      });
+      assert(messages.length === 0, 'Expecting no messages with the id were found');
+    });
+  });
+
+  describe('after message got sent', () => {
+    it('should set the troupe as last visited');
+    it('should create unread items');
   });
 
   describe('updateChatMessage', function() {
