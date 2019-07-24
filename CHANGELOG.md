@@ -1,6 +1,6 @@
 # 19.57.0 - *upcoming*
 
- - 
+ - Update left-menu on mobile to be completely hidden and swipe-out/pull, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1487
 
 
 # 19.56.0 - 2019-7-21
