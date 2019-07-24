@@ -19,7 +19,6 @@
   }
 }
 
-
 .commit {
   border-bottom: 1px dotted;
   cursor: pointer;
@@ -36,11 +35,10 @@
 .popover-footer a.open-in-github,
 .popover-footer a.open-profile {
   line-height: 20px;
-  &:hover{
+  &:hover {
     text-decoration: none;
   }
 }
-
 
 .trpChatContainer {
   box-sizing: border-box;
@@ -49,17 +47,18 @@
   height: 100%;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
+  // https://github.com/html-next/ember-gestures/issues/104
+  touch-action: pan-y;
 
   &::-webkit-scrollbar-track {
     background-color: transparent;
   }
 }
 
-
 // TODO: Remove because duplicate of `markdown.less`
 code {
-  border: 1px solid fade(@trpGrey,40%);
-  background-color: fade(@trpGrey,20%);
+  border: 1px solid fade(@trpGrey, 40%);
+  background-color: fade(@trpGrey, 20%);
   border-radius: 2px;
   padding: 0 4px;
   overflow-x: auto;
