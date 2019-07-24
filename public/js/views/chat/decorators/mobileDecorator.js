@@ -1,22 +1,10 @@
 'use strict';
 var $ = require('jquery');
-var context = require('gitter-web-client-context');
 var link = require('./tmpl/link.hbs');
 
 module.exports = (function() {
-  function getRoomRepo() {
-    var room = context.troupe();
-    if (room.get('githubType') === 'REPO') {
-      return room.get('uri');
-    } else {
-      return '';
-    }
-  }
-
   var decorator = {
     decorate: function(view) {
-      var roomRepo = getRoomRepo();
-
       view.$el.find('*[data-link-type="mention"]').each(function() {
         var $mention = $(this);
         var username = $mention.data('screenName');

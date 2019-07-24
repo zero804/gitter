@@ -10,7 +10,7 @@ var RealtimeClient = require('gitter-realtime-client').RealtimeClient;
 var wrapExtension = require('gitter-realtime-client').wrapExtension;
 var debug = require('debug-proxy')('app:realtime');
 var realtimePresenceTracker = require('./realtime-presence-tracking');
-var _ = require('underscore');
+var _ = require('lodash');
 var reloadOnUpdate = require('./reload-on-update');
 
 var PING_INTERVAL = 30000;

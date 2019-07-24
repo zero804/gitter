@@ -1,6 +1,6 @@
 'use strict';
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
 var Mutant = require('mutantjs');
@@ -158,7 +158,9 @@ module.exports = (function() {
     getPosition: function() {
       var el = this.targetElement;
 
-      var pos = _.extend({}, el.getBoundingClientRect(), this.$targetElement.offset());
+      const pos = {};
+      _.forIn(el.getBoundingClientRect(), (v, k) => (pos[k] = v));
+      _.forIn(this.$targetElement.offset(), (v, k) => (pos[k] = v));
 
       return pos;
     },
@@ -284,23 +286,16 @@ module.exports = (function() {
 
     applyPlacement: function(offset) {
       var $e = this.$el;
-      var e = $e[0];
 
-      var actualWidth;
-      var actualHeight;
-      var delta = 0;
       var replace;
 
       /* Adjust */
       if ('left' in offset && offset.left < 0) {
-        delta = offset.left * -2;
         offset.left = 0;
       }
 
       $e.css(offset);
 
-      actualWidth = e.offsetWidth;
-      actualHeight = e.offsetHeight;
       if (replace) $e.offset(offset);
     },
 

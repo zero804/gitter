@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var slugger = require('../../../utils/slugger');
 var context = require('gitter-web-client-context');
 var toggleClass = require('../../../utils/toggle-class');

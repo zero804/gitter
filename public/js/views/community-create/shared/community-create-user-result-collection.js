@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var ProxyCollection = require('@gitterhq/backbone-proxy-collection');
 var userSearchModels = require('../../../collections/user-search');
 var UserSuggestionCollection = require('../../../collections/user-suggestions');

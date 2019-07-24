@@ -1,11 +1,8 @@
 'use strict';
 
-var config = require('gitter-web-env').config;
 var Promise = require('bluebird');
 var client = require('./elasticsearch-client');
 var applyStandardQueryOptions = require('./apply-standard-query-options');
-
-const DEFAULT_QUERY_TIMEOUT = parseInt(config.get('elasticsearch:defaultQueryTimeout'), 10) || 500;
 
 function searchChatsForUserId(userId, options) {
   var queryRequest = {

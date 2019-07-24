@@ -33,6 +33,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const storeData = {
     isMobile,
     isLoggedIn: !!user,
+    user,
     darkTheme: userThemeSnapshot.theme === 'gitter-dark',
 
     roomMap,

@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var _ = require('underscore');
+var _ = require('lodash');
 var StatusError = require('statuserror');
 var chatService = require('gitter-web-chats');
 var restSerializer = require('../../../serializers/rest-serializer');

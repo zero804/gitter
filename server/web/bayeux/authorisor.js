@@ -15,6 +15,7 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var tokenProvider = require('../../services/tokens');
+const { createOptionsValidator } = require('../../utils/options-validator');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -155,9 +156,7 @@ function dataToSnapshot(type) {
   };
 }
 
-function populateSubUserCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
+function populateSubUserCollection({ userId, match }) {
   var subscribeUserId = match[1];
   var collection = match[2];
 
@@ -183,10 +182,7 @@ function populateSubUserCollection(options) {
   return Promise.resolve();
 }
 
-function populateTroupe(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var snapshotOptions = options.snapshot || false;
+function populateTroupe({ userId, match, snapshot = false }) {
   var troupeId = match[1];
 
   /**
@@ -194,7 +190,7 @@ function populateTroupe(options) {
    * then we return the current troupe to the user
    */
 
-  if (!snapshotOptions) return Promise.resolve();
+  if (!snapshot) return Promise.resolve();
 
   var strategy = new restSerializer.TroupeIdStrategy({
     currentUserId: userId,
@@ -208,12 +204,19 @@ function populateTroupe(options) {
   return restSerializer.serializeObject(troupeId, strategy).then(dataToSnapshot('room'));
 }
 
-function populateSubTroupeCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
-  var snapshotOptions = options.snapshot || {}; // Details of the snapshot
+function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
   var troupeId = match[1];
   var collection = match[2];
+
+  const validateChatSnapshot = createOptionsValidator(
+    'authorisor.populateSubTroupeCollection.chat',
+    { limit: true, lookups: true, beforeInclId: true }
+  );
+
+  const validateUserSnapshot = createOptionsValidator(
+    'authorisor.populateSubTroupeCollection.user',
+    { limit: true, lean: true }
+  );
 
   switch (collection) {
     case 'chatMessages':
@@ -221,17 +224,25 @@ function populateSubTroupeCollection(options) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
 
+      // TODO: check production logs for warnings with unexpected options
+      // then refactor this method to only accept the expected names
+      // the refactor can be done by reverting the commit responsible for this comment
+      validateChatSnapshot(snapshot);
+
       return restful
-        .serializeChatsForTroupe(troupeId, userId, snapshotOptions)
+        .serializeChatsForTroupe(troupeId, userId, snapshot)
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
-
+      // TODO: check production logs for warnings with unexpected options
+      // then refactor this method to only accept the expected names
+      // the refactor can be done by reverting the commit responsible for this comment
+      validateUserSnapshot(snapshot);
       return restful
-        .serializeUsersForTroupe(troupeId, userId, snapshotOptions)
+        .serializeUsersForTroupe(troupeId, userId, snapshot)
         .then(dataToSnapshot('room.users'));
 
     case 'events':
@@ -248,8 +259,7 @@ function populateSubTroupeCollection(options) {
   return Promise.resolve();
 }
 
-function populateSubSubTroupeCollection(options) {
-  var match = options.match;
+function populateSubSubTroupeCollection({ match }) {
   var troupeId = match[1];
   var collection = match[2];
   var subId = match[3];
@@ -268,9 +278,7 @@ function populateSubSubTroupeCollection(options) {
   return Promise.resolve();
 }
 
-function populateUserUnreadItemsCollection(options) {
-  var userId = options.userId;
-  var match = options.match;
+function populateUserUnreadItemsCollection({ userId, match }) {
   var subscriptionUserId = match[1];
   var troupeId = match[2];
 
@@ -354,6 +362,19 @@ module.exports = bayeuxExtension({
     var clientId = message.clientId;
 
     var state = message._private && message._private.authorisor;
+    /**
+     * This snapshot comes from extra metadata in bayeux message (`message.ext.snapshot`).
+     * Client can set it up to whatever they want. Our own application is using methods `getSnapshotState`
+     * which are defined on LiveCollections like `public/js/collections/infinite-mixin.js`. This mechanism
+     * is defined in `realtime-client`.
+     * It can have following values:
+     *  - `{ lean: true, limit: 25 }` `public/js/collections/users`
+     *  - `false` `public/js/components/live-context`
+     *  - `true/false` `public/js/components/realtime-troupe-listener`
+     *  - `{ lookups: ['user'] }` `public/js/collections/chat.js`
+     *  - `{ limit, beforeInclId }` `public/js/collections/infinite-mixin.js`
+     *  - and possibly more coming from clients implemented outside of `webapp`
+     */
     var snapshot = state && state.snapshot;
     var userId = state && state.userId;
 

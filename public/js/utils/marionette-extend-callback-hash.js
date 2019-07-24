@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 // Extend a Marrionette view option hash without clobbering the super entry
 // Useful for `events`, `modelEvents`, `childEvents` etc when extending another view

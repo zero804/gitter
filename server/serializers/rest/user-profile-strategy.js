@@ -3,9 +3,7 @@
 var _ = require('lodash');
 var BackendMuxer = require('gitter-web-backend-muxer');
 
-function UserProfileStrategy(options) {
-  options = options ? options : {};
-
+function UserProfileStrategy(/* options */) {
   var user;
   var profileResults;
 

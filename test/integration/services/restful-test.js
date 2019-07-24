@@ -7,8 +7,6 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var env = require('gitter-web-env');
 var nconf = env.config;
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var moment = require('moment');
 
 var counter = 0;
 
@@ -38,19 +36,6 @@ var hardcodedGitHubUser = {
 var hardcodedLocation = 'Cape Town';
 function ensureGitHubUser(options) {
   return userService.findOrCreateUserForGithubId(options);
-}
-
-// Make sure things is an array of objects with mongo ids matching the passed
-// in ids exactly in order. Useful for making sure a set of search results
-// match exactly what you expected.
-function matchIds(things, ids) {
-  if (things.length !== ids.length) return false;
-
-  return things.every(function(thing, index) {
-    var thingId = thing._id || thing.id;
-    var id = ids[index];
-    return mongoUtils.objectIDsEqual(thingId, id);
-  });
 }
 
 describe('restful #slow', function() {

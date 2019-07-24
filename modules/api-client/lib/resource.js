@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var debug = require('debug-proxy')('app:api-client');
 
 /* @const */

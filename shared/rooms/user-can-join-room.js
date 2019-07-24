@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 
 /*
 Some context: It is possible for a non-github user to follow a link to a public

@@ -4,7 +4,7 @@ var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var appEvents = require('./appevents');
 var splitTests = require('gitter-web-split-tests');
-var _ = require('underscore');
+var _ = require('lodash');
 
 require('./mixpanel');
 

@@ -1,5 +1,5 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var appEvents = require('../utils/appevents');
 require('../components/keyboard-events');
 

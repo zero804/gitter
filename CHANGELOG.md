@@ -1,3 +1,31 @@
+# 19.57.0 - *upcoming*
+
+ - 
+
+
+# 19.56.0 - 2019-7-21
+
+ - Replace underscore with lodash, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1429
+ - Add chat input to the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1469
+ - Add new message activity indicator for muted room with the Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1486
+
+Developer facing:
+
+ - Validate Vue code style in CI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1476
+ - Make unused variable in the code an error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1477
+    - Fix Express error handler middleware (needs 4 arguments), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1485
+ - Add test for deleting integrations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1479
+ - Add user ID to find-users-by-email script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1478
+ - Update `prettier@1.18.2` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1484
+ -  Clean up server side code before placing chat messages to Vuex store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1481
+
+# 19.55.1 - 2019-7-18
+
+ - Fix XSS on OAuth app authorize page, https://gitlab.com/gitlab-org/gitter/webapp/issues/2043
+    - Thanks to [`yipman`](https://hackerone.com/yipman) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/14
+
+
 # 19.55.0 - 2019-7-10
 
  - Add thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1460

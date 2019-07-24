@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var Promise = require('bluebird');
 var debug = require('debug-proxy')('app:collection-pool');
 

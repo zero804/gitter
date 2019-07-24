@@ -1,8 +1,7 @@
 'use strict';
-var _ = require('underscore');
+var _ = require('lodash');
 var Backbone = require('backbone');
 var clientEnv = require('gitter-client-env');
-var log = require('./log');
 const context = require('gitter-web-client-context');
 
 var basePath = clientEnv['basePath'];

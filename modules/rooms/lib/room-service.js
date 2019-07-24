@@ -22,7 +22,6 @@ var validate = require('./validate');
 var collections = require('gitter-web-utils/lib/collections');
 var StatusError = require('statuserror');
 var emailNotificationService = require('gitter-web-email-notifications');
-var emailAddressService = require('gitter-web-email-addresses');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var roomSearch = require('gitter-web-elasticsearch/lib/room-search');

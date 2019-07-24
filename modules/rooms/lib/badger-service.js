@@ -6,7 +6,7 @@ var stats = env.stats;
 var conf = env.config;
 var format = require('util').format;
 var github = require('octonode');
-var _ = require('underscore');
+var _ = require('lodash');
 var Promise = require('bluebird');
 var troupeTemplate = require('gitter-web-templates/lib/troupe-template');
 

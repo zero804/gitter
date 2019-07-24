@@ -2,7 +2,7 @@
 
 const debug = require('debug-proxy')('app:chat-item-view');
 const $ = require('jquery');
-const _ = require('underscore');
+const _ = require('lodash');
 const classnames = require('classnames');
 const moment = require('moment');
 const Marionette = require('backbone.marionette');
@@ -46,8 +46,6 @@ module.exports = (function() {
     return 'model-id-' + id;
   };
 
-  /* @const */
-  var MAX_HEIGHT = 640; /* This value also in chatItemView.less */
   // This needs to be adjusted in chatInputView as well as chat-server on the server
   /* @const */
   var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes

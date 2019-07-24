@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var PrimaryCollectionItemView = require('../primary-collection/primary-collection-item-view');
 var BaseCollectionItemView = require('../base-collection/base-collection-item-view');
 var fastdom = require('fastdom');

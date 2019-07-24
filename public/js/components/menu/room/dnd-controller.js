@@ -2,7 +2,7 @@
 
 var Backbone = require('backbone');
 var dragula = require('dragula');
-var _ = require('underscore');
+var _ = require('lodash');
 
 var DNDCtrl = function() {
   this.onMouseUp = this.onMouseUp.bind(this);

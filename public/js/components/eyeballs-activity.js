@@ -1,6 +1,6 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('lodash');
 var passiveEventListener = require('../utils/passive-event-listener');
 
 var INACTIVITY = 60 * 1000; /* One minute */

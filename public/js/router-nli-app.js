@@ -26,6 +26,7 @@ require('./views/widgets/avatar');
 userNotifications.initUserNotifications();
 
 onready(function() {
+  // eslint-disable-next-line no-unused-vars
   var router = new Router({
     dialogRegion: modalRegion,
     routes: [

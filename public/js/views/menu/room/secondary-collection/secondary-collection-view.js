@@ -1,7 +1,7 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var _ = require('underscore');
+var _ = require('lodash');
 var urlJoin = require('url-join');
 var extendCallbackHash = require('../../../../utils/marionette-extend-callback-hash');
 var ItemView = require('./secondary-collection-item-view');

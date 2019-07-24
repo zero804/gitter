@@ -2,9 +2,7 @@
 /*jslint node: true */
 'use strict';
 
-var Promise = require('bluebird');
 var userService = require('gitter-web-users');
-var troupeService = require('gitter-web-rooms/lib/troupe-service');
 var presenceService = require('gitter-web-presence');
 var shutdown = require('shutdown');
 var shimPositionOption = require('../yargs-shim-position-option');

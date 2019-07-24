@@ -2,9 +2,7 @@
 
 var avatars = require('gitter-web-avatars');
 
-function UserStrategy(options) {
-  options = options ? options : {};
-
+function UserStrategy(/* options */) {
   this.preload = function() {};
 
   this.map = function(user) {

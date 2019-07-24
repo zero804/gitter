@@ -1,6 +1,6 @@
 'use strict';
 var $ = require('jquery');
-var _ = require('underscore');
+var _ = require('lodash');
 var Marionette = require('backbone.marionette');
 var context = require('gitter-web-client-context');
 var appEvents = require('../../../utils/appevents');
@@ -14,7 +14,6 @@ var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('../../keyboard-events-mixin');
 var CollectionWrapperViewTemplate = require('./tmpl/collection-wrapper-view.hbs');
 var ProfileView = require('./profileView');
-var OrgCollectionView = require('./orgCollectionView');
 var dataSet = require('../../../utils/dataset-shim');
 var toggle = require('../../../utils/toggle');
 

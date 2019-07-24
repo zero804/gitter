@@ -2,7 +2,7 @@
 
 var appEvents = require('../utils/appevents');
 var platformKeys = require('../utils/platform-keys');
-var _ = require('underscore');
+var _ = require('lodash');
 var key = require('keymaster');
 
 module.exports = (function() {

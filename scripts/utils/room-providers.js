@@ -2,11 +2,9 @@
 'use strict';
 
 var yargs = require('yargs');
-var _ = require('lodash');
 var shutdown = require('shutdown');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 
-var argv = yargs.argv;
 var opts = yargs
   .option('uri', {
     required: true,

@@ -103,9 +103,7 @@ describe('OAuth tests', function() {
 
       await request(app)
         .get(
-          `/login/oauth/authorize?response_type=code&redirect_uri=${goodRedirectUri}&client_id=${
-            goodOauthClient.clientKey
-          }`
+          `/login/oauth/authorize?response_type=code&redirect_uri=${goodRedirectUri}&client_id=${goodOauthClient.clientKey}`
         )
         .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
         .expect(200)
@@ -136,9 +134,7 @@ describe('OAuth tests', function() {
 
       await request(app)
         .get(
-          `/login/oauth/authorize?response_type=code&redirect_uri=${badRedirectUri}&client_id=${
-            badOauthClient.clientKey
-          }`
+          `/login/oauth/authorize?response_type=code&redirect_uri=${badRedirectUri}&client_id=${badOauthClient.clientKey}`
         )
         .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
         .expect(401)

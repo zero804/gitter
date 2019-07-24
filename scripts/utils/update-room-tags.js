@@ -130,14 +130,18 @@ var tagRooms = function(roomContainers) {
 var saveRooms = function(rooms) {
   return Promise.all(
     rooms.map(function(room) {
-      return room
-        .save()
-        .then(function() {
-          TAGGED += 1;
-        })
-        .catch(function(err) {
-          return null;
-        });
+      return (
+        room
+          .save()
+          .then(function() {
+            TAGGED += 1;
+          })
+          // FIXME: Don't swallow an error
+          // eslint-disable-next-line no-unused-vars
+          .catch(function(err) {
+            return null;
+          })
+      );
     })
   );
 };

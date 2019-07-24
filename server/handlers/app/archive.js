@@ -6,9 +6,8 @@ var identifyRoute = env.middlewares.identifyRoute;
 
 var Promise = require('bluebird');
 var moment = require('moment');
-var _ = require('underscore');
+var _ = require('lodash');
 var StatusError = require('statuserror');
-var urlParse = require('url-parse');
 const asyncHandler = require('express-async-handler');
 
 var chatService = require('gitter-web-chats');
@@ -195,7 +194,7 @@ exports.chatArchive = [
   uriContextResolverMiddleware,
   preventClickjackingMiddleware,
   timezoneMiddleware,
-  asyncHandler(async (req, res, next) => {
+  asyncHandler(async (req, res /*, next*/) => {
     const user = req.user;
     const troupe = req.uriContext.troupe;
     const policy = req.uriContext.policy;

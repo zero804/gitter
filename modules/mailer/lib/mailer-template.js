@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var config = env.config;
-var fs = require('fs');
 var HandlebarsWrapper = require('gitter-web-templates/lib/handlebars-wrapper');
 var path = require('path');
 var _ = require('lodash');
@@ -10,12 +9,6 @@ var _ = require('lodash');
 var emailBasePath = config.get('email:emailBasePath');
 
 var handlebarsWrapper = new HandlebarsWrapper();
-
-function registerPartial(name) {
-  var partialFileName = path.join(__dirname, '../templates/partials', name + '.hbs');
-  var partialContent = fs.readFileSync(partialFileName, 'utf8');
-  handlebarsWrapper.handlebars.registerPartial(name, partialContent);
-}
 
 var CACHED = {};
 function getCachedTemplate(templateName) {

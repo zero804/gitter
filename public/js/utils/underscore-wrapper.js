@@ -3,7 +3,8 @@
 
 /* This require looks HORRIBLE, but it's a way to use the non-aliased underscore */
 /* Webpack config will alias all usages of underscore to this module */
-var _ = require('../../../node_modules/underscore');
+/* we've globally replaced underscore with lodash v3 */
+var _ = require('../../../node_modules/lodash');
 
 var ObjProto = Object.prototype;
 var toString = ObjProto.toString;

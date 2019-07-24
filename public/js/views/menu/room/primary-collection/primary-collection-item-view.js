@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var _ = require('underscore');
+var _ = require('lodash');
 var itemTemplate = require('./primary-collection-item-view.hbs');
 var apiClient = require('../../../../components/api-client');
 var context = require('gitter-web-client-context');
