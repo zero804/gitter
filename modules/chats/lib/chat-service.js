@@ -128,111 +128,88 @@ function resolveMentions(troupe, user, parsedMessage) {
  */
 async function newChatMessageToTroupe(troupe, user, data) {
   // Keep this up here, set sent time asap to ensure order
-  var sentAt = new Date();
+  const sentAt = new Date();
 
-  return Promise.try(function() {
-    if (!troupe) throw new StatusError(404, 'Unknown room');
+  if (!troupe) throw new StatusError(404, 'Unknown room');
 
-    /* You have to have text */
-    if (!data.text && data.text !== '' /* Allow empty strings for now */)
-      throw new StatusError(400, 'Text is required');
-    if (data.text.length > MAX_CHAT_MESSAGE_LENGTH)
-      throw new StatusError(400, 'Message exceeds maximum size');
+  /* You have to have text */
+  if (!data.text && data.text !== '' /* Allow empty strings for now */)
+    throw new StatusError(400, 'Text is required');
+  if (data.text.length > MAX_CHAT_MESSAGE_LENGTH)
+    throw new StatusError(400, 'Message exceeds maximum size');
 
-    // TODO: validate message
-    return processText(data.text);
-  })
-    .bind({
-      hellbanned: user.hellbanned
+  const parsedMessage = await processText(data.text);
+  const mentions = await resolveMentions(troupe, user, parsedMessage);
+
+  const isPublic = securityDescriptorUtils.isPublic(troupe);
+
+  const chatMessage = new ChatMessage({
+    fromUserId: user.id,
+    toTroupeId: troupe.id,
+    sent: sentAt,
+    text: data.text, // Keep the raw message.
+    status: data.status, // Checks if it is a status update
+    pub: isPublic || undefined, // Public room - useful for sampling
+    html: parsedMessage.html,
+    lang: parsedMessage.lang,
+    urls: parsedMessage.urls,
+    mentions: mentions,
+    issues: parsedMessage.issues,
+    _md: parsedMessage.markdownProcessingFailed
+      ? -CURRENT_META_DATA_VERSION
+      : CURRENT_META_DATA_VERSION
+  });
+
+  // hellban for users
+  // dont write message to db, just fake it for the troll / asshole
+  const isSpamming = await chatSpamDetection.detect(user, parsedMessage);
+  if (isSpamming || user.hellbanned) {
+    return chatMessage;
+  }
+
+  await chatMessage.save();
+  const lastAccessTime = mongoUtils.getDateFromObjectId(chatMessage._id);
+
+  recentRoomService
+    .saveLastVisitedTroupeforUserId(user._id, troupe._id, {
+      lastAccessTime: lastAccessTime
     })
-    .tap(function(parsedMessage) {
-      if (this.hellbanned) {
-        return;
-      }
-
-      return chatSpamDetection
-        .detect(user, parsedMessage)
-        .bind(this)
-        .then(function(isSpamming) {
-          if (isSpamming) {
-            this.hellbanned = true;
-          }
-        });
+    .catch(function(err) {
+      errorReporter(
+        err,
+        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+        { module: 'chat-service' }
+      );
     })
-    .then(function(parsedMessage) {
-      return [parsedMessage, resolveMentions(troupe, user, parsedMessage)];
+    .done();
+
+  // Async add unread items
+  unreadItemService
+    .createChatUnreadItems(user.id, troupe, chatMessage)
+    .catch(function(err) {
+      errorReporter(
+        err,
+        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+        { module: 'chat-service' }
+      );
     })
-    .spread(function(parsedMessage, mentions) {
-      var isPublic = securityDescriptorUtils.isPublic(troupe);
+    .done();
 
-      var chatMessage = new ChatMessage({
-        fromUserId: user.id,
-        toTroupeId: troupe.id,
-        sent: sentAt,
-        text: data.text, // Keep the raw message.
-        status: data.status, // Checks if it is a status update
-        pub: isPublic || undefined, // Public room - useful for sampling
-        html: parsedMessage.html,
-        lang: parsedMessage.lang,
-        urls: parsedMessage.urls,
-        mentions: mentions,
-        issues: parsedMessage.issues,
-        _md: parsedMessage.markdownProcessingFailed
-          ? -CURRENT_META_DATA_VERSION
-          : CURRENT_META_DATA_VERSION
-      });
+  const statMetadata = _.extend(
+    {
+      userId: user.id,
+      troupeId: troupe.id,
+      groupId: troupe.groupId,
+      username: user.username,
+      room_uri: troupe.uri,
+      owner: getOrgNameFromTroupeName(troupe.uri)
+    },
+    data.stats
+  );
 
-      // hellban for users
-      // dont write message to db, just fake it for the troll / asshole
-      if (this.hellbanned) {
-        return chatMessage;
-      }
+  stats.event('new_chat', statMetadata);
 
-      return chatMessage.save().then(function() {
-        var lastAccessTime = mongoUtils.getDateFromObjectId(chatMessage._id);
-
-        recentRoomService
-          .saveLastVisitedTroupeforUserId(user._id, troupe._id, {
-            lastAccessTime: lastAccessTime
-          })
-          .catch(function(err) {
-            errorReporter(
-              err,
-              { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
-              { module: 'chat-service' }
-            );
-          })
-          .done();
-
-        // Async add unread items
-        unreadItemService
-          .createChatUnreadItems(user.id, troupe, chatMessage)
-          .catch(function(err) {
-            errorReporter(
-              err,
-              { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
-              { module: 'chat-service' }
-            );
-          })
-          .done();
-
-        var statMetadata = _.extend(
-          {
-            userId: user.id,
-            troupeId: troupe.id,
-            groupId: troupe.groupId,
-            username: user.username,
-            room_uri: troupe.uri,
-            owner: getOrgNameFromTroupeName(troupe.uri)
-          },
-          data.stats
-        );
-
-        stats.event('new_chat', statMetadata);
-
-        return chatMessage;
-      });
-    });
+  return chatMessage;
 }
 
 // Returns some recent public chats
