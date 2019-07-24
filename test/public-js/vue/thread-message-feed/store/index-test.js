@@ -44,7 +44,10 @@ describe('thread message feed store', () => {
       await testAction(actions.sendMessage, undefined, { draftMessage: 'testMessage' }, [
         { type: types.UPDATE_DRAFT_MESSAGE, payload: '' }
       ]);
-      expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', { text: 'testMessage' });
+      expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
+        text: 'testMessage',
+        parentId: '5d11d571a2405419771cd3ee'
+      });
     });
   });
 

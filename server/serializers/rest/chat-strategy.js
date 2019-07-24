@@ -129,6 +129,7 @@ function ChatStrategy(options) {
       sent: formatDate(item.sent),
       editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
       fromUser: options.user ? options.user : mapUser(item.fromUserId),
+      parentId: item.parentId,
       unread: unread,
       readBy: item.readBy ? item.readBy.length : undefined,
       urls: castArray(item.urls),

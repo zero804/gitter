@@ -8,6 +8,7 @@ var installVersionIncMiddleware = require('../install-version-inc-middleware');
 var ChatMessageSchema = new Schema({
   fromUserId: ObjectId,
   toTroupeId: ObjectId, //TODO: rename to troupeId
+  parentId: ObjectId,
   text: String,
   status: { type: Boolean, required: false },
   pub: { type: Boolean, required: false }, // PUBLIC?

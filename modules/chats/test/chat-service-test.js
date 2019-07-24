@@ -168,6 +168,23 @@ describe('chatService', function() {
     });
   });
 
+  describe('thread messages', () => {
+    it('should create a message with parentId', async () => {
+      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+        text: 'I am replying to a thread',
+        parentId: '5d11d571a2405419771cd3ee'
+      });
+      assert.equal(chatMessage.parentId, '5d11d571a2405419771cd3ee');
+    });
+    it('should omit invalid parentId', async () => {
+      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+        text: 'I am replying to a thread',
+        parentId: 'abc'
+      });
+      assert.equal(chatMessage.parentId, undefined);
+    });
+  });
+
   describe('Finding messages #slow', function() {
     var chat1, chat2, chat3;
 

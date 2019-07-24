@@ -142,10 +142,12 @@ async function newChatMessageToTroupe(troupe, user, data) {
   const mentions = await resolveMentions(troupe, user, parsedMessage);
 
   const isPublic = securityDescriptorUtils.isPublic(troupe);
+  const sanitizedParentId = mongoUtils.isLikeObjectId(data.parentId) ? data.parentId : undefined;
 
   const chatMessage = new ChatMessage({
     fromUserId: user.id,
     toTroupeId: troupe.id,
+    parentId: sanitizedParentId,
     sent: sentAt,
     text: data.text, // Keep the raw message.
     status: data.status, // Checks if it is a status update
