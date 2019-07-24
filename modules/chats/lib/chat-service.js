@@ -126,7 +126,7 @@ function resolveMentions(troupe, user, parsedMessage) {
  * NB: it is the callers responsibility to ensure that the user has permission
  * to chat in the room
  */
-function newChatMessageToTroupe(troupe, user, data) {
+async function newChatMessageToTroupe(troupe, user, data) {
   // Keep this up here, set sent time asap to ensure order
   var sentAt = new Date();
 

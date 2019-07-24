@@ -108,30 +108,25 @@ describe('chatService', function() {
   });
 
   describe('updateChatMessage', function() {
-    it('should update a recent chat message sent by the same user', function() {
-      return chatService
-        .newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'Hello' })
-        .bind({})
-        .then(function(chatMessage) {
-          this.originalSentTime = chatMessage.sent;
-          assert(!chatMessage.editedAt, 'Expected editedAt to be null');
+    it('should update a recent chat message sent by the same user', async function() {
+      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+        text: 'Hello'
+      });
+      assert(!chatMessage.editedAt, 'Expected editedAt to be null');
 
-          return chatService.updateChatMessage(
-            fixture.troupe1,
-            chatMessage,
-            fixture.user1,
-            'Goodbye'
-          );
-        })
-        .then(function(chatMessage2) {
-          assert(chatMessage2.text === 'Goodbye', 'Expected new text in message');
-          assert(this.originalSentTime === chatMessage2.sent, 'Expected time to remain the same');
-          assert(chatMessage2.editedAt, 'Expected edited at time to be populated');
-          assert(
-            chatMessage2.editedAt > chatMessage2.sent,
-            'Expected edited at time to be after sent time'
-          );
-        });
+      const chatMessage2 = await chatService.updateChatMessage(
+        fixture.troupe1,
+        chatMessage,
+        fixture.user1,
+        'Goodbye'
+      );
+      assert(chatMessage2.text === 'Goodbye', 'Expected new text in message');
+      assert(chatMessage.sent === chatMessage2.sent, 'Expected time to remain the same');
+      assert(chatMessage2.editedAt, 'Expected edited at time to be populated');
+      assert(
+        chatMessage2.editedAt > chatMessage2.sent,
+        'Expected edited at time to be after sent time'
+      );
     });
   });
 
