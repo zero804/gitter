@@ -8,11 +8,19 @@ var User = require('gitter-web-persistence').User;
 
 describe('chat-spam-detection', function() {
   describe('integration tests #slow', function() {
-    var fixture = fixtureLoader.setup({
+    var fixture = fixtureLoader.setupEach({
       user1: {}
     });
 
-    it('should fight the germs that cause bad breath', function() {
+    it('should mark messages from hellbanned user as spam', async () => {
+      fixture.user1.hellbanned = true;
+      const isSpammy = await chatSpamDetection.detect(fixture.user1, {
+        text: 'Message from a banned user'
+      });
+      assert(isSpammy);
+    });
+
+    it('should use duplicate chat detector', function() {
       var COUNTER = [];
       for (var i = 0; i < 12; i++) {
         COUNTER.push(i);

@@ -165,7 +165,7 @@ async function newChatMessageToTroupe(troupe, user, data) {
   // hellban for users
   // dont write message to db, just fake it for the troll / asshole
   const isSpamming = await chatSpamDetection.detect(user, parsedMessage);
-  if (isSpamming || user.hellbanned) {
+  if (isSpamming) {
     return chatMessage;
   }
 
