@@ -47,7 +47,7 @@ export default {
         <div class="chat-item__details">
           <div class="chat-item__from js-chat-item-from">{{ message.fromUser.displayName }}</div>
           <div class="chat-item__username js-chat-item-from">@{{ message.fromUser.username }}</div>
-          <!-- TODO add permalink -->
+          <!-- TODO add permalink https://gitlab.com/gitlab-org/gitter/webapp/issues/2218 -->
           <a class="chat-item__time js-chat-time" :title="sentTimeFormattedFull">{{
             sentTimeFormatted
           }}</a>
