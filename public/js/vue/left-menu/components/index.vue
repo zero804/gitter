@@ -47,7 +47,30 @@ export default {
     ...mapActions(['toggleLeftMenu']),
     onMouseleave() {
       this.toggleLeftMenu(false);
+    },
+    onSwipeLeft() {
+      // Always unpinned on mobile, so you can only collapse
+      if (this.isMobile) {
+        this.toggleLeftMenu(false);
+      }
+    },
+    onSwipeRight() {
+      // Always unpinned on mobile, so you can only expand
+      if (this.isMobile) {
+        this.toggleLeftMenu(true);
+      }
     }
+  },
+
+  mounted() {
+    this.hammer = require('hammerjs')(document.body);
+
+    this.hammer.on('swipeleft', this.onSwipeLeft);
+    this.hammer.on('swiperight', this.onSwipeRight);
+  },
+  beforeDestroy() {
+    this.hammer.off('swipeleft', this.onSwipeLeft);
+    this.hammer.off('swiperight', this.onSwipeRight);
   }
 };
 </script>
@@ -144,6 +167,16 @@ export default {
   &:not(.logged-in).mobile {
     display: none;
   }
+
+  &.unpinned.mobile {
+    position: absolute;
+
+    transform: translateX(-100%);
+  }
+
+  &.unpinned.expanded.mobile {
+    transform: translateX(0%);
+  }
 }
 
 .layout-minibar {
@@ -154,14 +187,14 @@ export default {
 .layout-main-menu {
   width: 26.5rem;
 
-  .unpinned & {
+  .unpinned:not(.mobile) & {
     position: absolute;
     left: 7.5rem;
 
     transform: translateX(-100%);
   }
 
-  .unpinned.expanded & {
+  .unpinned.expanded:not(.mobile) & {
     transform: translateX(0%);
   }
 }
@@ -234,6 +267,8 @@ export default {
 .body-main-menu {
   overflow-x: hidden;
   overflow-y: auto;
+  // https://github.com/html-next/ember-gestures/issues/104
+  touch-action: pan-y;
   height: 100%;
 
   background-color: @main-application-bg-color;
