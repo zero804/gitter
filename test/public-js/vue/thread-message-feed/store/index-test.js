@@ -7,7 +7,7 @@ const testAction = require('../../store/vuex-action-helper');
 const appEvents = require('../../../../../public/js/utils/appevents');
 const apiClient = require('../../../../../public/js/components/api-client');
 const {
-  default: { actions, mutations },
+  default: { actions, mutations, getters },
   types
 } = require('../../../../../public/js/vue/thread-message-feed/store');
 
@@ -18,25 +18,17 @@ describe('thread message feed store', () => {
     });
 
     it('open shows TMF, hides right toolbar, sets parent id', async () => {
-      const parentMessage = {
-        id: '5d147ea84dad9dfbc522317a'
-      };
-      await testAction(
-        actions.open,
-        '5d147ea84dad9dfbc522317a',
-        { messageMap: { [parentMessage.id]: parentMessage } },
-        [
-          { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
-          { type: types.SET_PARENT_MESSAGE, payload: parentMessage }
-        ]
-      );
+      await testAction(actions.open, '5d147ea84dad9dfbc522317a', {}, [
+        { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
+        { type: types.SET_PARENT_MESSAGE_ID, payload: '5d147ea84dad9dfbc522317a' }
+      ]);
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
     });
 
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false },
-        { type: types.SET_PARENT_MESSAGE, payload: null }
+        { type: types.SET_PARENT_MESSAGE_ID, payload: null }
       ]);
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', true);
     });
@@ -68,13 +60,22 @@ describe('thread message feed store', () => {
       expect(state.draftMessage).toEqual('new draft message');
     });
 
-    it('SET_PARENT_MESSAGE', () => {
+    it('SET_PARENT_MESSAGE_ID', () => {
+      const state = {};
+      mutations[types.SET_PARENT_MESSAGE_ID](state, '5d147ea84dad9dfbc522317a');
+      expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
+    });
+  });
+
+  describe('getters', () => {
+    it('parentMessage', () => {
       const parentMessage = {
         id: '5d147ea84dad9dfbc522317a'
       };
-      const state = {};
-      mutations[types.SET_PARENT_MESSAGE](state, parentMessage);
-      expect(state.parentMessage).toEqual(parentMessage);
+      const state = { parentId: parentMessage.id };
+      const rootState = { messageMap: { [parentMessage.id]: parentMessage } };
+      const result = getters.parentMessage(state, {}, rootState);
+      expect(result).toEqual(parentMessage);
     });
   });
 });
