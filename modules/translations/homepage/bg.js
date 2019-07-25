@@ -1,4 +1,5 @@
 {
+	"Translated By": "<a href=\"https://github.com/brainsucked\" title=\"brainsucked GitHub\" target=\"_blank\">brainsucked</a>",
 	"Gitter &mdash; Where developers come to talk.": "Gitter &mdash; Където разработчиците се събират да разговарят.",
 	"Integrations": "Интеграции",
 	"Pricing": "Ценообразуване",
@@ -16,7 +17,7 @@
 	"Explore other communities": "Разгледайте други общности",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "Като се регистрирате вие се съгласявате с нашата <a %s>Правила и условия</a>",
 	"Free without limits": "Безплатна без граници",
-	"Enjoy free public communities with unlimited people, message history and integrations.": "Насладете се на безплатни публични общности с неограничени хора, история на съобщенията и интеграции.",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "Насладете се на безплатни публични и частни общности с неограничени хора, история на съобщенията и интеграции.",
 	"Simple to create": "Просто за създаване",
 	"Simply create your community and start talking - no need to set up any invitation services.": "Просто създайте вашата общност и започнете разговор - не е необходимо да създавате покани.",
 	"Quick to grow": "Бързо за нарастване",
