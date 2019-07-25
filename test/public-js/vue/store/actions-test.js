@@ -481,7 +481,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: payload }],
-        []
+        [{ type: 'threadMessageFeed/close', payload: undefined }]
       );
 
       expect(appEventTriggered).toEqual(false);
@@ -512,7 +512,10 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
+        [
+          { type: 'threadMessageFeed/close', payload: undefined },
+          { type: 'trackStat', payload: 'left-menu.changeRoom' }
+        ]
       );
 
       await navigationEventFiredPromise;
@@ -531,7 +534,10 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
+        [
+          { type: 'threadMessageFeed/close', payload: undefined },
+          { type: 'trackStat', payload: 'left-menu.changeRoom' }
+        ]
       );
 
       expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);

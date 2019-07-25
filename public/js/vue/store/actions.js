@@ -205,6 +205,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
 };
 
 export const changeDisplayedRoom = ({ state, commit, dispatch }, newRoomId) => {
+  dispatch('threadMessageFeed/close');
   commit(types.CHANGE_DISPLAYED_ROOM, newRoomId);
 
   const newRoom = state.roomMap[newRoomId];
