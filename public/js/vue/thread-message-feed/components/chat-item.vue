@@ -15,7 +15,7 @@ export default {
       type: Object,
       required: true
     },
-    threadMessageFeed: {
+    useCompactStyles: {
       type: Boolean,
       default: false
     }
@@ -32,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <div class="chat-item burstStart" :class="{ 'thread-message-feed': threadMessageFeed }">
+  <div class="chat-item burstStart" :class="{ compact: useCompactStyles }">
     <div class="chat-item__container">
       <div class="chat-item__aside">
         <div class="chat-item__avatar">
@@ -86,11 +86,11 @@ export default {
   margin-right: @item-detail-margin;
 }
 
-.thread-message-feed .chat-item__container {
+.compact .chat-item__container {
   padding-left: 0px;
 }
 
-.thread-message-feed .chat-item__content {
+.compact .chat-item__content {
   margin-left: 40px;
   margin-right: 10px;
 }

@@ -26,7 +26,7 @@ describe('thread-message-feed chat-item', () => {
         v: 29
       }
     },
-    threadMessageFeed: true
+    useCompactStyles: true
   };
 
   it('matches snapshot', () => {
