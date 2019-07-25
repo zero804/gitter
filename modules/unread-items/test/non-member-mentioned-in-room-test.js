@@ -30,6 +30,7 @@ describe('unread item end-to-end integration tests #slow', function() {
     const chat = await chatService.newChatMessageToTroupe(troupe, fixture.user1, {
       text: 'Hey there @' + user2.username
     });
+    // chatService doesn't wait for unreadItemService so we have to
     await new Promise(resolve => setTimeout(resolve, 200));
     assert.strictEqual(onUserMentionedInNonMemberRoom, 1);
     const x = await unreadItemService.getUnreadItems(user2.id, troupeId);
@@ -53,6 +54,7 @@ describe('unread item end-to-end integration tests #slow', function() {
     await chatService.newChatMessageToTroupe(troupe, fixture.user1, {
       text: 'Hey there @' + user3.username
     });
+    // chatService doesn't wait for unreadItemService so we have to
     await new Promise(resolve => setTimeout(resolve, 200));
     assert.strictEqual(onUserMentionedInNonMemberRoom, 0);
     const x = await unreadItemService.getUnreadItems(user3.id, troupeId);
