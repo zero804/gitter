@@ -42,9 +42,9 @@ exports[`thread-message-feed chat-item matches snapshot 1`] = `
          
         <a
           class="chat-item__time js-chat-time"
-          title="June 27, 2019 10:30 AM"
+          title="June 27, 2019 9:30 AM"
         >
-          Jun 27 10:30
+          Jun 27 09:30
         </a>
       </div>
        

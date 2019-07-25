@@ -1,11 +1,13 @@
 'use strict';
 
 const mount = require('../../vuex-mount');
+const momentTimezone = require('moment-timezone');
 const {
   default: ChatItem
 } = require('../../../../../public/js/vue/thread-message-feed/components/chat-item.vue');
 
 describe('thread-message-feed chat-item', () => {
+  momentTimezone.tz.setDefault('Europe/London');
   const defaultProps = {
     message: {
       id: '5d147ea84dad9dfbc522317a',
