@@ -159,7 +159,7 @@
     "passport-twitter": "^1.0.4",
     "permessage-deflate": "^0.1.2",
     "readme-badger": "^0.3.0",
-    "redis-lock": "0.0.8",
+    "redis-lock": "0.1.4",
     "request": "~2.40.0",
     "request-extensible": "^0.1.1",
     "request-http-cache": "^1.0.1",
