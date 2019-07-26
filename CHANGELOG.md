@@ -1,3 +1,10 @@
+# 19.58.0 - *upcoming*
+
+Developer facing:
+
+ - Add some end-to-end(e2e) tests running in Cypress(not Selenium), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1480
+
+
 # 19.57.0 - 2019-7-24
 
  - Update left-menu on mobile to be completely hidden and swipe-out/pull, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1487
