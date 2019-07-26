@@ -476,9 +476,13 @@ describe('actions', () => {
         appEventTriggered = true;
       });
 
-      await testAction(actions.changeDisplayedRoom, payload, state, [
-        { type: types.CHANGE_DISPLAYED_ROOM, payload: payload }
-      ]);
+      await testAction(
+        actions.changeDisplayedRoom,
+        payload,
+        state,
+        [{ type: types.CHANGE_DISPLAYED_ROOM, payload: payload }],
+        []
+      );
 
       expect(appEventTriggered).toEqual(false);
     });
