@@ -1,7 +1,7 @@
 {{#if fonts}}
   {{! pre-load all fonts }}
   {{#each fonts.preload as |font|}}
-    <link rel="preload" href="{{font.fontPath}}" as="font" type="font/woff">
+    <link rel="preload" href="{{font.fontPath}}" as="font" type="font/{{font.format}}">
   {{/each}}
 
   {{! define all font face rules in the head}}
@@ -16,10 +16,10 @@
     }
   {{/each}}
   {{! Webfonts loaded at runtime}}
-  {{#each fonts.preload as |font|}}
+  {{#each fonts.cdnFonts as |font|}}
     @font-face {
       font-family: "{{font.family}}";
-      src: url("{{font.fontPath}}") format('woff');
+      src: url("{{font.fontPath}}") format('{{font.format}}');
       font-weight: {{font.weight}};
       font-style: {{font.style}}
     }
