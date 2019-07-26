@@ -257,7 +257,7 @@
     "node-spritesheet": "github:trevorah/node-spritesheet",
     "nodeselektor": "^0.14.0",
     "nyc": "^7.0.0",
-    "parse-diff": "^0.4.0",
+    "parse-diff": "^0.5.0",
     "path-parse": "^1.0.5",
     "postcss": "^4.0.0",
     "postcss-loader": "^3.0.0",
