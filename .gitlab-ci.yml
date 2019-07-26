@@ -70,7 +70,7 @@ test-all:
     - release/*
   retry: 2
 
-test-e2e:
+.test_e2e_job: &test_e2e_job
   <<: *test_job
   variables:
     <<: *test_variables
@@ -97,6 +97,15 @@ test-e2e:
       - cypress/logs
     expire_in: 1 day
   retry: 2
+
+test_e2e_manual:
+  <<: *test_e2e_job
+  when: manual
+
+test_e2e:
+  <<: *test_e2e_job
+  only:
+    - /^renovate\/.*$/
 
 package:
   <<: *node_job
