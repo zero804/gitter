@@ -323,3 +323,23 @@ elasticsearch-base:
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
   tags:
     - docker
+
+renovate:
+  stage: docker_images
+  image: docker:latest
+  only:
+    - schedules
+  variables:
+    # GitLab access token with api access
+    #RENOVATE_GITLAB_TOKEN: xxx
+    # GitHub access token for getting release notes of package updates,
+    # https://github.com/renovatebot/renovate/blob/master/docs/self-hosting.md#githubcom-token-for-release-notes
+    #RENOVATE_GITHUB_TOKEN: xxx
+    RENOVATE_CONFIG_FILE: renovate-config.js
+  script:
+    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
+  allow_failure: true
+  services:
+    - docker:dind
+  tags:
+    - docker
