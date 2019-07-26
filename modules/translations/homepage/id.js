@@ -17,7 +17,7 @@
     "Explore other communities": "Jelajahi komunitas lainnya",
     "By signing up you agree to our <a %s>Terms and Conditions</a>": "Dengan mendaftar Anda menyetujui <a %s>Syarat dan Ketentuan</a> kami",
     "Free without limits": "Gratis tanpa batas",
-    "Enjoy free public communities with unlimited people, message history and integrations.": "Nikmati komunitas publik gratis dengan orang-orang yang tak ada batasnya, riwayat pesan dan integrasi.",
+    "Enjoy free public and private communities with unlimited people, message history and integrations.": "Nikmati komunitas publik gratis dengan orang-orang yang tak ada batasnya, riwayat pesan dan integrasi.",
     "Simple to create": "Mudah dibuat",
     "Simply create your community and start talking - no need to set up any invitation services.": "Cukup buat komunitas Anda dan mulailah berbicara - tidak perlu menyiapkan layanan undangan apa pun.",
     "Quick to grow": "Cepat tumbuh",

@@ -17,7 +17,7 @@
 	"Explore other communities": "استكشف المجتمعات الأخرى",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "بتسجيلك، أنت توافق على <a %s>الأحكام والشروط</a>",
 	"Free without limits": "مجّاني، بشكلٍ لا محدود",
-	"Enjoy free public communities with unlimited people, message history and integrations.": "استمتع بالمجتمعات المجانية، بعددٍ لا محدود من الأشخاص، والرسائل، والخدمات التكاملية",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "استمتع بالمجتمعات المجانية، بعددٍ لا محدود من الأشخاص، والرسائل، والخدمات التكاملية",
 	"Simple to create": "إنشاؤه بسيط",
 	"Simply create your community and start talking - no need to set up any invitation services.": "ببساطة، أنشئ مجتمعك، وابدأ التحدث - لا تحتاج لإعداد أي من خدمات الدعوة",
 	"Quick to grow": "سريع النمو",

@@ -16,7 +16,7 @@
 	"Explore other communities": "다른 커뮤니티 탐색",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "가입하면 <a %s>이용 약관</a>에 동의하게됩니다.",
 	"Free without limits": "무제한 무료",
-	"Enjoy free public communities with Unlimited people, message history and integrations.": "제한 없는 메시지 기록 및 통합을 통해 무료 공개 커뮤니티를 즐기십시오.",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "제한 없는 메시지 기록 및 통합을 통해 무료 공개 커뮤니티를 즐기십시오.",
 	"Simple to create": "간단한 시작",
 	"Simply create your community and start talking - no need to set up any invitation services.": "커뮤니티를 만들고 말하기 만하면 초대 서비스를 설정할 필요가 없습니다.",
 	"Quick to grow": "빠른 성장",

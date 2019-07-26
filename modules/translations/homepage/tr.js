@@ -17,7 +17,7 @@
   "Explore other communities": "Diğer topluluklara göz at",
   "By signing up you agree to our <a %s>Terms and Conditions</a>": "Giriş yaparak <a %s>şart ve koşullarımızı</a> kabul etmiş olursunuz.",
   "Free without limits": "Sınırsız ücretsiz",
-  "Enjoy free public communities with unlimited people, message history and integrations.": "Sınırsız katılımcı, sohbet geçmişi ve entegrasyon ile herkese açık topluluğun keyfini çıkarın.",
+  "Enjoy free public and private communities with unlimited people, message history and integrations.": "Sınırsız katılımcı, sohbet geçmişi ve entegrasyon ile herkese açık topluluğun keyfini çıkarın.",
   "Simple to create": "Kolay oluşturma",
   "Simply create your community and start talking - no need to set up any invitation services.": "Hiç bir davetiye hizmeti ayarlamadan kolayca topluluğunuzu oluşturun ve konuşmaya başlayın.",
   "Quick to grow": "Hızlı büyüme",

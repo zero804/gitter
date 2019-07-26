@@ -16,7 +16,7 @@
 	"Explore other communities": "Utforska andra grupper",
 	"By signing up you agree to our <a %s>Terms and Conditions</a>": "Genom att registrera dig godkänner du våra <a %s>Terms and Conditions</a>",
 	"Free without limits": "Gratis utan gränser",
-	"Enjoy free public communities with unlimited people, message history and integrations.": "Njuta av gratis offentliga grupper med obegränsat antal människor, meddelandehistorik och integrationer.",
+	"Enjoy free public and private communities with unlimited people, message history and integrations.": "Njuta av gratis offentliga grupper med obegränsat antal människor, meddelandehistorik och integrationer.",
 	"Simple to create": "Enkelt att börja",
 	"Simply create your community and start talking - no need to set up any invitation services.": "Helt enkelt skapa din egen grupp och börja prata - inga tjänster för inbjudningar krävs.",
 	"Quick to grow": "Snabbväxande",
