@@ -18,3 +18,8 @@ The homepage strings are kept in the homepage directory
 ## Additional areas of the application
 
 We will continue to expand on the entire application over time. Please watch this repository for updates
+
+## Testing
+It possible to visit the site with the lang query parameter, ex. https://gitter.im/?redirect=no&lang=ko.
+
+Or you can change the browser main language in Chrome in [Language Settings](chrome://settings/languages) by putting tested language [at the top of the list](https://stackoverflow.com/a/36074203/606571). 
