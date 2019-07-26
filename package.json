@@ -212,7 +212,7 @@
     "cumberbatch-name": "^1.0.9",
     "cypress": "^3.4.0",
     "cypress-failed-log": "^2.5.1",
-    "datadog-metrics": "^0.2.1",
+    "datadog-metrics": "^0.8.0",
     "del": "^3.0.0",
     "eslint": "^5.9.0",
     "eslint-config-prettier": "^3.6.0",
