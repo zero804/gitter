@@ -1,4 +1,6 @@
 {
+  "extends": ["config:base"],
+
   "platform": "gitlab",
   "endpoint": "https://gitlab.com/api/v4/",
   "repositories": ["gitlab-org/gitter/webapp"],
@@ -12,6 +14,7 @@
     "prConcurrentLimit": 5
   },
 
+  "prConcurrentLimit": 5,
   "enabledManagers": ["npm"],
   "ignorePaths": ["modules/**/*"]
 }
