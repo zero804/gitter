@@ -142,7 +142,7 @@
     "mongoose-number": "^0.1.1",
     "mutantjs": "^0.2.0",
     "nanoscroller": "^0.8.7",
-    "node-gcm": "^0.9.12",
+    "node-gcm": "^0.14.0",
     "node-mongodb-debug-log": "^0.1.2",
     "node-resque": "^1.0.1",
     "node-uuid": "1.4.0",
