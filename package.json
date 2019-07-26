@@ -172,7 +172,7 @@
     "snappy-cache": "^0.3.0",
     "statuserror": "^0.1.3",
     "stringformat": "0.0.5",
-    "temp": "0.4.0",
+    "temp": "0.9.0",
     "tentacles": "^0.3.3",
     "text-filter": "^0.1.1",
     "through2": "^2.0.1",
