@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var Troupe = require('gitter-web-persistence').Troupe;
 var TroupeUser = require('gitter-web-persistence').TroupeUser;
 var fixtureUtils = require('./fixture-utils');
+const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 var debug = require('debug')('gitter:tests:test-fixtures');
 
 // This corresponds with require("giter-web-rooms/lib/room-membership-flags").MODES.all
@@ -150,9 +151,23 @@ function createTroupe(fixtureName, f, fixture) {
   doc.sd = generateSecurityDescriptorForTroupeFixture(f, fixture);
 
   debug('Creating troupe %s with %j', fixtureName, doc);
-  return Troupe.create(doc).tap(function(troupe) {
+  return Troupe.create(doc).tap(async function(troupe) {
     if (!f.userIds || !f.userIds.length) return;
-    return bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
+
+    await bulkInsertTroupeUsers(troupe._id, f.userIds, f.membershipStrategy);
+
+    // By default we will add lastAccessTime unless you specify otherwise
+    if (f.lastAccessTime !== false) {
+      await Promise.all(
+        f.userIds.map(function(userId) {
+          return recentRoomCore.saveUserTroupeLastAccess(
+            userId,
+            troupe._id,
+            f.lastAccessTime || new Date()
+          );
+        })
+      );
+    }
   });
 }
 

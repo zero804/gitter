@@ -64,7 +64,7 @@ GitHubUserCollaboratorService.prototype.findOrgCollaborators = function() {
   return ghMe
     .getOrgs()
     .then(function(orgs) {
-      return Promise.map(orgs, function(org) {
+      return Promise.map(orgs || [], function(org) {
         return ghOrg.someMembers(org.login, { firstPageOnly: true }).reflect();
       });
     })

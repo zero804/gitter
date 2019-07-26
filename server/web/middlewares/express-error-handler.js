@@ -79,7 +79,7 @@ module.exports = function(err, req, res, next) {
   }
 
   var template = getTemplateForStatus(status);
-  var message = res.locals.errorMessage || 'An unknown error occurred';
+  var message = (res.locals && res.locals.errorMessage) || `An unknown error occurred ${err}`;
   var extraTemplateValues = {
     title: message
   };

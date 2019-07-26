@@ -103,7 +103,9 @@ function createUser(fixtureName, f) {
       return OAuthClient.findOne({ clientKey: f.accessToken }).then(function(client) {
         if (!client) throw new Error('Client not found clientKey=' + f.accessToken);
 
-        var token = '_test_' + uuid.v4();
+        // We are using underscores so this this token passes the
+        // `/api/v1/token/...` regex in `server/web/bayeux/authorisor.js`
+        var token = '_test_' + uuid.v4().replace(/-/g, '_');
         var doc = {
           token: token,
           userId: user._id,

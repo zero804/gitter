@@ -74,7 +74,9 @@ var accessTokenFailureExtension = {
         // More needs to be done here!
         log.error('Access denied', message);
 
-        window.alert('Realtime communications with the server have been disconnected.');
+        window.alert(
+          `Realtime communications with the server have been disconnected. ${message.error}`
+        );
         logout();
       }
     }
