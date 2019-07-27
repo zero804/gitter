@@ -145,7 +145,7 @@
     "node-gcm": "^0.9.12",
     "node-mongodb-debug-log": "^0.1.2",
     "node-resque": "^1.0.1",
-    "node-uuid": "1.4.0",
+    "node-uuid": "1.4.8",
     "oauth2orize": "~1.11.0",
     "octonode": "^0.6.8",
     "on-headers": "^1.0.1",
