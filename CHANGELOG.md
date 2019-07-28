@@ -3,6 +3,7 @@
 Developer facing:
 
  - Add some end-to-end(e2e) tests running in Cypress(not Selenium), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1480
+ - Add automatic dependency updates via Renovate, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1493
 
 
 # 19.57.0 - 2019-7-24
