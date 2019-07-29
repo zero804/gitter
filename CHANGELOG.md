@@ -1,5 +1,7 @@
 # 19.58.0 - *upcoming*
 
+ - Add expand/collapse transition to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1532
+
 Developer facing:
 
  - Add some end-to-end(e2e) tests running in Cypress(not Selenium), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1480
