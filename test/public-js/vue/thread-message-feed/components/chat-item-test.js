@@ -28,7 +28,7 @@ describe('thread-message-feed chat-item', () => {
         v: 29
       }
     },
-    useCompactStyles: true
+    useCompactStyles: false
   };
 
   describe('snapshot', () => {

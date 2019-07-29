@@ -72,7 +72,7 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
 
 exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
 <div
-  class="chat-item burstStart compact"
+  class="chat-item burstStart"
 >
   <div
     class="chat-item__container"
@@ -152,7 +152,7 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
 
 exports[`thread-message-feed chat-item snapshot with default props 1`] = `
 <div
-  class="chat-item burstStart compact"
+  class="chat-item burstStart"
 >
   <div
     class="chat-item__container"
