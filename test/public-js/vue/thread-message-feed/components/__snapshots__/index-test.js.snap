@@ -39,6 +39,30 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
 </div>
 `;
 
+exports[`thread-message-feed index missing parent message - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <span
+        class="error-text"
+      >
+        
+        Error: The message for this thread is unavailable. It was probably deleted.
+      
+      </span>
+    </section>
+  </section>
+</div>
+`;
+
 exports[`thread-message-feed index opened - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"

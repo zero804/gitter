@@ -43,4 +43,14 @@ describe('thread-message-feed index', () => {
     });
     expect(wrapper.element).toMatchSnapshot();
   });
+
+  it('missing parent message - matches snapshot', () => {
+    const { wrapper } = mount(Index, {}, store => {
+      addParentMessage(store.state);
+      addDefaultUser(store.state);
+      store.state.threadMessageFeed.isVisible = true;
+      store.state.messageMap = {};
+    });
+    expect(wrapper.element).toMatchSnapshot();
+  });
 });

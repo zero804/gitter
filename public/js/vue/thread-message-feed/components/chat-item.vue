@@ -92,7 +92,7 @@ export default {
 
 .compact .chat-item__content {
   margin-left: 40px;
-  margin-right: 10px;
+  margin-right: @thread-message-feed-padding;
 }
 
 .dark-theme .chat-item__text {

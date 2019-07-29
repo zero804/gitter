@@ -29,11 +29,16 @@ export default {
   >
     <section v-if="isVisible" class="body">
       <thread-header />
-      <section class="content">
+      <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
         </div>
         <chat-input :user="user" thread />
+      </section>
+      <section v-else class="content">
+        <span class="error-text">
+          Error: The message for this thread is unavailable. It was probably deleted.
+        </span>
       </section>
     </section>
   </div>
@@ -41,6 +46,7 @@ export default {
 
 <style lang="less" scoped>
 @import (reference) 'colors';
+@import (reference) 'trp3Vars';
 @import (reference) 'components/right-toolbar';
 @import (reference) 'dark-theme';
 
@@ -84,6 +90,9 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  .error-text {
+    margin: @thread-message-feed-padding;
+  }
 }
 
 .chat-messages {

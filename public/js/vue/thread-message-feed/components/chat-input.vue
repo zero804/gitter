@@ -98,12 +98,12 @@ export default {
 }
 
 .thread .chat-input__container {
-  margin-left: 10px;
+  margin-left: @thread-message-feed-padding;
 }
 
 .thread .chat-input__box {
-  margin-left: @avatarWidth + 10px;
-  margin-right: 10px;
+  margin-left: @avatarWidth + @thread-message-feed-padding;
+  margin-right: @thread-message-feed-padding;
 }
 
 .thread .chat-input__text-area {
