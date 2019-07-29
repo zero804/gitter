@@ -1,7 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var User = require('gitter-web-persistence').User;
 var OAuthAccessToken = require('gitter-web-persistence').OAuthAccessToken;
 var OAuthClient = require('gitter-web-persistence').OAuthClient;
@@ -105,7 +105,7 @@ function createUser(fixtureName, f) {
 
         // We are using underscores so this this token passes the
         // `/api/v1/token/...` regex in `server/web/bayeux/authorisor.js`
-        var token = '_test_' + uuid.v4().replace(/-/g, '_');
+        var token = '_test_' + uuid().replace(/-/g, '_');
         var doc = {
           token: token,
           userId: user._id,

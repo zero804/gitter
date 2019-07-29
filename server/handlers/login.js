@@ -6,7 +6,7 @@ var config = env.config;
 var identifyRoute = env.middlewares.identifyRoute;
 
 var jwt = require('jwt-simple');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var url = require('url');
 var express = require('express');
 var GithubMeService = require('gitter-web-github').GitHubMeService;
@@ -146,7 +146,7 @@ router.get('/zendesk', ensureLoggedIn, identifyRoute('login-zendesk'), function(
       var cfg = config.get('zendesk');
       var payload = {
         iat: new Date().getTime() / 1000,
-        jti: uuid.v4(),
+        jti: uuid(),
         name: req.user.displayName,
         email: email,
         external_id: req.user.id,

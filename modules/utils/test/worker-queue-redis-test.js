@@ -3,7 +3,7 @@
 'use strict';
 
 var workerQueue = require('../lib/worker-queue-redis');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 
 describe('worker-queue-redis', function() {
   // queue takes a while to start up
@@ -14,7 +14,7 @@ describe('worker-queue-redis', function() {
   });
 
   it('should echo data back #slow', function(done) {
-    var data = 'test data ' + uuid.v4();
+    var data = 'test data ' + uuid();
 
     var queue = workerQueue.queue('worker-queue-redis-test-1', {}, function() {
       return function(result, queuedone) {
@@ -32,7 +32,7 @@ describe('worker-queue-redis', function() {
   });
 
   it('should callback when invoked #slow', function(done) {
-    var data = 'test data ' + uuid.v4();
+    var data = 'test data ' + uuid();
 
     var queue = workerQueue.queue('worker-queue-redis-test-2', {}, function() {
       return function(result, queuedone) {

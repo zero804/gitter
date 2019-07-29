@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var redis = require('gitter-web-utils/lib/redis');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
 
@@ -119,7 +119,7 @@ function transloaditSignature(req, res, next) {
     var metadata = info.metadata;
 
     var apiBasePath = nconf.get('web:apiBasePath');
-    var token = uuid.v4();
+    var token = uuid();
 
     params.fields.token = randomString(4);
     params.notify_url = apiBasePath + '/private/transloadit/' + token;
