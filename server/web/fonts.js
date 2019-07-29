@@ -13,10 +13,10 @@ const getKatexSuffix = (weight, style) => {
   return suffixMap[`${weight},${style}`];
 };
 const generateKatexFont = (family, weight, style) => ({
-  fontPath: cdn(`${katexFolder}/KaTeX_${family}-${getKatexSuffix(weight, style)}.woff2`),
+  fontPath: cdn(`${katexFolder}/KaTeX_${family}-${getKatexSuffix(weight, style)}`),
   // All modern browsers except IE support woff2 https://caniuse.com/#feat=woff2
   // IE is going to fall back on Times New Roman, 0.82% of users are using IE as of 07/2019
-  format: 'woff2',
+  formats: ['woff', 'woff2'],
   weight: 'normal',
   family: `KaTeX_${family}`,
   style: 'italic'
@@ -24,50 +24,50 @@ const generateKatexFont = (family, weight, style) => ({
 
 var FONTS = [
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-Regular.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-Regular.otf'),
+    formats: ['woff'],
     weight: 'normal',
     family: 'source-sans-pro',
     style: 'normal'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-It.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-It.otf'),
+    formats: ['woff'],
     weight: 'normal',
     family: 'source-sans-pro',
     style: 'italic'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-Bold.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-Bold.otf'),
+    formats: ['woff'],
     weight: 'bold',
     family: 'source-sans-pro',
     style: 'normal'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-Semibold.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-Semibold.otf'),
+    formats: ['woff'],
     weight: 600,
     family: 'source-sans-pro',
     style: 'normal'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-BoldIt.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-BoldIt.otf'),
+    formats: ['woff'],
     weight: 'bold',
     family: 'source-sans-pro',
     style: 'italic'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-Light.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-Light.otf'),
+    formats: ['woff'],
     weight: 300,
     family: 'source-sans-pro',
     style: 'normal'
   },
   {
-    fontPath: cdn('fonts/sourcesans/SourceSansPro-ExtraLight.otf.woff'),
-    format: 'woff',
+    fontPath: cdn('fonts/sourcesans/SourceSansPro-ExtraLight.otf'),
+    formats: ['woff'],
     weight: 200,
     family: 'source-sans-pro',
     style: 'normal'

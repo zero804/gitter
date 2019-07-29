@@ -19,7 +19,9 @@
   {{#each fonts.cdnFonts as |font|}}
     @font-face {
       font-family: "{{font.family}}";
-      src: url("{{font.fontPath}}") format('{{font.format}}');
+      {{#each font.formats as |format|}}
+        src: url("{{font.fontPath}}.{{format}}") format('{{format}}');
+      {{/each}}
       font-weight: {{font.weight}};
       font-style: {{font.style}}
     }
