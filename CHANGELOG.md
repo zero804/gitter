@@ -1,4 +1,4 @@
-# 19.58.0 - *upcoming*
+# 19.58.0 - 2019-7-29
 
  - Add expand/collapse transition to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1532
  - Fix left-menu collapsed(pinned/unpinned) leaving blank space in Safari, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1531
