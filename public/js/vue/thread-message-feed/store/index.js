@@ -42,9 +42,6 @@ export default {
       commit(types.SET_PARENT_MESSAGE_ID, null);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
-    validateParentMessageExists: ({ getters, dispatch }) => {
-      if (!getters.parentMessage) dispatch('close');
-    },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
       commit(types.UPDATE_DRAFT_MESSAGE, newDraftMessage);
     },

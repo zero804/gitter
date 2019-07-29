@@ -34,23 +34,6 @@ describe('thread message feed store', () => {
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', true);
     });
 
-    describe('validateParentMessageExists', () => {
-      it('does nothing when parent message exists', async () => {
-        await testAction(actions.validateParentMessageExists, undefined, {
-          parentMessage: createSerializedMessageFixture()
-        });
-      });
-      it('calls close if parent message does not exist', async () => {
-        await testAction(
-          actions.validateParentMessageExists,
-          undefined,
-          { parentMessage: undefined },
-          [],
-          [{ type: 'close', payload: undefined }]
-        );
-      });
-    });
-
     it('updateDraftMessage changes draft message in the state', async () => {
       await testAction(actions.updateDraftMessage, 'testMessage', {}, [
         { type: types.UPDATE_DRAFT_MESSAGE, payload: 'testMessage' }

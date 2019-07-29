@@ -205,6 +205,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
 };
 
 export const changeDisplayedRoom = ({ state, commit, dispatch }, newRoomId) => {
+  dispatch('threadMessageFeed/close');
   commit(types.CHANGE_DISPLAYED_ROOM, newRoomId);
 
   const newRoom = state.roomMap[newRoomId];
@@ -234,13 +235,7 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
 
 export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
 
-export const setMessages = ({ commit, dispatch }, messages) => {
+export const setMessages = ({ commit }, messages) => {
   const newMessageMap = _.indexBy(messages, 'id');
   commit(types.REPLACE_MESSAGE_MAP, newMessageMap);
-  /**
-   * Once the right toolbar is in Vue, we can just use the `threadMessageFeed/parentMessage`
-   * getter to conditionally render either TMF or right toolbar. For now, we need to introduce
-   * this "hack".
-   */
-  dispatch('threadMessageFeed/validateParentMessageExists');
 };

@@ -481,7 +481,7 @@ describe('actions', () => {
         payload,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: payload }],
-        []
+        [{ type: 'threadMessageFeed/close', payload: undefined }]
       );
 
       expect(appEventTriggered).toEqual(false);
@@ -512,7 +512,10 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
+        [
+          { type: 'threadMessageFeed/close', payload: undefined },
+          { type: 'trackStat', payload: 'left-menu.changeRoom' }
+        ]
       );
 
       await navigationEventFiredPromise;
@@ -531,7 +534,10 @@ describe('actions', () => {
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
-        [{ type: 'trackStat', payload: 'left-menu.changeRoom' }]
+        [
+          { type: 'threadMessageFeed/close', payload: undefined },
+          { type: 'trackStat', payload: 'left-menu.changeRoom' }
+        ]
       );
 
       expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);
@@ -576,17 +582,11 @@ describe('actions', () => {
     const message1 = { id: '5cf8ef111111111111111111' };
     const message2 = { id: '5cf8ef222222222222222222' };
     const payload = [message1, message2];
-    await testAction(
-      actions.setMessages,
-      payload,
-      state,
-      [
-        {
-          type: types.REPLACE_MESSAGE_MAP,
-          payload: { [message1.id]: message1, [message2.id]: message2 }
-        }
-      ],
-      [{ type: 'threadMessageFeed/validateParentMessageExists', payload: undefined }]
-    );
+    await testAction(actions.setMessages, payload, state, [
+      {
+        type: types.REPLACE_MESSAGE_MAP,
+        payload: { [message1.id]: message1, [message2.id]: message2 }
+      }
+    ]);
   });
 });
