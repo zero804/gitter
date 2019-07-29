@@ -40,7 +40,7 @@ describe('chatService', function() {
         /StatusError: Text is required/
       );
     });
-    it('should validate that message length does not exceed 400 characters', async () => {
+    it('should validate that message length does not exceed 4096 characters', async () => {
       await assert.rejects(
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
           text: 'x'.repeat(4097)
@@ -78,7 +78,7 @@ describe('chatService', function() {
       const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
         aroundId: message.id
       });
-      assert(messages.length === 0, 'Expecting no messages with the id were found');
+      assert(messages.length === 0, 'Expected message not to be found');
     });
 
     it('should not store a spam message', async () => {
@@ -98,7 +98,7 @@ describe('chatService', function() {
       const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
         aroundId: message.id
       });
-      assert(messages.length === 0, 'Expecting no messages with the id were found');
+      assert(messages.length === 0, 'Expected message not to be found');
     });
   });
 
@@ -176,12 +176,14 @@ describe('chatService', function() {
       });
       assert.equal(chatMessage.parentId, '5d11d571a2405419771cd3ee');
     });
-    it('should omit invalid parentId', async () => {
-      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
-        text: 'I am replying to a thread',
-        parentId: 'abc'
-      });
-      assert.equal(chatMessage.parentId, undefined);
+    it('should validate parentId', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          text: 'I am replying to a thread',
+          parentId: 'abc'
+        }),
+        /StatusError: parentId must be a valid message ID/
+      );
     });
   });
 

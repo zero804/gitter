@@ -137,17 +137,18 @@ async function newChatMessageToTroupe(troupe, user, data) {
     throw new StatusError(400, 'Text is required');
   if (data.text.length > MAX_CHAT_MESSAGE_LENGTH)
     throw new StatusError(400, 'Message exceeds maximum size');
+  if (data.parentId && !mongoUtils.isLikeObjectId(data.parentId))
+    throw new StatusError(400, 'parentId must be a valid message ID');
 
   const parsedMessage = await processText(data.text);
   const mentions = await resolveMentions(troupe, user, parsedMessage);
 
   const isPublic = securityDescriptorUtils.isPublic(troupe);
-  const sanitizedParentId = mongoUtils.isLikeObjectId(data.parentId) ? data.parentId : undefined;
 
   const chatMessage = new ChatMessage({
     fromUserId: user.id,
     toTroupeId: troupe.id,
-    parentId: sanitizedParentId,
+    parentId: data.parentId,
     sent: sentAt,
     text: data.text, // Keep the raw message.
     status: data.status, // Checks if it is a status update
