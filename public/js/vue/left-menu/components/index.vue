@@ -158,6 +158,8 @@ export default {
   flex-direction: column;
   height: 100%;
 
+  transition: transform 0.05s ease;
+
   &::v-deep *,
   &::v-deep *:before,
   &::v-deep *:after {
@@ -186,6 +188,8 @@ export default {
 
 .layout-main-menu {
   width: 26.5rem;
+
+  transition: transform 0.1s ease;
 
   .unpinned:not(.mobile) & {
     position: absolute;
