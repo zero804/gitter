@@ -31,39 +31,34 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
         <div
           class="chat-item__from js-chat-item-from"
         >
-          Tomas Vik
+          Andrew Backer
         </div>
          
         <div
           class="chat-item__username js-chat-item-from"
         >
-          @viktomas_gitlab
+          @awbacker
         </div>
          
         <a
           class="chat-item__time js-chat-time"
-          title="June 27, 2019 9:30 AM"
+          title="May 18, 2016 3:48 AM"
         >
-          Jun 27 09:30
+          May 18 2016 03:48
         </a>
       </div>
        
       <div
         class="chat-item__text js-chat-item-text"
       >
-        Example message using a bit of  
-        <code>
-          code
-        </code>
-         and 
-        <strong>
-          bold
-        </strong>
-         to show how 
-        <em>
-          markdown
-        </em>
-         is stored.
+        <span
+          class="mention"
+          data-link-type="mention"
+          data-screen-name="MadLittleMods"
+        >
+          @MadLittleMods
+        </span>
+         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
       </div>
     </div>
   </div>
@@ -111,39 +106,34 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
         <div
           class="chat-item__from js-chat-item-from"
         >
-          Tomas Vik
+          Andrew Backer
         </div>
          
         <div
           class="chat-item__username js-chat-item-from"
         >
-          @viktomas_gitlab
+          @awbacker
         </div>
          
         <a
           class="chat-item__time js-chat-time"
-          title="June 27, 2019 9:30 AM"
+          title="May 18, 2016 3:48 AM"
         >
-          Jun 27 09:30
+          May 18 2016 03:48
         </a>
       </div>
        
       <div
         class="chat-item__text js-chat-item-text"
       >
-        Example message using a bit of  
-        <code>
-          code
-        </code>
-         and 
-        <strong>
-          bold
-        </strong>
-         to show how 
-        <em>
-          markdown
-        </em>
-         is stored.
+        <span
+          class="mention"
+          data-link-type="mention"
+          data-screen-name="MadLittleMods"
+        >
+          @MadLittleMods
+        </span>
+         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
       </div>
     </div>
   </div>
@@ -181,39 +171,34 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
         <div
           class="chat-item__from js-chat-item-from"
         >
-          Tomas Vik
+          Andrew Backer
         </div>
          
         <div
           class="chat-item__username js-chat-item-from"
         >
-          @viktomas_gitlab
+          @awbacker
         </div>
          
         <a
           class="chat-item__time js-chat-time"
-          title="June 27, 2019 9:30 AM"
+          title="May 18, 2016 3:48 AM"
         >
-          Jun 27 09:30
+          May 18 2016 03:48
         </a>
       </div>
        
       <div
         class="chat-item__text js-chat-item-text"
       >
-        Example message using a bit of  
-        <code>
-          code
-        </code>
-         and 
-        <strong>
-          bold
-        </strong>
-         to show how 
-        <em>
-          markdown
-        </em>
-         is stored.
+        <span
+          class="mention"
+          data-link-type="mention"
+          data-screen-name="MadLittleMods"
+        >
+          @MadLittleMods
+        </span>
+         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
       </div>
     </div>
   </div>

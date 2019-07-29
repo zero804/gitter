@@ -64,8 +64,14 @@ let messageSearchResultIncrement = 0;
 function createSerializedMessageSearchResultFixture() {
   messageSearchResultIncrement++;
 
+  return createSerializedMessageFixture({
+    id: `573bd813e2996a5a42c95899-${messageSearchResultIncrement}`
+  });
+}
+
+function createSerializedMessageFixture(overrides) {
   return {
-    id: `573bd813e2996a5a42c95899-${messageSearchResultIncrement}`,
+    id: `573bd813e2996a5a42c95899`,
     text:
       "@MadLittleMods For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design",
     html:
@@ -95,12 +101,13 @@ function createSerializedMessageSearchResultFixture() {
     issues: [],
     meta: [],
     highlights: ['offline'],
-    v: 1
+    v: 1,
+    ...overrides
   };
 }
-
 module.exports = {
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture,
+  createSerializedMessageFixture,
   createSerializedMessageSearchResultFixture
 };

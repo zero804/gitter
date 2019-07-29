@@ -6,6 +6,7 @@ jest.mock('../../../../../public/js/components/api-client');
 const testAction = require('../../store/vuex-action-helper');
 const appEvents = require('../../../../../public/js/utils/appevents');
 const apiClient = require('../../../../../public/js/components/api-client');
+const { createSerializedMessageFixture } = require('../../fixture-helpers');
 const {
   default: { actions, mutations, getters },
   types
@@ -36,7 +37,7 @@ describe('thread message feed store', () => {
     describe('validateParentMessageExists', () => {
       it('does nothing when parent message exists', async () => {
         await testAction(actions.validateParentMessageExists, undefined, {
-          parentMessage: { id: '5d147ea84dad9dfbc522317a' }
+          parentMessage: createSerializedMessageFixture()
         });
       });
       it('calls close if parent message does not exist', async () => {
@@ -86,9 +87,7 @@ describe('thread message feed store', () => {
 
   describe('getters', () => {
     it('parentMessage', () => {
-      const parentMessage = {
-        id: '5d147ea84dad9dfbc522317a'
-      };
+      const parentMessage = createSerializedMessageFixture();
       const state = { parentId: parentMessage.id };
       const rootState = { messageMap: { [parentMessage.id]: parentMessage } };
       const result = getters.parentMessage(state, {}, rootState);

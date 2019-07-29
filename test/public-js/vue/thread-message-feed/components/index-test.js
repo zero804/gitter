@@ -1,6 +1,7 @@
 'use strict';
 
 const mount = require('../../vuex-mount');
+const { createSerializedMessageFixture } = require('../../fixture-helpers');
 const {
   default: Index
 } = require('../../../../../public/js/vue/thread-message-feed/components/index.vue');
@@ -8,9 +9,7 @@ const {
 describe('thread-message-feed index', () => {
   const addDefaultUser = state => (state.user = { displayName: 'John Smith' });
   const addParentMessage = state => {
-    const parentMessage = {
-      id: '5d147ea84dad9dfbc522317a'
-    };
+    const parentMessage = createSerializedMessageFixture();
     state.messageMap = { [parentMessage.id]: parentMessage };
     state.threadMessageFeed.parentId = parentMessage.id;
   };
