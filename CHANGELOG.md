@@ -1,8 +1,10 @@
 # 19.59.0 - *upcoming*
 
-- Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
-- Add `parentId` to threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1490
-- Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
+ - Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
+ - Add `parentId` to threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1490
+ - Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
+ - Update dependency `@gitterhq/services` to `1.25.0` for [repl.it](https://repl.it/site/docs/classrooms/webhooks) service
+    - Thanks to [@kgashok](https://gitlab.com/kgashok) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/104
 
 Developer facing:
  - Update dependency `node-uuid@1.4.0` to `uuid@^3.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1533
