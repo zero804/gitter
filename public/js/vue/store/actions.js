@@ -4,6 +4,7 @@ import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
 import * as leftMenuConstants from '../left-menu/constants';
 import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
+import _ from 'lodash';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 export const setTest = ({ commit }, testValue) => commit(types.SET_TEST, testValue);
@@ -204,6 +205,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
 };
 
 export const changeDisplayedRoom = ({ state, commit, dispatch }, newRoomId) => {
+  dispatch('threadMessageFeed/close');
   commit(types.CHANGE_DISPLAYED_ROOM, newRoomId);
 
   const newRoom = state.roomMap[newRoomId];
@@ -232,3 +234,8 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
 };
 
 export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
+
+export const setMessages = ({ commit }, messages) => {
+  const newMessageMap = _.indexBy(messages, 'id');
+  commit(types.REPLACE_MESSAGE_MAP, newMessageMap);
+};

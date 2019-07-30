@@ -99,8 +99,48 @@ function createSerializedMessageSearchResultFixture() {
   };
 }
 
+function createSerializedMessageFixture(overrides) {
+  return {
+    id: '5d147ea84dad9dfbc522317a',
+    text:
+      '@MadLittleMods Example message using a bit of  `code` and **bold** to show how *markdown* is stored.',
+    html:
+      '<span data-link-type="mention" data-screen-name="MadLittleMods" class="mention">@MadLittleMods</span>  Example message using a bit of  <code>code</code> and <strong>bold</strong> to show how <em>markdown</em> is stored.',
+    sent: '2016-05-18T02:48:51.386Z',
+    fromUser: {
+      id: '5cdc09f6572f607a5bc8a41d',
+      username: 'viktomas_gitlab',
+      displayName: 'Tomas Vik',
+      url: '/viktomas_gitlab',
+      avatarUrl: 'http://localhost:5000/api/private/avatars/g/u/viktomas_gitlab',
+      avatarUrlSmall:
+        'https://secure.gravatar.com/avatar/6042a9152ada74d9fb6a0cdce895337e?s=60&d=identicon',
+      avatarUrlMedium:
+        'https://secure.gravatar.com/avatar/6042a9152ada74d9fb6a0cdce895337e?s=128&d=identicon',
+      v: 34
+    },
+    unread: false,
+    readBy: 1,
+    urls: [],
+    mentions: [
+      {
+        screenName: 'MadLittleMods',
+        userId: '553d437215522ed4b3df8c50',
+        userIds: []
+      }
+    ],
+    issues: [],
+    meta: [],
+    v: 1,
+    burstStart: true,
+    burstFinal: true,
+    ...overrides
+  };
+}
+
 module.exports = {
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture,
+  createSerializedMessageFixture,
   createSerializedMessageSearchResultFixture
 };

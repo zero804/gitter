@@ -11,6 +11,7 @@ function state() {
 
     groupMap: {},
     roomMap: {},
+    messageMap: {},
 
     displayedRoomId: null,
     hightLightedMessageId: null,

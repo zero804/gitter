@@ -6,7 +6,7 @@ exports[`thread-message-feed chat-input matches snapshot for thread 1`] = `
   id="chat-input-wrapper"
 >
   <div
-    class="chat-input__container js-chat-input-container"
+    class="chat-input__container"
   >
     <div
       class="chat-input__area"

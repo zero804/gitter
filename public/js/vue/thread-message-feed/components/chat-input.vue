@@ -57,7 +57,7 @@ export default {
 
 <template>
   <footer id="chat-input-wrapper" class="chat-input" :class="{ thread }">
-    <div v-if="user" class="chat-input__container js-chat-input-container">
+    <div v-if="user" class="chat-input__container">
       <div v-if="roomMember" class="chat-input__area">
         <div class="chat-input__avatar">
           <avatar :user="user" />
@@ -90,6 +90,7 @@ export default {
 @import (reference) 'dark-theme';
 @import (reference) 'mixins/text/default-fonts';
 @import 'public/js/views/chat/chatInputView.less';
+@import (reference) '../styles/variables';
 
 .thread.chat-input {
   .dark-theme & {
@@ -98,12 +99,12 @@ export default {
 }
 
 .thread .chat-input__container {
-  margin-left: 10px;
+  margin-left: @thread-message-feed-padding;
 }
 
 .thread .chat-input__box {
-  margin-left: @avatarWidth + 10px;
-  margin-right: 10px;
+  margin-left: @avatarWidth + @thread-message-feed-padding;
+  margin-right: @thread-message-feed-padding;
 }
 
 .thread .chat-input__text-area {
