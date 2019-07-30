@@ -31,13 +31,13 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
         <div
           class="chat-item__from"
         >
-          Andrew Backer
+          Tomas Vik
         </div>
          
         <div
           class="chat-item__username"
         >
-          @awbacker
+          @viktomas_gitlab
         </div>
          
         <a
@@ -58,7 +58,19 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
         >
           @MadLittleMods
         </span>
-         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
+          Example message using a bit of  
+        <code>
+          code
+        </code>
+         and 
+        <strong>
+          bold
+        </strong>
+         to show how 
+        <em>
+          markdown
+        </em>
+         is stored.
       </div>
     </div>
   </div>
@@ -106,13 +118,13 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
         <div
           class="chat-item__from"
         >
-          Andrew Backer
+          Tomas Vik
         </div>
          
         <div
           class="chat-item__username"
         >
-          @awbacker
+          @viktomas_gitlab
         </div>
          
         <a
@@ -133,7 +145,19 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
         >
           @MadLittleMods
         </span>
-         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
+          Example message using a bit of  
+        <code>
+          code
+        </code>
+         and 
+        <strong>
+          bold
+        </strong>
+         to show how 
+        <em>
+          markdown
+        </em>
+         is stored.
       </div>
     </div>
   </div>
@@ -171,13 +195,13 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
         <div
           class="chat-item__from"
         >
-          Andrew Backer
+          Tomas Vik
         </div>
          
         <div
           class="chat-item__username"
         >
-          @awbacker
+          @viktomas_gitlab
         </div>
          
         <a
@@ -198,7 +222,19 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
         >
           @MadLittleMods
         </span>
-         For some groups it might not matter much, but for others a lot.  Kinda like stack overflows 'take this offline' thing when you start doing a conversation in the comments.  Im' sure it's not simple to design
+          Example message using a bit of  
+        <code>
+          code
+        </code>
+         and 
+        <strong>
+          bold
+        </strong>
+         to show how 
+        <em>
+          markdown
+        </em>
+         is stored.
       </div>
     </div>
   </div>
