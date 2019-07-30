@@ -41,9 +41,12 @@ describe('thread message feed store', () => {
     });
 
     it('sendMessage creates message object and submits it to the collection', async () => {
-      await testAction(actions.sendMessage, undefined, { draftMessage: 'testMessage' }, [
-        { type: types.UPDATE_DRAFT_MESSAGE, payload: '' }
-      ]);
+      await testAction(
+        actions.sendMessage,
+        undefined,
+        { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' },
+        [{ type: types.UPDATE_DRAFT_MESSAGE, payload: '' }]
+      );
       expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
         text: 'testMessage',
         parentId: '5d11d571a2405419771cd3ee'
