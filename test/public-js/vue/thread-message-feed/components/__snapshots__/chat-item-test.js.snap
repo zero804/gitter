@@ -29,19 +29,19 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
         class="chat-item__details"
       >
         <div
-          class="chat-item__from js-chat-item-from"
+          class="chat-item__from"
         >
           Andrew Backer
         </div>
          
         <div
-          class="chat-item__username js-chat-item-from"
+          class="chat-item__username"
         >
           @awbacker
         </div>
          
         <a
-          class="chat-item__time js-chat-time"
+          class="chat-item__time"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -49,7 +49,7 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
       </div>
        
       <div
-        class="chat-item__text js-chat-item-text"
+        class="chat-item__text"
       >
         <span
           class="mention"
@@ -86,10 +86,10 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
     </div>
      
     <div
-      class="chat-item__actions js-chat-item-actions"
+      class="chat-item__actions"
     >
       <i
-        class="chat-item__icon icon-check chat-item__icon--read js-chat-item-readby"
+        class="chat-item__icon icon-check chat-item__icon--read"
       />
        
       <i
@@ -104,19 +104,19 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
         class="chat-item__details"
       >
         <div
-          class="chat-item__from js-chat-item-from"
+          class="chat-item__from"
         >
           Andrew Backer
         </div>
          
         <div
-          class="chat-item__username js-chat-item-from"
+          class="chat-item__username"
         >
           @awbacker
         </div>
          
         <a
-          class="chat-item__time js-chat-time"
+          class="chat-item__time"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -124,7 +124,7 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
       </div>
        
       <div
-        class="chat-item__text js-chat-item-text"
+        class="chat-item__text"
       >
         <span
           class="mention"
@@ -169,19 +169,19 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
         class="chat-item__details"
       >
         <div
-          class="chat-item__from js-chat-item-from"
+          class="chat-item__from"
         >
           Andrew Backer
         </div>
          
         <div
-          class="chat-item__username js-chat-item-from"
+          class="chat-item__username"
         >
           @awbacker
         </div>
          
         <a
-          class="chat-item__time js-chat-time"
+          class="chat-item__time"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -189,7 +189,7 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
       </div>
        
       <div
-        class="chat-item__text js-chat-item-text"
+        class="chat-item__text"
       >
         <span
           class="mention"

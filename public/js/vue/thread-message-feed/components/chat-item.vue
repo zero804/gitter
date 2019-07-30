@@ -39,20 +39,18 @@ export default {
           <avatar :user="message.fromUser" />
         </div>
       </div>
-      <div v-if="showItemActions" class="chat-item__actions js-chat-item-actions">
-        <i class="chat-item__icon icon-check chat-item__icon--read js-chat-item-readby"></i>
+      <div v-if="showItemActions" class="chat-item__actions">
+        <i class="chat-item__icon icon-check chat-item__icon--read"></i>
         <i class="chat-item__icon icon-ellipsis"></i>
       </div>
       <div class="chat-item__content">
         <div class="chat-item__details">
-          <div class="chat-item__from js-chat-item-from">{{ message.fromUser.displayName }}</div>
-          <div class="chat-item__username js-chat-item-from">@{{ message.fromUser.username }}</div>
+          <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
+          <div class="chat-item__username">@{{ message.fromUser.username }}</div>
           <!-- TODO add permalink https://gitlab.com/gitlab-org/gitter/webapp/issues/2218 -->
-          <a class="chat-item__time js-chat-time" :title="sentTimeFormattedFull">{{
-            sentTimeFormatted
-          }}</a>
+          <a class="chat-item__time" :title="sentTimeFormattedFull">{{ sentTimeFormatted }}</a>
         </div>
-        <div class="chat-item__text js-chat-item-text" v-html="message.html"></div>
+        <div class="chat-item__text" v-html="message.html"></div>
       </div>
     </div>
   </div>
