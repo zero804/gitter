@@ -1,3 +1,9 @@
+# 19.59.0 - *upcoming*
+
+Developer facing:
+ - Update dependency `node-uuid@1.4.0` to `uuid@^3.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1533
+
+
 # 19.58.0 - 2019-7-29
 
  - Add expand/collapse transition to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1532
