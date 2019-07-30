@@ -63,6 +63,5 @@
 	"Linux 32": "리눅스 32",
 	"Linux 64": "리눅스 64",
 	"iPhone": "아이폰",
-	"Android": "안드로이드",
-	"Enjoy free public and private communities with unlimited people, message history and integrations.": "Enjoy free public and private communities with unlimited people, message history and integrations."
+	"Android": "안드로이드"
 }
