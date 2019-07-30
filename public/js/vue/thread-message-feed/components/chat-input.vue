@@ -90,6 +90,7 @@ export default {
 @import (reference) 'dark-theme';
 @import (reference) 'mixins/text/default-fonts';
 @import 'public/js/views/chat/chatInputView.less';
+@import (reference) '../styles/variables';
 
 .thread.chat-input {
   .dark-theme & {

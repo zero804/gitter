@@ -49,6 +49,7 @@ export default {
 @import (reference) 'trp3Vars';
 @import (reference) 'components/right-toolbar';
 @import (reference) 'dark-theme';
+@import (reference) '../styles/variables';
 
 .root {
   .right-toolbar-position();

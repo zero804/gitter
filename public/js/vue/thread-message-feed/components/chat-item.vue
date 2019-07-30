@@ -62,6 +62,7 @@ export default {
 @import (reference) 'colors';
 @import (reference) 'typography';
 @import (reference) 'dark-theme';
+@import (reference) '../styles/variables';
 @import (reference) 'public/js/views/chat/chatItemView.less';
 
 @item-detail-margin: 2px;
