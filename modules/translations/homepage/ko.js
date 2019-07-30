@@ -63,5 +63,9 @@
 	"Linux 32": "리눅스 32",
 	"Linux 64": "리눅스 64",
 	"iPhone": "아이폰",
-	"Android": "안드로이드"
+	"Android": "안드로이드",
+	"Open Source": "Open Source",
+	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
+	"desktop": "desktop",
+	"iOS": "iOS"
 }

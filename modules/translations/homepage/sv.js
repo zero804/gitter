@@ -9,7 +9,6 @@
 	"Blog": "Blogg",
 	"Twitter": "Twitter",
 	"Support": "Support",
-
 	"Where communities thrive": "Där gemenskaper frodas",
 	"Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery.": "Gitter är en chatt- och nätverksplattform som hjälper till med hantering, växande och koppla gemenskaper tillsammans genom meddelanden, innehåll och upptäckter.",
 	"Create your own community": "Skapa din egna grupp",
@@ -23,7 +22,6 @@
 	"Grow your community in no time with our easy sharing tools.": "Väx din gemenskap på nolltid med våra lätta verktyg för delning.",
 	"Out in the open": "Ute i det fria",
 	"Let your community be discovered! With Gitter, everyone can find your community in our directory and via search engines.": "Låt din gemenskap upptäckas! Med Gitter kan alla hitta din grupp och gemenskap i vårt register och via sökmotorer.",
-
 	"Trusted by": "Pålitad av",
 	"Some of our communities": "Några av våra grupper",
 	"Create your own": "Skapa din egna",
@@ -31,15 +29,12 @@
 	"Explore": "Utforska",
 	"GitterHQ": "GitterHQ",
 	"Let’s talk about Gitter!": "Låt oss prata om Gitter!",
-
 	"Designed for community collaboration": "Designad för gemenskap kollaboration",
 	"Gitter is designed to make community messaging, collaboration and discovery as smooth and simple as possible. You can easily create, organise and grow your communities, inviting others to join just in one click.": "Gitter är designat för att göra gemenskap meddelanden, samarbeten och upptäckter så smidigt och enkelt som möjligt. Du kan enkelt skapa, organisera och växa din grupp, bjuda in andra att ansluta med bara ett klick.",
 	"We also provide integrations with GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>.": "Vi erbjuder också integreringar med GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. Vi stödjer egna webhooks, har en <a %s>open source repository</a> för integrationer såväl som en <a %s>flexibel API</a>.",
-
 	"Loved by our users": "Älskad av våra användare",
 	"Gitter is nothing without the people using it day in and day out.": "Gitter är ingenting utan våra användare som använder det dag ut och dag in.",
 	"We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.": "Vi frågade några personer vad Gitter betyder för dem, detta är deras svar. Om du älskar Gitter, Twittra oss på <a %s>%s</a> så uppdaterar vi dessa citat varje månad.",
-
 	"Pricing plans are coming early 2017. Join the Earlybird programme now and get a 75%% discount.": "Prisplanerna kommer tidigt 2017. Gå med i Earlybird programmet nu och få 75%% rabatt.",
 	"Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>.": "Priserna kan variera tack vare moms. Genom att registrera dig godkänner du våra <a %s>Terms and Conditions</a>.",
 	"Free": "Gratis",
@@ -59,7 +54,6 @@
 	"<b>PR & promotional</b> tools": "<b>PR & kampanj-</b> verktyg",
 	"Access to <b>community managers</b>": "Tillgång till <b>gemenskap verktygen</b>",
 	"<b>Join</b> earlybird programme": "<b>Gå med i</b> earlybird programmet",
-
 	"Get Gitter now!": "Skaffa Gitter nu!",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter är tillgängligt i alla moderna webbläsare såväl som appar för datorer och mobiltelefoner.",
 	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "Vi har just nu appar för OSX, iOS, Android, Windows och Linux. Vi har också en mysig liten <a %s>IRC brygga</a>",
@@ -69,6 +63,9 @@
 	"Linux 64": "Linux 64",
 	"iPhone": "iPhone",
 	"Android": "Android",
-
-	"Translated By": "Mattias A (Nubbie on GitHub) & svbeon"
+	"Translated By": "Mattias A (Nubbie on GitHub) & svbeon",
+	"Open Source": "Open Source",
+	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
+	"desktop": "desktop",
+	"iOS": "iOS"
 }

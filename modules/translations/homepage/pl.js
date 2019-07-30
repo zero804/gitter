@@ -10,7 +10,6 @@
 	"Blog": "Blog",
 	"Twitter": "Twitter",
 	"Support": "Wsparcie",
-
 	"Where communities thrive": "Gdzie społeczności prosperują",
 	"Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery.": "Gitter to czat i platforma sieciowa, która pomaga zarządzać, rozwijać i łączyć społeczności przez rozmowy, zawartość i odkrywanie.",
 	"Create your own community": "Stwórz swoją społeczność",
@@ -24,7 +23,6 @@
 	"Grow your community in no time with our easy sharing tools.": "Rozwiń swoją społeczność w krótkim czasie z naszymi narzędziami łatwego udostępniania.",
 	"Out in the open": "Na zewnątrz",
 	"Let your community be discovered! With Gitter, everyone can find your community in our directory and via search engines.": "Pozwól Twojej społeczności zostać zauważonym! Z Gitter każdy może znaleźć Twoją społeczność w naszym katalogu i poprzez wyszukiwarki.",
-
 	"Trusted by": "Zaufany przez",
 	"Some of our communities": "Niektóre z naszych społeczności",
 	"Create your own": "Utwórz własną",
@@ -32,15 +30,12 @@
 	"Explore": "Odkrywaj",
 	"GitterHQ": "GitterHQ",
 	"Let’s talk about Gitter!": "Porozmawiajmy o Gitter!",
-
 	"Designed for community collaboration": "Zaprojektowane dla społecznościowej współpracy",
 	"Gitter is designed to make community messaging, collaboration and discovery as smooth and simple as possible. You can easily create, organise and grow your communities, inviting others to join just in one click.": "Gitter jest zaprojektowany, by tworzyć komunikację w społeczności, współpracę i odkrywać tak gładko, i prosto jak to jest możliwe. Możesz łatwo tworzyć, organizować i rozwijać swoje społeczności, zapraszać innych do dołączenia poprzez jedno kliknięcie.",
 	"We also provide integrations with GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>.": "Zapewniamy także integrację z GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty i Sprintly. Akceptujemy niestandardowe webhooki, mamy <a %s>otwartoźródłowe repozytorium</a> dla integracji <a %s>elastycznych API</a>.",
-
 	"Loved by our users": "Pokochane przez naszych użytkowników",
 	"Gitter is nothing without the people using it day in and day out.": "Gitter jest niczym bez ludzi używających go dzień w dzień.",
 	"We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.": "Zapytaliśmy kilku ludzi co Gitter dla nich znaczy, to jest to co musieli powiedzieć. Jeśli kochasz Gitter, tweetnij do nas <a %s>%s</a>, będziemy aktualizować te cytaty co miesiąc.",
-
 	"Pricing plans are coming early 2017. Join the Earlybird programme now and get a 75%% discount.": "Plany cenowe nadchodzą na początku 2017 r. Dołącz do programu Earlybird teraz i odbierz obniżkę 75%%.",
 	"Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>.": "Ceny mogą podlegać podatkowy VAT. Poprzez rejestrację zgadzasz się z naszym <a %s>regulaminem</a>.",
 	"Free": "Darmowe",
@@ -60,7 +55,6 @@
 	"<b>PR & promotional</b> tools": "<b>PR i promujące</b> narzędzia",
 	"Access to <b>community managers</b>": "Dostęp do <b>menedżerów społeczności</b>",
 	"<b>Join</b> earlybird programme": "<b>Dolącz</b> do programu earlybird",
-
 	"Get Gitter now!": "Otrzymaj Gitter teraz!",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter jest dostępny na wszystkich nowoczesnych przeglądarkach jako aplikacje dla komputerów i urządzeń mobilnych.",
 	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "Aktualnie posiadamy aplikacje dla OS X, iOS, Android, Windows i Linux. Posiadamy także maleńki <a %s>mostek IRC</a>",
@@ -69,5 +63,9 @@
 	"Linux 32": "Linux 32",
 	"Linux 64": "Linux 64",
 	"iPhone": "iPhone",
-	"Android": "Android"
+	"Android": "Android",
+	"Open Source": "Open Source",
+	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
+	"desktop": "desktop",
+	"iOS": "iOS"
 }

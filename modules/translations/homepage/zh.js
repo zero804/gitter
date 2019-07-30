@@ -10,7 +10,6 @@
 	"Blog": "博客",
 	"Twitter": "Twitter",
 	"Support": "支持",
-
 	"Where communities thrive": "社区蓬勃发展的地方",
 	"Gitter is a chat and networking platform that helps to manage, grow and connect communities through messaging, content and discovery.": "Gitter 是一个聊天和网络平台，通过消息、内容和发现，帮助管理、发展和连接社区。",
 	"Create your own community": "创建你自己的社区",
@@ -24,7 +23,6 @@
 	"Grow your community in no time with our easy sharing tools.": "使用我们的轻松分享工具，立即发展您的社区。",
 	"Out in the open": "广为人知",
 	"Let your community be discovered! With Gitter, everyone can find your community in our directory and via search engines.": "让您的社区被发现！有了 Gitter，每个人都可以在我们的目录和搜索引擎中找到您的社区。",
-
 	"Trusted by": "备受信任",
 	"Some of our communities": "一些我们的社区",
 	"Create your own": "创建你自己的",
@@ -32,15 +30,12 @@
 	"Explore": "探索",
 	"GitterHQ": "GitterHQ",
 	"Let’s talk about Gitter!": "我们来谈谈 Gitter 吧！",
-
 	"Designed for community collaboration": "专为社区协作而设计",
 	"Gitter is designed to make community messaging, collaboration and discovery as smooth and simple as possible. You can easily create, organise and grow your communities, inviting others to join just in one click.": "Gitter 旨在使社区消息传递，协作和发现尽可能顺畅和简单。 您可以轻松创建，组织和发展您的社区，只需单击一下即可邀请其他人加入。",
 	"We also provide integrations with GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty & Sprintly. We accept custom webhooks, have an <a %s>open source repository</a> for integrations as well as a <a %s>flexible API</a>.": "我们还提供与 GitHub, Trello, Jenkins, Travis CI, Heroku, Sentry, BitBucket, HuBoard, Logentries, Pagerduty 以及 Sprintly 的集成。 我们同样支持自定义的 webhook，为集成提供了<a %s>开源库</a>以及<a %s>灵活的API</a>。",
-
 	"Loved by our users": "为用户所喜爱",
 	"Gitter is nothing without the people using it day in and day out.": "如果没有大家的支持，Gitter 什么也不是。",
 	"We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.": "我们采访了一些用户，Gitter 对他们意味着什么，这里是他们的话。如果你也喜欢 Gitter，在 Twitter 上<a %s>%s</a>，我们每个月都会更新这些留言。",
-
 	"Pricing plans are coming early 2017. Join the Earlybird programme now and get a 75%% discount.": "Pricing plans are coming early 2017. Join the Earlybird programme now and get a 75%% discount.",
 	"Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>.": "Prices may be subject to VAT. By signing up you agree to our <a %s>Terms and Conditions</a>.",
 	"Free": "免费",
@@ -60,7 +55,6 @@
 	"<b>PR & promotional</b> tools": "<b>PR & promotional</b> tools",
 	"Access to <b>community managers</b>": "Access to <b>community managers</b>",
 	"<b>Join</b> earlybird programme": "<b>Join</b> earlybird programme",
-
 	"Get Gitter now!": "即刻获取 Gitter ！",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter 支持所有现代浏览器，并为桌面设备和移动电话提供了应用程序。",
 	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "当前，我们为 OSX, iOS, Android, Windows 和 Linux 提供了应用程序。我们还有一款小巧可爱的 <a %s>IRC bridge</a>",
@@ -69,5 +63,9 @@
 	"Linux 32": "Linux 32",
 	"Linux 64": "Linux 64",
 	"iPhone": "iPhone",
-	"Android": "Android"
+	"Android": "Android",
+	"Open Source": "Open Source",
+	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
+	"desktop": "desktop",
+	"iOS": "iOS"
 }
