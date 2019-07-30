@@ -47,7 +47,8 @@ export default {
     },
     sendMessage: ({ state, commit }) => {
       const message = {
-        text: state.draftMessage
+        text: state.draftMessage,
+        parentId: state.parentId
       };
       // TODO add the temporary message to the feed + react on success or failure
       apiClient.room.post('/chatMessages', message);
