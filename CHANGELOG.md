@@ -7,7 +7,9 @@
     - Thanks to [@kgashok](https://gitlab.com/kgashok) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/104
 
 Developer facing:
+
  - Update dependency `node-uuid@1.4.0` to `uuid@^3.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1533
+ - Move `@gitterhq/services` update process to developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1538
 
 
 # 19.58.0 - 2019-7-29
