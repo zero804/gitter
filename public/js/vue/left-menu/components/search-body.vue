@@ -156,15 +156,20 @@ export default {
   .m-header-title();
 }
 
+@searchInputSpacing: 12px;
+
 .search-input-wrapper {
-  padding-left: @desktop-menu-left-padding;
-  padding-right: @desktop-menu-left-padding;
+  padding-left: ~'calc(@{desktop-menu-left-padding} - @{searchInputSpacing})';
+  padding-right: ~'calc(@{desktop-menu-left-padding} - @{searchInputSpacing})';
 }
 
 .search-input {
   box-sizing: initial;
   width: 100%;
-  height: 28px;
+  height: 36px;
+  padding: 8px @searchInputSpacing;
+
+  border-radius: 18px;
 
   .dark-theme & {
     color: @dark-theme-left-menu-text-color;
