@@ -134,11 +134,13 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         limit: 3
       })
       .then(result => {
-        const rooms = (result && result.results) || [];
-        rooms.forEach(room => {
+        const repos = (result && result.results) || [];
+        const roomsFromRepos = repos.map(repo => repo.room).filter(Boolean);
+
+        roomsFromRepos.forEach(room => {
           dispatch('upsertRoom', room);
         });
-        commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, rooms.map(room => room.id));
+        commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, roomsFromRepos.map(room => room.id));
       })
       .catch(err => {
         commit(types.RECEIVE_ROOM_SEARCH_REPO_ERROR, err);
