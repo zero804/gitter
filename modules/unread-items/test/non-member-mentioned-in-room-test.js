@@ -1,13 +1,13 @@
 'use strict';
 
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
-var assert = require('assert');
-var chatService = require('gitter-web-chats');
-var unreadItemService = require('../');
-var appEvents = require('gitter-web-appevents');
+const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const assert = require('assert');
+const chatService = require('gitter-web-chats');
+const unreadItemService = require('../');
+const appEvents = require('gitter-web-appevents');
 
 describe('unread item end-to-end integration tests #slow', function() {
-  var fixture = fixtureLoader.setup({
+  const fixture = fixtureLoader.setup({
     user1: { username: true },
     user2: { username: true },
     user3: { username: true },
@@ -15,69 +15,51 @@ describe('unread item end-to-end integration tests #slow', function() {
     troupe2: { users: ['user1'], githubType: 'ORG_CHANNEL', security: 'PRIVATE' }
   });
 
-  it('should notify when the user has access', function() {
-    var troupe = fixture.troupe1;
-    var troupeId = troupe.id;
-    var user2 = fixture.user2;
+  it('should notify when the user has access', async function() {
+    const troupe = fixture.troupe1;
+    const troupeId = troupe.id;
+    const user2 = fixture.user2;
 
-    var onUserMentionedInNonMemberRoom = 0;
+    let onUserMentionedInNonMemberRoom = 0;
     appEvents.onUserMentionedInNonMemberRoom(function(data) {
       if (String(data.userId) === String(user2.id)) {
         onUserMentionedInNonMemberRoom++;
       }
     });
 
-    return chatService
-      .newChatMessageToTroupe(troupe, fixture.user1, {
-        text: 'Hey there @' + user2.username
-      })
-      .delay(200) // NB: magic number :(
-      .bind({})
-      .then(function(chat) {
-        assert.strictEqual(onUserMentionedInNonMemberRoom, 1);
-        this.chatId = chat.id;
-        return unreadItemService.getUnreadItems(user2.id, troupeId);
-      })
-      .then(function(x) {
-        assert.deepEqual(x, [this.chatId]);
-
-        return unreadItemService.getRoomIdsMentioningUser(user2._id);
-      })
-      .then(function(roomIds) {
-        assert.deepEqual(roomIds, [troupeId]);
-      });
+    const chat = await chatService.newChatMessageToTroupe(troupe, fixture.user1, {
+      text: 'Hey there @' + user2.username
+    });
+    // chatService doesn't wait for unreadItemService so we have to
+    await new Promise(resolve => setTimeout(resolve, 200));
+    assert.strictEqual(onUserMentionedInNonMemberRoom, 1);
+    const x = await unreadItemService.getUnreadItems(user2.id, troupeId);
+    assert.deepEqual(x, [chat.id]);
+    const roomIds = await unreadItemService.getRoomIdsMentioningUser(user2._id);
+    assert.deepEqual(roomIds, [troupeId]);
   });
 
-  it('should not notify when the user does not have access', function() {
-    var troupe = fixture.troupe2;
-    var troupeId = troupe.id;
-    var user3 = fixture.user3;
+  it('should not notify when the user does not have access', async function() {
+    const troupe = fixture.troupe2;
+    const troupeId = troupe.id;
+    const user3 = fixture.user3;
 
-    var onUserMentionedInNonMemberRoom = 0;
+    let onUserMentionedInNonMemberRoom = 0;
     appEvents.onUserMentionedInNonMemberRoom(function(data) {
       if (String(data.userId) === String(user3.id)) {
         onUserMentionedInNonMemberRoom++;
       }
     });
 
-    return chatService
-      .newChatMessageToTroupe(troupe, fixture.user1, {
-        text: 'Hey there @' + user3.username
-      })
-      .delay(200) // NB: magic number :(
-      .bind({})
-      .then(function(chat) {
-        assert.strictEqual(onUserMentionedInNonMemberRoom, 0);
-        this.chatId = chat.id;
-        return unreadItemService.getUnreadItems(user3.id, troupeId);
-      })
-      .then(function(x) {
-        assert.deepEqual(x, []);
-
-        return unreadItemService.getRoomIdsMentioningUser(user3._id);
-      })
-      .then(function(roomIds) {
-        assert.deepEqual(roomIds, []);
-      });
+    await chatService.newChatMessageToTroupe(troupe, fixture.user1, {
+      text: 'Hey there @' + user3.username
+    });
+    // chatService doesn't wait for unreadItemService so we have to
+    await new Promise(resolve => setTimeout(resolve, 200));
+    assert.strictEqual(onUserMentionedInNonMemberRoom, 0);
+    const x = await unreadItemService.getUnreadItems(user3.id, troupeId);
+    assert.deepEqual(x, []);
+    const roomIds = await unreadItemService.getRoomIdsMentioningUser(user3._id);
+    assert.deepEqual(roomIds, []);
   });
 });
