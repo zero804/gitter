@@ -57,7 +57,7 @@ export default {
 
 <template>
   <footer id="chat-input-wrapper" class="chat-input" :class="{ thread }">
-    <div v-if="user" class="chat-input__container js-chat-input-container">
+    <div v-if="user" class="chat-input__container">
       <div v-if="roomMember" class="chat-input__area">
         <div class="chat-input__avatar">
           <avatar :user="user" />
