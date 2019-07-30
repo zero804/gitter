@@ -165,7 +165,7 @@ Before you proceed, make sure you have done the following:
 
 Once you are sure the above is done, preform the following:
 
-1. Update the version of the `@gitterhq/services` dependency in `package.json`
+1. Update the version of the `@gitterhq/services` dependency in this project's [`package.json`](package.json)
 2. `npm install`
 3. `make sprites`
 4. Commit your changes and release!
