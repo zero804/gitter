@@ -11,6 +11,7 @@ Developer facing:
  - Update dependency `node-uuid@1.4.0` to `uuid@^3.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1533
  - Move `@gitterhq/services` update process to developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1538
  - Update dependency `parse-diff` to `^0.5.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1512
+ - Update dependency `core-js` to `v3`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1530
 
 
 # 19.58.0 - 2019-7-29
