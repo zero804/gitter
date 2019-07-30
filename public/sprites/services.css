@@ -9,7 +9,7 @@
   background-position: 0 0;
 }
 
-.service-sprite.heroku-logo {
+.service-sprite.huboard-logo {
   width: 16px;
   height: 16px;
   background-position: -16px 0;
@@ -171,13 +171,13 @@
   background-position: -48px -66px;
 }
 
-.service-sprite.appveyor-logo {
+.service-sprite.heroku-logo {
   width: 16px;
   height: 16px;
   background-position: -64px -66px;
 }
 
-.service-sprite.huboard-logo {
+.service-sprite.appveyor-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -66px;
@@ -249,100 +249,106 @@
   background-position: -80px -82px;
 }
 
-.service-sprite.sentry-error {
+.service-sprite.replit-logo {
   width: 16px;
   height: 16px;
   background-position: -96px -82px;
 }
 
-.service-sprite.sentry-logo {
+.service-sprite.sentry-error {
   width: 16px;
   height: 16px;
   background-position: -112px 0;
 }
 
-.service-sprite.snapci-frown {
+.service-sprite.sentry-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -16px;
 }
 
-.service-sprite.snapci-logo {
+.service-sprite.snapci-frown {
   width: 16px;
   height: 16px;
   background-position: -112px -32px;
 }
 
-.service-sprite.snapci-smile {
+.service-sprite.snapci-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -48px;
 }
 
-.service-sprite.sprintly-columns {
+.service-sprite.snapci-smile {
   width: 16px;
   height: 16px;
   background-position: -112px -64px;
 }
 
-.service-sprite.sprintly-logo {
+.service-sprite.sprintly-columns {
   width: 16px;
   height: 16px;
   background-position: -112px -80px;
 }
 
-.service-sprite.thebuggenie-comment-o {
+.service-sprite.sprintly-logo {
   width: 16px;
   height: 16px;
   background-position: 0 -98px;
 }
 
-.service-sprite.thebuggenie-file-text-o {
+.service-sprite.thebuggenie-comment-o {
   width: 16px;
   height: 16px;
   background-position: -16px -98px;
 }
 
-.service-sprite.thebuggenie-logo {
+.service-sprite.thebuggenie-file-text-o {
   width: 16px;
   height: 16px;
   background-position: -32px -98px;
 }
 
-.service-sprite.trackjs-error {
+.service-sprite.thebuggenie-logo {
   width: 16px;
   height: 16px;
   background-position: -48px -98px;
 }
 
-.service-sprite.trackjs-logo {
+.service-sprite.trackjs-error {
   width: 16px;
   height: 16px;
   background-position: -64px -98px;
 }
 
-.service-sprite.travis-frown {
+.service-sprite.trackjs-logo {
   width: 16px;
   height: 16px;
   background-position: -80px -98px;
 }
 
-.service-sprite.travis-logo {
+.service-sprite.travis-frown {
   width: 16px;
   height: 16px;
   background-position: -96px -98px;
 }
 
-.service-sprite.travis-meh {
+.service-sprite.travis-logo {
   width: 16px;
   height: 16px;
   background-position: -112px -98px;
 }
 
-.service-sprite.travis-smile {
+.service-sprite.travis-meh {
   width: 16px;
   height: 16px;
   background-position: -128px 0;
+}
+
+.service-sprite.travis-smile {
+  width: 16px;
+  height: 16px;
+  background-position: -128px -16px;
 }
 
 
