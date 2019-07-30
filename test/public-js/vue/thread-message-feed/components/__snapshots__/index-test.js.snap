@@ -52,7 +52,7 @@ exports[`thread-message-feed index missing parent message - matches snapshot 1`]
       class="content"
     >
       <span
-        class="error-text"
+        class="error-text error-box"
       >
         
         Error: The message for this thread is unavailable. It was probably deleted.

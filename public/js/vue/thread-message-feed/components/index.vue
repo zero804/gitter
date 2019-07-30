@@ -36,7 +36,7 @@ export default {
         <chat-input :user="user" thread />
       </section>
       <section v-else class="content">
-        <span class="error-text">
+        <span class="error-text error-box">
           Error: The message for this thread is unavailable. It was probably deleted.
         </span>
       </section>
@@ -90,9 +90,10 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  .error-text {
-    margin: @thread-message-feed-padding;
-  }
+}
+
+.error-box {
+  margin: @thread-message-feed-padding;
 }
 
 .chat-messages {
