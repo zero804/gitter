@@ -146,3 +146,26 @@ set WEBPACK_REPORT=1&&npm start
 ```
 
 Open `webpack-report/index.html` in your browser
+
+
+
+## Upgrading `@gitterhq/services` to add support for more services (integrations, activity feed)
+
+Recently merged a merge request for [`@gitterhq/services](https://gitlab.com/gitlab-org/gitter/services)? then read on…
+
+### Prerequisites
+
+Before you proceed, make sure you have done the following:
+
+1. Pushed a tagged release of [`@gitterhq/services`](https://gitlab.com/gitlab-org/gitter/services) to GitLab
+2. Updated the [`@gitterhq/services`](https://gitlab.com/gitlab-org/gitter/services) dependency in [`gitter-webhooks-handler`](https://gitlab.com/gitlab-org/gitter/gitter-webhooks-handler) via npm
+3. Deployed the new [`gitter-webhooks-handler`](https://gitlab.com/gitlab-org/gitter/gitter-webhooks-handler) (don't worry, your new service won't be accessible unless someone is adept at guessing URLs)
+
+### Updating `@gitterhq/services`
+
+Once you are sure the above is done, preform the following:
+
+1. Update the version of the `@gitterhq/services` dependency in `package.json`
+2. `npm install`
+3. `make sprites`
+4. Commit your changes and release!
