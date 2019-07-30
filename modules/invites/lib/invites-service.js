@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var TroupeInvite = require('gitter-web-persistence').TroupeInvite;
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var assert = require('assert');
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -76,7 +76,7 @@ function createInvite(roomId, options) {
   }
 
   externalId = externalId.toLowerCase();
-  var secret = uuid.v4();
+  var secret = uuid();
   return TroupeInvite.create({
     troupeId: roomId,
     type: type,

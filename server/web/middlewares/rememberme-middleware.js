@@ -6,7 +6,7 @@ var nconf = env.config;
 var stats = env.stats;
 
 var _ = require('lodash');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var sechash = require('sechash');
 var userService = require('gitter-web-users');
 var useragentTagger = require('../user-agent-tagger');
@@ -32,8 +32,8 @@ var REMEMBER_ME_PREFIX = 'rememberme:';
  */
 var generateAuthToken = Promise.method(function(userId) {
   debug('Generate auth token: userId=%s', userId);
-  var key = uuid.v4();
-  var token = uuid.v4();
+  var key = uuid();
+  var token = uuid();
 
   var promiseLike = sechash.strongHash(token, {
     algorithm: 'sha512'

@@ -3,7 +3,7 @@
 
 var assert = require('assert');
 var workerQueue = require('../lib/worker-queue-redis');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 
 describe('redis-batcher', function() {
   // queue takes a while to start up
@@ -39,7 +39,7 @@ describe('redis-batcher', function() {
       }
     }
 
-    var underTest = new RedisBatcher('test1-' + uuid.v4(), 0, batchFn);
+    var underTest = new RedisBatcher('test1-' + uuid(), 0, batchFn);
     var count = 0;
     underTest.listen();
 
@@ -71,7 +71,7 @@ describe('redis-batcher', function() {
       }
     }
 
-    var underTest = new RedisBatcher('test2-' + uuid.v4(), 0, batchFn);
+    var underTest = new RedisBatcher('test2-' + uuid(), 0, batchFn);
 
     var keys = {};
     underTest.listen();

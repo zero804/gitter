@@ -10,7 +10,7 @@ var inputsForUser = require('./elastic-inputs-for-user');
 var elasticClient = require('../../utils/elasticsearch-typeahead-client');
 var userService = require('gitter-web-users');
 var collections = require('gitter-web-utils/lib/collections');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v4');
 var debug = require('debug')('gitter:app:user-typeahead');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
@@ -51,7 +51,7 @@ function query(text, options) {
 }
 
 function reindex() {
-  var newIndex = INDEX_PREFIX + uuid.v4();
+  var newIndex = INDEX_PREFIX + uuid();
 
   return createIndex(newIndex)
     .then(function() {
