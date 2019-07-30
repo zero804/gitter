@@ -1,6 +1,7 @@
 # 19.59.0 - *upcoming*
 
 - Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
+- Add `parentId` to threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1490
 
 Developer facing:
  - Update dependency `node-uuid@1.4.0` to `uuid@^3.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1533
