@@ -43,6 +43,34 @@ export default {
     }
   },
 
+  watch: {
+    isPinned: function() {
+      // Hack for Safari so the absolutely positioned room list goes in and out
+      // of the document flow properly. Otherwise it was leaving a big blank space
+      // Context: https://gitlab.com/gitlab-org/gitter/webapp/issues/2226
+      //
+      // Force a layout
+      // https://gist.github.com/paulirish/5d52fb081b3570c81e3a
+      if (window.safari) {
+        this.$refs.root.style.display = 'none';
+        this.$refs.root.offsetHeight;
+        this.$refs.root.style.display = '';
+      }
+    }
+  },
+
+  mounted() {
+    this.hammer = require('hammerjs')(document.body);
+
+    this.hammer.on('swipeleft', this.onSwipeLeft);
+    this.hammer.on('swiperight', this.onSwipeRight);
+  },
+
+  beforeDestroy() {
+    this.hammer.off('swipeleft', this.onSwipeLeft);
+    this.hammer.off('swiperight', this.onSwipeRight);
+  },
+
   methods: {
     ...mapActions(['toggleLeftMenu']),
     onMouseleave() {
@@ -60,17 +88,6 @@ export default {
         this.toggleLeftMenu(true);
       }
     }
-  },
-
-  mounted() {
-    this.hammer = require('hammerjs')(document.body);
-
-    this.hammer.on('swipeleft', this.onSwipeLeft);
-    this.hammer.on('swiperight', this.onSwipeRight);
-  },
-  beforeDestroy() {
-    this.hammer.off('swipeleft', this.onSwipeLeft);
-    this.hammer.off('swiperight', this.onSwipeRight);
   }
 };
 </script>
@@ -158,6 +175,8 @@ export default {
   flex-direction: column;
   height: 100%;
 
+  transition: transform 0.05s ease;
+
   &::v-deep *,
   &::v-deep *:before,
   &::v-deep *:after {
@@ -186,6 +205,8 @@ export default {
 
 .layout-main-menu {
   width: 26.5rem;
+
+  transition: transform 0.1s ease;
 
   .unpinned:not(.mobile) & {
     position: absolute;

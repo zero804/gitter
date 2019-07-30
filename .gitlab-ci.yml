@@ -44,10 +44,14 @@ validate:
     <<: *test_variables
   stage: build_unit_test
   services:
-    - registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-    - registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-    - redis:3.0
-    - neo4j:2.3
+    - name: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+      alias: mongo
+    - name: redis:3.0.3
+      alias: redis
+    - name: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+      alias: elasticsearch
+    - name: neo4j:2.3
+      alias: neo4j
   script:
     - make ci-test
 
@@ -65,6 +69,43 @@ test-all:
   only:
     - release/*
   retry: 2
+
+.test_e2e_job: &test_e2e_job
+  <<: *test_job
+  variables:
+    <<: *test_variables
+    ENABLE_FIXTURE_ENDPOINTS: 1
+    DISABLE_GITHUB_API: 1
+    NODE_ENV: test-docker
+  script:
+    # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
+    - apt-get update -q -y
+    - apt-get --yes install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+    # Create `output/assets/js/vue-ssr-server-bundle.json`
+    - npm run task-js
+    # Start the server and wait for it to come up
+    - mkdir -p logs
+    - npm start > logs/server-output.txt 2>&1 & node test/e2e/support/wait-for-server.js http://localhost:5000
+    # Run the tests
+    - npm run cypress -- run --env baseUrl=http://localhost:5000,apiBaseUrl=http://localhost:5000/api
+  artifacts:
+    when: always
+    paths:
+      - logs
+      - test/e2e/videos
+      - test/e2e/screenshots
+      - cypress/logs
+    expire_in: 1 day
+  retry: 2
+
+test_e2e_manual:
+  <<: *test_e2e_job
+  when: manual
+
+test_e2e:
+  <<: *test_e2e_job
+  only:
+    - /^renovate\/.*$/
 
 package:
   <<: *node_job
@@ -289,5 +330,25 @@ elasticsearch-base:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+  tags:
+    - docker
+
+renovate:
+  stage: docker_images
+  image: docker:latest
+  only:
+    - schedules
+  variables:
+    # GitLab access token with api access
+    #RENOVATE_GITLAB_TOKEN: xxx
+    # GitHub access token for getting release notes of package updates,
+    # https://github.com/renovatebot/renovate/blob/master/docs/self-hosting.md#githubcom-token-for-release-notes
+    #RENOVATE_GITHUB_TOKEN: xxx
+    RENOVATE_CONFIG_FILE: renovate-config.js
+  script:
+    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
+  allow_failure: true
+  services:
+    - docker:dind
   tags:
     - docker

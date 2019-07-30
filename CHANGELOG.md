@@ -1,3 +1,17 @@
+# 19.58.0 - 2019-7-29
+
+ - Add expand/collapse transition to Vue left-menu, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1532
+ - Fix left-menu collapsed(pinned/unpinned) leaving blank space in Safari, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1531
+
+Developer facing:
+
+ - Add some end-to-end(e2e) tests running in Cypress(not Selenium), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1480
+ - Add automatic dependency updates via Renovate, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1493
+ - Update dependency `random-seed` to `^0.3.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1515
+ - Update dependency `proxyquire` to `v0.6.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1514
+ - Update dependency `oauth2orize` to `~1.11.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1510
+
+
 # 19.57.0 - 2019-7-24
 
  - Update left-menu on mobile to be completely hidden and swipe-out/pull, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1487

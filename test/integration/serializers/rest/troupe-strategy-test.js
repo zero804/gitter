@@ -24,11 +24,13 @@ describe('TroupeStrategy', function() {
       // going with USER_CHANNEL rather than default of ORG so that some of the
       // tests below don't unnecessarily try to go down the github path.
       githubType: 'USER_CHANNEL',
-      security: 'PUBLIC'
+      security: 'PUBLIC',
+      lastAccessTime: new Date('2019')
     },
     troupe2: {
       oneToOne: true,
-      users: ['user1', 'user2']
+      users: ['user1', 'user2'],
+      lastAccessTime: new Date('2019')
     },
     troupe3: {
       users: ['user1'],
@@ -78,6 +80,7 @@ describe('TroupeStrategy', function() {
           userCount: 1,
           unreadItems: 0,
           mentions: 0,
+          lastAccessTime: '2019-01-01T00:00:00.000Z',
           lurk: false,
           url: '/' + t.uri,
           githubType: 'USER_CHANNEL',
@@ -136,6 +139,7 @@ describe('TroupeStrategy', function() {
           },
           unreadItems: 0,
           mentions: 0,
+          lastAccessTime: '2019-01-01T00:00:00.000Z',
           lurk: false,
           url: '/' + u2.username,
           githubType: 'ONETOONE',
@@ -164,6 +168,7 @@ describe('TroupeStrategy', function() {
           uri: t.uri,
           oneToOne: false,
           userCount: 1,
+          lastAccessTime: '2019-01-01T00:00:00.000Z',
           lurk: false,
           url: '/' + t.uri,
           githubType: 'USER_CHANNEL',
