@@ -6,7 +6,7 @@
     "@gitterhq/backbone-proxy-collection": "^2.3.0",
     "@gitterhq/cal-heatmap": "^3.6.1",
     "@gitterhq/faye-redis": "^0.4.4",
-    "@gitterhq/services": "^1.23.0",
+    "@gitterhq/services": "^1.25.0",
     "@gitterhq/styleguide": "^2.2.0",
     "@gitterhq/translations": "^1.9.1",
     "apn": "1.7.5",
