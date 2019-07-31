@@ -181,4 +181,26 @@ describe('restful #slow', function() {
         });
     });
   });
+
+  describe('serializeChatsForTroupe', () => {
+    const range = size => new Array(size).fill(undefined).map((_, i) => i);
+
+    const overLimitMessages = range(31).reduce(
+      (acc, i) => ({
+        ...acc,
+        [`message${i}`]: { user: 'user1', troupe: 'troupe1', text: 'foo' }
+      }),
+      {}
+    );
+    const fixture = fixtureLoader.setup({
+      user1: {},
+      troupe1: { group: 'group1', users: ['user1'] },
+      ...overLimitMessages
+    });
+    it('serializes messages with default limit 30', async () => {
+      const { troupe1, user1 } = fixture;
+      const serializedMessages = await restful.serializeChatsForTroupe(troupe1._id, user1._id, {});
+      assert.equal(serializedMessages.length, 30);
+    });
+  });
 });
