@@ -5,7 +5,6 @@
  - Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
  - Update dependency `@gitterhq/services` to `1.25.0` for [repl.it](https://repl.it/site/docs/classrooms/webhooks) service
     - Thanks to [@kgashok](https://gitlab.com/kgashok) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/104
- - Restrict restSerializer options to the expected values, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1492
  - Update @gitterhq/translations to 1.10.1, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1535
     - Thanks to [@brainsucked](https://github.com/brainsucked\) for [contributing a fix to the Bulgarian translation](https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/70)
 
@@ -16,6 +15,7 @@ Developer facing:
  - Update dependency `parse-diff` to `^0.5.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1512
  - Update dependency `core-js` to `v3`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1530
  - Update dependency `redis-lock` to `v0.1.4`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1516
+ - Restrict `restSerializer` options to the expected values, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1492
 
 
 # 19.58.0 - 2019-7-29
