@@ -9,6 +9,7 @@ var persistence = require('gitter-web-persistence');
 var ChatMessage = persistence.ChatMessage;
 var ChatMessageBackup = persistence.ChatMessageBackup;
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
+const sinon = require('sinon');
 var chatService = require('../lib/chat-service');
 
 describe('chatService', function() {
@@ -255,6 +256,22 @@ describe('chatService', function() {
         afterId: chat2.id
       });
       assert.deepEqual(chats.map(chat => chat.id), [chat3.id]);
+    });
+
+    it('should find messages around unread marker', async () => {
+      const unreadItemService = require('gitter-web-unread-items');
+      const chatServiceWithUnreads = proxyquireNoCallThru('../lib/chat-service', {
+        'gitter-web-unread-items': unreadItemService
+      });
+      const getFirstUnreadItemStub = sinon.stub(unreadItemService, 'getFirstUnreadItem');
+      const { troupe1, user1 } = fixture;
+      getFirstUnreadItemStub.withArgs(user1.id, troupe1.id).returns(Promise.resolve(chat2.id));
+      const chats = await chatServiceWithUnreads.findChatMessagesForTroupe(fixture.troupe1.id, {
+        marker: 'first-unread',
+        userId: user1.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
+      getFirstUnreadItemStub.restore();
     });
   });
 
