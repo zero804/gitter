@@ -5,6 +5,7 @@
  - Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
  - Update dependency `@gitterhq/services` to `1.25.0` for [repl.it](https://repl.it/site/docs/classrooms/webhooks) service
     - Thanks to [@kgashok](https://gitlab.com/kgashok) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/104
+ - Restrict restSerializer options to the expected values, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1492
 
 Developer facing:
 
