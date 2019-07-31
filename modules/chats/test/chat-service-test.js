@@ -187,169 +187,74 @@ describe('chatService', function() {
     });
   });
 
-  describe('Finding messages #slow', function() {
-    var chat1, chat2, chat3;
+  describe('Finding messages #slow', () => {
+    let chat1, chat2, chat3;
 
-    beforeEach(function() {
-      return chatService
-        .newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
-        .then(function(chat) {
-          chat1 = chat.id;
-          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'B' });
-        })
-        .then(function(chat) {
-          chat2 = chat.id;
-          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'C' });
-        })
-        .then(function(chat) {
-          chat3 = chat.id;
-        });
+    beforeEach(async () => {
+      const { troupe1, user1 } = fixture;
+      chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
+      chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'B' });
+      chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'C' });
     });
 
-    it('should find messages using aroundId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 3);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat1;
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat2;
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat3;
-            }).length,
-            1
-          );
-        });
+    it('should find messages using aroundId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        aroundId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
     });
 
-    it('should find messages with skip', function() {
-      return Promise.join(
-        chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
-          skip: 1,
-          readPreference: 'primaryPreferred'
+    it('should find messages with skip', async () => {
+      const withSkip = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        skip: 1,
+        readPreference: 'primaryPreferred'
+      });
+      const withoutSkip = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {});
+
+      assert.strictEqual(withSkip.length, 2);
+      assert.strictEqual(withoutSkip.length, 3);
+
+      var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
+      var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
+
+      var lastItemWithSkip = withSkip[withSkip.length - 1];
+      // Last item without skip does not exist in with skip...
+      assert.deepEqual(
+        withSkip.filter(function(f) {
+          return f.id === lastItemWithoutSkip.id;
         }),
-        chatService.findChatMessagesForTroupe(fixture.troupe1.id, {}),
-        function(withSkip, withoutSkip) {
-          assert.strictEqual(withSkip.length, 2);
-          assert.strictEqual(withoutSkip.length, 3);
-
-          var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
-          var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
-
-          var lastItemWithSkip = withSkip[withSkip.length - 1];
-          // Last item without skip does not exist in with skip...
-          assert.deepEqual(
-            withSkip.filter(function(f) {
-              return f.id === lastItemWithoutSkip.id;
-            }),
-            []
-          );
-
-          assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
-        }
+        []
       );
+
+      assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
     });
 
     it('should not allow skip greater than 5000', function() {
-      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 10000 }).then(
-        function() {
-          assert.ok(false);
-        },
-        function(err) {
-          assert.strictEqual(
-            err.message,
-            'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'
-          );
-        }
+      return assert.rejects(
+        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 10000 }),
+        /StatusError: Skip is limited to 5000 items. Please use beforeId rather than skip. See https:\/\/developer.gitter.im/
       );
     });
 
-    it('should find messages using beforeId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 1);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            0
-          );
-        });
+    it('should find messages using beforeId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        beforeId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id]);
     });
 
-    it('should find messages using beforeInclId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { beforeInclId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 2);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            0
-          );
-        });
+    it('should find messages using beforeInclId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        beforeInclId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id]);
     });
 
-    it('should find messages using afterId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { afterId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 1);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            1
-          );
-        });
+    it('should find messages using afterId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        afterId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat3.id]);
     });
   });
 
