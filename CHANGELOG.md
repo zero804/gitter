@@ -1,3 +1,8 @@
+# 19.60.0 - *upcoming*
+
+ - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
+
+
 # 19.59.0 - 2019-07-31
 
  - Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
