@@ -375,7 +375,7 @@ function sentAfter(objectId) {
 /**
  * Returns a promise of messages
  */
-function findChatMessagesForTroupe(troupeId, options = {}, callback) {
+async function findChatMessagesForTroupe(troupeId, options = {}, callback) {
   var limit = Math.min(options.limit || 50, 100);
   var skip = options.skip || 0;
 
