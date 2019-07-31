@@ -15,7 +15,6 @@ var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 var tokenProvider = require('../../services/tokens');
-const { createOptionsValidator } = require('../../utils/options-validator');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 
@@ -204,45 +203,29 @@ function populateTroupe({ userId, match, snapshot = false }) {
   return restSerializer.serializeObject(troupeId, strategy).then(dataToSnapshot('room'));
 }
 
-function populateSubTroupeCollection({ userId, match, snapshot = {} }) {
+function populateSubTroupeCollection({
+  userId,
+  match,
+  snapshot: { limit, lean, lookups, beforeInclId } = {}
+}) {
   var troupeId = match[1];
   var collection = match[2];
-
-  const validateChatSnapshot = createOptionsValidator(
-    'authorisor.populateSubTroupeCollection.chat',
-    { limit: true, lookups: true, beforeInclId: true }
-  );
-
-  const validateUserSnapshot = createOptionsValidator(
-    'authorisor.populateSubTroupeCollection.user',
-    { limit: true, lean: true }
-  );
 
   switch (collection) {
     case 'chatMessages':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
-
-      // TODO: check production logs for warnings with unexpected options
-      // then refactor this method to only accept the expected names
-      // the refactor can be done by reverting the commit responsible for this comment
-      validateChatSnapshot(snapshot);
-
       return restful
-        .serializeChatsForTroupe(troupeId, userId, snapshot)
+        .serializeChatsForTroupe(troupeId, userId, { limit, lean, lookups, beforeInclId })
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':
       if (survivalMode) {
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
-      // TODO: check production logs for warnings with unexpected options
-      // then refactor this method to only accept the expected names
-      // the refactor can be done by reverting the commit responsible for this comment
-      validateUserSnapshot(snapshot);
       return restful
-        .serializeUsersForTroupe(troupeId, userId, snapshot)
+        .serializeUsersForTroupe(troupeId, userId, { limit, lean })
         .then(dataToSnapshot('room.users'));
 
     case 'events':
@@ -413,6 +396,6 @@ module.exports = bayeuxExtension({
 
         return message;
       })
-      .nodeify(callback);
+      .then(message => callback(null, message), err => callback(err));
   }
 });
