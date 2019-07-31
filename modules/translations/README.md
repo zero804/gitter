@@ -23,3 +23,37 @@ We will continue to expand on the entire application over time. Please watch thi
 It possible to visit the site with the lang query parameter, ex. https://gitter.im/?redirect=no&lang=ko.
 
 Or you can change the browser main language in Chrome in [Language Settings](chrome://settings/languages) by putting tested language [at the top of the list](https://stackoverflow.com/a/36074203/606571). 
+
+## Generating keys and placeholders
+Generation and formatting happens automatically when linking this package to `webapp`
+- `npm link` in this package
+- `npm link '@gitterhq/translations'` in `webapp`
+
+and then starting the `webapp` and going to:
+
+<details>
+<summary> Generated translation links </summary>
+
+- http://localhost:5000/?lang=ar
+- http://localhost:5000/?lang=bg
+- http://localhost:5000/?lang=cs
+- http://localhost:5000/?lang=de
+- http://localhost:5000/?lang=en
+- http://localhost:5000/?lang=es
+- http://localhost:5000/?lang=id
+- http://localhost:5000/?lang=it
+- http://localhost:5000/?lang=ja
+- http://localhost:5000/?lang=ka
+- http://localhost:5000/?lang=ko
+- http://localhost:5000/?lang=pl
+- http://localhost:5000/?lang=pt
+- http://localhost:5000/?lang=ru
+- http://localhost:5000/?lang=sk
+- http://localhost:5000/?lang=sv
+- http://localhost:5000/?lang=tr
+- http://localhost:5000/?lang=ua
+- http://localhost:5000/?lang=zh
+
+</details>
+
+This adds all the missing keys to the homepage translation files.
