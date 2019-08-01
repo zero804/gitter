@@ -43,7 +43,7 @@ module.exports = {
     const searchTerm = req.query.q;
     if (typeof searchTerm === 'string') {
       return restful
-        .serializeUsersMatchingSearchTerm(req.param.troupeId, options.searchTerm)
+        .serializeUsersMatchingSearchTerm(req.params.troupeId, searchTerm)
         .then(function(result) {
           res.setHeader('Cache-Control', 'public, max-age=' + SEARCH_EXPIRES_SECONDS);
           res.setHeader(

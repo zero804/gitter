@@ -178,4 +178,14 @@ describe('room-api', function() {
         });
     }
   });
+
+  it('GET /v1/rooms/:roomId/users?q=name', async () => {
+    const result = await request(app)
+      .get(`/v1/rooms/${fixture.troupe1.id}/users?q=name`)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200);
+    const users = result.body;
+    // ES is not populated in tests, just making sure that the code can execute
+    assert.deepEqual(users, []);
+  });
 });
