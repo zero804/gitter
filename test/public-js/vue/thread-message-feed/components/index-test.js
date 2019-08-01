@@ -17,10 +17,6 @@ describe('thread-message-feed index', () => {
   it('closed - matches snapshot', async () => {
     const { wrapper } = mount(Index, {}, store => {
       store.state.threadMessageFeed.isVisible = false;
-      // Further state changes shouldn't be necessary but for some reason the `mount` helper
-      // tries to render the v-if hidden child components as well and causes Vue warnings
-      addParentMessage(store.state);
-      addDefaultUser(store.state);
     });
     expect(wrapper.element).toMatchSnapshot();
   });
