@@ -7,11 +7,11 @@ Communities are also referred to as "groups" internally in the codebase.
 
 ## Community creation
 
-Use the "+" button in the bottom-left of the menu bar to start the community creation process.
+Use the **+** -> **Create community** option in the bottom-left of the menu bar to start the community creation process.
 
 Communities can be associated with a GitHub organisation or repo. If you don't see the GitHub org/repo listed that you want to associate, see [*Why isn't my GitHub organisation or repos appearing?* FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing]
 
-![](https://i.imgur.com/Wjk6Y4h.png)
+![](https://i.imgur.com/2eZyyEQ.png)
 
 
 ## Community admins

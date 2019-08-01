@@ -54,9 +54,9 @@ Hiding a room with keep it from appearing in your left-menu room list. If you re
 
 ### Room creation
 
-Use the "Add a room" button at the bottom of the conversation list in the left menu to start creating a room.
+Use the **+** -> **Create room** option in the bottom-left of the menu bar to start the room creation process.
 
-![](https://i.imgur.com/KxJ2Oym.png)
+![](https://i.imgur.com/Mt6sMOe.png)
 
 If you aren't an admin of any communities, you will be redirected to the [create community flow](./communities.md#community-creation).
 
