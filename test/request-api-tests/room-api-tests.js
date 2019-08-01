@@ -32,10 +32,11 @@ describe('room-api', function() {
     user3: {
       accessToken: 'web-internal'
     },
+    user4: {},
     group1: {},
     troupe1: {
       security: 'PUBLIC',
-      users: ['user1'],
+      users: ['user1', 'user4'],
       securityDescriptor: {
         extraAdmins: ['user3']
       },
@@ -187,5 +188,16 @@ describe('room-api', function() {
     const users = result.body;
     // ES is not populated in tests, just making sure that the code can execute
     assert.deepEqual(users, []);
+  });
+
+  it('GET /v1/rooms/:roomId/users?lean=true&skip=1&limit1', async () => {
+    const result = await request(app)
+      .get(`/v1/rooms/${fixture.troupe1.id}/users?lean=true&skip=1&limit1`)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200);
+    const users = result.body;
+    assert.equal(users.length, 1);
+    // skips user1 and only returns user4
+    assert.equal(users[0].id, fixture.user4._id.toString());
   });
 });
