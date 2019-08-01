@@ -40,6 +40,9 @@ var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 600;
 
+const MIN_CHAT_MESSAGE_RESULTS = 50;
+const MAX_CHAT_MESSAGE_RESULTS = 100;
+
 /**
  * Milliseconds considered 'recent'
  */
@@ -373,11 +376,32 @@ function sentAfter(objectId) {
 }
 
 /**
+ * Finds all messages for thread message feed represented by parentId.
+ *
+ * @param {String|ObjectID} troupeId room in which the parent message is.
+ *         This is used solely for security purposes (clients need to ensure users
+ *         have access to this room)
+ * @param {String|ObjectID} parentId
+ *
+ * @returns Array of last MAX_CHAT_MESSAGE_RESULTS messages in ascending order
+ */
+async function findThreadChatMessages(troupeId, parentId) {
+  const messages = await ChatMessage.where('toTroupeId', troupeId)
+    .where('parentId', parentId)
+    .sort({ sent: 'desc' })
+    .limit(MAX_CHAT_MESSAGE_RESULTS) // TODO: handle infinite scrolling in TMF
+    .lean()
+    .exec();
+  mongooseUtils.addIdToLeanArray(messages);
+  return messages.reverse();
+}
+
+/**
  * Returns a promise of messages
  */
 //eslint-disable-next-line complexity,max-statements
 async function findChatMessagesForTroupe(troupeId, options = {}) {
-  var limit = Math.min(options.limit || 50, 100);
+  var limit = Math.min(options.limit || MIN_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
   var skip = options.skip || 0;
 
   if (skip > 5000) {
@@ -607,6 +631,7 @@ module.exports = {
   getDateOfFirstMessageInRoom,
   findChatMessagesForTroupe,
   findChatMessagesForTroupeForDateRange,
+  findThreadChatMessages,
   searchChatMessagesForRoom,
   removeAllMessagesForUserId,
   removeAllMessagesForUserIdInRoomId,

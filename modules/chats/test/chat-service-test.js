@@ -188,6 +188,39 @@ describe('chatService', function() {
     });
   });
 
+  describe('Finding thread messages', () => {
+    let chat1, chat2, chat3;
+
+    beforeEach(async () => {
+      const { troupe1, user1 } = fixture;
+      chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
+      chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'B',
+        parentId: chat1.id
+      });
+      chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'C',
+        parentId: chat1.id
+      });
+      // message created only to validate that it gets excluded from parentId queries
+      await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'D' });
+    });
+
+    afterEach(async () => {
+      return chatService.removeAllMessagesForUserId(fixture.user1._id);
+    });
+
+    it('finds child messages for parent message', async () => {
+      const chats = await chatService.findThreadChatMessages(fixture.troupe1.id, chat1.id);
+      assert.deepEqual(chats.map(chat => chat.id), [chat2.id, chat3.id]);
+    })
+
+    it('does not find child messages for when parent message is not from troupe', async () => {
+      const chats = await chatService.findThreadChatMessages(fixture.troupe2.id, chat1.id);
+      assert.deepEqual(chats, []);
+    })
+  });
+
   describe('Finding messages #slow', () => {
     let chat1, chat2, chat3;
 
@@ -196,6 +229,10 @@ describe('chatService', function() {
       chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
       chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'B' });
       chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'C' });
+    });
+
+    afterEach(async () => {
+      return chatService.removeAllMessagesForUserId(fixture.user1._id);
     });
 
     it('should find messages using aroundId', async () => {
