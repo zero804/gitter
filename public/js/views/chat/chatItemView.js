@@ -757,7 +757,7 @@ module.exports = (function() {
     },
 
     threadReply: function() {
-      appEvents.trigger('dispatchVueAction', 'threadMessageFeed/toggle', true);
+      appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', this.model.get('id'));
     },
 
     quote: function() {

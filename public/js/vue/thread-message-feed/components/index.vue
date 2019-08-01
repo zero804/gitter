@@ -1,15 +1,18 @@
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
+import ChatItem from './chat-item.vue';
 
 export default {
   name: 'ThreadMessageFeed',
   components: {
     ChatInput,
-    ThreadHeader
+    ThreadHeader,
+    ChatItem
   },
   computed: {
+    ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
       user: 'user',
@@ -24,11 +27,18 @@ export default {
     class="js-thread-message-feed-root root"
     :class="{ opened: isVisible, 'dark-theme': darkTheme }"
   >
-    <section class="body">
+    <section v-if="isVisible" class="body">
       <thread-header />
-      <section class="content">
-        <div class="chat-messages"></div>
+      <section v-if="parentMessage" class="content">
+        <div class="chat-messages">
+          <chat-item :message="parentMessage" :use-compact-styles="true" />
+        </div>
         <chat-input :user="user" thread />
+      </section>
+      <section v-else class="content">
+        <span class="error-text error-box">
+          Error: The message for this thread is unavailable. It was probably deleted.
+        </span>
       </section>
     </section>
   </div>
@@ -36,8 +46,10 @@ export default {
 
 <style lang="less" scoped>
 @import (reference) 'colors';
+@import (reference) 'trp3Vars';
 @import (reference) 'components/right-toolbar';
 @import (reference) 'dark-theme';
+@import (reference) '../styles/variables';
 
 .root {
   .right-toolbar-position();
@@ -79,6 +91,10 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.error-box {
+  margin: @thread-message-feed-padding;
 }
 
 .chat-messages {

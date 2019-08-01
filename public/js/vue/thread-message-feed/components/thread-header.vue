@@ -4,7 +4,7 @@ import { mapActions } from 'vuex';
 export default {
   name: 'ThreadHeader',
   methods: {
-    ...mapActions({ toggle: 'threadMessageFeed/toggle' })
+    ...mapActions({ close: 'threadMessageFeed/close' })
   }
 };
 </script>
@@ -12,7 +12,7 @@ export default {
 <template>
   <header>
     <h2 class="title">Thread</h2>
-    <button ref="close-button" class="close-button" @click="toggle(false)">
+    <button ref="close-button" class="close-button" @click="close()">
       <span class="icon-wrapper">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30.5 30.5">
           <path
