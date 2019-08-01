@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var urlParser = require('../utils/url-parser');
 const context = require('gitter-web-client-context');
 const log = require('../utils/log');
+const appEvents = require('../utils/appevents');
 
 const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
@@ -42,6 +43,7 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       // Try find the room in the collection
       var newTroupe = this._troupes.findWhere({ url: targetInfo.roomUrl });
       if (newTroupe) {
+        appEvents.trigger('dispatchVueAction', 'changeDisplayedRoom', newTroupe.id);
         return this.trigger('switch', newTroupe);
       }
     }
