@@ -3,6 +3,7 @@
  - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
  - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
  - Fix "Chat privately" in user popover not changing left-menu room highlight, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1547
+ - Fix room switching in IE11, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1551
 
 Developer facing:
 
