@@ -3,6 +3,10 @@
  - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
  - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
 
+Developer facing:
+
+ - Separate serializing for users based on a search term, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1543
+
 
 # 19.59.0 - 2019-07-31
 
