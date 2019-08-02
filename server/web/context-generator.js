@@ -7,51 +7,29 @@ var restSerializer = require('../serializers/rest-serializer');
 var userService = require('gitter-web-users');
 var roomMetaService = require('gitter-web-rooms/lib/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-
-function serializeGroupForMainMenu(uriContext, user, leftMenu) {
-  if (!leftMenu) return null;
-  var groupId = leftMenu.groupId;
-  if (!groupId) return null;
-
-  var group = uriContext && uriContext.group;
-
-  if (mongoUtils.objectIDsEqual(group && group._id, groupId)) {
-    // Save having to do another fetch
-    return serializeGroup(group, user);
-  }
-
-  return serializeGroupId(groupId, user);
-}
 
 /**
  * Returns the promise of a mini-context
  */
-function generateMainMenuContext(req, leftMenu) {
+function generateMainMenuContext(req) {
   var user = req.user;
   var uriContext = req.uriContext;
 
   var troupe = uriContext && uriContext.troupe;
+  const group = uriContext && uriContext.group;
   var roomMember = uriContext && uriContext.roomMember;
 
   return Promise.all([
     contextGeneratorRequest(req),
     user ? serializeUser(user) : null,
-    serializeGroupForMainMenu(uriContext, user, leftMenu),
+    serializeGroup(group, user),
     troupe ? serializeTroupe(troupe, user) : undefined
   ]).spread(function(reqContextHash, serializedUser, serializedGroup, serializedTroupe) {
-    if (!leftMenu) leftMenu = {};
-    // TODO: how is suggestedRoomsHidden different from hasDismissedSuggestions?
-    var suggestedRoomsHidden = leftMenu.suggestedRoomsHidden;
-    delete leftMenu.suggestedRoomsHidden;
-
     var serializedContext = _.extend({}, reqContextHash, {
       roomMember: roomMember,
       user: serializedUser,
       group: serializedGroup,
-      troupe: serializedTroupe,
-      suggestedRoomsHidden: suggestedRoomsHidden,
-      leftRoomMenuState: leftMenu
+      troupe: serializedTroupe
     });
 
     return serializedContext;
@@ -164,15 +142,6 @@ function serializeGroup(group, user) {
   });
 
   return restSerializer.serializeObject(group, strategy);
-}
-
-function serializeGroupId(groupId, user) {
-  var strategy = new restSerializer.GroupIdStrategy({
-    currentUser: user,
-    currentUserId: user && user._id
-  });
-
-  return restSerializer.serializeObject(groupId, strategy);
 }
 
 function serializeTroupeId(troupeId, user) {

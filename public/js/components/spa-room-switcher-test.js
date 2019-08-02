@@ -4,6 +4,8 @@ var Backbone = require('backbone');
 var assert = require('assert');
 var url = require('url');
 
+const BASE_PATH = 'https://gitter.im';
+
 function parseUrl(href) {
   var full = url.resolve(BASE_PATH, href);
   var parsed = url.parse(full);
@@ -33,8 +35,6 @@ function locationDelegate(location) {
     return parseUrl(location);
   };
 }
-
-const BASE_PATH = 'https://gitter.im';
 
 jest.mock('../utils/url-parser');
 const urlParser = require('../utils/url-parser');
@@ -77,106 +77,73 @@ describe('spa-room-switcher', function() {
   });
 
   it('should replace the URL when the room cannot be found', function() {
-    var roomSwitcher = new SPARoomSwitcher(
+    window.location.assign = jest.fn();
+
+    const roomSwitcher = new SPARoomSwitcher(
       fixtureTroupes(),
       BASE_PATH,
       locationDelegate('https://gitter.im/suprememoocow/~chat'),
       locationDelegate('https://gitter.im/suprememoocow/')
     );
-    var count = 0;
 
-    roomSwitcher.on('replace', function(href) {
-      assert.strictEqual(href, 'https://gitter.im/gubbings/newroom/~chat#initial');
-      count++;
-    });
-
-    roomSwitcher.on('reload', function() {
-      assert.ok(false);
-    });
-
-    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
+    roomSwitcher.on('switch', function(/*troupe permalinkChatId*/) {
       assert.ok(false);
     });
 
     roomSwitcher.change('/gubbings/newroom/~chat');
-    assert.strictEqual(count, 1);
+
+    expect(window.location.assign).toHaveBeenCalledWith('/gubbings/newroom');
   });
 
-  it('should replace the URL when the current frame is not a chat', function() {
+  it('should replace the URL when the current frame is not a chat', function(done) {
     var roomSwitcher = new SPARoomSwitcher(
       fixtureTroupes(),
       BASE_PATH,
       locationDelegate('https://gitter.im/suprememoocow/~home'),
       locationDelegate('https://gitter.im/suprememoocow/')
     );
-    var count = 0;
 
-    roomSwitcher.on('replace', function(href) {
-      assert.strictEqual(href, 'https://gitter.im/gitterHQ/gitter/~chat#initial');
-      count++;
-    });
-
-    roomSwitcher.on('reload', function() {
-      assert.ok(false);
-    });
-
-    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
-      assert.ok(false);
+    roomSwitcher.on('switch', function(troupe /*, permalinkChatId*/) {
+      assert.strictEqual(troupe.get('url'), '/gitterHQ/gitter');
+      done();
     });
 
     roomSwitcher.change('/gitterHQ/gitter/~chat');
-    assert.strictEqual(count, 1);
   });
 
   it('should replace the URL when the frame being switched to not a chat', function() {
+    window.location.assign = jest.fn();
+
     var roomSwitcher = new SPARoomSwitcher(
       fixtureTroupes(),
       BASE_PATH,
       locationDelegate('https://gitter.im/suprememoocow/~chat'),
       locationDelegate('https://gitter.im/suprememoocow/')
     );
-    var count = 0;
-
-    roomSwitcher.on('replace', function(href) {
-      assert.strictEqual(href, 'https://gitter.im/gitterHQ/gitter/~blah#initial');
-      count++;
-    });
-
-    roomSwitcher.on('reload', function() {
-      assert.ok(false);
-    });
 
     roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
       assert.ok(false);
     });
 
     roomSwitcher.change('/gitterHQ/gitter/~blah');
-    assert.strictEqual(count, 1);
+
+    expect(window.location.assign).toHaveBeenCalledWith('/gitterHQ/gitter');
   });
 
-  it('should reload the URL when the frame being switched has the same URL as the current room', function() {
+  it('should reload the URL when the frame being switched has the same URL as the current room', function(done) {
     var roomSwitcher = new SPARoomSwitcher(
       fixtureTroupes(),
       BASE_PATH,
       locationDelegate('https://gitter.im/suprememoocow/~chat?at=1838383838383'),
       locationDelegate('https://gitter.im/suprememoocow/')
     );
-    var count = 0;
 
-    roomSwitcher.on('replace', function(/*href*/) {
-      assert.ok(false);
-    });
-
-    roomSwitcher.on('reload', function() {
-      count++;
-    });
-
-    roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
-      assert.ok(false);
+    roomSwitcher.on('switch', function(troupe /*permalinkChatId*/) {
+      assert.strictEqual(troupe.get('url'), '/suprememoocow');
+      done();
     });
 
     roomSwitcher.change('/suprememoocow/~chat?at=1838383838383');
-    assert.strictEqual(count, 1);
   });
 
   it('replace with a path name if a fully qualified org room url is passed', function() {
@@ -297,7 +264,9 @@ describe('spa-room-switcher', function() {
   /**
    * https://github.com/troupe/gitter-webapp/issues/683
    */
-  it('should not have issues with the dev-ua room ', function(done) {
+  it('should not have issues with the dev-ua room ', function() {
+    window.location.assign = jest.fn();
+
     var roomSwitcher = new SPARoomSwitcher(
       fixtureTroupes(),
       BASE_PATH,
@@ -305,19 +274,12 @@ describe('spa-room-switcher', function() {
       locationDelegate('https://gitter.im/dev-ua/')
     );
 
-    roomSwitcher.on('replace', function(href) {
-      assert.strictEqual('/orgs/dev-ua/rooms/~iframe', href);
-      done();
-    });
-
-    roomSwitcher.on('reload', function() {
-      assert.ok(false);
-    });
-
     roomSwitcher.on('switch', function(/*troupe, permalinkChatId*/) {
       assert.ok(false);
     });
 
     roomSwitcher.change('https://gitter.im/orgs/dev-ua/rooms/');
+
+    expect(window.location.assign).toHaveBeenCalledWith('/orgs/dev-ua/rooms/');
   });
 });

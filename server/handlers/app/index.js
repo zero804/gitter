@@ -11,7 +11,6 @@ var preventClickjackingOnlyGitterEmbedMiddleware = require('../../web/middleware
 var archive = require('./archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
-var selectRenderer = require('./select-renderer');
 var desktopRenderer = require('../renderers/desktop-renderer');
 var embedRenderer = require('../renderers/embed-renderer');
 var cardRenderer = require('../renderers/card-renderer');
@@ -35,15 +34,7 @@ var mainFrameMiddlewarePipeline = [
   function(req, res, next) {
     var uriContext = req.uriContext;
 
-    var renderer = selectRenderer(req);
-
-    if (!renderer.hasSecondaryView()) {
-      // If a child frame is going to be loaded (aka the secondary view)
-      // Then we should wait for that frame to load before saving the state
-      saveRoom(req);
-    }
-
-    return renderer.renderPrimaryView(req, res, next, {
+    return desktopRenderer.renderView(req, res, next, {
       uriContext: uriContext
     });
   },
@@ -60,7 +51,7 @@ var frameMiddlewarePipeline = [
   function(req, res, next) {
     saveRoom(req);
 
-    return desktopRenderer.renderSecondaryView(req, res, next, {
+    return desktopRenderer.renderView(req, res, next, {
       uriContext: req.uriContext
     });
   },

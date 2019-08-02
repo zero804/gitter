@@ -1,10 +1,9 @@
-@import "bootstrap/bootstrap";
-@import "trpMobileFonts";
-@import "colors";
-@import "typography";
-@import "trpButtons";
-@import "trp3Vars";
-// @import "nanoScroller";
+@import 'bootstrap/bootstrap';
+@import 'trpMobileFonts';
+@import 'colors';
+@import 'typography';
+@import 'trpButtons';
+@import 'trp3Vars';
 
 /* new stuff */
 // @import "menu";
@@ -14,15 +13,11 @@
 
 @header-height: 50px;
 
-
-
 body.with-sideMenu {
   background-color: @trpDarkBlue;
 }
 
-
 .mobile-header {
-
   flex-shrink: 0;
   width: 100%;
   z-index: 1;
@@ -30,7 +25,6 @@ body.with-sideMenu {
   line-height: @header-height;
   text-align: center;
   height: @header-height;
-
 
   .trpTitle {
     display: inline-block;
@@ -48,9 +42,6 @@ body.with-sideMenu {
     line-height: @desktop-header-height;
   }
 }
-
-
-
 
 #showTroupesButton {
   position: absolute;
@@ -85,7 +76,7 @@ body.with-sideMenu {
 }
 
 .animation(@transform) {
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   transition: all 200ms @transform;
 }
 
@@ -94,7 +85,7 @@ body.with-sideMenu {
   max-width: 280px;
   overflow: hidden;
 
-  li[data-value="undefined"] {
+  li[data-value='undefined'] {
     display: none;
   }
 }

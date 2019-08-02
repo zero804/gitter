@@ -15,7 +15,6 @@ router.use('/', /* clickjacking is fine-tuned in the file */ require('./root'));
 router.use('/logout', preventClickjackingMiddleware, require('./logout'));
 router.use('/login', preventClickjackingMiddleware, require('./login'));
 
-// Double route mounting for explore onto /explore and /home/~explore
 router.get(
   new RegExp('^/explore(.*)?'),
   identifyRoute('root-explore'),
@@ -32,12 +31,8 @@ router.get(
   }
 );
 
-// The route for the inner frame
-router.use('/home/~explore', preventClickjackingOnlyGitterEmbedMiddleware, require('./explore'));
-
 router.use('/home', /* clickjacking is fine-tuned in the file */ require('./home'));
 router.use('/learn', preventClickjackingOnlyGitterEmbedMiddleware, require('./learn'));
-router.use('/mobile', preventClickjackingMiddleware, require('./mobile'));
 router.use('/settings', /* clickjacking is fine-tuned in the file */ require('./settings'));
 router.use('/orgs', /* clickjacking is fine-tuned in the file */ require('./org-pages'));
 

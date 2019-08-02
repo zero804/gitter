@@ -10,7 +10,7 @@ var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var RepoInfoModel = require('../../collections/repo-info');
 var cocktail = require('backbone.cocktail');
-var closeViewMixin = require('../menu/room/minibar/close-view/close-view-mixin');
+const closeViewMixin = require('./close-view/close-view-mixin');
 const appEvents = require('../../utils/appevents');
 
 require('../behaviors/isomorphic');

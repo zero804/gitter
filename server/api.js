@@ -1,8 +1,5 @@
 'use strict';
 
-/* Listen for SIGUSR1 signals to start/stop profiling */
-// require('./utils/profiler');
-
 require('./utils/diagnostics');
 
 /* Configure winston before all else! */

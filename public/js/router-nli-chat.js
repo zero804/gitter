@@ -3,14 +3,12 @@
 require('./utils/font-setup');
 
 var appEvents = require('./utils/appevents');
-var context = require('gitter-web-client-context');
 var Backbone = require('backbone');
 var itemCollections = require('./collections/instances/integrated-items');
 var chatCollection = require('./collections/instances/chats');
 var PeopleModal = require('./views/modals/people-modal');
 var LoginView = require('./views/modals/login-view');
 var onready = require('./utils/onready');
-var frameUtils = require('gitter-web-frame-utils');
 var ChatToolbarLayout = require('./views/layouts/chat-toolbar');
 var urlParse = require('url-parse');
 
@@ -32,14 +30,6 @@ onready(function() {
   appEvents.on('navigation', function(url) {
     // No pushState here. Open links within the parent...
     window.parent.location.href = url;
-  });
-
-  appEvents.on('permalink.requested', function(type, chat) {
-    if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
-    var url = context.troupe().get('url');
-    var id = chat.id;
-
-    frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
   });
 
   var appView = new ChatToolbarLayout({

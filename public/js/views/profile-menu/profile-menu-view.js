@@ -16,7 +16,6 @@ var toggleDarkTheme = require('../../utils/toggle-dark-theme');
 var autoModelSave = require('../../utils/auto-model-save');
 var showDesktopNotification = require('../../utils/show-desktop-notification');
 var apiClient = require('../../components/api-client');
-var frameUtils = require('gitter-web-frame-utils');
 
 require('@gitterhq/styleguide/css/components/dropdowns.css');
 
@@ -77,10 +76,6 @@ function getProfileCollection() {
       var newTheme = currentTheme === 'gitter-dark' ? '' : 'gitter-dark';
 
       toggleDarkTheme(!!newTheme.length);
-
-      if (frameUtils.hasParentFrameSameOrigin()) {
-        frameUtils.postMessage({ type: 'toggle-dark-theme', theme: newTheme });
-      }
 
       apiClient.user.put('/settings/userTheme', { theme: newTheme }).catch(err => {
         showDesktopNotification({

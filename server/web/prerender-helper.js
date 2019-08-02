@@ -4,16 +4,6 @@ var compileTemplate = require('./compile-web-template');
 var prerenderWrapper = require('./prerender-wrapper');
 
 var PRERENDERED_VIEWS = [
-  //NEW LEFT MENU
-  'js/views/menu/room/layout/room-menu-layout',
-  'js/views/menu/room/primary-collection/primary-collection-item-view',
-  'js/views/menu/room/minibar/minibar-item-view',
-
-  //OLD MENU
-  'js/views/menu/old/tmpl/troupeMenu',
-  'js/views/menu/old/tmpl/profile',
-  'js/views/menu/old/tmpl/org-list-item',
-
   'js/views/archive/tmpl/archive-navigation-view',
   'js/views/app/tmpl/headerViewTemplate',
   'js/views/app/tmpl/headerViewTemplate',

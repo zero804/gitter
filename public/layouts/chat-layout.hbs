@@ -48,18 +48,14 @@
       </div>
     </div>
 
-    {{#if useVueLeftMenu}}
-      {{> staging_marker}}
-    {{/if}}
+    {{> staging_marker}}
 
     <div class="js-drag-overlay drag-frame hide">
       <span class="octicon octicon-arrow-down"></span>
     </div>
 
 
-    {{#if useVueLeftMenu}}
-      {{{ generateTroupeContext troupeContext }}}
-      {{{ bootScript bootScriptName "router-app" jsRoot=jsRoot }}}
-    {{/if}}
+    {{{ generateTroupeContext troupeContext }}}
+    {{{ bootScript bootScriptName "router-app" jsRoot=jsRoot }}}
   </body>
 </html>

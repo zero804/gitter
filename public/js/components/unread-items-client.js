@@ -128,7 +128,7 @@ module.exports = (function() {
     },
 
     _clearActivityBadge: function() {
-      appEvents.trigger('clearActivityBadge');
+      appEvents.trigger('clearActivityBadge', context.getTroupeId());
     },
 
     _onItemMarkedRead: function(itemId, mention, lurkMode) {
@@ -671,7 +671,7 @@ module.exports = (function() {
 
       // Bridge events to appEvents
       _unreadItemStore.on('newcountvalue', function(count) {
-        appEvents.trigger('unreadItemsCount', count);
+        appEvents.trigger('unreadItemsCount', context.troupe().id, count);
       });
 
       new ReadItemSender(_unreadItemStore);
