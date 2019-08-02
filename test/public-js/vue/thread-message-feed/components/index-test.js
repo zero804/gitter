@@ -26,6 +26,10 @@ describe('thread-message-feed index', () => {
       addParentMessage(store.state);
       addDefaultUser(store.state);
       store.state.threadMessageFeed.isVisible = true;
+      store.state.threadMessageFeed.childMessages = [
+        createSerializedMessageFixture({ id: '1' }),
+        createSerializedMessageFixture({ id: '2' })
+      ];
     });
     expect(wrapper.element).toMatchSnapshot();
   });
@@ -36,6 +40,7 @@ describe('thread-message-feed index', () => {
       addDefaultUser(store.state);
       store.state.threadMessageFeed.isVisible = true;
       store.state.darkTheme = true;
+      store.state.threadMessageFeed.childMessages = [];
     });
     expect(wrapper.element).toMatchSnapshot();
   });

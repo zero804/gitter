@@ -15,6 +15,7 @@ export default {
     ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
+      childMessages: state => state.threadMessageFeed.childMessages,
       user: 'user',
       darkTheme: 'darkTheme'
     })
@@ -32,6 +33,12 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
+          <chat-item
+            v-for="message in childMessages"
+            :key="message.id"
+            :message="message"
+            :use-compact-styles="true"
+          />
         </div>
         <chat-input :user="user" thread />
       </section>

@@ -27,6 +27,7 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
           message="[object Object]"
           usecompactstyles="true"
         />
+         
       </div>
        
       <chat-input-stub
@@ -78,6 +79,15 @@ exports[`thread-message-feed index opened - matches snapshot 1`] = `
       <div
         class="chat-messages"
       >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
         <chat-item-stub
           message="[object Object]"
           usecompactstyles="true"

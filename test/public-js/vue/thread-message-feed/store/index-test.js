@@ -19,17 +19,24 @@ describe('thread message feed store', () => {
     });
 
     it('open shows TMF, hides right toolbar, sets parent id', async () => {
-      await testAction(actions.open, '5d147ea84dad9dfbc522317a', {}, [
-        { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
-        { type: types.SET_PARENT_MESSAGE_ID, payload: '5d147ea84dad9dfbc522317a' }
-      ]);
+      await testAction(
+        actions.open,
+        '5d147ea84dad9dfbc522317a',
+        {},
+        [
+          { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
+          { type: types.SET_PARENT_MESSAGE_ID, payload: '5d147ea84dad9dfbc522317a' }
+        ],
+        [{ type: 'fetchChildMessages' }]
+      );
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
     });
 
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false },
-        { type: types.SET_PARENT_MESSAGE_ID, payload: null }
+        { type: types.SET_PARENT_MESSAGE_ID, payload: null },
+        { type: types.UPDATE_CHILD_MESSAGES, payload: [] }
       ]);
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', true);
     });
@@ -71,6 +78,13 @@ describe('thread message feed store', () => {
       const state = {};
       mutations[types.SET_PARENT_MESSAGE_ID](state, '5d147ea84dad9dfbc522317a');
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
+    });
+
+    it('UPDATE_CHILD_MESSAGES', () => {
+      const state = {};
+      const childMessage = createSerializedMessageFixture();
+      mutations[types.UPDATE_CHILD_MESSAGES](state, [childMessage]);
+      expect(state.childMessages).toEqual([childMessage]);
     });
   });
 
