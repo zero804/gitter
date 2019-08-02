@@ -58,7 +58,7 @@
     "no-mixed-spaces-and-tabs": "error",
     "no-negated-condition": "warn",
     "no-unneeded-ternary": "error",
-    "no-use-before-define": ["warn", { "variables": true, "functions": false, "classes": false }],
+    "no-use-before-define": ["warn", { "variables": true, "functions": true, "classes": true }],
     "no-undef": "error",
     "no-multi-spaces": [
       "warn",
