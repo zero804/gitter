@@ -40,25 +40,26 @@ module.exports = {
   id: 'resourceTroupeUser',
 
   index: function(req, res) {
-    var options = {
-      lean: !!req.query.lean,
-      skip: parseInt(req.query.skip, 10) || undefined,
-      limit: parseInt(req.query.limit, 10) || undefined,
-      searchTerm: req.query.q
-    };
-
-    return restful
-      .serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options)
-      .then(function(result) {
-        if (typeof req.query.q === 'string') {
+    const searchTerm = req.query.q;
+    if (typeof searchTerm === 'string') {
+      return restful
+        .serializeUsersMatchingSearchTerm(req.params.troupeId, searchTerm)
+        .then(function(result) {
           res.setHeader('Cache-Control', 'public, max-age=' + SEARCH_EXPIRES_SECONDS);
           res.setHeader(
             'Expires',
             new Date(Date.now() + SEARCH_EXPIRES_MILLISECONDS).toUTCString()
           );
-        }
-        return result;
-      });
+          return result;
+        });
+    }
+
+    const options = {
+      lean: !!req.query.lean,
+      skip: parseInt(req.query.skip, 10) || undefined,
+      limit: parseInt(req.query.limit, 10) || undefined
+    };
+    return restful.serializeUsersForTroupe(req.params.troupeId, req.user && req.user.id, options);
   },
 
   create: function(req) {
