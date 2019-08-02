@@ -71,27 +71,25 @@ async function serializeChatsForTroupe(
   return restSerializer.serialize(chatMessages, strategy);
 }
 
+function serializeUsersMatchingSearchTerm(roomId, searchTerm) {
+  if (survivalMode || searchTerm.length < 1) {
+    return Promise.resolve([]);
+  }
+
+  return userTypeahead.query(searchTerm, { roomId }).then(function(users) {
+    const strategy = new restSerializer.UserStrategy();
+    return restSerializer.serialize(users, strategy);
+  });
+}
+
 /**
  *
  * @param {*} options Options can be:
  *      - `limit` - maximum amount of records retrieved
- *      - `searchTerm` - query used to match users
  *      - `lean` - if true, the result is not full mongoose model, just plain object
  *      - `skip` - how many first records should be omitted (used for pagination)
  */
-function serializeUsersForTroupe(troupeId, userId, { limit, searchTerm, lean, skip }) {
-  // TODO: extract the if into a separate function - the searchTerm branch of this function is completely separate
-  if (typeof searchTerm === 'string') {
-    if (survivalMode || searchTerm.length < 1) {
-      return Promise.resolve([]);
-    }
-
-    return userTypeahead.query(searchTerm, { roomId: troupeId }).then(function(users) {
-      var strategy = new restSerializer.UserStrategy();
-      return restSerializer.serialize(users, strategy);
-    });
-  }
-
+function serializeUsersForTroupe(troupeId, userId, { limit, lean, skip }) {
   limit = isNaN(limit) ? DEFAULT_USERS_LIMIT : limit;
   skip = isNaN(skip) ? 0 : skip;
   if (limit > MAX_USERS_LIMIT) {
@@ -267,6 +265,7 @@ module.exports = {
   serializeTroupesForUser: serializeTroupesForUser,
   serializeChatsForTroupe: serializeChatsForTroupe,
   serializeUsersForTroupe: serializeUsersForTroupe,
+  serializeUsersMatchingSearchTerm: serializeUsersMatchingSearchTerm,
   serializeUnreadItemsForTroupe: serializeUnreadItemsForTroupe,
   serializeReadBysForChat: serializeReadBysForChat,
   serializeEventsForTroupe: serializeEventsForTroupe,
