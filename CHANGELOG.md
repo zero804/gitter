@@ -8,6 +8,7 @@ Developer facing:
 
  - Separate serializing for users based on a search term, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1543
  - Update dependency `sinon` to `^7.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1546
+ - Remove unused/orphaned files from `public/` (dead code), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1552
 
 
 # 19.59.0 - 2019-07-31
@@ -491,7 +492,7 @@ Developer facing:
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
  - Update minimum requirement to npm 6.x
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1286
- - Remove unused/orphaned dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
+ - Remove unused/orphaned dependencies (dead code), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
  - Re-enable validation CI job (fix eslint errors), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1290
 
 
