@@ -6,6 +6,7 @@
 Developer facing:
 
  - Separate serializing for users based on a search term, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1543
+ - Update dependency `sinon` to `^7.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1546
 
 
 # 19.59.0 - 2019-07-31
