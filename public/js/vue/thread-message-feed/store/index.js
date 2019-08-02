@@ -6,7 +6,10 @@ export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  UPDATE_CHILD_MESSAGES: 'UPDATE_CHILD_MESSAGES'
+  UPDATE_CHILD_MESSAGES: 'UPDATE_CHILD_MESSAGES',
+  REQUEST_CHILD_MESSAGES: 'REQUEST_CHILD_MESSAGES',
+  RECEIVE_CHILD_MESSAGES_SUCCESS: 'RECEIVE_CHILD_MESSAGES_SUCCESS',
+  RECEIVE_CHILD_MESSAGES_ERROR: 'RECEIVE_CHILD_MESSAGES_ERROR'
 };
 
 export default {
@@ -15,7 +18,7 @@ export default {
     isVisible: false,
     draftMessage: '',
     parentId: null,
-    childMessages: []
+    childMessages: { loading: false, error: false, results: [] }
   },
   mutations: {
     [types.TOGGLE_THREAD_MESSAGE_FEED](state, isVisible) {
@@ -27,8 +30,19 @@ export default {
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     },
-    [types.UPDATE_CHILD_MESSAGES](state, childMessages) {
-      state.childMessages = childMessages;
+    [types.REQUEST_CHILD_MESSAGES](state) {
+      state.childMessages.error = false;
+      state.childMessages.loading = true;
+    },
+    [types.RECEIVE_CHILD_MESSAGES_SUCCESS](state, childMessages) {
+      state.childMessages.error = false;
+      state.childMessages.loading = false;
+      state.childMessages.results = childMessages;
+    },
+    [types.RECEIVE_CHILD_MESSAGES_ERROR](state) {
+      state.childMessages.error = true;
+      state.childMessages.loading = false;
+      state.childMessages.results = [];
     }
   },
   getters: {
@@ -62,9 +76,14 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     fetchChildMessages: ({ state, commit }) => {
+      commit(types.REQUEST_CHILD_MESSAGES);
       apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
-        .then(childMessages => commit(types.UPDATE_CHILD_MESSAGES, childMessages));
+        .then(childMessages => commit(types.RECEIVE_CHILD_MESSAGES_SUCCESS, childMessages))
+        .catch((/* error */) => {
+          // TODO log error
+          commit(types.RECEIVE_CHILD_MESSAGES_ERROR);
+        });
     }
   }
 };
