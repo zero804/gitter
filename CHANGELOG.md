@@ -4,6 +4,8 @@
  - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
  - Fix "Chat privately" in user popover not changing left-menu room highlight, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1547
  - Fix room switching in IE11, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1551
+ - Provide helpful link to community/room creation docs to the homepage for repo maintainers that are new to Gitter, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1550
+    - Thanks to [@kellytk](https://gitlab.com/kellytk) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1549
 
 Developer facing:
 
