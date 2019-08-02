@@ -10,6 +10,7 @@ function createMessage(fixtureName, f) {
   return ChatMessage.create({
     fromUserId: f.fromUserId,
     toTroupeId: f.toTroupeId,
+    parentId: f.parentId,
     text: f.text,
     status: f.status,
     html: f.html,
@@ -24,21 +25,28 @@ function createMessage(fixtureName, f) {
   });
 }
 
-function createMessages(expected, fixture) {
-  return Promise.map(Object.keys(expected), function(key) {
-    if (key.match(/^message(?!Report)/)) {
-      var expectedMessage = expected[key];
-
-      expectedMessage.fromUserId = fixture[expectedMessage.user]._id;
-      expectedMessage.toTroupeId = fixture[expectedMessage.troupe]._id;
-
-      return createMessage(key, expectedMessage).then(function(message) {
-        fixture[key] = message;
-      });
+const createMessages = (createChildMessages = false) => (expected, fixtures) => {
+  const enrichExpectedMessage = expectedMessage => {
+    expectedMessage.fromUserId = fixtures[expectedMessage.user]._id;
+    expectedMessage.toTroupeId = fixtures[expectedMessage.troupe]._id;
+    if (createChildMessages) {
+      expectedMessage.parentId = fixtures[expectedMessage.parent]._id;
     }
+  };
+  const fixtureNameRegex = createChildMessages ? /^childMessage/ : /^message(?!Report)/;
+  return Promise.all(
+    Object.keys(expected)
+      .filter(fixtureName => fixtureName.match(fixtureNameRegex))
+      .map(async fixtureName => {
+        const expectedMessage = expected[fixtureName];
+        enrichExpectedMessage(expectedMessage);
+        const message = await createMessage(fixtureName, expectedMessage);
+        fixtures[fixtureName] = message;
+      })
+  );
+};
 
-    return null;
-  });
-}
-
-module.exports = createMessages;
+module.exports = {
+  createMessages: createMessages(false),
+  createChildMessages: createMessages(true)
+};
