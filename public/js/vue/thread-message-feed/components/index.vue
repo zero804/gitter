@@ -33,10 +33,10 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
-          <span class="error-text error-box" v-if="childMessages.error">
+          <span v-if="childMessages.error" class="error-text error-box">
             Error: Therad messages couldn't be loaded.
           </span>
-          <span v-else-if="childMessages.loading">Lodaing ...</span>
+          <span v-else-if="childMessages.loading">Loading ...</span>
           <chat-item
             v-for="message in childMessages.results"
             v-else

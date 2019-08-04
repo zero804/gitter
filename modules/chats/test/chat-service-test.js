@@ -213,12 +213,12 @@ describe('chatService', function() {
     it('finds child messages for parent message', async () => {
       const chats = await chatService.findThreadChatMessages(fixture.troupe1.id, chat1.id);
       assert.deepEqual(chats.map(chat => chat.id), [chat2.id, chat3.id]);
-    })
+    });
 
     it('does not find child messages for when parent message is not from troupe', async () => {
       const chats = await chatService.findThreadChatMessages(fixture.troupe2.id, chat1.id);
       assert.deepEqual(chats, []);
-    })
+    });
   });
 
   describe('Finding messages #slow', () => {

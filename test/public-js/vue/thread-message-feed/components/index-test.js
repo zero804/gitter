@@ -21,17 +21,39 @@ describe('thread-message-feed index', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('opened - matches snapshot', () => {
-    const { wrapper } = mount(Index, {}, store => {
-      addParentMessage(store.state);
-      addDefaultUser(store.state);
-      store.state.threadMessageFeed.isVisible = true;
-      store.state.threadMessageFeed.childMessages = [
-        createSerializedMessageFixture({ id: '1' }),
-        createSerializedMessageFixture({ id: '2' })
-      ];
+  describe('child messages', () => {
+    it('opened - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.results = [
+          createSerializedMessageFixture({ id: '1' }),
+          createSerializedMessageFixture({ id: '2' })
+        ];
+      });
+      expect(wrapper.element).toMatchSnapshot();
     });
-    expect(wrapper.element).toMatchSnapshot();
+
+    it('loading - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.loading = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('error - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.error = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   it('dark theme - matches snapshot', () => {
@@ -40,7 +62,6 @@ describe('thread-message-feed index', () => {
       addDefaultUser(store.state);
       store.state.threadMessageFeed.isVisible = true;
       store.state.darkTheme = true;
-      store.state.threadMessageFeed.childMessages = [];
     });
     expect(wrapper.element).toMatchSnapshot();
   });

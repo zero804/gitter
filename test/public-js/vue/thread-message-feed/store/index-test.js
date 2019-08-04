@@ -3,6 +3,7 @@
 jest.mock('../../../../../public/js/utils/appevents');
 jest.mock('../../../../../public/js/components/api-client');
 
+const VuexApiRequest = require('../../../../../public/js/vue/store/vuex-api-request').default;
 const testAction = require('../../store/vuex-action-helper');
 const appEvents = require('../../../../../public/js/utils/appevents');
 const apiClient = require('../../../../../public/js/components/api-client');
@@ -11,6 +12,8 @@ const {
   default: { actions, mutations, getters },
   types
 } = require('../../../../../public/js/vue/thread-message-feed/store');
+
+const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
 
 describe('thread message feed store', () => {
   describe('actions', () => {
@@ -36,7 +39,7 @@ describe('thread message feed store', () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false },
         { type: types.SET_PARENT_MESSAGE_ID, payload: null },
-        { type: types.UPDATE_CHILD_MESSAGES, payload: [] }
+        { type: childMessagesVuexRequest.successType, payload: [] }
       ]);
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', true);
     });
@@ -80,11 +83,11 @@ describe('thread message feed store', () => {
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
     });
 
-    it('UPDATE_CHILD_MESSAGES', () => {
-      const state = {};
+    it('CHILD_MESSAGES', () => {
+      const state = childMessagesVuexRequest.initialState;
       const childMessage = createSerializedMessageFixture();
-      mutations[types.UPDATE_CHILD_MESSAGES](state, [childMessage]);
-      expect(state.childMessages).toEqual([childMessage]);
+      mutations[childMessagesVuexRequest.successType](state, [childMessage]);
+      expect(state.childMessages.results).toEqual([childMessage]);
     });
   });
 

@@ -1,25 +1,25 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
+import VuexApiRequest from '../../store/vuex-api-request';
+
+const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
 
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  UPDATE_CHILD_MESSAGES: 'UPDATE_CHILD_MESSAGES',
-  REQUEST_CHILD_MESSAGES: 'REQUEST_CHILD_MESSAGES',
-  RECEIVE_CHILD_MESSAGES_SUCCESS: 'RECEIVE_CHILD_MESSAGES_SUCCESS',
-  RECEIVE_CHILD_MESSAGES_ERROR: 'RECEIVE_CHILD_MESSAGES_ERROR'
+  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType
 };
 
 export default {
   namespaced: true,
-  state: {
+  state: () => ({
     isVisible: false,
     draftMessage: '',
     parentId: null,
-    childMessages: { loading: false, error: false, results: [] }
-  },
+    ...childMessagesVuexRequest.initialState
+  }),
   mutations: {
     [types.TOGGLE_THREAD_MESSAGE_FEED](state, isVisible) {
       state.isVisible = isVisible;
@@ -30,20 +30,7 @@ export default {
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     },
-    [types.REQUEST_CHILD_MESSAGES](state) {
-      state.childMessages.error = false;
-      state.childMessages.loading = true;
-    },
-    [types.RECEIVE_CHILD_MESSAGES_SUCCESS](state, childMessages) {
-      state.childMessages.error = false;
-      state.childMessages.loading = false;
-      state.childMessages.results = childMessages;
-    },
-    [types.RECEIVE_CHILD_MESSAGES_ERROR](state) {
-      state.childMessages.error = true;
-      state.childMessages.loading = false;
-      state.childMessages.results = [];
-    }
+    ...childMessagesVuexRequest.mutations
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
@@ -60,7 +47,7 @@ export default {
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
       commit(types.SET_PARENT_MESSAGE_ID, null);
-      commit(types.UPDATE_CHILD_MESSAGES, []);
+      commit(childMessagesVuexRequest.successType, []);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
@@ -76,13 +63,13 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     fetchChildMessages: ({ state, commit }) => {
-      commit(types.REQUEST_CHILD_MESSAGES);
+      commit(childMessagesVuexRequest.requestType);
       apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
-        .then(childMessages => commit(types.RECEIVE_CHILD_MESSAGES_SUCCESS, childMessages))
+        .then(childMessages => commit(childMessagesVuexRequest.successType, childMessages))
         .catch((/* error */) => {
           // TODO log error
-          commit(types.RECEIVE_CHILD_MESSAGES_ERROR);
+          commit(childMessagesVuexRequest.errorType);
         });
     }
   }
