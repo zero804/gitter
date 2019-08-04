@@ -39,6 +39,12 @@ function getGitterAppMetadata(req, userAgentString) {
   };
 }
 
+function createVersionString(versionObject) {
+  const { major, minor, patch } = versionObject;
+  const versionNumbers = [major || '0', minor || '0', patch || '0'];
+  return versionNumbers.join('.');
+}
+
 function tagify(ua) {
   return {
     'agent:type': ua.type,
@@ -49,21 +55,6 @@ function tagify(ua) {
     'agent:os:family': ua.os.family,
     'agent:os:version': createVersionString(ua.os)
   };
-}
-
-function createVersionString(obj) {
-  var version;
-  if (obj.major) {
-    version = '' + obj.major;
-    if (obj.minor) {
-      version = version + '.' + obj.minor;
-      if (obj.patch) {
-        version = version + '.' + obj.patch;
-      }
-    }
-  }
-
-  return version;
 }
 
 module.exports = function(req) {
