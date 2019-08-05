@@ -68,7 +68,7 @@ export default {
         .get(`/chatMessages/${state.parentId}/thread`)
         .then(childMessages => commit(childMessagesVuexRequest.successType, childMessages))
         .catch((/* error */) => {
-          // TODO log error
+          // error is reported by apiClient
           commit(childMessagesVuexRequest.errorType);
         });
     }
