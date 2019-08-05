@@ -1,13 +1,15 @@
 {
   "env": {
     "commonjs": true,
-    "browser": true
+    "browser": true,
+    "jest": true
   },
   "parserOptions": {
     "ecmaVersion": 2018,
     "sourceType": "script"
   },
-  "plugins": ["jquery"],
+  "plugins": ["jquery", "jest"],
+  "extends": ["plugin:jest/recommended"],
   "rules": {
     "node/no-unpublished-require": "off",
     "node/no-unsupported-features": "off",
@@ -64,5 +66,12 @@
       }
     ],
     "vue/component-name-in-template-casing": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "jest": {
+        "jestConfigFile": "jest.config.js"
+      }
+    }
   }
 }
