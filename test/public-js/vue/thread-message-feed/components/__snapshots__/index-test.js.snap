@@ -59,9 +59,13 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
           usecompactstyles="true"
         />
          
-        <span>
-          Loading ...
-        </span>
+        <div
+          class="loading-message"
+        >
+          
+          Loading thread 
+          <loading-spinner-stub />
+        </div>
       </div>
        
       <chat-input-stub

@@ -3,12 +3,14 @@ import { mapState, mapGetters } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
+import LoadingSpinner from '../../components/loading-spinner.vue';
 
 export default {
   name: 'ThreadMessageFeed',
   components: {
     ChatInput,
     ThreadHeader,
+    LoadingSpinner,
     ChatItem
   },
   computed: {
@@ -36,7 +38,9 @@ export default {
           <span v-if="childMessages.error" class="error-text error-box">
             Error: Therad messages couldn't be loaded.
           </span>
-          <span v-else-if="childMessages.loading">Loading ...</span>
+          <div v-else-if="childMessages.loading" class="loading-message">
+            Loading thread <loading-spinner />
+          </div>
           <chat-item
             v-for="message in childMessages.results"
             v-else
@@ -107,6 +111,14 @@ export default {
 
 .error-box {
   margin: @thread-message-feed-padding;
+}
+
+.loading-message {
+  margin-left: @thread-message-feed-padding;
+  margin-right: @thread-message-feed-padding;
+  margin-top: 30px;
+  width: 100%;
+  text-align: center;
 }
 
 .chat-messages {
