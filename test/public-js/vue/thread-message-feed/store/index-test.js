@@ -19,6 +19,7 @@ describe('thread message feed store', () => {
   describe('actions', () => {
     beforeEach(() => {
       appEvents.trigger.mockReset();
+      apiClient.room.get.mockReset();
     });
 
     it('open shows TMF, hides right toolbar, sets parent id', async () => {
@@ -62,6 +63,32 @@ describe('thread message feed store', () => {
         parentId: '5d11d571a2405419771cd3ee'
       });
     });
+
+    it('fetchChildMessages - success', async () => {
+      apiClient.room.get.mockImplementation(() => Promise.resolve(['result1']));
+      await testAction(
+        actions.fetchChildMessages,
+        undefined,
+        { parentId: '5d11d571a2405419771cd3ee' },
+        [
+          { type: childMessagesVuexRequest.requestType },
+          { type: childMessagesVuexRequest.successType, payload: ['result1'] }
+        ]
+      );
+    });
+
+    it('fetchChildMessages - error', async () => {
+      apiClient.room.get.mockImplementation(() => Promise.reject(null));
+      await testAction(
+        actions.fetchChildMessages,
+        undefined,
+        { parentId: '5d11d571a2405419771cd3ee' },
+        [
+          { type: childMessagesVuexRequest.requestType },
+          { type: childMessagesVuexRequest.errorType }
+        ]
+      );
+    });
   });
 
   describe('mutations', () => {
@@ -83,7 +110,7 @@ describe('thread message feed store', () => {
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
     });
 
-    it('CHILD_MESSAGES', () => {
+    it('includes childMessageVuexRequest', () => {
       const state = childMessagesVuexRequest.initialState;
       const childMessage = createSerializedMessageFixture();
       mutations[childMessagesVuexRequest.successType](state, [childMessage]);
