@@ -1,6 +1,6 @@
 'use strict';
 
-jest.mock('../../../public/js/utils/raf');
+jest.mock('../utils/raf');
 const raf = require('../utils/raf');
 raf.mockImplementation(function(fn) {
   setImmediate(fn);

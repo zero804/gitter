@@ -1,5 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const { default: Index } = require('../../../../../public/js/vue/left-menu/components/index.vue');
+const { default: Index } = require('./index.vue');
 
 describe('left-menu index', () => {
   describe('all state', () => {

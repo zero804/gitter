@@ -1,7 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: ChatInput
-} = require('../../../../../public/js/vue/thread-message-feed/components/chat-input.vue');
+const { default: ChatInput } = require('./chat-input.vue');
 
 describe('thread-message-feed chat-input', () => {
   const defaultProps = {

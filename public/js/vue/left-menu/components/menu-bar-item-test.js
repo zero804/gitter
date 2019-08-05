@@ -1,8 +1,6 @@
 const mount = require('../../__test__/vuex-mount');
 const leftMenuConstants = require('../constants');
-const {
-  default: MenuBarItem
-} = require('../../../../../public/js/vue/left-menu/components/menu-bar-item.vue');
+const { default: MenuBarItem } = require('./menu-bar-item.vue');
 
 describe('menu-bar-item', () => {
   it('all matches snapshot', () => {

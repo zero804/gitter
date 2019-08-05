@@ -1,7 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: ListItem
-} = require('../../../../../public/js/vue/left-menu/components/list-item.vue');
+const { default: ListItem } = require('./list-item.vue');
 
 const {
   createSerializedRoomFixture,

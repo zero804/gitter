@@ -1,9 +1,7 @@
 const mount = require('../../__test__/vuex-mount');
 const momentTimezone = require('moment-timezone');
 const { createSerializedMessageFixture } = require('../../__test__/fixture-helpers');
-const {
-  default: ChatItem
-} = require('../../../../../public/js/vue/thread-message-feed/components/chat-item.vue');
+const { default: ChatItem } = require('./chat-item.vue');
 
 describe('thread-message-feed chat-item', () => {
   momentTimezone.tz.setDefault('Europe/London');

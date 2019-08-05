@@ -2,9 +2,7 @@ jest.mock('gitter-web-avatars');
 
 const mount = require('../../__test__/vuex-mount');
 const avatars = require('gitter-web-avatars');
-const {
-  default: Avatar
-} = require('../../../../../public/js/vue/thread-message-feed/components/avatar.vue');
+const { default: Avatar } = require('./avatar.vue');
 
 describe('thread-message-feed avatar', () => {
   it('default size matches snapshot', () => {

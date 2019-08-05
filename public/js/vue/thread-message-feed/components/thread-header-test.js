@@ -1,7 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: ThreadHeader
-} = require('../../../../../public/js/vue/thread-message-feed/components/thread-header.vue');
+const { default: ThreadHeader } = require('./thread-header.vue');
 
 describe('thread-message-feed thread-header', () => {
   it('matches snapshot', () => {

@@ -1,8 +1,6 @@
 const leftMenuConstants = require('../constants');
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: MenuBarItemToggle
-} = require('../../../../../public/js/vue/left-menu/components/menu-bar-item-toggle.vue');
+const { default: MenuBarItemToggle } = require('./menu-bar-item-toggle.vue');
 
 describe('menu-bar-item-toggle', () => {
   it('toggle matches snapshot', () => {

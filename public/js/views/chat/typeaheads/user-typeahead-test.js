@@ -106,7 +106,7 @@ function generateTypeahead(options) {
     };
   });
 
-  jest.mock('../../../../../public/js/utils/is-mobile', () => {
+  jest.mock('../../../utils/is-mobile', () => {
     return function() {
       return false;
     };
@@ -128,9 +128,9 @@ function generateTypeahead(options) {
     };
   });
 
-  jest.mock('../../../../../public/js/components/api-client', () => ({}));
+  jest.mock('../../../components/api-client', () => ({}));
 
-  jest.mock('../../../../../public/js/views/chat/typeaheads/tmpl/typeahead.hbs', () => {
+  jest.mock('../../../views/chat/typeaheads/tmpl/typeahead.hbs', () => {
     return function() {};
   });
 

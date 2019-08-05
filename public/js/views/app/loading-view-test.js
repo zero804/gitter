@@ -5,7 +5,7 @@
 
 var assert = require('assert');
 
-jest.mock('../../../../public/js/utils/appevents');
+jest.mock('../../utils/appevents');
 const appEvents = require('../../utils/appevents');
 appEvents.on.mockImplementation(() => {});
 

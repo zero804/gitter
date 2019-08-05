@@ -1,7 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: SearchBody
-} = require('../../../../../public/js/vue/left-menu/components/search-body.vue');
+const { default: SearchBody } = require('./search-body.vue');
 
 const {
   createSerializedRoomFixture,

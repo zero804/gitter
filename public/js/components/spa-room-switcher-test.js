@@ -36,7 +36,7 @@ function locationDelegate(location) {
 
 const BASE_PATH = 'https://gitter.im';
 
-jest.mock('../../../public/js/utils/url-parser');
+jest.mock('../utils/url-parser');
 const urlParser = require('../utils/url-parser');
 urlParser.parse.mockImplementation(function(href) {
   return parseUrl(href);

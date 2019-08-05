@@ -1,5 +1,5 @@
-jest.mock('../../../../../public/js/utils/appevents');
-jest.mock('../../../../../public/js/components/api-client');
+jest.mock('../../../utils/appevents');
+jest.mock('../../../components/api-client');
 
 const testAction = require('../../store/__test__/vuex-action-helper');
 const appEvents = require('../../../utils/appevents');

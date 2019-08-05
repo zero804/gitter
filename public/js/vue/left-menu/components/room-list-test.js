@@ -1,9 +1,7 @@
 const Vue = require('vue');
 const mount = require('../../__test__/vuex-mount');
 
-const {
-  default: RoomList
-} = require('../../../../../public/js/vue/left-menu/components/room-list.vue');
+const { default: RoomList } = require('./room-list.vue');
 
 const { createSerializedRoomFixture } = require('../../__test__/fixture-helpers');
 

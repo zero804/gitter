@@ -1,7 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const {
-  default: MenuBarItemCreate
-} = require('../../../../../public/js/vue/left-menu/components/menu-bar-item-create.vue');
+const { default: MenuBarItemCreate } = require('./menu-bar-item-create.vue');
 
 describe('menu-bar-item-create', () => {
   it('create matches snapshot', () => {

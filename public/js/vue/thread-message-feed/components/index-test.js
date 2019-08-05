@@ -1,8 +1,6 @@
 const mount = require('../../__test__/vuex-mount');
 const { createSerializedMessageFixture } = require('../../__test__/fixture-helpers');
-const {
-  default: Index
-} = require('../../../../../public/js/vue/thread-message-feed/components/index.vue');
+const { default: Index } = require('./index.vue');
 
 describe('thread-message-feed index', () => {
   const addDefaultUser = state => (state.user = { displayName: 'John Smith' });

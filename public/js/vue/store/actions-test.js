@@ -9,13 +9,13 @@ const {
 } = require('../../../../public/js/vue/store/requests');
 
 jest.mock('gitter-web-client-context');
-jest.mock('../../../../public/js/utils/appevents', () => {
+jest.mock('../../utils/appevents', () => {
   return {
-    ...require.requireActual('../../../../public/js/utils/appevents'),
+    ...require.requireActual('../../utils/appevents'),
     triggerParent: jest.fn()
   };
 });
-jest.mock('../../../../public/js/components/api-client');
+jest.mock('../../components/api-client');
 
 const actions = require('./actions');
 const testAction = require('./__test__/vuex-action-helper');

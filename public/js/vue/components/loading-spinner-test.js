@@ -1,7 +1,5 @@
 const mount = require('../__test__/vuex-mount');
-const {
-  default: LoadingSpinner
-} = require('../../../../public/js/vue/components/loading-spinner.vue');
+const { default: LoadingSpinner } = require('./loading-spinner.vue');
 
 describe('loading-spinner', () => {
   it('matches snapshot', () => {
