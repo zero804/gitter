@@ -20,13 +20,13 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
           usecompactstyles="true"
         />
          
-        <span
+        <div
           class="error-text error-box"
         >
           
-          Error: Therad messages couldn't be loaded.
+          Error: Therad messages can't be fetched.
         
-        </span>
+        </div>
       </div>
        
       <chat-input-stub

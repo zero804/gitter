@@ -35,9 +35,9 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
-          <span v-if="childMessages.error" class="error-text error-box">
-            Error: Therad messages couldn't be loaded.
-          </span>
+          <div v-if="childMessages.error" class="error-text error-box">
+            Error: Therad messages can't be fetched.
+          </div>
           <div v-else-if="childMessages.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
@@ -111,6 +111,9 @@ export default {
 
 .error-box {
   margin: @thread-message-feed-padding;
+  .chat-messages & {
+    margin-left: @thread-chat-item-compact-left-margin + @thread-message-feed-padding;
+  }
 }
 
 .loading-message {
