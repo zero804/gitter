@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 'use strict';
 
-var Promise = require('bluebird');
-var shutdown = require('shutdown');
-var path = require('path');
-var fs = require('fs-extra');
-var outputFile = Promise.promisify(fs.outputFile);
-var temp = require('temp');
-var mkdir = Promise.promisify(temp.mkdir);
+const shutdown = require('shutdown');
+const path = require('path');
+const os = require('os');
+const fsPromises = require('fs').promises;
+const outputFile = fsPromises.appendFile;
+const mkdir = fsPromises.mkdtemp;
 
-var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
-var userService = require('gitter-web-users');
-var chatService = require('gitter-web-chats');
-var chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
+const onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
+const userService = require('gitter-web-users');
+const chatService = require('gitter-web-chats');
+const chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
 
-var opts = require('yargs')
+const opts = require('yargs')
   .option('username', {
     alias: 'u',
     required: true,
@@ -39,98 +38,84 @@ var opts = require('yargs')
   .help('help')
   .alias('help', 'h').argv;
 
-var messageTextFilterRegex = opts.grep ? new RegExp(opts.grep, 'i') : null;
+const messageTextFilterRegex = opts.grep ? new RegExp(opts.grep, 'i') : null;
 
 if (opts.dry) {
   console.log('Dry-run: nothing will be deleted/saved');
 }
 
-var clearMessages = onMongoConnect()
-  .then(function() {
-    console.log('username', opts.username, process.argv);
-    return userService.findByUsername(opts.username);
-  })
-  .then(function(user) {
-    if (!user) {
-      console.error('Could not find user with', opts.username);
-      return;
-    }
+const makeBackup = async messages => {
+  const now = new Date();
+  const filename =
+    'messages-' +
+    opts.username +
+    '-bak-' +
+    now.getFullYear() +
+    '-' +
+    now.getMonth() +
+    '-' +
+    now.getDate() +
+    '--' +
+    now.getTime() +
+    '.json';
+  const dir = await mkdir(path.join(os.tmpdir(), 'gitter-delete-message-bak'));
+  const filePath = path.join(dir, filename);
+  console.log('Saving log to:', filePath);
+  return outputFile(filePath, JSON.stringify(messages, null, 2));
+};
 
-    return chatsForUserSearch.searchChatsForUserId(user.id, {
-      limit: opts.limit
+const clearMessages = async () => {
+  await onMongoConnect();
+  console.log('username', opts.username, process.argv);
+  const user = await userService.findByUsername(opts.username);
+  if (!user) {
+    console.error('Could not find user with', opts.username);
+    return;
+  }
+
+  const response = await chatsForUserSearch.searchChatsForUserId(user.id, {
+    limit: opts.limit
+  });
+  const hits = response && response.hits && response.hits.hits ? response.hits.hits : [];
+  console.log('Found ' + hits.length + ' messages');
+
+  let filteredHits = hits;
+  if (messageTextFilterRegex) {
+    filteredHits = hits.filter(function(hit) {
+      return hit._source && hit._source.text && hit._source.text.match(messageTextFilterRegex);
     });
-  })
-  .then(function(response) {
-    var hits = response && response.hits && response.hits.hits ? response.hits.hits : [];
-    console.log('Found ' + hits.length + ' messages');
+  }
 
-    var filteredHits = hits;
-    if (messageTextFilterRegex) {
-      filteredHits = hits.filter(function(hit) {
-        return hit._source && hit._source.text && hit._source.text.match(messageTextFilterRegex);
-      });
-    }
-
-    var messageIds = filteredHits.map(function(hit) {
-      return hit._id;
-    });
-
-    var getMessages = chatService.findByIds(messageIds);
-
-    var getExistentMesssages = getMessages.then(function(messages) {
-      return messages.filter(function(message) {
-        return !!message;
-      });
-    });
-
-    return getExistentMesssages
-      .tap(function(messages) {
-        console.log('Working with', messages.length + '/' + messageIds.length);
-
-        var now = new Date();
-        var filename =
-          'messages-' +
-          opts.username +
-          '-bak-' +
-          now.getFullYear() +
-          '-' +
-          now.getMonth() +
-          '-' +
-          now.getDate() +
-          '--' +
-          now.getTime() +
-          '.json';
-        var saveLog = mkdir('gitter-delete-message-bak').then(function(dir) {
-          var filePath = path.join(dir, filename);
-          console.log('Saving log to:', filePath);
-          return outputFile(filePath, JSON.stringify(messages, null, 2));
-        });
-
-        return saveLog;
-      })
-      .then(function(messages) {
-        var clearMessages = messages.map(function(message) {
-          message.set({
-            text: '',
-            html: ''
-          });
-
-          if (!opts.dry) {
-            return message.save();
-          }
-        });
-
-        return clearMessages;
-      });
+  const messageIds = filteredHits.map(function(hit) {
+    return hit._id;
   });
 
-clearMessages
-  .delay(2000)
+  const possiblyEmptyMessages = await chatService.findByIds(messageIds);
+
+  const messages = possiblyEmptyMessages.filter(Boolean);
+  console.log('Working with', messages.length + '/' + messageIds.length);
+
+  await makeBackup(messages);
+
+  const clearMessages = messages.map(function(message) {
+    message.set({
+      text: '',
+      html: ''
+    });
+
+    if (!opts.dry) {
+      return message.save();
+    }
+  });
+
+  return Promise.all(clearMessages);
+};
+
+clearMessages()
   .then(function() {
     shutdown.shutdownGracefully();
   })
   .catch(function(err) {
     console.error('Error: ' + err, err);
     shutdown.shutdownGracefully(1);
-  })
-  .done();
+  });
