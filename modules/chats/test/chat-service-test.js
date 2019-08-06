@@ -23,6 +23,8 @@ describe('chatService', function() {
     troupe2: {
       users: ['user1'],
       securityDescriptor: {
+        members: 'INVITE',
+        admins: 'MANUAL',
         public: false
       }
     }
@@ -189,34 +191,37 @@ describe('chatService', function() {
   });
 
   describe('Finding thread messages', () => {
-    let chat1, chat2, chat3;
-
-    beforeEach(async () => {
-      const { troupe1, user1 } = fixture;
-      chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
-      chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, {
+    const chatFixture = fixtureLoader.setupEach({
+      user1: {},
+      troupe1: { users: ['user1'] },
+      message1: { user: 'user1', troupe: 'troupe1', text: 'A' },
+      message2: {
+        user: 'user1',
+        troupe: 'troupe1',
         text: 'B',
-        parentId: chat1.id
-      });
-      chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        parent: 'message1',
+        sent: new Date('2014-01-01T00:00:00.000Z')
+      },
+      message3: {
+        user: 'user1',
+        troupe: 'troupe1',
         text: 'C',
-        parentId: chat1.id
-      });
-      // message created only to validate that it gets excluded from parentId queries
-      await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'D' });
-    });
-
-    afterEach(async () => {
-      return chatService.removeAllMessagesForUserId(fixture.user1._id);
+        parent: 'message1',
+        sent: new Date('2014-01-02T00:00:00.000Z')
+      }
     });
 
     it('finds child messages for parent message', async () => {
-      const chats = await chatService.findThreadChatMessages(fixture.troupe1.id, chat1.id);
-      assert.deepEqual(chats.map(chat => chat.id), [chat2.id, chat3.id]);
+      const { message1, message2, message3 } = chatFixture;
+      const chats = await chatService.findThreadChatMessages(chatFixture.troupe1.id, message1.id);
+      assert.deepEqual(chats.map(chat => chat.id), [message2.id, message3.id]);
     });
 
     it('does not find child messages for when parent message is not from troupe', async () => {
-      const chats = await chatService.findThreadChatMessages(fixture.troupe2.id, chat1.id);
+      const chats = await chatService.findThreadChatMessages(
+        fixture.troupe2.id,
+        chatFixture.message1.id
+      );
       assert.deepEqual(chats, []);
     });
   });
