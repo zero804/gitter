@@ -312,7 +312,7 @@ describe('mutations', () => {
 
     describe('Message search', () => {
       generateSearchTests(
-        'People',
+        'Message',
         messageSearchRequest.requestType,
         messageSearchRequest.successType,
         messageSearchRequest.errorType,
