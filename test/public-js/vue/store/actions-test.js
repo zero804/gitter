@@ -6,7 +6,8 @@ const types = require('../../../../public/js/vue/store/mutation-types');
 const {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
-  roomSearchPeopleRequest
+  roomSearchPeopleRequest,
+  messageSearchRequest
 } = require('../../../../public/js/vue/store/requests');
 
 jest.mock('gitter-web-client-context');
@@ -523,8 +524,8 @@ describe('actions', () => {
         null,
         state,
         [
-          { type: types.REQUEST_MESSAGE_SEARCH },
-          { type: types.RECEIVE_MESSAGE_SEARCH_SUCCESS, payload: null }
+          { type: messageSearchRequest.requestType },
+          { type: messageSearchRequest.successType, payload: null }
         ],
         [],
         done
@@ -542,8 +543,8 @@ describe('actions', () => {
         null,
         state,
         [
-          { type: types.REQUEST_MESSAGE_SEARCH },
-          { type: types.RECEIVE_MESSAGE_SEARCH_ERROR, payload: null }
+          { type: messageSearchRequest.requestType },
+          { type: messageSearchRequest.errorType, payload: null }
         ],
         [],
         done

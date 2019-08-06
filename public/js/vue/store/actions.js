@@ -1,5 +1,10 @@
 import * as types from './mutation-types';
-import { roomSearchRepoRequest, roomSearchRoomRequest, roomSearchPeopleRequest } from './requests';
+import {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest,
+  messageSearchRequest
+} from './requests';
 import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
@@ -191,7 +196,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
   const searchInputValue = state.search.searchInputValue;
 
   if (searchInputValue && searchInputValue.length > 0) {
-    commit(types.REQUEST_MESSAGE_SEARCH);
+    commit(messageSearchRequest.requestType);
     apiClient.room
       .get('/chatMessages', {
         q: searchInputValue,
@@ -199,10 +204,10 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
         limit: 30
       })
       .then(result => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_SUCCESS, result);
+        commit(messageSearchRequest.successType, result);
       })
       .catch(err => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_ERROR, err);
+        commit(messageSearchRequest.errorType, err);
       });
   }
 };

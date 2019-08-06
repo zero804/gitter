@@ -1,6 +1,11 @@
 import Vue from 'vue';
 import * as types from './mutation-types';
-import { roomSearchRepoRequest, roomSearchRoomRequest, roomSearchPeopleRequest } from './requests';
+import {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest,
+  messageSearchRequest
+} from './requests';
 import fuzzysearch from 'fuzzysearch';
 
 function roomFilter(searchTermInput = '', room) {
@@ -75,35 +80,7 @@ export default {
 
   ...roomSearchPeopleRequest.mutations,
 
-  [types.REQUEST_ROOM_SEARCH_PEOPLE](state) {
-    state.search.people.error = false;
-    state.search.people.loading = true;
-  },
-  [types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS](state, searchResults) {
-    state.search.people.error = false;
-    state.search.people.loading = false;
-    state.search.people.results = searchResults;
-  },
-  [types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR](state) {
-    state.search.people.error = true;
-    state.search.people.loading = false;
-    state.search.people.results = [];
-  },
-
-  [types.REQUEST_MESSAGE_SEARCH](state) {
-    state.search.message.error = false;
-    state.search.message.loading = true;
-  },
-  [types.RECEIVE_MESSAGE_SEARCH_SUCCESS](state, searchResults) {
-    state.search.message.error = false;
-    state.search.message.loading = false;
-    state.search.message.results = searchResults;
-  },
-  [types.RECEIVE_MESSAGE_SEARCH_ERROR](state) {
-    state.search.message.error = true;
-    state.search.message.loading = false;
-    state.search.message.results = [];
-  },
+  ...messageSearchRequest.mutations,
 
   [types.CHANGE_DISPLAYED_ROOM](state, newRoomId) {
     state.displayedRoomId = newRoomId;

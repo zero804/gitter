@@ -5,7 +5,8 @@ const types = require('../../../../public/js/vue/store/mutation-types');
 const {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
-  roomSearchPeopleRequest
+  roomSearchPeopleRequest,
+  messageSearchRequest
 } = require('../../../../public/js/vue/store/requests');
 const mutations = require('../../../../public/js/vue/store/mutations').default;
 
@@ -312,9 +313,9 @@ describe('mutations', () => {
     describe('Message search', () => {
       generateSearchTests(
         'People',
-        types.REQUEST_MESSAGE_SEARCH,
-        types.RECEIVE_MESSAGE_SEARCH_SUCCESS,
-        types.RECEIVE_MESSAGE_SEARCH_ERROR,
+        messageSearchRequest.requestType,
+        messageSearchRequest.successType,
+        messageSearchRequest.errorType,
         'message'
       );
     });
