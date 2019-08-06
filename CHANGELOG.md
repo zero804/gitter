@@ -1,3 +1,8 @@
+# 19.61.0 - *upcoming*
+
+ - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
+
+
 # 19.60.0 - 2019-08-06
 
  - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
