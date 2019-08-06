@@ -5,7 +5,8 @@ const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
 const {
   roomSearchRepoRequest,
-  roomSearchRoomRequest
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest
 } = require('../../../../public/js/vue/store/requests');
 
 jest.mock('gitter-web-client-context');
@@ -433,10 +434,10 @@ describe('actions', () => {
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
           { type: roomSearchRepoRequest.requestType },
           { type: roomSearchRoomRequest.requestType },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: roomSearchPeopleRequest.requestType },
           { type: roomSearchRepoRequest.successType, payload: [] },
           { type: roomSearchRoomRequest.successType, payload: [roomResult1.id] },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1.id] }
+          { type: roomSearchPeopleRequest.successType, payload: [oneToOneResult1.id] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
@@ -463,13 +464,13 @@ describe('actions', () => {
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
           { type: roomSearchRepoRequest.requestType },
           { type: roomSearchRoomRequest.requestType },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: roomSearchPeopleRequest.requestType },
           {
             type: roomSearchRepoRequest.successType,
             payload: [REPO_SEARCH_RESPONSE[0].room.id]
           },
           { type: roomSearchRoomRequest.successType, payload: [] },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [] }
+          { type: roomSearchPeopleRequest.successType, payload: [] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
@@ -493,10 +494,10 @@ describe('actions', () => {
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
           { type: roomSearchRepoRequest.requestType },
           { type: roomSearchRoomRequest.requestType },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: roomSearchPeopleRequest.requestType },
           { type: roomSearchRepoRequest.errorType, payload: true },
           { type: roomSearchRoomRequest.errorType, payload: true },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, payload: true }
+          { type: roomSearchPeopleRequest.errorType, payload: true }
         ],
         [{ type: 'trackStat', payload: 'left-menu.search.input' }],
         done
