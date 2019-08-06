@@ -32,14 +32,14 @@ describe('chat-api', function() {
       text: 'A',
       sent: new Date('2014-01-01T00:00:00.000Z')
     },
-    childMessage1: {
+    message2: {
       user: 'user1',
       troupe: 'troupe1',
       parent: 'message1',
       text: 'B',
       sent: new Date('2014-01-02T00:00:00.000Z')
     },
-    childMessage2: {
+    message3: {
       user: 'user1',
       troupe: 'troupe1',
       parent: 'message1',
@@ -55,10 +55,7 @@ describe('chat-api', function() {
       .expect(200)
       .then(response => response.body)
       .then(messages =>
-        assert.deepEqual(messages.map(m => m.id), [
-          fixture.childMessage1.id,
-          fixture.childMessage2.id
-        ])
+        assert.deepEqual(messages.map(m => m.id), [fixture.message2.id, fixture.message3.id])
       );
   });
 });
