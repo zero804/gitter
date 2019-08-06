@@ -9,6 +9,7 @@ var persistence = require('gitter-web-persistence');
 var ChatMessage = persistence.ChatMessage;
 var ChatMessageBackup = persistence.ChatMessageBackup;
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
+const sinon = require('sinon');
 var chatService = require('../lib/chat-service');
 
 describe('chatService', function() {
@@ -22,6 +23,8 @@ describe('chatService', function() {
     troupe2: {
       users: ['user1'],
       securityDescriptor: {
+        members: 'INVITE',
+        admins: 'MANUAL',
         public: false
       }
     }
@@ -187,169 +190,130 @@ describe('chatService', function() {
     });
   });
 
-  describe('Finding messages #slow', function() {
-    var chat1, chat2, chat3;
-
-    beforeEach(function() {
-      return chatService
-        .newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'A' })
-        .then(function(chat) {
-          chat1 = chat.id;
-          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'B' });
-        })
-        .then(function(chat) {
-          chat2 = chat.id;
-          return chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: 'C' });
-        })
-        .then(function(chat) {
-          chat3 = chat.id;
-        });
+  describe('Finding thread messages', () => {
+    const chatFixture = fixtureLoader.setupEach({
+      user1: {},
+      troupe1: { users: ['user1'] },
+      message1: { user: 'user1', troupe: 'troupe1', text: 'A' },
+      message2: {
+        user: 'user1',
+        troupe: 'troupe1',
+        text: 'B',
+        parent: 'message1',
+        sent: new Date('2014-01-01T00:00:00.000Z')
+      },
+      message3: {
+        user: 'user1',
+        troupe: 'troupe1',
+        text: 'C',
+        parent: 'message1',
+        sent: new Date('2014-01-02T00:00:00.000Z')
+      }
     });
 
-    it('should find messages using aroundId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { aroundId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 3);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat1;
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat2;
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === chat3;
-            }).length,
-            1
-          );
-        });
+    it('finds child messages for parent message', async () => {
+      const { message1, message2, message3 } = chatFixture;
+      const chats = await chatService.findThreadChatMessages(chatFixture.troupe1.id, message1.id);
+      assert.deepEqual(chats.map(chat => chat.id), [message2.id, message3.id]);
     });
 
-    it('should find messages with skip', function() {
-      return Promise.join(
-        chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
-          skip: 1,
-          readPreference: 'primaryPreferred'
-        }),
-        chatService.findChatMessagesForTroupe(fixture.troupe1.id, {}),
-        function(withSkip, withoutSkip) {
-          assert.strictEqual(withSkip.length, 2);
-          assert.strictEqual(withoutSkip.length, 3);
-
-          var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
-          var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
-
-          var lastItemWithSkip = withSkip[withSkip.length - 1];
-          // Last item without skip does not exist in with skip...
-          assert.deepEqual(
-            withSkip.filter(function(f) {
-              return f.id === lastItemWithoutSkip.id;
-            }),
-            []
-          );
-
-          assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
-        }
+    it('does not find child messages for when parent message is not from troupe', async () => {
+      const chats = await chatService.findThreadChatMessages(
+        fixture.troupe2.id,
+        chatFixture.message1.id
       );
+      assert.deepEqual(chats, []);
+    });
+  });
+
+  describe('Finding messages #slow', () => {
+    let chat1, chat2, chat3;
+
+    beforeEach(async () => {
+      const { troupe1, user1 } = fixture;
+      chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
+      chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'B' });
+      chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'C' });
+    });
+
+    afterEach(async () => {
+      return chatService.removeAllMessagesForUserId(fixture.user1._id);
+    });
+
+    it('should find messages using aroundId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        aroundId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
+    });
+
+    it('should find messages with skip', async () => {
+      const withSkip = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        skip: 1,
+        readPreference: 'primaryPreferred'
+      });
+      const withoutSkip = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {});
+
+      assert.strictEqual(withSkip.length, 2);
+      assert.strictEqual(withoutSkip.length, 3);
+
+      var lastItemWithoutSkip = withoutSkip[withoutSkip.length - 1];
+      var secondLastItemWithoutSkip = withoutSkip[withoutSkip.length - 2];
+
+      var lastItemWithSkip = withSkip[withSkip.length - 1];
+      // Last item without skip does not exist in with skip...
+      assert.deepEqual(
+        withSkip.filter(function(f) {
+          return f.id === lastItemWithoutSkip.id;
+        }),
+        []
+      );
+
+      assert.strictEqual(secondLastItemWithoutSkip.id, lastItemWithSkip.id);
     });
 
     it('should not allow skip greater than 5000', function() {
-      return chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 10000 }).then(
-        function() {
-          assert.ok(false);
-        },
-        function(err) {
-          assert.strictEqual(
-            err.message,
-            'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'
-          );
-        }
+      return assert.rejects(
+        chatService.findChatMessagesForTroupe(fixture.troupe1.id, { skip: 10000 }),
+        /StatusError: Skip is limited to 5000 items. Please use beforeId rather than skip. See https:\/\/developer.gitter.im/
       );
     });
 
-    it('should find messages using beforeId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { beforeId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 1);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            0
-          );
-        });
+    it('should find messages using beforeId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        beforeId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id]);
     });
 
-    it('should find messages using beforeInclId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { beforeInclId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 2);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            1
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            0
-          );
-        });
+    it('should find messages using beforeInclId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        beforeInclId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id]);
     });
 
-    it('should find messages using afterId', function() {
-      return chatService
-        .findChatMessagesForTroupe(fixture.troupe1.id, { afterId: chat2 })
-        .then(function(chats) {
-          assert(chats.length >= 1);
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat1);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat2);
-            }).length,
-            0
-          );
-          assert.strictEqual(
-            chats.filter(function(f) {
-              return f.id === String(chat3);
-            }).length,
-            1
-          );
-        });
+    it('should find messages using afterId', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        afterId: chat2.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat3.id]);
+    });
+
+    it('should find messages around unread marker', async () => {
+      const unreadItemService = require('gitter-web-unread-items');
+      const chatServiceWithUnreads = proxyquireNoCallThru('../lib/chat-service', {
+        'gitter-web-unread-items': unreadItemService
+      });
+      const getFirstUnreadItemStub = sinon.stub(unreadItemService, 'getFirstUnreadItem');
+      const { troupe1, user1 } = fixture;
+      getFirstUnreadItemStub.withArgs(user1.id, troupe1.id).returns(Promise.resolve(chat2.id));
+      const chats = await chatServiceWithUnreads.findChatMessagesForTroupe(fixture.troupe1.id, {
+        marker: 'first-unread',
+        userId: user1.id
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
+      getFirstUnreadItemStub.restore();
     });
   });
 

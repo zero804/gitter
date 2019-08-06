@@ -143,6 +143,7 @@ module.exports = {
 
   subresources: {
     readBy: require('./chat-read-by'),
-    report: require('./chat-message-report')
+    report: require('./chat-message-report'),
+    thread: require('./chat-messages-thread')
   }
 };

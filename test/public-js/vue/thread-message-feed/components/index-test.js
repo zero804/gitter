@@ -17,21 +17,43 @@ describe('thread-message-feed index', () => {
   it('closed - matches snapshot', async () => {
     const { wrapper } = mount(Index, {}, store => {
       store.state.threadMessageFeed.isVisible = false;
-      // Further state changes shouldn't be necessary but for some reason the `mount` helper
-      // tries to render the v-if hidden child components as well and causes Vue warnings
-      addParentMessage(store.state);
-      addDefaultUser(store.state);
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('opened - matches snapshot', () => {
-    const { wrapper } = mount(Index, {}, store => {
-      addParentMessage(store.state);
-      addDefaultUser(store.state);
-      store.state.threadMessageFeed.isVisible = true;
+  describe('child messages', () => {
+    it('opened - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.results = [
+          createSerializedMessageFixture({ id: '1' }),
+          createSerializedMessageFixture({ id: '2' })
+        ];
+      });
+      expect(wrapper.element).toMatchSnapshot();
     });
-    expect(wrapper.element).toMatchSnapshot();
+
+    it('loading - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.loading = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('error - matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        addParentMessage(store.state);
+        addDefaultUser(store.state);
+        store.state.threadMessageFeed.isVisible = true;
+        store.state.threadMessageFeed.childMessages.error = true;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 
   it('dark theme - matches snapshot', () => {
