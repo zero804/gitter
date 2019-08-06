@@ -2,14 +2,15 @@ import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import VuexApiRequest from '../../store/vuex-api-request';
 
-const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
+// Exported for testing
+export const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
 
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType
+  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
 
 export default {

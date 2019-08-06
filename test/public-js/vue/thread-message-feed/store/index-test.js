@@ -3,17 +3,15 @@
 jest.mock('../../../../../public/js/utils/appevents');
 jest.mock('../../../../../public/js/components/api-client');
 
-const VuexApiRequest = require('../../../../../public/js/vue/store/vuex-api-request').default;
 const testAction = require('../../store/vuex-action-helper');
 const appEvents = require('../../../../../public/js/utils/appevents');
 const apiClient = require('../../../../../public/js/components/api-client');
 const { createSerializedMessageFixture } = require('../../fixture-helpers');
 const {
   default: { actions, mutations, getters },
-  types
+  types,
+  childMessagesVuexRequest
 } = require('../../../../../public/js/vue/thread-message-feed/store');
-
-const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
 
 describe('thread message feed store', () => {
   describe('actions', () => {
