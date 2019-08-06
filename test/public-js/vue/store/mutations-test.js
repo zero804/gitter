@@ -2,7 +2,10 @@
 
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
-const { roomSearchRepoRequest } = require('../../../../public/js/vue/store/requests');
+const {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest
+} = require('../../../../public/js/vue/store/requests');
 const mutations = require('../../../../public/js/vue/store/mutations').default;
 
 const { createSerializedRoomFixture } = require('../fixture-helpers');
@@ -290,9 +293,9 @@ describe('mutations', () => {
 
       generateSearchTests(
         'Room',
-        types.REQUEST_ROOM_SEARCH_ROOM,
-        types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS,
-        types.RECEIVE_ROOM_SEARCH_ROOM_ERROR,
+        roomSearchRoomRequest.requestType,
+        roomSearchRoomRequest.successType,
+        roomSearchRoomRequest.errorType,
         'room'
       );
 

@@ -1,5 +1,5 @@
 import * as types from './mutation-types';
-import { roomSearchRepoRequest } from './requests';
+import { roomSearchRepoRequest, roomSearchRoomRequest } from './requests';
 import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
@@ -147,7 +147,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         commit(roomSearchRepoRequest.errorType, err);
       });
 
-    commit(types.REQUEST_ROOM_SEARCH_ROOM);
+    commit(roomSearchRoomRequest.requestType);
     apiClient
       .get('/v1/rooms', {
         q: searchInputValue,
@@ -159,10 +159,10 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         rooms.forEach(room => {
           dispatch('upsertRoom', room);
         });
-        commit(types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, rooms.map(room => room.id));
+        commit(roomSearchRoomRequest.successType, rooms.map(room => room.id));
       })
       .catch(err => {
-        commit(types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, err);
+        commit(roomSearchRoomRequest.errorType, err);
       });
 
     commit(types.REQUEST_ROOM_SEARCH_PEOPLE);
