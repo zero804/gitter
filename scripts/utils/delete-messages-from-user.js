@@ -11,6 +11,7 @@ const mkdir = fsPromises.mkdtemp;
 const onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 const userService = require('gitter-web-users');
 const chatService = require('gitter-web-chats');
+const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const chatsForUserSearch = require('gitter-web-elasticsearch/lib/chats-for-user-search');
 
 const opts = require('yargs')
@@ -97,18 +98,14 @@ const clearMessages = async () => {
 
   await makeBackup(messages);
 
-  const clearMessages = messages.map(function(message) {
-    message.set({
-      text: '',
-      html: ''
-    });
+  if (opts.dry) return;
 
-    if (!opts.dry) {
-      return message.save();
-    }
-  });
-
-  return Promise.all(clearMessages);
+  return Promise.all(
+    messages.map(async message => {
+      const troupe = await troupeService.findById(message.toTroupeId);
+      return chatService.deleteMessageFromRoom(troupe, message);
+    })
+  );
 };
 
 clearMessages()
