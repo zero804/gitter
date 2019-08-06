@@ -12,6 +12,7 @@ Developer facing:
  - Separate serializing for users based on a search term, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1543
  - Update dependency `sinon` to `^7.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1546
  - Remove unused/orphaned files from `public/` (dead code), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1552
+- Update dependency `useragent` to `2.3.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1523
 
 
 # 19.59.0 - 2019-07-31
