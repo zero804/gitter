@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import * as types from './mutation-types';
+import { roomSearchRepoRequest } from './requests';
 import fuzzysearch from 'fuzzysearch';
 
 function roomFilter(searchTermInput = '', room) {
@@ -68,20 +69,7 @@ export default {
     );
   },
 
-  [types.REQUEST_ROOM_SEARCH_REPO](state) {
-    state.search.repo.error = false;
-    state.search.repo.loading = true;
-  },
-  [types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS](state, searchResults) {
-    state.search.repo.error = false;
-    state.search.repo.loading = false;
-    state.search.repo.results = searchResults;
-  },
-  [types.RECEIVE_ROOM_SEARCH_REPO_ERROR](state) {
-    state.search.repo.error = true;
-    state.search.repo.loading = false;
-    state.search.repo.results = [];
-  },
+  ...roomSearchRepoRequest.mutations,
 
   [types.REQUEST_ROOM_SEARCH_ROOM](state) {
     state.search.room.error = false;
