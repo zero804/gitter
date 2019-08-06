@@ -30,8 +30,6 @@ const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
 
-var useHints = true;
-
 var MAX_CHAT_MESSAGE_LENGTH = 4096;
 
 var CURRENT_META_DATA_VERSION = markdownMajorVersion;
@@ -456,10 +454,7 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
       q = q.where('_id').gt(afterId);
     }
 
-    if (useHints) {
-      q.hint({ toTroupeId: 1, sent: -1 });
-    }
-
+    // TODO: explore implication of removing hints https://docs.mongodb.com/v3.2/core/query-plans/#index-filters
     q = q.sort(options.sort || { sent: sentOrder }).limit(limit);
 
     if (skip) {
@@ -482,6 +477,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     }
 
     return q
+      .where('parentId')
+      .exists(false)
       .lean()
       .exec()
       .then(function(results) {
@@ -504,6 +501,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .lte(sentBefore(aroundId))
     .where('_id')
     .lte(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'desc' })
     .lean()
     .limit(halfLimit);
@@ -513,14 +512,11 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .gte(sentAfter(aroundId))
     .where('_id')
     .gt(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'asc' })
     .lean()
     .limit(halfLimit);
-
-  if (useHints) {
-    q1.hint({ toTroupeId: 1, sent: -1 });
-    q2.hint({ toTroupeId: 1, sent: -1 });
-  }
 
   /* Around case */
   return Promise.all([q1.exec(), q2.exec()]).spread(function(a, b) {
@@ -626,12 +622,6 @@ function deleteMessageFromRoom(room, chatMessage) {
     .return(null);
 }
 
-const testOnly = {
-  setUseHints: function(value) {
-    useHints = value;
-  }
-};
-
 module.exports = {
   newChatMessageToTroupe,
   getRecentPublicChats,
@@ -647,6 +637,5 @@ module.exports = {
   searchChatMessagesForRoom,
   removeAllMessagesForUserId,
   removeAllMessagesForUserIdInRoomId,
-  deleteMessageFromRoom,
-  testOnly
+  deleteMessageFromRoom
 };

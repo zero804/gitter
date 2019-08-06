@@ -32,7 +32,10 @@ export default {
 </script>
 
 <template>
-  <div class="chat-item burstStart" :class="{ compact: useCompactStyles }">
+  <div
+    class="chat-item burstStart"
+    :class="{ compact: useCompactStyles, syncerror: message.error }"
+  >
     <div class="chat-item__container">
       <div class="chat-item__aside">
         <div class="chat-item__avatar">
@@ -50,7 +53,8 @@ export default {
           <!-- TODO add permalink https://gitlab.com/gitlab-org/gitter/webapp/issues/2218 -->
           <a class="chat-item__time" :title="sentTimeFormattedFull">{{ sentTimeFormatted }}</a>
         </div>
-        <div class="chat-item__text" v-html="message.html"></div>
+        <div v-if="message.html" class="chat-item__text" v-html="message.html"></div>
+        <div v-else class="chat-item__text">{{ message.text }}</div>
       </div>
     </div>
   </div>

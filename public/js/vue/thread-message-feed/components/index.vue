@@ -14,10 +14,13 @@ export default {
     ChatItem
   },
   computed: {
-    ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
+    ...mapGetters({
+      parentMessage: 'threadMessageFeed/parentMessage',
+      childMessages: 'threadMessageFeed/childMessages'
+    }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
-      childMessages: state => state.threadMessageFeed.childMessages,
+      childMessagesRequest: state => state.threadMessageFeed.childMessages,
       user: 'user',
       darkTheme: 'darkTheme'
     })
@@ -35,14 +38,14 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
-          <div v-if="childMessages.error" class="error-text error-box">
+          <div v-if="childMessagesRequest.error" class="error-text error-box">
             Error: Therad messages can't be fetched.
           </div>
-          <div v-else-if="childMessages.loading" class="loading-message">
+          <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
           <chat-item
-            v-for="message in childMessages.results"
+            v-for="message in childMessages"
             v-else
             :key="message.id"
             :message="message"
