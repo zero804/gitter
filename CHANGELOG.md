@@ -1,4 +1,4 @@
-# 19.60.0 - *upcoming*
+# 19.60.0 - 2019-08-06
 
  - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
  - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
