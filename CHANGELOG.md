@@ -5,6 +5,7 @@
 Developer facing:
 
  - Use VuexApiRequest for the left menu search, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1557
+ - Fix: `delete-messages-from-user.js` should remove messages instead of clearing them, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1555
 
 
 # 19.60.0 - 2019-08-06
