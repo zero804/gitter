@@ -2,6 +2,10 @@
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
 
+Developer facing:
+
+ - Use VuexApiRequest for the left menu search, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1557
+
 
 # 19.60.0 - 2019-08-06
 
