@@ -160,70 +160,6 @@ describe('mutations', () => {
   });
 
   describe('Search', () => {
-    function generateSearchTests(
-      type,
-      requestType,
-      receiveSuccessType,
-      recieveErrorType,
-      searchKey
-    ) {
-      describe(`${type}`, () => {
-        describe(`${requestType}`, () => {
-          beforeEach(() => {
-            state.search[searchKey].error = true;
-            state.search[searchKey].loading = true;
-
-            mutations[requestType](state);
-          });
-
-          it('clears error state', () => {
-            expect(state.search[searchKey].error).toEqual(false);
-          });
-
-          it('sets loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(true);
-          });
-        });
-
-        describe(`${receiveSuccessType}`, () => {
-          const searchResults = [1, 2];
-          beforeEach(() => {
-            mutations[receiveSuccessType](state, searchResults);
-          });
-
-          it('clears error state', () => {
-            expect(state.search[searchKey].error).toEqual(false);
-          });
-
-          it('clears loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(false);
-          });
-
-          it('sets search results', () => {
-            expect(state.search[searchKey].results).toEqual(searchResults);
-          });
-        });
-
-        describe(`${recieveErrorType}`, () => {
-          beforeEach(() => {
-            mutations[recieveErrorType](state);
-          });
-
-          it('sets error state', () => {
-            expect(state.search[searchKey].error).toEqual(true);
-          });
-
-          it('clears loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(false);
-          });
-
-          it('clears search results', () => {
-            expect(state.search[searchKey].results).toEqual([]);
-          });
-        });
-      });
-    }
-
     it('UPDATE_SEARCH_INPUT_VALUE', () => {
       const newValue = 'newTestValue';
       mutations[types.UPDATE_SEARCH_INPUT_VALUE](state, newValue);
@@ -285,39 +221,27 @@ describe('mutations', () => {
         });
       });
 
-      generateSearchTests(
-        'Repo',
-        roomSearchRepoRequest.requestType,
-        roomSearchRepoRequest.successType,
-        roomSearchRepoRequest.errorType,
-        'repo'
-      );
+      it('is integrated with roomSearchRepoRequest', () => {
+        mutations[roomSearchRepoRequest.successType](state, ['result']);
+        expect(state.search.repo.results).toEqual(['result']);
+      });
 
-      generateSearchTests(
-        'Room',
-        roomSearchRoomRequest.requestType,
-        roomSearchRoomRequest.successType,
-        roomSearchRoomRequest.errorType,
-        'room'
-      );
+      it('is integrated with roomSearchRoomRequest', () => {
+        mutations[roomSearchRoomRequest.successType](state, ['result']);
+        expect(state.search.room.results).toEqual(['result']);
+      });
 
-      generateSearchTests(
-        'People',
-        roomSearchPeopleRequest.requestType,
-        roomSearchPeopleRequest.successType,
-        roomSearchPeopleRequest.errorType,
-        'people'
-      );
+      it('is integrated with roomSearchPeopleRequest', () => {
+        mutations[roomSearchPeopleRequest.successType](state, ['result']);
+        expect(state.search.people.results).toEqual(['result']);
+      });
     });
 
     describe('Message search', () => {
-      generateSearchTests(
-        'Message',
-        messageSearchRequest.requestType,
-        messageSearchRequest.successType,
-        messageSearchRequest.errorType,
-        'message'
-      );
+      it('is integrated with messageSearchRequest', () => {
+        mutations[messageSearchRequest.successType](state, ['result']);
+        expect(state.search.message.results).toEqual(['result']);
+      });
     });
   });
 
