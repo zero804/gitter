@@ -1,10 +1,10 @@
 'use strict';
 
 module.exports = {
-  testMatch: ['<rootDir>/test/public-js/**/*-test.js'],
+  testMatch: ['<rootDir>/public/js/**/*-test.js'],
   moduleFileExtensions: ['js', 'json', 'vue'],
   moduleNameMapper: {
-    '\\.(jpg|jpeg|png|svg)$': '<rootDir>/test/public-js/vue/__mocks__/file_mock.js'
+    '\\.(jpg|jpeg|png|svg)$': '<rootDir>/public/js/vue/__mocks__/file_mock.js'
   },
   transform: {
     '^.+\\.js$': 'babel-jest',
