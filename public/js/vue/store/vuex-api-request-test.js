@@ -1,8 +1,6 @@
-'use strict';
-
 const assert = require('assert');
 
-const VuexApiRequest = require('../../../../public/js/vue/store/vuex-api-request').default;
+const VuexApiRequest = require('./vuex-api-request').default;
 
 describe('VuexApiRequest', () => {
   const testInstance = new VuexApiRequest('CHAT_MESSAGES', 'path.to.state');
