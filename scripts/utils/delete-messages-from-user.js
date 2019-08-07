@@ -5,8 +5,8 @@ const shutdown = require('shutdown');
 const path = require('path');
 const os = require('os');
 const fsPromises = require('fs').promises;
-const outputFile = fsPromises.appendFile;
-const mkdir = fsPromises.mkdtemp;
+const appendFile = fsPromises.appendFile;
+const mkdtemp = fsPromises.mkdtemp;
 
 const onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 const userService = require('gitter-web-users');
@@ -59,10 +59,10 @@ const makeBackup = async messages => {
     '--' +
     now.getTime() +
     '.json';
-  const dir = await mkdir(path.join(os.tmpdir(), 'gitter-delete-message-bak'));
+  const dir = await mkdtemp(path.join(os.tmpdir(), 'gitter-delete-message-bak'));
   const filePath = path.join(dir, filename);
   console.log('Saving log to:', filePath);
-  return outputFile(filePath, JSON.stringify(messages, null, 2));
+  return appendFile(filePath, JSON.stringify(messages, null, 2));
 };
 
 const clearMessages = async () => {
