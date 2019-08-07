@@ -2,6 +2,12 @@
 
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
+const {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest,
+  messageSearchRequest
+} = require('../../../../public/js/vue/store/requests');
 const mutations = require('../../../../public/js/vue/store/mutations').default;
 
 const { createSerializedRoomFixture } = require('../fixture-helpers');
@@ -154,70 +160,6 @@ describe('mutations', () => {
   });
 
   describe('Search', () => {
-    function generateSearchTests(
-      type,
-      requestType,
-      receiveSuccessType,
-      recieveErrorType,
-      searchKey
-    ) {
-      describe(`${type}`, () => {
-        describe(`${requestType}`, () => {
-          beforeEach(() => {
-            state.search[searchKey].error = true;
-            state.search[searchKey].loading = true;
-
-            mutations[requestType](state);
-          });
-
-          it('clears error state', () => {
-            expect(state.search[searchKey].error).toEqual(false);
-          });
-
-          it('sets loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(true);
-          });
-        });
-
-        describe(`${receiveSuccessType}`, () => {
-          const searchResults = [1, 2];
-          beforeEach(() => {
-            mutations[receiveSuccessType](state, searchResults);
-          });
-
-          it('clears error state', () => {
-            expect(state.search[searchKey].error).toEqual(false);
-          });
-
-          it('clears loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(false);
-          });
-
-          it('sets search results', () => {
-            expect(state.search[searchKey].results).toEqual(searchResults);
-          });
-        });
-
-        describe(`${recieveErrorType}`, () => {
-          beforeEach(() => {
-            mutations[recieveErrorType](state);
-          });
-
-          it('sets error state', () => {
-            expect(state.search[searchKey].error).toEqual(true);
-          });
-
-          it('clears loading state', () => {
-            expect(state.search[searchKey].loading).toEqual(false);
-          });
-
-          it('clears search results', () => {
-            expect(state.search[searchKey].results).toEqual([]);
-          });
-        });
-      });
-    }
-
     it('UPDATE_SEARCH_INPUT_VALUE', () => {
       const newValue = 'newTestValue';
       mutations[types.UPDATE_SEARCH_INPUT_VALUE](state, newValue);
@@ -279,39 +221,27 @@ describe('mutations', () => {
         });
       });
 
-      generateSearchTests(
-        'Repo',
-        types.REQUEST_ROOM_SEARCH_REPO,
-        types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS,
-        types.RECEIVE_ROOM_SEARCH_REPO_ERROR,
-        'repo'
-      );
+      it('is integrated with roomSearchRepoRequest', () => {
+        mutations[roomSearchRepoRequest.successType](state, ['result']);
+        expect(state.search.repo.results).toEqual(['result']);
+      });
 
-      generateSearchTests(
-        'Room',
-        types.REQUEST_ROOM_SEARCH_ROOM,
-        types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS,
-        types.RECEIVE_ROOM_SEARCH_ROOM_ERROR,
-        'room'
-      );
+      it('is integrated with roomSearchRoomRequest', () => {
+        mutations[roomSearchRoomRequest.successType](state, ['result']);
+        expect(state.search.room.results).toEqual(['result']);
+      });
 
-      generateSearchTests(
-        'People',
-        types.REQUEST_ROOM_SEARCH_PEOPLE,
-        types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS,
-        types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR,
-        'people'
-      );
+      it('is integrated with roomSearchPeopleRequest', () => {
+        mutations[roomSearchPeopleRequest.successType](state, ['result']);
+        expect(state.search.people.results).toEqual(['result']);
+      });
     });
 
     describe('Message search', () => {
-      generateSearchTests(
-        'People',
-        types.REQUEST_MESSAGE_SEARCH,
-        types.RECEIVE_MESSAGE_SEARCH_SUCCESS,
-        types.RECEIVE_MESSAGE_SEARCH_ERROR,
-        'message'
-      );
+      it('is integrated with messageSearchRequest', () => {
+        mutations[messageSearchRequest.successType](state, ['result']);
+        expect(state.search.message.results).toEqual(['result']);
+      });
     });
   });
 
