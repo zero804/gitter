@@ -9,8 +9,6 @@ var onReady = require('../utils/onready');
 var showDesktopNotification = require('../utils/show-desktop-notification');
 
 var linkHandler = require('./link-handler');
-// disabled inline notifications because they are sucky
-// var webNotifications = require('./web-notifications');
 var WindowNotification = window.Notification;
 var webkitNotifications = window.webkitNotifications;
 

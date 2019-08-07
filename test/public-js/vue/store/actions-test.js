@@ -21,6 +21,59 @@ const apiClient = require('../../../../public/js/components/api-client');
 
 const { createSerializedRoomFixture } = require('../fixture-helpers');
 
+const REPO_SEARCH_RESPONSE = [
+  {
+    id: 34833775,
+    name: 'MadLittleMods/postcss-css-variables',
+    description:
+      'PostCSS plugin to transform CSS Custom Properties(CSS variables) syntax into a static representation',
+    uri: 'MadLittleMods/postcss-css-variables',
+    private: false,
+    room: {
+      id: '55c0b4f60fc9f982beac26ca',
+      name: 'MadLittleMods/postcss-css-variables',
+      topic:
+        'PostCSS plugin to transform CSS Custom Properties(CSS variables) syntax into a static representation',
+      avatarUrl: 'https://avatars-01.gitter.im/group/iv/3/57542c89c43b8c601977426d',
+      uri: 'MadLittleMods/postcss-css-variables',
+      oneToOne: false,
+      userCount: 10,
+      unreadItems: 0,
+      mentions: 0,
+      lastAccessTime: '2019-02-07T21:58:57.238Z',
+      lurk: false,
+      url: '/MadLittleMods/postcss-css-variables',
+      githubType: 'REPO',
+      security: 'PUBLIC',
+      noindex: false,
+      roomMember: true,
+      groupId: '57542c89c43b8c601977426d',
+      public: true
+    },
+    exists: true,
+    avatar_url: 'https://avatars3.githubusercontent.com/u/558581?v=4'
+  },
+  {
+    id: 39976492,
+    name: 'MadLittleMods/postcss-increase-specificity',
+    description:
+      "Why? Dealing with CSS you can't remove(mainly from a 3rd party). Increases specificity of selectors.",
+    uri: 'MadLittleMods/postcss-increase-specificity',
+    private: false,
+    exists: false,
+    avatar_url: 'https://avatars3.githubusercontent.com/u/558581?v=4'
+  },
+  {
+    id: 41282211,
+    name: 'MadLittleMods/postcss-presentation',
+    description: 'PostCSS presentation to introduce PostCSS to my coworkers',
+    uri: 'MadLittleMods/postcss-presentation',
+    private: false,
+    exists: false,
+    avatar_url: 'https://avatars3.githubusercontent.com/u/558581?v=4'
+  }
+];
+
 describe('actions', () => {
   let state;
   beforeEach(() => {
@@ -339,13 +392,8 @@ describe('actions', () => {
       );
     });
 
-    it('searches value success', done => {
+    it('room searches succeeds with some results', done => {
       state.search.searchInputValue = 'special';
-
-      const repoRoomResult1 = _.omit(createSerializedRoomFixture('github-org/repo1'), [
-        'lastAccessTime',
-        'roomMember'
-      ]);
 
       const roomResult1 = _.omit(createSerializedRoomFixture('community/not-joined1'), [
         'lastAccessTime',
@@ -364,7 +412,7 @@ describe('actions', () => {
         v: 1
       };
 
-      apiClient.user.get.mockImplementation(() => Promise.resolve({ results: [repoRoomResult1] }));
+      apiClient.user.get.mockImplementation(() => Promise.resolve({ results: [] }));
       apiClient.get.mockImplementation(endpoint => {
         if (endpoint === '/v1/rooms') {
           return Promise.resolve({ results: [roomResult1] });
@@ -382,15 +430,46 @@ describe('actions', () => {
           { type: types.REQUEST_ROOM_SEARCH_REPO },
           { type: types.REQUEST_ROOM_SEARCH_ROOM },
           { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
-          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [repoRoomResult1.id] },
+          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [] },
           { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1.id] },
           { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1.id] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
-          { type: 'upsertRoom', payload: repoRoomResult1 },
           { type: 'upsertRoom', payload: roomResult1 },
           { type: 'upsertRoom', payload: oneToOneResult1 }
+        ],
+        done
+      );
+    });
+
+    it('repo searches succeeds with some results', done => {
+      state.search.searchInputValue = 'postcss';
+
+      apiClient.user.get.mockImplementation(() =>
+        Promise.resolve({ results: REPO_SEARCH_RESPONSE })
+      );
+      apiClient.get.mockImplementation(() => Promise.resolve({ results: [] }));
+
+      testAction(
+        actions.fetchRoomSearchResults,
+        null,
+        state,
+        [
+          { type: types.UPDATE_ROOM_SEARCH_CURRENT },
+          { type: types.REQUEST_ROOM_SEARCH_REPO },
+          { type: types.REQUEST_ROOM_SEARCH_ROOM },
+          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          {
+            type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS,
+            payload: [REPO_SEARCH_RESPONSE[0].room.id]
+          },
+          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [] },
+          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [] }
+        ],
+        [
+          { type: 'trackStat', payload: 'left-menu.search.input' },
+          { type: 'upsertRoom', payload: REPO_SEARCH_RESPONSE[0].room }
         ],
         done
       );

@@ -1,13 +1,27 @@
+# 19.60.0 - 2019-08-06
+
+ - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
+ - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
+ - Fix "Chat privately" in user popover not changing left-menu room highlight, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1547
+ - Fix room switching in IE11, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1551
+ - Provide helpful link to community/room creation docs to the homepage for repo maintainers that are new to Gitter, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1550
+    - Thanks to [@kellytk](https://gitlab.com/kellytk) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1549
+
+Developer facing:
+
+ - Separate serializing for users based on a search term, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1543
+ - Update dependency `sinon` to `^7.3.2`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1546
+ - Remove unused/orphaned files from `public/` (dead code), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1552
+- Update dependency `useragent` to `2.3.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1523
+
+
 # 19.59.0 - 2019-07-31
 
  - Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
- - Add `parentId` to threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1490
- - Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
  - Update dependency `@gitterhq/services` to `1.25.0` for [repl.it](https://repl.it/site/docs/classrooms/webhooks) service
     - Thanks to [@kgashok](https://gitlab.com/kgashok) for the contribution, https://gitlab.com/gitlab-org/gitter/services/merge_requests/104
- - Restrict restSerializer options to the expected values, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1492
  - Update @gitterhq/translations to 1.10.1, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1535
-    - Thanks to [@brainsucked](https://github.com/brainsucked\) for [contributing a fix to the Bulgarian translation](https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/70)
+    - Thanks to [@brainsucked](https://github.com/brainsucked) for [contributing a fix to the Bulgarian translation](https://gitlab.com/gitlab-org/gitter/gitter-translations/merge_requests/70)
 
 Developer facing:
 
@@ -16,6 +30,9 @@ Developer facing:
  - Update dependency `parse-diff` to `^0.5.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1512
  - Update dependency `core-js` to `v3`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1530
  - Update dependency `redis-lock` to `v0.1.4`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1516
+ - Restrict `restSerializer` options to the expected values, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1492
+ - Add `parentId` to threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1490
+ - Programmatically globally load KaTeX fonts, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1534
 
 
 # 19.58.0 - 2019-7-29
@@ -479,7 +496,7 @@ Developer facing:
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1281
  - Update minimum requirement to npm 6.x
     - Thanks to [@gtsiolis](https://gitlab.com/gtsiolis) for the contribution, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1286
- - Remove unused/orphaned dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
+ - Remove unused/orphaned dependencies (dead code), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1289
  - Re-enable validation CI job (fix eslint errors), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1290
 
 

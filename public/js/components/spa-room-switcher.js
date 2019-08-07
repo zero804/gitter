@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var urlParser = require('../utils/url-parser');
 const context = require('gitter-web-client-context');
 const log = require('../utils/log');
+const appEvents = require('../utils/appevents');
 
 const useVueLeftMenu = context.hasFeature('vue-left-menu');
 
@@ -34,14 +35,21 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
   },
 
   _changeNew: function(iframeUrl) {
-    var targetParsed = urlParser.parse(iframeUrl);
+    const targetParsed = urlParser.parse(iframeUrl);
+
+    let pathname = targetParsed.pathname;
+    // Fix for IE 10 giving iframeUrls with first slash missing
+    if (iframeUrl.search(/^https?:/i) < 0 && iframeUrl.charAt(0) !== '/') {
+      pathname = '/' + pathname;
+    }
 
     // Check that we are navigating to a ~chat page
-    var targetInfo = this.getFrameType(targetParsed.pathname);
+    var targetInfo = this.getFrameType(pathname);
     if (targetInfo.type === 'chat' && targetInfo.roomUrl) {
       // Try find the room in the collection
       var newTroupe = this._troupes.findWhere({ url: targetInfo.roomUrl });
       if (newTroupe) {
+        appEvents.trigger('dispatchVueAction', 'changeDisplayedRoom', newTroupe.id);
         return this.trigger('switch', newTroupe);
       }
     }

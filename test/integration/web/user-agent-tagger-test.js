@@ -28,9 +28,9 @@ describe('user agent tags', function() {
     assert.equal(tags['agent:family'], 'GitterBeta');
     assert.equal(tags['agent:version'], '1.2.1');
     assert.equal(tags['agent:device:family'], 'iPhone');
-    assert.equal(tags['agent:device:version'], undefined);
+    assert.equal(tags['agent:device:version'], '0.0.0');
     assert.equal(tags['agent:os:family'], 'iOS');
-    assert.equal(tags['agent:os:version'], '7.1');
+    assert.equal(tags['agent:os:version'], '7.1.0');
   });
 
   it('should map the gitter ios app version without buildnumber/versionnumber fix', function() {
@@ -54,7 +54,7 @@ describe('user agent tags', function() {
     assert.equal(tags['agent:family'], 'Chrome');
     assert.equal(tags['agent:version'], '35.0.1916');
     assert.equal(tags['agent:device:family'], 'Other');
-    assert.equal(tags['agent:device:version'], undefined);
+    assert.equal(tags['agent:device:version'], '0.0.0');
     assert.equal(tags['agent:os:family'], 'Mac OS X');
     assert.equal(tags['agent:os:version'], '10.9.3');
   });
