@@ -3,6 +3,12 @@
 const _ = require('lodash');
 const createState = require('../../../../public/js/vue/store/state').default;
 const types = require('../../../../public/js/vue/store/mutation-types');
+const {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest,
+  messageSearchRequest
+} = require('../../../../public/js/vue/store/requests');
 
 jest.mock('gitter-web-client-context');
 jest.mock('../../../../public/js/utils/appevents', () => {
@@ -427,12 +433,12 @@ describe('actions', () => {
         state,
         [
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
-          { type: types.REQUEST_ROOM_SEARCH_REPO },
-          { type: types.REQUEST_ROOM_SEARCH_ROOM },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
-          { type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, payload: [] },
-          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [roomResult1.id] },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [oneToOneResult1.id] }
+          { type: roomSearchRepoRequest.requestType },
+          { type: roomSearchRoomRequest.requestType },
+          { type: roomSearchPeopleRequest.requestType },
+          { type: roomSearchRepoRequest.successType, payload: [] },
+          { type: roomSearchRoomRequest.successType, payload: [roomResult1.id] },
+          { type: roomSearchPeopleRequest.successType, payload: [oneToOneResult1.id] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
@@ -457,15 +463,15 @@ describe('actions', () => {
         state,
         [
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
-          { type: types.REQUEST_ROOM_SEARCH_REPO },
-          { type: types.REQUEST_ROOM_SEARCH_ROOM },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
+          { type: roomSearchRepoRequest.requestType },
+          { type: roomSearchRoomRequest.requestType },
+          { type: roomSearchPeopleRequest.requestType },
           {
-            type: types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS,
+            type: roomSearchRepoRequest.successType,
             payload: [REPO_SEARCH_RESPONSE[0].room.id]
           },
-          { type: types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, payload: [] },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, payload: [] }
+          { type: roomSearchRoomRequest.successType, payload: [] },
+          { type: roomSearchPeopleRequest.successType, payload: [] }
         ],
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
@@ -487,12 +493,12 @@ describe('actions', () => {
         state,
         [
           { type: types.UPDATE_ROOM_SEARCH_CURRENT },
-          { type: types.REQUEST_ROOM_SEARCH_REPO },
-          { type: types.REQUEST_ROOM_SEARCH_ROOM },
-          { type: types.REQUEST_ROOM_SEARCH_PEOPLE },
-          { type: types.RECEIVE_ROOM_SEARCH_REPO_ERROR, payload: true },
-          { type: types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, payload: true },
-          { type: types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, payload: true }
+          { type: roomSearchRepoRequest.requestType },
+          { type: roomSearchRoomRequest.requestType },
+          { type: roomSearchPeopleRequest.requestType },
+          { type: roomSearchRepoRequest.errorType, payload: true },
+          { type: roomSearchRoomRequest.errorType, payload: true },
+          { type: roomSearchPeopleRequest.errorType, payload: true }
         ],
         [{ type: 'trackStat', payload: 'left-menu.search.input' }],
         done
@@ -518,8 +524,8 @@ describe('actions', () => {
         null,
         state,
         [
-          { type: types.REQUEST_MESSAGE_SEARCH },
-          { type: types.RECEIVE_MESSAGE_SEARCH_SUCCESS, payload: null }
+          { type: messageSearchRequest.requestType },
+          { type: messageSearchRequest.successType, payload: null }
         ],
         [],
         done
@@ -537,8 +543,8 @@ describe('actions', () => {
         null,
         state,
         [
-          { type: types.REQUEST_MESSAGE_SEARCH },
-          { type: types.RECEIVE_MESSAGE_SEARCH_ERROR, payload: null }
+          { type: messageSearchRequest.requestType },
+          { type: messageSearchRequest.errorType, payload: null }
         ],
         [],
         done
