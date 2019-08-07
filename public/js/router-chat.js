@@ -44,6 +44,18 @@ onready(function() {
       'setMessages',
       chatCollection.models.map(m => m.attributes)
     );
+    chatCollection.models.forEach(m => {
+      if (m.attributes.parentId) {
+        chatCollection.remove(m);
+      }
+    });
+  });
+
+  // TODO: find out why the TMF adds new message to the collection in the first place
+  chatCollection.on('add', message => {
+    if (message.attributes.parentId) {
+      chatCollection.remove(message);
+    }
   });
   var appView = new ChatToolbarInputLayout({
     model: context.troupe(),
