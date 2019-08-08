@@ -661,13 +661,13 @@ describe('actions', () => {
     );
   });
 
-  it('setMessages', async () => {
+  it('addMessages', async () => {
     const message1 = { id: '5cf8ef111111111111111111' };
     const message2 = { id: '5cf8ef222222222222222222' };
     const payload = [message1, message2];
-    await testAction(actions.setMessages, payload, state, [
+    await testAction(actions.addMessages, payload, state, [
       {
-        type: types.REPLACE_MESSAGE_MAP,
+        type: types.ADD_TO_MESSAGE_MAP,
         payload: { [message1.id]: message1, [message2.id]: message2 }
       }
     ]);

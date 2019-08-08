@@ -1,5 +1,6 @@
 jest.mock('../../../utils/appevents');
 jest.mock('../../../components/api-client');
+jest.spyOn(Date, 'now').mockImplementation(() => 1479427200000);
 
 const testAction = require('../../store/__test__/vuex-action-helper');
 const appEvents = require('../../../utils/appevents');
@@ -47,16 +48,29 @@ describe('thread message feed store', () => {
       ]);
     });
 
-    it('sendMessage creates message object and submits it to the collection', async () => {
-      await testAction(
-        actions.sendMessage,
-        undefined,
-        { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' },
-        [{ type: types.UPDATE_DRAFT_MESSAGE, payload: '' }]
-      );
-      expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
-        text: 'testMessage',
-        parentId: '5d11d571a2405419771cd3ee'
+    describe('sendMessage', () => {
+      it('sendMessage creates message object and submits it to the collection', async () => {
+        const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
+        const state = { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' };
+        const tmpMessage = {
+          id: `tmp-${Date.now()}`, // TODO: this is going to be flakey
+          fromUser: undefined,
+          text: state.draftMessage,
+          parentId: state.parentId
+        };
+        apiClient.room.post.mockResolvedValue(storedMessage);
+        await testAction(actions.sendMessage, undefined, state, [
+          { type: types.REQUEST_SEND_CHILD_MESSAGE, payload: { tmpMessage } },
+          { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
+          {
+            type: types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS,
+            payload: { tmpId: tmpMessage.id, message: storedMessage }
+          }
+        ]);
+        expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
+          text: 'testMessage',
+          parentId: '5d11d571a2405419771cd3ee'
+        });
       });
     });
 
@@ -110,8 +124,12 @@ describe('thread message feed store', () => {
       const state = childMessagesVuexRequest.initialState;
       const childMessage = createSerializedMessageFixture();
       mutations[childMessagesVuexRequest.successType](state, [childMessage]);
-      expect(state.childMessages.results).toEqual([childMessage]);
+      expect(state.childMessagesRequest.results).toEqual([childMessage]);
     });
+
+    test.todo('REQUEST_SEND_CHILD_MESSAGE');
+    test.todo('RESPONSE_SEND_CHILD_MESSAGE_SUCCESS');
+    test.todo('RESPONSE_SEND_CHILD_MESSAGE_ERROR');
   });
 
   describe('getters', () => {

@@ -20,7 +20,7 @@ export default {
     }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
-      childMessagesRequest: state => state.threadMessageFeed.childMessages,
+      childMessagesRequest: state => state.threadMessageFeed.childMessagesRequest,
       user: 'user',
       darkTheme: 'darkTheme'
     })

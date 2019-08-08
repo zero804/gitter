@@ -1,11 +1,14 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import VuexApiRequest from '../../store/vuex-api-request';
-import * as moment from 'moment';
+import moment from 'moment';
 import * as _ from 'lodash';
 
 // Exported for testing
-export const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
+export const childMessagesVuexRequest = new VuexApiRequest(
+  'CHILD_MESSAGES',
+  'childMessagesRequest'
+);
 
 // Exported for testing
 export const types = {
@@ -37,22 +40,24 @@ export default {
       state.draftMessage = draftMessage;
     },
     [types.REQUEST_SEND_CHILD_MESSAGE](state, { tmpMessage }) {
-      state.childMessages.results.push(tmpMessage);
+      state.childMessagesRequest.results.push(tmpMessage);
     },
     [types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS](state, { tmpId, message }) {
-      const updatedResults = state.childMessages.results.filter(message => message.id !== tmpId);
+      const updatedResults = state.childMessagesRequest.results.filter(
+        message => message.id !== tmpId
+      );
       updatedResults.push(message);
-      state.childMessages.results = updatedResults;
+      state.childMessagesRequest.results = updatedResults;
     },
     [types.RESPONSE_SEND_CHILD_MESSAGE_ERROR](state, { tmpId }) {
-      const updatedResults = state.childMessages.results.map(message => {
+      const updatedResults = state.childMessagesRequest.results.map(message => {
         if (message.id === tmpId) {
           return { ...message, error: true };
         } else {
           return message;
         }
       });
-      state.childMessages.results = updatedResults;
+      state.childMessagesRequest.results = updatedResults;
     },
     ...childMessagesVuexRequest.mutations
   },
@@ -63,8 +68,9 @@ export default {
     childMessages: (state, getters, rootState) => {
       const { parentId } = state;
       const updates = Object.values(rootState.messageMap).filter(m => m.parentId === parentId);
-      const allChildMessages = [...updates, ...state.childMessages.results];
+      const allChildMessages = [...updates, ...state.childMessagesRequest.results];
       const uniqueMessages = _.uniq(allChildMessages, false, 'id');
+      // we use moment because the messages combine messages from bayeux (messageMap) and ordinary json messages (results)
       return uniqueMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
     }
   },
@@ -89,7 +95,7 @@ export default {
         text: state.draftMessage,
         parentId: state.parentId
       };
-      const tmpId = `tmp-${new Date().getTime()}`;
+      const tmpId = `tmp-${Date.now()}`;
       const tmpMessage = {
         ...message,
         id: tmpId,

@@ -23,7 +23,7 @@ describe('thread-message-feed index', () => {
         addParentMessage(store.state);
         addDefaultUser(store.state);
         store.state.threadMessageFeed.isVisible = true;
-        store.state.threadMessageFeed.childMessages.results = [
+        store.state.threadMessageFeed.childMessagesRequest.results = [
           createSerializedMessageFixture({ id: '1' }),
           createSerializedMessageFixture({ id: '2' })
         ];
@@ -36,7 +36,7 @@ describe('thread-message-feed index', () => {
         addParentMessage(store.state);
         addDefaultUser(store.state);
         store.state.threadMessageFeed.isVisible = true;
-        store.state.threadMessageFeed.childMessages.loading = true;
+        store.state.threadMessageFeed.childMessagesRequest.loading = true;
       });
       expect(wrapper.element).toMatchSnapshot();
     });
@@ -46,7 +46,7 @@ describe('thread-message-feed index', () => {
         addParentMessage(store.state);
         addDefaultUser(store.state);
         store.state.threadMessageFeed.isVisible = true;
-        store.state.threadMessageFeed.childMessages.error = true;
+        store.state.threadMessageFeed.childMessagesRequest.error = true;
       });
       expect(wrapper.element).toMatchSnapshot();
     });

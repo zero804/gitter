@@ -294,4 +294,13 @@ describe('mutations', () => {
       expect(state.roomMap[123]).toEqual(newRoomObject);
     });
   });
+  describe('ADD_TO_MESSAGE_MAP', () => {
+    it('should merge existing map and payload', () => {
+      const message1 = { id: '5cf8ef111111111111111111' };
+      const message2 = { id: '5cf8ef222222222222222222' };
+      state.messageMap = { [message1.id]: message1 };
+      mutations[types.ADD_TO_MESSAGE_MAP](state, { [message2.id]: message2 });
+      expect(state.messageMap).toEqual({ [message1.id]: message1, [message2.id]: message2 });
+    });
+  });
 });
