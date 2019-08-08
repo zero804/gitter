@@ -1,6 +1,7 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import VuexApiRequest from '../../store/vuex-api-request';
+import * as moment from 'moment';
 import * as _ from 'lodash';
 
 // Exported for testing
@@ -64,7 +65,7 @@ export default {
       const updates = Object.values(rootState.messageMap).filter(m => m.parentId === parentId);
       const allChildMessages = [...updates, ...state.childMessages.results];
       const uniqueMessages = _.uniq(allChildMessages, false, 'id');
-      return uniqueMessages.sort((m1, m2) => new Date(m1.sent) - new Date(m2.sent));
+      return uniqueMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
     }
   },
   actions: {
@@ -95,7 +96,6 @@ export default {
         fromUser: rootState.user
       };
       commit(types.REQUEST_SEND_CHILD_MESSAGE, { tmpMessage });
-      // TODO add the temporary message to the feed + react on success or failure
       apiClient.room
         .post('/chatMessages', message)
         .then(message => commit(types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS, { tmpId, message }))

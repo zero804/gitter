@@ -243,7 +243,7 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
 
 export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
 
-export const setMessages = ({ commit }, messages) => {
+export const addMessages = ({ commit }, messages) => {
   const newMessageMap = _.indexBy(messages, 'id');
-  commit(types.REPLACE_MESSAGE_MAP, newMessageMap);
+  commit(types.ADD_TO_MESSAGE_MAP, newMessageMap);
 };

@@ -38,25 +38,31 @@ require('./components/ping');
 
 onready(function() {
   require('./components/link-handler').installLinkHandler();
+  const useThreadedConversations = context.hasFeature('threaded-conversations');
+  function removeMessageIfChild(collection, message) {
+    if (message.attributes.parentId) {
+      collection.remove(message);
+    }
+  }
+
   chatCollection.on('sync', () => {
     appEvents.trigger(
       'dispatchVueAction',
-      'setMessages',
+      'addMessages',
       chatCollection.models.map(m => m.attributes)
     );
+    if (!useThreadedConversations) return;
     chatCollection.models.forEach(m => {
-      if (m.attributes.parentId) {
-        chatCollection.remove(m);
-      }
+      removeMessageIfChild(chatCollection, m);
     });
   });
 
-  // TODO: find out why the TMF adds new message to the collection in the first place
-  chatCollection.on('add', message => {
-    if (message.attributes.parentId) {
-      chatCollection.remove(message);
-    }
-  });
+  if (useThreadedConversations) {
+    chatCollection.on('add', message => {
+      appEvents.trigger('dispatchVueAction', 'addMessages', [message.attributes]);
+      removeMessageIfChild(chatCollection, message);
+    });
+  }
   var appView = new ChatToolbarInputLayout({
     model: context.troupe(),
     template: false,
