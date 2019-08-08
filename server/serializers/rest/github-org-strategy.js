@@ -47,6 +47,7 @@ function GitHubOrgStrategy(options) {
       id: item.id,
       name: item.login,
       avatar_url: item.avatar_url,
+      absoluteUri: item.absoluteUri,
       room: troupeUriStrategy.map(item.login),
       premium: !!plan
     };
