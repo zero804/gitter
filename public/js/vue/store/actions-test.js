@@ -668,7 +668,7 @@ describe('actions', () => {
     await testAction(actions.addMessages, payload, state, [
       {
         type: types.ADD_TO_MESSAGE_MAP,
-        payload: { [message1.id]: message1, [message2.id]: message2 }
+        payload
       }
     ]);
   });

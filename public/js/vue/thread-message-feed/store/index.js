@@ -1,24 +1,17 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
-import VuexApiRequest from '../../store/vuex-api-request';
 import moment from 'moment';
 import * as _ from 'lodash';
-
-// Exported for testing
-export const childMessagesVuexRequest = new VuexApiRequest(
-  'CHILD_MESSAGES',
-  'childMessagesRequest'
-);
+import * as rootTypes from '../../store/mutation-types';
 
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  REQUEST_SEND_CHILD_MESSAGE: 'REQUEST_SEND_CHILD_MESSAGE',
-  RESPONSE_SEND_CHILD_MESSAGE_SUCCESS: 'RESPONSE_SEND_CHILD_MESSAGE_SUCCESS',
-  RESPONSE_SEND_CHILD_MESSAGE_ERROR: 'RESPONSE_SEND_CHILD_MESSAGE_ERROR',
-  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
+  REQUEST_CHILD_MESSAGES: 'REQUEST_CHILD_MESSAGES',
+  RESPONSE_CHILD_MESSAGES_SUCCESS: 'RESPONSE_CHILD_MESSAGES_SUCCESS',
+  RESPONSE_CHILD_MESSAGES_ERROR: 'RESPONSE_CHILD_MESSAGES_ERROR'
 };
 
 export default {
@@ -27,7 +20,7 @@ export default {
     isVisible: false,
     draftMessage: '',
     parentId: null,
-    ...childMessagesVuexRequest.initialState
+    childMessagesRequest: { loading: false, error: false }
   }),
   mutations: {
     [types.TOGGLE_THREAD_MESSAGE_FEED](state, isVisible) {
@@ -39,27 +32,18 @@ export default {
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     },
-    [types.REQUEST_SEND_CHILD_MESSAGE](state, { tmpMessage }) {
-      state.childMessagesRequest.results.push(tmpMessage);
+    [types.REQUEST_CHILD_MESSAGES](state) {
+      state.childMessagesRequest.loading = true;
+      state.childMessagesRequest.error = false;
     },
-    [types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS](state, { tmpId, message }) {
-      const updatedResults = state.childMessagesRequest.results.filter(
-        message => message.id !== tmpId
-      );
-      updatedResults.push(message);
-      state.childMessagesRequest.results = updatedResults;
+    [types.RESPONSE_CHILD_MESSAGES_SUCCESS](state) {
+      state.childMessagesRequest.loading = false;
+      state.childMessagesRequest.error = false;
     },
-    [types.RESPONSE_SEND_CHILD_MESSAGE_ERROR](state, { tmpId }) {
-      const updatedResults = state.childMessagesRequest.results.map(message => {
-        if (message.id === tmpId) {
-          return { ...message, error: true };
-        } else {
-          return message;
-        }
-      });
-      state.childMessagesRequest.results = updatedResults;
-    },
-    ...childMessagesVuexRequest.mutations
+    [types.RESPONSE_CHILD_MESSAGES_ERROR](state) {
+      state.childMessagesRequest.loading = false;
+      state.childMessagesRequest.error = true;
+    }
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
@@ -67,10 +51,11 @@ export default {
     },
     childMessages: (state, getters, rootState) => {
       const { parentId } = state;
-      const updates = Object.values(rootState.messageMap).filter(m => m.parentId === parentId);
-      const allChildMessages = [...updates, ...state.childMessagesRequest.results];
-      const uniqueMessages = _.uniq(allChildMessages, false, 'id');
-      // we use moment because the messages combine messages from bayeux (messageMap) and ordinary json messages (results)
+      const childMessages = Object.values(rootState.messageMap).filter(
+        m => m.parentId === parentId
+      );
+      const uniqueMessages = _.uniq(childMessages, false, 'id');
+      // we use moment because the messages combine messages from bayeux and ordinary json messages (fetch during TMF open)
       return uniqueMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
     }
   },
@@ -84,7 +69,7 @@ export default {
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
       commit(types.SET_PARENT_MESSAGE_ID, null);
-      commit(childMessagesVuexRequest.successType, []);
+      //commit(childMessagesVuexRequest.successType, []);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
@@ -101,21 +86,29 @@ export default {
         id: tmpId,
         fromUser: rootState.user
       };
-      commit(types.REQUEST_SEND_CHILD_MESSAGE, { tmpMessage });
+      commit(rootTypes.ADD_TO_MESSAGE_MAP, [tmpMessage], { root: true });
       apiClient.room
         .post('/chatMessages', message)
-        .then(message => commit(types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS, { tmpId, message }))
-        .catch(() => commit(types.RESPONSE_SEND_CHILD_MESSAGE_ERROR, { tmpId }));
+        .then(message => {
+          commit(rootTypes.REMOVE_FROM_MESSAGE_MAP, tmpId, { root: true });
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
+        })
+        .catch(() => {
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true }], { root: true });
+        });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     fetchChildMessages: ({ state, commit }) => {
-      commit(childMessagesVuexRequest.requestType);
+      commit(types.REQUEST_CHILD_MESSAGES);
       apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
-        .then(childMessages => commit(childMessagesVuexRequest.successType, childMessages))
+        .then(childMessages => {
+          commit(types.RESPONSE_CHILD_MESSAGES_SUCCESS);
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });
+        })
         .catch((/* error */) => {
           // error is reported by apiClient
-          commit(childMessagesVuexRequest.errorType);
+          commit(types.RESPONSE_CHILD_MESSAGES_ERROR);
         });
     }
   }

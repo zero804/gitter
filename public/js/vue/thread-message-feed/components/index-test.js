@@ -23,10 +23,12 @@ describe('thread-message-feed index', () => {
         addParentMessage(store.state);
         addDefaultUser(store.state);
         store.state.threadMessageFeed.isVisible = true;
-        store.state.threadMessageFeed.childMessagesRequest.results = [
-          createSerializedMessageFixture({ id: '1' }),
-          createSerializedMessageFixture({ id: '2' })
-        ];
+        const parentId = store.state.threadMessageFeed.parentId;
+        store.state.messageMap = {
+          ...store.state.messageMap,
+          1: createSerializedMessageFixture({ id: '1', parentId }),
+          2: createSerializedMessageFixture({ id: '2', parentId })
+        };
       });
       expect(wrapper.element).toMatchSnapshot();
     });

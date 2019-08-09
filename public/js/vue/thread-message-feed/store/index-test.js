@@ -6,10 +6,10 @@ const testAction = require('../../store/__test__/vuex-action-helper');
 const appEvents = require('../../../utils/appevents');
 const apiClient = require('../../../components/api-client');
 const { createSerializedMessageFixture } = require('../../__test__/fixture-helpers');
+import * as rootTypes from '../../store/mutation-types';
 const {
   default: { actions, mutations, getters },
-  types,
-  childMessagesVuexRequest
+  types
 } = require('.');
 
 describe('thread message feed store', () => {
@@ -36,8 +36,7 @@ describe('thread message feed store', () => {
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false },
-        { type: types.SET_PARENT_MESSAGE_ID, payload: null },
-        { type: childMessagesVuexRequest.successType, payload: [] }
+        { type: types.SET_PARENT_MESSAGE_ID, payload: null }
       ]);
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', true);
     });
@@ -49,55 +48,66 @@ describe('thread message feed store', () => {
     });
 
     describe('sendMessage', () => {
-      it('sendMessage creates message object and submits it to the collection', async () => {
-        const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
-        const state = { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' };
-        const tmpMessage = {
-          id: `tmp-${Date.now()}`, // TODO: this is going to be flakey
+      let storedMessage, tmpMessage, initialState;
+      beforeEach(() => {
+        storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
+        initialState = { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' };
+        tmpMessage = {
+          id: `tmp-${Date.now()}`,
           fromUser: undefined,
-          text: state.draftMessage,
-          parentId: state.parentId
+          text: initialState.draftMessage,
+          parentId: initialState.parentId
         };
+        apiClient.room.post.mockReset();
+      });
+      it('sendMessage creates message object and submits it to the collection', async () => {
         apiClient.room.post.mockResolvedValue(storedMessage);
-        await testAction(actions.sendMessage, undefined, state, [
-          { type: types.REQUEST_SEND_CHILD_MESSAGE, payload: { tmpMessage } },
+        await testAction(actions.sendMessage, undefined, initialState, [
+          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
           { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
-          {
-            type: types.RESPONSE_SEND_CHILD_MESSAGE_SUCCESS,
-            payload: { tmpId: tmpMessage.id, message: storedMessage }
-          }
+          { type: rootTypes.REMOVE_FROM_MESSAGE_MAP, payload: tmpMessage.id },
+          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [storedMessage] }
         ]);
         expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
           text: 'testMessage',
           parentId: '5d11d571a2405419771cd3ee'
         });
       });
+
+      it('sendMessage marks failed message with an error', async () => {
+        apiClient.room.post.mockRejectedValue(null);
+        await testAction(actions.sendMessage, undefined, initialState, [
+          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
+          { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
+          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [{ ...tmpMessage, error: true }] }
+        ]);
+      });
     });
 
-    it('fetchChildMessages - success', async () => {
-      apiClient.room.get.mockImplementation(() => Promise.resolve(['result1']));
-      await testAction(
-        actions.fetchChildMessages,
-        undefined,
-        { parentId: '5d11d571a2405419771cd3ee' },
-        [
-          { type: childMessagesVuexRequest.requestType },
-          { type: childMessagesVuexRequest.successType, payload: ['result1'] }
-        ]
-      );
-    });
+    describe('fetchChildMessages', () => {
+      it('success', async () => {
+        apiClient.room.get.mockImplementation(() => Promise.resolve(['result1']));
+        await testAction(
+          actions.fetchChildMessages,
+          undefined,
+          { parentId: '5d11d571a2405419771cd3ee' },
+          [
+            { type: types.REQUEST_CHILD_MESSAGES },
+            { type: types.RESPONSE_CHILD_MESSAGES_SUCCESS },
+            { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: ['result1'] }
+          ]
+        );
+      });
 
-    it('fetchChildMessages - error', async () => {
-      apiClient.room.get.mockImplementation(() => Promise.reject(null));
-      await testAction(
-        actions.fetchChildMessages,
-        undefined,
-        { parentId: '5d11d571a2405419771cd3ee' },
-        [
-          { type: childMessagesVuexRequest.requestType },
-          { type: childMessagesVuexRequest.errorType }
-        ]
-      );
+      it('error', async () => {
+        apiClient.room.get.mockImplementation(() => Promise.reject(null));
+        await testAction(
+          actions.fetchChildMessages,
+          undefined,
+          { parentId: '5d11d571a2405419771cd3ee' },
+          [{ type: types.REQUEST_CHILD_MESSAGES }, { type: types.RESPONSE_CHILD_MESSAGES_ERROR }]
+        );
+      });
     });
   });
 
@@ -120,16 +130,23 @@ describe('thread message feed store', () => {
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
     });
 
-    it('includes childMessageVuexRequest', () => {
-      const state = childMessagesVuexRequest.initialState;
-      const childMessage = createSerializedMessageFixture();
-      mutations[childMessagesVuexRequest.successType](state, [childMessage]);
-      expect(state.childMessagesRequest.results).toEqual([childMessage]);
+    describe('CHILD_MESSAGES', () => {
+      it('REQUEST_CHILD_MESSAGES', () => {
+        const state = { childMessagesRequest: { loading: false, error: true } };
+        mutations[types.REQUEST_CHILD_MESSAGES](state);
+        expect(state.childMessagesRequest).toEqual({ loading: true, error: false });
+      });
+      it('RESPONSE_CHILD_MESSAGES_SUCCESS', () => {
+        const state = { childMessagesRequest: { loading: true, error: true } };
+        mutations[types.RESPONSE_CHILD_MESSAGES_SUCCESS](state);
+        expect(state.childMessagesRequest).toEqual({ loading: false, error: false });
+      });
+      it('RESPONSE_CHILD_MESSAGES_ERROR', () => {
+        const state = { childMessagesRequest: { loading: true, error: false } };
+        mutations[types.RESPONSE_CHILD_MESSAGES_ERROR](state);
+        expect(state.childMessagesRequest).toEqual({ loading: false, error: true });
+      });
     });
-
-    test.todo('REQUEST_SEND_CHILD_MESSAGE');
-    test.todo('RESPONSE_SEND_CHILD_MESSAGE_SUCCESS');
-    test.todo('RESPONSE_SEND_CHILD_MESSAGE_ERROR');
   });
 
   describe('getters', () => {
