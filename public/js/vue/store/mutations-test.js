@@ -294,13 +294,20 @@ describe('mutations', () => {
       expect(state.roomMap[123]).toEqual(newRoomObject);
     });
   });
-  describe('ADD_TO_MESSAGE_MAP', () => {
-    it('should merge existing map and payload', () => {
-      const message1 = { id: '5cf8ef111111111111111111' };
-      const message2 = { id: '5cf8ef222222222222222222' };
-      state.messageMap = { [message1.id]: message1 };
-      mutations[types.ADD_TO_MESSAGE_MAP](state, { [message2.id]: message2 });
-      expect(state.messageMap).toEqual({ [message1.id]: message1, [message2.id]: message2 });
-    });
+
+  it('ADD_TO_MESSAGE_MAP should add payload messages to the messageMap', () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    const message2 = { id: '5cf8ef222222222222222222' };
+    state.messageMap = { [message1.id]: message1 };
+    mutations[types.ADD_TO_MESSAGE_MAP](state, [message2]);
+    expect(state.messageMap).toEqual({ [message1.id]: message1, [message2.id]: message2 });
+  });
+
+  it('REMOVE_FROM_MESSAGE_MAP removes message with given ID from messageMap', () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    const message2 = { id: '5cf8ef222222222222222222' };
+    state.messageMap = { [message1.id]: message1, [message2.id]: message2 };
+    mutations[types.REMOVE_FROM_MESSAGE_MAP](state, message1.id);
+    expect(state.messageMap).toEqual({ [message2.id]: message2 });
   });
 });
