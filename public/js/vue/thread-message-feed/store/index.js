@@ -79,11 +79,13 @@ export default {
         text: state.draftMessage,
         parentId: state.parentId
       };
-      const tmpId = `tmp-${Date.now()}`;
+      const timestamp = Date.now();
+      const tmpId = `tmp-${timestamp}`;
       const tmpMessage = {
         ...message,
         id: tmpId,
-        fromUser: rootState.user
+        fromUser: rootState.user,
+        sent: new Date(timestamp)
       };
       commit(rootTypes.ADD_TO_MESSAGE_MAP, [tmpMessage], { root: true });
       apiClient.room

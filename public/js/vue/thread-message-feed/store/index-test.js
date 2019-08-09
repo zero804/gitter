@@ -56,7 +56,8 @@ describe('thread message feed store', () => {
           id: `tmp-${Date.now()}`,
           fromUser: undefined,
           text: initialState.draftMessage,
-          parentId: initialState.parentId
+          parentId: initialState.parentId,
+          sent: new Date(Date.now())
         };
         apiClient.room.post.mockReset();
       });
