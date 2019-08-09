@@ -69,7 +69,6 @@ export default {
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
       commit(types.SET_PARENT_MESSAGE_ID, null);
-      //commit(childMessagesVuexRequest.successType, []);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
