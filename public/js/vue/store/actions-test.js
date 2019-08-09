@@ -663,8 +663,7 @@ describe('actions', () => {
 
   it('addMessages', async () => {
     const message1 = { id: '5cf8ef111111111111111111' };
-    const message2 = { id: '5cf8ef222222222222222222' };
-    const payload = [message1, message2];
+    const payload = [message1];
     await testAction(actions.addMessages, payload, state, [
       {
         type: types.ADD_TO_MESSAGE_MAP,
