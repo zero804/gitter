@@ -583,6 +583,13 @@ function deleteMessage(message) {
     });
 }
 
+function deleteMessageFromRoom(room, chatMessage) {
+  return unreadItemService
+    .removeItem(chatMessage.fromUserId, room, chatMessage)
+    .then(() => deleteMessage(chatMessage))
+    .return(null);
+}
+
 function removeAllMessagesForUserId(userId) {
   return ChatMessage.find({ fromUserId: userId })
     .exec()
@@ -613,13 +620,6 @@ function removeAllMessagesForUserIdInRoomId(userId, roomId) {
       concurrency: 1
     });
   });
-}
-
-function deleteMessageFromRoom(room, chatMessage) {
-  return unreadItemService
-    .removeItem(chatMessage.fromUserId, room, chatMessage)
-    .then(() => deleteMessage(chatMessage))
-    .return(null);
 }
 
 module.exports = {
