@@ -14,8 +14,6 @@ module.exports = function(hbs) {
   hbs.registerHelper('chatItemPrerender', require('./prerender-chat-helper'));
   hbs.registerHelper('activityItemPrerender', require('./prerender-activity-helper'));
   hbs.registerHelper('widget', require('./widget-prerenderers').widget);
-  hbs.registerHelper('prerenderRoomListItem', require('./prerender-room-item-helper'));
-  hbs.registerHelper('prerenderOrgListItem', require('./prerender-org-item-helper'));
   hbs.registerHelper('paginate', require('./paginate-helper'));
 
   hbs.registerHelper('avatarSrcSet', avatarImgSrcSetHbsHelper);

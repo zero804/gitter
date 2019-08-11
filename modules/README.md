@@ -13,7 +13,6 @@
 * [`elasticsearch`](./elasticsearch): Backend: Elasticsearch Utils
 * [`env`](./env): Backend: configuration
 * [`fingerprinting`](./fingerprinting): Frontend: Client fingerprinting
-* [`frame-utils`](./frame-utils): Frontend: Client utility
 * [`github`](./github): Backend: GitHub API
 * [`github-backend`](./github-backend): Backend: Muxer GitHub Backend
 * [`gitlab-backend`](./gitlab-backend): Backend: Muxer GitLab Backend

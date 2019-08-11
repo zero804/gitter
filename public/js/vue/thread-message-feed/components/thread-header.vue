@@ -32,7 +32,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) 'colors';
-@import (reference) 'components/menu/room/header-title';
+@import (reference) 'components/m-header-title';
 
 .title {
   .m-header-title();

@@ -44,12 +44,6 @@ function renderSecondaryView(req, res, next, options) {
   });
 }
 
-function hasSecondaryView() {
-  // Desktop uses a secondary view
-  return true;
-}
-
 module.exports = {
-  renderSecondaryView: renderSecondaryView,
-  hasSecondaryView: hasSecondaryView
+  renderSecondaryView: renderSecondaryView
 };

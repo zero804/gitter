@@ -165,7 +165,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) 'base-zindex-levels';
-@import (reference) 'components/menu/room/header-title';
+@import (reference) 'components/m-header-title';
 @import (reference) 'dark-theme';
 
 .root {

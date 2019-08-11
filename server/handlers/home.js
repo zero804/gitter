@@ -1,18 +1,15 @@
 'use strict';
 
 var express = require('express');
-var urlJoin = require('url-join');
 var ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 var timezoneMiddleware = require('../web/middlewares/timezone');
 var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var featureToggles = require('../web/middlewares/feature-toggles');
 var userHomeRenderer = require('./renderers/userhome');
-var mainFrameRenderer = require('./renderers/main-frame');
 const exploreRenderer = require('./renderers/explore-renderer');
 const learnRenderer = require('./renderers/learn-renderer');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
-var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
@@ -23,31 +20,6 @@ router.get(
   preventClickjackingMiddleware,
   isPhoneMiddleware,
   timezoneMiddleware,
-  function(req, res, next) {
-    const useVueLeftMenu = req.fflip.has('vue-left-menu');
-    if (useVueLeftMenu) {
-      userHomeRenderer.renderHomePage(req, res, next);
-    } else {
-      if (req.isPhone) {
-        userHomeRenderer.renderMobileUserHome(req, res, next, 'home');
-      } else {
-        mainFrameRenderer.renderMainFrame(req, res, next, {
-          subFrameLocation: '/home/~home',
-          title: 'Home',
-          suggestedMenuState: 'search'
-        });
-      }
-    }
-  }
-);
-
-router.get(
-  '/~home',
-  identifyRoute('home-frame'),
-  ensureLoggedIn,
-  preventClickjackingOnlyGitterEmbedMiddleware,
-  featureToggles,
-  isPhoneMiddleware,
   function(req, res, next) {
     userHomeRenderer.renderHomePage(req, res, next);
   }
@@ -71,27 +43,11 @@ router.get(
   preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
-  function(req, res, next) {
-    const useVueLeftMenu = req.fflip.has('vue-left-menu');
-
-    if (!req.user) {
-      return res.redirect('/explore');
-    } else if (useVueLeftMenu) {
+  function(req, res) {
+    if (req.user) {
       return exploreRenderer.renderExplorePage(req, res);
     } else {
-      var exploreParam = req.params[0] || '';
-      var subFrameLocation = urlJoin('/home/~explore', exploreParam);
-
-      var renderer = mainFrameRenderer.renderMainFrame;
-      if (req.isPhone) {
-        renderer = mainFrameRenderer.renderMobileMainFrame;
-      }
-
-      return renderer(req, res, next, {
-        subFrameLocation: subFrameLocation,
-        title: 'Explore',
-        suggestedMenuState: 'search'
-      });
+      return res.redirect('/explore');
     }
   }
 );
@@ -104,21 +60,7 @@ router.get(
   featureToggles,
   isPhoneMiddleware,
   function(req, res, next) {
-    const useVueLeftMenu = req.fflip.has('vue-left-menu');
-    if (useVueLeftMenu) {
-      learnRenderer.renderLearnPage(req, res, next);
-    } else {
-      var renderer = mainFrameRenderer.renderMainFrame;
-      if (req.isPhone) {
-        renderer = mainFrameRenderer.renderMobileMainFrame;
-      }
-
-      renderer(req, res, next, {
-        subFrameLocation: '/learn/~learn',
-        title: 'Learn',
-        suggestedMenuState: 'search'
-      });
-    }
+    learnRenderer.renderLearnPage(req, res, next);
   }
 );
 

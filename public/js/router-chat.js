@@ -11,7 +11,6 @@ var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var onready = require('./utils/onready');
 var appEvents = require('./utils/appevents');
-var frameUtils = require('gitter-web-frame-utils');
 var liveContext = require('./components/live-context');
 var apiClient = require('./components/api-client');
 var perfTiming = require('./components/perf-timing');
@@ -37,32 +36,7 @@ require('./components/focus-events');
 // Preload widgets
 require('./components/ping');
 
-const useVueLeftMenu = context.hasFeature('vue-left-menu');
-
 onready(function() {
-  if (!useVueLeftMenu) {
-    appEvents.on('navigation', function(url, type, title, options) {
-      options = options || {};
-
-      if (!url && options.refresh) {
-        window.location.reload();
-        return;
-      }
-      if (frameUtils.hasParentFrameSameOrigin()) {
-        frameUtils.postMessage({
-          type: 'navigation',
-          url: url,
-          urlType: type,
-          title: title
-        });
-      } else {
-        // No pushState here. Open the link directly
-        // Remember that (window.parent === window) when there is no parent frame
-        window.parent.location.href = url;
-      }
-    });
-  }
-
   require('./components/link-handler').installLinkHandler();
   chatCollection.on('sync', () => {
     appEvents.trigger(
@@ -175,27 +149,10 @@ onready(function() {
         changeRoom(message.newTroupe, message.permalinkChatId);
         break;
 
-      case 'about.to.leave.current.room':
-        context.troupe().set('aboutToLeave', true);
-
-        break;
-
       case 'roomList':
         appEvents.trigger('chat-cache:preload', message.rooms);
         break;
     }
-  });
-
-  if (!useVueLeftMenu) {
-    frameUtils.postMessage({
-      type: 'context.troupeId',
-      troupeId: context.getTroupeId(),
-      name: context.troupe().get('name')
-    });
-  }
-
-  appEvents.on('route', function(hash) {
-    frameUtils.postMessage({ type: 'route', hash: hash });
   });
 
   appEvents.on('vue:change:room', function(room) {
@@ -217,70 +174,7 @@ onready(function() {
       var formattedDate = fullTimeFormat(chat.get('sent'));
       appEvents.trigger('input.append', ':point_up: [' + formattedDate + '](' + fullUrl + ')');
     }
-
-    frameUtils.postMessage({ type: 'permalink.requested', url: url, permalinkType: type, id: id });
   });
-
-  appEvents.on('realtime.testConnection', function(reason) {
-    frameUtils.postMessage({ type: 'realtime.testConnection', reason: reason });
-  });
-
-  appEvents.on('realtime:newConnectionEstablished', function() {
-    frameUtils.postMessage({ type: 'realtime.testConnection', reason: 'newConnection' });
-  });
-
-  appEvents.on('unreadItemsCount', function(newCount) {
-    frameUtils.postMessage({
-      type: 'unreadItemsCount',
-      count: newCount,
-      troupeId: context.getTroupeId()
-    });
-  });
-
-  appEvents.on('clearActivityBadge', function() {
-    frameUtils.postMessage({ type: 'clearActivityBadge', troupeId: context.getTroupeId() });
-  });
-
-  // We already listen for this in the app frame
-  if (!useVueLeftMenu) {
-    // Bubble keyboard events
-    appEvents.on('keyboard.all', function(name, event, handler) {
-      // Don't send back events coming from the app frame
-      if (event.origin && event.origin === 'app') return;
-      var message = {
-        type: 'keyboard',
-        name: name,
-
-        // JSON serialisation makes it not possible to send the event object
-        // Keep track of the origin in case of return
-        event: { origin: event.origin },
-        handler: handler
-      };
-      frameUtils.postMessage(message);
-    });
-
-    // Bubble chat toggle events
-    appEvents.on('chat.edit.show', function() {
-      frameUtils.postMessage({ type: 'chat.edit.show' });
-    });
-
-    appEvents.on('chat.edit.hide', function() {
-      frameUtils.postMessage({ type: 'chat.edit.hide' });
-    });
-
-    // Send focus events to app frame
-    appEvents.on('focus.request.app.in', function(event) {
-      frameUtils.postMessage({ type: 'focus', focus: 'in', event: event });
-    });
-
-    appEvents.on('focus.request.app.out', function(event) {
-      frameUtils.postMessage({ type: 'focus', focus: 'out', event: event });
-    });
-
-    appEvents.on('ajaxError', function() {
-      frameUtils.postMessage({ type: 'ajaxError' });
-    });
-  }
 
   var notifyRemoveError = function(message) {
     appEvents.triggerParent('user_notification', {
