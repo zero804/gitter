@@ -1,6 +1,7 @@
 # 19.61.0 - *upcoming*
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
+ - Remove old left-menu code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1553
 
 Developer facing:
 
