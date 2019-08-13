@@ -2,7 +2,6 @@
 
 process.env.DISABLE_API_LISTEN = '1';
 
-var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
@@ -20,7 +19,7 @@ describe('create-github-room-api', function() {
   before(function() {
     if (this._skipFixtureSetup) return;
 
-    request = require('supertest-as-promised')(Promise);
+    request = require('supertest');
     app = require('../../server/api');
   });
 
