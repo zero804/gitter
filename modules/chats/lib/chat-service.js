@@ -10,7 +10,6 @@ const env = require('gitter-web-env');
 const stats = env.stats;
 const errorReporter = env.errorReporter;
 const logger = env.logger.get('chat');
-const context = require('gitter-web-client-context');
 
 const mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
@@ -30,7 +29,7 @@ const unreadItemService = require('gitter-web-unread-items');
 const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-const useThreadedConversations = context.hasFeature('threaded-conversations');
+//const useThreadedConversations = context.hasFeature('threaded-conversations');
 
 var useHints = true;
 
@@ -458,12 +457,10 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
       q = q.where('_id').gt(afterId);
     }
 
+    q.where('parentId').exists(false);
+
     if (useHints) {
       q.hint({ toTroupeId: 1, sent: -1 });
-    }
-
-    if (useThreadedConversations) {
-      q.where('parentId').exists(false);
     }
 
     q = q.sort(options.sort || { sent: sentOrder }).limit(limit);
@@ -510,6 +507,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .lte(sentBefore(aroundId))
     .where('_id')
     .lte(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'desc' })
     .lean()
     .limit(halfLimit);
@@ -519,6 +518,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .gte(sentAfter(aroundId))
     .where('_id')
     .gt(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'asc' })
     .lean()
     .limit(halfLimit);
@@ -526,11 +527,6 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
   if (useHints) {
     q1.hint({ toTroupeId: 1, sent: -1 });
     q2.hint({ toTroupeId: 1, sent: -1 });
-  }
-
-  if (useThreadedConversations) {
-    q1.where('parentId').exists(false);
-    q2.where('parentId').exists(false);
   }
 
   /* Around case */
