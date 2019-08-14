@@ -73,9 +73,6 @@
       "enabled": false,
       "cubeUrl": "ws://beta-internal.beta.gitter:1080"
     },
-    "mixpanel": {
-      "enabled": false
-    },
     "intercom": {
       "enabled" : false
     },

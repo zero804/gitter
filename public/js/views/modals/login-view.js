@@ -14,6 +14,7 @@ var View = Marionette.ItemView.extend({
     options = options || {};
 
     // these are mixpanel variables that we have to pass on
+    // TODO action and source can be probably remove since we aren't using mixpanel anymore
     this.action = options.action || '';
     this.source = options.source || '';
     this.returnTo = options.returnTo || '';

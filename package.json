@@ -5,6 +5,7 @@
   "dependencies": {
     "@gitterhq/backbone-proxy-collection": "^2.3.0",
     "@gitterhq/cal-heatmap": "^3.6.1",
+    "@gitterhq/env": "^0.41.0",
     "@gitterhq/faye-redis": "^0.4.4",
     "@gitterhq/services": "^1.25.0",
     "@gitterhq/styleguide": "^2.2.0",
@@ -97,7 +98,6 @@
     "gitter-web-shared": "file:./shared/",
     "gitter-web-slugify": "file:modules/slugify",
     "gitter-web-spam-detection": "file:modules/spam-detection",
-    "gitter-web-split-tests": "file:modules/split-tests",
     "gitter-web-suggestions": "file:modules/suggestions",
     "gitter-web-templates": "file:modules/templates",
     "gitter-web-test-utils": "file:modules/test-utils",
@@ -131,7 +131,6 @@
     "loglevel": "^1.2.0",
     "lru-cache": "^2.5.0",
     "method-override": "^2.3.4",
-    "mixpanel": "~0.0.19",
     "moment": "^2.10.3",
     "mongodb": "^2.2.35",
     "mongodb-unique-ids": "^0.2.0",

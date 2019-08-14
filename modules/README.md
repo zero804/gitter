@@ -38,7 +38,6 @@
 * [`service-worker`](./service-worker): Frontend: Service worker
 * [`slugify`](./slugify): Frontend: Slug generation
 * [`spam-detection`](./spam-detection): Backend: Spam Detection
-* [`split-tests`](./split-tests): Backend: Split-test Utilities
 * [`suggestions`](./suggestions): Backend: Room Suggestions
 * [`templates`](./templates): Backend: Handlebars Template Utilities
 * [`test-utils`](./test-utils): Testing: Test Helpers and Fixture Generators

@@ -38,7 +38,7 @@ var liveCollections = require('gitter-web-live-collection-events');
 var roomRepoService = require('./room-repo-service');
 
 /**
- * sendJoinStats() sends information to MixPanels about a join_room event
+ * sendJoinStats() sends stats about a join_room event
  *
  * user       User
  * room       Troupe
