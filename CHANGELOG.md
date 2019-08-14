@@ -1,4 +1,4 @@
-# 19.61.0 - *upcoming*
+# 20.0.0 - 2019-8-14
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
  - Remove old left-menu code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1553
@@ -6,10 +6,10 @@
 
 Developer facing:
 
- - Use VuexApiRequest for the left menu search, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1557
- - Fix: `delete-messages-from-user.js` should remove messages instead of clearing them, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1555
- - Move jest unit tests to production folders (test/public-js to public/js), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1554
- - Remove mixpanel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1541
+ - Use `VuexApiRequest` for the left-menu search, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1557
+ - Fix `delete-messages-from-user.js` utility script to remove messages instead of clearing them, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1555
+ - Move Jest unit tests to production folders alongside code (`test/public-js` to `public/js`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1554
+ - Remove Mixpanel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1541
 
 
 # 19.60.0 - 2019-08-06
