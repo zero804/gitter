@@ -49,9 +49,7 @@ async function generateOrgContext(req) {
   ]);
 
   return _.extend({}, basicContext, {
-    group: serializedGroup,
-    // This is used to track pageViews in mixpanel
-    isCommunityPage: true
+    group: serializedGroup
   });
 }
 

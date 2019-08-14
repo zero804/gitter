@@ -21,7 +21,6 @@ var troupeEnv = {
   homeUrl: config.get('web:homeurl'),
   badgeBaseUrl: config.get('web:badgeBaseUrl'),
   embedBaseUrl: config.get('web:embedBaseUrl'),
-  mixpanelToken: config.get('stats:mixpanel:enabled') && config.get('stats:mixpanel:token'),
   googleTrackingId: config.get('stats:ga:key'),
   googleTrackingDomain: config.get('stats:ga:domain'),
   env: env,
