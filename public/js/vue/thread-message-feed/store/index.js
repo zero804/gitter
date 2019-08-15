@@ -67,21 +67,21 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, newDraftMessage);
     },
     sendMessage: ({ state, commit, rootState }) => {
-      const message = {
+      const messagePayload = {
         text: state.draftMessage,
         parentId: state.parentId
       };
       const timestamp = Date.now();
       const tmpId = `tmp-${timestamp}`;
       const tmpMessage = {
-        ...message,
+        ...messagePayload,
         id: tmpId,
         fromUser: rootState.user,
         sent: new Date(timestamp)
       };
       commit(rootTypes.ADD_TO_MESSAGE_MAP, [tmpMessage], { root: true });
       apiClient.room
-        .post('/chatMessages', message)
+        .post('/chatMessages', messagePayload)
         .then(message => {
           commit(rootTypes.REMOVE_FROM_MESSAGE_MAP, tmpId, { root: true });
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
