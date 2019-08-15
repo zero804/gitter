@@ -257,6 +257,9 @@ module.exports = (function() {
     },
 
     _requiresFullRender: function(changes) {
+      if (changes && 'threadMessageCount' in changes) {
+        return true;
+      }
       if (changes && 'burstStart' in changes) {
         var prevBurstStart = !!this.model.previous('burstStart');
         var burstStart = !!this.model.get('burstStart');
