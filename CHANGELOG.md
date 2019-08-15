@@ -1,3 +1,9 @@
+# 20.1.0 - *upcoming*
+
+Developer facing:
+ -  Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
+
+
 # 20.0.0 - 2019-8-14
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
