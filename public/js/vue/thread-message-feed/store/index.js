@@ -1,7 +1,6 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import moment from 'moment';
-import * as _ from 'lodash';
 import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
 
@@ -48,9 +47,8 @@ export default {
       const childMessages = Object.values(rootState.messageMap).filter(
         m => m.parentId === parentId
       );
-      const uniqueMessages = _.uniq(childMessages, false, 'id');
       // we use moment because the messages combine messages from bayeux and ordinary json messages (fetch during TMF open)
-      return uniqueMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
+      return childMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
     }
   },
   actions: {
