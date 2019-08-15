@@ -6,7 +6,7 @@ process.env.TEST_EXPORT_RATE_LIMIT = 100;
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
-var request = require('supertest-as-promised');
+var request = require('supertest');
 
 var app = require('../../../../server/web');
 

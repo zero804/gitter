@@ -6,6 +6,8 @@ var Promise = require('bluebird');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 
+const delay = time => new Promise(resolve => setTimeout(resolve, time));
+
 describe('chat-api', function() {
   var app, request;
 
@@ -14,7 +16,7 @@ describe('chat-api', function() {
   before(function() {
     if (this._skipFixtureSetup) return;
 
-    request = require('supertest-as-promised')(Promise);
+    request = require('supertest');
     app = require('../../server/api');
   });
 
@@ -157,7 +159,7 @@ describe('chat-api', function() {
         var body = result.body;
         chatId = body.id;
       })
-      .delay(1000)
+      .then(delay(1000))
       .then(function() {
         return request(app)
           .get('/v1/user/me/rooms/' + fixture.troupe2.id + '/unreadItems')
@@ -206,7 +208,7 @@ describe('chat-api', function() {
         var body = result.body;
         chatId = body.id;
       })
-      .delay(1000)
+      .then(delay(1000))
       .then(function() {
         return request(app)
           .get('/v1/user/me/rooms/' + fixture.troupe2.id + '/unreadItems')

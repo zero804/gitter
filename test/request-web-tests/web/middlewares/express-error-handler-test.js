@@ -4,9 +4,8 @@ process.env.DISABLE_API_LISTEN = '1';
 process.env.DISABLE_API_WEB_LISTEN = '1';
 process.env.TEST_EXPORT_RATE_LIMIT = 100;
 
-const Promise = require('bluebird');
 const assert = require('assert');
-const request = require('supertest-as-promised')(Promise);
+const request = require('supertest');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const express = require('express');
 
