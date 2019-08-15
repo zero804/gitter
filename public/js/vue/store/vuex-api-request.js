@@ -47,7 +47,8 @@ export default class VuexApiRequest {
   get mutations() {
     return {
       [this.requestType]: state => this.setRequestState(state, false, true),
-      [this.successType]: (state, results) => this.setRequestState(state, false, false, results),
+      [this.successType]: (state, results = []) =>
+        this.setRequestState(state, false, false, results),
       [this.errorType]: state => this.setRequestState(state, true, false, [])
     };
   }

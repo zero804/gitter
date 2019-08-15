@@ -3,15 +3,20 @@ import apiClient from '../../../components/api-client';
 import moment from 'moment';
 import * as _ from 'lodash';
 import * as rootTypes from '../../store/mutation-types';
+import VuexApiRequest from '../../store/vuex-api-request';
+
+// Exported for testing
+export const childMessagesVuexRequest = new VuexApiRequest(
+  'CHILD_MESSAGES',
+  'childMessagesRequest'
+);
 
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  REQUEST_CHILD_MESSAGES: 'REQUEST_CHILD_MESSAGES',
-  RESPONSE_CHILD_MESSAGES_SUCCESS: 'RESPONSE_CHILD_MESSAGES_SUCCESS',
-  RESPONSE_CHILD_MESSAGES_ERROR: 'RESPONSE_CHILD_MESSAGES_ERROR'
+  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
 
 export default {
@@ -20,7 +25,7 @@ export default {
     isVisible: false,
     draftMessage: '',
     parentId: null,
-    childMessagesRequest: { loading: false, error: false }
+    ...childMessagesVuexRequest.initialState
   }),
   mutations: {
     [types.TOGGLE_THREAD_MESSAGE_FEED](state, isVisible) {
@@ -32,18 +37,7 @@ export default {
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     },
-    [types.REQUEST_CHILD_MESSAGES](state) {
-      state.childMessagesRequest.loading = true;
-      state.childMessagesRequest.error = false;
-    },
-    [types.RESPONSE_CHILD_MESSAGES_SUCCESS](state) {
-      state.childMessagesRequest.loading = false;
-      state.childMessagesRequest.error = false;
-    },
-    [types.RESPONSE_CHILD_MESSAGES_ERROR](state) {
-      state.childMessagesRequest.loading = false;
-      state.childMessagesRequest.error = true;
-    }
+    ...childMessagesVuexRequest.mutations
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
@@ -100,16 +94,16 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     fetchChildMessages: ({ state, commit }) => {
-      commit(types.REQUEST_CHILD_MESSAGES);
+      commit(childMessagesVuexRequest.requestType);
       apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
         .then(childMessages => {
-          commit(types.RESPONSE_CHILD_MESSAGES_SUCCESS);
+          commit(childMessagesVuexRequest.successType);
           commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });
         })
         .catch((/* error */) => {
           // error is reported by apiClient
-          commit(types.RESPONSE_CHILD_MESSAGES_ERROR);
+          commit(childMessagesVuexRequest.errorType);
         });
     }
   }

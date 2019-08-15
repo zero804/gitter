@@ -9,7 +9,8 @@ const { createSerializedMessageFixture } = require('../../__test__/fixture-helpe
 import * as rootTypes from '../../store/mutation-types';
 const {
   default: { actions, mutations, getters },
-  types
+  types,
+  childMessagesVuexRequest
 } = require('.');
 
 describe('thread message feed store', () => {
@@ -93,8 +94,8 @@ describe('thread message feed store', () => {
           undefined,
           { parentId: '5d11d571a2405419771cd3ee' },
           [
-            { type: types.REQUEST_CHILD_MESSAGES },
-            { type: types.RESPONSE_CHILD_MESSAGES_SUCCESS },
+            { type: childMessagesVuexRequest.requestType },
+            { type: childMessagesVuexRequest.successType },
             { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: ['result1'] }
           ]
         );
@@ -106,7 +107,10 @@ describe('thread message feed store', () => {
           actions.fetchChildMessages,
           undefined,
           { parentId: '5d11d571a2405419771cd3ee' },
-          [{ type: types.REQUEST_CHILD_MESSAGES }, { type: types.RESPONSE_CHILD_MESSAGES_ERROR }]
+          [
+            { type: childMessagesVuexRequest.requestType },
+            { type: childMessagesVuexRequest.errorType }
+          ]
         );
       });
     });
@@ -131,22 +135,10 @@ describe('thread message feed store', () => {
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
     });
 
-    describe('CHILD_MESSAGES', () => {
-      it('REQUEST_CHILD_MESSAGES', () => {
-        const state = { childMessagesRequest: { loading: false, error: true } };
-        mutations[types.REQUEST_CHILD_MESSAGES](state);
-        expect(state.childMessagesRequest).toEqual({ loading: true, error: false });
-      });
-      it('RESPONSE_CHILD_MESSAGES_SUCCESS', () => {
-        const state = { childMessagesRequest: { loading: true, error: true } };
-        mutations[types.RESPONSE_CHILD_MESSAGES_SUCCESS](state);
-        expect(state.childMessagesRequest).toEqual({ loading: false, error: false });
-      });
-      it('RESPONSE_CHILD_MESSAGES_ERROR', () => {
-        const state = { childMessagesRequest: { loading: true, error: false } };
-        mutations[types.RESPONSE_CHILD_MESSAGES_ERROR](state);
-        expect(state.childMessagesRequest).toEqual({ loading: false, error: true });
-      });
+    it('includes childMessageVuexRequest', () => {
+      const state = childMessagesVuexRequest.initialState;
+      mutations[childMessagesVuexRequest.errorType](state);
+      expect(state.childMessagesRequest.error).toEqual(true);
     });
   });
 
