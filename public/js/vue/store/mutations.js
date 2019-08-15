@@ -1,6 +1,5 @@
 import Vue from 'vue';
 import * as types from './mutation-types';
-import * as _ from 'lodash';
 import {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
@@ -102,8 +101,7 @@ export default {
     }
   },
   [types.ADD_TO_MESSAGE_MAP](state, messages) {
-    const newMessageMap = _.indexBy(messages, 'id');
-    state.messageMap = { ...state.messageMap, ...newMessageMap };
+    messages.forEach(message => Vue.set(state.messageMap, message.id, message));
   },
   [types.REMOVE_FROM_MESSAGE_MAP](state, id) {
     Vue.delete(state.messageMap, id);
