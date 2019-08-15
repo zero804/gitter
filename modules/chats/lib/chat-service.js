@@ -29,7 +29,6 @@ const unreadItemService = require('gitter-web-unread-items');
 const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
-//const useThreadedConversations = context.hasFeature('threaded-conversations');
 
 var useHints = true;
 
