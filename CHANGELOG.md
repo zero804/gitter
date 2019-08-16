@@ -1,5 +1,7 @@
 # 20.1.0 - *upcoming*
 
+ - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
+
 Developer facing:
  -  Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
 
