@@ -38,31 +38,6 @@ require('./components/ping');
 
 onready(function() {
   require('./components/link-handler').installLinkHandler();
-  const useThreadedConversations = context.hasFeature('threaded-conversations');
-  function removeMessageIfChild(collection, message) {
-    if (message.attributes.parentId) {
-      collection.remove(message);
-    }
-  }
-
-  chatCollection.on('sync', () => {
-    appEvents.trigger(
-      'dispatchVueAction',
-      'addMessages',
-      chatCollection.models.map(m => m.attributes)
-    );
-    if (!useThreadedConversations) return;
-    chatCollection.models.forEach(m => {
-      removeMessageIfChild(chatCollection, m);
-    });
-  });
-
-  if (useThreadedConversations) {
-    chatCollection.on('add', message => {
-      appEvents.trigger('dispatchVueAction', 'addMessages', [message.attributes]);
-      removeMessageIfChild(chatCollection, message);
-    });
-  }
   var appView = new ChatToolbarInputLayout({
     model: context.troupe(),
     template: false,
