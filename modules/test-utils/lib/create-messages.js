@@ -10,6 +10,7 @@ function createMessage(f) {
     fromUserId: f.fromUserId,
     toTroupeId: f.toTroupeId,
     parentId: f.parentId,
+    threadMessageCount: f.threadMessageCount,
     text: f.text,
     status: f.status,
     html: f.html,

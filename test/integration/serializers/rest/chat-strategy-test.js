@@ -2,6 +2,7 @@
 
 var testRequire = require('../../test-require');
 var assertUtils = require('../../assert-utils');
+const assert = require('assert');
 var env = require('gitter-web-env');
 var nconf = env.config;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -168,6 +169,37 @@ describe('chat-strategy-test', function() {
       });
       return serialize([fixture.message1], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
+      });
+    });
+
+    describe('threadMessages', () => {
+      const threadFixtures = fixtureLoader.setupEach({
+        user1: {},
+        troupe1: { users: ['user1'] },
+        message1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          threadMessageCount: 7,
+          text: 'A'
+        },
+        message2: {
+          user: 'user1',
+          troupe: 'troupe1',
+          parent: 'message1',
+          text: 'B'
+        }
+      });
+      it('should propagate threadMessageCount attribute', async () => {
+        const { message1, troupe1 } = threadFixtures;
+        const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
+        const serialized = await serialize([message1], strategy);
+        assert.equal(serialized[0].threadMessageCount, 7);
+      });
+      it('should propagate parentId attribute', async () => {
+        const { message1, message2, troupe1 } = threadFixtures;
+        const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
+        const serialized = await serialize([message2], strategy);
+        assert.equal(serialized[0].parentId, message1.id);
       });
     });
 

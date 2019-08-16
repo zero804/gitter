@@ -123,6 +123,15 @@ function resolveMentions(troupe, user, parsedMessage) {
   });
 }
 
+async function incrementThreadMessageCount(parentId, troupeId) {
+  const parent = await ChatMessage.findById(parentId).exec();
+  if (!parent || !mongoUtils.objectIDsEqual(parent.toTroupeId, troupeId)) {
+    throw new StatusError(400, "Parent message with doesn't exist");
+  }
+  parent.threadMessageCount = parent.threadMessageCount + 1 || 1;
+  return parent.save();
+}
+
 /**
  * Create a new chat and return a promise of the chat.
  *
@@ -143,6 +152,9 @@ async function newChatMessageToTroupe(troupe, user, data) {
   if (data.parentId && !mongoUtils.isLikeObjectId(data.parentId))
     throw new StatusError(400, 'parentId must be a valid message ID');
 
+  if (data.parentId) {
+    await incrementThreadMessageCount(data.parentId, troupe.id);
+  }
   const parsedMessage = await processText(data.text);
   const mentions = await resolveMentions(troupe, user, parsedMessage);
 

@@ -171,14 +171,19 @@ describe('chatService', function() {
     });
   });
 
-  describe('thread messages', () => {
+  describe('creating thread messages', () => {
     it('should create a message with parentId', async () => {
-      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
-        text: 'I am replying to a thread',
-        parentId: '5d11d571a2405419771cd3ee'
+      const { troupe1, user1 } = fixture;
+      const parent = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'A'
       });
-      assert.equal(chatMessage.parentId, '5d11d571a2405419771cd3ee');
+      const chatMessage = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'I am replying to a thread',
+        parentId: parent.id
+      });
+      assert.equal(chatMessage.parentId, parent.id);
     });
+
     it('should validate parentId', async () => {
       await assert.rejects(
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
@@ -186,6 +191,39 @@ describe('chatService', function() {
           parentId: 'abc'
         }),
         /StatusError: parentId must be a valid message ID/
+      );
+    });
+
+    it('should add/increment threadMessageCount on parent', async () => {
+      const { troupe1, user1 } = fixture;
+      const parent = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'A'
+      });
+      assert(!parent.threadMessageCount);
+      await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'B',
+        parentId: parent.id
+      });
+      const oneChildParent = await chatService.findById(parent.id);
+      assert.equal(oneChildParent.threadMessageCount, 1);
+      await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'C',
+        parentId: parent.id
+      });
+      const twoChildParent = await chatService.findById(parent.id);
+      assert.equal(twoChildParent.threadMessageCount, 2);
+    });
+
+    it('should not accept parent message from a different room', async () => {
+      const { troupe1, troupe2, user1 } = fixture;
+      const parent = await chatService.newChatMessageToTroupe(troupe2, user1, {
+        text: 'A'
+      });
+      await assert.rejects(() =>
+        chatService.newChatMessageToTroupe(troupe1, user1, {
+          text: 'B',
+          parentId: parent.id
+        })
       );
     });
   });
