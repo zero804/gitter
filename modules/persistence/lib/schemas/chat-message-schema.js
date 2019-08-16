@@ -11,6 +11,7 @@ var ChatMessageSchema = new Schema({
   parentId: ObjectId,
   text: String,
   status: { type: Boolean, required: false },
+  threadMessageCount: { type: Number, required: false },
   pub: { type: Boolean, required: false }, // PUBLIC?
   html: String,
   urls: Array, // TODO: schema-ify this

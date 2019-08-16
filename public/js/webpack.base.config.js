@@ -37,7 +37,7 @@ const webpackConfig = {
           helperDirs: [
             path.dirname(require.resolve('gitter-web-templates/shared/helpers/pluralize'))
           ],
-          knownHelpers: ['cdn', 'avatarSrcSet'],
+          knownHelpers: ['cdn', 'avatarSrcSet', 'widget'],
           partialsRootRelative: path.resolve(__dirname, '../templates/partials/') + path.sep
         }
       },

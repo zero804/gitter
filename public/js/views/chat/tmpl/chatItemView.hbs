@@ -34,5 +34,10 @@
     <div class='chat-item__text js-chat-item-text'>
       {{{ html }}}
     </div>
+    {{#if threadMessageCount}}
+      <div class='chat-item__parent-message-indicator js-parent-message-indicator'>
+        <img class="chat-item__pmi-icon" src="{{cdn 'images/svg/corner-down-right.svg'}}" /> {{threadMessageCount}} {{ pluralize threadMessageCount 'reply' 'replies' }}
+      </div>
+    {{/if}}
   </div>
 </div>

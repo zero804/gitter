@@ -58,7 +58,8 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook': 'expandActivity',
     click: 'onClick',
-    'click .js-chat-item-actions': 'showActions'
+    'click .js-chat-item-actions': 'showActions',
+    'click .js-parent-message-indicator': 'openThread'
   };
 
   var touchEvents = {
@@ -73,6 +74,9 @@ module.exports = (function() {
     // it happens via a click event, but not for a touch event
     click: 'onTap'
   };
+
+  const sendOpenThreadAction = chatId =>
+    appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', chatId);
 
   var ChatItemView = Marionette.ItemView.extend({
     attributes: function() {
@@ -257,6 +261,9 @@ module.exports = (function() {
     },
 
     _requiresFullRender: function(changes) {
+      if (changes && 'threadMessageCount' in changes) {
+        return true;
+      }
       if (changes && 'burstStart' in changes) {
         var prevBurstStart = !!this.model.previous('burstStart');
         var burstStart = !!this.model.get('burstStart');
@@ -589,6 +596,10 @@ module.exports = (function() {
       e.stopPropagation();
     },
 
+    openThread: function() {
+      sendOpenThreadAction(this.model.get('id'));
+    },
+
     highlight: function() {
       var self = this;
       this.$el.addClass('chat-item__highlighted');
@@ -757,7 +768,7 @@ module.exports = (function() {
     },
 
     threadReply: function() {
-      appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', this.model.get('id'));
+      sendOpenThreadAction(this.model.get('id'));
     },
 
     quote: function() {
