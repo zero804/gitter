@@ -59,10 +59,7 @@ onready(function() {
 
   if (useThreadedConversations) {
     chatCollection.on('add', message => {
-      // if the current user sent the message, the chat input box handles adding it to Vuex store
-      if (message.attributes.fromUser.id !== context.getUserId()) {
-        appEvents.trigger('dispatchVueAction', 'addMessages', [message.attributes]);
-      }
+      appEvents.trigger('dispatchVueAction', 'addMessages', [message.attributes]);
       removeMessageIfChild(chatCollection, message);
     });
   }

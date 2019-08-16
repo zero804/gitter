@@ -103,7 +103,7 @@ export default {
   [types.ADD_TO_MESSAGE_MAP](state, messages) {
     messages.forEach(message => Vue.set(state.messageMap, message.id, message));
   },
-  [types.REMOVE_FROM_MESSAGE_MAP](state, id) {
-    Vue.delete(state.messageMap, id);
+  [types.REMOVE_FROM_MESSAGE_MAP](state, ids) {
+    ids.forEach(id => Vue.delete(state.messageMap, id));
   }
 };

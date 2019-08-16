@@ -3,6 +3,7 @@ import apiClient from '../../../components/api-client';
 import moment from 'moment';
 import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
+import { generateChildMessageTmpId } from '../../store/actions';
 
 // Exported for testing
 export const childMessagesVuexRequest = new VuexApiRequest(
@@ -71,19 +72,17 @@ export default {
         text: state.draftMessage,
         parentId: state.parentId
       };
-      const timestamp = Date.now();
-      const tmpId = `tmp-${timestamp}`;
+      const fromUser = rootState.user;
       const tmpMessage = {
         ...messagePayload,
-        id: tmpId,
-        fromUser: rootState.user,
-        sent: new Date(timestamp)
+        id: generateChildMessageTmpId(state.parentId, fromUser._id, state.draftMessage),
+        fromUser,
+        sent: new Date(Date.now())
       };
       commit(rootTypes.ADD_TO_MESSAGE_MAP, [tmpMessage], { root: true });
       apiClient.room
         .post('/chatMessages', messagePayload)
         .then(message => {
-          commit(rootTypes.REMOVE_FROM_MESSAGE_MAP, tmpId, { root: true });
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
         })
         .catch(() => {

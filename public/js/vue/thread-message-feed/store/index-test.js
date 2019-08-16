@@ -52,10 +52,14 @@ describe('thread message feed store', () => {
       let storedMessage, tmpMessage, initialState;
       beforeEach(() => {
         storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
-        initialState = { parentId: '5d11d571a2405419771cd3ee', draftMessage: 'testMessage' };
+        initialState = {
+          parentId: '5d11d571a2405419771cd3ee',
+          draftMessage: 'testMessage',
+          user: { _id: 'userId' }
+        };
         tmpMessage = {
-          id: `tmp-${Date.now()}`,
-          fromUser: undefined,
+          id: `tmp-5d11d571a2405419771cd3ee-userId-testMessage`,
+          fromUser: { _id: 'userId' },
           text: initialState.draftMessage,
           parentId: initialState.parentId,
           sent: new Date(Date.now())
@@ -67,7 +71,6 @@ describe('thread message feed store', () => {
         await testAction(actions.sendMessage, undefined, initialState, [
           { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
           { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
-          { type: rootTypes.REMOVE_FROM_MESSAGE_MAP, payload: tmpMessage.id },
           { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [storedMessage] }
         ]);
         expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {

@@ -307,7 +307,7 @@ describe('mutations', () => {
     const message1 = { id: '5cf8ef111111111111111111' };
     const message2 = { id: '5cf8ef222222222222222222' };
     state.messageMap = { [message1.id]: message1, [message2.id]: message2 };
-    mutations[types.REMOVE_FROM_MESSAGE_MAP](state, message1.id);
+    mutations[types.REMOVE_FROM_MESSAGE_MAP](state, [message1.id]);
     expect(state.messageMap).toEqual({ [message2.id]: message2 });
   });
 });

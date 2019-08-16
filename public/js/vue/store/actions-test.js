@@ -671,4 +671,29 @@ describe('actions', () => {
       }
     ]);
   });
+
+  it('addMessages removes tmp messages', async () => {
+    const tmpMessage = {
+      id: `tmp-5cf8ef111111111111111111-userId-hello`
+    };
+    const message1 = {
+      id: '5cf8ef22222222222222222',
+      parentId: '5cf8ef111111111111111111',
+      fromUser: { id: 'userId' },
+      text: 'hello'
+    };
+
+    const payload = [message1];
+    const testState = { ...state, messageMap: { [tmpMessage.id]: tmpMessage } };
+    await testAction(actions.addMessages, payload, testState, [
+      {
+        type: types.ADD_TO_MESSAGE_MAP,
+        payload
+      },
+      {
+        type: types.REMOVE_FROM_MESSAGE_MAP,
+        payload: [tmpMessage.id]
+      }
+    ]);
+  });
 });

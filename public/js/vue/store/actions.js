@@ -11,6 +11,11 @@ import appEvents from '../../utils/appevents';
 import * as leftMenuConstants from '../left-menu/constants';
 import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
 
+/** Generates id for TMF child messages that have been sent but not yet stored in DB */
+export function generateChildMessageTmpId(parentId, userId, text) {
+  return `tmp-${parentId}-${userId}-${text.substring(0, 64)}`;
+}
+
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 export const setTest = ({ commit }, testValue) => commit(types.SET_TEST, testValue);
 
@@ -242,6 +247,16 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
 
 export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
 
-export const addMessages = ({ commit }, messages) => {
+function findTemporaryMessageIds(messageMap, newMessages) {
+  return newMessages
+    .filter(m => m.parentId)
+    .map(m => generateChildMessageTmpId(m.parentId, m.fromUser.id, m.text))
+    .filter(tmpId => messageMap[tmpId]);
+}
+
+export const addMessages = ({ state, commit }, messages) => {
   commit(types.ADD_TO_MESSAGE_MAP, messages);
+  const idsToDelete = findTemporaryMessageIds(state.messageMap, messages);
+  if (idsToDelete.length === 0) return;
+  commit(types.REMOVE_FROM_MESSAGE_MAP, idsToDelete);
 };
