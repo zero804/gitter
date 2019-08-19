@@ -81,7 +81,8 @@ module.exports = (function() {
   var ChatItemView = Marionette.ItemView.extend({
     attributes: function() {
       var classMap = {
-        'chat-item': true
+        'chat-item': true,
+        'child-item': !!this.model.get('parentId')
       };
 
       var id = this.model.get('id');
