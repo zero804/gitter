@@ -70,9 +70,6 @@
     "intercom": {
       "enabled" : false
     },
-    "mixpanel": {
-      "enabled": false
-    },
     "customerio": {
       "enabled": false
     },

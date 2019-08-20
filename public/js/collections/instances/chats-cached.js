@@ -6,10 +6,10 @@ var unreadItemsClient = require('../../components/unread-items-client');
 var errorHandle = require('../../utils/live-collection-error-handle');
 var ProxyCollection = require('@gitterhq/backbone-proxy-collection');
 var Pool = require('../../components/chat-cache/pool');
-var appEvents = require('../../utils/appevents');
 var Promise = require('bluebird');
 var selectCacheCandidates = require('../../components/chat-cache/select-cache-candidates');
-var frameUtils = require('gitter-web-frame-utils');
+const roomListGenerator = require('../../components/chat-cache/room-list-generator');
+const troupeCollections = require('./troupes');
 
 function invokeChatPreload(pool, rooms) {
   var cacheRooms = selectCacheCandidates(pool.size, rooms);
@@ -51,22 +51,25 @@ function create() {
   }
 
   initialPromise.then(function() {
-    //request the room list from the parent application
-    frameUtils.postMessage({ type: 'request:roomList' });
-
-    appEvents.once('chat-cache:preload', function(rooms) {
-      invokeChatPreload(pool, rooms);
-    });
+    if (troupeCollections.troupes.length) {
+      invokeChatPreload(pool, roomListGenerator(troupeCollections.troupes));
+    } else {
+      //if we don't have any troupes in the troupeCollection
+      //wait for it to sync before posting the message
+      troupeCollections.troupes.once('sync', function() {
+        invokeChatPreload(pool, roomListGenerator(troupeCollections.troupes));
+      });
+    }
   });
 
   return chatCollection;
 }
 
-if (!context.hasFeature('chat-cache') || !frameUtils.hasParentFrameSameOrigin()) {
-  /* If the feature is not turned on, fallback to non-cached chats */
-  module.exports = require('./chats');
-} else {
-  var chatCollection = create();
+if (context.hasFeature('chat-cache')) {
+  const chatCollection = create();
   window._chatCollection = chatCollection;
   module.exports = chatCollection;
+} else {
+  // If the feature is not turned on, fallback to non-cached chats
+  module.exports = require('./chats');
 }

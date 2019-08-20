@@ -9,7 +9,6 @@
 var clientEnv = require('gitter-client-env');
 var currentVersion = clientEnv['version'];
 var debug = require('debug-proxy')('app:reload-on-update');
-var frameUtils = require('gitter-web-frame-utils');
 var ConditionalDebouncer = require('../utils/conditional-debouncer');
 var eyeballsDetector = require('./eyeballs-detector');
 
@@ -31,11 +30,7 @@ function getRandomReloadPeriod() {
  */
 function reloadNow() {
   debug("The time has come. To say fair's fair. To pay the rent. To pay our share.");
-  if (frameUtils.hasParentFrameSameOrigin()) {
-    window.parent.location.reload(true);
-  } else {
-    window.location.reload(true);
-  }
+  window.location.reload(true);
 }
 
 /**

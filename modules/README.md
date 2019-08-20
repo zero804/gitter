@@ -13,7 +13,6 @@
 * [`elasticsearch`](./elasticsearch): Backend: Elasticsearch Utils
 * [`env`](./env): Backend: configuration
 * [`fingerprinting`](./fingerprinting): Frontend: Client fingerprinting
-* [`frame-utils`](./frame-utils): Frontend: Client utility
 * [`github`](./github): Backend: GitHub API
 * [`github-backend`](./github-backend): Backend: Muxer GitHub Backend
 * [`gitlab-backend`](./gitlab-backend): Backend: Muxer GitLab Backend
@@ -39,7 +38,6 @@
 * [`service-worker`](./service-worker): Frontend: Service worker
 * [`slugify`](./slugify): Frontend: Slug generation
 * [`spam-detection`](./spam-detection): Backend: Spam Detection
-* [`split-tests`](./split-tests): Backend: Split-test Utilities
 * [`suggestions`](./suggestions): Backend: Room Suggestions
 * [`templates`](./templates): Backend: Handlebars Template Utilities
 * [`test-utils`](./test-utils): Testing: Test Helpers and Fixture Generators

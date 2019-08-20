@@ -6,11 +6,6 @@ var contextGenerator = require('../../../web/context-generator');
 var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 async function mixinHbsDataForVueLeftMenu(req, existingData) {
-  const useVueLeftMenu = req.fflip.has('vue-left-menu');
-  if (!useVueLeftMenu) {
-    return existingData;
-  }
-
   const user = req.user;
   const userId = user && user.id;
   const [groups, rooms, baseTroupeContext, userThemeSnapshot] = await Promise.all([
@@ -61,7 +56,6 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
 
     layout: 'chat-layout',
     isMobile,
-    useVueLeftMenu: useVueLeftMenu,
     leftMenuHtml: vueLeftMenuHtmlOutput,
     threadMessageFeedHtml: threadMessageFeedHtmlOutput,
 

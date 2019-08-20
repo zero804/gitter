@@ -1,7 +1,7 @@
 <script>
 import { mapActions } from 'vuex';
 import LoadingSpinner from '../../components/loading-spinner.vue';
-import parseForTemplate from 'gitter-web-shared/parse/left-menu-primary-item';
+import parseItemForTemplate from './lib/parse-item-for-template';
 
 export default {
   name: 'ListItem',
@@ -28,7 +28,7 @@ export default {
   },
   computed: {
     nameData() {
-      return parseForTemplate(this.item, this.type);
+      return parseItemForTemplate(this.item, this.type);
     }
   },
 
@@ -83,8 +83,26 @@ export default {
 
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
-@import (reference) '../../../../less/components/menu/room/menu-text.less';
 @import (reference) 'dark-theme';
+@import (reference) 'mixins/optimise-text';
+
+.room-menu-text() {
+  .optimised-text();
+  height: @menu-item-height;
+  max-height: @menu-item-height;
+  overflow: hidden;
+  color: @menu-item-color;
+  font-size: 1.4rem;
+  font-weight: 300;
+  line-height: @menu-item-height;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  .fonts-loaded & {
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+}
 
 .list-item {
   position: relative;

@@ -69,10 +69,6 @@ onready(function() {
     appEvents.trigger('track', url);
   }
 
-  // var appView = new AppIntegratedView({ });
-
-  // appView.leftMenuRegion.show(new TroupeMenuView({ }));
-
   function updateContent(state) {
     if (state) {
       // TODO: update the title....
@@ -105,6 +101,10 @@ onready(function() {
   //   }
   // });
 
+  appEvents.on('route', function(hash) {
+    window.location.hash = `#${hash}`;
+  });
+
   appEvents.on('navigation', function(url, type, title) {
     // This is a bit hacky..
     // Add a /-/ if the path only has one component
@@ -115,6 +115,15 @@ onready(function() {
     pushState(frameUrl, title, url);
     titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);
+  });
+
+  appEvents.on('permalink.requested', function(type, chat) {
+    var url = context.troupe().get('url');
+
+    var permalinkUrl = url + '?at=' + chat.id;
+    var frameUrl = url + '/~' + type + '?at=' + chat.id;
+    var title = url.substring(1);
+    pushState(frameUrl, title, permalinkUrl);
   });
 
   // Revert to a previously saved state
@@ -145,32 +154,12 @@ onready(function() {
         titlebarUpdater.setRoomName(message.name);
         break;
 
-      case 'navigation':
-        appEvents.trigger('navigation', message.url, message.urlType, message.title);
-        break;
-
-      case 'route':
-        window.location.hash = '#' + message.hash;
-        break;
-
       // case 'route-silent':
       //   var routeCb = router.routes[message.hash];
       //   if(routeCb) {
       //     routeCb.apply(router, message.args);
       //   }
       //   break;
-
-      // case 'realtime.testConnection':
-      //   var reason = message.reason;
-      //   realtime.testConnection('chat.' + reason);
-      //   break;
-
-      case 'permalink.requested':
-        var url = message.url + '?at=' + message.id;
-        var frameUrl = message.url + '/~' + message.permalinkType + '?at=' + message.id;
-        var title = message.url.substring(1);
-        pushState(frameUrl, title, url);
-        break;
     }
   });
 

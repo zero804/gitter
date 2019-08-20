@@ -3,18 +3,21 @@ import { mapState, mapGetters } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
+import LoadingSpinner from '../../components/loading-spinner.vue';
 
 export default {
   name: 'ThreadMessageFeed',
   components: {
     ChatInput,
     ThreadHeader,
+    LoadingSpinner,
     ChatItem
   },
   computed: {
     ...mapGetters({ parentMessage: 'threadMessageFeed/parentMessage' }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
+      childMessages: state => state.threadMessageFeed.childMessages,
       user: 'user',
       darkTheme: 'darkTheme'
     })
@@ -32,6 +35,19 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
+          <div v-if="childMessages.error" class="error-text error-box">
+            Error: Therad messages can't be fetched.
+          </div>
+          <div v-else-if="childMessages.loading" class="loading-message">
+            Loading thread <loading-spinner />
+          </div>
+          <chat-item
+            v-for="message in childMessages.results"
+            v-else
+            :key="message.id"
+            :message="message"
+            :use-compact-styles="true"
+          />
         </div>
         <chat-input :user="user" thread />
       </section>
@@ -95,6 +111,17 @@ export default {
 
 .error-box {
   margin: @thread-message-feed-padding;
+  .chat-messages & {
+    margin-left: @thread-chat-item-compact-left-margin + @thread-message-feed-padding;
+  }
+}
+
+.loading-message {
+  margin-left: @thread-message-feed-padding;
+  margin-right: @thread-message-feed-padding;
+  margin-top: 30px;
+  width: 100%;
+  text-align: center;
 }
 
 .chat-messages {

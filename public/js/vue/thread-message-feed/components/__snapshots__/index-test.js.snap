@@ -1,0 +1,183 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`thread-message-feed index child messages error - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <div
+        class="chat-messages"
+      >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <div
+          class="error-text error-box"
+        >
+          
+          Error: Therad messages can't be fetched.
+        
+        </div>
+      </div>
+       
+      <chat-input-stub
+        roommember="true"
+        thread="true"
+        user="[object Object]"
+      />
+    </section>
+  </section>
+</div>
+`;
+
+exports[`thread-message-feed index child messages loading - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <div
+        class="chat-messages"
+      >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <div
+          class="loading-message"
+        >
+          
+          Loading thread 
+          <loading-spinner-stub />
+        </div>
+      </div>
+       
+      <chat-input-stub
+        roommember="true"
+        thread="true"
+        user="[object Object]"
+      />
+    </section>
+  </section>
+</div>
+`;
+
+exports[`thread-message-feed index child messages opened - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <div
+        class="chat-messages"
+      >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+      </div>
+       
+      <chat-input-stub
+        roommember="true"
+        thread="true"
+        user="[object Object]"
+      />
+    </section>
+  </section>
+</div>
+`;
+
+exports[`thread-message-feed index closed - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root"
+>
+  <!---->
+</div>
+`;
+
+exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened dark-theme"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <div
+        class="chat-messages"
+      >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+      </div>
+       
+      <chat-input-stub
+        roommember="true"
+        thread="true"
+        user="[object Object]"
+      />
+    </section>
+  </section>
+</div>
+`;
+
+exports[`thread-message-feed index missing parent message - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <span
+        class="error-text error-box"
+      >
+        
+        Error: The message for this thread is unavailable. It was probably deleted.
+      
+      </span>
+    </section>
+  </section>
+</div>
+`;

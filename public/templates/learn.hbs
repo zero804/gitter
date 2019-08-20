@@ -8,9 +8,6 @@
   <title>Learn</title>
 
   {{> fonts}}
-  {{#unless useVueLeftMenu}}
-    <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
-  {{/unless}}
   <base target="_blank">
 </head>
 <body>
@@ -61,10 +58,5 @@
       <a class="learn-section__link learn-section__link--main" href="https://gitlab.com/gitlab-org/gitter/webapp/issues">gitlab.com/gitlab-org/gitter/webapp/issues</a>
     </section>
   </div>
-
-  {{#unless useVueLeftMenu}}
-    {{{ generateTroupeContext troupeContext }}}
-    {{{ bootScript bootScriptName }}}
-  {{/unless}}
 </body>
 </html>

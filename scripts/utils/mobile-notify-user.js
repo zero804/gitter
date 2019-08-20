@@ -71,7 +71,7 @@ if (opts.username) {
         )
       ];
     })
-    .spread(function(room, chats) {
+    .then(function([room, chats]) {
       var user = this.user;
 
       return pushNotificationGateway.sendUserNotification('new_chat', user.id, {

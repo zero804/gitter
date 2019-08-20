@@ -11,10 +11,6 @@
   <title>Home</title>
 
   {{> fonts}}
-
-  {{#unless useVueLeftMenu}}
-    <link rel="stylesheet" href="{{cdn 'styles/userhome.css' }}">
-  {{/unless}}
   <base target="_parent">
 </head>
 <body>
@@ -69,10 +65,5 @@
 
     </section>
   </div>
-
-  {{#unless useVueLeftMenu}}
-    {{{ generateTroupeContext troupeContext }}}
-    {{{ bootScript 'router-userhome' jsRoot=jsRoot }}}
-  {{/unless}}
 </body>
 </html>

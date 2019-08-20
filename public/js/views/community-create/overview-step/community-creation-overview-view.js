@@ -81,12 +81,6 @@ module.exports = CommunityCreateBaseStepView.extend({
       // Move to the default room
       appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
 
-      // Select the new community in the new left menu
-      appEvents.trigger('left-menu-menu-bar:activate', {
-        state: 'org',
-        groupId: results.id
-      });
-
       // Hide create community
       communityCreateModel.set('active', false);
     });

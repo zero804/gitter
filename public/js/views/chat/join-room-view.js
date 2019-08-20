@@ -5,9 +5,19 @@ var template = require('./tmpl/join-room-view.hbs');
 var context = require('gitter-web-client-context');
 var apiClient = require('../../components/api-client');
 var urlParse = require('url-parse');
-var frameUtils = require('gitter-web-frame-utils');
 var userCanJoinRoom = require('gitter-web-shared/rooms/user-can-join-room');
 var makeRoomProviderSentence = require('gitter-web-shared/rooms/make-room-provider-sentence');
+
+function hasParentFrameSameOrigin() {
+  if (window.parent === window) return false; // This is the top window
+  try {
+    // This should always return true if you can access the parent origin
+    return window.location.host === window.parent.location.host;
+  } catch (e) {
+    // Cross-origin. So No.
+    return false;
+  }
+}
 
 var JoinRoomView = Marionette.ItemView.extend({
   template: template,
@@ -31,7 +41,7 @@ var JoinRoomView = Marionette.ItemView.extend({
       id: context.getTroupeId()
     };
 
-    if (frameUtils.hasParentFrameSameOrigin()) {
+    if (hasParentFrameSameOrigin()) {
       var parsed = urlParse(window.parent.location.href, true);
       roomPostOptions.source = parsed.query.source;
     } else {

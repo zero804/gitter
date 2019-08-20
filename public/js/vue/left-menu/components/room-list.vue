@@ -128,6 +128,7 @@ export default {
 <style lang="less" scoped>
 @import (reference) 'trp3Vars';
 @import (reference) 'colors';
+@import (reference) 'dark-theme';
 
 .favourite-room-list,
 .room-list {
@@ -165,6 +166,10 @@ export default {
       border-top: 1px dashed @search-message-decal-color;
       border-bottom: 1px dashed @search-message-decal-color;
       border-left: 1px dashed @search-message-decal-color;
+
+      .dark-theme & {
+        background-color: @dark-theme-left-menu-active-item-bg-color;
+      }
     }
   }
 }

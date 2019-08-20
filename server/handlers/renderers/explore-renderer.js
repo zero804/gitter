@@ -71,24 +71,6 @@ _.extend(FAUX_TAG_MAP, {
   Haskell: ['haskell']
 });
 
-// TODO: Remove `exploreTagRedirector` after [vue-left-menu] ships
-// This will redirect `/explore` to `/explore/DEFAULT_TAGS`
-const exploreRedirectStaticTagMap = exploreTagUtils.generateTagMap(FAUX_TAG_MAP);
-const firstTag = exploreRedirectStaticTagMap[Object.keys(exploreRedirectStaticTagMap)[1]];
-async function exploreTagRedirector(req, res) {
-  let defaultTags = firstTag.tags;
-  // Default to suggested if logged in
-  if (req.user) {
-    defaultTags = [exploreTagUtils.tagConstants.SUGGESTED_TAG_LABEL.toLowerCase()];
-  }
-
-  const exploreTargetRedirectUrl = urlJoin(
-    getExploreBaseUrl(req),
-    '/tags/' + defaultTags.join(',')
-  );
-  res.redirect(exploreTargetRedirectUrl);
-}
-
 async function renderExplorePage(req, res) {
   const troupeContext = await contextGenerator.generateBasicContext(req);
   const user = troupeContext.user;
@@ -175,6 +157,5 @@ async function renderExplorePage(req, res) {
 }
 
 module.exports = {
-  exploreTagRedirector: asyncHandler(exploreTagRedirector),
   renderExplorePage: asyncHandler(renderExplorePage)
 };

@@ -1,12 +1,7 @@
 'use strict';
 
-var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
 var appEvents = require('./appevents');
-var splitTests = require('gitter-web-split-tests');
-var _ = require('lodash');
-
-require('./mixpanel');
 
 var trackingId = clientEnv['googleTrackingId'];
 var trackingDomain = clientEnv['googleTrackingDomain'] || 'gitter.im'; // Remove this default 23/10/2014;
@@ -35,29 +30,7 @@ if (trackingId) {
   ga('send', 'pageview');
 }
 
-function trackPageView(routeName) {
-  if (window.mixpanel && window.mixpanel.register) {
-    if (context.getUserId()) window.mixpanel.register({ userStatus: 'ACTIVE' });
-
-    var isUserHome = routeName === '/home';
-    var authenticated = !!context.getUserId();
-    var userAgent = window.navigator.userAgent;
-
-    window.mixpanel.track(
-      'pageView',
-      _.extend(
-        {
-          pageName: routeName,
-          authenticated: authenticated,
-          isUserHome: isUserHome,
-          isCommunityPage: context().isCommunityPage,
-          userAgent: userAgent
-        },
-        splitTests.listVariants()
-      )
-    );
-  }
-
+function trackPageView(/*routeName*/) {
   var gs = window._gs;
   if (gs) {
     gs('track');
@@ -70,10 +43,6 @@ function trackPageView(routeName) {
 }
 
 function trackError(message, file, line) {
-  // if(window.mixpanel && window.mixpanel.track) {
-  //   window.mixpanel.track('jserror', { message: message, file: file, line: line } );
-  // }
-
   if (trackingId) {
     ga('send', 'event', 'error', message, file, line);
   }
@@ -83,11 +52,9 @@ appEvents.on('track', function(routeName) {
   trackPageView(routeName);
 });
 
-appEvents.on('track-event', function(eventName, data) {
-  if (window.mixpanel && window.mixpanel.track) {
-    window.mixpanel.track(eventName, data);
-  }
-});
+// appEvents.on('track-event', function(eventName, data) {
+//
+// });
 
 trackPageView(window.location.pathname);
 

@@ -32,11 +32,7 @@ async function renderHomePage(req, res, next) {
   contextGenerator
     .generateBasicContext(req)
     .then(async function(troupeContext) {
-      const useVueLeftMenu = req.fflip.has('vue-left-menu');
-      var page = 'userhome-template';
-      if (!useVueLeftMenu && req.isPhone) {
-        page = 'mobile/mobile-userhome';
-      }
+      const page = 'userhome-template';
 
       var osName = req.getParsedUserAgent().os.family.toLowerCase();
 
@@ -68,35 +64,6 @@ async function renderHomePage(req, res, next) {
     .catch(next);
 }
 
-function renderMobileUserHome(req, res, next) {
-  contextGenerator
-    .generateBasicContext(req)
-    .then(function(troupeContext) {
-      res.render('mobile/mobile-userhome', {
-        hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-        fonts: fonts.getFonts(),
-        troupeName: (troupeContext.troupe && troupeContext.troupe.uri) || 'Home',
-        troupeContext: troupeContext,
-        agent: req.headers['user-agent'],
-        user: req.user
-      });
-    })
-    .catch(next);
-}
-
-function renderMobileNativeUserhome(req, res) {
-  contextGenerator.generateBasicContext(req).then(function(troupeContext) {
-    res.render('mobile/native-userhome-app', {
-      hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-      fonts: fonts.getFonts(),
-      bootScriptName: 'mobile-native-userhome',
-      troupeContext: troupeContext
-    });
-  });
-}
-
 module.exports = exports = {
-  renderHomePage: asyncHandler(renderHomePage),
-  renderMobileUserHome: renderMobileUserHome,
-  renderMobileNativeUserhome: renderMobileNativeUserhome
+  renderHomePage: asyncHandler(renderHomePage)
 };

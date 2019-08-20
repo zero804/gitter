@@ -3,9 +3,6 @@
 	  <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {{> fonts}}
-    {{#unless useVueLeftMenu}}
-      <link rel='stylesheet' type='text/css' href="{{ cdn 'styles/org-page.css' }}">
-    {{/unless}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
 
     {{#if hasDarkTheme}}
@@ -104,10 +101,5 @@
       </div>
       {{/paginate}}
     </main>
-
-    {{#unless useVueLeftMenu}}
-      {{{ generateTroupeContext troupeContext }}}
-      {{{ bootScript 'router-org-page' }}}
-    {{/unless}}
   </body>
 </html>

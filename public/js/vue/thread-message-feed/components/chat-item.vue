@@ -90,7 +90,7 @@ export default {
 }
 
 .compact .chat-item__content {
-  margin-left: 40px;
+  margin-left: @thread-chat-item-compact-left-margin;
   margin-right: @thread-message-feed-padding;
 }
 

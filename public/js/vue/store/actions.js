@@ -1,4 +1,10 @@
 import * as types from './mutation-types';
+import {
+  roomSearchRepoRequest,
+  roomSearchRoomRequest,
+  roomSearchPeopleRequest,
+  messageSearchRequest
+} from './requests';
 import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
@@ -126,7 +132,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
 
     dispatch('trackStat', 'left-menu.search.input');
 
-    commit(types.REQUEST_ROOM_SEARCH_REPO);
+    commit(roomSearchRepoRequest.requestType);
     apiClient.user
       .get('/repos', {
         q: searchInputValue,
@@ -140,13 +146,13 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         roomsFromRepos.forEach(room => {
           dispatch('upsertRoom', room);
         });
-        commit(types.RECEIVE_ROOM_SEARCH_REPO_SUCCESS, roomsFromRepos.map(room => room.id));
+        commit(roomSearchRepoRequest.successType, roomsFromRepos.map(room => room.id));
       })
       .catch(err => {
-        commit(types.RECEIVE_ROOM_SEARCH_REPO_ERROR, err);
+        commit(roomSearchRepoRequest.errorType, err);
       });
 
-    commit(types.REQUEST_ROOM_SEARCH_ROOM);
+    commit(roomSearchRoomRequest.requestType);
     apiClient
       .get('/v1/rooms', {
         q: searchInputValue,
@@ -158,13 +164,13 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         rooms.forEach(room => {
           dispatch('upsertRoom', room);
         });
-        commit(types.RECEIVE_ROOM_SEARCH_ROOM_SUCCESS, rooms.map(room => room.id));
+        commit(roomSearchRoomRequest.successType, rooms.map(room => room.id));
       })
       .catch(err => {
-        commit(types.RECEIVE_ROOM_SEARCH_ROOM_ERROR, err);
+        commit(roomSearchRoomRequest.errorType, err);
       });
 
-    commit(types.REQUEST_ROOM_SEARCH_PEOPLE);
+    commit(roomSearchPeopleRequest.requestType);
     apiClient
       .get('/v1/user', {
         q: searchInputValue,
@@ -176,10 +182,10 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
         rooms.forEach(room => {
           dispatch('upsertRoom', room);
         });
-        commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_SUCCESS, rooms.map(room => room.id));
+        commit(roomSearchPeopleRequest.successType, rooms.map(room => room.id));
       })
       .catch(err => {
-        commit(types.RECEIVE_ROOM_SEARCH_PEOPLE_ERROR, err);
+        commit(roomSearchPeopleRequest.errorType, err);
       });
   } else {
     commit(types.SEARCH_CLEARED);
@@ -190,7 +196,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
   const searchInputValue = state.search.searchInputValue;
 
   if (searchInputValue && searchInputValue.length > 0) {
-    commit(types.REQUEST_MESSAGE_SEARCH);
+    commit(messageSearchRequest.requestType);
     apiClient.room
       .get('/chatMessages', {
         q: searchInputValue,
@@ -198,10 +204,10 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
         limit: 30
       })
       .then(result => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_SUCCESS, result);
+        commit(messageSearchRequest.successType, result);
       })
       .catch(err => {
-        commit(types.RECEIVE_MESSAGE_SEARCH_ERROR, err);
+        commit(messageSearchRequest.errorType, err);
       });
   }
 };

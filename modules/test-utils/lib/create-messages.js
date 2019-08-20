@@ -1,15 +1,15 @@
 'use strict';
 
-var Promise = require('bluebird');
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var debug = require('debug')('gitter:tests:test-fixtures');
 
-function createMessage(fixtureName, f) {
-  debug('Creating %s', fixtureName);
+function createMessage(f) {
+  debug('Creating %s', f.fixtureName);
 
   return ChatMessage.create({
     fromUserId: f.fromUserId,
     toTroupeId: f.toTroupeId,
+    parentId: f.parentId,
     text: f.text,
     status: f.status,
     html: f.html,
@@ -24,21 +24,32 @@ function createMessage(fixtureName, f) {
   });
 }
 
-function createMessages(expected, fixture) {
-  return Promise.map(Object.keys(expected), function(key) {
-    if (key.match(/^message(?!Report)/)) {
-      var expectedMessage = expected[key];
-
-      expectedMessage.fromUserId = fixture[expectedMessage.user]._id;
-      expectedMessage.toTroupeId = fixture[expectedMessage.troupe]._id;
-
-      return createMessage(key, expectedMessage).then(function(message) {
-        fixture[key] = message;
-      });
+async function createMessages(expected, fixtures) {
+  function linkExpectedWithFixtures(expectedMessage) {
+    expectedMessage.fromUserId = fixtures[expectedMessage.user]._id;
+    expectedMessage.toTroupeId = fixtures[expectedMessage.troupe]._id;
+    if (expectedMessage.parent) {
+      expectedMessage.parentId = fixtures[expectedMessage.parent]._id;
     }
+  }
 
-    return null;
-  });
+  async function createFixture(expectedMessage) {
+    linkExpectedWithFixtures(expectedMessage);
+    const message = await createMessage(expectedMessage);
+    fixtures[expectedMessage.fixtureName] = message;
+  }
+
+  const expectedMessages = Object.keys(expected)
+    .filter(fixtureName => fixtureName.match(/^message(?!Report)/))
+    .map(fixtureName => ({ fixtureName, ...expected[fixtureName] }));
+
+  // separate messages based on whether they are normal or child (thread) messages
+  // normal messages need to be created first so they can be referenced by child messages
+  const normalMessages = expectedMessages.filter(m => !m.parent);
+  await Promise.all(normalMessages.map(createFixture));
+
+  const childMessages = expectedMessages.filter(m => !!m.parent);
+  await Promise.all(childMessages.map(createFixture));
 }
 
 module.exports = createMessages;

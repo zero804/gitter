@@ -2,11 +2,8 @@
 var _ = require('lodash');
 var Backbone = require('backbone');
 var clientEnv = require('gitter-client-env');
-const context = require('gitter-web-client-context');
 
 var basePath = clientEnv['basePath'];
-
-const useVueLeftMenu = context.hasFeature('vue-left-menu');
 /*
  *
  * This is the new application-wide message bus. Use it instead of jquery $(document).on(...)
@@ -16,12 +13,7 @@ var appEvents = {
   triggerParent: function() {
     var args = Array.prototype.slice.call(arguments, 0);
     if (typeof window !== 'undefined') {
-      let targetWindow = window.parent;
-      if (useVueLeftMenu) {
-        targetWindow = window;
-      }
-
-      targetWindow.postMessage(
+      window.postMessage(
         JSON.stringify({
           child_window_event: args
         }),
