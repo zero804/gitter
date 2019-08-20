@@ -82,7 +82,7 @@ module.exports = (function() {
     attributes: function() {
       var classMap = {
         'chat-item': true,
-        'child-item': !!this.model.get('parentId')
+        'hidden-threaded-conversation-chat-item': !!this.model.get('parentId')
       };
 
       var id = this.model.get('id');
