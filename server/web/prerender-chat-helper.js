@@ -12,7 +12,7 @@ const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var chatWrapper = compileTemplate.compileString(
-  '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}}">{{{inner}}}</div>'
+  '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}} {{threadedConversationClass}}">{{{inner}}}</div>'
 );
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
@@ -85,12 +85,14 @@ module.exports = exports = function(model, params) {
 
   var unreadClass = model.unread ? 'unread' : 'read';
   var burstClass = model.burstStart ? 'burstStart' : 'burstContinued';
+  const threadedConversationClass = model.parentId ? 'hidden-threaded-conversation-chat-item' : '';
 
   return chatWrapper({
     id: model.id,
-    burstClass: burstClass,
-    unreadClass: unreadClass,
-    deletedClass: deletedClass,
+    burstClass,
+    unreadClass,
+    deletedClass,
+    threadedConversationClass,
     locale: locale,
     inner: result
   });
