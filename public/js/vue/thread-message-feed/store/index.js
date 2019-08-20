@@ -3,7 +3,7 @@ import apiClient from '../../../components/api-client';
 import moment from 'moment';
 import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
-import { generateChildMessageTmpId } from '../../store/actions';
+import { generateChildMessageTmpId } from '../../store/mutations';
 
 // Exported for testing
 export const childMessagesVuexRequest = new VuexApiRequest(

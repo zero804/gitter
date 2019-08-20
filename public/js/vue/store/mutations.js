@@ -8,6 +8,11 @@ import {
 } from './requests';
 import fuzzysearch from 'fuzzysearch';
 
+/** Generates id for TMF child messages that have been sent but not yet stored in DB */
+export function generateChildMessageTmpId(parentId, userId, text) {
+  return `tmp-${parentId}-${userId}-${text.substring(0, 64)}`;
+}
+
 function roomFilter(searchTermInput = '', room) {
   const searchTerm = searchTermInput.toLowerCase();
 
@@ -101,9 +106,16 @@ export default {
     }
   },
   [types.ADD_TO_MESSAGE_MAP](state, messages) {
-    messages.forEach(message => Vue.set(state.messageMap, message.id, message));
-  },
-  [types.REMOVE_FROM_MESSAGE_MAP](state, ids) {
-    ids.forEach(id => Vue.delete(state.messageMap, id));
+    messages.forEach(message => {
+      if (message.parentId) {
+        const tempId = generateChildMessageTmpId(
+          message.parentId,
+          message.fromUser.id,
+          message.text
+        );
+        Vue.delete(state.messageMap, tempId);
+      }
+      Vue.set(state.messageMap, message.id, message);
+    });
   }
 };
