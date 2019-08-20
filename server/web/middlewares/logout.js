@@ -3,7 +3,10 @@
 var env = require('gitter-web-env');
 var winston = env.logger;
 var nconf = env.config;
+const asyncHandler = require('express-async-handler');
 var rememberMe = require('./rememberme-middleware');
+const oauthService = require('../../services/oauth-service');
+const getAccessToken = require('../get-access-token-from-req');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
 var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
@@ -24,7 +27,7 @@ function logoutPreserveSession(req, res, next) {
   return next();
 }
 
-module.exports = function(req, res, next) {
+module.exports = asyncHandler(async (req, res, next) => {
   var user = req.user;
   var userId = user && user.id;
   var username = user && user.username;
@@ -34,7 +37,10 @@ module.exports = function(req, res, next) {
     username: username
   });
 
-  logoutPreserveSession(req, res, function() {
+  const accessToken = getAccessToken(req);
+  await oauthService.deleteToken(accessToken);
+
+  logoutPreserveSession(req, res, () => {
     res.clearCookie(sessionCookieName, { domain: nconf.get('web:cookieDomain') });
 
     req.session.destroy(function(err) {
@@ -42,4 +48,4 @@ module.exports = function(req, res, next) {
       next(err);
     });
   });
-};
+});
