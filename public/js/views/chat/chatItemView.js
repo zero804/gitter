@@ -82,6 +82,8 @@ module.exports = (function() {
     attributes: function() {
       var classMap = {
         'chat-item': true,
+        // Hiding child messages from the main message feed
+        // Chosen as an easier alternative to creating a new filtered LiveCollection for chat messages
         'hidden-threaded-conversation-chat-item': !!this.model.get('parentId')
       };
 
