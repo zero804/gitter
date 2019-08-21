@@ -10,7 +10,6 @@ import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
 import * as leftMenuConstants from '../left-menu/constants';
 import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
-import _ from 'lodash';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
 export const setTest = ({ commit }, testValue) => commit(types.SET_TEST, testValue);
@@ -243,7 +242,6 @@ export const jumpToMessageId = ({ commit, dispatch }, messageId) => {
 
 export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM, newRoomState);
 
-export const setMessages = ({ commit }, messages) => {
-  const newMessageMap = _.indexBy(messages, 'id');
-  commit(types.REPLACE_MESSAGE_MAP, newMessageMap);
+export const addMessages = ({ commit }, messages) => {
+  commit(types.ADD_TO_MESSAGE_MAP, messages);
 };

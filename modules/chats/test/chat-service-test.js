@@ -272,6 +272,8 @@ describe('chatService', function() {
       chat1 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'A' });
       chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'B' });
       chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'C' });
+      // validating that findMessagesForTroupe doesn't return child messages
+      await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'D', parentId: chat1.id });
     });
 
     afterEach(async () => {
