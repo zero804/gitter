@@ -38,13 +38,6 @@ require('./components/ping');
 
 onready(function() {
   require('./components/link-handler').installLinkHandler();
-  chatCollection.on('sync', () => {
-    appEvents.trigger(
-      'dispatchVueAction',
-      'setMessages',
-      chatCollection.models.map(m => m.attributes)
-    );
-  });
   var appView = new ChatToolbarInputLayout({
     model: context.troupe(),
     template: false,

@@ -294,4 +294,29 @@ describe('mutations', () => {
       expect(state.roomMap[123]).toEqual(newRoomObject);
     });
   });
+
+  it('ADD_TO_MESSAGE_MAP should add payload messages to the messageMap', () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    const message2 = { id: '5cf8ef222222222222222222' };
+    state.messageMap = { [message1.id]: message1 };
+    mutations[types.ADD_TO_MESSAGE_MAP](state, [message2]);
+    expect(state.messageMap).toEqual({ [message1.id]: message1, [message2.id]: message2 });
+  });
+
+  it('ADD_TO_MESSAGE_MAP should remove temporary messages', () => {
+    const tmpMessage = {
+      id: `tmp-5cf8ef111111111111111111-userId-hello`
+    };
+    const message1 = {
+      id: '5cf8ef22222222222222222',
+      parentId: '5cf8ef111111111111111111',
+      fromUser: { id: 'userId' },
+      text: 'hello'
+    };
+    const payload = [message1];
+    state.messageMap = { [tmpMessage.id]: tmpMessage };
+    state.user = { id: 'userId' };
+    mutations[types.ADD_TO_MESSAGE_MAP](state, payload);
+    expect(state.messageMap).toEqual({ [message1.id]: message1 });
+  });
 });
