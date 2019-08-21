@@ -1,6 +1,6 @@
 'use strict';
 
-var { Issues, MergeRequests } = require('gitlab/dist/es5');
+var { Issues, MergeRequests } = require('gitlab');
 var cacheWrapper = require('gitter-web-cache-wrapper');
 var avatars = require('gitter-web-avatars');
 var getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
@@ -51,7 +51,6 @@ GitLabIssuableService.prototype.getIssue = function(project, iid) {
   return this.getAccessTokenPromise
     .then(function(accessToken) {
       const gitlabLibOpts = {
-        url: 'https://gitlab.com',
         oauthToken: accessToken,
         token: getPublicTokenFromPool()
       };

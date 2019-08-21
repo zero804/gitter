@@ -64,7 +64,7 @@ exports[`left-menu index all state matches snapshot 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -154,7 +154,7 @@ exports[`left-menu index dark-theme matches snapshot 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -244,7 +244,7 @@ exports[`left-menu index mobile mobile matches snapshot 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -578,7 +578,7 @@ exports[`left-menu index people state matches snapshot 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -668,7 +668,7 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -758,7 +758,7 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
@@ -848,7 +848,7 @@ exports[`left-menu index search state matches snapshot 1`] = `
     </section>
      
     <section
-      class="body-main-menu layout-main-menu"
+      class="body-main-menu layout-main-menu scroller"
     >
       <div
         class="hide"
