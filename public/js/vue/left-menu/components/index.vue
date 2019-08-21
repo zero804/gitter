@@ -129,7 +129,7 @@ export default {
       <section class="layout-minibar">
         <menu-bar-body />
       </section>
-      <section class="body-main-menu layout-main-menu">
+      <section class="body-main-menu layout-main-menu scroller">
         <div class="hide">
           {{ test }}
         </div>
