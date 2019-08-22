@@ -143,7 +143,7 @@ var FIXTURES = [
   {
     name: 'Authed user accessing X/Y room, not in room, no recent success',
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false, Y: false },
     expectRecordSuccessfulCheck: true,
     inRoom: false,
     membersPolicy: 'X',
@@ -163,7 +163,7 @@ var FIXTURES = [
   {
     name: 'Authed user accessing X/Y room, canRead, not in room, with recent success',
     hasPolicyDelegate: true,
-    recentSuccess: true,
+    recentSuccess: { X: true, Y: false },
     expectRecordSuccessfulCheck: false,
     inRoom: false,
     membersPolicy: 'X',
@@ -176,10 +176,11 @@ var FIXTURES = [
     expectedPolicyResult2: undefined,
     read: true
   },
+
   {
     name: 'Authed user accessing X/Y room, canJoin, not in room, with recent success',
     hasPolicyDelegate: true,
-    recentSuccess: true,
+    recentSuccess: { X: true, Y: false },
     expectRecordSuccessfulCheck: true,
     inRoom: false,
     membersPolicy: 'X',
@@ -188,14 +189,14 @@ var FIXTURES = [
     isInExtraAdmins: false,
     expectedPolicy1: 'X',
     expectedPolicyResult1: true,
-    expectedPolicy2: undefined,
-    expectedPolicyResult2: undefined,
+    expectedPolicy2: 'Y',
+    expectedPolicyResult2: false,
     join: true
   },
   {
     name: 'Authed user accessing X/Y public room, without recent success and with backend fail',
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false, Y: false },
     expectRecordSuccessfulCheck: false,
     membersPolicy: 'X',
     adminPolicy: 'Y',
@@ -210,7 +211,7 @@ var FIXTURES = [
   {
     name: 'Authed user accessing X/Y public room, without recent success and with backend fail',
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false, Y: false },
     expectRecordSuccessfulCheck: false,
     membersPolicy: 'X',
     adminPolicy: 'Y',
@@ -234,7 +235,7 @@ var FIXTURES = [
     name:
       'Authed user in private room, backend failed without recent success, should not be removed from room',
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false, Y: false },
     expectRecordSuccessfulCheck: false,
     membersPolicy: 'X',
     adminPolicy: 'Y',
@@ -251,7 +252,7 @@ var FIXTURES = [
   {
     name: 'Authed user in private room, access denied, should be removed from room',
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false, Y: false },
     expectRecordSuccessfulCheck: false,
     membersPolicy: 'X',
     adminPolicy: 'Y',
@@ -286,7 +287,7 @@ var FIXTURES = [
     name: 'An org admin in an INVITE only room is an admin of the room',
     inRoom: true,
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false },
     expectRecordSuccessfulCheck: true,
     membersPolicy: 'INVITE',
     adminPolicy: 'X',
@@ -304,7 +305,7 @@ var FIXTURES = [
     name: 'An non-org-admin in an INVITE only room is not an admin of the room',
     inRoom: true,
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false },
     membersPolicy: 'INVITE',
     adminPolicy: 'X',
     isInExtraMembers: false,
@@ -321,7 +322,7 @@ var FIXTURES = [
     name: 'User for INVITE_OR_ADMIN room, in room, not admin',
     inRoom: true,
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false },
     membersPolicy: 'INVITE_OR_ADMIN',
     adminPolicy: 'X',
     isInExtraMembers: false,
@@ -338,7 +339,7 @@ var FIXTURES = [
     name: 'User for INVITE_OR_ADMIN room, not in room, not admin',
     inRoom: false,
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false },
     membersPolicy: 'INVITE_OR_ADMIN',
     adminPolicy: 'X',
     isInExtraMembers: false,
@@ -356,7 +357,7 @@ var FIXTURES = [
     name: 'User for INVITE_OR_ADMIN room, not in room, is admin',
     inRoom: false,
     hasPolicyDelegate: true,
-    recentSuccess: false,
+    recentSuccess: { X: false },
     membersPolicy: 'INVITE_OR_ADMIN',
     adminPolicy: 'X',
     isInExtraMembers: false,
@@ -393,6 +394,19 @@ var FIXTURES = [
     join: false,
     admin: false,
     addUser: false
+  },
+  {
+    name: 'Admin for PUBLIC room without required provider',
+    public: true,
+    roomProviders: ['github'],
+    userProviders: ['gitlab'],
+    inRoom: true,
+    isInExtraAdmins: true,
+    read: true,
+    write: true,
+    join: true,
+    admin: true,
+    addUser: true
   }
 ];
 
@@ -400,7 +414,7 @@ describe('create-base-policy', function() {
   // All the attributes:
   // name: String,
   // hasPolicyDelegate: true,
-  // recentSuccess: true,
+  // recentSuccess: {POLICY_NAME: true},
   // expectRecordSuccessfulCheck: false,
   // inRoom: false,
   // membersPolicy: undefined,
@@ -421,9 +435,9 @@ describe('create-base-policy', function() {
     /* eslint complexity: ["error", 13] */
     it(name, function() {
       var stubRateLimiter = {
-        checkForRecentSuccess: Promise.method(function() {
-          if (meta.recentSuccess === true || meta.recentSuccess === false) {
-            return meta.recentSuccess;
+        checkForRecentSuccess: Promise.method(function(rateLimitKey) {
+          if (meta.recentSuccess && meta.recentSuccess.hasOwnProperty(rateLimitKey)) {
+            return meta.recentSuccess[rateLimitKey];
           }
           assert.ok(false, 'Unexpected call to checkForRecentSuccess');
         }),
@@ -519,8 +533,8 @@ describe('create-base-policy', function() {
             assert.ok(false, 'Unexpected policy: ' + policyName);
           }),
 
-          getPolicyRateLimitKey: function() {
-            return 'XXX';
+          getPolicyRateLimitKey: function(policyName) {
+            return policyName;
           },
 
           getAccessDetails: function() {
