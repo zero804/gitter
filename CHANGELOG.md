@@ -3,6 +3,10 @@
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
  - Restore custom styling on left panel scrollbar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1565
      - Thanks to [@cbj4074](https://gitlab.com/cbj4074) for the contribution
+ - Security fix related to access token, https://gitlab.com/gitlab-org/gitter/webapp/issues/2056
+     - Thanks to [@amalyoman](https://hackerone.com/amalyoman) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/17
+
 
 Developer facing:
  -  Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
