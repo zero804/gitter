@@ -79,14 +79,18 @@ export default {
         fromUser,
         sent: new Date(Date.now())
       };
-      commit(rootTypes.ADD_TO_MESSAGE_MAP, [tmpMessage], { root: true });
+      commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, loading: true }], { root: true });
       apiClient.room
         .post('/chatMessages', messagePayload)
         .then(message => {
+          // the message from the API response fully replaces the `tmpMessage` and because it
+          // doesn't contain the `loading` attribute, UI will hide the loading indicator
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
         })
         .catch(() => {
-          commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true }], { root: true });
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true, loading: false }], {
+            root: true
+          });
         });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
