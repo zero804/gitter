@@ -7,6 +7,7 @@
  - Improve left-menu create community/room plus(`+`) icon, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1569
  - Try to make connectivity indicator styles more performant, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1570
  - Add link to docs/help in profile menu dropdown, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1571
+ - Update learn content and move to userhome(`/home`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1572
 
 Developer facing:
 
