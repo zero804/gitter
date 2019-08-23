@@ -5,7 +5,7 @@
      - Thanks to [@cbj4074](https://gitlab.com/cbj4074) for the contribution
  - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
  - Improve left-menu create community/room plus(`+`) icon, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1569
-
+ - Try to make connectivity indicator styles more performant, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1570
 
 Developer facing:
 
