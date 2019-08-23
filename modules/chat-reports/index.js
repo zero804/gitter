@@ -14,6 +14,9 @@ const userService = require('gitter-web-users');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const calculateReportWeight = require('./lib/calculate-report-weight').calculateReportWeight;
 
+const GOOD_USER_IDS = [
+];
+const GOOD_USER_THRESHOLD = 10;
 const BAD_USER_THRESHOLD = 5;
 const BAD_MESSAGE_THRESHOLD = 2;
 const ONE_DAY_TIME = 24 * 60 * 60 * 1000; // One day
@@ -132,7 +135,8 @@ function newReport(fromUser, messageId) {
           logger.info(
             `Report from ${report.reporterUserId} with weight=${report.weight} made against user ${report.messageUserId}, sum=${sum}/${BAD_USER_THRESHOLD}`
           );
-          if (sum >= BAD_USER_THRESHOLD) {
+          const threshold = GOOD_USER_IDS.includes(report.messageUserId) ? GOOD_USER_THRESHOLD : BAD_USER_THRESHOLD;
+          if (sum >= threshold) {
             stats.event('new_bad_user_from_reports', {
               userId: report.messageUserId,
               sum: sum
