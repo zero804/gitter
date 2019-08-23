@@ -45,6 +45,10 @@ var ircClientIdPromise = persistenceService.OAuthClient.findOne({
 // Fail on error
 ircClientIdPromise.done();
 
+function deleteToken(token, callback) {
+  return tokenProvider.deleteToken(token).nodeify(callback);
+}
+
 function findClientById(id, callback) {
   persistenceService.OAuthClient.findById(id, callback);
 }
@@ -185,10 +189,6 @@ function findOrGenerateIRCToken(userId, callback) {
       return tokenProvider.getToken(userId, clientId);
     })
     .nodeify(callback);
-}
-
-function deleteToken(token, callback) {
-  return tokenProvider.deleteToken(token).nodeify(callback);
 }
 
 // eslint-disable-next-line complexity

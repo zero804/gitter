@@ -63,7 +63,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
             throw err;
           }
 
-          assert.strictEqual(err.statusCode, 404);
+          assert.strictEqual(err.response.status, 404);
         });
     });
 
@@ -97,7 +97,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
             throw err;
           }
 
-          assert.strictEqual(err.statusCode, 404);
+          assert.strictEqual(err.response.status, 404);
         });
     });
   });
@@ -128,7 +128,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
             throw err;
           }
 
-          assert.strictEqual(err.statusCode, 404);
+          assert.strictEqual(err.response.status, 404);
         });
     });
 
@@ -144,7 +144,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
             throw err;
           }
 
-          assert.strictEqual(err.statusCode, 404);
+          assert.strictEqual(err.response.status, 404);
         });
     });
 
@@ -160,7 +160,7 @@ describe('gitlab-issue-service #flakey #slow #gitlab', function() {
             throw err;
           }
 
-          assert.strictEqual(err.statusCode, 404);
+          assert.strictEqual(err.response.status, 404);
         });
     });
   });
