@@ -3,6 +3,7 @@
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
  - Restore custom styling on left panel scrollbar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1565
      - Thanks to [@cbj4074](https://gitlab.com/cbj4074) for the contribution
+ - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
 
 Developer facing:
  - Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
