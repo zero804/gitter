@@ -18,8 +18,7 @@ function createSerializedRoomFixture(uri) {
     tags: [],
     roomMember: true,
     groupId: '5a8739841543b98772a686a8',
-    public: true,
-    absoluteRoomUri: `http://localhost:5000/${uri}`
+    public: true
   };
 }
 
@@ -52,8 +51,7 @@ function createSerializedOneToOneRoomFixture(username) {
     tags: [],
     roomMember: true,
     groupId: null,
-    public: false,
-    absoluteRoomUri: `http://localhost:5000/${username}`
+    public: false
   };
 }
 
