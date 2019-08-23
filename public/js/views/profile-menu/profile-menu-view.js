@@ -103,7 +103,7 @@ function getProfileCollection() {
 
   result.add({
     name: 'Help (Documentation)',
-    stub: 'https://gitlab.com/gitlab-org/gitter/webapp/tree/develop/docs',
+    stub: 'https://gitlab.com/gitlab-org/gitter/webapp/tree/develop/docs#documentation',
     target: '_blank'
   });
 
