@@ -6,7 +6,6 @@ var urlJoin = require('url-join');
 const identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 const featureToggles = require('../web/middlewares/feature-toggles');
 var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
-var preventClickjackingOnlyGitterEmbedMiddleware = require('../web/middlewares/prevent-clickjacking-only-gitter-embed');
 const exploreRenderer = require('./renderers/explore-renderer');
 
 var router = express.Router({ caseSensitive: true, mergeParams: true });
@@ -32,7 +31,6 @@ router.get(
 );
 
 router.use('/home', /* clickjacking is fine-tuned in the file */ require('./home'));
-router.use('/learn', preventClickjackingOnlyGitterEmbedMiddleware, require('./learn'));
 router.use('/settings', /* clickjacking is fine-tuned in the file */ require('./settings'));
 router.use('/orgs', /* clickjacking is fine-tuned in the file */ require('./org-pages'));
 
