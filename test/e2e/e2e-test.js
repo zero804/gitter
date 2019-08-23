@@ -9,10 +9,6 @@ const gitterBaseUrl = Cypress.env('baseUrl');
 assert(gitterBaseUrl);
 
 describe('e2e tests', function() {
-  before(() => {
-    cy.toggleFeature('vue-left-menu', true);
-  });
-
   beforeEach(() => {
     // Remember the feature toggle cookie
     Cypress.Cookies.preserveOnce('fflip');
