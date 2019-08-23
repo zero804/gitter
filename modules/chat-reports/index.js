@@ -15,6 +15,7 @@ const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const calculateReportWeight = require('./lib/calculate-report-weight').calculateReportWeight;
 
 const GOOD_USER_IDS = [
+  "matrixbot" // added by request in #2243
 ];
 const GOOD_USER_THRESHOLD = 10;
 const BAD_USER_THRESHOLD = 5;
