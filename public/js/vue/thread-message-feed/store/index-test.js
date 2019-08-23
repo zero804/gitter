@@ -62,7 +62,8 @@ describe('thread message feed store', () => {
           fromUser: { _id: 'userId' },
           text: initialState.draftMessage,
           parentId: initialState.parentId,
-          sent: new Date(Date.now())
+          sent: new Date(Date.now()),
+          loading: true
         };
         apiClient.room.post.mockReset();
       });
@@ -84,7 +85,10 @@ describe('thread message feed store', () => {
         await testAction(actions.sendMessage, undefined, initialState, [
           { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
           { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
-          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [{ ...tmpMessage, error: true }] }
+          {
+            type: rootTypes.ADD_TO_MESSAGE_MAP,
+            payload: [{ ...tmpMessage, error: true, loading: false }]
+          }
         ]);
       });
     });

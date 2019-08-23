@@ -1,11 +1,12 @@
 <script>
 import Avatar from './avatar.vue';
+import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 export default {
   name: 'ChatItem',
-  components: { Avatar },
+  components: { Avatar, LoadingSpinner },
   props: {
     showItemActions: {
       type: Boolean,
@@ -52,6 +53,7 @@ export default {
           <div class="chat-item__username">@{{ message.fromUser.username }}</div>
           <!-- TODO add permalink https://gitlab.com/gitlab-org/gitter/webapp/issues/2218 -->
           <a class="chat-item__time" :title="sentTimeFormattedFull">{{ sentTimeFormatted }}</a>
+          <loading-spinner v-if="message.loading" class="message-loading-icon" />
         </div>
         <div v-if="message.html" class="chat-item__text" v-html="message.html"></div>
         <div v-else class="chat-item__text">{{ message.text }}</div>
@@ -100,5 +102,9 @@ export default {
 
 .dark-theme .chat-item__text {
   color: @dark-theme-chat-main-text-color;
+}
+
+.message-loading-icon {
+  margin: 4px;
 }
 </style>

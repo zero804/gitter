@@ -9,10 +9,12 @@
  - Security fix related to admin access, https://gitlab.com/gitlab-org/gitter/webapp/issues/2207
       - Thanks to [@giddsec](https://hackerone.com/giddsec) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
      - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/16
-
+ - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
 
 Developer facing:
- -  Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
+ - Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
+ - Fix develop branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
+ - Do not use partial index for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1567
 
 
 # 20.0.0 - 2019-8-14
