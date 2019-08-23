@@ -7,6 +7,7 @@
 Developer facing:
  - Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
  - Fix develop branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
+ - Do not use partial index for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1567
 
 
 # 20.0.0 - 2019-8-14
