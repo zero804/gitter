@@ -34,6 +34,7 @@ describe('redis-token-provider', function() {
 
               redisTokenProvider.testOnly.redisClient.ttl(
                 redisTokenProvider.testOnly.tokenValidationCachePrefix + token,
+                // eslint-disable-next-line max-nested-callbacks
                 function(err, ttl) {
                   if (err) return done(err);
 

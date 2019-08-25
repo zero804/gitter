@@ -7,62 +7,54 @@ var roomMembershipService = require('./room-membership-service');
 var Promise = require('bluebird');
 var debug = require('debug')('gitter:app:user-removal-service');
 var identityService = require('gitter-web-identity');
+const oauthService = require('gitter-web-oauth');
 
-exports.removeByUsername = function(username, options = {}) {
-  return userService.findByUsername(username).then(function(user) {
-    debug('Remove by username %s', username);
-    if (!user) return;
+// eslint-disable-next-line max-statements
+exports.removeByUsername = async function(username, options = {}) {
+  const user = await userService.findByUsername(username);
+  debug('Remove by username %s', username);
+  if (!user) return;
 
-    var userId = user.id;
+  const userId = user.id;
 
-    return roomMembershipService
-      .findRoomIdsForUser(userId)
-      .then(function(troupeIds) {
-        return troupeService.findByIds(troupeIds);
-      })
-      .then(function(troupes) {
-        return Promise.all(
-          Promise.map(
-            troupes,
-            function(troupe) {
-              if (troupe.oneToOne) {
-                return roomService.deleteRoom(troupe);
-              } else {
-                return roomService.removeUserFromRoom(troupe, user);
-              }
-            },
-            { concurrency: 1 }
-          )
-        );
-      })
-      .then(function() {
-        if (options.deleteUser) {
-          return user.remove();
-        }
+  const troupeIds = await roomMembershipService.findRoomIdsForUser(userId);
 
-        user.state = 'REMOVED';
-        user.email = undefined;
-        user.invitedEmail = undefined;
-        user.githubToken = null;
-        user.githubScopes = {};
-        user.githubUserToken = null;
+  const troupes = await troupeService.findByIds(troupeIds);
+  for (let troupe of troupes) {
+    if (troupe.oneToOne) {
+      await roomService.deleteRoom(troupe);
+    } else {
+      await roomService.removeUserFromRoom(troupe, user);
+    }
+  }
 
-        let whenIdentitiesRemoved = Promise.resolve();
-        if (options.ghost) {
-          user.username = `ghost~${user.id}`;
-          user.displayName = 'Ghost';
-          user.identities = [];
-          user.emails = [];
-          user.gravatarImageUrl = undefined;
-          user.gravatarVersion = undefined;
-          user.githubId = undefined;
-          user.stripeCustomerId = undefined;
-          user.tz = undefined;
+  if (options.deleteUser) {
+    await user.remove();
+  } else {
+    user.state = 'REMOVED';
+    user.email = undefined;
+    user.invitedEmail = undefined;
+    user.githubToken = null;
+    user.githubScopes = {};
+    user.githubUserToken = null;
 
-          whenIdentitiesRemoved = identityService.removeForUser(user);
-        }
+    let whenIdentitiesRemoved = Promise.resolve();
+    if (options.ghost) {
+      user.username = `ghost~${user.id}`;
+      user.displayName = 'Ghost';
+      user.identities = [];
+      user.emails = [];
+      user.gravatarImageUrl = undefined;
+      user.gravatarVersion = undefined;
+      user.githubId = undefined;
+      user.stripeCustomerId = undefined;
+      user.tz = undefined;
 
-        return Promise.all([user.save(), whenIdentitiesRemoved]);
-      });
-  });
+      whenIdentitiesRemoved = identityService.removeForUser(user);
+    }
+
+    await Promise.all([user.save(), whenIdentitiesRemoved]);
+  }
+
+  await oauthService.removeAllAccessTokensForUser(userId);
 };
