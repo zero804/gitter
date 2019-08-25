@@ -1,7 +1,6 @@
 'use strict';
 
-var testRequire = require('../../test-require');
-var anonymousTokenProvider = testRequire('./services/tokens/anonymous-token-provider');
+var anonymousTokenProvider = require('../lib/tokens/anonymous-token-provider');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 

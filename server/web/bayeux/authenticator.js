@@ -6,7 +6,7 @@ var logger = env.logger;
 var errorReporter = env.errorReporter;
 var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') });
 
-var oauth = require('../../services/oauth-service');
+var oauth = require('gitter-web-oauth');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var presenceService = require('gitter-web-presence');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');

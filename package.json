@@ -85,6 +85,7 @@
     "gitter-web-live-collection-events": "file:modules/live-collection-events",
     "gitter-web-mailer": "file:modules/mailer",
     "gitter-web-mongoose-bluebird": "file:modules/mongoose-bluebird",
+    "gitter-web-oauth": "file:modules/oauth",
     "gitter-web-permissions": "file:modules/permissions",
     "gitter-web-persistence": "file:modules/persistence",
     "gitter-web-persistence-utils": "file:modules/persistence-utils",
