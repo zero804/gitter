@@ -139,10 +139,15 @@ function validateAccessTokenAndClient(token) {
   });
 }
 
-function removeAllAccessTokensForUser(userId, callback) {
-  return persistenceService.OAuthAccessToken.remove({ userId: userId })
-    .exec()
-    .nodeify(callback);
+async function removeAllAccessTokensForUser(userId) {
+  const oAuthAccessTokens = await persistenceService.OAuthAccessToken.find({ userId: userId });
+
+  // Remove the tokens from the caches
+  await Promise.all(
+    oAuthAccessTokens.map(oAuthAccessToken => {
+      return deleteToken(oAuthAccessToken.token);
+    })
+  );
 }
 
 function findClientByClientKey(clientKey, callback) {
