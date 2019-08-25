@@ -1,6 +1,6 @@
 'use strict';
 
-var oauthService = require('../../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 var restSerializer = require('../../serializers/rest-serializer');
 var Promise = require('bluebird');
 

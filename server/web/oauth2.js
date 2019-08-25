@@ -11,8 +11,8 @@ const url = require('url');
 
 var oauth2orize = require('oauth2orize');
 var passport = require('passport');
-var oauthService = require('../services/oauth-service');
-var random = require('../utils/random');
+var oauthService = require('gitter-web-oauth');
+var random = require('gitter-web-oauth/lib/random');
 var ensureLoggedIn = require('./middlewares/ensure-logged-in');
 
 const OauthAuthorizationError = require('./oauth-authorization-error');

@@ -104,7 +104,7 @@ describe('authorisor', function() {
         },
         'gitter-web-presence': presenceServiceMock,
         '../../services/restful': restfulMock,
-        '../../services/tokens': {
+        'gitter-web-oauth/lib/tokens': {
           validateToken: token => {
             if (token === meta.token) {
               return Promise.resolve([meta.userId, meta.clientId]);

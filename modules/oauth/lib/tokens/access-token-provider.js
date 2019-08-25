@@ -2,7 +2,7 @@
 
 var persistenceService = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var random = require('../../utils/random');
+var random = require('../random');
 
 module.exports = {
   getToken: function(userId, clientId, callback) {

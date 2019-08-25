@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var stats = env.stats;
 var debug = require('debug')('gitter:infra:configure-csrf');
-var oauthService = require('../../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 
 function setAccessToken(req, userId, accessToken) {

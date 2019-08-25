@@ -3,7 +3,7 @@
 var env = require('gitter-web-env');
 var config = env.config;
 
-var random = require('../../utils/random');
+var random = require('../random');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var crypto = require('crypto');
 

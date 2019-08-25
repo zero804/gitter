@@ -1,17 +1,17 @@
 'use strict';
 
-var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var env = require('gitter-web-env');
-var nconf = env.config;
-var logger = env.logger;
+const WEB_INTERNAL_CLIENT_KEY = 'web-internal';
+const env = require('gitter-web-env');
+const nconf = env.config;
+const logger = env.logger;
 
-var appEvents = require('gitter-web-appevents');
-var persistenceService = require('gitter-web-persistence');
-var Promise = require('bluebird');
-var StatusError = require('statuserror');
-var userService = require('gitter-web-users');
-var tokenProvider = require('./tokens/');
-var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
+const appEvents = require('gitter-web-appevents');
+const persistenceService = require('gitter-web-persistence');
+const Promise = require('bluebird');
+const StatusError = require('statuserror');
+const userService = require('gitter-web-users');
+const tokenProvider = require('./tokens/');
+const MongooseCachedLookup = require('./mongoose-cached-lookup');
 
 var ircClientId;
 

@@ -1,7 +1,7 @@
 'use strict';
 
 var StatusError = require('statuserror');
-var oauthService = require('../../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 var checkAlreadyOnUnauthorizedUrl = require('../../utils/check-already-on-unauthorized-url');
 const getAccessToken = require('../get-access-token-from-req');

@@ -1,8 +1,7 @@
 'use strict';
 
-var testRequire = require('../../test-require');
 var assert = require('assert');
-var redisTokenProvider = testRequire('./services/tokens/redis-token-provider');
+var redisTokenProvider = require('../lib/tokens/redis-token-provider');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('redis-token-provider', function() {
