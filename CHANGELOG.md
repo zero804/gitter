@@ -1,14 +1,6 @@
 # 20.1.0 - *upcoming*
 
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
- - Restore custom styling on left panel scrollbar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1565
-     - Thanks to [@cbj4074](https://gitlab.com/cbj4074) for the contribution
- - Security fix related to access token, https://gitlab.com/gitlab-org/gitter/webapp/issues/2056
-     - Thanks to [@amalyoman](https://hackerone.com/amalyoman) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
-     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/17
- - Security fix related to admin access, https://gitlab.com/gitlab-org/gitter/webapp/issues/2207
-      - Thanks to [@giddsec](https://hackerone.com/giddsec) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
-     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/16
  - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
  - Improve left-menu create community/room plus(`+`) icon, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1569
  - Try to make connectivity indicator styles more performant, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1570
@@ -18,10 +10,23 @@
 Developer facing:
 
  - Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
- - Fix `develop` branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
  - Do not use partial index for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1567
  - Remove `vue-left-menu` feature toggle from Cypress e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1574
 
+# 20.0.1 - 2019-08-23
+
+ - Restore custom styling on left panel scrollbar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1565
+     - Thanks to [@cbj4074](https://gitlab.com/cbj4074) for the contribution
+ - Security fix related to access token, https://gitlab.com/gitlab-org/gitter/webapp/issues/2056
+     - Thanks to [@amalyoman](https://hackerone.com/amalyoman) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/17
+ - Security fix related to admin access, https://gitlab.com/gitlab-org/gitter/webapp/issues/2207
+      - Thanks to [@giddsec](https://hackerone.com/giddsec) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/16
+
+Developer facing:
+
+ - Fix `develop` branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
 
 # 20.0.0 - 2019-8-14
 
