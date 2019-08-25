@@ -12,6 +12,11 @@ body {
   box-sizing: border-box;
 }
 
+.userhome-page-wrapper {
+  overflow: auto;
+  height: 100%;
+}
+
 .userhome-header {
   background-image: url(../images/home/banner.jpg);
   background-size: cover;
@@ -73,21 +78,33 @@ body {
 }
 
 .userhome-header__title {
+  overflow: hidden;
   position: absolute;
   bottom: 0;
+
+  max-height: 2.5em;
   margin: 3rem 0 3rem 6rem;
   font-size: 3em;
   font-weight: 200;
-  min-width: 420px;
 }
 
 .userhome-main {
   margin: 4rem 0 1rem 6rem;
+
+  @media (max-width: @small-breakpoint) {
+    margin-left: 2rem;
+  }
 }
 
-.userhome-main--learn {
+.userhome-apps {
+  margin-bottom: 4rem;
+}
+
+.userhome-learn {
   display: flex;
   flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-bottom: 4rem;
 }
 
 .userhome-pages {
@@ -142,7 +159,7 @@ body {
   margin-bottom: 2rem;
 }
 
-.userhome-apps > i {
+.userhome-apps-icon {
   font-size: 1.6em;
   vertical-align: middle;
   margin-right: 0.25em;
@@ -185,7 +202,6 @@ body {
 .learn-section {
   flex-shrink: 0;
   flex-basis: 14em;
-  flex-grow: 1;
   margin-right: 3em;
   margin-bottom: 3em;
   width: 258px;

@@ -53,7 +53,11 @@ export default {
     <div class="menu-bar-bottom">
       <menu-bar-item-create type="create">
         <template v-slot:icon>
-          +
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
+            <path
+              d="M2,10 L10,10 L10,2 L12,2 L12,10 L20,10 L20,12 L12,12 L12,20 L10,20 L10,12 L2,12"
+            />
+          </svg>
         </template>
       </menu-bar-item-create>
 
