@@ -14,6 +14,7 @@ Developer facing:
  - Remove `vue-left-menu` feature toggle from Cypress e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1574
  - Add API documentation for hiding a room, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/58
      - Thanks to [@aj-vargas](https://gitlab.com/aj-vargas) for the contribution
+ - Update dependency `shutdown` to `^0.3.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1519
 
 # 20.0.1 - 2019-08-23
 
