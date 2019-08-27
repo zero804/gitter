@@ -1,11 +1,8 @@
 const _ = require('lodash');
-const urlJoin = require('url-join');
 const avatars = require('gitter-web-avatars');
 const roomNameShortener = require('gitter-web-shared/room-name-shortener');
 const getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 const getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
-
-const clientEnv = require('gitter-client-env');
 
 export default function parseItemForTemplate(data, state) {
   data.name = data.name || data.uri || '';
@@ -13,16 +10,13 @@ export default function parseItemForTemplate(data, state) {
     data.name = data.fromUser.username;
   }
 
-  data.absoluteRoomUri = urlJoin(clientEnv.basePath, data.uri || data.url);
-
   //For user results
   if (data.displayName) {
     return _.extend(
       {},
       {
         name: roomNameShortener(data.displayName),
-        avatarUrl: avatars.getForUser(data),
-        absoluteRoomUri: data.absoluteRoomUri
+        avatarUrl: avatars.getForUser(data)
       }
     );
   }
