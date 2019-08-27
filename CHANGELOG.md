@@ -1,4 +1,4 @@
-# 20.1.0 - *upcoming*
+# 20.1.0 - 2019-08-27
 
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
  - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
