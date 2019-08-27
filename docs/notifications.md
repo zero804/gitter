@@ -46,6 +46,8 @@ When you have a Gitter instance open on a desktop/browser, we don't send a notif
 
 We understand this can be unexpected and undesirable, you can track, https://gitlab.com/gitlab-org/gitter/webapp/issues/1846
 
+For Android, there is also an open bug around push notifications, https://gitlab.com/gitlab-org/gitter/gitter-android-app/issues/121
+
 
 ## Emails
 
