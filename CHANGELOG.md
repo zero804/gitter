@@ -1,3 +1,7 @@
+# 20.2.0 - *upcoming*
+
+ - Make left-menu room links available on page-load(SSR), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1573
+
 # 20.1.0 - 2019-08-27
 
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
