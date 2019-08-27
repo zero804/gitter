@@ -1,7 +1,7 @@
 const appEvents = require('../../utils/appevents');
+const context = require('gitter-web-client-context');
 
 import troupeCollections from '../../collections/instances/troupes';
-import chatCollection from '../../collections/instances/chats-cached';
 
 function setupDataBridge(store) {
   appEvents.on('dispatchVueAction', (actionName, ...args) => {
@@ -19,13 +19,16 @@ function setupDataBridge(store) {
     store.dispatch('upsertRoom', newRoom.attributes);
   });
 
-  chatCollection.on('sync', () => {
-    store.dispatch('addMessages', chatCollection.models.map(m => m.attributes));
-  });
+  if (context.inTroupeContext()) {
+    const chatCollection = require('../../collections/instances/chats-cached');
+    chatCollection.on('sync', () => {
+      store.dispatch('addMessages', chatCollection.models.map(m => m.attributes));
+    });
 
-  chatCollection.on('add', message => {
-    store.dispatch('addMessages', [message.attributes]);
-  });
+    chatCollection.on('add', message => {
+      store.dispatch('addMessages', [message.attributes]);
+    });
+  }
 }
 
 export default setupDataBridge;
