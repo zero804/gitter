@@ -12,6 +12,8 @@ Developer facing:
  - Remove `supertest-as-promised` dependency, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1560
  - Do not use partial index for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1567
  - Remove `vue-left-menu` feature toggle from Cypress e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1574
+ - Add API documentation for hiding a room, https://gitlab.com/gitlab-org/gitter/docs/merge_requests/58
+     - Thanks to [@aj-vargas](https://gitlab.com/aj-vargas) for the contribution
 
 # 20.0.1 - 2019-08-23
 
