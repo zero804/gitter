@@ -1,4 +1,4 @@
-# 20.2.0 - *upcoming*
+# 20.1.1 - 2019-08-28
 
  - Make left-menu room links available on page-load(SSR), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1573
 
