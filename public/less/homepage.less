@@ -14,6 +14,14 @@
 
 @import '../js/views/modals/login-view.less';
 
+.width-block() {
+  width: 450px;
+
+  @media (max-width: 900px) {
+    width: auto;
+  }
+}
+
 // fixes for ui-components
 html {
   font-size: 62.5%;
@@ -542,7 +550,7 @@ section {
 }
 
 #intro-panel p {
-  width: 450px;
+  .width-block();
   margin-top: 40px;
   margin-bottom: 40px;
 
@@ -609,7 +617,6 @@ section {
 }
 
 .intro-panel-cta-button-block {
-  margin-bottom: 1rem;
   white-space: nowrap;
 
   @media (max-width: 1200px) {
@@ -618,6 +625,7 @@ section {
 }
 
 .intro-panel-button {
+  margin-bottom: 1rem;
   margin-right: 2.4rem;
   text-decoration: none;
 }
@@ -697,7 +705,7 @@ section {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  height: 7rem;
+  height: 14rem;
 
   margin-left: 0;
   list-style: none;
@@ -751,15 +759,15 @@ section {
 #apps-panel h1 + p,
 #testimonials-panel h1,
 #testimonials-panel h1 + p {
-  width: 450px;
+  .width-block();
   color: #726c61;
 }
 
 #integrations-panel p,
 #apps-panel p,
 #testimonials-panel p {
+  .width-block();
   padding: 15px 0;
-  width: 450px;
 }
 
 #integrations-panel h1 + p,
@@ -823,10 +831,11 @@ section {
 }
 
 #testimonials-panel .quotes {
+  .width-block();
+
   position: absolute;
   top: 80px;
 
-  width: 450px;
   padding: 35px 40px 40px;
   margin-left: 150px;
 
@@ -847,11 +856,12 @@ section {
 }
 
 #testimonials-panel blockquote {
+  .width-block();
+
   position: absolute;
   top: 0;
   left: 0;
 
-  width: 450px;
   padding: 35px 40px 40px;
 
   opacity: 0;
@@ -1196,5 +1206,181 @@ section {
   display: none;
   @media only screen and (max-width: @exceptDesktop_bp) {
     display: inline;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-nav .top-navigation a {
+    margin-right: 20px !important;
+  }
+  #intro-panel .top-navigation {
+    left: 160px !important;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .top-navigation {
+    display: none;
+  }
+}
+
+@media (max-width: 1200px) {
+  .wrap {
+    width: 90% !important;
+  }
+
+  .wrap > .half {
+    float: none !important;
+    clear: both !important;
+    width: 100% !important;
+  }
+
+  .homepage #intro-panel ul {
+    padding: 0;
+    display: block;
+  }
+  #intro-panel ul li {
+    margin-bottom: 50px;
+  }
+  #intro-panel ul li img {
+    height: 60px;
+    width: auto;
+  }
+  #intro-panel ul li span {
+    width: 100%;
+  }
+
+  .map,
+  #communities-panel {
+    display: none;
+  }
+
+  #apps-panel .devices,
+  #apps-panel h1,
+  #apps-panel p {
+    float: none !important;
+  }
+  #apps-panel .devices {
+    margin-bottom: 60px;
+  }
+
+  #integrations-panel .loves {
+    top: -60px !important;
+    left: 0 !important;
+  }
+
+  #testimonials-panel .wrap .quotes {
+    position: relative;
+    left: 0;
+    top: 0;
+
+    width: auto;
+    margin: 0 0 40px;
+  }
+
+  #integrations-panel .loves ul {
+    width: 150px;
+  }
+
+  #testimonials-panel .quotes blockquote,
+  #integrations-panel .wrap .loves {
+    width: 100%;
+  }
+
+  #testimonials-panel h1,
+  #testimonials-panel p {
+    float: none !important;
+  }
+
+  .testimonial-image-wrapper {
+    width: 32px;
+    height: 32px;
+
+    left: auto;
+    right: 40px;
+    top: 32px;
+  }
+
+  #apps-panel .devices {
+    width: 100% !important;
+  }
+
+  #testimonials-panel .wrap .quotes:before {
+    left: auto;
+    top: auto;
+    right: 30px;
+    bottom: -21px;
+
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    transform: rotate(-90deg);
+  }
+
+  p {
+    width: 100% !important;
+  }
+
+  .team li {
+    max-height: 200px !important;
+    margin: 10px;
+    overflow: hidden;
+    border-radius: 6px;
+    display: inline-block !important;
+    float: none !important;
+
+    // width: 100% !important;
+    // margin: 0 auto !important;
+    // margin-bottom: 30px;
+  }
+  .team li > img {
+    width: 100%;
+    height: auto;
+  }
+
+  #bottom-panel small {
+    text-align: center;
+  }
+  #bottom-panel small span {
+    display: block;
+    float: none;
+
+    width: 100%;
+    text-align: center;
+  }
+  #bottom-panel small a {
+    display: inline-block;
+    float: none;
+    margin: 0 15px;
+
+    text-align: center;
+  }
+}
+
+@media (max-width: 500px) {
+  #intro-panel ul li span {
+    display: none;
+  }
+
+  #apps-panel .devices {
+    left: -300px !important;
+  }
+
+  .top-navigation {
+    display: none;
+  }
+
+  body .site-nav {
+    padding-top: 30px;
+  }
+
+  body #intro-panel h1 {
+    margin-top: 60px;
+
+    font-size: 36px;
+    line-height: 44px;
+  }
+
+  .no-small {
+    display: none !important;
   }
 }
