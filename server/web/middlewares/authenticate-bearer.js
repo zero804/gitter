@@ -5,6 +5,7 @@ var oauthService = require('../../services/oauth-service');
 var validateUserAgentFromReq = require('../validate-user-agent-from-req');
 var checkAlreadyOnUnauthorizedUrl = require('../../utils/check-already-on-unauthorized-url');
 const getAccessToken = require('../get-access-token-from-req');
+const passportLogin = require('../passport-login');
 
 /**
  *
@@ -30,16 +31,10 @@ module.exports = function(req, res, next) {
 
       var user = tokenInfo.user;
       var client = tokenInfo.client;
-
-      req.login(user, function(err) {
-        if (err) return next(err);
-
+      return passportLogin(req, user).then(() => {
         req.authInfo = { client: client, accessToken: accessToken };
         next();
-        return null;
       });
-
-      return null;
     })
     .catch(next);
 };

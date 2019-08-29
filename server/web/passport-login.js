@@ -1,16 +1,43 @@
 'use strict';
 
-var Promise = require('bluebird');
+const assert = require('assert');
 
-function logIn(req, user) {
-  return Promise.fromCallback(function(callback) {
-    req.login(user, callback);
-  }).return(user);
-}
 /**
- * Performs a passport login,
+ * This code removes a possible session fixation. We regenerate the session
+ * upon logging in so an anonymous session cookie can't be reused.
+ *
+ * References:
+ *  - https://github.com/jaredhanson/passport/issues/192#issuecomment-162836516
+ *  - https://stackoverflow.com/a/26394156/606571
+ */
+async function regeneratePassportSession(req) {
+  const passportSession = req.session.passport;
+  return new Promise((resolve, reject) =>
+    req.session.regenerate(function(err) {
+      if (err) reject(err);
+      assert(!req.session.passport);
+      req.session.passport = passportSession;
+      req.session.save(function(err) {
+        if (err) reject(err);
+        resolve();
+      });
+    })
+  );
+}
+
+/**
+ * Adds user to passport, if this is the
+ * first time (user just logged in) we generate a new session
  * and returns a user with identity object
  */
-module.exports = function(req, user) {
-  return logIn(req, user);
+module.exports = async function(req, user) {
+  // if user just logged in (session hasn't been authenticated before)
+  if (!req.user) await regeneratePassportSession(req);
+  await new Promise((resolve, reject) => {
+    req.login(user, err => {
+      if (err) reject(err);
+      resolve();
+    });
+  });
+  return user;
 };
