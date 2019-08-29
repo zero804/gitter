@@ -58,7 +58,8 @@ module.exports = (function() {
     'mouseover .js-chat-item-readby': 'showReadByIntent',
     'click .webhook': 'expandActivity',
     click: 'onClick',
-    'click .js-chat-item-actions': 'showActions'
+    'click .js-chat-item-actions': 'showActions',
+    'click .js-parent-message-indicator': 'openThread'
   };
 
   var touchEvents = {
@@ -74,10 +75,16 @@ module.exports = (function() {
     click: 'onTap'
   };
 
+  const sendOpenThreadAction = chatId =>
+    appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', chatId);
+
   var ChatItemView = Marionette.ItemView.extend({
     attributes: function() {
       var classMap = {
-        'chat-item': true
+        'chat-item': true,
+        // Hiding child messages from the main message feed
+        // Chosen as an easier alternative to creating a new filtered LiveCollection for chat messages
+        'hidden-threaded-conversation-chat-item': !!this.model.get('parentId')
       };
 
       var id = this.model.get('id');
@@ -257,6 +264,9 @@ module.exports = (function() {
     },
 
     _requiresFullRender: function(changes) {
+      if (changes && 'threadMessageCount' in changes) {
+        return true;
+      }
       if (changes && 'burstStart' in changes) {
         var prevBurstStart = !!this.model.previous('burstStart');
         var burstStart = !!this.model.get('burstStart');
@@ -589,6 +599,10 @@ module.exports = (function() {
       e.stopPropagation();
     },
 
+    openThread: function() {
+      sendOpenThreadAction(this.model.get('id'));
+    },
+
     highlight: function() {
       var self = this;
       this.$el.addClass('chat-item__highlighted');
@@ -757,7 +771,7 @@ module.exports = (function() {
     },
 
     threadReply: function() {
-      appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', this.model.get('id'));
+      sendOpenThreadAction(this.model.get('id'));
     },
 
     quote: function() {

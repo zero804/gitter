@@ -5,8 +5,9 @@ const { default: ChatItem } = require('./chat-item.vue');
 
 describe('thread-message-feed chat-item', () => {
   momentTimezone.tz.setDefault('Europe/London');
+  const message = createSerializedMessageFixture();
   const defaultProps = {
-    message: createSerializedMessageFixture(),
+    message,
     useCompactStyles: false
   };
 
@@ -21,6 +22,20 @@ describe('thread-message-feed chat-item', () => {
     });
     it('compact styles', () => {
       const { wrapper } = mount(ChatItem, { ...defaultProps, useCompactStyles: true });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+    it('error', () => {
+      const { wrapper } = mount(ChatItem, {
+        ...defaultProps,
+        message: { ...message, error: true }
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+    it('loading', () => {
+      const { wrapper } = mount(ChatItem, {
+        ...defaultProps,
+        message: { ...message, loading: true }
+      });
       expect(wrapper.element).toMatchSnapshot();
     });
   });

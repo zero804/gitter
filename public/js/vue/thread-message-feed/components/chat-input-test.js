@@ -34,11 +34,9 @@ describe('thread-message-feed chat-input', () => {
     });
 
     it('should trigger send action when enter key is pressed', () => {
-      const { wrapper, stubbedActions } = mount(
-        ChatInput,
-        defaultProps,
-        store => (store.state.threadMessageFeed.chatCollection = { create: jest.fn() })
-      );
+      const { wrapper, stubbedActions } = mount(ChatInput, defaultProps, store => {
+        store.state.user = { _id: 'userId' };
+      });
       wrapper.find({ ref: 'chat-input' }).trigger('keydown.enter');
       expect(stubbedActions.threadMessageFeed.sendMessage).toHaveBeenCalled();
     });

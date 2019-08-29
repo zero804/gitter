@@ -7,7 +7,7 @@ exports[`list-item active room matches snapshot 1`] = `
 >
   <a
     class="list-item-link is-active"
-    href="http://localhost:5000/my-community/room1"
+    href="/my-community/room1"
   >
     <img
       class="list-item-avatar"
@@ -38,7 +38,7 @@ exports[`list-item community room matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"
@@ -70,7 +70,7 @@ exports[`list-item favourite loading room matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"
@@ -102,7 +102,7 @@ exports[`list-item favourite room matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"
@@ -133,7 +133,7 @@ exports[`list-item muted room with activity matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"
@@ -166,7 +166,7 @@ exports[`list-item one to one room matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/EricGitterTester"
+    href="/EricGitterTester"
   >
     <img
       class="list-item-avatar"
@@ -197,7 +197,7 @@ exports[`list-item room with long name matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/abcdefghijklmnop/qrstuvwxyz"
+    href="/abcdefghijklmnop/qrstuvwxyz"
   >
     <img
       class="list-item-avatar"
@@ -228,7 +228,7 @@ exports[`list-item room with mentions matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"
@@ -263,7 +263,7 @@ exports[`list-item room with short name matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/foo/bar"
+    href="/foo/bar"
   >
     <img
       class="list-item-avatar"
@@ -294,7 +294,7 @@ exports[`list-item room with unread matches snapshot 1`] = `
 >
   <a
     class="list-item-link"
-    href="http://localhost:5000/my-community/community"
+    href="/my-community/community"
   >
     <img
       class="list-item-avatar"

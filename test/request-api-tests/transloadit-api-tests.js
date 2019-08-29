@@ -4,7 +4,6 @@ process.env.DISABLE_API_LISTEN = '1';
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var Promise = require('bluebird');
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var groupService = require('gitter-web-groups/lib/group-service');
@@ -24,7 +23,7 @@ describe('transloadit-api-tests', function() {
     before(function() {
       if (this._skipFixtureSetup) return;
 
-      request = require('supertest-as-promised')(Promise);
+      request = require('supertest');
       app = require('../../server/api');
     });
 

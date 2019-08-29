@@ -29,6 +29,10 @@
   clear: both;
 }
 
+.hidden-threaded-conversation-chat-item {
+  display: none;
+}
+
 .chat-item {
   transition: background-color 0.2s linear;
   background-color: transparent;
@@ -388,6 +392,14 @@ body.mobile .chat-item__icon--read {
     overflow: hidden;
     margin: 4px 0 0 0;
   }
+}
+
+.chat-item__parent-message-indicator {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  &:hover {
+    cursor:pointer;
+   }
 }
 
 body.mobile .chat-item__content {

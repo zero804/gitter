@@ -7,6 +7,8 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
 var unreadItemsEngine = require('gitter-web-unread-items/lib/engine');
 
+const delay = time => argument => new Promise(resolve => setTimeout(() => resolve(argument), time));
+
 describe('one-to-one-rooms', function() {
   var app, request;
 
@@ -15,7 +17,7 @@ describe('one-to-one-rooms', function() {
   before(function() {
     if (this._skipFixtureSetup) return;
 
-    request = require('supertest-as-promised')(Promise);
+    request = require('supertest');
     app = require('../../server/api');
   });
 
@@ -32,6 +34,7 @@ describe('one-to-one-rooms', function() {
   });
 
   it('One-to-one between two users with default notification settings', function() {
+    let roomId, chatId;
     return request(app)
       .post('/v1/rooms')
       .send({
@@ -42,12 +45,8 @@ describe('one-to-one-rooms', function() {
       .then(function(res) {
         return res;
       })
-      .bind({
-        roomId: null,
-        chatId: null
-      })
       .then(function(res) {
-        var roomId = (this.roomId = res.body.id);
+        roomId = res.body.id;
         assert(roomId);
 
         return request(app)
@@ -60,16 +59,16 @@ describe('one-to-one-rooms', function() {
         assert.strictEqual(body.mode, 'all');
 
         return request(app)
-          .post('/v1/rooms/' + this.roomId + '/chatMessages')
+          .post('/v1/rooms/' + roomId + '/chatMessages')
           .send({
             text: 'Hello in a one-to-one'
           })
           .set('x-access-token', fixture.user1.accessToken)
           .expect(200);
       })
-      .delay(1000) // Unread item distribution is async
+      .then(delay(1000)) // Unread item distribution is async
       .then(function(res) {
-        this.chatId = res.body.id;
+        chatId = res.body.id;
         var since = Date.now();
         return unreadItemsEngine.listTroupeUsersForEmailNotifications(since, 60);
       })
@@ -78,11 +77,12 @@ describe('one-to-one-rooms', function() {
         assert(result[fixture.user2.id]);
 
         // User2 will be notified of the new chat in the one-to-one
-        assert.deepEqual(result[fixture.user2.id][this.roomId], [this.chatId]);
+        assert.deepEqual(result[fixture.user2.id][roomId], [chatId]);
       });
   });
 
   it('One-to-one between two users with where one user has default notification settings of mute', function() {
+    let roomId;
     return request(app)
       .put('/v1/user/me/settings/defaultRoomMode')
       .send({
@@ -101,11 +101,8 @@ describe('one-to-one-rooms', function() {
           .set('x-access-token', fixture.user3.accessToken)
           .expect(200);
       })
-      .bind({
-        roomId: null
-      })
       .then(function(res) {
-        var roomId = (this.roomId = res.body.id);
+        roomId = res.body.id;
         assert(roomId);
 
         return request(app)
@@ -118,7 +115,7 @@ describe('one-to-one-rooms', function() {
         assert.strictEqual(body.mode, 'announcement');
 
         return request(app)
-          .get('/v1/user/me/rooms/' + this.roomId + '/settings/notifications')
+          .get('/v1/user/me/rooms/' + roomId + '/settings/notifications')
           .set('x-access-token', fixture.user2.accessToken)
           .expect(200);
       })

@@ -3,7 +3,6 @@
 
 var env = require('gitter-web-env');
 var nconf = env.config;
-var Promise = require('bluebird');
 var yargs = require('yargs');
 var shutdown = require('shutdown');
 var StatusError = require('statuserror');
@@ -62,7 +61,7 @@ function getParams() {
 }
 
 function run() {
-  var request = require('supertest-as-promised')(Promise);
+  var request = require('supertest');
   var app = require('../../server/api');
 
   return getParams()

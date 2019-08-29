@@ -1,9 +1,15 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
+import moment from 'moment';
+import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
+import { generateChildMessageTmpId } from '../../store/mutations';
 
 // Exported for testing
-export const childMessagesVuexRequest = new VuexApiRequest('CHILD_MESSAGES', 'childMessages');
+export const childMessagesVuexRequest = new VuexApiRequest(
+  'CHILD_MESSAGES',
+  'childMessagesRequest'
+);
 
 // Exported for testing
 export const types = {
@@ -36,6 +42,14 @@ export default {
   getters: {
     parentMessage: (state, getters, rootState) => {
       return rootState.messageMap[state.parentId];
+    },
+    childMessages: (state, getters, rootState) => {
+      const { parentId } = state;
+      const childMessages = Object.values(rootState.messageMap).filter(
+        m => m.parentId === parentId
+      );
+      // we use moment because the messages combine messages from bayeux and ordinary json messages (fetch during TMF open)
+      return childMessages.sort((m1, m2) => moment(m1.sent).diff(m2.sent)); // sort from oldest to latest
     }
   },
   actions: {
@@ -48,26 +62,46 @@ export default {
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
       commit(types.SET_PARENT_MESSAGE_ID, null);
-      commit(childMessagesVuexRequest.successType, []);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
       commit(types.UPDATE_DRAFT_MESSAGE, newDraftMessage);
     },
-    sendMessage: ({ state, commit }) => {
-      const message = {
+    sendMessage: ({ state, commit, rootState }) => {
+      const messagePayload = {
         text: state.draftMessage,
         parentId: state.parentId
       };
-      // TODO add the temporary message to the feed + react on success or failure
-      apiClient.room.post('/chatMessages', message);
+      const fromUser = rootState.user;
+      const tmpMessage = {
+        ...messagePayload,
+        id: generateChildMessageTmpId(state.parentId, fromUser._id, state.draftMessage),
+        fromUser,
+        sent: new Date(Date.now())
+      };
+      commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, loading: true }], { root: true });
+      apiClient.room
+        .post('/chatMessages', messagePayload)
+        .then(message => {
+          // the message from the API response fully replaces the `tmpMessage` and because it
+          // doesn't contain the `loading` attribute, UI will hide the loading indicator
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
+        })
+        .catch(() => {
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true, loading: false }], {
+            root: true
+          });
+        });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     fetchChildMessages: ({ state, commit }) => {
       commit(childMessagesVuexRequest.requestType);
       apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
-        .then(childMessages => commit(childMessagesVuexRequest.successType, childMessages))
+        .then(childMessages => {
+          commit(childMessagesVuexRequest.successType);
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });
+        })
         .catch((/* error */) => {
           // error is reported by apiClient
           commit(childMessagesVuexRequest.errorType);

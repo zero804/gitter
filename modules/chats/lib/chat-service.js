@@ -123,6 +123,15 @@ function resolveMentions(troupe, user, parsedMessage) {
   });
 }
 
+async function incrementThreadMessageCount(parentId, troupeId) {
+  const parent = await ChatMessage.findById(parentId).exec();
+  if (!parent || !mongoUtils.objectIDsEqual(parent.toTroupeId, troupeId)) {
+    throw new StatusError(400, "Parent message with doesn't exist");
+  }
+  parent.threadMessageCount = parent.threadMessageCount + 1 || 1;
+  return parent.save();
+}
+
 /**
  * Create a new chat and return a promise of the chat.
  *
@@ -143,6 +152,9 @@ async function newChatMessageToTroupe(troupe, user, data) {
   if (data.parentId && !mongoUtils.isLikeObjectId(data.parentId))
     throw new StatusError(400, 'parentId must be a valid message ID');
 
+  if (data.parentId) {
+    await incrementThreadMessageCount(data.parentId, troupe.id);
+  }
   const parsedMessage = await processText(data.text);
   const mentions = await resolveMentions(troupe, user, parsedMessage);
 
@@ -189,17 +201,20 @@ async function newChatMessageToTroupe(troupe, user, data) {
     })
     .done();
 
-  // Async add unread items
-  unreadItemService
-    .createChatUnreadItems(user.id, troupe, chatMessage)
-    .catch(function(err) {
-      errorReporter(
-        err,
-        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
-        { module: 'chat-service' }
-      );
-    })
-    .done();
+  // TODO: thread messages trigger unread for their parent https://gitlab.com/gitlab-org/gitter/webapp/issues/2244
+  if (!data.parentId) {
+    // Async add unread items
+    unreadItemService
+      .createChatUnreadItems(user.id, troupe, chatMessage)
+      .catch(function(err) {
+        errorReporter(
+          err,
+          { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+          { module: 'chat-service' }
+        );
+      })
+      .done();
+  }
 
   const statMetadata = _.extend(
     {
@@ -444,6 +459,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
       q = q.where('_id').gt(afterId);
     }
 
+    q.where('parentId').exists(false);
+
     if (useHints) {
       q.hint({ toTroupeId: 1, sent: -1 });
     }
@@ -492,6 +509,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .lte(sentBefore(aroundId))
     .where('_id')
     .lte(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'desc' })
     .lean()
     .limit(halfLimit);
@@ -501,6 +520,8 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
     .gte(sentAfter(aroundId))
     .where('_id')
     .gt(aroundId)
+    .where('parentId')
+    .exists(false)
     .sort({ sent: 'asc' })
     .lean()
     .limit(halfLimit);
@@ -575,6 +596,13 @@ function deleteMessage(message) {
     });
 }
 
+function deleteMessageFromRoom(room, chatMessage) {
+  return unreadItemService
+    .removeItem(chatMessage.fromUserId, room, chatMessage)
+    .then(() => deleteMessage(chatMessage))
+    .return(null);
+}
+
 function removeAllMessagesForUserId(userId) {
   return ChatMessage.find({ fromUserId: userId })
     .exec()
@@ -605,13 +633,6 @@ function removeAllMessagesForUserIdInRoomId(userId, roomId) {
       concurrency: 1
     });
   });
-}
-
-function deleteMessageFromRoom(room, chatMessage) {
-  return unreadItemService
-    .removeItem(chatMessage.fromUserId, room, chatMessage)
-    .then(() => deleteMessage(chatMessage))
-    .return(null);
 }
 
 const testOnly = {

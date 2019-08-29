@@ -6,7 +6,7 @@ process.env.TEST_EXPORT_RATE_LIMIT = 100;
 
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
-const request = require('supertest-as-promised')(Promise);
+const request = require('supertest');
 
 const mockedRequest = require('request');
 

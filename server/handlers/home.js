@@ -7,7 +7,6 @@ var isPhoneMiddleware = require('../web/middlewares/is-phone');
 var featureToggles = require('../web/middlewares/feature-toggles');
 var userHomeRenderer = require('./renderers/userhome');
 const exploreRenderer = require('./renderers/explore-renderer');
-const learnRenderer = require('./renderers/learn-renderer');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
 
@@ -52,6 +51,7 @@ router.get(
   }
 );
 
+// FIXME: Remove after 2020-8-22
 router.get(
   '/learn',
   identifyRoute('home-learn-main'),
@@ -59,8 +59,8 @@ router.get(
   preventClickjackingMiddleware,
   featureToggles,
   isPhoneMiddleware,
-  function(req, res, next) {
-    learnRenderer.renderLearnPage(req, res, next);
+  function(req, res) {
+    return res.redirect('/home');
   }
 );
 

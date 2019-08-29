@@ -11,6 +11,7 @@ var ChatMessageSchema = new Schema({
   parentId: ObjectId,
   text: String,
   status: { type: Boolean, required: false },
+  threadMessageCount: { type: Number, required: false },
   pub: { type: Boolean, required: false }, // PUBLIC?
   html: String,
   urls: Array, // TODO: schema-ify this
@@ -33,13 +34,7 @@ var ChatMessageSchema = new Schema({
   _md: Number // Meta parse version
 });
 ChatMessageSchema.index({ toTroupeId: 1, sent: -1 });
-ChatMessageSchema.index(
-  { parentId: 1, sent: -1 },
-  {
-    partialFilterExpression: { parentId: { $exists: true } },
-    background: true
-  }
-);
+ChatMessageSchema.index({ parentId: 1, sent: -1 }, { background: true });
 ChatMessageSchema.index({ fromUserId: 1 }, { background: true });
 ChatMessageSchema.schemaTypeName = 'ChatMessageSchema';
 

@@ -34,9 +34,7 @@ const webpackConfig = merge(baseConfig, {
     apps: path.resolve(path.join(__dirname, './apps.js')),
     'router-org-page': path.resolve(path.join(__dirname, './router-org-page.js')),
     'router-userhome': path.resolve(path.join(__dirname, './router-userhome.js')),
-    'chat-message-reports': path.resolve(path.join(__dirname, './chat-message-reports.js')),
-
-    'router-home-learn': path.resolve(path.join(__dirname, './router-home-learn'))
+    'chat-message-reports': path.resolve(path.join(__dirname, './chat-message-reports.js'))
   },
   output: {
     filename: '[name].bundle.js',

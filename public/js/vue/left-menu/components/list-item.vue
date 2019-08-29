@@ -1,5 +1,6 @@
 <script>
 import { mapActions } from 'vuex';
+import urlJoin from 'url-join';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 import parseItemForTemplate from './lib/parse-item-for-template';
 
@@ -29,6 +30,9 @@ export default {
   computed: {
     nameData() {
       return parseItemForTemplate(this.item, this.type);
+    },
+    itemLink() {
+      return urlJoin('/', this.item.uri || this.item.url);
     }
   },
 
@@ -55,7 +59,7 @@ export default {
       ref="link"
       class="list-item-link"
       :class="{ 'is-active': active }"
-      :href="item.absoluteRoomUri"
+      :href="itemLink"
       @click.stop.prevent="roomClick(item)"
     >
       <img class="list-item-avatar" :src="item.avatarUrl" />
