@@ -9,6 +9,6 @@
   "private": true,
   "dependencies": {
     "bluebird": "^3.5.1",
-    "mongoose": "^4.6.8"
+    "mongoose": "^4.13.19"
   }
 }
