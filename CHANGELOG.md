@@ -1,3 +1,8 @@
+# 20.2.0 - *upcoming*
+
+ - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564
+
+
 # 20.1.1 - 2019-08-28
 
  - Make left-menu room links available on page-load(SSR), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1573
