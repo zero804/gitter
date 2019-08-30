@@ -3,6 +3,10 @@
  - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564
  - Add set of straightforward instructions to get OAuth scopes to match, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1580
 
+# 20.1.2 - 2019-08-29
+- Security fix related login session, https://gitlab.com/gitlab-org/gitter/webapp/issues/2051
+     - Thanks to [@favicon](https://hackerone.com/favicon) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/18
 
 # 20.1.1 - 2019-08-28
 
