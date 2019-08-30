@@ -71,6 +71,13 @@ You can check these settings here,
 For example, if you have ["Gitter Private Repo Access"](./oauth-scopes.md#private-repositories)
 granted personally or on the organisation, please make sure it is also granted on the other.
 
+ 1. Go to https://github.com/settings/applications
+ 1. Click on **Gitter Public Repo Access**
+ 1. **Request** access for the given org  under the **Organization access** section
+ 1. Back on https://github.com/settings/applications, click on **Gitter Private Repo Access**
+    - If you don't see **Gitter Private Repo Access**, see https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/oauth-scopes.md#grant-private-repo-access
+ 1. **Request** access for the given org under the **Organization access** section
+
 You can also try making your organisation membership public, `https://github.com/orgs/YOURORG/people`
 
 For more information see [OAuth Scopes](./oauth-scopes.md).

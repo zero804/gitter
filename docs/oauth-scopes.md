@@ -24,9 +24,9 @@ If you are uncomfortable with this permission, you can always create a private c
 
 Alternatively, you can create private channels that are not based on GitHub resources, this way you can create private rooms that don't map to a private repo.
 
----
+##### Grant Private Repo Access
 
-If you don't see "Gitter Private Repo Access" listed in your [personal application settings](https://github.com/settings/applications), you can start the process in Gitter via the user dropdown menu in the top-right.
+If you don't see **Gitter Private Repo Access** listed in your [personal application settings](https://github.com/settings/applications), you can start the process in Gitter via the user dropdown menu in the top-right.
 
 ![](https://i.imgur.com/hn4dRO1.png)
 
