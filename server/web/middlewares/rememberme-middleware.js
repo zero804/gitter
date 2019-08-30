@@ -151,7 +151,7 @@ function processRememberMeToken(presentedCookie) {
       if (!user) return null;
 
       // Account disabled? Go away
-      if (user.state === 'DISABLED') return null;
+      if (user.state === 'DISABLED' || user.isRemoved()) return null;
 
       /* No token, user will need to relogin */
       if (userScopes.isMissingTokens(user)) return null;

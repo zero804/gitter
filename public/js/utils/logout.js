@@ -5,11 +5,7 @@ var serviceWorkerDeregistation = require('gitter-web-service-worker/browser/dere
 var Promise = require('bluebird');
 
 function navigate(href) {
-  try {
-    window.parent.location.href = href;
-  } catch (e) {
-    window.location.href = href;
-  }
+  window.location.href = href;
 }
 
 function logout(forcedRedirect) {
