@@ -36,7 +36,7 @@ function installApi() {
 
           if (!client) return;
 
-          if (!user) {
+          if (!user || user.isRemoved()) {
             /* This will be converted to null in auth-api.js */
             user = { _anonymous: true };
           }
@@ -58,7 +58,7 @@ function install() {
     return userService
       .findById(id)
       .then(function(user) {
-        if (user && user.state === 'DISABLED') {
+        if (user && (user.state === 'DISABLED' || user.isRemoved())) {
           return null;
         }
 
