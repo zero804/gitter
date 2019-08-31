@@ -154,6 +154,14 @@ function makeEmitter() {
       localEventEmitter.on('tokenRevoked', callback);
     },
 
+    tokenDeleted: function(data) {
+      localEventEmitter.emit('tokenDeleted', data);
+    },
+
+    onTokenDeleted: function(callback) {
+      localEventEmitter.on('tokenDeleted', callback);
+    },
+
     userRemovedFromTroupe: function(options) {
       localEventEmitter.emit('userRemovedFromTroupe', options);
     },
