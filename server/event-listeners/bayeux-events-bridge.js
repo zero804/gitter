@@ -8,6 +8,7 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') })
 var appEvents = require('gitter-web-appevents');
 var bayeux = require('../web/bayeux');
 var ent = require('ent');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var presenceService = require('gitter-web-presence');
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
@@ -77,6 +78,24 @@ exports.install = function() {
     winston.info(
       `All sockets belonging to user ${userId} have been unsubscribed from room ${troupeId}`
     );
+  });
+
+  // Cleanup any of the realtime sockets associated with the token that was just deleted
+  appEvents.onTokenDeleted(async function({ accessToken }) {
+    const socketIds = await presenceService.listAllSocketsForUser(accessToken.userId);
+
+    const sockets = await presenceService.getSockets(socketIds);
+
+    for (let socketId of Object.keys(sockets)) {
+      const socket = sockets[socketId];
+
+      if (mongoUtils.objectIDsEqual(socket.oauthClientId, accessToken.clientId)) {
+        winston.info(
+          `accessToken(${accessToken}) deleted so we are closing associated realtime socket(${socketId})`
+        );
+        await bayeux.destroyClient(socketId);
+      }
+    }
   });
 
   appEvents.onUserNotification(function(data) {
