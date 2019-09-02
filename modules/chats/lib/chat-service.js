@@ -411,115 +411,105 @@ async function findThreadChatMessages(troupeId, parentId) {
   return messages.reverse();
 }
 
-/**
- * Returns a promise of messages
- */
-//eslint-disable-next-line complexity,max-statements
-async function findChatMessagesForTroupe(troupeId, options = {}) {
-  var limit = Math.min(options.limit || MIN_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
-  var skip = options.skip || 0;
+async function findChatMessagesInRange(
+  troupeId,
+  { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip }
+) {
+  let validatedLimit = Math.min(limit || MIN_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
+  const validatedSkip = skip || 0;
 
-  if (skip > 5000) {
+  if (validatedSkip > 5000) {
     throw new StatusError(
       400,
       'Skip is limited to 5000 items. Please use beforeId rather than skip. See https://developer.gitter.im'
     );
   }
+  let q = ChatMessage.where('toTroupeId', troupeId);
 
-  let markerId;
-  if (options.marker === 'first-unread' && options.userId) {
-    markerId = await findFirstUnreadMessageId(troupeId, options.userId);
-  }
-  if (!markerId && !options.aroundId) {
-    var q = ChatMessage.where('toTroupeId', troupeId);
-
-    var sentOrder = 'desc';
-
-    if (options.beforeId) {
-      var beforeId = new ObjectID(options.beforeId);
-      // Also add sent as this helps mongo by using the { troupeId, sent } index
-      q = q.where('sent').lte(sentBefore(beforeId));
-      q = q.where('_id').lt(beforeId);
-    }
-
-    if (options.beforeInclId) {
-      var beforeInclId = new ObjectID(options.beforeInclId);
-      // Also add sent as this helps mongo by using the { troupeId, sent } index
-      q = q.where('sent').lte(sentBefore(beforeInclId));
-      q = q.where('_id').lte(beforeInclId); // Note: less than *or equal to*
-    }
-
-    if (options.afterId) {
-      // Reverse the initial order for afterId
-      sentOrder = 'asc';
-
-      var afterId = new ObjectID(options.afterId);
-      // Also add sent as this helps mongo by using the { troupeId, sent } index
-      q = q.where('sent').gte(sentAfter(afterId));
-      q = q.where('_id').gt(afterId);
-    }
-
-    q.where('parentId').exists(false);
-
-    if (useHints) {
-      q.hint({ toTroupeId: 1, sent: -1 });
-    }
-
-    q = q.sort(options.sort || { sent: sentOrder }).limit(limit);
-
-    if (skip) {
-      if (skip > 1000) {
-        logger.warn(
-          'chat-service: Client requested large skip value on chat message collection query',
-          { troupeId: troupeId, skip: skip }
-        );
-      }
-
-      q = q.skip(skip);
-
-      if (!options.readPreference) {
-        q = q.read(mongoReadPrefs.secondaryPreferred);
-      }
-    }
-
-    if (options.readPreference) {
-      q = q.read(options.readPreference);
-    }
-
-    return q
-      .lean()
-      .exec()
-      .then(function(results) {
-        mongooseUtils.addIdToLeanArray(results);
-
-        if (sentOrder === 'desc') {
-          results.reverse();
-        }
-
-        return results;
-      });
+  if (beforeId) {
+    // Also add sent as this helps mongo by using the { troupeId, sent } index
+    q = q.where('sent').lte(sentBefore(new ObjectID(beforeId)));
+    q = q.where('_id').lt(new ObjectID(beforeId));
   }
 
-  var aroundId = new ObjectID(markerId || options.aroundId);
+  if (beforeInclId) {
+    // Also add sent as this helps mongo by using the { troupeId, sent } index
+    q = q.where('sent').lte(sentBefore(new ObjectID(beforeInclId)));
+    q = q.where('_id').lte(new ObjectID(beforeInclId)); // Note: less than *or equal to*
+  }
 
-  var halfLimit = Math.floor(options.limit / 2) || 25;
+  let sentOrder = 'desc';
+  if (afterId) {
+    // Reverse the initial order for afterId
+    sentOrder = 'asc';
 
-  var q1 = ChatMessage.where('toTroupeId', troupeId)
+    // Also add sent as this helps mongo by using the { troupeId, sent } index
+    q = q.where('sent').gte(sentAfter(new ObjectID(afterId)));
+    q = q.where('_id').gt(new ObjectID(afterId));
+  }
+
+  q.where('parentId').exists(false);
+
+  if (useHints) {
+    q.hint({ toTroupeId: 1, sent: -1 });
+  }
+
+  q = q.sort(sort || { sent: sentOrder }).limit(validatedLimit);
+
+  if (validatedSkip) {
+    if (validatedSkip > 1000) {
+      logger.warn(
+        'chat-service: Client requested large skip value on chat message collection query',
+        { troupeId: troupeId, skip: validatedSkip }
+      );
+    }
+
+    q = q.skip(validatedSkip);
+
+    if (!readPreference) {
+      q = q.read(mongoReadPrefs.secondaryPreferred);
+    }
+  }
+
+  if (readPreference) {
+    q = q.read(readPreference);
+  }
+
+  return q
+    .lean()
+    .exec()
+    .then(function(results) {
+      mongooseUtils.addIdToLeanArray(results);
+
+      if (sentOrder === 'desc') {
+        results.reverse();
+      }
+
+      return results;
+    });
+}
+
+async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit }) {
+  const messageInTheMiddleId = new ObjectID(markerId || aroundId);
+
+  const halfLimit = Math.floor(limit / 2) || 25;
+
+  const q1 = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
-    .lte(sentBefore(aroundId))
+    .lte(sentBefore(messageInTheMiddleId))
     .where('_id')
-    .lte(aroundId)
+    .lte(messageInTheMiddleId)
     .where('parentId')
     .exists(false)
     .sort({ sent: 'desc' })
     .lean()
     .limit(halfLimit);
 
-  var q2 = ChatMessage.where('toTroupeId', troupeId)
+  const q2 = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
-    .gte(sentAfter(aroundId))
+    .gte(sentAfter(messageInTheMiddleId))
     .where('_id')
-    .gt(aroundId)
+    .gt(messageInTheMiddleId)
     .where('parentId')
     .exists(false)
     .sort({ sent: 'asc' })
@@ -538,6 +528,21 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
 
     return [].concat(a.reverse(), b);
   });
+}
+
+/**
+ * Returns a promise of messages
+ */
+async function findChatMessagesForTroupe(troupeId, options = {}) {
+  let markerId;
+  if (options.marker === 'first-unread' && options.userId) {
+    markerId = await findFirstUnreadMessageId(troupeId, options.userId);
+  }
+  if (!markerId && !options.aroundId) {
+    return findChatMessagesInRange(troupeId, options);
+  } else {
+    return findChatMessagesAroundId(troupeId, markerId, options);
+  }
 }
 
 function findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate) {
