@@ -14,6 +14,7 @@ var onready = require('./utils/onready');
 var urlParser = require('./utils/url-parser');
 var appEvents = require('./utils/appevents');
 var context = require('gitter-web-client-context');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 
 var TitlebarUpdater = require('./components/titlebar');
 const userNotifications = require('./components/user-notifications');
@@ -300,13 +301,9 @@ onready(function() {
 
   appEvents.on('permalink.requested', function(type, chat /*, options*/) {
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
-    var url = context.troupe().get('url');
-    var id = chat.id;
-
-    const permalinkUrl = url + '?at=' + id;
-    const frameUrl = url + '/~' + type + '?at=' + id;
-    const title = url.substring(1);
-    pushState(frameUrl, title, permalinkUrl);
+    const troupeUrl = context.troupe().get('url');
+    const permalinkUrl = generatePermalink(troupeUrl, chat.id);
+    pushState(permalinkUrl, window.title, permalinkUrl);
   });
 
   appEvents.on('unreadItemsCount', function(troupeId, count) {
