@@ -490,15 +490,20 @@ async function findChatMessagesInRange(
 }
 
 async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit }) {
-  const messageInTheMiddleId = new ObjectID(markerId || aroundId);
+  const message = await findByIdLean(markerId || aroundId);
+
+  if (!message) return [];
+
+  // if the around message is child message, we are going to searching around parent
+  const searchMessageId = new ObjectID(message.parentId || message._id);
 
   const halfLimit = Math.floor(limit / 2) || 25;
 
   const q1 = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
-    .lte(sentBefore(messageInTheMiddleId))
+    .lte(sentBefore(searchMessageId))
     .where('_id')
-    .lte(messageInTheMiddleId)
+    .lte(searchMessageId)
     .where('parentId')
     .exists(false)
     .sort({ sent: 'desc' })
@@ -507,9 +512,9 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit })
 
   const q2 = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
-    .gte(sentAfter(messageInTheMiddleId))
+    .gte(sentAfter(searchMessageId))
     .where('_id')
-    .gt(messageInTheMiddleId)
+    .gt(searchMessageId)
     .where('parentId')
     .exists(false)
     .sort({ sent: 'asc' })
@@ -522,12 +527,13 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit })
   }
 
   /* Around case */
-  return Promise.all([q1.exec(), q2.exec()]).spread(function(a, b) {
-    mongooseUtils.addIdToLeanArray(a);
-    mongooseUtils.addIdToLeanArray(b);
+  const [before, after] = await Promise.all([q1.exec(), q2.exec()]);
+  const childMessageArray = message.parentId ? [message] : [];
 
-    return [].concat(a.reverse(), b);
-  });
+  // adding the child message for clients to be able to reference it
+  const result = [...before.reverse(), ...after, ...childMessageArray];
+  mongooseUtils.addIdToLeanArray(result);
+  return result;
 }
 
 /**
