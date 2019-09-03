@@ -57,7 +57,7 @@
 	"<b>Join</b> earlybird programme": "<b>Join</b> earlybird programme",
 	"Get Gitter now!": "Get Gitter now!",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter is available in all modern browsers as well as apps for desktops and mobile phones.",
-	"We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>": "We currently have apps for OSX, iOS, Android, Windows and Linux. We also have a sweet little <a %s>IRC bridge</a>",
+	"We also have a sweet little <a %s>IRC bridge</a>": "We also have a sweet little <a %s>IRC bridge</a>",
 	"Mac": "Mac",
 	"Windows": "Windows",
 	"Linux 32": "Linux 32",
@@ -67,5 +67,7 @@
 	"Open Source": "Open Source",
 	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
 	"desktop": "desktop",
-	"iOS": "iOS"
+	"iOS": "iOS",
+	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.",
+	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>."
 }
