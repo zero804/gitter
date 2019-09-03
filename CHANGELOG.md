@@ -1,4 +1,4 @@
-# 20.2.0 - *upcoming*
+# 20.2.0 - 2019-9-3
 
  - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564
  - Add set of straightforward instructions to get OAuth scopes to match, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1580
