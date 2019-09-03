@@ -42,6 +42,7 @@ exports[`thread-message-feed chat-item snapshot compact styles 1`] = `
          
         <a
           class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -121,6 +122,7 @@ exports[`thread-message-feed chat-item snapshot error 1`] = `
          
         <a
           class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -200,6 +202,7 @@ exports[`thread-message-feed chat-item snapshot loading 1`] = `
          
         <a
           class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -291,6 +294,7 @@ exports[`thread-message-feed chat-item snapshot showing item actions 1`] = `
          
         <a
           class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48
@@ -370,6 +374,7 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
          
         <a
           class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
           title="May 18, 2016 3:48 AM"
         >
           May 18 2016 03:48

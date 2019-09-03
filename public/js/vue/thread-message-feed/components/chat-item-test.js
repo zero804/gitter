@@ -1,6 +1,9 @@
 const mount = require('../../__test__/vuex-mount');
 const momentTimezone = require('moment-timezone');
-const { createSerializedMessageFixture } = require('../../__test__/fixture-helpers');
+const {
+  createSerializedMessageFixture,
+  createSerializedRoomFixture
+} = require('../../__test__/fixture-helpers');
 const { default: ChatItem } = require('./chat-item.vue');
 
 describe('thread-message-feed chat-item', () => {
@@ -10,32 +13,53 @@ describe('thread-message-feed chat-item', () => {
     message,
     useCompactStyles: false
   };
+  const addRoomToStore = store => {
+    const room = createSerializedRoomFixture('abc/def');
+    store.state.roomMap = { [room.id]: room };
+    store.state.displayedRoomId = room.id;
+  };
 
   describe('snapshot', () => {
     it('with default props', () => {
-      const { wrapper } = mount(ChatItem, defaultProps);
+      const { wrapper } = mount(ChatItem, defaultProps, addRoomToStore);
       expect(wrapper.element).toMatchSnapshot();
     });
     it('showing item actions', () => {
-      const { wrapper } = mount(ChatItem, { ...defaultProps, showItemActions: true });
+      const { wrapper } = mount(
+        ChatItem,
+        { ...defaultProps, showItemActions: true },
+        addRoomToStore
+      );
       expect(wrapper.element).toMatchSnapshot();
     });
     it('compact styles', () => {
-      const { wrapper } = mount(ChatItem, { ...defaultProps, useCompactStyles: true });
+      const { wrapper } = mount(
+        ChatItem,
+        { ...defaultProps, useCompactStyles: true },
+        addRoomToStore
+      );
       expect(wrapper.element).toMatchSnapshot();
     });
     it('error', () => {
-      const { wrapper } = mount(ChatItem, {
-        ...defaultProps,
-        message: { ...message, error: true }
-      });
+      const { wrapper } = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, error: true }
+        },
+        addRoomToStore
+      );
       expect(wrapper.element).toMatchSnapshot();
     });
     it('loading', () => {
-      const { wrapper } = mount(ChatItem, {
-        ...defaultProps,
-        message: { ...message, loading: true }
-      });
+      const { wrapper } = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, loading: true }
+        },
+        addRoomToStore
+      );
       expect(wrapper.element).toMatchSnapshot();
     });
   });
