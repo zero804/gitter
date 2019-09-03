@@ -1,12 +1,11 @@
 'use strict';
 
-var Promise = require('bluebird');
-var testRequire = require('../test-require');
-var assert = require('assert');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
-var oauthService = testRequire('./services/oauth-service');
+const Promise = require('bluebird');
+const assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+const oauthService = require('../lib/oauth-service');
 
-var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('oauth-service', function() {
   var fixture = fixtureLoader.setup({

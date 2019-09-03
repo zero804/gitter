@@ -1,7 +1,6 @@
 'use strict';
 
-var testRequire = require('../../test-require');
-var accessTokenProvider = testRequire('./services/tokens/access-token-provider');
+var accessTokenProvider = require('../lib/tokens/access-token-provider');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
 var assert = require('assert');

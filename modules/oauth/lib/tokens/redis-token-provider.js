@@ -4,6 +4,8 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var conf = env.config;
 
+const assert = require('assert');
+
 /* Uses the no-persist redis */
 var redisClient = env.redis.createClient(
   process.env.REDIS_NOPERSIST_CONNECTION_STRING || conf.get('redis_nopersist')
@@ -11,18 +13,29 @@ var redisClient = env.redis.createClient(
 var STANDARD_TTL = 10 * 60; /* 10 minutes */
 var ANONYMOUS_TTL = conf.get('web:sessionTTL') + 60; /* One minute more than the session age */
 
-var tokenLookupCachePrefix = 'token:c:';
-var tokenValidationCachePrefix = 'token:t:';
+const tokenLookupCachePrefix = 'token:c:';
+const tokenValidationCachePrefix = 'token:t:';
+
+function getAnonymousRedisKey(token) {
+  assert(token);
+  return tokenValidationCachePrefix + token;
+}
+
+function getRedisKey(userId, clientId) {
+  assert(userId);
+  assert(clientId);
+  return tokenLookupCachePrefix + userId + ':' + clientId;
+}
 
 module.exports = {
   getToken: function(userId, clientId, callback) {
     if (!userId) return callback();
 
-    redisClient.get(tokenLookupCachePrefix + userId + ':' + clientId, callback);
+    redisClient.get(getRedisKey(userId, clientId), callback);
   },
 
   validateToken: function(token, callback) {
-    var redisKey = tokenValidationCachePrefix + token;
+    var redisKey = getAnonymousRedisKey(token);
     redisClient.get(redisKey, function(err, value) {
       if (err) {
         logger.warn('Unable to lookup token in cache ' + err, { exception: err });
@@ -51,10 +64,10 @@ module.exports = {
 
     var cacheTimeout = userId ? STANDARD_TTL : ANONYMOUS_TTL;
 
-    multi.setex(tokenValidationCachePrefix + token, cacheTimeout, (userId || '') + ':' + clientId);
+    multi.setex(getAnonymousRedisKey(token), cacheTimeout, (userId || '') + ':' + clientId);
 
     if (userId) {
-      multi.setex(tokenLookupCachePrefix + userId + ':' + clientId, cacheTimeout, token);
+      multi.setex(getRedisKey(userId, clientId), cacheTimeout, token);
     }
 
     multi.exec(callback);
@@ -73,13 +86,9 @@ module.exports = {
       var clientId = result[1];
 
       // Anonymous tokens don't have this
-      if (!userId) return redisClient.del(tokenValidationCachePrefix + token, callback);
+      if (!userId) return redisClient.del(getAnonymousRedisKey(token), callback);
 
-      return redisClient.del(
-        tokenValidationCachePrefix + token,
-        tokenLookupCachePrefix + userId + ':' + clientId,
-        callback
-      );
+      return redisClient.del(getAnonymousRedisKey(token), getRedisKey(userId, clientId), callback);
     });
   },
 

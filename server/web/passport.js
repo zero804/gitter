@@ -4,7 +4,7 @@ var passport = require('passport');
 var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy;
 var BearerStrategy = require('gitter-passport-http-bearer').Strategy;
 var userService = require('gitter-web-users');
-var oauthService = require('../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 var githubUserStrategy = require('./strategies/github-user');
 var githubUpgradeStrategy = require('./strategies/github-upgrade');
 var gitlabStrategy = require('./strategies/gitlab');
@@ -36,7 +36,7 @@ function installApi() {
 
           if (!client) return;
 
-          if (!user) {
+          if (!user || user.isRemoved()) {
             /* This will be converted to null in auth-api.js */
             user = { _anonymous: true };
           }
@@ -58,7 +58,7 @@ function install() {
     return userService
       .findById(id)
       .then(function(user) {
-        if (user && user.state === 'DISABLED') {
+        if (user && (user.state === 'DISABLED' || user.isRemoved())) {
           return null;
         }
 

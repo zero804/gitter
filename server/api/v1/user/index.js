@@ -46,7 +46,7 @@ module.exports = {
     return restSerializer.serializeObject(req.resourceUser, strategy);
   },
 
-  destroy: function(req) {
+  destroy: async function(req) {
     if (!req.user) throw new StatusError(401);
 
     let ghost = false;
@@ -54,13 +54,11 @@ module.exports = {
       ghost = req.body.ghost;
     }
 
-    return userRemovalService
-      .removeByUsername(req.user.username, {
-        ghost: ghost
-      })
-      .then(function() {
-        return { success: true };
-      });
+    await userRemovalService.removeByUsername(req.user.username, {
+      ghost: ghost
+    });
+
+    return { success: true };
   },
 
   load: function(req, id) {

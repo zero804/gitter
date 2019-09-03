@@ -5,7 +5,7 @@ var winston = env.logger;
 var nconf = env.config;
 const asyncHandler = require('express-async-handler');
 var rememberMe = require('./rememberme-middleware');
-const oauthService = require('../../services/oauth-service');
+const oauthService = require('gitter-web-oauth');
 const getAccessToken = require('../get-access-token-from-req');
 
 var authCookieName = nconf.get('web:cookiePrefix') + 'auth';
@@ -16,7 +16,7 @@ var sessionCookieName = nconf.get('web:cookiePrefix') + 'session';
 function logoutPreserveSession(req, res, next) {
   req.logout();
 
-  var authCookie = req.cookies[authCookieName];
+  var authCookie = req.cookies && req.cookies[authCookieName];
 
   if (authCookie) {
     res.clearCookie(authCookieName, { domain: nconf.get('web:cookieDomain') });
