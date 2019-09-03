@@ -4,7 +4,7 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var StatusError = require('statuserror');
 var stats = env.stats;
-var oauthService = require('../../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 
 function isInternalClient(req) {
   if (!req.authInfo || !req.authInfo.client) return false;

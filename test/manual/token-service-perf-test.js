@@ -1,7 +1,7 @@
 'use strict';
 
 var speedy = require('speedy');
-var oauthService = require('../../server/services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 
 speedy.run({
   a: function(done) {

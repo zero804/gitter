@@ -119,5 +119,26 @@ describe('e2e tests', function() {
       cy.get('.welcome-modal__header').contains('Get Started: Spread the word');
       cy.get('.js-chat-name').contains(NEW_ROOM_NAME);
     });
+
+    it('can delete account', function() {
+      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+
+      cy.get('#profile-menu').click();
+
+      cy.get('#profile-menu-items')
+        .contains('Delete Account')
+        .click();
+
+      cy.get('.modal')
+        .contains(`Delete ${fixtures.user1.username}`, {
+          // wait for the 10 second cooldown before the button is enabled
+          timeout: 12000
+        })
+        .should('not.be.disabled')
+        .click();
+
+      // Make sure we got logged out and back on the homepage
+      cy.url().should('eq', urlJoin(gitterBaseUrl, '/'));
+    });
   });
 });

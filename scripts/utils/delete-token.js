@@ -5,7 +5,7 @@
 process.env.NO_AUTO_INDEX = 1;
 
 var shutdown = require('shutdown');
-var oauthService = require('../../server/services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 
 var opts = require('yargs')
   .option('token', {

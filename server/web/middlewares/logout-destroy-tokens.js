@@ -6,7 +6,7 @@ var stats = env.stats;
 var StatusError = require('statuserror');
 
 var logout = require('./logout');
-var oauthService = require('../../services/oauth-service');
+var oauthService = require('gitter-web-oauth');
 var userService = require('gitter-web-users');
 
 module.exports = function(req, res, next) {

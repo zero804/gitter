@@ -14,7 +14,7 @@ var Promise = require('bluebird');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:bayeux-authorisor');
 var recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
-var tokenProvider = require('../../services/tokens');
+const tokenProvider = require('gitter-web-oauth/lib/tokens');
 
 var survivalMode = !!process.env.SURVIVAL_MODE || false;
 

@@ -56,35 +56,23 @@ module.exports = function(underTest) {
       });
     });
 
-    it('should not find tokens that have been deleted', function(done) {
-      underTest.getToken(userId, clientId, function(err, token2) {
-        if (err) return done(err);
+    it('should not find tokens that have been deleted', async function() {
+      const token2 = await underTest.getToken(userId, clientId);
 
-        underTest.deleteToken(token2, function(err) {
-          if (err) return done(err);
+      await underTest.deleteToken(token2);
 
-          underTest.getToken(userId, clientId, function(err, token3) {
-            if (err) return done(err);
-            assert(token2 != token3);
+      const token3 = await underTest.getToken(userId, clientId);
+      assert(token2 !== token3);
 
-            underTest.validateToken(token2, function(err, userClient) {
-              if (err) return done(err);
-              assert(!userClient);
+      const userClientFromToken2 = await underTest.validateToken(token2);
+      assert(!userClientFromToken2);
 
-              underTest.validateToken(token3, function(err, userClient) {
-                if (err) return done(err);
+      const userClientFromToken3 = await underTest.validateToken(token3);
 
-                assert(Array.isArray(userClient));
-                // Deep equals freaks out with mongo ids
-                assert.strictEqual(userId, '' + userClient[0]);
-                assert.strictEqual(clientId, '' + userClient[1]);
-
-                done();
-              });
-            });
-          });
-        });
-      });
+      assert(Array.isArray(userClientFromToken3));
+      // Deep equals freaks out with mongo ids
+      assert.strictEqual(userId, '' + userClientFromToken3[0]);
+      assert.strictEqual(clientId, '' + userClientFromToken3[1]);
     });
   });
 };

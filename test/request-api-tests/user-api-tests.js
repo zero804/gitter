@@ -17,7 +17,7 @@ describe('user-api', function() {
     app = require('../../server/api');
   });
 
-  var fixture = fixtureLoader.setup({
+  var fixture = fixtureLoader.setupEach({
     user1: {
       accessToken: 'web-internal'
     },
@@ -62,32 +62,48 @@ describe('user-api', function() {
       });
   });
 
-  it('DELETE /v1/user/:userId', function() {
-    return request(app)
-      .delete('/v1/user/me')
-      .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        assert.strictEqual(result.status, 200);
-        assert.deepEqual(result.body, {
-          success: true
+  describe('DELETE /v1/user/:userId', () => {
+    it('should be successful', function() {
+      return request(app)
+        .delete('/v1/user/me')
+        .set('x-access-token', fixture.user1.accessToken)
+        .expect(200)
+        .then(function(result) {
+          assert.strictEqual(result.status, 200);
+          assert.deepEqual(result.body, {
+            success: true
+          });
         });
-      });
-  });
+    });
 
-  it('DELETE /v1/user/:userId with ghost option', function() {
-    return request(app)
-      .delete('/v1/user/me')
-      .send({
-        ghost: true
-      })
-      .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        assert.strictEqual(result.status, 200);
-        assert.deepEqual(result.body, {
-          success: true
+    it('should be successful with ghost option', function() {
+      return request(app)
+        .delete('/v1/user/me')
+        .send({
+          ghost: true
+        })
+        .set('x-access-token', fixture.user1.accessToken)
+        .expect(200)
+        .then(function(result) {
+          assert.strictEqual(result.status, 200);
+          assert.deepEqual(result.body, {
+            success: true
+          });
         });
-      });
+    });
+
+    it('should clear access tokens', async function() {
+      // Delete the user
+      await request(app)
+        .delete('/v1/user/me')
+        .set('x-access-token', fixture.user1.accessToken)
+        .expect(200);
+
+      // Access token should no longer work
+      await request(app)
+        .get('/v1/user/me')
+        .set('x-access-token', fixture.user1.accessToken)
+        .expect(401);
+    });
   });
 });

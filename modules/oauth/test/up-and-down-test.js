@@ -1,8 +1,7 @@
 'use strict';
 
-var testRequire = require('../../test-require');
 var assert = require('assert');
-var UpAndDown = testRequire('./services/tokens/up-and-down');
+var UpAndDown = require('../lib/tokens/up-and-down');
 
 describe('up-and-down', function() {
   it('should work down and then up', function(done) {

@@ -1,17 +1,17 @@
 'use strict';
 
-var WEB_INTERNAL_CLIENT_KEY = 'web-internal';
-var env = require('gitter-web-env');
-var nconf = env.config;
-var logger = env.logger;
+const WEB_INTERNAL_CLIENT_KEY = 'web-internal';
+const env = require('gitter-web-env');
+const nconf = env.config;
+const logger = env.logger;
 
-var appEvents = require('gitter-web-appevents');
-var persistenceService = require('gitter-web-persistence');
-var Promise = require('bluebird');
-var StatusError = require('statuserror');
-var userService = require('gitter-web-users');
-var tokenProvider = require('./tokens/');
-var MongooseCachedLookup = require('../utils/mongoose-cached-lookup');
+const appEvents = require('gitter-web-appevents');
+const persistenceService = require('gitter-web-persistence');
+const Promise = require('bluebird');
+const StatusError = require('statuserror');
+const userService = require('gitter-web-users');
+const tokenProvider = require('./tokens/');
+const MongooseCachedLookup = require('./mongoose-cached-lookup');
 
 var ircClientId;
 
@@ -139,10 +139,15 @@ function validateAccessTokenAndClient(token) {
   });
 }
 
-function removeAllAccessTokensForUser(userId, callback) {
-  return persistenceService.OAuthAccessToken.remove({ userId: userId })
-    .exec()
-    .nodeify(callback);
+async function removeAllAccessTokensForUser(userId) {
+  const oAuthAccessTokens = await persistenceService.OAuthAccessToken.find({ userId: userId });
+
+  // Remove the tokens from the caches
+  await Promise.all(
+    oAuthAccessTokens.map(oAuthAccessToken => {
+      return deleteToken(oAuthAccessToken.token);
+    })
+  );
 }
 
 function findClientByClientKey(clientKey, callback) {

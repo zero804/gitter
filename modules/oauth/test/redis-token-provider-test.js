@@ -1,8 +1,7 @@
 'use strict';
 
-var testRequire = require('../../test-require');
 var assert = require('assert');
-var redisTokenProvider = testRequire('./services/tokens/redis-token-provider');
+var redisTokenProvider = require('../lib/tokens/redis-token-provider');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 describe('redis-token-provider', function() {
@@ -35,6 +34,7 @@ describe('redis-token-provider', function() {
 
               redisTokenProvider.testOnly.redisClient.ttl(
                 redisTokenProvider.testOnly.tokenValidationCachePrefix + token,
+                // eslint-disable-next-line max-nested-callbacks
                 function(err, ttl) {
                   if (err) return done(err);
 

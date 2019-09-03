@@ -2,7 +2,6 @@
 
 var Marionette = require('backbone.marionette');
 var log = require('../../utils/log');
-var logout = require('../../utils/logout');
 var context = require('gitter-web-client-context');
 var appEvents = require('../../utils/appevents');
 var ModalView = require('./modal');
@@ -77,7 +76,8 @@ var Modal = ModalView.extend({
           })
           .then(() => {
             this.lockModel.set('deletionRequestSucceeded', true);
-            return logout();
+            // Redirect back to the homepage
+            window.location.href = '/';
           })
           .catch(err => {
             log.error('Error while deleting account', { exception: err });
