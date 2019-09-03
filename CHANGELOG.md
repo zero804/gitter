@@ -3,12 +3,21 @@
  - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564
  - Add set of straightforward instructions to get OAuth scopes to match, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1580
 
-# 20.1.2 - 2019-08-29
+
+# 20.1.3 - 2019-9-3
+
+- Security fix related deleted user tokens, https://gitlab.com/gitlab-org/gitter/webapp/issues/2081
+     - Thanks to [@dhakalananda](https://hackerone.com/dhakalananda) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/20
+
+
+# 20.1.2 - 2019-8-29
+
 - Security fix related login session, https://gitlab.com/gitlab-org/gitter/webapp/issues/2051
      - Thanks to [@favicon](https://hackerone.com/favicon) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
      - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/18
 
-# 20.1.1 - 2019-08-28
+# 20.1.1 - 2019-8-28
 
  - Make left-menu room links available on page-load(SSR), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1573
  - Fix mobile homepage styles, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1579
@@ -18,7 +27,7 @@ Developer facing:
  - Only listen on chatCollection if we are in troupe context, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1577
 
 
-# 20.1.0 - 2019-08-27
+# 20.1.0 - 2019-8-27
 
  - Showing the parent message indicator in the main message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1563
  - Threaded Conversations: Indicate that the message hasn't been stored in DB, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1568
@@ -65,7 +74,7 @@ Developer facing:
  - Remove Mixpanel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1541
 
 
-# 19.60.0 - 2019-08-06
+# 19.60.0 - 2019-8-6
 
  - Update left-menu search input styling, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1539
  - Fix repo search results leading to 404 undefined room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1540
@@ -82,7 +91,7 @@ Developer facing:
 - Update dependency `useragent` to `2.3.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1523
 
 
-# 19.59.0 - 2019-07-31
+# 19.59.0 - 2019-7-31
 
  - Show parent message in the thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1482
  - Update dependency `@gitterhq/services` to `1.25.0` for [repl.it](https://repl.it/site/docs/classrooms/webhooks) service
