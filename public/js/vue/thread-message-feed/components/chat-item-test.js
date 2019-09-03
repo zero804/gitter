@@ -62,5 +62,16 @@ describe('thread-message-feed chat-item', () => {
       );
       expect(wrapper.element).toMatchSnapshot();
     });
+    it('highlighted', () => {
+      const { wrapper } = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, highlighted: true }
+        },
+        addRoomToStore
+      );
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
 });

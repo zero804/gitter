@@ -45,7 +45,11 @@ export default {
 <template>
   <div
     class="chat-item burstStart"
-    :class="{ compact: useCompactStyles, syncerror: message.error }"
+    :class="{
+      compact: useCompactStyles,
+      syncerror: message.error,
+      'chat-item__highlighted': message.highlighted
+    }"
   >
     <div class="chat-item__container">
       <div class="chat-item__aside">

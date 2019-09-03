@@ -117,5 +117,9 @@ export default {
       }
       Vue.set(state.messageMap, message.id, message);
     });
+  },
+  [types.SET_MESSAGE_HIGHLIGHT](state, { id, highlighted }) {
+    const message = state.messageMap[id];
+    Vue.set(state.messageMap, id, { ...message, highlighted });
   }
 };

@@ -382,6 +382,17 @@ module.exports = (function() {
 
         if (!model) return;
 
+        // if permalink points to a child message
+        const parentId = model.get('parentId');
+        if (parentId) {
+          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/highlightChildMessage', {
+            parentId,
+            id: model.id
+          });
+          self.highlightPermalinkChat(parentId);
+          return;
+        }
+
         var models = isolateBurst(self.collection, model);
         models.forEach(function(model) {
           var view = self.children.findByModel(model);

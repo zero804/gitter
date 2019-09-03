@@ -319,4 +319,11 @@ describe('mutations', () => {
     mutations[types.ADD_TO_MESSAGE_MAP](state, payload);
     expect(state.messageMap).toEqual({ [message1.id]: message1 });
   });
+
+  it('SET_MESSAGE_HIGHLIGHT', () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    state.messageMap = { [message1.id]: message1 };
+    mutations[types.SET_MESSAGE_HIGHLIGHT](state, { id: message1.id, highlighted: true });
+    expect(state.messageMap[message1.id].highlighted).toEqual(true);
+  });
 });

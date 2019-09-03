@@ -160,6 +160,86 @@ exports[`thread-message-feed chat-item snapshot error 1`] = `
 </div>
 `;
 
+exports[`thread-message-feed chat-item snapshot highlighted 1`] = `
+<div
+  class="chat-item burstStart chat-item__highlighted"
+>
+  <div
+    class="chat-item__container"
+  >
+    <div
+      class="chat-item__aside"
+    >
+      <div
+        class="chat-item__avatar"
+      >
+        <avatar-stub
+          size="s"
+          user="[object Object]"
+        />
+      </div>
+    </div>
+     
+    <!---->
+     
+    <div
+      class="chat-item__content"
+    >
+      <div
+        class="chat-item__details"
+      >
+        <div
+          class="chat-item__from"
+        >
+          Tomas Vik
+        </div>
+         
+        <div
+          class="chat-item__username"
+        >
+          @viktomas_gitlab
+        </div>
+         
+        <a
+          class="chat-item__time"
+          href="/abc/def?at=5d147ea84dad9dfbc522317a"
+          title="May 18, 2016 3:48 AM"
+        >
+          May 18 2016 03:48
+        </a>
+         
+        <!---->
+      </div>
+       
+      <div
+        class="chat-item__text"
+      >
+        <span
+          class="mention"
+          data-link-type="mention"
+          data-screen-name="MadLittleMods"
+        >
+          @MadLittleMods
+        </span>
+          Example message using a bit of  
+        <code>
+          code
+        </code>
+         and 
+        <strong>
+          bold
+        </strong>
+         to show how 
+        <em>
+          markdown
+        </em>
+         is stored.
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`thread-message-feed chat-item snapshot loading 1`] = `
 <div
   class="chat-item burstStart"
