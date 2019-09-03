@@ -220,7 +220,7 @@ deploy-build-image:
     - mkdir -p ~/.ssh
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
     # Make the infra tools available (like Ansible)
-    - git clone git@gitlab.com:gl-infra/gitter-infrastructure.git
+    - git clone git@gitlab.com:gitlab-com/gl-infra/gitter-infrastructure.git
     - ANSIBLE_DIR=$(cd gitter-infrastructure/ansible && pwd) && echo $ANSIBLE_DIR
     - mkdir -p /root && echo "$ANSIBLE_VAULT_PASS" > /root/.vault_pass
   tags:
