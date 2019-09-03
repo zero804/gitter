@@ -7,6 +7,7 @@ var urlParse = require('url-parse');
 var clientEnv = require('gitter-client-env');
 var appEvents = require('./utils/appevents');
 var context = require('gitter-web-client-context');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 var onready = require('./utils/onready');
 const userNotifications = require('./components/user-notifications');
 var TitlebarUpdater = require('./components/titlebar');
@@ -118,12 +119,8 @@ onready(function() {
   });
 
   appEvents.on('permalink.requested', function(type, chat) {
-    var url = context.troupe().get('url');
-
-    var permalinkUrl = url + '?at=' + chat.id;
-    var frameUrl = url + '/~' + type + '?at=' + chat.id;
-    var title = url.substring(1);
-    pushState(frameUrl, title, permalinkUrl);
+    var permalinkUrl = generatePermalink(context.troupe().get('url'), chat.id);
+    pushState(permalinkUrl, window.title, permalinkUrl);
   });
 
   // Revert to a previously saved state
