@@ -119,7 +119,8 @@ onready(function() {
   });
 
   appEvents.on('permalink.requested', function(type, chat) {
-    var permalinkUrl = generatePermalink(context.troupe().get('url'), chat.id);
+    const troupeUrl = context.troupe().get('url');
+    const permalinkUrl = generatePermalink(troupeUrl, chat.id);
     pushState(permalinkUrl, window.title, permalinkUrl);
   });
 
