@@ -34,9 +34,22 @@ export default {
       return generatePermalink(troupeUri, this.message.id, this.message.sent);
     }
   },
+  watch: {
+    message: function(newMessage, oldMessage) {
+      if (newMessage.highlighted && !oldMessage.highlighted) {
+        this.scrollIntoView();
+      }
+    }
+  },
+  mounted: function() {
+    if (this.message.highlighted) this.scrollIntoView();
+  },
   methods: {
-    setPermalinkLocation() {
+    setPermalinkLocation: function() {
       window.history.pushState(this.permalinkUrl, window.title, this.permalinkUrl);
+    },
+    scrollIntoView: function() {
+      this.$el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }
 };

@@ -62,16 +62,19 @@ describe('thread-message-feed chat-item', () => {
       );
       expect(wrapper.element).toMatchSnapshot();
     });
-    it('highlighted', () => {
+    it('highlighted - scrolls into view', () => {
+      const scrollIntoViewMock = jest.fn();
       const { wrapper } = mount(
         ChatItem,
         {
           ...defaultProps,
           message: { ...message, highlighted: true }
         },
-        addRoomToStore
+        addRoomToStore,
+        { methods: { scrollIntoView: scrollIntoViewMock } }
       );
       expect(wrapper.element).toMatchSnapshot();
+      expect(scrollIntoViewMock.mock.calls.length).toBe(1);
     });
   });
 });

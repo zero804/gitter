@@ -160,7 +160,7 @@ exports[`thread-message-feed chat-item snapshot error 1`] = `
 </div>
 `;
 
-exports[`thread-message-feed chat-item snapshot highlighted 1`] = `
+exports[`thread-message-feed chat-item snapshot highlighted - scrolls into view 1`] = `
 <div
   class="chat-item burstStart chat-item__highlighted"
 >
