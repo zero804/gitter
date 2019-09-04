@@ -8,12 +8,6 @@ function setupDataBridge(store) {
     store.dispatch(actionName, ...args);
   });
 
-  /* * /
-  troupeCollections.troupes.on('all', (...args) => {
-    console.log('all troupes', args);
-  });
-  /* */
-
   troupeCollections.troupes.on('add change', newRoom => {
     //console.log('change troupes', newRoom);
     store.dispatch('upsertRoom', newRoom.attributes);
