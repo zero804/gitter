@@ -88,5 +88,8 @@
 	"We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.": "We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.",
 	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
 	"desktop": "desktop",
-	"iOS": "iOS"
+	"iOS": "iOS",
+	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.",
+	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>.",
+	"We also have a sweet little <a %s>IRC bridge</a>.": "We also have a sweet little <a %s>IRC bridge</a>."
 }

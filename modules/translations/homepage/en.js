@@ -57,7 +57,6 @@
 	"<b>Join</b> earlybird programme": "<b>Join</b> earlybird programme",
 	"Get Gitter now!": "Get Gitter now!",
 	"Gitter is available in all modern browsers as well as apps for desktops and mobile phones.": "Gitter is available in all modern browsers as well as apps for desktops and mobile phones.",
-	"We also have a sweet little <a %s>IRC bridge</a>": "We also have a sweet little <a %s>IRC bridge</a>",
 	"Mac": "Mac",
 	"Windows": "Windows",
 	"Linux 32": "Linux 32",
@@ -69,5 +68,6 @@
 	"desktop": "desktop",
 	"iOS": "iOS",
 	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.",
-	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>."
+	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>.",
+	"We also have a sweet little <a %s>IRC bridge</a>.": "We also have a sweet little <a %s>IRC bridge</a>."
 }
