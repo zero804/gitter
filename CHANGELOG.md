@@ -1,3 +1,8 @@
+# 20.3.0 - *upcoming*
+
+Developer facing:
+ -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
+
 # 20.2.0 - 2019-9-3
 
  - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564
