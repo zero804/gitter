@@ -495,7 +495,7 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit })
   // if the message doesn't exist, just return last 50 messages in the room
   if (!message) return findChatMessagesInRange(troupeId);
 
-  // if the around message is child message, we are going to searching around parent
+  // if the around message is child message in a thread, we are going to searching around parent
   const searchMessageId = new ObjectID(message.parentId || message._id);
 
   const halfLimit = Math.floor(limit / 2) || 25;
@@ -545,6 +545,7 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
   if (options.marker === 'first-unread' && options.userId) {
     markerId = await findFirstUnreadMessageId(troupeId, options.userId);
   }
+
   if (!markerId && !options.aroundId) {
     return findChatMessagesInRange(troupeId, options);
   } else {
