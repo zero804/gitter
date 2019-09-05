@@ -413,7 +413,7 @@ async function findThreadChatMessages(troupeId, parentId) {
 
 async function findChatMessagesInRange(
   troupeId,
-  { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip }
+  { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip } = {}
 ) {
   let validatedLimit = Math.min(limit || MIN_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
   const validatedSkip = skip || 0;
