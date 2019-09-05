@@ -492,7 +492,8 @@ async function findChatMessagesInRange(
 async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit }) {
   const message = await findByIdLean(markerId || aroundId);
 
-  if (!message) return [];
+  // if the message doesn't exist, just return last 50 messages in the room
+  if (!message) return findChatMessagesInRange(troupeId);
 
   // if the around message is child message, we are going to searching around parent
   const searchMessageId = new ObjectID(message.parentId || message._id);
