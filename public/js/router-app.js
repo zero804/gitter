@@ -29,6 +29,7 @@ var notificationRoutes = require('./routes/notification-routes');
 var createRoutes = require('./routes/create-routes');
 var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
 var userRoutes = require('./routes/user-routes');
+const pushState = require('./utils/browser/pushState');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -116,15 +117,9 @@ onready(function() {
     }
   });
 
-  function pushState(state, title, url) {
-    if (state === window.history.state) {
-      // Don't repush the same state...
-      return;
-    }
-
+  function pushStateWithTitleBar(state, title, url) {
+    pushState(url, title, state);
     titlebarUpdater.setRoomName(title);
-    window.history.pushState(state, title, url);
-    appEvents.trigger('track', url);
   }
 
   /* Deal with the popstate */
@@ -167,7 +162,7 @@ onready(function() {
       var newFrame = '/home/~home';
       var title = 'home';
 
-      pushState(newFrame, title, newLocation);
+      pushStateWithTitleBar(newFrame, title, newLocation);
       roomSwitcher && roomSwitcher.change(newFrame);
     }
   };
@@ -274,13 +269,13 @@ onready(function() {
     }
 
     if (parsed.pathname === window.location.pathname) {
-      pushState(frameUrl, title, url);
+      pushStateWithTitleBar(frameUrl, title, url);
 
       return;
     }
 
     //Update windows location
-    pushState(frameUrl, title, url);
+    pushStateWithTitleBar(frameUrl, title, url);
 
     if (options.disableFrameReload) {
       return;
@@ -303,7 +298,7 @@ onready(function() {
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
     const troupeUrl = context.troupe().get('url');
     const permalinkUrl = generatePermalink(troupeUrl, chat.id);
-    pushState(permalinkUrl, window.title, permalinkUrl);
+    pushState(permalinkUrl);
   });
 
   appEvents.on('unreadItemsCount', function(troupeId, count) {

@@ -4,6 +4,7 @@ import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const pushState = require('../../../utils/browser/pushState');
 
 export default {
   name: 'ChatItem',
@@ -46,7 +47,7 @@ export default {
   },
   methods: {
     setPermalinkLocation: function() {
-      window.history.pushState(this.permalinkUrl, window.title, this.permalinkUrl);
+      pushState(this.permalinkUrl);
     },
     scrollIntoView: function() {
       this.$el.scrollIntoView({ block: 'center', behavior: 'smooth' });
