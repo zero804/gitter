@@ -118,8 +118,10 @@ export default {
       Vue.set(state.messageMap, message.id, message);
     });
   },
-  [types.SET_MESSAGE_HIGHLIGHT](state, { id, highlighted }) {
-    const message = state.messageMap[id];
-    Vue.set(state.messageMap, id, { ...message, highlighted });
+  [types.UPDATE_MESSAGE](state, newMessageState) {
+    const { id } = newMessageState;
+    if (!id) return;
+    const oldMessage = state.messageMap[id] || {};
+    Vue.set(state.messageMap, id, { ...oldMessage, ...newMessageState });
   }
 };

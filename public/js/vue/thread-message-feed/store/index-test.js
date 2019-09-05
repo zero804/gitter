@@ -129,7 +129,7 @@ describe('thread message feed store', () => {
         {},
         // ideally, we would test the delayed mutation setting highlighted to false, but we won't wait
         // 5 seconds for it, the risk and impact of highlight staying on are low
-        [{ type: rootTypes.SET_MESSAGE_HIGHLIGHT, payload: { id: 'def', highlighted: true } }],
+        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'def', highlighted: true } }],
         [{ type: 'open', payload: 'abc' }]
       );
     });

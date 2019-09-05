@@ -109,9 +109,9 @@ export default {
     },
     highlightChildMessage: ({ dispatch, commit }, { parentId, id }) => {
       dispatch('open', parentId).then(() => {
-        commit(rootTypes.SET_MESSAGE_HIGHLIGHT, { id, highlighted: true }, { root: true });
+        commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: true }, { root: true });
         setTimeout(
-          () => commit(rootTypes.SET_MESSAGE_HIGHLIGHT, { id, highlighted: false }, { root: true }),
+          () => commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: false }, { root: true }),
           5000
         );
       });
