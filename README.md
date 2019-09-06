@@ -238,6 +238,29 @@ npm run mocha -- test/some-test.js
 npm run mocha -- test/some-test.js --grep "specific test"
 ```
 
+#### End-to-end(e2e) tests
+
+Start the `webapp` with the fixtures endpoint and GitHub API stubbed
+
+macOS/Linux:
+```shell
+DISABLE_GITHUB_API=1 ENABLE_FIXTURE_ENDPOINTS=1 npm start
+```
+
+Windows:
+```shell
+set DISABLE_GITHUB_API=1&&set ENABLE_FIXTURE_ENDPOINTS=1&&npm start
+```
+
+Start the e2e tests
+
+```shell
+# Run with GUI (in Chrome)
+npm run test-e2e-open
+
+# Run headless without any GUI (in Electron)
+npm run test-e2e-run
+```
 
 
 # Contributing
