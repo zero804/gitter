@@ -40,7 +40,7 @@ var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 /* @const */
 var MAX_CHAT_EDIT_AGE_SECONDS = 600;
 
-const MIN_CHAT_MESSAGE_RESULTS = 50;
+const DEFAULT_CHAT_MESSAGE_RESULTS = 50;
 const MAX_CHAT_MESSAGE_RESULTS = 100;
 
 /**
@@ -411,11 +411,13 @@ async function findThreadChatMessages(troupeId, parentId) {
   return messages.reverse();
 }
 
+const validateSearchLimit = rawLimit =>
+  Math.min(rawLimit || DEFAULT_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
+
 async function findChatMessagesInRange(
   troupeId,
   { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip } = {}
 ) {
-  let validatedLimit = Math.min(limit || MIN_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
   const validatedSkip = skip || 0;
 
   if (validatedSkip > 5000) {
@@ -454,7 +456,7 @@ async function findChatMessagesInRange(
     q.hint({ toTroupeId: 1, sent: -1 });
   }
 
-  q = q.sort(sort || { sent: sentOrder }).limit(validatedLimit);
+  q = q.sort(sort || { sent: sentOrder }).limit(validateSearchLimit(limit));
 
   if (validatedSkip) {
     if (validatedSkip > 1000) {
@@ -498,7 +500,7 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit })
   // if the around message is child message in a thread, we are going to searching around parent
   const searchMessageId = new ObjectID(message.parentId || message._id);
 
-  const halfLimit = Math.floor(limit / 2) || 25;
+  const halfLimit = Math.floor(validateSearchLimit(limit) / 2);
 
   const q1 = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
