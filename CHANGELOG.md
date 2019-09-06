@@ -8,6 +8,7 @@
 Developer facing:
 
  -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
+ - Document and make it easier to run the e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1585
 
 
 # 20.2.0 - 2019-9-3
