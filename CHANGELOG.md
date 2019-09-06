@@ -1,9 +1,13 @@
 # 20.3.0 - *upcoming*
 
  - Show "Reply in thread" for parent messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1581
+ - Fix community home overflowing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1587
+ - Fix mobile swipe to open left-menu gesture on userhome, explore, and community home, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1588
 
 Developer facing:
+
  -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
+
 
 # 20.2.0 - 2019-9-3
 
