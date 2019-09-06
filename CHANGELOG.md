@@ -1,6 +1,7 @@
 # 20.3.0 - *upcoming*
 
  - Show "Reply in thread" for parent messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1581
+ - Update @gitterhq/translations to 1.11.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1586
 
 Developer facing:
  -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
