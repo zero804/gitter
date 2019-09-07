@@ -33,14 +33,25 @@ describe('e2e tests', function() {
           }
         },
         troupe1: { users: ['user1'] },
-        troupeInGroup1: { group: 'group1', users: ['user1'] }
+        troupeInGroup1: { group: 'group1', users: ['user1'] },
+        message1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: 'hello from the parent'
+        },
+        message2: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: 'hello from the child',
+          parent: 'message1'
+        }
       }).then(newFixtures => {
         fixtures = newFixtures;
       });
     });
 
     beforeEach(() => {
-      cy.login(fixtures.user1);
+      return cy.login(fixtures.user1);
     });
 
     it('shows chat page', function() {
@@ -139,6 +150,15 @@ describe('e2e tests', function() {
 
       // Make sure we got logged out and back on the homepage
       cy.url().should('eq', urlJoin(gitterBaseUrl, '/'));
+    });
+
+    it('permalinks in main message feed and thread message feed', async () => {
+      await cy.toggleFeature('threaded-conversations', true);
+      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
+      cy.get('#chat-container .chat-item__highlighted').contains('hello from the parent');
+      cy.get('#js-thread-message-feed-root .chat-item__highlighted').contains(
+        'hello from the child'
+      );
     });
   });
 });
