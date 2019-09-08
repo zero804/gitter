@@ -3,12 +3,12 @@
 const appEvents = require('../appevents');
 
 /**
- * Changes the browser location and sends track event,
- * doesn't do anything if we are trying to push the current state
+ * Updates the browser address bar and sends a track event,
+ * doesn't do anything if the address bar already contains the url
  */
-module.exports = (url, title = undefined, state = undefined) => {
-  const innerState = state || url;
-  if (window.history.state === innerState) return; // don't navigate if the state hasn't changed
-  window.history.pushState(innerState, title || window.title, url);
+module.exports = (url, title = undefined) => {
+  // Don't repush the same state
+  if (url === window.history.state) return; // don't navigate if the state hasn't changed
+  window.history.pushState(url, title || window.title, url);
   appEvents.trigger('track', url);
 };

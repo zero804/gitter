@@ -117,8 +117,8 @@ onready(function() {
     }
   });
 
-  function pushStateWithTitleBar(state, title, url) {
-    pushState(url, title, state);
+  function pushStateWithTitleBar(url, title) {
+    pushState(url, title);
     titlebarUpdater.setRoomName(title);
   }
 
@@ -162,7 +162,7 @@ onready(function() {
       var newFrame = '/home/~home';
       var title = 'home';
 
-      pushStateWithTitleBar(newFrame, title, newLocation);
+      pushStateWithTitleBar(newLocation, title);
       roomSwitcher && roomSwitcher.change(newFrame);
     }
   };
@@ -269,13 +269,13 @@ onready(function() {
     }
 
     if (parsed.pathname === window.location.pathname) {
-      pushStateWithTitleBar(frameUrl, title, url);
+      pushStateWithTitleBar(url, title);
 
       return;
     }
 
     //Update windows location
-    pushStateWithTitleBar(frameUrl, title, url);
+    pushStateWithTitleBar(url, title);
 
     if (options.disableFrameReload) {
       return;
