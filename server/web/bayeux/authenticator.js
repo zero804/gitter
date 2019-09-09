@@ -109,6 +109,7 @@ module.exports = bayeuxExtension({
           client: ext.client,
           troupeId: ext.troupeId,
           oauthClientId: oauthClient.id,
+          token: ext.token,
           uniqueClientId: ext.uniqueClientId,
           realtimeLibrary: ext.realtimeLibrary,
           eyeballState: parseInt(ext.eyeballs, 10) || 0
@@ -126,15 +127,18 @@ module.exports = bayeuxExtension({
     var state = message._private && message._private.authenticator;
     if (!state) return callback(null, message);
 
-    var userId = state.userId;
-    var connectionType = state.connectionType;
-    var clientId = message.clientId;
-    var clientType = state.client;
-    var troupeId = state.troupeId;
-    var oauthClientId = state.oauthClientId;
-    var uniqueClientId = state.uniqueClientId;
-    var realtimeLibrary = state.realtimeLibrary;
-    var eyeballState = state.eyeballState;
+    const { clientId } = message;
+    const {
+      userId,
+      connectionType,
+      client: clientType,
+      troupeId,
+      oauthClientId,
+      token,
+      uniqueClientId,
+      realtimeLibrary,
+      eyeballState
+    } = state;
 
     // Get the presence service involved around about now
     presenceService.userSocketConnected(
@@ -145,6 +149,7 @@ module.exports = bayeuxExtension({
       realtimeLibrary,
       troupeId,
       oauthClientId,
+      token,
       uniqueClientId,
       eyeballState,
       function(err) {

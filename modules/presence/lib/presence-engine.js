@@ -196,6 +196,7 @@ function userSocketConnected(
   realtimeLibrary,
   troupeId,
   oauthClientId,
+  token,
   uniqueClientId,
   eyeballState,
   callback
@@ -217,6 +218,7 @@ function userSocketConnected(
         realtimeLibrary,
         troupeId || null,
         oauthClientId,
+        token,
         uniqueClientId
       )
       .spread(function(lockSuccess, saddResult) {
@@ -255,6 +257,7 @@ function userSocketConnected(
       realtimeLibrary,
       troupeId || null,
       oauthClientId,
+      token,
       uniqueClientId
     )
     .spread(function(lockSuccess, userSocketCountString, saddResult) {
@@ -629,7 +632,19 @@ function listMobileUsers(callback) {
 
 function getSocket(socketId, callback) {
   return redisClient
-    .hmget(keySocketUser(socketId), 'uid', 'tid', 'eb', 'mob', 'ctime', 'ct', 'rl', 'ocid', 'ucid')
+    .hmget(
+      keySocketUser(socketId),
+      'uid',
+      'tid',
+      'eb',
+      'mob',
+      'ctime',
+      'ct',
+      'rl',
+      'ocid',
+      'tok',
+      'ucid'
+    )
     .spread(function(
       userId,
       troupeId,
@@ -639,6 +654,7 @@ function getSocket(socketId, callback) {
       clientType,
       realtimeLibrary,
       oauthClientId,
+      token,
       uniqueClientId
     ) {
       if (!createdTimeString) return;
@@ -652,6 +668,7 @@ function getSocket(socketId, callback) {
         clientType: clientType,
         realtimeLibrary: realtimeLibrary,
         oauthClientId: oauthClientId,
+        token,
         uniqueClientId: uniqueClientId
       };
     })
@@ -671,6 +688,7 @@ function getSockets(socketIds, callback) {
       'ct',
       'rl',
       'ocid',
+      'tok',
       'ucid'
     );
   });
@@ -697,7 +715,8 @@ function getSockets(socketIds, callback) {
           clientType: result[5],
           realtimeLibrary: result[6],
           oauthClientId: result[7],
-          uniqueClientId: result[8]
+          token: result[8],
+          uniqueClientId: result[9]
         };
 
         return hash;
