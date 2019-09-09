@@ -10,6 +10,7 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context = require('gitter-web-client-context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
+const useThreadedConversations = context.hasFeature('threaded-conversations');
 
 require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
@@ -381,6 +382,17 @@ module.exports = (function() {
         if (err) return; // Log this?
 
         if (!model) return;
+
+        // if permalink points to a child message
+        const parentId = model.get('parentId');
+        if (parentId && useThreadedConversations) {
+          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/highlightChildMessage', {
+            parentId,
+            id: model.id
+          });
+          self.highlightPermalinkChat(parentId);
+          return;
+        }
 
         var models = isolateBurst(self.collection, model);
         models.forEach(function(model) {

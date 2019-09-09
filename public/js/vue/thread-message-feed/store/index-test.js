@@ -121,6 +121,18 @@ describe('thread message feed store', () => {
         );
       });
     });
+
+    it('highlightChildMessage opens TMF and highlights child message', async () => {
+      await testAction(
+        actions.highlightChildMessage,
+        { parentId: 'abc', id: 'def' },
+        {},
+        // ideally, we would test the delayed mutation setting highlighted to false, but we won't wait
+        // 5 seconds for it, the risk and impact of highlight staying on are low
+        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'def', highlighted: true } }],
+        [{ type: 'open', payload: 'abc' }]
+      );
+    });
   });
 
   describe('mutations', () => {

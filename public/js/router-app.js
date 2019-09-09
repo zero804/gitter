@@ -14,6 +14,7 @@ var onready = require('./utils/onready');
 var urlParser = require('./utils/url-parser');
 var appEvents = require('./utils/appevents');
 var context = require('gitter-web-client-context');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 
 var TitlebarUpdater = require('./components/titlebar');
 const userNotifications = require('./components/user-notifications');
@@ -28,6 +29,7 @@ var notificationRoutes = require('./routes/notification-routes');
 var createRoutes = require('./routes/create-routes');
 var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
 var userRoutes = require('./routes/user-routes');
+const pushState = require('./utils/browser/pushState');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -115,15 +117,9 @@ onready(function() {
     }
   });
 
-  function pushState(state, title, url) {
-    if (state === window.history.state) {
-      // Don't repush the same state...
-      return;
-    }
-
+  function pushStateWithTitleBar(url, title) {
+    pushState(url, title);
     titlebarUpdater.setRoomName(title);
-    window.history.pushState(state, title, url);
-    appEvents.trigger('track', url);
   }
 
   /* Deal with the popstate */
@@ -166,7 +162,7 @@ onready(function() {
       var newFrame = '/home/~home';
       var title = 'home';
 
-      pushState(newFrame, title, newLocation);
+      pushStateWithTitleBar(newLocation, title);
       roomSwitcher && roomSwitcher.change(newFrame);
     }
   };
@@ -273,13 +269,13 @@ onready(function() {
     }
 
     if (parsed.pathname === window.location.pathname) {
-      pushState(frameUrl, title, url);
+      pushStateWithTitleBar(url, title);
 
       return;
     }
 
     //Update windows location
-    pushState(frameUrl, title, url);
+    pushStateWithTitleBar(url, title);
 
     if (options.disableFrameReload) {
       return;
@@ -300,13 +296,9 @@ onready(function() {
 
   appEvents.on('permalink.requested', function(type, chat /*, options*/) {
     if (context.inOneToOneTroupeContext()) return; // No permalinks to one-to-one chats
-    var url = context.troupe().get('url');
-    var id = chat.id;
-
-    const permalinkUrl = url + '?at=' + id;
-    const frameUrl = url + '/~' + type + '?at=' + id;
-    const title = url.substring(1);
-    pushState(frameUrl, title, permalinkUrl);
+    const troupeUrl = context.troupe().get('url');
+    const permalinkUrl = generatePermalink(troupeUrl, chat.id);
+    pushState(permalinkUrl);
   });
 
   appEvents.on('unreadItemsCount', function(troupeId, count) {

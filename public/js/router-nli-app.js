@@ -7,12 +7,14 @@ var urlParse = require('url-parse');
 var clientEnv = require('gitter-client-env');
 var appEvents = require('./utils/appevents');
 var context = require('gitter-web-client-context');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 var onready = require('./utils/onready');
 const userNotifications = require('./components/user-notifications');
 var TitlebarUpdater = require('./components/titlebar');
 var debug = require('debug-proxy')('app:router-nli-app');
 var modalRegion = require('./components/modal-region');
 var Router = require('./routes/router');
+const pushState = require('./utils/browser/pushState');
 
 require('./views/widgets/preload');
 require('./template/helpers/all');
@@ -64,11 +66,6 @@ onready(function() {
    */
   window.history.replaceState(chatIFrame.src, '', window.location.href);
 
-  function pushState(state, title, url) {
-    window.history.pushState(state, title, url);
-    appEvents.trigger('track', url);
-  }
-
   function updateContent(state) {
     if (state) {
       // TODO: update the title....
@@ -110,20 +107,18 @@ onready(function() {
     // Add a /-/ if the path only has one component
     // so /moo/ goes to /moo/-/chat but
     // /moo/foo goes to /moo/foo/chat
+    // FIXME: remove the iframe logic from router-nli-app
     var frameUrl = url + '/~' + type;
 
-    pushState(frameUrl, title, url);
+    pushState(url, title);
     titlebarUpdater.setRoomName(title);
     updateContent(frameUrl);
   });
 
   appEvents.on('permalink.requested', function(type, chat) {
-    var url = context.troupe().get('url');
-
-    var permalinkUrl = url + '?at=' + chat.id;
-    var frameUrl = url + '/~' + type + '?at=' + chat.id;
-    var title = url.substring(1);
-    pushState(frameUrl, title, permalinkUrl);
+    const troupeUrl = context.troupe().get('url');
+    const permalinkUrl = generatePermalink(troupeUrl, chat.id);
+    pushState(permalinkUrl);
   });
 
   // Revert to a previously saved state
