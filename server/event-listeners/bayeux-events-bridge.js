@@ -89,9 +89,9 @@ exports.install = function() {
     for (let socketId of Object.keys(sockets)) {
       const socket = sockets[socketId];
 
-      if (mongoUtils.objectIDsEqual(socket.oauthClientId, accessToken.clientId)) {
+      if (socket.token === accessToken.token) {
         winston.info(
-          `accessToken(${accessToken}) deleted so we are closing associated realtime socket(${socketId})`
+          `accessToken(${accessToken.token}) deleted so we are closing associated realtime socket(${socketId})`
         );
         await bayeux.destroyClient(socketId);
       }
