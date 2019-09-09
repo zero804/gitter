@@ -51,7 +51,7 @@ describe('e2e tests', function() {
     });
 
     beforeEach(() => {
-      return cy.login(fixtures.user1);
+      cy.login(fixtures.user1);
     });
 
     it('shows chat page', function() {
@@ -152,8 +152,8 @@ describe('e2e tests', function() {
       cy.url().should('eq', urlJoin(gitterBaseUrl, '/'));
     });
 
-    it('permalinks in main message feed and thread message feed', async () => {
-      await cy.toggleFeature('threaded-conversations', true);
+    it('permalinks in main message feed and thread message feed', () => {
+      cy.toggleFeature('threaded-conversations', true);
       cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
       cy.get('#chat-container .chat-item__highlighted').contains('hello from the parent');
       cy.get('#js-thread-message-feed-root .chat-item__highlighted').contains(
