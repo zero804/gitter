@@ -4,6 +4,7 @@
  - Fix community home overflowing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1587
  - Fix mobile swipe to open left-menu gesture on userhome, explore, and community home, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1588
  - Update `@gitterhq/translations` to `1.11.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1586
+ - Permalinks in thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1582
 
 Developer facing:
 
