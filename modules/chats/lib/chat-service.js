@@ -400,13 +400,28 @@ function sentAfter(objectId) {
  *
  * @returns Array of last MAX_CHAT_MESSAGE_RESULTS messages in ascending order
  */
-async function findThreadChatMessages(troupeId, parentId) {
-  const messages = await ChatMessage.where('toTroupeId', troupeId)
-    .where('parentId', parentId)
-    .sort({ sent: 'desc' })
-    .limit(MAX_CHAT_MESSAGE_RESULTS) // TODO: handle infinite scrolling in TMF
-    .lean()
-    .exec();
+async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId } = {}) {
+  const q = ChatMessage.where('toTroupeId', troupeId);
+  q.where('parentId', parentId);
+
+  let sentOrder = 'desc';
+  if (beforeId) {
+    // Also add sent as this helps mongo by using the { troupeId, sent } index
+    q.where('sent').lte(sentBefore(new ObjectID(beforeId)));
+    q.where('_id').lt(new ObjectID(beforeId));
+  }
+  if (afterId) {
+    // Reverse the initial order for afterId
+    sentOrder = 'asc';
+
+    // Also add sent as this helps mongo by using the { troupeId, sent } index
+    q.where('sent').gte(sentAfter(new ObjectID(afterId)));
+    q.where('_id').gt(new ObjectID(afterId));
+  }
+  q.sort({ sent: sentOrder });
+  q.limit(MAX_CHAT_MESSAGE_RESULTS);
+
+  const messages = await q.lean().exec();
   mongooseUtils.addIdToLeanArray(messages);
   return messages.reverse();
 }
