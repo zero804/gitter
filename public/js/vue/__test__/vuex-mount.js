@@ -5,7 +5,7 @@ const _ = require('lodash');
 const { default: createStore, modules } = require('../store');
 const actions = require('../store/actions');
 
-const mount = (Component, propsData = {}, extendStore = () => {}) => {
+const mount = (Component, propsData = {}, extendStore = () => {}, mountOptions = {}) => {
   const localVue = createLocalVue();
   localVue.use(Vuex);
 
@@ -29,7 +29,8 @@ const mount = (Component, propsData = {}, extendStore = () => {}) => {
   const wrapper = shallowMount(Component, {
     localVue,
     store,
-    propsData
+    propsData,
+    ...mountOptions
   });
 
   const stubbedModuleActions = _.mapValues(stubbedModules, stubbedModule => stubbedModule.actions);

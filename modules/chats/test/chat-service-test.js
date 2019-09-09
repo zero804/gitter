@@ -265,7 +265,7 @@ describe('chatService', function() {
   });
 
   describe('Finding messages #slow', () => {
-    let chat1, chat2, chat3;
+    let chat1, chat2, chat3, childThreadMessage1;
 
     beforeEach(async () => {
       const { troupe1, user1 } = fixture;
@@ -273,7 +273,10 @@ describe('chatService', function() {
       chat2 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'B' });
       chat3 = await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'C' });
       // validating that findMessagesForTroupe doesn't return child messages
-      await chatService.newChatMessageToTroupe(troupe1, user1, { text: 'D', parentId: chat1.id });
+      childThreadMessage1 = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'D',
+        parentId: chat1.id
+      });
     });
 
     afterEach(async () => {
@@ -282,9 +285,18 @@ describe('chatService', function() {
 
     it('should find messages using aroundId', async () => {
       const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
-        aroundId: chat2.id
+        aroundId: chat2.id,
+        limit: 4 //one before and one after, important thanks to small set of test data
       });
       assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
+    });
+
+    it('should find messages around parent if afterId belongs to a child message', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        aroundId: childThreadMessage1.id,
+        limit: 2 // validating that the around logic works by eliminating chat3
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, childThreadMessage1.id]); // adds the child message at the end
     });
 
     it('should find messages with skip', async () => {

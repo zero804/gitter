@@ -56,8 +56,8 @@ export default {
     open: ({ commit, dispatch }, parentId) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
       commit(types.SET_PARENT_MESSAGE_ID, parentId);
-      dispatch('fetchChildMessages');
       appEvents.trigger('vue:right-toolbar:toggle', false);
+      return dispatch('fetchChildMessages');
     },
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
@@ -96,7 +96,7 @@ export default {
     },
     fetchChildMessages: ({ state, commit }) => {
       commit(childMessagesVuexRequest.requestType);
-      apiClient.room
+      return apiClient.room
         .get(`/chatMessages/${state.parentId}/thread`)
         .then(childMessages => {
           commit(childMessagesVuexRequest.successType);
@@ -106,6 +106,15 @@ export default {
           // error is reported by apiClient
           commit(childMessagesVuexRequest.errorType);
         });
+    },
+    highlightChildMessage: ({ dispatch, commit }, { parentId, id }) => {
+      dispatch('open', parentId).then(() => {
+        commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: true }, { root: true });
+        setTimeout(
+          () => commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: false }, { root: true }),
+          5000
+        );
+      });
     }
   }
 };

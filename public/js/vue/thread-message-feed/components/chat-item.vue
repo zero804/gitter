@@ -3,6 +3,8 @@ import Avatar from './avatar.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const pushState = require('../../../utils/browser/pushState');
 
 export default {
   name: 'ChatItem',
@@ -27,6 +29,28 @@ export default {
     },
     sentTimeFormattedFull: function() {
       return fullTimeFormat(this.message.sent);
+    },
+    permalinkUrl: function() {
+      const troupeUri = this.$store.getters.displayedRoom.uri;
+      return generatePermalink(troupeUri, this.message.id, this.message.sent);
+    }
+  },
+  watch: {
+    message: function(newMessage, oldMessage) {
+      if (newMessage.highlighted && !oldMessage.highlighted) {
+        this.scrollIntoView();
+      }
+    }
+  },
+  mounted: function() {
+    if (this.message.highlighted) this.scrollIntoView();
+  },
+  methods: {
+    setPermalinkLocation: function() {
+      pushState(this.permalinkUrl);
+    },
+    scrollIntoView: function() {
+      this.$el.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   }
 };
@@ -35,7 +59,11 @@ export default {
 <template>
   <div
     class="chat-item burstStart"
-    :class="{ compact: useCompactStyles, syncerror: message.error }"
+    :class="{
+      compact: useCompactStyles,
+      syncerror: message.error,
+      'chat-item__highlighted': message.highlighted
+    }"
   >
     <div class="chat-item__container">
       <div class="chat-item__aside">
@@ -51,8 +79,13 @@ export default {
         <div class="chat-item__details">
           <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
           <div class="chat-item__username">@{{ message.fromUser.username }}</div>
-          <!-- TODO add permalink https://gitlab.com/gitlab-org/gitter/webapp/issues/2218 -->
-          <a class="chat-item__time" :title="sentTimeFormattedFull">{{ sentTimeFormatted }}</a>
+          <a
+            class="chat-item__time"
+            :href="permalinkUrl"
+            :title="sentTimeFormattedFull"
+            @click.stop.prevent="setPermalinkLocation"
+            >{{ sentTimeFormatted }}</a
+          >
           <loading-spinner v-if="message.loading" class="message-loading-icon" />
         </div>
         <div v-if="message.html" class="chat-item__text" v-html="message.html"></div>
