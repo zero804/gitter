@@ -197,6 +197,7 @@ module.exports = (function() {
       }
       data.isPermalinkable = this.isPermalinkable;
       data.showItemActions = !this.isArchive();
+      data.useThreadedConversations = useThreadedConversations;
       return data;
     },
 
