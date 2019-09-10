@@ -390,6 +390,18 @@ function sentAfter(objectId) {
   return new Date(objectId.getTimestamp().valueOf() - 1000);
 }
 
+function addBeforeFilter(query, beforeId) {
+  // Also add sent as this helps mongo by using the { troupeId, sent } index
+  query.where('sent').lte(sentBefore(new ObjectID(beforeId)));
+  query.where('_id').lt(new ObjectID(beforeId));
+}
+
+function addAfterFilter(query, afterId) {
+  // FIXME: find out why we need sent? We've got the default _id index
+  // Also add sent as this helps mongo by using the { troupeId, sent } index
+  query.where('sent').gte(sentAfter(new ObjectID(afterId)));
+  query.where('_id').gt(new ObjectID(afterId));
+}
 /**
  * Finds all messages for thread message feed represented by parentId.
  *
@@ -404,26 +416,18 @@ async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId } 
   const q = ChatMessage.where('toTroupeId', troupeId);
   q.where('parentId', parentId);
 
-  let sentOrder = 'desc';
-  if (beforeId) {
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q.where('sent').lte(sentBefore(new ObjectID(beforeId)));
-    q.where('_id').lt(new ObjectID(beforeId));
-  }
-  if (afterId) {
-    // Reverse the initial order for afterId
-    sentOrder = 'asc';
+  if (beforeId) addBeforeFilter(q, beforeId);
+  if (afterId) addAfterFilter(q, afterId);
 
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q.where('sent').gte(sentAfter(new ObjectID(afterId)));
-    q.where('_id').gt(new ObjectID(afterId));
-  }
+  // Reverse the initial order for afterId
+  const sentOrder = afterId ? 'asc' : 'desc';
   q.sort({ sent: sentOrder });
   q.limit(MAX_CHAT_MESSAGE_RESULTS);
 
   const messages = await q.lean().exec();
   mongooseUtils.addIdToLeanArray(messages);
-  return messages.reverse();
+  if (sentOrder === 'desc') messages.reverse();
+  return messages;
 }
 
 const validateSearchLimit = rawLimit =>
@@ -443,27 +447,14 @@ async function findChatMessagesInRange(
   }
   let q = ChatMessage.where('toTroupeId', troupeId);
 
-  if (beforeId) {
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q = q.where('sent').lte(sentBefore(new ObjectID(beforeId)));
-    q = q.where('_id').lt(new ObjectID(beforeId));
-  }
+  if (beforeId) addBeforeFilter(q, beforeId);
 
   if (beforeInclId) {
     // Also add sent as this helps mongo by using the { troupeId, sent } index
     q = q.where('sent').lte(sentBefore(new ObjectID(beforeInclId)));
     q = q.where('_id').lte(new ObjectID(beforeInclId)); // Note: less than *or equal to*
   }
-
-  let sentOrder = 'desc';
-  if (afterId) {
-    // Reverse the initial order for afterId
-    sentOrder = 'asc';
-
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q = q.where('sent').gte(sentAfter(new ObjectID(afterId)));
-    q = q.where('_id').gt(new ObjectID(afterId));
-  }
+  if (afterId) addAfterFilter(q, afterId);
 
   q.where('parentId').exists(false);
 
@@ -471,6 +462,8 @@ async function findChatMessagesInRange(
     q.hint({ toTroupeId: 1, sent: -1 });
   }
 
+  // Reverse the initial order for afterId
+  const sentOrder = afterId ? 'asc' : 'desc';
   q = q.sort(sort || { sent: sentOrder }).limit(validateSearchLimit(limit));
 
   if (validatedSkip) {
