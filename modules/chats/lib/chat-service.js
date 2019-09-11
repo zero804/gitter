@@ -378,7 +378,7 @@ function findFirstUnreadMessageId(troupeId, userId) {
 
 /**
  * Mongo timestamps have a resolution down to the second, whereas
- * sent times have a resolution down to the milliseond.
+ * sent times have a resolution down to the millisecond.
  * To ensure that there is an overlap, we need to slightly
  * extend the search range using these two functions.
  */
@@ -392,13 +392,17 @@ function sentAfter(objectId) {
 
 function addBeforeFilter(query, beforeId) {
   // Also add sent as this helps mongo by using the { troupeId, sent } index
+  // For some reason, mongodb doesn't do an index intersection on {_id} and {troupeId, sent} index
+  // ane because the `_id` condition is used in the filter stage, it really does help
+  // to filter on `sent` to limit the amount of results ¯\_(ツ)_/¯
+  // It does, however, mean that the timestamp from _id needs to match the sent date otherwise one of
+  // the filters (beforeId or afterId) misses the message
   query.where('sent').lte(sentBefore(new ObjectID(beforeId)));
   query.where('_id').lt(new ObjectID(beforeId));
 }
 
 function addAfterFilter(query, afterId) {
-  // FIXME: find out why we need sent? We've got the default _id index
-  // Also add sent as this helps mongo by using the { troupeId, sent } index
+  // See addBeforeFilter comment above
   query.where('sent').gte(sentAfter(new ObjectID(afterId)));
   query.where('_id').gt(new ObjectID(afterId));
 }
