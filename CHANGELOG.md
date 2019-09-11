@@ -1,4 +1,4 @@
-# 20.3.0 - *upcoming*
+# 20.3.0 - 2019-09-11
 
  - Show "Reply in thread" for parent messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1581
  - Fix community home overflowing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1587
