@@ -2,8 +2,9 @@
 
 - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
     - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
- - Fix "Gitter OAuth app flow is messed up", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1596
 
+# 20.3.1 - 2019-09-12
+ - Fix "Gitter OAuth app flow is messed up", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1596
 
 # 20.3.0 - 2019-09-11
 
