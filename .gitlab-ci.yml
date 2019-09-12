@@ -87,7 +87,7 @@ test-all:
     - mkdir -p logs
     - npm start > logs/server-output.txt 2>&1 & node test/e2e/support/wait-for-server.js http://localhost:5000
     # Run the tests
-    - npm run cypress -- run --env baseUrl=http://localhost:5000,apiBaseUrl=http://localhost:5000/api
+    - npm run test-e2e-run
   artifacts:
     when: always
     paths:

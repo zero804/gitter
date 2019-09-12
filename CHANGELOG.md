@@ -1,3 +1,18 @@
+# 20.3.0 - 2019-09-11
+
+ - Show "Reply in thread" for parent messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1581
+ - Fix community home overflowing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1587
+ - Fix mobile swipe to open left-menu gesture on userhome, explore, and community home, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1588
+ - Update `@gitterhq/translations` to `1.11.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1586
+ - Permalinks in thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1582
+ - Put the parent message indicator behind a feature toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1591
+
+Developer facing:
+
+ -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
+ - Document and make it easier to run the e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1585
+
+
 # 20.2.0 - 2019-9-3
 
  - Fix missing unreads in left-menu after sleeping/suspending computer, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1564

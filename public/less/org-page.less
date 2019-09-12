@@ -123,8 +123,11 @@ body {
 }
 
 .org-page-main {
-  height: 100%;
   overflow: scroll;
+  // https://github.com/html-next/ember-gestures/issues/104
+  touch-action: pan-y;
+
+  height: 100%;
   padding: 65px 3.25em-@excess-card-margin 3.25em 3.25em-@excess-card-margin;
   background-color: @main-application-bg-color;
   @excess-card-margin: 0.5em;

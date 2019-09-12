@@ -197,6 +197,7 @@ module.exports = (function() {
       }
       data.isPermalinkable = this.isPermalinkable;
       data.showItemActions = !this.isArchive();
+      data.useThreadedConversations = useThreadedConversations;
       return data;
     },
 
@@ -558,7 +559,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: useThreadedConversations ? '115px' : '100px'
+        width: useThreadedConversations ? '125px' : '100px'
       });
 
       this.listenTo(actions, 'render', function() {
@@ -834,9 +835,10 @@ module.exports = (function() {
       const actions = [];
 
       if (useThreadedConversations) {
+        const threadMessageCount = this.model.get('threadMessageCount');
         actions.push({
           name: 'threadReply',
-          description: 'Start a thread',
+          description: threadMessageCount ? 'Reply in thread' : 'Start a thread',
           disabled: !isPersisted
         });
       } else {
