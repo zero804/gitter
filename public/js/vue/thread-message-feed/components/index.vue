@@ -1,9 +1,10 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
+import Intersect from './intersect';
 
 export default {
   name: 'ThreadMessageFeed',
@@ -11,8 +12,19 @@ export default {
     ChatInput,
     ThreadHeader,
     LoadingSpinner,
-    ChatItem
+    ChatItem,
+    Intersect
   },
+  mounted: function() {
+    // const options = {
+    //   root: this.$refs.content,
+    //   rootMargin: '0px',
+    //   threshold: 1.0
+    // };
+    // const observer = new IntersectionObserver(this.changeMessage.bind(this), options);
+    // observer.observe(this.$refs.msg);
+  },
+  data: () => ({ msg: null }),
   computed: {
     ...mapGetters({
       parentMessage: 'threadMessageFeed/parentMessage',
@@ -23,6 +35,11 @@ export default {
       childMessagesRequest: state => state.threadMessageFeed.childMessagesRequest,
       user: 'user',
       darkTheme: 'darkTheme'
+    })
+  },
+  methods: {
+    ...mapActions({
+      fetchEarlierMessages: 'threadMessageFeed/fetchEarlierMessages'
     })
   }
 };
@@ -38,6 +55,7 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
+          <intersect @enter="fetchEarlierMessages()"> <div></div> </intersect>
           <div v-if="childMessagesRequest.error" class="error-text error-box">
             Error: Therad messages can't be fetched.
           </div>
@@ -46,7 +64,6 @@ export default {
           </div>
           <chat-item
             v-for="message in childMessages"
-            v-else
             :key="message.id"
             :message="message"
             :use-compact-styles="true"

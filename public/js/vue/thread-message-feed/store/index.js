@@ -16,6 +16,7 @@ export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
+  SET_AT_TOP: 'SET_AT_TOP',
   ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
 
@@ -24,6 +25,7 @@ export default {
   state: () => ({
     isVisible: false,
     draftMessage: '',
+    atTop: false,
     parentId: null,
     ...childMessagesVuexRequest.initialState
   }),
@@ -36,6 +38,9 @@ export default {
     },
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
+    },
+    [types.SET_AT_TOP](state) {
+      state.atTop = true;
     },
     ...childMessagesVuexRequest.mutations
   },
@@ -94,13 +99,19 @@ export default {
         });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
-    fetchChildMessages: ({ state, commit }) => {
+    fetchChildMessages: ({ state, commit }, { beforeId, afterId } = {}) => {
       commit(childMessagesVuexRequest.requestType);
+      const options = { beforeId, afterId };
+      const query = Object.keys(options)
+        .filter(key => options[key])
+        .map(key => key + '=' + options[key])
+        .join('&');
       return apiClient.room
-        .get(`/chatMessages/${state.parentId}/thread`)
+        .get(`/chatMessages/${state.parentId}/thread${query ? '?' + query : ''}`)
         .then(childMessages => {
           commit(childMessagesVuexRequest.successType);
           commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });
+          return childMessages;
         })
         .catch((/* error */) => {
           // error is reported by apiClient
@@ -115,6 +126,18 @@ export default {
           5000
         );
       });
+    },
+    fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
+      if (state.atTop) return;
+      dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
+        childMessages => {
+          // fewer messages than the limit => we are done
+          if (childMessages.length !== 15) {
+            // TODO full limit
+            commit(types.SET_AT_TOP);
+          }
+        }
+      );
     }
   }
 };

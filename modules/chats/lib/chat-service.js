@@ -426,7 +426,8 @@ async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId } 
   // Reverse the initial order for afterId
   const sentOrder = afterId ? 'asc' : 'desc';
   q.sort({ sent: sentOrder });
-  q.limit(MAX_CHAT_MESSAGE_RESULTS);
+  //TODO put back a normal limit
+  q.limit(15);
 
   const messages = await q.lean().exec();
   mongooseUtils.addIdToLeanArray(messages);
