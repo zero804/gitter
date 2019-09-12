@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
@@ -8,7 +9,6 @@ var statsd = env.createStatsClient({ prefix: nconf.get('stats:statsd:prefix') })
 var appEvents = require('gitter-web-appevents');
 var bayeux = require('../web/bayeux');
 var ent = require('ent');
-const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var presenceService = require('gitter-web-presence');
 var restSerializer = require('../serializers/rest-serializer');
 var debug = require('debug')('gitter:app:bayeux-events-bridge');
@@ -58,10 +58,33 @@ exports.install = function() {
     }
   });
 
-  appEvents.onTokenRevoked(function(data) {
-    var token = data.token;
-    var url = '/api/v1/token/' + token;
-    var message = {
+  async function cleanupSocketsForToken(token, userId) {
+    assert(token);
+    assert(userId);
+    const socketIds = await presenceService.listAllSocketsForUser(userId);
+
+    const sockets = await presenceService.getSockets(socketIds);
+
+    for (let socketId of Object.keys(sockets)) {
+      const socket = sockets[socketId];
+
+      if (socket.token === token) {
+        winston.info(
+          `accessToken(${token}) deleted so we are closing associated realtime socket(${socketId})`
+        );
+        await bayeux.destroyClient(socketId);
+      }
+    }
+  }
+
+  appEvents.onTokenRevoked(async data => {
+    const { token, userId } = data;
+
+    // Cleanup any of the realtime sockets associated with the token that was just revoked/deleted
+    await cleanupSocketsForToken(token, userId);
+
+    const url = '/api/v1/token/' + token;
+    const message = {
       notification: 'token_revoked'
     };
     debug('Token revoked on %s: %j', url, message);
@@ -78,24 +101,6 @@ exports.install = function() {
     winston.info(
       `All sockets belonging to user ${userId} have been unsubscribed from room ${troupeId}`
     );
-  });
-
-  // Cleanup any of the realtime sockets associated with the token that was just deleted
-  appEvents.onTokenDeleted(async function({ accessToken }) {
-    const socketIds = await presenceService.listAllSocketsForUser(accessToken.userId);
-
-    const sockets = await presenceService.getSockets(socketIds);
-
-    for (let socketId of Object.keys(sockets)) {
-      const socket = sockets[socketId];
-
-      if (socket.token === accessToken.token) {
-        winston.info(
-          `accessToken(${accessToken.token}) deleted so we are closing associated realtime socket(${socketId})`
-        );
-        await bayeux.destroyClient(socketId);
-      }
-    }
   });
 
   appEvents.onUserNotification(function(data) {

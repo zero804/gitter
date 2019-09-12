@@ -86,7 +86,10 @@ module.exports = {
       await accessToken.remove();
 
       // Trigger the realtime socket cleanup
-      appEvents.tokenDeleted({ accessToken });
+      appEvents.tokenRevoked({
+        userId: accessToken.userId,
+        token: accessToken.token
+      });
 
       if (callback) {
         callback();
