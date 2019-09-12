@@ -72,10 +72,11 @@ describe('presenceService', function() {
       'online',
       'test',
       'faye',
-      null,
-      null,
-      null,
-      null
+      null, // troupeId
+      null, // oauthClientId
+      null, // token
+      null, // uniqueClientId
+      null // eyeballState
     );
   });
 
@@ -83,7 +84,18 @@ describe('presenceService', function() {
     var userId = 'TESTUSER1' + Date.now();
     var socketId = 'TESTSOCKET1' + Date.now();
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.socketDisconnected(socketId);
       });
@@ -108,7 +120,18 @@ describe('presenceService', function() {
 
       // Connect the socket
       return presenceService
-        .userSocketConnected(userId, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
+        .userSocketConnected(
+          userId,
+          socketId,
+          'online',
+          'test',
+          'faye',
+          troupeId,
+          null, // oauthClientId
+          null, // token
+          null, // uniqueClientId
+          true
+        )
         .then(function() {
           // Check that the lookup code is working as expected
           return presenceService
@@ -175,8 +198,9 @@ describe('presenceService', function() {
           'test',
           'faye',
           troupeId,
-          null,
-          null,
+          null, // oauthClientId
+          null, // token
+          null, // uniqueClientId
           false
         );
       })
@@ -205,7 +229,18 @@ describe('presenceService', function() {
 
     // This simulates three events happening in very quick succession
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        troupeId,
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        true
+      )
       .then(function() {
         return presenceService.socketDisconnected(socketId);
       })
@@ -259,8 +294,9 @@ describe('presenceService', function() {
           'test',
           'faye',
           troupeId,
-          null,
-          null,
+          null, // oauthClientId
+          null, // token
+          null, // uniqueClientId
           true
         );
       })
@@ -322,7 +358,18 @@ describe('presenceService', function() {
 
     // Connect socket
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        troupeId,
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        true
+      )
       .then(function() {
         var signals = [1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1];
 
@@ -346,7 +393,18 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET4' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.collectGarbage(fakeEngine);
       })
@@ -365,7 +423,18 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET4' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'mobile', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'mobile',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.listOnlineUsers();
       })
@@ -379,7 +448,18 @@ describe('presenceService', function() {
     var socketId = 'TESTSOCKET5' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'mobile', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'mobile',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.categorizeUsersByOnlineStatus([userId]);
       })
@@ -396,7 +476,18 @@ describe('presenceService', function() {
     var troupeId = 'TESTTROUPE4' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'mobile', 'test', 'faye', troupeId, null, null, true)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'mobile',
+        'test',
+        'faye',
+        troupeId,
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        true
+      )
       .then(function() {
         return presenceService.findOnlineUsersForTroupe(troupeId);
       })
@@ -471,7 +562,18 @@ describe('presenceService', function() {
     }
 
     return presenceService
-      .userSocketConnected(userId, socketId1, 'mobile', 'test', 'faye', troupeId, null, null, true)
+      .userSocketConnected(
+        userId,
+        socketId1,
+        'mobile',
+        'test',
+        'faye',
+        troupeId,
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        true
+      )
       .then(function() {
         return ensureUserTroupeStatus(true);
       })
@@ -483,9 +585,10 @@ describe('presenceService', function() {
           'test',
           'faye',
           troupeId,
-          true,
-          null,
-          null
+          null, // oauthClientId
+          null, // token TODO
+          null, // uniqueClientId
+          null // eyeballState
         );
       })
       .then(function() {
@@ -523,7 +626,18 @@ describe('presenceService', function() {
     redisClient = Promise.promisifyAll(redisClient);
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token TODO
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         // Now mess things up intentionally
         return redisClient.zincrbyAsync(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId);
@@ -557,7 +671,18 @@ describe('presenceService', function() {
     redisClient = Promise.promisifyAll(redisClient);
 
     return presenceService
-      .userSocketConnected(userId1, socketId1, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId1,
+        socketId1,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token TODO
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.userSocketConnected(
           userId2,
@@ -565,10 +690,11 @@ describe('presenceService', function() {
           'mobile',
           'test',
           'faye',
-          null,
-          null,
-          null,
-          null
+          null, // troupeId
+          null, // oauthClientId
+          null, // token TODO
+          null, // uniqueClientId
+          null // eyeballState
         );
       })
       .then(function() {
@@ -614,7 +740,18 @@ describe('presenceService', function() {
     redisClient = Promise.promisifyAll(redisClient);
 
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token TODO
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         // now mess things up intentionally
         return redisClient.zincrbyAsync(presenceService.testOnly.ACTIVE_USERS_KEY, 1, userId);
@@ -648,7 +785,18 @@ describe('presenceService', function() {
     var socketId2 = 'TESTSOCKET2' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId1, socketId1, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId1,
+        socketId1,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token TODO
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.userSocketConnected(
           userId2,
@@ -656,10 +804,11 @@ describe('presenceService', function() {
           'online',
           'test',
           'faye',
-          null,
-          null,
-          null,
-          null
+          null, // troupeId
+          null, // oauthClientId
+          null, // token TODO
+          null, // uniqueClientId
+          null // eyeballState
         );
       })
       .then(function() {
@@ -680,7 +829,18 @@ describe('presenceService', function() {
     var userId3 = 'TESTUSER3' + Date.now();
 
     return presenceService
-      .userSocketConnected(userId1, socketId1, 'online', 'test', 'faye', troupeId, null, null, true)
+      .userSocketConnected(
+        userId1,
+        socketId1,
+        'online',
+        'test',
+        'faye',
+        troupeId,
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        true
+      )
       .then(function() {
         return presenceService.userSocketConnected(
           userId2,
@@ -688,10 +848,11 @@ describe('presenceService', function() {
           'online',
           'test',
           'faye',
-          null,
-          null,
-          null,
-          null
+          null, // troupeId
+          null, // oauthClientId
+          null, // token
+          null, // uniqueClientId
+          null // eyeballState
         );
       })
       .then(function() {
@@ -736,10 +897,11 @@ describe('presenceService', function() {
       'online',
       'test',
       'faye',
-      null,
-      null,
-      null,
-      null
+      null, // troupeId
+      null, // oauthClientId
+      null, // token
+      null, // uniqueClientId
+      null // eyeballState
     );
     const socketIds = await presenceService.listAllSocketsForUser(userId);
     assert.equal(socketIds.length, 1);
@@ -758,7 +920,18 @@ describe('presenceService', function() {
 
     // Connect the socket
     return presenceService
-      .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, null)
+      .userSocketConnected(
+        userId,
+        socketId,
+        'online',
+        'test',
+        'faye',
+        null, // troupeId
+        null, // oauthClientId
+        null, // token
+        null, // uniqueClientId
+        null // eyeballState
+      )
       .then(function() {
         return presenceService.socketExists(socketId);
       })
@@ -779,13 +952,22 @@ describe('presenceService', function() {
   });
 
   describe('socketReassociated', function() {
-    var userId, socketId, troupeId, troupeId2, presenceChangeMock, eyeballSignalMock;
+    var userId,
+      socketId,
+      troupeId,
+      troupeId2,
+      oauthClientId,
+      token,
+      presenceChangeMock,
+      eyeballSignalMock;
 
     beforeEach(function() {
       userId = 'TESTUSER1' + Date.now();
       socketId = 'TESTSOCKET1' + Date.now();
       troupeId = 'TESTTROUPE1' + Date.now();
       troupeId2 = 'TESTTROUPE2' + Date.now();
+      oauthClientId = 'TESTOAUTHCLIENT1' + Date.now();
+      token = 'TESTTOKEN1' + Date.now();
 
       presenceChangeMock = mockito.mockFunction();
       eyeballSignalMock = mockito.mockFunction();
@@ -809,8 +991,9 @@ describe('presenceService', function() {
             'test',
             'faye',
             troupeId,
-            null,
-            null,
+            oauthClientId,
+            token,
+            null, // uniqueClientId
             true
           )
           .then(function() {
@@ -842,12 +1025,25 @@ describe('presenceService', function() {
             assert.strictEqual(socket.troupeId, troupeId2);
             assert.strictEqual(socket.eyeballs, true);
             assert.strictEqual(socket.clientType, 'test');
+            assert.strictEqual(socket.oauthClientId, oauthClientId);
+            assert.strictEqual(socket.token, token);
           });
       });
 
       it('should reassociate a socket when previously there was no socket', function() {
         return presenceService
-          .userSocketConnected(userId, socketId, 'online', 'test', 'faye', null, null, null, true)
+          .userSocketConnected(
+            userId,
+            socketId,
+            'online',
+            'test',
+            'faye',
+            null, // troupeId
+            null, // oauthClientId
+            null, // token
+            null, // uniqueClientId
+            true
+          )
           .then(function() {
             // Validate user is in troupe1
             return presenceService.listOnlineUsersForTroupes([troupeId]);
@@ -888,8 +1084,9 @@ describe('presenceService', function() {
             'test',
             'faye',
             troupeId,
-            null,
-            null,
+            null, // oauthClientId
+            null, // token
+            null, // uniqueClientId
             true
           )
           .then(function() {
@@ -927,7 +1124,18 @@ describe('presenceService', function() {
     describe('anonymous', function() {
       it('should reassociate a socket correctly', function() {
         return presenceService
-          .userSocketConnected(null, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
+          .userSocketConnected(
+            null,
+            socketId,
+            'online',
+            'test',
+            'faye',
+            troupeId,
+            oauthClientId,
+            token,
+            null, // uniqueClientId
+            true
+          )
           .then(function() {
             mockito.verify(presenceChangeMock, never())(null, anything(), anything());
 
@@ -956,12 +1164,25 @@ describe('presenceService', function() {
             assert.strictEqual(socket.troupeId, troupeId2);
             assert.strictEqual(socket.eyeballs, false);
             assert.strictEqual(socket.clientType, 'test');
+            assert.strictEqual(socket.oauthClientId, oauthClientId);
+            assert.strictEqual(socket.token, token);
           });
       });
 
       it('should reassociate a socket when previously there was no socket', function() {
         return presenceService
-          .userSocketConnected(null, socketId, 'online', 'test', 'faye', null, null, null, true)
+          .userSocketConnected(
+            null,
+            socketId,
+            'online',
+            'test',
+            'faye',
+            null, // troupeId
+            null, // oauthClientId
+            null, // token
+            null, // uniqueClientId
+            true
+          )
           .then(function() {
             mockito.verify(presenceChangeMock, never())(null, anything(), anything());
 
@@ -995,7 +1216,18 @@ describe('presenceService', function() {
 
       it('should clear a socket troupe association', function() {
         return presenceService
-          .userSocketConnected(null, socketId, 'online', 'test', 'faye', troupeId, null, null, true)
+          .userSocketConnected(
+            null,
+            socketId,
+            'online',
+            'test',
+            'faye',
+            troupeId,
+            null, // oauthClientId
+            null, // token
+            null, // uniqueClientId
+            true
+          )
           .then(function() {
             mockito.verify(presenceChangeMock, never())(null, anything(), anything());
 

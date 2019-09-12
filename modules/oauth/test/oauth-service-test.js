@@ -16,7 +16,13 @@ describe('oauth-service', function() {
     oAuthAccessTokenRevoked1: {
       user: 'user1',
       client: 'oAuthClientRevoked1'
-    }
+    },
+
+    oAuthClientToDelete1: {
+      ownerUser: 'user1'
+    },
+    oAuthAccessTokenToBeDeleted1: { user: 'user1', client: 'oAuthClientToDelete1' },
+    oAuthAccessTokenToBeDeleted2: { user: 'user1', client: 'oAuthClientToDelete1' }
   });
 
   it('should create tokens', function() {
@@ -220,5 +226,25 @@ describe('oauth-service', function() {
         assert.strictEqual(result, meta.result);
       });
     });
+  });
+
+  it('deleteOauthClient', async () => {
+    // Ensure there are some tokens to delete
+    const tokensBefore = await oauthService.findAccessTokensByClientId(
+      fixture.oAuthClientToDelete1._id
+    );
+    assert.strictEqual(tokensBefore.length, 2);
+
+    // Delete the OAuth client
+    await oauthService.deleteOauthClient(fixture.oAuthClientToDelete1);
+
+    // Make sure the OAuth client is deleted
+    assert.strictEqual(await oauthService.findClientById(fixture.oAuthClientToDelete1._id), null);
+
+    // Make sure all of the tokens are deleted
+    const tokensAfter = await oauthService.findAccessTokensByClientId(
+      fixture.oAuthClientToDelete1._id
+    );
+    assert.strictEqual(tokensAfter.length, 0);
   });
 });

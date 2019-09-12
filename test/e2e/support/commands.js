@@ -34,17 +34,22 @@ assert(gitterApiBaseUrl);
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
-Cypress.Commands.add('login', user => {
-  cy.log(`Logging in as user ${user.username} -> ${user.accessToken}`);
+Cypress.Commands.add('login', accessToken => {
+  cy.log(`Logging in with token ${accessToken}`);
   cy.request({
     url: gitterBaseUrl,
     method: 'GET',
     body: {
-      access_token: user.accessToken
+      access_token: accessToken
     }
   }).then(res => {
     assert.equal(res.status, 200);
   });
+});
+
+Cypress.Commands.add('loginUser', user => {
+  cy.log(`Logging in as user ${user.username} -> ${user.accessToken}`);
+  cy.login(user.accessToken);
 });
 
 Cypress.Commands.add('toggleFeature', (featureName, force) => {
@@ -68,4 +73,21 @@ Cypress.Commands.add('toggleFeature', (featureName, force) => {
       assert.equal(body.status, 200);
       assert.equal(body.action, force);
     });
+});
+
+Cypress.Commands.add('sendMessage', (user, room, messageText) => {
+  cy.log(`Sending message in ${room._id}: "${messageText}"`);
+
+  // Send the message
+  cy.request({
+    url: urlJoin(gitterBaseUrl, '/api/v1/rooms/', room._id, '/chatMessages'),
+    method: 'POST',
+    body: { text: messageText },
+    headers: {
+      Authorization: `Bearer ${user.accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  }).then(res => {
+    assert.equal(res.status, 200);
+  });
 });

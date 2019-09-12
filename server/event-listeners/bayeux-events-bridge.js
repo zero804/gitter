@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 var env = require('gitter-web-env');
 var nconf = env.config;
 var Promise = require('bluebird');
@@ -57,10 +58,33 @@ exports.install = function() {
     }
   });
 
-  appEvents.onTokenRevoked(function(data) {
-    var token = data.token;
-    var url = '/api/v1/token/' + token;
-    var message = {
+  async function cleanupSocketsForToken(token, userId) {
+    assert(token);
+    assert(userId);
+    const socketIds = await presenceService.listAllSocketsForUser(userId);
+
+    const sockets = await presenceService.getSockets(socketIds);
+
+    for (let socketId of Object.keys(sockets)) {
+      const socket = sockets[socketId];
+
+      if (socket.token === token) {
+        winston.info(
+          `accessToken(${token}) deleted so we are closing associated realtime socket(${socketId})`
+        );
+        await bayeux.destroyClient(socketId);
+      }
+    }
+  }
+
+  appEvents.onTokenRevoked(async data => {
+    const { token, userId } = data;
+
+    // Cleanup any of the realtime sockets associated with the token that was just revoked/deleted
+    await cleanupSocketsForToken(token, userId);
+
+    const url = '/api/v1/token/' + token;
+    const message = {
       notification: 'token_revoked'
     };
     debug('Token revoked on %s: %j', url, message);

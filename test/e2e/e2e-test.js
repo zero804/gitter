@@ -34,6 +34,7 @@ describe('e2e tests', function() {
         },
         troupe1: { users: ['user1'] },
         troupeInGroup1: { group: 'group1', users: ['user1'] },
+
         message1: {
           user: 'user1',
           troupe: 'troupe1',
@@ -44,6 +45,15 @@ describe('e2e tests', function() {
           troupe: 'troupe1',
           text: 'hello from the child',
           parent: 'message1'
+        },
+
+        userToBeTokenDeleted1: {
+          accessToken: 'web-internal'
+        },
+        oAuthClientToBeDeleted1: { ownerUser: 'userToBeTokenDeleted1' },
+        oAuthAccessTokenToBeDeleted1: {
+          user: 'userToBeTokenDeleted1',
+          client: 'oAuthClientToBeDeleted1'
         }
       }).then(newFixtures => {
         fixtures = newFixtures;
@@ -51,7 +61,7 @@ describe('e2e tests', function() {
     });
 
     beforeEach(() => {
-      cy.login(fixtures.user1);
+      cy.loginUser(fixtures.user1);
     });
 
     it('shows chat page', function() {
@@ -79,31 +89,72 @@ describe('e2e tests', function() {
       cy.get('#chat-container').contains(MESSAGE_CONTENT);
     });
 
-    it('can receive a message', function() {
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+    describe('receiving messages', () => {
+      it('can receive a message', function() {
+        cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
 
-      const MESSAGE_CONTENT = 'my new message';
+        const MESSAGE_CONTENT = 'my new message';
 
-      // Make sure our new message does not exist yet
-      cy.get('#chat-container')
-        .contains(MESSAGE_CONTENT)
-        .should('not.exist');
+        // Make sure our new message does not exist yet
+        cy.get('#chat-container')
+          .contains(MESSAGE_CONTENT)
+          .should('not.exist');
 
-      // Send the message
-      cy.request({
-        url: urlJoin(gitterBaseUrl, '/api/v1/rooms/', fixtures.troupe1._id, '/chatMessages'),
-        method: 'POST',
-        body: { text: MESSAGE_CONTENT },
-        headers: {
-          Authorization: `Bearer ${fixtures.user1.accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      }).then(res => {
-        assert.equal(res.status, 200);
+        cy.sendMessage(fixtures.user1, fixtures.troupe1, MESSAGE_CONTENT);
+
+        // See the message show up
+        cy.get('#chat-container').contains(MESSAGE_CONTENT);
       });
 
-      // See the message show up
-      cy.get('#chat-container').contains(MESSAGE_CONTENT);
+      it('stops receiving messages after token is destroyed', function() {
+        cy.login(fixtures.oAuthAccessTokenToBeDeleted1.token);
+
+        cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+
+        const MESSAGE_CONTENT = 'my new message';
+
+        // Make sure our new message does not exist yet
+        cy.get('#chat-container')
+          .contains(MESSAGE_CONTENT)
+          .should('not.exist');
+
+        cy.sendMessage(fixtures.user1, fixtures.troupe1, MESSAGE_CONTENT);
+
+        // See the message show up
+        cy.get('#chat-container').contains(MESSAGE_CONTENT);
+
+        // Delete the token by deleting the OAuth client
+        cy.request({
+          url: urlJoin(
+            gitterBaseUrl,
+            '/api/v1/oauth-clients/',
+            fixtures.oAuthClientToBeDeleted1._id
+          ),
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${fixtures.userToBeTokenDeleted1.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        }).then(res => {
+          assert.equal(res.status, 200);
+        });
+
+        // Send another message that should never show up for our `userToBeTokenDeleted1`
+        const MESSAGE_THAT_SHOULD_NEVER_SHOW_CONTENT =
+          'my new message after token was destroyed and realtime socket should be closed';
+
+        // Make sure our new message does not exist yet
+        cy.get('#chat-container')
+          .contains(MESSAGE_THAT_SHOULD_NEVER_SHOW_CONTENT)
+          .should('not.exist');
+
+        cy.sendMessage(fixtures.user1, fixtures.troupe1, MESSAGE_THAT_SHOULD_NEVER_SHOW_CONTENT);
+
+        // See the message show up
+        cy.get('#chat-container')
+          .contains(MESSAGE_THAT_SHOULD_NEVER_SHOW_CONTENT)
+          .should('not.exist');
+      });
     });
 
     it('can create a room', function() {

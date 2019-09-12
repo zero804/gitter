@@ -171,8 +171,11 @@ onready(function() {
 
   // We remove `onRoomRemoveHandler` so we don't try to redirect to the user home
   // before the `logout()` kicks in (see `delete-account-view.js`)
-  appEvents.on('account.delete-start', function() {
+  appEvents.on('account.delete-start', () => {
     allRoomsCollection.off('remove', onRoomRemoveHandler);
+  });
+  appEvents.on('account.delete-stop', () => {
+    allRoomsCollection.on('remove', onRoomRemoveHandler);
   });
 
   window.addEventListener(

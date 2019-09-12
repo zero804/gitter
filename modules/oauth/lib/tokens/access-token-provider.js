@@ -3,6 +3,7 @@
 var persistenceService = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var random = require('../random');
+const appEvents = require('gitter-web-appevents');
 
 module.exports = {
   getToken: function(userId, clientId, callback) {
@@ -78,10 +79,27 @@ module.exports = {
     return callback();
   },
 
-  deleteToken: function(token, callback) {
-    return persistenceService.OAuthAccessToken.remove({ token: token })
-      .exec()
-      .nodeify(callback);
+  deleteToken: async function(token, callback) {
+    try {
+      const accessToken = await persistenceService.OAuthAccessToken.findOne({ token: token });
+
+      await accessToken.remove();
+
+      // Trigger the realtime socket cleanup
+      appEvents.tokenRevoked({
+        userId: accessToken.userId,
+        token: accessToken.token
+      });
+
+      if (callback) {
+        callback();
+      }
+    } catch (err) {
+      if (callback) {
+        callback(err);
+      }
+      throw err;
+    }
   },
 
   invalidateCache: function(callback) {
