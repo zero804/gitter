@@ -151,9 +151,23 @@ function getOrCreateClient() {
 
   // Subscribe to the token for changes to check if it was revoked
   if (context.isLoggedIn()) {
-    context.getAccessToken().then(function(accessToken) {
+    context.getAccessToken().then(accessToken => {
       var contextModel = new Backbone.Model({
         token: accessToken
+      });
+
+      let preventTokenRevokedFlow = false;
+      appEvents.on('account.delete-start', () => {
+        debug('account.delete-start');
+        preventTokenRevokedFlow = true;
+      });
+      appEvents.on('account.delete-stop', () => {
+        debug('account.delete-stop');
+        preventTokenRevokedFlow = false;
+      });
+      appEvents.on('account.logout-start', () => {
+        debug('account.logout-start');
+        preventTokenRevokedFlow = true;
       });
 
       var templateSubscription = client.subscribeTemplate({
@@ -162,8 +176,14 @@ function getOrCreateClient() {
         onMessage: function(message) {
           switch (message.notification) {
             case 'token_revoked':
-              log.error('Token was revoked', message);
-              logout('/login/token-revoked');
+              log.error(
+                `Token was revoked (preventTokenRevokedFlow=${preventTokenRevokedFlow})`,
+                message
+              );
+              if (!preventTokenRevokedFlow) {
+                log.error('Token was revoked and logging out', message);
+                logout('/login/token-revoked');
+              }
               break;
           }
         }
@@ -173,10 +193,18 @@ function getOrCreateClient() {
         log.error('Token subscription error' + channel, { exception: err });
 
         if (err.code === 401 || err.code === 403) {
-          log.error('Token subscription unathorized/forbidden, logging out' + channel, {
-            exception: err
-          });
-          logout('/login/token-revoked');
+          log.error(
+            `Token subscription unathorized/forbidden (preventTokenRevokedFlow=${preventTokenRevokedFlow}): ${channel}`,
+            {
+              exception: err
+            }
+          );
+          if (!preventTokenRevokedFlow) {
+            log.error(`Token subscription unathorized/forbidden and logging out`, {
+              exception: err
+            });
+            logout('/login/token-revoked');
+          }
         }
       });
     });

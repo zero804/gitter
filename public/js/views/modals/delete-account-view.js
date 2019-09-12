@@ -93,6 +93,12 @@ var Modal = ModalView.extend({
                 `Error while deleting account: ${err} (status: ${err.status})`
               );
             }
+
+            // We only trigger a stop on error as they could decide to not delete
+            // their account after they see an error and continue using the app
+            //
+            // Otherwise, the delete flow redirect should continue
+            appEvents.trigger('account.delete-stop');
           })
           .then(() => {
             this.lockModel.set('deletionRequestLoading', false);
