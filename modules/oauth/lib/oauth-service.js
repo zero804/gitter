@@ -45,12 +45,38 @@ var ircClientIdPromise = persistenceService.OAuthClient.findOne({
 // Fail on error
 ircClientIdPromise.done();
 
+function findAccessTokensByClientId(clientId) {
+  return persistenceService.OAuthAccessToken.find({ clientId });
+}
+
 function deleteToken(token, callback) {
   return tokenProvider.deleteToken(token).nodeify(callback);
 }
 
+async function deleteOauthClient(oauthClient) {
+  // Delete all of the tokens associated with the OAuth Client
+  const accessTokens = await findAccessTokensByClientId(oauthClient._id);
+  for (let accessToken of accessTokens) {
+    await deleteToken(accessToken.token);
+  }
+
+  await oauthClient.remove();
+}
+
 function findClientById(id, callback) {
-  persistenceService.OAuthClient.findById(id, callback);
+  return persistenceService.OAuthClient.findById(id)
+    .exec()
+    .asCallback(callback);
+}
+
+function findClientByClientKey(clientKey, callback) {
+  return persistenceService.OAuthClient.findOne({ clientKey: clientKey })
+    .exec()
+    .asCallback(callback);
+}
+
+function findClientsByOwnerUserId(userId) {
+  return persistenceService.OAuthClient.find({ ownerUserId: userId });
 }
 
 // this is called when a user actively logs in via oauth
@@ -150,12 +176,6 @@ async function removeAllAccessTokensForUser(userId) {
   );
 }
 
-function findClientByClientKey(clientKey, callback) {
-  return persistenceService.OAuthClient.findOne({ clientKey: clientKey })
-    .exec()
-    .asCallback(callback);
-}
-
 function findOrCreateToken(userId, clientId, callback) {
   if (!clientId) return Promise.reject(new Error('clientId required')).nodeify(callback);
 
@@ -235,17 +255,20 @@ function isInternalClient(client) {
 
 module.exports = {
   findClientById: findClientById,
+  findClientByClientKey,
+  findClientsByOwnerUserId,
+  findAccessTokensByClientId,
   saveAuthorizationCode: saveAuthorizationCode,
   findAuthorizationCode: findAuthorizationCode,
   deleteAuthorizationCode: deleteAuthorizationCode,
   validateAccessTokenAndClient: validateAccessTokenAndClient,
   removeAllAccessTokensForUser: removeAllAccessTokensForUser,
-  findClientByClientKey: findClientByClientKey,
   findOrCreateToken: findOrCreateToken,
   findOrGenerateWebToken: findOrGenerateWebToken,
   generateAnonWebToken: generateAnonWebToken,
   findOrGenerateIRCToken: findOrGenerateIRCToken,
   deleteToken: deleteToken,
+  deleteOauthClient,
   isInternalClient: isInternalClient,
   testOnly: {
     invalidateCache: function() {
