@@ -1,3 +1,9 @@
+# 20.4.0 - *upcoming*
+
+- Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
+    - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
+
+
 # 20.3.0 - 2019-09-11
 
  - Show "Reply in thread" for parent messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1581
