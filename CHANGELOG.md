@@ -5,8 +5,18 @@
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
 
 
-# 20.3.1 - 2019-09-12
+# 20.3.2 - 2019-9-12
+
+ - Security fix related deleting OAuth clients and access tokens, https://gitlab.com/gitlab-org/gitter/webapp/issues/2053
+    - Thanks to [@favicon](https://hackerone.com/favicon) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/22
+    - https://gitlab.com/gitlab-org/gitter/developer-gitter-im/merge_requests/26
+
+
+# 20.3.1 - 2019-9-12
+
  - Fix "Gitter OAuth app flow is messed up", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1596
+
 
 # 20.3.0 - 2019-09-11
 
@@ -19,7 +29,7 @@
 
 Developer facing:
 
- -  Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
+ - Move some apps content strings to be translatable, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1583
  - Document and make it easier to run the e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1585
 
 
