@@ -430,7 +430,7 @@ async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId, l
   // Reverse the initial order for afterId
   const sentOrder = afterId ? 'asc' : 'desc';
   q.sort({ sent: sentOrder });
-  //TODO put back a normal limit
+
   q.limit(validateSearchLimit(limit));
 
   const messages = await q.lean().exec();
