@@ -52,7 +52,7 @@ export default {
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
-          <intersect v-if="childMessages.length" @enter="fetchEarlierMessages()">
+          <intersect @enter="fetchEarlierMessages()">
             <div></div>
           </intersect>
           <chat-item
@@ -61,7 +61,7 @@ export default {
             :message="message"
             :use-compact-styles="true"
           />
-          <intersect v-if="childMessages.length" @enter="fetchLaterMessages()">
+          <intersect @enter="fetchLaterMessages()">
             <div></div>
           </intersect>
         </div>

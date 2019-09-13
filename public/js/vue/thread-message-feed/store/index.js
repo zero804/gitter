@@ -14,6 +14,9 @@ export const childMessagesVuexRequest = new VuexApiRequest(
   'childMessagesRequest'
 );
 
+const canStartFetchingMessages = state =>
+  !state.childMessagesRequest.loading && !state.childMessagesRequest.error;
+
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
@@ -150,8 +153,8 @@ export default {
       );
     },
     fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
-      if (state.atTop) return;
-      if (!getters.childMessages.length) return;
+      if (state.atTop || !canStartFetchingMessages(state)) return;
+      if (getters.childMessages.length) return;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
         childMessages => {
           if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_TOP);
@@ -159,7 +162,7 @@ export default {
       );
     },
     fetchLaterMessages: ({ dispatch, state, getters, commit }) => {
-      if (state.atBottom) return;
+      if (state.atBottom || !canStartFetchingMessages(state)) return;
       const childMessages = getters.childMessages;
       if (!childMessages.length) return;
       dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
@@ -169,7 +172,7 @@ export default {
       );
     },
     fetchInitialMessages: ({ dispatch, commit }) => {
-      dispatch('fetchChildMessages').then(childMessages => {
+      return dispatch('fetchChildMessages').then(childMessages => {
         const lastMessage = childMessages[childMessages.length - 1];
         if (lastMessage) dispatch('focusOnMessage', lastMessage.id);
         commit(types.SET_AT_BOTTOM);
