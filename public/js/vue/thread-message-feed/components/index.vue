@@ -46,20 +46,24 @@ export default {
       <section v-if="parentMessage" class="content">
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
-          <intersect @enter="fetchEarlierMessages()"> <div></div> </intersect>
           <div v-if="childMessagesRequest.error" class="error-text error-box">
             Error: Therad messages can't be fetched.
           </div>
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
+          <intersect v-if="childMessages.length" @enter="fetchEarlierMessages()">
+            <div></div>
+          </intersect>
           <chat-item
             v-for="message in childMessages"
             :key="message.id"
             :message="message"
             :use-compact-styles="true"
           />
-          <intersect @enter="fetchLaterMessages()"> <div></div> </intersect>
+          <intersect v-if="childMessages.length" @enter="fetchLaterMessages()">
+            <div></div>
+          </intersect>
         </div>
         <chat-input :user="user" thread />
       </section>
