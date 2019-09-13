@@ -154,6 +154,7 @@ describe('e2e tests', function() {
 
     // This test is very flaky thanks to https://gitlab.com/gitlab-org/gitter/webapp/issues/2276
     // So it is disabled for now.
+    // FIXME: enable the test when https://gitlab.com/gitlab-org/gitter/webapp/issues/2276 is fixed
     xit('permalinks in main message feed and thread message feed', () => {
       cy.toggleFeature('threaded-conversations', true);
       cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
