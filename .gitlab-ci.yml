@@ -44,9 +44,13 @@ container_scanning:
   variables:
     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+  artifacts:
+    - gl-container-scanning-report.json
 
 sast:
   stage: security
+  artifacts:
+    - gl-sast-report.json
 
 dast:
   stage: security
