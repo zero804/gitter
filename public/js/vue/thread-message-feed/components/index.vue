@@ -104,8 +104,7 @@ export default {
 }
 
 .body {
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   height: 100%;
   width: 100%;
   display: flex;
@@ -120,9 +119,10 @@ export default {
 }
 
 .content {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  overflow: hidden;
 }
 
 .error-box {
@@ -142,8 +142,8 @@ export default {
 
 .chat-messages {
   width: 100%;
-  height: 100%;
   display: inline-block;
   overflow: auto;
+  flex-grow: 1;
 }
 </style>
