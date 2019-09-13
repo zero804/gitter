@@ -130,7 +130,6 @@ describe('thread message feed store', () => {
           {},
           [{ type: types.SET_AT_BOTTOM }],
           [{ type: 'fetchChildMessages' }],
-          () => {},
           { fetchChildMessages: new Array(15).fill('a') }
         );
       });
@@ -142,7 +141,6 @@ describe('thread message feed store', () => {
           {},
           [{ type: types.SET_AT_BOTTOM }, { type: types.SET_AT_TOP }],
           [{ type: 'fetchChildMessages' }],
-          () => {},
           { fetchChildMessages: new Array(10).fill('a') }
         );
       });
@@ -159,7 +157,6 @@ describe('thread message feed store', () => {
           { childMessages },
           [],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          () => {},
           { fetchChildMessages: new Array(15).fill('a') }
         );
       });
@@ -171,7 +168,6 @@ describe('thread message feed store', () => {
           { childMessages },
           [{ type: types.SET_AT_TOP }],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          () => {},
           { fetchChildMessages: new Array(10).fill('a') }
         );
       });
@@ -196,7 +192,6 @@ describe('thread message feed store', () => {
           { childMessages },
           [],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          () => {},
           { fetchChildMessages: new Array(15).fill('a') }
         );
       });
@@ -208,7 +203,6 @@ describe('thread message feed store', () => {
           { childMessages },
           [{ type: types.SET_AT_BOTTOM }],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          () => {},
           { fetchChildMessages: new Array(10).fill('a') }
         );
       });

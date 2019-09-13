@@ -1,5 +1,3 @@
-const noop = () => {};
-
 /**
  * Helper for testing action with expected mutations inspired in
  * https://vuex.vuejs.org/en/testing.html
@@ -9,7 +7,6 @@ const noop = () => {};
  * @param {Object} state will be provided to the action
  * @param {Array} [expectedMutations=[]] mutations expected to be committed
  * @param {Array} [expectedActions=[]] actions expected to be dispatched
- * @param {Function} [done=noop] to be executed after the tests
  * @param {Object} [actionResults={}] to be executed after the tests
  * @return {Promise}
  *
@@ -28,7 +25,6 @@ const noop = () => {};
  *    { type: 'actionName', payload: {param: 'foobar'}},
  *    { type: 'actionName1'}
  *   ]
- *   done,
  *   { 'actionName': 'expectedResult'}
  * );
  *
@@ -49,7 +45,6 @@ function actionHelper(
   state,
   expectedMutations = [],
   expectedActions = [],
-  done = noop,
   actionResults = {}
 ) {
   const mutations = [];
@@ -86,7 +81,6 @@ function actionHelper(
       mutations: expectedMutations,
       actions: expectedActions
     });
-    done();
   };
 
   const result = action(
