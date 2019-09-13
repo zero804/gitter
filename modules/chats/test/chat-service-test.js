@@ -229,8 +229,8 @@ describe('chatService', function() {
   });
 
   describe('Finding thread messages', () => {
-    // This is a silly workaround for the fact that the mongo ID timestamp will
-    // Have current time in it and we can't set date too far away from NOW
+    // This is a silly workaround for the fact that the mongo ID timestamp contains
+    // the current time and we can't set date too far away from NOW
     // But we still need to have the sent time different to test the sort by sent
     const shiftNowBy = milliseconds => {
       const result = new Date();
@@ -288,6 +288,15 @@ describe('chatService', function() {
         afterId: chatFixture.message5.id
       });
       const expectedChildIds = [6, 7, 8, 9, 10].map(i => chatFixture[`message${i}`].id);
+      assert.deepEqual(chats.map(chat => chat.id), expectedChildIds);
+    });
+
+    it('finds limited amount of child messages', async () => {
+      const { message0 } = chatFixture;
+      const chats = await chatService.findThreadChatMessages(chatFixture.troupe1.id, message0.id, {
+        limit: '3'
+      });
+      const expectedChildIds = [8, 9, 10].map(i => chatFixture[`message${i}`].id);
       assert.deepEqual(chats.map(chat => chat.id), expectedChildIds);
     });
   });

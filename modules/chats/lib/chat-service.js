@@ -406,6 +406,10 @@ function addAfterFilter(query, afterId) {
   query.where('sent').gte(sentAfter(new ObjectID(afterId)));
   query.where('_id').gt(new ObjectID(afterId));
 }
+
+const validateSearchLimit = rawLimit =>
+  Math.min(rawLimit || DEFAULT_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
+
 /**
  * Finds all messages for thread message feed represented by parentId.
  *
@@ -416,7 +420,7 @@ function addAfterFilter(query, afterId) {
  *
  * @returns Array of last MAX_CHAT_MESSAGE_RESULTS messages in ascending order
  */
-async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId } = {}) {
+async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId, limit } = {}) {
   const q = ChatMessage.where('toTroupeId', troupeId);
   q.where('parentId', parentId);
 
@@ -427,16 +431,13 @@ async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId } 
   const sentOrder = afterId ? 'asc' : 'desc';
   q.sort({ sent: sentOrder });
   //TODO put back a normal limit
-  q.limit(15);
+  q.limit(validateSearchLimit(limit));
 
   const messages = await q.lean().exec();
   mongooseUtils.addIdToLeanArray(messages);
   if (sentOrder === 'desc') messages.reverse();
   return messages;
 }
-
-const validateSearchLimit = rawLimit =>
-  Math.min(rawLimit || DEFAULT_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
 
 async function findChatMessagesInRange(
   troupeId,

@@ -5,8 +5,7 @@ import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
 import { generateChildMessageTmpId } from '../../store/mutations';
 
-// TODO set proper limit
-const FETCH_MESSAGES_LIMIT = 15;
+const FETCH_MESSAGES_LIMIT = 50;
 
 // Exported for testing
 export const childMessagesVuexRequest = new VuexApiRequest(
@@ -117,9 +116,12 @@ export default {
         });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
-    fetchChildMessages: ({ state, commit }, { beforeId, afterId } = {}) => {
+    fetchChildMessages: (
+      { state, commit },
+      { beforeId, afterId, limit = FETCH_MESSAGES_LIMIT } = {}
+    ) => {
       commit(childMessagesVuexRequest.requestType);
-      const options = { beforeId, afterId };
+      const options = { beforeId, afterId, limit };
       const query = Object.keys(options)
         .filter(key => options[key])
         .map(key => key + '=' + options[key])

@@ -93,6 +93,15 @@ describe('chat-api', function() {
       .then(messages => assert.deepEqual(messages.map(m => m.id), [fixture.message2.id]));
   });
 
+  it('GET /v1/rooms/:roomId/chatMessages/:parentId/thread?limit=1', function() {
+    return request(app)
+      .get(`/v1/rooms/${fixture.troupe1.id}/chatMessages/${fixture.message1.id}/thread?limit=1`)
+      .set('x-access-token', fixture.user1.accessToken)
+      .expect(200)
+      .then(response => response.body)
+      .then(messages => assert.deepEqual(messages.map(m => m.id), [fixture.message3.id]));
+  });
+
   it('Forbidden GET /v1/rooms/:roomId/chatMessages/:parentId/thread', function() {
     return request(app)
       .get(`/v1/rooms/${fixture.troupe2.id}/chatMessages/${fixture.message4.id}/thread`)
