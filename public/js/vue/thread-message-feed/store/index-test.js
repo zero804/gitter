@@ -151,13 +151,13 @@ describe('thread message feed store', () => {
       });
     });
 
-    describe('fetchEarlierMessages', () => {
+    describe('fetchOlderMessages', () => {
       const testMessageOverrides = [{ id: '1' }, { id: '2' }];
       const childMessages = testMessageOverrides.map(m => createSerializedMessageFixture(m));
 
       it('calls fetchChildMessages with beforeId', async () => {
         await testAction(
-          actions.fetchEarlierMessages,
+          actions.fetchOlderMessages,
           undefined,
           { childMessages, childMessagesRequest: {} },
           [],
@@ -168,7 +168,7 @@ describe('thread message feed store', () => {
 
       it('calls fetchChildMessages and marks that we reached the top', async () => {
         await testAction(
-          actions.fetchEarlierMessages,
+          actions.fetchOlderMessages,
           undefined,
           { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_TOP }],
@@ -179,7 +179,7 @@ describe('thread message feed store', () => {
 
       it('does nothing when we reached the top already', async () => {
         await testAction(
-          actions.fetchEarlierMessages,
+          actions.fetchOlderMessages,
           undefined,
           { atTop: true, childMessagesRequest: {} },
           [],
@@ -189,7 +189,7 @@ describe('thread message feed store', () => {
 
       it('does nothing when there are no child messages', async () => {
         await testAction(
-          actions.fetchEarlierMessages,
+          actions.fetchOlderMessages,
           undefined,
           { childMessages: [], childMessagesRequest: {} },
           [],
@@ -198,13 +198,13 @@ describe('thread message feed store', () => {
       });
     });
 
-    describe('fetchLaterMessages', () => {
+    describe('fetchNewerMessages', () => {
       const testMessageOverrides = [{ id: '1' }, { id: '2' }];
       const childMessages = testMessageOverrides.map(m => createSerializedMessageFixture(m));
 
       it('calls fetchChildMessages with afterId', async () => {
         await testAction(
-          actions.fetchLaterMessages,
+          actions.fetchNewerMessages,
           undefined,
           { childMessages, childMessagesRequest: {} },
           [],
@@ -215,7 +215,7 @@ describe('thread message feed store', () => {
 
       it('calls fetchChildMessages and marks that we reached the bottom', async () => {
         await testAction(
-          actions.fetchLaterMessages,
+          actions.fetchNewerMessages,
           undefined,
           { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_BOTTOM }],
@@ -226,7 +226,7 @@ describe('thread message feed store', () => {
 
       it('does nothing when we reached the bottom already', async () => {
         await testAction(
-          actions.fetchLaterMessages,
+          actions.fetchNewerMessages,
           undefined,
           { atBottom: true, childMessagesRequest: {} },
           [],
@@ -236,7 +236,7 @@ describe('thread message feed store', () => {
 
       it('does nothing when there are no child messages', async () => {
         await testAction(
-          actions.fetchLaterMessages,
+          actions.fetchNewerMessages,
           undefined,
           { childMessages: [], childMessagesRequest: {} },
           [],

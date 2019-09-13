@@ -29,8 +29,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchEarlierMessages: 'threadMessageFeed/fetchEarlierMessages',
-      fetchLaterMessages: 'threadMessageFeed/fetchLaterMessages'
+      fetchOlderMessages: 'threadMessageFeed/fetchOlderMessages',
+      fetchNewerMessages: 'threadMessageFeed/fetchNewerMessages'
     })
   }
 };
@@ -52,7 +52,7 @@ export default {
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
-          <intersect @enter="fetchEarlierMessages()">
+          <intersect @enter="fetchOlderMessages()">
             <div></div>
           </intersect>
           <chat-item
@@ -61,7 +61,7 @@ export default {
             :message="message"
             :use-compact-styles="true"
           />
-          <intersect @enter="fetchLaterMessages()">
+          <intersect @enter="fetchNewerMessages()">
             <div></div>
           </intersect>
         </div>

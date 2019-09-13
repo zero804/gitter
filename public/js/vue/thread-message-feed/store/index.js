@@ -154,7 +154,7 @@ export default {
         5000
       );
     },
-    fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
+    fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;
       if (!getters.childMessages.length) return;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
@@ -163,7 +163,7 @@ export default {
         }
       );
     },
-    fetchLaterMessages: ({ dispatch, state, getters, commit }) => {
+    fetchNewerMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atBottom || !canStartFetchingMessages(state)) return;
       const childMessages = getters.childMessages;
       if (!childMessages.length) return;
