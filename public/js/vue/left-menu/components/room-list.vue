@@ -1,5 +1,5 @@
 <script>
-import _ from 'underscore';
+import _ from 'lodash';
 import { pojo as sortsAndFilters } from 'gitter-realtime-client/lib/sorts-filters';
 import { mapState, mapActions } from 'vuex';
 import draggable from 'vuedraggable';
