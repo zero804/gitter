@@ -10,6 +10,7 @@ const noop = () => {};
  * @param {Array} [expectedMutations=[]] mutations expected to be committed
  * @param {Array} [expectedActions=[]] actions expected to be dispatched
  * @param {Function} [done=noop] to be executed after the tests
+ * @param {Object} [actionResults={}] to be executed after the tests
  * @return {Promise}
  *
  * @example
@@ -28,6 +29,7 @@ const noop = () => {};
  *    { type: 'actionName1'}
  *   ]
  *   done,
+ *   { 'actionName': 'expectedResult'}
  * );
  *
  * @example
@@ -37,6 +39,7 @@ const noop = () => {};
  *   state, //state
  *   [ { type: types.MUTATION} ], // expected mutations
  *   [], // expected actions
+ *   {actionName: 'expectedResult'} // dispatching action will return
  * ).then(done)
  * .catch(done.fail);
  */
@@ -46,7 +49,8 @@ function actionHelper(
   state,
   expectedMutations = [],
   expectedActions = [],
-  done = noop
+  done = noop,
+  actionResults = {}
 ) {
   const mutations = [];
   const actions = [];
@@ -71,7 +75,7 @@ function actionHelper(
     }
 
     actions.push(dispatchedAction);
-    return Promise.resolve();
+    return Promise.resolve(actionResults[type]);
   };
 
   const validateResults = () => {

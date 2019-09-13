@@ -5,6 +5,9 @@ import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
 import { generateChildMessageTmpId } from '../../store/mutations';
 
+// TODO set proper limit
+const FETCH_MESSAGES_LIMIT = 15;
+
 // Exported for testing
 export const childMessagesVuexRequest = new VuexApiRequest(
   'CHILD_MESSAGES',
@@ -17,6 +20,8 @@ export const types = {
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
   SET_AT_TOP: 'SET_AT_TOP',
+  SET_AT_BOTTOM: 'SET_AT_BOTTOM',
+  CLEAR_STATE: 'CLEAR_STATE',
   ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
 
@@ -26,6 +31,7 @@ export default {
     isVisible: false,
     draftMessage: '',
     atTop: false,
+    atBottom: false,
     parentId: null,
     ...childMessagesVuexRequest.initialState
   }),
@@ -41,6 +47,15 @@ export default {
     },
     [types.SET_AT_TOP](state) {
       state.atTop = true;
+    },
+    [types.SET_AT_BOTTOM](state) {
+      state.atBottom = true;
+    },
+    [types.CLEAR_STATE](state) {
+      state.parentId = null;
+      state.draftMessage = '';
+      state.atTop = false;
+      state.atBottom = false;
     },
     ...childMessagesVuexRequest.mutations
   },
@@ -59,14 +74,14 @@ export default {
   },
   actions: {
     open: ({ commit, dispatch }, parentId) => {
+      commit(types.CLEAR_STATE);
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
       commit(types.SET_PARENT_MESSAGE_ID, parentId);
       appEvents.trigger('vue:right-toolbar:toggle', false);
-      return dispatch('fetchChildMessages');
+      return dispatch('fetchInitialMessages');
     },
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
-      commit(types.SET_PARENT_MESSAGE_ID, null);
       appEvents.trigger('vue:right-toolbar:toggle', true);
     },
     updateDraftMessage: ({ commit }, newDraftMessage) => {
@@ -129,15 +144,30 @@ export default {
     },
     fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop) return;
+      if (!getters.childMessages.length) return;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
         childMessages => {
-          // fewer messages than the limit => we are done
-          if (childMessages.length !== 15) {
-            // TODO full limit
-            commit(types.SET_AT_TOP);
-          }
+          if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_TOP);
         }
       );
+    },
+    fetchLaterMessages: ({ dispatch, state, getters, commit }) => {
+      if (state.atBottom) return;
+      const childMessages = getters.childMessages;
+      if (!childMessages.length) return;
+      dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
+        childMessages => {
+          if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_BOTTOM);
+        }
+      );
+    },
+    fetchInitialMessages: ({ dispatch, commit }) => {
+      dispatch('fetchChildMessages').then(childMessages => {
+        commit(types.SET_AT_BOTTOM);
+        if (childMessages.length < FETCH_MESSAGES_LIMIT) {
+          commit(types.SET_AT_TOP);
+        }
+      });
     }
   }
 };
