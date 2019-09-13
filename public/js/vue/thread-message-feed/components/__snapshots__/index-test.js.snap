@@ -28,9 +28,13 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
         
         </div>
          
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
           
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
@@ -71,9 +75,13 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
           <loading-spinner-stub />
         </div>
          
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
           
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
@@ -166,9 +174,13 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
          
         <!---->
          
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
           
-        <!---->
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub

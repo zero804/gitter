@@ -134,8 +134,8 @@ describe('thread message feed store', () => {
           undefined,
           {},
           [{ type: types.SET_AT_BOTTOM }],
-          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 14 }],
-          { fetchChildMessages: generateSequence(15).map(i => ({ id: i })) }
+          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 49 }],
+          { fetchChildMessages: generateSequence(50).map(i => ({ id: i })) }
         );
       });
 
@@ -159,10 +159,10 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchEarlierMessages,
           undefined,
-          { childMessages },
+          { childMessages, childMessagesRequest: {} },
           [],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          { fetchChildMessages: generateSequence(15) }
+          { fetchChildMessages: generateSequence(50) }
         );
       });
 
@@ -170,7 +170,7 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchEarlierMessages,
           undefined,
-          { childMessages },
+          { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_TOP }],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
           { fetchChildMessages: generateSequence(10) }
@@ -178,11 +178,23 @@ describe('thread message feed store', () => {
       });
 
       it('does nothing when we reached the top already', async () => {
-        await testAction(actions.fetchEarlierMessages, undefined, { atTop: true }, [], []);
+        await testAction(
+          actions.fetchEarlierMessages,
+          undefined,
+          { atTop: true, childMessagesRequest: {} },
+          [],
+          []
+        );
       });
 
       it('does nothing when there are no child messages', async () => {
-        await testAction(actions.fetchEarlierMessages, undefined, { childMessages: [] }, [], []);
+        await testAction(
+          actions.fetchEarlierMessages,
+          undefined,
+          { childMessages: [], childMessagesRequest: {} },
+          [],
+          []
+        );
       });
     });
 
@@ -194,10 +206,10 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchLaterMessages,
           undefined,
-          { childMessages },
+          { childMessages, childMessagesRequest: {} },
           [],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          { fetchChildMessages: generateSequence(15) }
+          { fetchChildMessages: generateSequence(50) }
         );
       });
 
@@ -205,7 +217,7 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchLaterMessages,
           undefined,
-          { childMessages },
+          { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_BOTTOM }],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
           { fetchChildMessages: generateSequence(10) }
@@ -213,11 +225,23 @@ describe('thread message feed store', () => {
       });
 
       it('does nothing when we reached the bottom already', async () => {
-        await testAction(actions.fetchLaterMessages, undefined, { atBottom: true }, [], []);
+        await testAction(
+          actions.fetchLaterMessages,
+          undefined,
+          { atBottom: true, childMessagesRequest: {} },
+          [],
+          []
+        );
       });
 
       it('does nothing when there are no child messages', async () => {
-        await testAction(actions.fetchLaterMessages, undefined, { childMessages: [] }, [], []);
+        await testAction(
+          actions.fetchLaterMessages,
+          undefined,
+          { childMessages: [], childMessagesRequest: {} },
+          [],
+          []
+        );
       });
     });
 

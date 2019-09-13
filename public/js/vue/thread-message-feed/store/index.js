@@ -156,7 +156,7 @@ export default {
     },
     fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;
-      if (getters.childMessages.length) return;
+      if (!getters.childMessages.length) return;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
         childMessages => {
           if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_TOP);
