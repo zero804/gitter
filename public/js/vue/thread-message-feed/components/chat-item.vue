@@ -38,19 +38,22 @@ export default {
   watch: {
     message: function(newMessage, oldMessage) {
       if (newMessage.highlighted && !oldMessage.highlighted) {
+        this.scrollIntoView(true);
+      } else if (newMessage.focused && !oldMessage.focused) {
         this.scrollIntoView();
       }
     }
   },
   mounted: function() {
-    if (this.message.highlighted) this.scrollIntoView();
+    if (this.message.highlighted) this.scrollIntoView(true);
+    else if (this.message.focused) this.scrollIntoView();
   },
   methods: {
     setPermalinkLocation: function() {
       pushState(this.permalinkUrl);
     },
-    scrollIntoView: function() {
-      this.$el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    scrollIntoView: function(smooth = false) {
+      this.$el.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
     }
   }
 };

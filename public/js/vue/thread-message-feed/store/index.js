@@ -142,6 +142,13 @@ export default {
         );
       });
     },
+    focusOnMessage: ({ commit }, id) => {
+      commit(rootTypes.UPDATE_MESSAGE, { id, focused: true }, { root: true });
+      setTimeout(
+        () => commit(rootTypes.UPDATE_MESSAGE, { id, focused: false }, { root: true }),
+        5000
+      );
+    },
     fetchEarlierMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop) return;
       if (!getters.childMessages.length) return;
@@ -163,6 +170,8 @@ export default {
     },
     fetchInitialMessages: ({ dispatch, commit }) => {
       dispatch('fetchChildMessages').then(childMessages => {
+        const lastMessage = childMessages[childMessages.length - 1];
+        if (lastMessage) dispatch('focusOnMessage', lastMessage.id);
         commit(types.SET_AT_BOTTOM);
         if (childMessages.length < FETCH_MESSAGES_LIMIT) {
           commit(types.SET_AT_TOP);

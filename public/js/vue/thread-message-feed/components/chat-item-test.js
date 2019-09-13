@@ -74,6 +74,19 @@ describe('thread-message-feed chat-item', () => {
         { methods: { scrollIntoView: scrollIntoViewMock } }
       );
       expect(wrapper.element).toMatchSnapshot();
+      expect(scrollIntoViewMock.mock.calls[0]).toEqual([true]);
+    });
+    it('focused - scrolls into view', () => {
+      const scrollIntoViewMock = jest.fn();
+      mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, focused: true }
+        },
+        addRoomToStore,
+        { methods: { scrollIntoView: scrollIntoViewMock } }
+      );
       expect(scrollIntoViewMock.mock.calls.length).toBe(1);
     });
   });

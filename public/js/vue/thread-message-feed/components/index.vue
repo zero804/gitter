@@ -15,16 +15,6 @@ export default {
     ChatItem,
     Intersect
   },
-  mounted: function() {
-    // const options = {
-    //   root: this.$refs.content,
-    //   rootMargin: '0px',
-    //   threshold: 1.0
-    // };
-    // const observer = new IntersectionObserver(this.changeMessage.bind(this), options);
-    // observer.observe(this.$refs.msg);
-  },
-  data: () => ({ msg: null }),
   computed: {
     ...mapGetters({
       parentMessage: 'threadMessageFeed/parentMessage',
@@ -39,7 +29,8 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchEarlierMessages: 'threadMessageFeed/fetchEarlierMessages'
+      fetchEarlierMessages: 'threadMessageFeed/fetchEarlierMessages',
+      fetchLaterMessages: 'threadMessageFeed/fetchLaterMessages'
     })
   }
 };
@@ -68,6 +59,7 @@ export default {
             :message="message"
             :use-compact-styles="true"
           />
+          <intersect @enter="fetchLaterMessages()"> <div></div> </intersect>
         </div>
         <chat-input :user="user" thread />
       </section>

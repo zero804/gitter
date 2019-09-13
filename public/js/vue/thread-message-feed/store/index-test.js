@@ -122,6 +122,11 @@ describe('thread message feed store', () => {
       });
     });
 
+    /** Generates array with `length` integers starting at 0
+     *  generateSequence(5) = [0,1,2,3,4]
+     */
+    const generateSequence = length => new Array(length).fill(null).map((_, i) => i);
+
     describe('fetchInitialMessages', () => {
       it('calls fetchChildMessages', async () => {
         await testAction(
@@ -129,8 +134,8 @@ describe('thread message feed store', () => {
           undefined,
           {},
           [{ type: types.SET_AT_BOTTOM }],
-          [{ type: 'fetchChildMessages' }],
-          { fetchChildMessages: new Array(15).fill('a') }
+          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 14 }],
+          { fetchChildMessages: generateSequence(15).map(i => ({ id: i })) }
         );
       });
 
@@ -140,8 +145,8 @@ describe('thread message feed store', () => {
           undefined,
           {},
           [{ type: types.SET_AT_BOTTOM }, { type: types.SET_AT_TOP }],
-          [{ type: 'fetchChildMessages' }],
-          { fetchChildMessages: new Array(10).fill('a') }
+          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 9 }],
+          { fetchChildMessages: generateSequence(10).map(i => ({ id: i })) }
         );
       });
     });
@@ -157,7 +162,7 @@ describe('thread message feed store', () => {
           { childMessages },
           [],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          { fetchChildMessages: new Array(15).fill('a') }
+          { fetchChildMessages: generateSequence(15) }
         );
       });
 
@@ -168,7 +173,7 @@ describe('thread message feed store', () => {
           { childMessages },
           [{ type: types.SET_AT_TOP }],
           [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          { fetchChildMessages: new Array(10).fill('a') }
+          { fetchChildMessages: generateSequence(10) }
         );
       });
 
@@ -192,7 +197,7 @@ describe('thread message feed store', () => {
           { childMessages },
           [],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          { fetchChildMessages: new Array(15).fill('a') }
+          { fetchChildMessages: generateSequence(15) }
         );
       });
 
@@ -203,7 +208,7 @@ describe('thread message feed store', () => {
           { childMessages },
           [{ type: types.SET_AT_BOTTOM }],
           [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          { fetchChildMessages: new Array(10).fill('a') }
+          { fetchChildMessages: generateSequence(10) }
         );
       });
 
@@ -225,6 +230,18 @@ describe('thread message feed store', () => {
         // 5 seconds for it, the risk and impact of highlight staying on are low
         [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'def', highlighted: true } }],
         [{ type: 'open', payload: 'abc' }]
+      );
+    });
+
+    it('focusOnMessage sets message as focused', async () => {
+      await testAction(
+        actions.focusOnMessage,
+        'abc',
+        {},
+        // ideally, we would test the delayed mutation setting focused to false, but we won't wait
+        // 5 seconds for it, the risk and impact of focused staying on are low
+        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'abc', focused: true } }],
+        []
       );
     });
   });
