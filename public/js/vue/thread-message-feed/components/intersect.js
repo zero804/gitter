@@ -24,13 +24,11 @@ export default {
     );
   },
   mounted() {
-    this.$nextTick(() => {
-      if (!this.$slots.default || this.$slots.default.length !== 1) {
-        log.warn('[VueIntersect] You must wrap exactly one element in a <intersect> component.');
-      }
+    if (!this.$slots.default || this.$slots.default.length !== 1) {
+      log.warn('[VueIntersect] You must wrap exactly one element in a <intersect> component.');
+    }
 
-      this.observer.observe(this.$slots.default[0].elm);
-    });
+    this.observer.observe(this.$slots.default[0].elm);
   },
   destroyed() {
     this.observer.disconnect();
