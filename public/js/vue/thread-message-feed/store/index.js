@@ -16,6 +16,18 @@ export const childMessagesVuexRequest = new VuexApiRequest(
 const canStartFetchingMessages = state =>
   !state.childMessagesRequest.loading && !state.childMessagesRequest.error;
 
+/**
+ * sets a boolean attribute on a message to `true` and after 5s sets
+ * the same attribute to `false`
+ * Used for notifying a chat-item component that it should react on an event
+ */
+const turnMessageFlagOnForFiveSeconds = (commit, id, flagName) => {
+  commit(rootTypes.UPDATE_MESSAGE, { id, [flagName]: true }, { root: true });
+  setTimeout(
+    () => commit(rootTypes.UPDATE_MESSAGE, { id, [flagName]: false }, { root: true }),
+    5000
+  );
+};
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
@@ -138,21 +150,15 @@ export default {
           commit(childMessagesVuexRequest.errorType);
         });
     },
+    /* opens TMF and highlights the permalinked child message */
     highlightChildMessage: ({ dispatch, commit }, { parentId, id }) => {
       dispatch('open', parentId).then(() => {
-        commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: true }, { root: true });
-        setTimeout(
-          () => commit(rootTypes.UPDATE_MESSAGE, { id, highlighted: false }, { root: true }),
-          5000
-        );
+        turnMessageFlagOnForFiveSeconds(commit, id, 'highlighted');
       });
     },
+    /* used to scroll TMF down to the newest message */
     focusOnMessage: ({ commit }, id) => {
-      commit(rootTypes.UPDATE_MESSAGE, { id, focused: true }, { root: true });
-      setTimeout(
-        () => commit(rootTypes.UPDATE_MESSAGE, { id, focused: false }, { root: true }),
-        5000
-      );
+      turnMessageFlagOnForFiveSeconds(commit, id, 'focused');
     },
     fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;

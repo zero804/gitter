@@ -37,6 +37,7 @@ export default {
   },
   watch: {
     message: function(newMessage, oldMessage) {
+      // see mounted() for highlighted and focused explanation
       if (newMessage.highlighted && !oldMessage.highlighted) {
         this.scrollIntoView(true);
       } else if (newMessage.focused && !oldMessage.focused) {
@@ -45,7 +46,9 @@ export default {
     }
   },
   mounted: function() {
+    // highlighted is used for bringing users attention to permalinked message
     if (this.message.highlighted) this.scrollIntoView(true);
+    // focused is ensuring this chat item is in view, e.g. when opening TMF we focus on the newest message
     else if (this.message.focused) this.scrollIntoView();
   },
   methods: {
