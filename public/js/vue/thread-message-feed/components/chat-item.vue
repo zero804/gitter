@@ -37,26 +37,26 @@ export default {
   },
   watch: {
     message: function(newMessage, oldMessage) {
-      // see mounted() for highlighted and focused explanation
+      // see mounted() for highlighted and focusedAt explanation
       if (newMessage.highlighted && !oldMessage.highlighted) {
-        this.scrollIntoView(true);
-      } else if (newMessage.focused && !oldMessage.focused) {
-        this.scrollIntoView();
+        this.scrollIntoView('smooth', 'center');
+      } else if (newMessage.focusedAt && !oldMessage.focusedAt) {
+        this.scrollIntoView('auto', newMessage.focusedAt);
       }
     }
   },
   mounted: function() {
     // highlighted is used for bringing users attention to permalinked message
-    if (this.message.highlighted) this.scrollIntoView(true);
-    // focused is ensuring this chat item is in view, e.g. when opening TMF we focus on the newest message
-    else if (this.message.focused) this.scrollIntoView();
+    if (this.message.highlighted) this.scrollIntoView('smooth', 'center');
+    // focusedAt is ensuring this chat item is in view, e.g. when opening TMF we focus on the newest message
+    else if (this.message.focusedAt) this.scrollIntoView('auto', this.message.focusedAt);
   },
   methods: {
     setPermalinkLocation: function() {
       pushState(this.permalinkUrl);
     },
-    scrollIntoView: function(smooth = false) {
-      this.$el.scrollIntoView({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+    scrollIntoView: function(behavior, block) {
+      this.$el.scrollIntoView({ block, behavior });
     }
   }
 };

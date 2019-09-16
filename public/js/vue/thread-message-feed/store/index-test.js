@@ -122,10 +122,11 @@ describe('thread message feed store', () => {
       });
     });
 
-    /** Generates array with `length` integers starting at 0
-     *  generateSequence(5) = [0,1,2,3,4]
+    /**
+     *  generateSequenceWithIds(3) = [{id:'0'},{id:'1'},{id:'2'}]
      */
-    const generateSequence = length => new Array(length).fill(null).map((_, i) => i);
+    const generateSequenceWithIds = length =>
+      new Array(length).fill(null).map((_, i) => ({ id: i.toString() }));
 
     describe('fetchInitialMessages', () => {
       it('calls fetchChildMessages', async () => {
@@ -134,8 +135,11 @@ describe('thread message feed store', () => {
           undefined,
           {},
           [{ type: types.SET_AT_BOTTOM }],
-          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 49 }],
-          { fetchChildMessages: generateSequence(50).map(i => ({ id: i })) }
+          [
+            { type: 'fetchChildMessages' },
+            { type: 'focusOnMessage', payload: { message: { id: '49' }, block: 'end' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(50) }
         );
       });
 
@@ -145,8 +149,11 @@ describe('thread message feed store', () => {
           undefined,
           {},
           [{ type: types.SET_AT_BOTTOM }, { type: types.SET_AT_TOP }],
-          [{ type: 'fetchChildMessages' }, { type: 'focusOnMessage', payload: 9 }],
-          { fetchChildMessages: generateSequence(10).map(i => ({ id: i })) }
+          [
+            { type: 'fetchChildMessages' },
+            { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'end' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(10) }
         );
       });
     });
@@ -161,8 +168,11 @@ describe('thread message feed store', () => {
           undefined,
           { childMessages, childMessagesRequest: {} },
           [],
-          [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          { fetchChildMessages: generateSequence(50) }
+          [
+            { type: 'fetchChildMessages', payload: { beforeId: '1' } },
+            { type: 'focusOnMessage', payload: { message: { id: '49' }, block: 'start' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(50) }
         );
       });
 
@@ -172,8 +182,11 @@ describe('thread message feed store', () => {
           undefined,
           { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_TOP }],
-          [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
-          { fetchChildMessages: generateSequence(10) }
+          [
+            { type: 'fetchChildMessages', payload: { beforeId: '1' } },
+            { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'start' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(10) }
         );
       });
 
@@ -208,8 +221,11 @@ describe('thread message feed store', () => {
           undefined,
           { childMessages, childMessagesRequest: {} },
           [],
-          [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          { fetchChildMessages: generateSequence(50) }
+          [
+            { type: 'fetchChildMessages', payload: { afterId: '2' } },
+            { type: 'focusOnMessage', payload: { message: { id: '0' }, block: 'end' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(50) }
         );
       });
 
@@ -219,8 +235,11 @@ describe('thread message feed store', () => {
           undefined,
           { childMessages, childMessagesRequest: {} },
           [{ type: types.SET_AT_BOTTOM }],
-          [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
-          { fetchChildMessages: generateSequence(10) }
+          [
+            { type: 'fetchChildMessages', payload: { afterId: '2' } },
+            { type: 'focusOnMessage', payload: { message: { id: '0' }, block: 'end' } }
+          ],
+          { fetchChildMessages: generateSequenceWithIds(10) }
         );
       });
 
@@ -257,14 +276,14 @@ describe('thread message feed store', () => {
       );
     });
 
-    it('focusOnMessage sets message as focused', async () => {
+    it('focusOnMessage sets message as focusedAt with given block', async () => {
       await testAction(
         actions.focusOnMessage,
-        'abc',
+        { message: { id: 'abc' }, block: 'start' },
         {},
-        // ideally, we would test the delayed mutation setting focused to false, but we won't wait
-        // 5 seconds for it, the risk and impact of focused staying on are low
-        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'abc', focused: true } }],
+        // ideally, we would test the delayed mutation setting focusedAt to false, but we won't wait
+        // 5 seconds for it, the risk and impact of focusedAt staying on are low
+        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'abc', focusedAt: 'start' } }],
         []
       );
     });
