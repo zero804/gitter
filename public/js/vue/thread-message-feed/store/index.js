@@ -156,7 +156,9 @@ export default {
         setTemporaryMessageProp(commit, id, 'highlighted');
       });
     },
-    /* used to scroll TMF down to the newest message, or to reposition TMF during infinite scroll */
+    /* used to scroll TMF down to the newest message, or to reposition TMF during infinite scroll
+     * `block` is scrollIntoView block argument ('start', 'end', 'center', 'nearest')
+     */
     focusOnMessage: ({ commit }, { message, block }) => {
       if (!message) return;
       setTemporaryMessageProp(commit, message.id, 'focusedAt', block);
