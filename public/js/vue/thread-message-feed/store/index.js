@@ -36,7 +36,7 @@ export const types = {
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
   SET_AT_TOP: 'SET_AT_TOP',
   SET_AT_BOTTOM: 'SET_AT_BOTTOM',
-  CLEAR_STATE: 'CLEAR_STATE',
+  RESET_THREAD_STATE: 'RESET_THREAD_STATE',
   ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
 
@@ -66,7 +66,7 @@ export default {
     [types.SET_AT_BOTTOM](state) {
       state.atBottom = true;
     },
-    [types.CLEAR_STATE](state) {
+    [types.RESET_THREAD_STATE](state) {
       state.parentId = null;
       state.draftMessage = '';
       state.atTop = false;
@@ -89,7 +89,7 @@ export default {
   },
   actions: {
     open: ({ commit, dispatch }, parentId) => {
-      commit(types.CLEAR_STATE);
+      commit(types.RESET_THREAD_STATE);
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
       commit(types.SET_PARENT_MESSAGE_ID, parentId);
       appEvents.trigger('vue:right-toolbar:toggle', false);

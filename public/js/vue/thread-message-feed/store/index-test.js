@@ -26,7 +26,7 @@ describe('thread message feed store', () => {
         '5d147ea84dad9dfbc522317a',
         {},
         [
-          { type: types.CLEAR_STATE },
+          { type: types.RESET_THREAD_STATE },
           { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
           { type: types.SET_PARENT_MESSAGE_ID, payload: '5d147ea84dad9dfbc522317a' }
         ],
@@ -320,14 +320,14 @@ describe('thread message feed store', () => {
       expect(state.atBottom).toEqual(true);
     });
 
-    it('CLEAR_STATE', () => {
+    it('RESET_THREAD_STATE', () => {
       const state = {
         parentId: '5d147ea84dad9dfbc522317a',
         draftMessage: 'abc',
         atTop: true,
         atBottom: true
       };
-      mutations[types.CLEAR_STATE](state);
+      mutations[types.RESET_THREAD_STATE](state);
       expect(state).toEqual({ parentId: null, draftMessage: '', atTop: false, atBottom: false });
     });
 
