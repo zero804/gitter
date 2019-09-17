@@ -5,12 +5,13 @@
     "baseport": "80",
     "basepath": "https://beta.gitter.im",
     "apiBasePath": "https://beta.gitter.im/api",
+    "oauthBasePath": "https://login-beta.gitter.im",
     "cookieDomain": ".gitter.im",
     "cookiePrefix": "b_",
     "secureCookies": true,
     "consoleLogging": true,
     "cacheTemplates": true,
-    "badgeBaseUrl" : "https://badges-beta.gitter.im",
+    "badgeBaseUrl": "https://badges-beta.gitter.im",
     "backlog": 1024,
     "startApiInPrimaryApp": true
   },
@@ -41,11 +42,7 @@
   "cdn": {
     "use": true,
     "prefixFile": "/var/log/gitter/cdn-version",
-    "hosts": [
-      "cdn01-beta.gitter.im",
-      "cdn02-beta.gitter.im",
-      "cdn03-beta.gitter.im"
-    ]
+    "hosts": ["cdn01-beta.gitter.im", "cdn02-beta.gitter.im", "cdn03-beta.gitter.im"]
   },
   "logging": {
     "logToFile": true,
@@ -74,7 +71,7 @@
       "cubeUrl": "ws://beta-internal.beta.gitter:1080"
     },
     "intercom": {
-      "enabled" : false
+      "enabled": false
     },
     "customerio": {
       "enabled": false
@@ -87,21 +84,14 @@
   "apn": {
     "feedbackInterval": 60
   },
-  "gitlaboauth": {
-  },
-  "twitteroauth": {
-  },
-  "linkedinoauth2": {
-  },
-  "googleoauth2": {
-  },
+  "gitlaboauth": {},
+  "twitteroauth": {},
+  "linkedinoauth2": {},
+  "googleoauth2": {},
   "redis": {
     "sentinel": {
       "master-name": "gitter-master",
-      "hosts": [
-        "sentinel-alias-01.beta.gitter:26379",
-        "sentinel-alias-02.beta.gitter:26379"
-      ],
+      "hosts": ["sentinel-alias-01.beta.gitter:26379", "sentinel-alias-02.beta.gitter:26379"],
       "validateHost": "10.*.*.*"
     },
     "redisDb": 1
@@ -109,39 +99,28 @@
   "redis_nopersist": {
     "sentinel": {
       "master-name": "gitter-nopersist-beta",
-      "hosts": [
-        "sentinel-alias-01.beta.gitter:26379",
-        "sentinel-alias-02.beta.gitter:26379"
-      ],
+      "hosts": ["sentinel-alias-01.beta.gitter:26379", "sentinel-alias-02.beta.gitter:26379"],
       "validateHost": "10.*.*.*"
     }
   },
   "redis_faye": {
     "sentinel": {
       "master-name": "gitter-nopersist-beta",
-      "hosts": [
-        "sentinel-alias-01.beta.gitter:26379",
-        "sentinel-alias-02.beta.gitter:26379"
-      ],
+      "hosts": ["sentinel-alias-01.beta.gitter:26379", "sentinel-alias-02.beta.gitter:26379"],
       "validateHost": "10.*.*.*"
     }
   },
   "redis_caching": {
     "sentinel": {
       "master-name": "gitter-caching-beta",
-      "hosts": [
-        "sentinel-alias-01.beta.gitter:26379",
-        "sentinel-alias-02.beta.gitter:26379"
-      ],
+      "hosts": ["sentinel-alias-01.beta.gitter:26379", "sentinel-alias-02.beta.gitter:26379"],
       "validateHost": "10.*.*.*"
     }
   },
   "mongo": {
     "comment": "TEST AGAINST PRODUCTION DATA",
     "connection": {
-      "hosts": [
-        "mongo-beta-01.beta.gitter:27017"
-      ],
+      "hosts": ["mongo-beta-01.beta.gitter:27017"],
       "database": "gitter",
       "options": {
         "replicaSet": "TroupeBetaProdData",
@@ -152,12 +131,9 @@
     "logQueries": false,
     "noAutoIndex": true
   },
-  "github": {
-  },
-  "irc": {
-  },
-  "transloadit": {
-  },
+  "github": {},
+  "irc": {},
+  "transloadit": {},
   "errorReporting": {
     "enabled": true
   },
@@ -165,14 +141,10 @@
     "enabled": true
   },
   "elasticsearch": {
-    "hosts": [
-      "http://es-alias-001.beta.gitter:9200"
-    ]
+    "hosts": ["http://es-alias-001.beta.gitter:9200"]
   },
   "elasticsearchTypeahead": {
-    "hosts": [
-      "http://typeahead-beta-01.beta.gitter:9200"
-    ]
+    "hosts": ["http://typeahead-beta-01.beta.gitter:9200"]
   },
   "neo4j": {
     "endpoint": "http://beta-internal.beta.gitter:7474"
