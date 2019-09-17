@@ -133,8 +133,8 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchInitialMessages,
           undefined,
-          {},
-          [{ type: types.SET_AT_BOTTOM }],
+          { parentId: 'parent-a1b2c3' },
+          [{ type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages' },
             { type: 'focusOnMessage', payload: { message: { id: '49' }, block: 'end' } }
@@ -147,8 +147,11 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchInitialMessages,
           undefined,
-          {},
-          [{ type: types.SET_AT_BOTTOM }, { type: types.SET_AT_TOP }],
+          { parentId: 'parent-a1b2c3' },
+          [
+            { type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' },
+            { type: types.SET_AT_TOP_IF_SAME_PARENT, payload: 'parent-a1b2c3' }
+          ],
           [
             { type: 'fetchChildMessages' },
             { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'end' } }
@@ -180,8 +183,8 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchOlderMessages,
           undefined,
-          { childMessages, childMessagesRequest: {} },
-          [{ type: types.SET_AT_TOP }],
+          { childMessages, childMessagesRequest: {}, parentId: 'parent-a1b2c3' },
+          [{ type: types.SET_AT_TOP_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages', payload: { beforeId: '1' } },
             { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'start' } }
@@ -233,8 +236,8 @@ describe('thread message feed store', () => {
         await testAction(
           actions.fetchNewerMessages,
           undefined,
-          { childMessages, childMessagesRequest: {} },
-          [{ type: types.SET_AT_BOTTOM }],
+          { childMessages, childMessagesRequest: {}, parentId: 'parent-a1b2c3' },
+          [{ type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages', payload: { afterId: '2' } },
             { type: 'focusOnMessage', payload: { message: { id: '0' }, block: 'end' } }
@@ -308,15 +311,15 @@ describe('thread message feed store', () => {
       expect(state.parentId).toEqual('5d147ea84dad9dfbc522317a');
     });
 
-    it('SET_AT_TOP', () => {
+    it('SET_AT_TOP_IF_SAME_PARENT', () => {
       const state = {};
-      mutations[types.SET_AT_TOP](state);
+      mutations[types.SET_AT_TOP_IF_SAME_PARENT](state);
       expect(state.atTop).toEqual(true);
     });
 
-    it('SET_AT_BOTTOM', () => {
+    it('SET_AT_BOTTOM_IF_SAME_PARENT', () => {
       const state = {};
-      mutations[types.SET_AT_BOTTOM](state);
+      mutations[types.SET_AT_BOTTOM_IF_SAME_PARENT](state);
       expect(state.atBottom).toEqual(true);
     });
 

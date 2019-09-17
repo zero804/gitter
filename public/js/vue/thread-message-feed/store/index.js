@@ -34,8 +34,8 @@ export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
   SET_PARENT_MESSAGE_ID: 'SET_PARENT_MESSAGE_ID',
   UPDATE_DRAFT_MESSAGE: 'UPDATE_DRAFT_MESSAGE',
-  SET_AT_TOP: 'SET_AT_TOP',
-  SET_AT_BOTTOM: 'SET_AT_BOTTOM',
+  SET_AT_TOP_IF_SAME_PARENT: 'SET_AT_TOP_IF_SAME_PARENT',
+  SET_AT_BOTTOM_IF_SAME_PARENT: 'SET_AT_BOTTOM_IF_SAME_PARENT',
   RESET_THREAD_STATE: 'RESET_THREAD_STATE',
   ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
 };
@@ -60,10 +60,14 @@ export default {
     [types.UPDATE_DRAFT_MESSAGE](state, draftMessage) {
       state.draftMessage = draftMessage;
     },
-    [types.SET_AT_TOP](state) {
+    [types.SET_AT_TOP_IF_SAME_PARENT](state, parentId) {
+      // TMF parent changed during fetching, don't add a mark
+      if (state.parentId !== parentId) return;
       state.atTop = true;
     },
-    [types.SET_AT_BOTTOM](state) {
+    [types.SET_AT_BOTTOM_IF_SAME_PARENT](state, parentId) {
+      // TMF parent changed during fetching, don't add a mark
+      if (state.parentId !== parentId) return;
       state.atBottom = true;
     },
     [types.RESET_THREAD_STATE](state) {
@@ -163,9 +167,11 @@ export default {
     fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;
       if (!getters.childMessages.length) return;
+      const parentIdBeforeFetch = state.parentId;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
         childMessages => {
-          if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_TOP);
+          if (childMessages.length < FETCH_MESSAGES_LIMIT)
+            commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
           dispatch('focusOnMessage', {
             message: childMessages[childMessages.length - 1],
             block: 'start'
@@ -177,20 +183,23 @@ export default {
       if (state.atBottom || !canStartFetchingMessages(state)) return;
       const childMessages = getters.childMessages;
       if (!childMessages.length) return;
+      const parentIdBeforeFetch = state.parentId;
       dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
         childMessages => {
-          if (childMessages.length < FETCH_MESSAGES_LIMIT) commit(types.SET_AT_BOTTOM);
+          if (childMessages.length < FETCH_MESSAGES_LIMIT)
+            commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
           dispatch('focusOnMessage', { message: childMessages[0], block: 'end' });
         }
       );
     },
-    fetchInitialMessages: ({ dispatch, commit }) => {
+    fetchInitialMessages: ({ dispatch, state, commit }) => {
+      const parentIdBeforeFetch = state.parentId;
       return dispatch('fetchChildMessages').then(childMessages => {
         const lastMessage = childMessages[childMessages.length - 1];
         if (lastMessage) dispatch('focusOnMessage', { message: lastMessage, block: 'end' });
-        commit(types.SET_AT_BOTTOM);
+        commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
         if (childMessages.length < FETCH_MESSAGES_LIMIT) {
-          commit(types.SET_AT_TOP);
+          commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
         }
       });
     }
