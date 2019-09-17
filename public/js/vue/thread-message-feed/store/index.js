@@ -1,6 +1,7 @@
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import moment from 'moment';
+import composeQueryString from 'gitter-web-qs/compose';
 import * as rootTypes from '../../store/mutation-types';
 import VuexApiRequest from '../../store/vuex-api-request';
 import { generateChildMessageTmpId } from '../../store/mutations';
@@ -134,12 +135,8 @@ export default {
     ) => {
       commit(childMessagesVuexRequest.requestType);
       const options = { beforeId, afterId, limit };
-      const query = Object.keys(options)
-        .filter(key => options[key])
-        .map(key => key + '=' + options[key])
-        .join('&');
       return apiClient.room
-        .get(`/chatMessages/${state.parentId}/thread${query ? '?' + query : ''}`)
+        .get(`/chatMessages/${state.parentId}/thread${composeQueryString(options)}`)
         .then(childMessages => {
           commit(childMessagesVuexRequest.successType);
           commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });

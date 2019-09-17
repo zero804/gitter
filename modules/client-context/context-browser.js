@@ -1,7 +1,7 @@
 'use strict';
 
 var Backbone = require('backbone');
-var qs = require('gitter-web-qs');
+var parsedQuery = require('gitter-web-qs/parse');
 var _ = require('lodash');
 var Promise = require('bluebird');
 var clientEnv = require('gitter-client-env');
@@ -26,8 +26,8 @@ function getTroupeModel() {
     troupeModel = ctx.troupe;
   } else if (ctx.troupeId) {
     troupeModel = { id: ctx.troupeId };
-  } else if (qs.troupeId) {
-    troupeModel = { id: qs.troupeId };
+  } else if (parsedQuery.troupeId) {
+    troupeModel = { id: parsedQuery.troupeId };
   }
 
   return new Backbone.Model(troupeModel);
@@ -202,7 +202,7 @@ context.getAccessToken = Promise.method(function() {
 
   function checkToken() {
     // This is a very rough first attempt
-    var token = window.bearerToken || qs.bearerToken || ctx.accessToken;
+    var token = window.bearerToken || parsedQuery.bearerToken || ctx.accessToken;
     if (token) return token;
 
     iterations++;
