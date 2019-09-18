@@ -286,7 +286,12 @@ describe('thread message feed store', () => {
         {},
         // ideally, we would test the delayed mutation setting focusedAt to false, but we won't wait
         // 5 seconds for it, the risk and impact of focusedAt staying on are low
-        [{ type: rootTypes.UPDATE_MESSAGE, payload: { id: 'abc', focusedAt: 'start' } }],
+        [
+          {
+            type: rootTypes.UPDATE_MESSAGE,
+            payload: { id: 'abc', focusedAt: { block: 'start', timestamp: 1479427200000 } }
+          }
+        ],
         []
       );
     });

@@ -162,7 +162,11 @@ export default {
      */
     focusOnMessage: ({ commit }, { message, block }) => {
       if (!message) return;
-      setTemporaryMessageProp(commit, message.id, 'focusedAt', block);
+      commit(
+        rootTypes.UPDATE_MESSAGE,
+        { id: message.id, focusedAt: { block, timestamp: Date.now() } },
+        { root: true }
+      );
     },
     fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;

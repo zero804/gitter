@@ -82,7 +82,7 @@ describe('thread-message-feed chat-item', () => {
         ChatItem,
         {
           ...defaultProps,
-          message: { ...message, focusedAt: 'start' }
+          message: { ...message, focusedAt: { block: 'start', timestamp: Date.now() } }
         },
         addRoomToStore,
         { methods: { scrollIntoView: scrollIntoViewMock } }
