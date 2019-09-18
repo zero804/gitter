@@ -8,6 +8,11 @@ Developer facing:
 
  - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
 
+ # 20.3.3 - 2019-9-18
+ - Security fix related to access to room information, https://gitlab.com/gitlab-org/gitter/webapp/issues/2082
+    - Thanks to [@dhakalananda](https://hackerone.com/dhakalananda) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/25
+
 # 20.3.2 - 2019-9-12
 
  - Security fix related deleting OAuth clients and access tokens, https://gitlab.com/gitlab-org/gitter/webapp/issues/2053
