@@ -4,6 +4,9 @@
     - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
 
+Developer facing:
+
+ - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
 
 # 20.3.2 - 2019-9-12
 
