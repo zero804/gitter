@@ -175,12 +175,13 @@ export default {
       const parentIdBeforeFetch = state.parentId;
       dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
         childMessages => {
-          if (childMessages.length < FETCH_MESSAGES_LIMIT)
-            commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
+          // align last message to the top (pushes the new messages just above the TMF viewport)
           dispatch('focusOnMessage', {
             message: childMessages[childMessages.length - 1],
             block: 'start'
           });
+          if (childMessages.length < FETCH_MESSAGES_LIMIT)
+            commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
         }
       );
     },
@@ -191,9 +192,10 @@ export default {
       const parentIdBeforeFetch = state.parentId;
       dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
         childMessages => {
+          // align last message to the bottom (pushes the new messages just below the TMF viewport)
+          dispatch('focusOnMessage', { message: childMessages[0], block: 'end' });
           if (childMessages.length < FETCH_MESSAGES_LIMIT)
             commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
-          dispatch('focusOnMessage', { message: childMessages[0], block: 'end' });
         }
       );
     },
