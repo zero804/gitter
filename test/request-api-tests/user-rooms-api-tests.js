@@ -11,19 +11,13 @@ describe('user-rooms-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
-    if (this._skipFixtureSetup) return;
-
     request = require('supertest');
     app = require('../../server/api');
   });
 
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
-
   var fixture = fixtureLoader.setup({
-    deleteDocuments: {
-      Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() }]
-    },
-    user1: '#integrationUser1',
+    user1: { accessToken: 'web-internal' },
+    user2: { accessToken: 'web-internal' },
     troupe1: {
       security: 'PUBLIC',
       users: ['user1']
@@ -69,5 +63,20 @@ describe('user-rooms-api', function() {
         assert.strictEqual(chat.length, 0);
         assert.strictEqual(mention.length, 0);
       });
+  });
+
+  it('PATCH /v1/user/:userId/rooms/:roomId', () => {
+    return request(app)
+      .put(`/v1/user/${fixture.user1.id}/rooms/${fixture.troupe2.id}`)
+      .set('x-access-token', fixture.user1.accessToken)
+      .send({ favourite: 1 })
+      .expect(200);
+  });
+
+  it('PATCH /v1/user/:userId/rooms/:roomId is forbidden for unauthorized user', () => {
+    return request(app)
+      .patch(`/v1/user/${fixture.user2.id}/rooms/${fixture.troupe2.id}`)
+      .set('x-access-token', fixture.user2.accessToken)
+      .expect(403);
   });
 });

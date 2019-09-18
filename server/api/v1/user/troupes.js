@@ -17,65 +17,63 @@ function joinRoom(user, room, policy, options) {
   return roomWithPolicyService.joinRoom(options);
 }
 
-function performUpdateToUserRoom(req) {
+async function performUpdateToUserRoom(req) {
   var user = req.user;
   if (!user) throw new StatusError(401);
 
   var userId = user._id;
   var troupeId = req.params.userTroupeId;
   var policy = req.userRoomPolicy;
+  const [troupe, isMember] = await troupeService.findByIdLeanWithMembership(troupeId, userId);
+  const canJoin = await policy.canJoin();
+  if (!isMember && !canJoin) throw new StatusError(403);
 
-  return troupeService
-    .findByIdLeanWithMembership(troupeId, userId)
-    .spread(function(troupe, isMember) {
-      var updatedTroupe = req.body;
+  const updatedTroupe = req.body;
 
-      var promises = [];
+  const promises = [];
 
-      if ('favourite' in updatedTroupe) {
-        var fav = updatedTroupe.favourite;
+  if ('favourite' in updatedTroupe) {
+    const fav = updatedTroupe.favourite;
 
-        if (!fav || isMember) {
-          promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
-        } else {
-          // The user has added a favourite that they don't belong to
-          // Add them to the room first
-          if (!troupe.oneToOne) {
-            /* Ignore one-to-one rooms */
-            promises.push(
-              joinRoom(user, troupe, policy).then(function() {
-                return recentRoomService.updateFavourite(userId, troupeId, fav);
-              })
-            );
-          }
-        }
-      }
-
-      if ('updateLastAccess' in updatedTroupe) {
-        promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
-      }
-
-      if ('mode' in updatedTroupe) {
+    if (!fav || isMember) {
+      promises.push(recentRoomService.updateFavourite(userId, troupeId, fav));
+    } else {
+      // The user has added a favourite that they don't belong to
+      // Add them to the room first
+      if (!troupe.oneToOne) {
+        /* Ignore one-to-one rooms */
         promises.push(
-          userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode)
+          joinRoom(user, troupe, policy).then(function() {
+            return recentRoomService.updateFavourite(userId, troupeId, fav);
+          })
         );
       }
+    }
+  }
 
-      return Promise.all(promises);
-    })
-    .then(function() {
-      if (req.accepts(['text', 'json']) === 'text') return;
+  if ('updateLastAccess' in updatedTroupe) {
+    promises.push(recentRoomService.saveLastVisitedTroupeforUserId(userId, troupeId));
+  }
 
-      var strategy = new restSerializer.TroupeIdStrategy({
-        currentUserId: userId,
-        // include all these because it will replace the troupe in the context
-        includeTags: true,
-        includeProviders: true,
-        includeGroups: true
-      });
+  if ('mode' in updatedTroupe) {
+    promises.push(
+      userRoomModeUpdateService.setModeForUserInRoom(user, troupeId, updatedTroupe.mode)
+    );
+  }
 
-      return restSerializer.serializeObject(req.params.userTroupeId, strategy);
-    });
+  await Promise.all(promises);
+
+  if (req.accepts(['text', 'json']) === 'text') return;
+
+  const strategy = new restSerializer.TroupeIdStrategy({
+    currentUserId: userId,
+    // include all these because it will replace the troupe in the context
+    includeTags: true,
+    includeProviders: true,
+    includeGroups: true
+  });
+
+  return restSerializer.serializeObject(req.params.userTroupeId, strategy);
 }
 
 module.exports = {
