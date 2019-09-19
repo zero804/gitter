@@ -110,6 +110,7 @@ export default {
 .thread .chat-input__text-area {
   .dark-theme & {
     background-color: @dark-theme-thread-message-feed-bg-color;
+    color: @dark-theme-chat-main-text-color;
   }
 }
 </style>
