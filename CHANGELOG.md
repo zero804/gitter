@@ -3,6 +3,7 @@
  - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
     - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
+ - Dark theme style for TMF chat input text, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1598
 
 Developer facing:
 
