@@ -8,6 +8,7 @@
 Developer facing:
 
  - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
+ -  Clean up user-rooms-api-tests.js, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1599
 
  # 20.3.3 - 2019-9-18
  - Security fix related to access to room information, https://gitlab.com/gitlab-org/gitter/webapp/issues/2082
