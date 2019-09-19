@@ -378,7 +378,7 @@ function findFirstUnreadMessageId(troupeId, userId) {
 
 /**
  * Mongo timestamps have a resolution down to the second, whereas
- * sent times have a resolution down to the milliseond.
+ * sent times have a resolution down to the millisecond.
  * To ensure that there is an overlap, we need to slightly
  * extend the search range using these two functions.
  */
@@ -390,6 +390,26 @@ function sentAfter(objectId) {
   return new Date(objectId.getTimestamp().valueOf() - 1000);
 }
 
+function addBeforeFilter(query, beforeId) {
+  // Also add sent as this helps mongo by using the { troupeId, sent } index
+  // For some reason, mongodb doesn't do an index intersection on {_id} and {troupeId, sent} index
+  // and because the `_id` condition is used in the filter stage, it really does help
+  // to filter on `sent` to limit the amount of results ¯\_(ツ)_/¯
+  // It does, however, mean that the timestamp from _id needs to match the sent date otherwise one of
+  // the filters (beforeId or afterId) misses the message
+  query.where('sent').lte(sentBefore(new ObjectID(beforeId)));
+  query.where('_id').lt(new ObjectID(beforeId));
+}
+
+function addAfterFilter(query, afterId) {
+  // See addBeforeFilter comment above
+  query.where('sent').gte(sentAfter(new ObjectID(afterId)));
+  query.where('_id').gt(new ObjectID(afterId));
+}
+
+const validateSearchLimit = rawLimit =>
+  Math.min(rawLimit || DEFAULT_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
+
 /**
  * Finds all messages for thread message feed represented by parentId.
  *
@@ -400,19 +420,24 @@ function sentAfter(objectId) {
  *
  * @returns Array of last MAX_CHAT_MESSAGE_RESULTS messages in ascending order
  */
-async function findThreadChatMessages(troupeId, parentId) {
-  const messages = await ChatMessage.where('toTroupeId', troupeId)
-    .where('parentId', parentId)
-    .sort({ sent: 'desc' })
-    .limit(MAX_CHAT_MESSAGE_RESULTS) // TODO: handle infinite scrolling in TMF
-    .lean()
-    .exec();
-  mongooseUtils.addIdToLeanArray(messages);
-  return messages.reverse();
-}
+async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId, limit } = {}) {
+  const q = ChatMessage.where('toTroupeId', troupeId);
+  q.where('parentId', parentId);
 
-const validateSearchLimit = rawLimit =>
-  Math.min(rawLimit || DEFAULT_CHAT_MESSAGE_RESULTS, MAX_CHAT_MESSAGE_RESULTS);
+  if (beforeId) addBeforeFilter(q, beforeId);
+  if (afterId) addAfterFilter(q, afterId);
+
+  // Reverse the initial order for afterId
+  const sentOrder = afterId ? 'asc' : 'desc';
+  q.sort({ sent: sentOrder });
+
+  q.limit(validateSearchLimit(limit));
+
+  const messages = await q.lean().exec();
+  mongooseUtils.addIdToLeanArray(messages);
+  if (sentOrder === 'desc') messages.reverse();
+  return messages;
+}
 
 async function findChatMessagesInRange(
   troupeId,
@@ -428,27 +453,14 @@ async function findChatMessagesInRange(
   }
   let q = ChatMessage.where('toTroupeId', troupeId);
 
-  if (beforeId) {
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q = q.where('sent').lte(sentBefore(new ObjectID(beforeId)));
-    q = q.where('_id').lt(new ObjectID(beforeId));
-  }
+  if (beforeId) addBeforeFilter(q, beforeId);
 
   if (beforeInclId) {
     // Also add sent as this helps mongo by using the { troupeId, sent } index
     q = q.where('sent').lte(sentBefore(new ObjectID(beforeInclId)));
     q = q.where('_id').lte(new ObjectID(beforeInclId)); // Note: less than *or equal to*
   }
-
-  let sentOrder = 'desc';
-  if (afterId) {
-    // Reverse the initial order for afterId
-    sentOrder = 'asc';
-
-    // Also add sent as this helps mongo by using the { troupeId, sent } index
-    q = q.where('sent').gte(sentAfter(new ObjectID(afterId)));
-    q = q.where('_id').gt(new ObjectID(afterId));
-  }
+  if (afterId) addAfterFilter(q, afterId);
 
   q.where('parentId').exists(false);
 
@@ -456,6 +468,8 @@ async function findChatMessagesInRange(
     q.hint({ toTroupeId: 1, sent: -1 });
   }
 
+  // Reverse the initial order for afterId
+  const sentOrder = afterId ? 'asc' : 'desc';
   q = q.sort(sort || { sent: sentOrder }).limit(validateSearchLimit(limit));
 
   if (validatedSkip) {

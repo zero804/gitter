@@ -1,9 +1,10 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import ThreadHeader from './thread-header.vue';
 import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
+import Intersect from './intersect';
 
 export default {
   name: 'ThreadMessageFeed',
@@ -11,7 +12,8 @@ export default {
     ChatInput,
     ThreadHeader,
     LoadingSpinner,
-    ChatItem
+    ChatItem,
+    Intersect
   },
   computed: {
     ...mapGetters({
@@ -23,6 +25,12 @@ export default {
       childMessagesRequest: state => state.threadMessageFeed.childMessagesRequest,
       user: 'user',
       darkTheme: 'darkTheme'
+    })
+  },
+  methods: {
+    ...mapActions({
+      fetchOlderMessages: 'threadMessageFeed/fetchOlderMessages',
+      fetchNewerMessages: 'threadMessageFeed/fetchNewerMessages'
     })
   }
 };
@@ -44,13 +52,18 @@ export default {
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
+          <intersect @enter="fetchOlderMessages()">
+            <div></div>
+          </intersect>
           <chat-item
             v-for="message in childMessages"
-            v-else
             :key="message.id"
             :message="message"
             :use-compact-styles="true"
           />
+          <intersect @enter="fetchNewerMessages()">
+            <div></div>
+          </intersect>
         </div>
         <chat-input :user="user" thread />
       </section>
@@ -91,8 +104,6 @@ export default {
 }
 
 .body {
-  overflow-x: hidden;
-  overflow-y: auto;
   height: 100%;
   width: 100%;
   display: flex;
@@ -107,9 +118,10 @@ export default {
 }
 
 .content {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  overflow: hidden;
 }
 
 .error-box {
@@ -129,8 +141,8 @@ export default {
 
 .chat-messages {
   width: 100%;
-  height: 100%;
   display: inline-block;
   overflow: auto;
+  flex-grow: 1;
 }
 </style>
