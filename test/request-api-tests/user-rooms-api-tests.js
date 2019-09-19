@@ -8,8 +8,6 @@ var assert = require('assert');
 describe('user-rooms-api', function() {
   var app, request;
 
-  fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
-
   before(function() {
     request = require('supertest');
     app = require('../../server/api');
