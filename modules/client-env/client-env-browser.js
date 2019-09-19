@@ -1,14 +1,14 @@
 /*eslint-env browser */
 
 'use strict';
-var qs = require('gitter-web-qs');
+var parsedQuery = require('gitter-web-qs/parse');
 
 var env = window.gitterClientEnv || {};
 // Allow env through the querystring
-if (qs.env) {
+if (parsedQuery.env) {
   var m;
   try {
-    m = JSON.parse(qs.env);
+    m = JSON.parse(parsedQuery.env);
   } catch (e) {
     // Ignore errors here
   }

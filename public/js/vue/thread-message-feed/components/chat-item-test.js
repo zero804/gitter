@@ -74,7 +74,20 @@ describe('thread-message-feed chat-item', () => {
         { methods: { scrollIntoView: scrollIntoViewMock } }
       );
       expect(wrapper.element).toMatchSnapshot();
-      expect(scrollIntoViewMock.mock.calls.length).toBe(1);
+      expect(scrollIntoViewMock.mock.calls[0]).toEqual(['smooth', 'center']);
+    });
+    it('focusedAt - scrolls into view', () => {
+      const scrollIntoViewMock = jest.fn();
+      mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, focusedAt: { block: 'start', timestamp: Date.now() } }
+        },
+        addRoomToStore,
+        { methods: { scrollIntoView: scrollIntoViewMock } }
+      );
+      expect(scrollIntoViewMock.mock.calls[0]).toEqual(['auto', 'start']);
     });
   });
 });

@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 import { pojo as sortsAndFilters } from 'gitter-realtime-client/lib/sorts-filters';
 
 function sortRooms(a, b) {

@@ -1,5 +1,3 @@
-const noop = () => {};
-
 /**
  * Helper for testing action with expected mutations inspired in
  * https://vuex.vuejs.org/en/testing.html
@@ -9,7 +7,7 @@ const noop = () => {};
  * @param {Object} state will be provided to the action
  * @param {Array} [expectedMutations=[]] mutations expected to be committed
  * @param {Array} [expectedActions=[]] actions expected to be dispatched
- * @param {Function} [done=noop] to be executed after the tests
+ * @param {Object} [actionResults={}] to be executed after the tests
  * @return {Promise}
  *
  * @example
@@ -27,7 +25,7 @@ const noop = () => {};
  *    { type: 'actionName', payload: {param: 'foobar'}},
  *    { type: 'actionName1'}
  *   ]
- *   done,
+ *   { 'actionName': 'expectedResult'}
  * );
  *
  * @example
@@ -37,6 +35,7 @@ const noop = () => {};
  *   state, //state
  *   [ { type: types.MUTATION} ], // expected mutations
  *   [], // expected actions
+ *   {actionName: 'expectedResult'} // dispatching action will return
  * ).then(done)
  * .catch(done.fail);
  */
@@ -46,7 +45,7 @@ function actionHelper(
   state,
   expectedMutations = [],
   expectedActions = [],
-  done = noop
+  actionResults = {}
 ) {
   const mutations = [];
   const actions = [];
@@ -71,7 +70,7 @@ function actionHelper(
     }
 
     actions.push(dispatchedAction);
-    return Promise.resolve();
+    return Promise.resolve(actionResults[type]);
   };
 
   const validateResults = () => {
@@ -82,7 +81,6 @@ function actionHelper(
       mutations: expectedMutations,
       actions: expectedActions
     });
-    done();
   };
 
   const result = action(

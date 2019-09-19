@@ -10,7 +10,12 @@ module.exports = {
   index: asyncHandler(async req => {
     const userId = req.user && req.user.id;
     const { troupeId, chatMessageId } = req.params;
-    const chatMessages = await chatService.findThreadChatMessages(troupeId, chatMessageId);
+    const { beforeId, afterId, limit } = req.query;
+    const chatMessages = await chatService.findThreadChatMessages(troupeId, chatMessageId, {
+      beforeId,
+      afterId,
+      limit
+    });
     const strategy = new restSerializer.ChatStrategy({
       currentUserId: userId,
       troupeId: troupeId

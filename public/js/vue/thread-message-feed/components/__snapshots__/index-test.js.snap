@@ -27,6 +27,14 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
           Error: Therad messages can't be fetched.
         
         </div>
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+          
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
@@ -66,6 +74,14 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
           Loading thread 
           <loading-spinner-stub />
         </div>
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+          
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
@@ -98,6 +114,12 @@ exports[`thread-message-feed index child messages opened - matches snapshot 1`] 
           usecompactstyles="true"
         />
          
+        <!---->
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+         
         <chat-item-stub
           message="[object Object]"
           usecompactstyles="true"
@@ -106,6 +128,10 @@ exports[`thread-message-feed index child messages opened - matches snapshot 1`] 
           message="[object Object]"
           usecompactstyles="true"
         />
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
@@ -146,6 +172,15 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
           usecompactstyles="true"
         />
          
+        <!---->
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+          
+        <intersect-stub>
+          <div />
+        </intersect-stub>
       </div>
        
       <chat-input-stub
