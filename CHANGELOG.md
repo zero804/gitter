@@ -4,11 +4,12 @@
     - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
  - Dark theme style for TMF chat input text, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1598
+ - Infinite scrolling of Thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1592
 
 Developer facing:
 
  - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
- -  Clean up user-rooms-api-tests.js, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1599
+ - Clean up user-rooms-api-tests.js, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1599
 
  # 20.3.3 - 2019-9-18
  - Security fix related to access to room information, https://gitlab.com/gitlab-org/gitter/webapp/issues/2082
