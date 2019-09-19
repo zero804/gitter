@@ -393,7 +393,7 @@ function sentAfter(objectId) {
 function addBeforeFilter(query, beforeId) {
   // Also add sent as this helps mongo by using the { troupeId, sent } index
   // For some reason, mongodb doesn't do an index intersection on {_id} and {troupeId, sent} index
-  // ane because the `_id` condition is used in the filter stage, it really does help
+  // and because the `_id` condition is used in the filter stage, it really does help
   // to filter on `sent` to limit the amount of results ¯\_(ツ)_/¯
   // It does, however, mean that the timestamp from _id needs to match the sent date otherwise one of
   // the filters (beforeId or afterId) misses the message

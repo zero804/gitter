@@ -37,11 +37,12 @@ export default {
   },
   watch: {
     message: function(newMessage, oldMessage) {
-      // see mounted() for highlighted and focusedAt explanation
+      // highlighted is used for bringing users attention to permalinked message
       if (newMessage.highlighted && !oldMessage.highlighted) {
         this.scrollIntoView('smooth', 'center');
       } else if (
-        // either the focusedAt property is new, or it has changed
+        // focusedAt is ensuring this chat item is in view, e.g. when opening TMF we focus on the newest message
+        // this condition is met when either the focusedAt property is new, or it has changed
         newMessage.focusedAt &&
         (!oldMessage.focusedAt || newMessage.focusedAt !== oldMessage.focusedAt)
       ) {
