@@ -27,7 +27,7 @@ var commandsList = [
     completion: 'ban @',
     regexp: /^\/ban/,
     action: function(text) {
-      var userMatch = text.match(/\/ban @([\w\-]+)(\s+(removemsgs))?/);
+      var userMatch = text.match(/\/ban @([\w\-.]+)(\s+(removemsgs))?/);
       if (!userMatch) return;
       var user = userMatch[1];
       var removeMessages = !!userMatch[3];
