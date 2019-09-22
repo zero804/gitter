@@ -3,9 +3,28 @@ stages:
   - build_unit_test
   - pre_deploy
   - deploy
+  - security
 
 variables:
   DOCKER_DRIVER: overlay2
+
+.webapp_variables: &webapp_variables
+  BLUEBIRD_DEBUG: 1
+  NEO4J_AUTH: none
+
+.webapp_services:
+  - &webapp_service_mongo
+    name: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+    alias: mongo
+  - &webapp_service_redis
+    name: redis:3.0.3
+    alias: redis
+  - &webapp_service_elasticsearch
+    name: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+    alias: elasticsearch
+  - &webapp_service_neo4j
+    name: neo4j:2.3
+    alias: neo4j
 
 .node_job: &node_job
   image: registry.gitlab.com/gitlab-org/gitter/webapp
@@ -34,24 +53,16 @@ validate:
     # to re-use the scripts that GitLab has, https://gitlab.com/gitlab-org/gitlab-ce/issues/57010
     - npm run prettier -- --check "**/*.{js,vue}"
 
-.test_variables: &test_variables
-  BLUEBIRD_DEBUG: 1
-  NEO4J_AUTH: none
-
 .test_job: &test_job
   <<: *node_job
   variables:
-    <<: *test_variables
+    <<: *webapp_variables
   stage: build_unit_test
   services:
-    - name: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-      alias: mongo
-    - name: redis:3.0.3
-      alias: redis
-    - name: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-      alias: elasticsearch
-    - name: neo4j:2.3
-      alias: neo4j
+    - *webapp_service_mongo
+    - *webapp_service_redis
+    - *webapp_service_elasticsearch
+    - *webapp_service_neo4j
   script:
     - make ci-test
 
@@ -64,7 +75,7 @@ test:
 test-all:
   <<: *test_job
   variables:
-    <<: *test_variables
+    <<: *webapp_variables
     ALLOW_FLAKEY_TESTS: 1
   only:
     - release/*
@@ -73,7 +84,7 @@ test-all:
 .test_e2e_job: &test_e2e_job
   <<: *test_job
   variables:
-    <<: *test_variables
+    <<: *webapp_variables
     ENABLE_FIXTURE_ENDPOINTS: 1
     DISABLE_GITHUB_API: 1
     NODE_ENV: test-docker
@@ -352,3 +363,30 @@ renovate:
     - docker:dind
   tags:
     - docker
+
+# Security reports
+# =========================================================
+include:
+  - template: SAST.gitlab-ci.yml
+  # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
+  #- template: DAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
+
+dependency_scanning:
+  stage: security
+  variables:
+    DS_PYTHON_VERSION: 2
+  tags:
+    - docker
+
+container_scanning:
+  stage: security
+  variables:
+    CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+
+.sast:
+  stage: security
+#
+# TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
