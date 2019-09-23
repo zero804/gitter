@@ -2,7 +2,6 @@
 var Mutant = require('mutantjs');
 var _ = require('lodash');
 var rafUtils = require('./raf-utils');
-var isMobile = require('./is-mobile');
 var passiveEventListener = require('./passive-event-listener');
 var raf = require('./raf');
 
@@ -287,19 +286,7 @@ module.exports = (function() {
     },
 
     scroll: function(pixelsFromTop) {
-      if (isMobile()) {
-        // haha, you think scrolling is easy? WELCOME TO MOBILE!
-        // https://code.google.com/p/android/issues/detail?id=19625
-        // http://stackoverflow.com/questions/12225456/jquery-scrolltop-does-not-work-in-scrolling-div-on-mobile-browsers-alternativ
-
-        // ios and android will ignore scrollTop if the element is currently being scrolled,
-        // probably due to internal performance reasons. This forces the element to scroll:
-        this._target.style.overflow = 'hidden';
-        this._target.scrollTop = pixelsFromTop;
-        this._target.style.overflow = '';
-      } else {
-        this._target.scrollTop = pixelsFromTop;
-      }
+      this._target.scrollTop = pixelsFromTop;
     }
   };
 
