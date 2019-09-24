@@ -5,6 +5,7 @@
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
  - Dark theme style for TMF chat input text, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1598
  - Infinite scrolling of Thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1592
+ - Fix an invalid robots.txt API entry, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1601 
 
 Developer facing:
 
