@@ -3,7 +3,6 @@
 
 const ObjectID = require('mongodb').ObjectID;
 const shutdown = require('shutdown');
-const avatars = require('gitter-web-avatars');
 const userService = require('gitter-web-users');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const emailNotificationService = require('gitter-web-email-notifications');
