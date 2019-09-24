@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var mailer = env.mailer;
 var Promise = require('bluebird');
+const _ = require('lodash');
 var cdn = require('gitter-web-cdn');
 var mailerTemplate = require('./mailer-template');
 var debug = require('debug')('gitter:app:mailer');
@@ -30,34 +31,34 @@ exports.sendEmail = function(options) {
 
 function addedToRoomMapping(data) {
   return {
-    NAME: data.recipientName,
-    SENDER: data.senderName,
-    ROOMURI: data.roomUri,
-    ROOMURL: data.roomUrl,
-    UNSUB: data.unsubscribeUrl,
+    NAME: _.escape(data.recipientName),
+    SENDER: _.escape(data.senderName),
+    ROOMURI: _.escape(data.roomUri),
+    ROOMURL: _.escape(data.roomUrl),
+    UNSUB: _.escape(data.unsubscribeUrl),
     LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
 
 function invitationMapping(data) {
   return {
-    NAME: data.recipientName,
-    DATE: data.date,
-    SENDER: data.senderName,
-    ROOMURI: data.roomUri,
-    ROOMURL: data.roomUrl,
-    INVITEURL: data.inviteUrl,
+    NAME: _.escape(data.recipientName),
+    DATE: _.escape(data.date),
+    SENDER: _.escape(data.senderName),
+    ROOMURI: _.escape(data.roomUri),
+    ROOMURL: _.escape(data.roomUrl),
+    INVITEURL: _.escape(data.inviteUrl),
     LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
 
 function unreadNoticationMapping(data) {
   return {
-    NAME: data.recipientName,
-    SENDER: data.senderName,
-    ROOMURI: data.roomUri,
-    ROOMURL: data.roomUrl,
-    UNSUB: data.unsubscribeUrl,
+    NAME: _.escape(data.recipientName),
+    SENDER: _.escape(data.senderName),
+    ROOMURI: _.escape(data.roomUri),
+    ROOMURL: _.escape(data.roomUrl),
+    UNSUB: _.escape(data.unsubscribeUrl),
     HTML: mailerTemplate('unread_notification_html', data),
     MICRODATA: mailerTemplate('unread_notification_microdata', data),
     PLAINTEXT: mailerTemplate('unread_notification', data),
@@ -68,19 +69,19 @@ function unreadNoticationMapping(data) {
 function createdRoomMapping(data) {
   var twitterSnippet = data.isPublic
     ? '<tr><td><br><a href="' +
-      data.twitterURL +
+      _.escape(data.twitterURL) +
       '" style="text-decoration: none" target="_blank" class="button-twitter">Share on Twitter</a></td></tr>'
     : '';
 
   return {
-    NAME: data.recipientName,
-    SENDER: data.senderName,
-    ROOMURI: data.roomUri,
-    ROOMURL: data.roomUrl,
-    UNSUB: data.unsubscribeUrl,
-    TWITTERURL: twitterSnippet,
-    ORGNOTE: '', // No used since splitsville
-    ROOMTYPE: data.roomType,
+    NAME: _.escape(data.recipientName),
+    SENDER: _.escape(data.senderName),
+    ROOMURI: _.escape(data.roomUri),
+    ROOMURL: _.escape(data.roomUrl),
+    UNSUB: _.escape(data.unsubscribeUrl),
+    TWITTERURL: _.escape(twitterSnippet),
+    ORGNOTE: _.escape(''), // No used since splitsville
+    ROOMTYPE: _.escape(data.roomType),
     LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
   };
 }
