@@ -1,8 +1,6 @@
 {
   "web": {
-    "apiBasePath": "https://beta.gitter.im/api_staging",
-    "for_nomad_only_oauthRedirectorBasepath": "http://http-router.service.beta.gitter",
-    "for_nomad_only_cookieDomain": ".service.beta.gitter"
+    "apiBasePath": "https://beta.gitter.im/api_staging"
   },
   "ws": {
     "hostname": "ws-beta-staging.gitter.im",
