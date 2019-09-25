@@ -67,13 +67,19 @@ describe('thread message feed store', () => {
         };
         apiClient.room.post.mockReset();
       });
-      it('sendMessage creates message object and submits it to the collection', async () => {
+      it('sendMessage creates message object, submits it to the collection and focuses UI on it', async () => {
         apiClient.room.post.mockResolvedValue(storedMessage);
-        await testAction(actions.sendMessage, undefined, initialState, [
-          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
-          { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
-          { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [storedMessage] }
-        ]);
+        await testAction(
+          actions.sendMessage,
+          undefined,
+          initialState,
+          [
+            { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [tmpMessage] },
+            { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
+            { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [storedMessage] }
+          ],
+          [{ type: 'focusOnMessage', payload: { message: storedMessage, block: 'end' } }]
+        );
         expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
           text: 'testMessage',
           parentId: '5d11d571a2405419771cd3ee'

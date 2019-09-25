@@ -106,7 +106,7 @@ export default {
     updateDraftMessage: ({ commit }, newDraftMessage) => {
       commit(types.UPDATE_DRAFT_MESSAGE, newDraftMessage);
     },
-    sendMessage: ({ state, commit, rootState }) => {
+    sendMessage: ({ state, commit, dispatch, rootState }) => {
       const messagePayload = {
         text: state.draftMessage,
         parentId: state.parentId
@@ -125,6 +125,7 @@ export default {
           // the message from the API response fully replaces the `tmpMessage` and because it
           // doesn't contain the `loading` attribute, UI will hide the loading indicator
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
+          dispatch('focusOnMessage', { message, block: 'end' });
         })
         .catch(() => {
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true, loading: false }], {
