@@ -5,13 +5,23 @@
  - Update epics roadmap links to use updated Gitter label( ~"Gitter" -> ~"group::gitter"), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1595
  - Dark theme style for TMF chat input text, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1598
  - Infinite scrolling of Thread message feed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1592
- - Fix an invalid robots.txt API entry, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1601 
+ - Fix an invalid robots.txt API entry, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1601
 
 Developer facing:
 
  - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
  - Clean up user-rooms-api-tests.js, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1599
  - Generate security reports in CI (for [GitLab security dashboard](https://gitlab.com/help/user/application_security/security_dashboard/index.md)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1375
+
+
+# 20.3.4 - 2019-9-25
+
+ - Security fix related to banning users, https://gitlab.com/gitlab-org/gitter/webapp/issues/2100
+    - Thanks to [@n0n4me](https://hackerone.com/n0n4me) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/28
+ - Security fix related to OAuth flow, https://gitlab.com/gitlab-org/gitter/webapp/issues/2278
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/26
+
 
 # 20.3.3 - 2019-9-18
 
