@@ -13,6 +13,7 @@ Developer facing:
  - Script to add a user as an extra admin of a group, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1597
  - Clean up user-rooms-api-tests.js, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1599
  - Generate security reports in CI (for [GitLab security dashboard](https://gitlab.com/help/user/application_security/security_dashboard/index.md)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1375
+ - Have an option to send email notification with real room messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1602
 
 
 # 20.3.4 - 2019-9-25
