@@ -1,4 +1,4 @@
-# 20.4.0 - *upcoming*
+# 20.4.0 - 2019-9-25
 
  - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
     - Thanks to [@isiahmeadows](https://gitlab.com/isiahmeadows) for the contribution
