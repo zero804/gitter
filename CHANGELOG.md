@@ -2,6 +2,11 @@
 
  - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
 
+# 20.4.1 - 2019-9-26
+ - Security fix related to message text processing, https://gitlab.com/gitlab-org/gitter/webapp/issues/2083
+    - Thanks to [@jaykpatel](https://hackerone.com/jaykpatel) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/29
+
 # 20.4.0 - 2019-9-25
 
  - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
