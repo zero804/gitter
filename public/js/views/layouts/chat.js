@@ -9,6 +9,7 @@ var issuableDecorator = require('../chat/decorators/issuableDecorator');
 var commitDecorator = require('../chat/decorators/commitDecorator');
 var mentionDecorator = require('../chat/decorators/mentionDecorator');
 var emojiDecorator = require('../chat/decorators/emojiDecorator');
+const linkDecorator = require('../chat/decorators/linkDecorator');
 require('../behaviors/isomorphic');
 
 var ChatLayout = Marionette.LayoutView.extend({
@@ -30,7 +31,13 @@ var ChatLayout = Marionette.LayoutView.extend({
   initChatRegion: function(optionsForRegion) {
     var monitorUnreadItems = Marionette.getOption(this, 'monitorUnreadItems');
 
-    const decorators = [issuableDecorator, commitDecorator, mentionDecorator, emojiDecorator];
+    const decorators = [
+      issuableDecorator,
+      commitDecorator,
+      mentionDecorator,
+      emojiDecorator,
+      linkDecorator
+    ];
 
     return new ChatContainerView(
       optionsForRegion({
