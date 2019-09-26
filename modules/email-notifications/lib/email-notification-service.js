@@ -14,6 +14,7 @@ var moment = require('moment');
 var Promise = require('bluebird');
 var i18nFactory = require('gitter-web-i18n');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
+const { sanitizeChatText } = require('./sanitizer');
 
 /*
  * Return a nice sane
@@ -146,6 +147,9 @@ module.exports = {
 
         troupesWithUnreadCounts.forEach(function(d) {
           d.truncated = d.chats.length < d.unreadCount;
+          d.chats.forEach(chat => {
+            chat.text = sanitizeChatText(chat.text);
+          });
         });
 
         var subject = calculateSubjectForUnreadEmail(i18n, troupesWithUnreadCounts);
