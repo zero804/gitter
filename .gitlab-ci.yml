@@ -366,27 +366,27 @@ renovate:
 
 # Security reports
 # =========================================================
-# include:
-#   - template: SAST.gitlab-ci.yml
-#   # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
-#   #- template: DAST.gitlab-ci.yml
-#   - template: Dependency-Scanning.gitlab-ci.yml
-#   - template: Container-Scanning.gitlab-ci.yml
+include:
+  - template: SAST.gitlab-ci.yml
+  # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
+  #- template: DAST.gitlab-ci.yml
+  - template: Dependency-Scanning.gitlab-ci.yml
+  - template: Container-Scanning.gitlab-ci.yml
 
-# dependency_scanning:
-#   stage: security
-#   variables:
-#     DS_PYTHON_VERSION: 2
-#   tags:
-#     - docker
+dependency_scanning:
+  stage: security
+  variables:
+    DS_PYTHON_VERSION: 2
+  tags:
+    - docker
 
-# container_scanning:
-#   stage: security
-#   variables:
-#     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
-#     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+container_scanning:
+  stage: security
+  variables:
+    CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
-# .sast:
-#   stage: security
-#
+.sast:
+  stage: security
+
 # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
