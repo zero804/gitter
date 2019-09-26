@@ -5,6 +5,7 @@ const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const pushState = require('../../../utils/browser/pushState');
+const linkDecorator = require('../../../views/chat/decorators/linkDecorator');
 
 export default {
   name: 'ChatItem',
@@ -50,11 +51,16 @@ export default {
       }
     }
   },
+  updated: function() {
+    this.decorate();
+  },
   mounted: function() {
     // highlighted is used for bringing users attention to permalinked message
     if (this.message.highlighted) this.scrollIntoView('smooth', 'center');
     // focusedAt is ensuring this chat item is in view, e.g. when opening TMF we focus on the newest message
     else if (this.message.focusedAt) this.scrollIntoView('auto', this.message.focusedAt.block);
+
+    this.decorate();
   },
   methods: {
     setPermalinkLocation: function() {
@@ -62,6 +68,9 @@ export default {
     },
     scrollIntoView: function(behavior, block) {
       this.$el.scrollIntoView({ block, behavior });
+    },
+    decorate: function() {
+      linkDecorator.decorate(this);
     }
   }
 };

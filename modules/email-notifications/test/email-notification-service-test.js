@@ -9,100 +9,102 @@ var config = require('gitter-web-env').config;
 
 var BASE_EMAIL_PATH = config.get('email:emailBasePath');
 
-var EMAIL_DATA = [
-  {
-    troupe: {
-      id: '53d61acc1a1c8bd81c69ce23',
-      uri: 'gitterHQ/gitter',
-      oneToOne: false,
-      userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
-      url: '/gitterHQ/gitter',
-      urlUserMap: false,
-      nameUserMap: false
-    },
-    unreadCount: 1,
-    unreadItems: ['5405bfdd66579b000004df1a'],
-    chats: [
-      {
-        id: '5405bfdd66579b000004df1a',
-        text: 'GOOD STUFF',
-        html: 'GOOD STUFF',
-        sent: '2014-09-02T13:02:21.343Z',
-        mentions: [],
-        fromUser: {
-          id: '53cf8aa8fe44f8028eb727fb',
-          username: 'gitterawesome',
-          displayName: 'gitterawesome',
-          avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
-          avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
-        }
-      },
-      {
-        id: '5405bfdd66579b000004df1a',
-        text: 'AWesome',
-        html: 'AWesome',
-        sent: '2014-09-02T13:02:21.343Z',
-        mentions: [],
-        fromUser: {
-          id: '53cf8aa8fe44f8028eb727fb',
-          username: 'gitterawesome',
-          displayName: 'gitterawesome',
-          avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
-          avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
-        }
-      }
-    ]
+const TROUPE1 = {
+  troupe: {
+    id: '53d61acc1a1c8bd81c69ce23',
+    uri: 'gitterHQ/gitter',
+    oneToOne: false,
+    userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
+    url: '/gitterHQ/gitter',
+    urlUserMap: false,
+    nameUserMap: false
   },
-  {
-    troupe: {
-      id: '53d61acc1a1c8bd81c69ce23',
-      uri: 'gitterHQ/nibbles',
-      oneToOne: false,
-      userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
-      url: '/gitterHQ/gitter',
-      urlUserMap: false,
-      nameUserMap: false
-    },
-    unreadCount: 50,
-    unreadItems: ['5405bfdd66579b000004df1a'],
-    chats: [
-      {
-        id: '5405bfdd66579b000004df1a',
-        text: 'GOOD STUFF',
-        html: 'GOOD STUFF',
-        sent: '2014-09-02T13:02:21.343Z',
-        mentions: [],
-        fromUser: {
-          id: '53cf8aa8fe44f8028eb727fb',
-          username: 'gitterawesome',
-          displayName: 'gitterawesome',
-          avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
-          avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
-        }
-      },
-      {
-        id: '5405bfdd66579b000004df1a',
-        text: 'AWesome',
-        html: 'AWesome',
-        sent: '2014-09-02T13:02:21.343Z',
-        mentions: [],
-        fromUser: {
-          id: '53cf8aa8fe44f8028eb727fb',
-          username: 'gitterawesome',
-          displayName: 'gitterawesome',
-          avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
-          avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
-        }
+  unreadCount: 1,
+  unreadItems: ['5405bfdd66579b000004df1a'],
+  chats: [
+    {
+      id: '5405bfdd66579b000004df1a',
+      text: 'GOOD STUFF',
+      html: 'GOOD STUFF',
+      sent: '2014-09-02T13:02:21.343Z',
+      mentions: [],
+      fromUser: {
+        id: '53cf8aa8fe44f8028eb727fb',
+        username: 'gitterawesome',
+        displayName: 'gitterawesome',
+        avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
+        avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
       }
-    ]
-  }
-];
+    },
+    {
+      id: '5405bfdd66579b000004df1a',
+      text: 'AWesome',
+      html: 'AWesome',
+      sent: '2014-09-02T13:02:21.343Z',
+      mentions: [],
+      fromUser: {
+        id: '53cf8aa8fe44f8028eb727fb',
+        username: 'gitterawesome',
+        displayName: 'gitterawesome',
+        avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
+        avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
+      }
+    }
+  ]
+};
+
+const TROUPE2 = {
+  troupe: {
+    id: '53d61acc1a1c8bd81c69ce23',
+    uri: 'gitterHQ/nibbles',
+    oneToOne: false,
+    userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
+    url: '/gitterHQ/gitter',
+    urlUserMap: false,
+    nameUserMap: false
+  },
+  unreadCount: 50,
+  unreadItems: ['5405bfdd66579b000004df1a'],
+  chats: [
+    {
+      id: '5405bfdd66579b000004df1a',
+      text: 'GOOD STUFF',
+      html: 'GOOD STUFF',
+      sent: '2014-09-02T13:02:21.343Z',
+      mentions: [],
+      fromUser: {
+        id: '53cf8aa8fe44f8028eb727fb',
+        username: 'gitterawesome',
+        displayName: 'gitterawesome',
+        avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
+        avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
+      }
+    },
+    {
+      id: '5405bfdd66579b000004df1a',
+      text: 'AWesome',
+      html: 'AWesome',
+      sent: '2014-09-02T13:02:21.343Z',
+      mentions: [],
+      fromUser: {
+        id: '53cf8aa8fe44f8028eb727fb',
+        username: 'gitterawesome',
+        displayName: 'gitterawesome',
+        avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
+        avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
+      }
+    }
+  ]
+};
+const EMAIL_DATA = [TROUPE1, TROUPE2];
 
 describe('email-notification-service', function() {
   describe('unread notifications', function() {
     var emailNotificationService;
     var lang;
     var emailPayload;
+
+    const user = { id: '5405bfdd66579b000004df1a' };
 
     beforeEach(function() {
       emailPayload = null;
@@ -128,8 +130,6 @@ describe('email-notification-service', function() {
     });
 
     it('should send emails about unread items', function() {
-      var user = { id: '5405bfdd66579b000004df1a' };
-
       return emailNotificationService
         .sendUnreadItemsNotification(user, EMAIL_DATA)
         .then(function() {
@@ -142,8 +142,6 @@ describe('email-notification-service', function() {
 
     it('should send emails about unread items in de', function() {
       lang = 'de';
-      var user = { id: '5405bfdd66579b000004df1a' };
-
       return emailNotificationService
         .sendUnreadItemsNotification(user, EMAIL_DATA)
         .then(function() {
@@ -154,9 +152,8 @@ describe('email-notification-service', function() {
         });
     });
 
-    it('should send emails about unread items in an unknown langage', function() {
+    it('should send emails about unread items in an unknown language', function() {
       lang = 'gobbledegook';
-      var user = { id: '5405bfdd66579b000004df1a' };
 
       return emailNotificationService
         .sendUnreadItemsNotification(user, EMAIL_DATA)
@@ -166,6 +163,33 @@ describe('email-notification-service', function() {
             'Unread messages in gitterHQ/gitter and gitterHQ/nibbles'
           );
         });
+    });
+
+    it('should escape RTLO and IDN URLs in unread messages', () => {
+      const textToBeEscaped =
+        'You will find your MP3 at http://example.com/evil\u202E3pm.exe and do not forget to use http://\u0261itlab.com';
+      const chat = {
+        id: '5405bfdd66579b000004df1a',
+        text: textToBeEscaped,
+        html: '[DUMMY MARKDOWN HTML, WE ONLY TEST THE TEXT]',
+        sent: '2014-09-02T13:02:21.343Z',
+        mentions: [],
+        fromUser: {
+          id: '53cf8aa8fe44f8028eb727fb',
+          username: 'gitterawesome',
+          displayName: 'gitterawesome',
+          avatarUrlSmall: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=60',
+          avatarUrlMedium: 'https://avatars.githubusercontent.com/u/7022301?v=2&s=128'
+        }
+      };
+      const testData = [{ ...TROUPE1, chats: [chat] }];
+
+      return emailNotificationService.sendUnreadItemsNotification(user, testData).then(function() {
+        assert.equal(
+          emailPayload.data.troupesWithUnreadCounts[0].chats[0].text,
+          'You will find your MP3 at http://example.com/evil%E2%80%AE3pm.exe and do not forget to use http://xn--itlab-qmc.com/'
+        );
+      });
     });
   });
 
