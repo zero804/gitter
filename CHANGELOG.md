@@ -1,3 +1,7 @@
+# 20.5.0 - *upcoming*
+
+ - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
+
 # 20.4.0 - 2019-9-25
 
  - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594
