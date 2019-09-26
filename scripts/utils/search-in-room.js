@@ -37,7 +37,7 @@ function execute(opts) {
     });
 }
 
-return execute(opts)
+execute(opts)
   .delay(1000)
   .then(function() {
     shutdown.shutdownGracefully();

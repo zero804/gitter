@@ -292,6 +292,7 @@
   "main": "web.js",
   "scripts": {
     "gulp": "gulp",
+    "health-check": "node health-check.js",
     "start": "gulp watch",
     "dev": "gulp watch",
     "dev-template": "concurrently --raw \"npm run start -- --watch server --watch shared --watch modules --watch public  --ignore public/**/!(*.hbs)\" \"gulp watch\"",

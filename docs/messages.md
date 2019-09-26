@@ -57,6 +57,8 @@ You can directly mention someone else using the `@username` syntax. As you type 
 
 If the person you mention has notifications enabled, they will see a notification that they have been mentioned.
 
+If you're the admin of a room, you can make announcements by using `@/all`. Each person who has notification for `@/all` announcements enabled will see a notification of that annoucement.
+
 
 ### Issuable decorations
 

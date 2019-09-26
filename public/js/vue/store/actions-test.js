@@ -88,58 +88,48 @@ describe('actions', () => {
     apiClient.user.patch.mockReset();
   });
 
-  it('setInitialData', done => {
+  it('setInitialData', async () => {
     const payload = { a: 1, b: 2 };
     testAction(
       actions.setInitialData,
       payload,
       state,
       [{ type: types.SET_INITIAL_DATA, payload: payload }],
-      [],
-      done
+      []
     );
   });
 
-  it('setTest', done => {
+  it('setTest', async () => {
     const payload = 'newTestValue';
-    testAction(
-      actions.setTest,
-      payload,
-      state,
-      [{ type: types.SET_TEST, payload: payload }],
-      [],
-      done
-    );
+    testAction(actions.setTest, payload, state, [{ type: types.SET_TEST, payload: payload }], []);
   });
 
   describe('toggleDarkTheme', () => {
-    it('sets the state', done => {
+    it('sets the state', async () => {
       const payload = true;
       testAction(
         actions.toggleDarkTheme,
         payload,
         state,
         [{ type: types.TOGGLE_DARK_THEME, payload: payload }],
-        [],
-        done
+        []
       );
     });
   });
 
   describe('setLeftMenuState', () => {
-    it('sets the state', done => {
+    it('sets the state', async () => {
       const payload = 'people';
       testAction(
         actions.setLeftMenuState,
         payload,
         state,
         [{ type: types.SWITCH_LEFT_MENU_STATE, payload: payload }],
-        [{ type: 'trackStat', payload: 'left-menu.minibar.activated.people' }],
-        done
+        [{ type: 'trackStat', payload: 'left-menu.minibar.activated.people' }]
       );
     });
 
-    it('when switching to search tab, re-searches for messages in the current room', done => {
+    it('when switching to search tab, re-searches for messages in the current room', async () => {
       const payload = 'search';
       testAction(
         actions.setLeftMenuState,
@@ -149,50 +139,46 @@ describe('actions', () => {
         [
           { type: 'trackStat', payload: 'left-menu.minibar.activated.search' },
           { type: 'fetchMessageSearchResults' }
-        ],
-        done
+        ]
       );
     });
   });
 
-  it('toggleLeftMenuPinnedState', done => {
+  it('toggleLeftMenuPinnedState', async () => {
     const payload = false;
     testAction(
       actions.toggleLeftMenuPinnedState,
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU_PINNED_STATE, payload: payload }],
-      [{ type: 'trackStat', payload: 'left-menu.pinned.false' }],
-      done
+      [{ type: 'trackStat', payload: 'left-menu.pinned.false' }]
     );
   });
 
-  it('toggleLeftMenu', done => {
+  it('toggleLeftMenu', async () => {
     const payload = false;
     testAction(
       actions.toggleLeftMenu,
       payload,
       state,
       [{ type: types.TOGGLE_LEFT_MENU, payload: payload }],
-      [{ type: 'trackStat', payload: `left-menu.toggle.${payload}` }],
-      done
+      [{ type: 'trackStat', payload: `left-menu.toggle.${payload}` }]
     );
   });
 
-  it('updatefavouriteDraggingInProgress', done => {
+  it('updatefavouriteDraggingInProgress', async () => {
     const payload = true;
     testAction(
       actions.updatefavouriteDraggingInProgress,
       payload,
       state,
       [{ type: types.UPDATE_FAVOURITE_DRAGGING_STATE, payload: payload }],
-      [],
-      done
+      []
     );
   });
 
   describe('_localUpdateRoomFavourite', () => {
-    it('updates lone room to favourite', done => {
+    it('updates lone room to favourite', async () => {
       const room1 = createSerializedRoomFixture('community/room1');
 
       state.roomMap[room1.id] = room1;
@@ -203,12 +189,11 @@ describe('actions', () => {
         payload,
         state,
         [],
-        [{ type: 'upsertRoom', payload }],
-        done
+        [{ type: 'upsertRoom', payload }]
       );
     });
 
-    it('updates subsequent favourites', done => {
+    it('updates subsequent favourites', async () => {
       const favouriteRoom1 = {
         ...createSerializedRoomFixture('community/favourite-room1'),
         favourite: 1
@@ -241,14 +226,13 @@ describe('actions', () => {
           { type: 'upsertRoom', payload: { id: favouriteRoom1.id, favourite: 2 } },
           { type: 'upsertRoom', payload: { id: favouriteRoom2.id, favourite: 3 } },
           { type: 'upsertRoom', payload: { id: favouriteRoom3.id, favourite: 4 } }
-        ],
-        done
+        ]
       );
     });
   });
 
   describe('updateRoomFavourite', () => {
-    it('updates lone room to favourite', done => {
+    it('updates lone room to favourite', async () => {
       const room1 = createSerializedRoomFixture('community/room1');
 
       state.roomMap[room1.id] = room1;
@@ -272,12 +256,11 @@ describe('actions', () => {
         [
           { type: '_localUpdateRoomFavourite', payload },
           { type: 'upsertRoom', payload: updatedRoom1 }
-        ],
-        done
+        ]
       );
     });
 
-    it('rollsback favourite on error', done => {
+    it('rollsback favourite on error', async () => {
       const room1 = createSerializedRoomFixture('community/room1');
 
       state.roomMap[room1.id] = room1;
@@ -296,12 +279,11 @@ describe('actions', () => {
         [
           { type: '_localUpdateRoomFavourite', payload },
           { type: '_localUpdateRoomFavourite', payload: { id: room1.id, favourite: undefined } }
-        ],
-        done
+        ]
       );
     });
 
-    it('rollsback favourite move up on error', done => {
+    it('rollsback favourite move up on error', async () => {
       const favouriteRoom1 = {
         ...createSerializedRoomFixture('community/favourite-room1'),
         favourite: 5
@@ -331,12 +313,11 @@ describe('actions', () => {
             // so we want to get the new index that represents where the itemBeingMoved was before
             payload: { id: favouriteRoom1.id, favourite: favouriteRoom1.favourite + 1 }
           }
-        ],
-        done
+        ]
       );
     });
 
-    it('rollsback favourite move down on error', done => {
+    it('rollsback favourite move down on error', async () => {
       const favouriteRoom1 = {
         ...createSerializedRoomFixture('community/favourite-room1'),
         favourite: 1
@@ -364,26 +345,24 @@ describe('actions', () => {
             type: '_localUpdateRoomFavourite',
             payload: { id: favouriteRoom1.id, favourite: favouriteRoom1.favourite }
           }
-        ],
-        done
+        ]
       );
     });
   });
 
-  it('updateSearchInputValue', done => {
+  it('updateSearchInputValue', async () => {
     const payload = 'newSearchValue';
     testAction(
       actions.updateSearchInputValue,
       payload,
       state,
       [{ type: types.UPDATE_SEARCH_INPUT_VALUE, payload: payload }],
-      [],
-      done
+      []
     );
   });
 
   describe('fetchRoomSearchResults', () => {
-    it('action fired but no search input', done => {
+    it('action fired but no search input', async () => {
       state.search.searchInputValue = '';
 
       testAction(
@@ -391,12 +370,11 @@ describe('actions', () => {
         null,
         state,
         [{ type: types.SEARCH_CLEARED, payload: undefined }],
-        [],
-        done
+        []
       );
     });
 
-    it('room searches succeeds with some results', done => {
+    it('room searches succeeds with some results', async () => {
       state.search.searchInputValue = 'special';
 
       const roomResult1 = _.omit(createSerializedRoomFixture('community/not-joined1'), [
@@ -442,12 +420,11 @@ describe('actions', () => {
           { type: 'trackStat', payload: 'left-menu.search.input' },
           { type: 'upsertRoom', payload: roomResult1 },
           { type: 'upsertRoom', payload: oneToOneResult1 }
-        ],
-        done
+        ]
       );
     });
 
-    it('repo searches succeeds with some results', done => {
+    it('repo searches succeeds with some results', async () => {
       state.search.searchInputValue = 'postcss';
 
       apiClient.user.get.mockImplementation(() =>
@@ -474,12 +451,11 @@ describe('actions', () => {
         [
           { type: 'trackStat', payload: 'left-menu.search.input' },
           { type: 'upsertRoom', payload: REPO_SEARCH_RESPONSE[0].room }
-        ],
-        done
+        ]
       );
     });
 
-    it('searches value error', done => {
+    it('searches value error', async () => {
       state.search.searchInputValue = 'special';
 
       apiClient.user.get.mockImplementation(() => Promise.reject(true));
@@ -498,21 +474,20 @@ describe('actions', () => {
           { type: roomSearchRoomRequest.errorType, payload: true },
           { type: roomSearchPeopleRequest.errorType, payload: true }
         ],
-        [{ type: 'trackStat', payload: 'left-menu.search.input' }],
-        done
+        [{ type: 'trackStat', payload: 'left-menu.search.input' }]
       );
     });
   });
 
   describe('fetchMessageSearchResults', () => {
-    it('action fired but no search input', done => {
+    it('action fired but no search input', async () => {
       state.search.searchInputValue = '';
 
-      testAction(actions.fetchMessageSearchResults, null, state, [], [], done);
+      testAction(actions.fetchMessageSearchResults, null, state, [], []);
     });
 
     // FIXME: Waiting until we switch over to Axios for requests in the apiClient so we can mock
-    it.skip('searches value success', done => {
+    it.skip('searches value success', async () => {
       state.search.searchInputValue = 'search input value';
 
       // TODO: Stub request success
@@ -525,13 +500,12 @@ describe('actions', () => {
           { type: messageSearchRequest.requestType },
           { type: messageSearchRequest.successType, payload: null }
         ],
-        [],
-        done
+        []
       );
     });
 
     // FIXME: Waiting until we switch over to Axios for requests in the apiClient so we can mock
-    it.skip('searches value error', done => {
+    it.skip('searches value error', async () => {
       state.search.searchInputValue = 'search input value';
 
       // TODO: Stub request error
@@ -544,8 +518,7 @@ describe('actions', () => {
           { type: messageSearchRequest.requestType },
           { type: messageSearchRequest.errorType, payload: null }
         ],
-        [],
-        done
+        []
       );
     });
   });
@@ -649,15 +622,14 @@ describe('actions', () => {
     });
   });
 
-  it('upsertRoom', done => {
+  it('upsertRoom', async () => {
     const payload = { id: '5cf8efbc4dfb4240048b768e', unreads: 5 };
     testAction(
       actions.upsertRoom,
       payload,
       state,
       [{ type: types.UPDATE_ROOM, payload: payload }],
-      [],
-      done
+      []
     );
   });
 

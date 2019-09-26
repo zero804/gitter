@@ -38,7 +38,7 @@ var data = mailerService.testOnly.VALID_TEMPLATES['unread-notification']({
   ]
 });
 
-return Promise.props(data).then(function(data) {
+Promise.props(data).then(function(data) {
   console.log('DATA', data);
   fs.writeFileSync(path.join(__dirname, 'unread-notification.out.html'), template(data));
 });

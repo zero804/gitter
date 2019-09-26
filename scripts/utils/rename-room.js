@@ -52,7 +52,7 @@ function confirm() {
   });
 }
 
-return Promise.join(
+Promise.join(
   troupeService.findByUri(lcOld),
   troupeService.findByUri(lcNew),
   groupService.findByUri(lcNewGroup),
