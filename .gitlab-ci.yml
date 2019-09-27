@@ -367,11 +367,11 @@ renovate:
 # Security reports
 # =========================================================
 include:
-  - template: SAST.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
   # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
-  #- template: DAST.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
-  - template: Container-Scanning.gitlab-ci.yml
+  #- template: Security/DAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
 
 dependency_scanning:
   stage: security
@@ -388,5 +388,4 @@ container_scanning:
 
 .sast:
   stage: security
-
 # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
