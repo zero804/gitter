@@ -9,6 +9,7 @@ var userService = require('gitter-web-users');
 var troupeService = require('gitter-web-rooms/lib/troupe-service');
 const chatService = require('gitter-web-chats');
 var emailNotificationService = require('gitter-web-email-notifications');
+const serializer = require('../../server/serializers/notification-serializer');
 
 var opts = require('yargs')
   .option('username', {
@@ -43,20 +44,27 @@ async function getMessages(troupe, returnDummyMessage) {
       }
     ];
   }
-  return chatService.findChatMessagesForTroupe(troupe._id, { limit: 3 });
+  return chatService.findChatMessagesForTroupe(troupe.id || troupe._id, { limit: 3 });
 }
 
 async function sendNotification() {
   const user = await userService.findByUsername(opts.username);
   const rooms = await troupeService.findByUris(opts.roomUri);
+
+  const roomStrategy = new serializer.TroupeStrategy({ recipientUserId: user.id });
+  const serialiazedRooms = await serializer.serialize(rooms, roomStrategy);
+
   const roomData = await Promise.all(
-    rooms.map(async room => {
+    serialiazedRooms.map(async room => {
       const chats = await getMessages(room, opts.dummy);
+
+      const chatStrategy = new serializer.ChatStrategy({ recipientUserId: user.id });
+      const serializedChats = await serializer.serialize(chats, chatStrategy);
 
       return {
         troupe: room,
         unreadCount: opts.roomUri.length,
-        chats
+        chats: serializedChats
       };
     })
   );
