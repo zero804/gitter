@@ -5,6 +5,7 @@
 Developer facing:
 
  - Use more robust security CI includes which will work on [`dev.gitlab.org`](https://dev.gitlab.org/), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1607
+ - Update docker-compose file to version 3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1609
 
 
 # 20.4.1 - 2019-9-26
