@@ -126,9 +126,10 @@ function handleUploadToGroup(transloadit, metadata) {
       if (!hasOriginalFinalResults) {
         throw new StatusError(
           500,
-          'Transloadit upload failed' + transloadit.message
-            ? ': ' + transloadit.message
-            : '. AssemblyID: ' + transloadit.assembly_id
+          'Transloadit upload failed' +
+            (transloadit.message
+              ? ': ' + transloadit.message
+              : '. AssemblyID: ' + transloadit.assembly_id)
         );
       }
 
