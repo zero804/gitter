@@ -7,6 +7,8 @@ Developer facing:
  - Use more robust security CI includes which will work on [`dev.gitlab.org`](https://dev.gitlab.org/), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1607
  - Update docker-compose file to version 3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1609
  - Remove bluebird usage from delete-user script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1605
+ - Fix iOS asset build, including embedded chat startup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1610
+    - Thanks to [@puremourning](https://gitlab.com/puremourning) for the contribution
 
 
 # 20.4.3 - 2019-10-2
