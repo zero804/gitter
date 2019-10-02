@@ -79,7 +79,7 @@ function TroupeStrategy(options) {
     }
 
     var t = {
-      id: item.id,
+      id: item.id || item._id,
       name: item.oneToOne ? user && user.displayName : item.name,
       uri: item.uri,
       oneToOne: item.oneToOne,
