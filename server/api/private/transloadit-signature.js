@@ -6,6 +6,7 @@ var redis = require('gitter-web-utils/lib/redis');
 var uuid = require('uuid/v4');
 var StatusError = require('statuserror');
 var Promise = require('bluebird');
+const policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 var singletonTransloaditClient;
 
@@ -32,7 +33,7 @@ function randomString(length) {
   return result;
 }
 
-function parseAndValidateTransloadit(user, input) {
+async function parseAndValidateTransloadit(user, input) {
   var templateId;
 
   switch (input.type) {
@@ -76,6 +77,12 @@ function parseAndValidateTransloadit(user, input) {
   // room or group id.
 
   if (input.room_uri && input.room_id) {
+    const policy = await policyFactory.createPolicyForRoomId(user, input.room_id);
+    const writeAccess = await policy.canWrite();
+    if (!writeAccess) {
+      throw new StatusError(403);
+    }
+
     // upload a document or image to a room
     metadata.room_id = input.room_id;
 
@@ -88,6 +95,12 @@ function parseAndValidateTransloadit(user, input) {
       path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
     };
   } else if (input.type === 'avatar' && input.group_id) {
+    const policy = await policyFactory.createPolicyForGroupId(user, input.group_id);
+    const writeAccess = await policy.canAdmin();
+    if (!writeAccess) {
+      throw new StatusError(403);
+    }
+
     // upload an avatar to a group
     metadata.group_id = input.group_id;
 
@@ -112,8 +125,8 @@ function parseAndValidateTransloadit(user, input) {
 }
 
 function transloaditSignature(req, res, next) {
-  return Promise.try(function() {
-    var info = parseAndValidateTransloadit(req.user, req.query);
+  return Promise.try(async () => {
+    const info = await parseAndValidateTransloadit(req.user, req.query);
 
     var params = info.params;
     var metadata = info.metadata;
