@@ -9,10 +9,26 @@ Developer facing:
  - Remove bluebird usage from delete-user script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1605
 
 
+# 20.4.3 - 2019-10-2
+
+ - Fix Twitter share link in create room email, https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/36
+
+
+# 20.4.2 - 2019-10-2
+
+ - Security fix related to email templates, https://gitlab.com/gitlab-org/gitter/webapp/issues/2086
+    - Thanks to [@paresh_parmar](https://hackerone.com/paresh_parmar) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/30
+ - Security fix related to uploads, https://gitlab.com/gitlab-org/gitter/webapp/issues/2114
+    - Thanks to [@iframe](https://hackerone.com/iframe) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/34
+
 # 20.4.1 - 2019-9-26
+
  - Security fix related to message text processing, https://gitlab.com/gitlab-org/gitter/webapp/issues/2083
     - Thanks to [@jaykpatel](https://hackerone.com/jaykpatel) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/29
+
 
 # 20.4.0 - 2019-9-25
 
