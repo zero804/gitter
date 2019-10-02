@@ -3,7 +3,7 @@ stages:
   - build_unit_test
   - pre_deploy
   - deploy
-  #- security
+  - security
 
 variables:
   DOCKER_DRIVER: overlay2
@@ -365,26 +365,26 @@ renovate:
     - docker
 # Security reports
 # =========================================================
-# include:
-#   - template: Security/SAST.gitlab-ci.yml
-#   # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
-#   #- template: Security/DAST.gitlab-ci.yml
-#   - template: Security/Dependency-Scanning.gitlab-ci.yml
-#   - template: Security/Container-Scanning.gitlab-ci.yml
-#
-# dependency_scanning:
-#   stage: security
-#   variables:
-#     DS_PYTHON_VERSION: 2
-#   tags:
-#     - docker
-#
-# container_scanning:
-#   stage: security
-#   variables:
-#     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
-#     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
-#
-# .sast:
-#   stage: security
+include:
+  - template: Security/SAST.gitlab-ci.yml
+  # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
+  #- template: Security/DAST.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
+
+dependency_scanning:
+  stage: security
+  variables:
+    DS_PYTHON_VERSION: 2
+  tags:
+    - docker
+
+container_scanning:
+  stage: security
+  variables:
+    CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
+    CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+
+.sast:
+  stage: security
 # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
