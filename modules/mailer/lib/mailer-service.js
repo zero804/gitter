@@ -79,7 +79,7 @@ function createdRoomMapping(data) {
     ROOMURI: _.escape(data.roomUri),
     ROOMURL: _.escape(data.roomUrl),
     UNSUB: _.escape(data.unsubscribeUrl),
-    TWITTERURL: _.escape(twitterSnippet),
+    TWITTERURL: twitterSnippet,
     ORGNOTE: _.escape(''), // No used since splitsville
     ROOMTYPE: _.escape(data.roomType),
     LOGOURL: cdn('images/logo/gitter-logo-email-64.png', { email: true })
