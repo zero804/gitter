@@ -3,15 +3,22 @@
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
 var stats = env.stats;
+const config = env.config;
 var Processor = require('gitter-markdown-processor');
 var shutdown = require('shutdown');
 var Promise = require('bluebird');
+
+const camoUrl = config.get('camo:camoUrl');
+const camoSecret = config.get('camo:camoSecret');
 
 // processor starts its own process, so lazy load it
 var processor;
 
 function createProcessor() {
-  var p = new Processor();
+  const p = new Processor({
+    camoUrl,
+    camoSecret
+  });
 
   shutdown.addHandler('markdown_cluster', 1, function(callback) {
     p.shutdown(callback);
