@@ -363,12 +363,12 @@ renovate:
     - docker:dind
   tags:
     - docker
+#
 # Security reports
 # =========================================================
 include:
   - template: Security/SAST.gitlab-ci.yml
-  # TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
-  #- template: Security/DAST.gitlab-ci.yml
+  - template: Security/DAST.gitlab-ci.yml
   - template: Security/Dependency-Scanning.gitlab-ci.yml
   - template: Security/Container-Scanning.gitlab-ci.yml
 
@@ -389,5 +389,51 @@ sast:
   stage: security
   variables:
     SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
-#
-# TODO: Enable dast, https://gitlab.com/gitlab-org/gitter/webapp/issues/2118
+
+dast:
+  stage: security
+  dependencies:
+    - containerize
+  variables:
+    <<: *webapp_variables
+    NODE_ENV: test-docker
+    DAST_WEBSITE: http://webapp-server:5000/
+    # Pass-through webapp secrets from our project-level secret variables
+    web__sessionSecret: '${web__sessionSecret}'
+    web__statePassphrase: '${web__statePassphrase}'
+    ws__superClientPassword: '${ws__superClientPassword}'
+    web__messageSecret: '${web__messageSecret}'
+    email__unsubscribeNotificationsSecret: '${email__unsubscribeNotificationsSecret}'
+    integrations__secret: '${integrations__secret}'
+    github__statePassphrase: '${github__statePassphrase}'
+    twitteroauth__consumer_key: '${twitteroauth__consumer_key}'
+    twitteroauth__consumer_secret: '${twitteroauth__consumer_secret}'
+    gitlaboauth__client_id: '${gitlaboauth__client_id}'
+    gitlaboauth__client_secret: '${gitlaboauth__client_secret}'
+    gitlab__public_token_pool: '${gitlab__public_token_pool}'
+    github__client_id: '${github__client_id}'
+    github__client_secret: '${github__client_secret}'
+    github__user_client_id: '${github__user_client_id}'
+    github__user_client_secret: '${github__user_client_secret}'
+    github__anonymous_app__client_id: '${github__anonymous_app__client_id}'
+    github__anonymous_app__client_secret: '${github__anonymous_app__client_secret}'
+    tokens__anonymousPassword: '${tokens__anonymousPassword}'
+  before_script:
+    # Used to communicate with the other services and share the other hostnames we can connect to
+    # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
+    - cp /etc/hosts "${CI_PROJECT_DIR}/"
+  services:
+    - name: registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
+      alias: webapp-server
+      # Used to communicate with the other services and share the other hostnames we can connect to
+      # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
+      entrypoint:
+        [
+          '/bin/sh',
+          '-c',
+          'while [ ! -f /$CI_PROJECT_DIR/hosts ]; do sleep 1; done && cat /$CI_PROJECT_DIR/hosts > /etc/hosts && node web.js',
+        ]
+    - *webapp_service_mongo
+    - *webapp_service_redis
+    - *webapp_service_elasticsearch
+    - *webapp_service_neo4j
