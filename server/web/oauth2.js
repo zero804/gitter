@@ -122,22 +122,20 @@ server.exchange(
 
 exports.authorization = [
   ensureLoggedIn,
-  server.authorization(function(clientKey, redirectUri, done) {
-    stats.event('oauth.authorize');
-    oauthService.findClientByClientKey(clientKey, function(err, client) {
-      if (err) {
-        return done(err);
-      }
+  server.authorization(async function(clientKey, redirectUri, done) {
+    try {
+      stats.event('oauth.authorize');
+      const client = await oauthService.findClientByClientKey(clientKey);
 
       if (!client) {
         return done(new OauthAuthorizationError('Provided clientKey does not exist.'));
       }
 
-      const urlData = url.parse(client.registeredRedirectUri);
-      const hasBadProtocol =
-        !urlData.protocol || urlData.protocol === 'javascript:' || urlData.protocol === 'data:';
-
-      if (client.registeredRedirectUri !== redirectUri) {
+      if (
+        !client.registeredRedirectUri ||
+        !redirectUri ||
+        client.registeredRedirectUri !== redirectUri
+      ) {
         logger.warn('Provided redirectUri does not match registered URI for client_id/clientKey ', {
           redirectUri: redirectUri,
           registeredUri: client.registeredRedirectUri,
@@ -149,7 +147,12 @@ exports.authorization = [
             'Provided redirectUri does not match registered URI for client_id/clientKey'
           )
         );
-      } else if (hasBadProtocol) {
+      }
+
+      const urlData = url.parse(client.registeredRedirectUri);
+      const hasBadProtocol =
+        !urlData.protocol || urlData.protocol === 'javascript:' || urlData.protocol === 'data:';
+      if (hasBadProtocol) {
         logger.warn('Provided redirectUri is using disallowed bad protocol ', {
           redirectUri: redirectUri,
           registeredUri: client.registeredRedirectUri,
@@ -164,7 +167,10 @@ exports.authorization = [
       }
 
       return done(null, client, redirectUri);
-    });
+    } catch (err) {
+      errorReporter(err, { clientKey, redirectUri }, { module: 'oauth.authorize' });
+      done(new OauthAuthorizationError('Error occured while oauth.authorize'));
+    }
   }),
   function(req, res, next) {
     /* Is this client allowed to skip the authorization page? */
