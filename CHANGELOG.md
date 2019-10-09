@@ -11,6 +11,7 @@ Developer facing:
  - Fix iOS asset build, including embedded chat startup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1610
     - Thanks to [@puremourning](https://gitlab.com/puremourning) for the contribution
  - Exclude non-production code from SAST scans, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1612
+ - Generate DAST security reports in CI (for [GitLab security dashboard](https://gitlab.com/help/user/application_security/security_dashboard/index.md)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1613
 
 
 # 20.4.3 - 2019-10-2
