@@ -123,6 +123,10 @@ var HeaderView = Marionette.ItemView.extend({
           this.hideRoom();
         } else if (href === '#notifications') {
           this.requestBrowserNotificationsPermission();
+        } else if (href === '#community-home') {
+          this.goToOrgRooms();
+        } else if (href === '#favourite') {
+          this.toggleFavourite();
         }
       });
     }
@@ -201,6 +205,7 @@ var HeaderView = Marionette.ItemView.extend({
     }
   },
 
+  // eslint-disable-next-line max-statements
   createMenu: function() {
     var c = context();
     var isStaff = context.isStaff();
@@ -218,6 +223,10 @@ var HeaderView = Marionette.ItemView.extend({
     menuBuilder.addConditional(!isOneToOne, { title: 'Add people to this room', href: '#add' });
     menuBuilder.addConditional(!isOneToOne, { title: 'Share this chat room', href: '#share' });
     menuBuilder.addDivider();
+    menuBuilder.addConditional(isRoomMember, {
+      title: `${this.model.get('favourite') ? 'Unfavourite' : 'Favourite'} room`,
+      href: '#favourite'
+    });
     menuBuilder.addConditional(isRoomMember, { title: 'Notifications', href: '#notifications' });
 
     if (!isOneToOne) {
@@ -243,6 +252,7 @@ var HeaderView = Marionette.ItemView.extend({
         href: 'https://www.github.com' + url,
         target: '_blank'
       });
+      menuBuilder.add({ title: 'Community home', href: '#community-home' });
 
       menuBuilder.addDivider();
 
@@ -281,7 +291,10 @@ var HeaderView = Marionette.ItemView.extend({
     // archive router is not ready to handle app events yet.
     if (this.isArchive()) return;
 
-    e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
+
     var group = this.model.get('group');
     if (!group) return;
     var homeUri = group.homeUri;
