@@ -13,6 +13,7 @@ Developer facing:
  - Exclude non-production code from SAST scans, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1612
  - Generate DAST security reports in CI (for [GitLab security dashboard](https://gitlab.com/help/user/application_security/security_dashboard/index.md)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1613
  - Introduce backbone eslint plugin, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1615
+ - Update to `cypress@3.4.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1616
 
 
 # 20.4.3 - 2019-10-2
