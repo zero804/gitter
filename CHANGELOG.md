@@ -16,6 +16,13 @@ Developer facing:
  - Update to `cypress@3.4.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1616
 
 
+# 20.4.4 - 2019-10-10
+
+ - Security fix related to OAuth client authorization flow, https://gitlab.com/gitlab-org/gitter/webapp/issues/2305
+    - Thanks to [@gregxsunday](https://hackerone.com/gregxsunday) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/40
+
+
 # 20.4.3 - 2019-10-2
 
  - Fix Twitter share link in create room email, https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/36
