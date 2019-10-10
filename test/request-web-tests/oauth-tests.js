@@ -15,6 +15,9 @@ describe('OAuth tests', function() {
     user1: {
       accessToken: 'web-internal'
     },
+    oAuthClientNoRedirectUri1: {
+      registeredRedirectUri: null
+    },
     oAuthClient1: {
       registeredRedirectUri: 'http://localhost:3434/callback'
     },
@@ -148,5 +151,42 @@ describe('OAuth tests', function() {
           );
         });
     });
+  });
+
+  it(`GET /login/oauth/authorize with no client.redirect_uri does not crash server`, async () => {
+    this.timeout(8000);
+
+    const oAuthClient = fixture.oAuthClientNoRedirectUri1;
+
+    await request(app)
+      .get(
+        `/login/oauth/authorize?response_type=code&redirect_uri=http://whatever&client_id=${oAuthClient.clientKey}`
+      )
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(401);
+  });
+
+  it(`GET /login/oauth/authorize with no ?redirect_uri query param does not crash server`, async () => {
+    this.timeout(8000);
+
+    const oAuthClient = fixture.oAuthClientNoRedirectUri1;
+
+    await request(app)
+      .get(`/login/oauth/authorize?response_type=code&client_id=${oAuthClient.clientKey}`)
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(401);
+  });
+
+  it(`GET /login/oauth/authorize with empty ?redirect_uri= query param does not crash server`, async () => {
+    this.timeout(8000);
+
+    const oAuthClient = fixture.oAuthClientNoRedirectUri1;
+
+    await request(app)
+      .get(
+        `/login/oauth/authorize?response_type=code&redirect_uri=&client_id=${oAuthClient.clientKey}`
+      )
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(401);
   });
 });
