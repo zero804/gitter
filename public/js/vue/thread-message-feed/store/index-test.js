@@ -35,6 +35,17 @@ describe('thread message feed store', () => {
       expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
     });
 
+    // this is utilized by calling open by default before some other TMF actions
+    it('open does nothing if TMF is already opened', () => {
+      testAction(
+        actions.open,
+        '5d147ea84dad9dfbc522317a',
+        { isVisible: true, parentId: '5d147ea84dad9dfbc522317a' },
+        [],
+        []
+      );
+    });
+
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false }
@@ -78,7 +89,7 @@ describe('thread message feed store', () => {
             { type: types.UPDATE_DRAFT_MESSAGE, payload: '' },
             { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [storedMessage] }
           ],
-          [{ type: 'focusOnMessage', payload: { message: storedMessage, block: 'end' } }]
+          [{ type: 'focusOnMessage', payload: { id: storedMessage.id, block: 'end' } }]
         );
         expect(apiClient.room.post).toHaveBeenCalledWith('/chatMessages', {
           text: 'testMessage',
@@ -143,7 +154,7 @@ describe('thread message feed store', () => {
           [{ type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages' },
-            { type: 'focusOnMessage', payload: { message: { id: '49' }, block: 'end' } }
+            { type: 'focusOnMessage', payload: { id: '49', block: 'end' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(50) }
         );
@@ -160,7 +171,7 @@ describe('thread message feed store', () => {
           ],
           [
             { type: 'fetchChildMessages' },
-            { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'end' } }
+            { type: 'focusOnMessage', payload: { id: '9', block: 'end' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(10) }
         );
@@ -179,7 +190,7 @@ describe('thread message feed store', () => {
           [],
           [
             { type: 'fetchChildMessages', payload: { beforeId: '1' } },
-            { type: 'focusOnMessage', payload: { message: { id: '49' }, block: 'start' } }
+            { type: 'focusOnMessage', payload: { id: '49', block: 'start' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(50) }
         );
@@ -193,7 +204,7 @@ describe('thread message feed store', () => {
           [{ type: types.SET_AT_TOP_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages', payload: { beforeId: '1' } },
-            { type: 'focusOnMessage', payload: { message: { id: '9' }, block: 'start' } }
+            { type: 'focusOnMessage', payload: { id: '9', block: 'start' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(10) }
         );
@@ -232,7 +243,7 @@ describe('thread message feed store', () => {
           [],
           [
             { type: 'fetchChildMessages', payload: { afterId: '2' } },
-            { type: 'focusOnMessage', payload: { message: { id: '0' }, block: 'end' } }
+            { type: 'focusOnMessage', payload: { id: '0', block: 'end' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(50) }
         );
@@ -246,7 +257,7 @@ describe('thread message feed store', () => {
           [{ type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
           [
             { type: 'fetchChildMessages', payload: { afterId: '2' } },
-            { type: 'focusOnMessage', payload: { message: { id: '0' }, block: 'end' } }
+            { type: 'focusOnMessage', payload: { id: '0', block: 'end' } }
           ],
           { fetchChildMessages: generateSequenceWithIds(10) }
         );
@@ -285,11 +296,11 @@ describe('thread message feed store', () => {
       );
     });
 
-    it('focusOnMessage sets message as focusedAt with given block', async () => {
+    it('focusOnMessage opens TMF and sets message as focusedAt with given block', async () => {
       await testAction(
         actions.focusOnMessage,
-        { message: { id: 'abc' }, block: 'start' },
-        {},
+        { id: 'abc', block: 'start' },
+        { messageMap: { abc: { id: 'abc', parentId: 'def' } } },
         // ideally, we would test the delayed mutation setting focusedAt to false, but we won't wait
         // 5 seconds for it, the risk and impact of focusedAt staying on are low
         [
@@ -298,7 +309,12 @@ describe('thread message feed store', () => {
             payload: { id: 'abc', focusedAt: { block: 'start', timestamp: 1479427200000 } }
           }
         ],
-        []
+        [
+          {
+            type: 'open',
+            payload: 'def'
+          }
+        ]
       );
     });
   });

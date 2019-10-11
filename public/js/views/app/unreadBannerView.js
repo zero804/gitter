@@ -133,10 +133,10 @@ var BottomBannerView = TopBannerView.extend({
   onMainButtonClick: function() {
     this.toggleScrollHelper(true);
 
-    var mentionId = this.model.get('mostRecentMentionId');
+    var mentionId = this.model.get('firstMentionIdBelow');
     if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
 
-    var itemId = this.model.get('mostRecentUnreadItemId');
+    var itemId = this.model.get('firstUnreadItemIdBelow');
     if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
 
     appEvents.trigger('chatCollectionView:scrollToBottom');

@@ -75,14 +75,14 @@ Cypress.Commands.add('toggleFeature', (featureName, force) => {
     });
 });
 
-Cypress.Commands.add('sendMessage', (user, room, messageText) => {
+Cypress.Commands.add('sendMessage', (user, room, messageText, attributes) => {
   cy.log(`Sending message in ${room._id}: "${messageText}"`);
 
   // Send the message
   cy.request({
     url: urlJoin(gitterBaseUrl, '/api/v1/rooms/', room._id, '/chatMessages'),
     method: 'POST',
-    body: { text: messageText },
+    body: { ...attributes, text: messageText },
     headers: {
       Authorization: `Bearer ${user.accessToken}`,
       'Content-Type': 'application/json'
