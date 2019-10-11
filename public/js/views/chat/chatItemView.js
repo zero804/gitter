@@ -187,7 +187,7 @@ module.exports = (function() {
         data.sent = moment();
       }
 
-      data.sentTimeFormatted = timeFormat(data.sent);
+      data.sentTimeFormatted = timeFormat(data.sent, { forceUtc: this.isArchive() });
       data.permalinkUrl = this.getPermalinkUrl();
       data.sentTimeFormattedFull = fullTimeFormat(data.sent);
 

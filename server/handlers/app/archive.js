@@ -15,11 +15,9 @@ var chatHeapmapAggregator = require('gitter-web-elasticsearch/lib/chat-heatmap-a
 var restSerializer = require('../../serializers/rest-serializer');
 var contextGenerator = require('../../web/context-generator');
 var burstCalculator = require('../../utils/burst-calculator');
-var dateTZtoUTC = require('gitter-web-shared/time/date-timezone-to-utc');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const urlJoin = require('url-join');
 const clientEnv = require('gitter-client-env');
-var beforeTodayAnyTimezone = require('gitter-web-shared/time/before-today-any-timezone');
 var debug = require('debug')('gitter:app:app-archive');
 var fonts = require('../../web/fonts');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
@@ -216,25 +214,11 @@ exports.chatArchive = [
     let nextDateUTC = moment(startDateUTC).add(1, 'days');
     let previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
-    const startDateLocal = dateTZtoUTC(yyyy, mm, dd, res.locals.tzOffset);
-    const endDateLocal = moment(startDateLocal)
-      .add(1, 'days')
-      .toDate();
-
     const aroundId = fixMongoIdQueryParam(req.query.at);
     const chatMessage = await chatService.findById(aroundId);
     if (chatMessage) {
-      /*
-       * If a permalink was generated in a different timezone, the message might have been
-       * sent on a different day in the local timezone. If so, we'll redirect to that day.
-       *
-       * The redirect may as well happen if we fixed the message ID from URL.
-       *
-       * res.locals.tzOffset is always defined (0 is default), it represents inverted UTC offset (-120 for +02:00)
-       * see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
-       */
-      const sentLocal = moment(chatMessage.sent).utcOffset(-res.locals.tzOffset);
-      const permalink = generatePermalink(troupe.uri, aroundId, sentLocal, true);
+      const sentDateTime = moment(chatMessage.sent);
+      const permalink = generatePermalink(troupe.uri, aroundId, sentDateTime, true);
       if (urlJoin(clientEnv['basePath'], req.url) !== permalink) {
         res.redirect(permalink);
         return;
@@ -261,13 +245,13 @@ exports.chatArchive = [
     debug(
       'Archive searching for messages in troupe %s in date range %s-%s',
       troupeId,
-      startDateLocal,
-      endDateLocal
+      startDateUTC,
+      nextDateUTC
     );
     const chatMessages = await chatService.findChatMessagesForTroupeForDateRange(
       troupeId,
-      startDateLocal,
-      endDateLocal
+      startDateUTC,
+      nextDateUTC
     );
     const strategy = new restSerializer.ChatStrategy({
       unread: false, // All chats are read in the archive
@@ -320,16 +304,9 @@ exports.chatArchive = [
     const isPrivate = !securityDescriptorUtils.isPublic(troupe);
 
     /*
-    What I'm trying to do here is: The current day is still in-progress, so
-    it shouldn't be cached because it can still gain more messages.  All
-    past days are done, so they can all safely be cached. But the concept
-    of when the day starts and ends depends on res.locals.tzOffset, so
-    to make 100% sure I'm just adding an extra 12 hours to the utc day
-    (as -12 to +12 are all possible) and then I can avoid doing
-    complicated timezone maths using moment and it should work for all
-    timezones.
+    If the we are showing archive for a finished day, we'll include caching headers
     */
-    if (beforeTodayAnyTimezone(endDateLocal)) {
+    if (today >= nextDateUTC) {
       res.setHeader('Cache-Control', 'public, max-age=' + ONE_YEAR_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + ONE_YEAR_MILLISECONDS).toUTCString());
     }
@@ -358,7 +335,6 @@ exports.chatArchive = [
       nextDateLink: nextDateLink,
       monthYearFormatted: monthYearFormatted,
 
-      showDatesWithoutTimezone: true, // Timeago widget will render whether or not we know the users timezone
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies)
     });

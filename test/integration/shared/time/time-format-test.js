@@ -6,6 +6,7 @@ var timeFormat = testRequire('../shared/time/time-format');
 
 var DATE_DAY1_6AM = new Date('2015-06-16T06:00:00Z');
 var DATE_DAY1_12PM = new Date('2015-06-16T12:00:00Z');
+const DATE_DAY2_12AM = new Date('2015-06-17T00:00:00Z');
 var DATE_DAY2_12PM = new Date('2015-06-17T12:00:00Z');
 var DATE_NEXT_YEAR = new Date('2016-06-17T12:00:00Z');
 
@@ -106,6 +107,33 @@ var TEST_CASES = [
     offset: 480,
     compact: true,
     expected: '6月 15 2015'
+  },
+  {
+    time: DATE_DAY1_6AM,
+    now: DATE_DAY1_6AM,
+    lang: 'en',
+    offset: 480,
+    compact: false,
+    forceUtc: true,
+    expected: '06:00 UTC'
+  },
+  {
+    time: DATE_DAY2_12AM,
+    now: DATE_DAY2_12AM,
+    lang: 'en',
+    offset: 480,
+    compact: false,
+    forceUtc: true,
+    expected: '00:00 UTC'
+  },
+  {
+    time: DATE_DAY1_6AM,
+    now: DATE_NEXT_YEAR,
+    lang: 'en',
+    offset: 480,
+    compact: false,
+    forceUtc: true,
+    expected: 'Jun 16 2015 06:00 UTC'
   }
 ];
 
@@ -117,9 +145,10 @@ describe('time-format', function() {
           lang: test.lang,
           tzOffset: test.offset,
           now: test.now,
-          compact: test.compact
+          compact: test.compact,
+          forceUtc: test.forceUtc
         });
-        assert.strictEqual(test.expected, result);
+        assert.strictEqual(result, test.expected);
       });
     });
   });
