@@ -6,6 +6,9 @@ const {
 } = require('../../__test__/fixture-helpers');
 const { default: ChatItem } = require('./chat-item.vue');
 
+jest.mock('../../../components/unread-items-client');
+const unreadItemsClient = require('../../../components/unread-items-client');
+
 describe('thread-message-feed chat-item', () => {
   momentTimezone.tz.setDefault('Europe/London');
   const message = createSerializedMessageFixture();
@@ -24,43 +27,35 @@ describe('thread-message-feed chat-item', () => {
       const { wrapper } = mount(ChatItem, defaultProps, addRoomToStore);
       expect(wrapper.element).toMatchSnapshot();
     });
-    it('showing item actions', () => {
-      const { wrapper } = mount(
-        ChatItem,
-        { ...defaultProps, showItemActions: true },
-        addRoomToStore
-      );
-      expect(wrapper.element).toMatchSnapshot();
+    describe('component flags', () => {
+      ['useCompactStyles', 'showItemActions'].forEach(flag => {
+        it(flag, () => {
+          const { wrapper } = mount(
+            ChatItem,
+            {
+              ...defaultProps,
+              [flag]: true
+            },
+            addRoomToStore
+          );
+          expect(wrapper.element).toMatchSnapshot();
+        });
+      });
     });
-    it('compact styles', () => {
-      const { wrapper } = mount(
-        ChatItem,
-        { ...defaultProps, useCompactStyles: true },
-        addRoomToStore
-      );
-      expect(wrapper.element).toMatchSnapshot();
-    });
-    it('error', () => {
-      const { wrapper } = mount(
-        ChatItem,
-        {
-          ...defaultProps,
-          message: { ...message, error: true }
-        },
-        addRoomToStore
-      );
-      expect(wrapper.element).toMatchSnapshot();
-    });
-    it('loading', () => {
-      const { wrapper } = mount(
-        ChatItem,
-        {
-          ...defaultProps,
-          message: { ...message, loading: true }
-        },
-        addRoomToStore
-      );
-      expect(wrapper.element).toMatchSnapshot();
+    describe('message flags', () => {
+      ['error', 'loading', 'unread'].forEach(flag => {
+        it(flag, () => {
+          const { wrapper } = mount(
+            ChatItem,
+            {
+              ...defaultProps,
+              message: { ...message, [flag]: true }
+            },
+            addRoomToStore
+          );
+          expect(wrapper.element).toMatchSnapshot();
+        });
+      });
     });
     it('highlighted - scrolls into view', () => {
       const scrollIntoViewMock = jest.fn();
@@ -76,18 +71,30 @@ describe('thread-message-feed chat-item', () => {
       expect(wrapper.element).toMatchSnapshot();
       expect(scrollIntoViewMock.mock.calls[0]).toEqual(['smooth', 'center']);
     });
-    it('focusedAt - scrolls into view', () => {
-      const scrollIntoViewMock = jest.fn();
-      mount(
-        ChatItem,
-        {
-          ...defaultProps,
-          message: { ...message, focusedAt: { block: 'start', timestamp: Date.now() } }
-        },
-        addRoomToStore,
-        { methods: { scrollIntoView: scrollIntoViewMock } }
-      );
-      expect(scrollIntoViewMock.mock.calls[0]).toEqual(['auto', 'start']);
-    });
+  });
+  it('focusedAt - scrolls into view', () => {
+    const scrollIntoViewMock = jest.fn();
+    mount(
+      ChatItem,
+      {
+        ...defaultProps,
+        message: { ...message, focusedAt: { block: 'start', timestamp: Date.now() } }
+      },
+      addRoomToStore,
+      { methods: { scrollIntoView: scrollIntoViewMock } }
+    );
+    expect(scrollIntoViewMock.mock.calls[0]).toEqual(['auto', 'start']);
+  });
+  it('unread message reports itself as read when entering viewport', () => {
+    const { wrapper } = mount(
+      ChatItem,
+      {
+        ...defaultProps,
+        message: { ...message, unread: true }
+      },
+      addRoomToStore
+    );
+    wrapper.vm.onViewportEnter();
+    expect(unreadItemsClient.markItemRead.mock.calls[0]).toEqual([message.id]);
   });
 });

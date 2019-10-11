@@ -256,10 +256,17 @@ module.exports = (function() {
     },
 
     scrollToChat: function(chat) {
-      var view = this.children.findByModel(chat);
-      if (!view) return;
-      this.rollers.scrollToElement(view.el, { centre: true });
-      return true;
+      const parentId = chat.get('parentId');
+      if (parentId && useThreadedConversations) {
+        appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
+          id: chat.id
+        });
+        this.scrollToChatId(parentId);
+      } else {
+        const view = this.children.findByModel(chat);
+        if (!view) return;
+        this.rollers.scrollToElement(view.el, { centre: true });
+      }
     },
 
     scrollToChatId: function(id) {

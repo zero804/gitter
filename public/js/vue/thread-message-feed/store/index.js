@@ -92,7 +92,8 @@ export default {
     }
   },
   actions: {
-    open: ({ commit, dispatch }, parentId) => {
+    open: ({ commit, dispatch, state }, parentId) => {
+      if (state.isVisible && state.parentId === parentId) return;
       commit(types.RESET_THREAD_STATE);
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
       commit(types.SET_PARENT_MESSAGE_ID, parentId);
@@ -125,7 +126,7 @@ export default {
           // the message from the API response fully replaces the `tmpMessage` and because it
           // doesn't contain the `loading` attribute, UI will hide the loading indicator
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
-          dispatch('focusOnMessage', { message, block: 'end' });
+          dispatch('focusOnMessage', { id: message.id, block: 'end' });
         })
         .catch(() => {
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true, loading: false }], {
@@ -162,13 +163,17 @@ export default {
      * `block` is scrollIntoView block argument ('start', 'end', 'center', 'nearest')
      * https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
      */
-    focusOnMessage: ({ commit }, { message, block }) => {
+    focusOnMessage: ({ dispatch, commit, rootState }, { id, block }) => {
+      const message = rootState.messageMap[id];
       if (!message) return;
-      commit(
-        rootTypes.UPDATE_MESSAGE,
-        { id: message.id, focusedAt: { block, timestamp: Date.now() } },
-        { root: true }
-      );
+      // this might be later conditional. If this is not child message, don't call open.
+      dispatch('open', message.parentId).then(() => {
+        commit(
+          rootTypes.UPDATE_MESSAGE,
+          { id, focusedAt: { block, timestamp: Date.now() } },
+          { root: true }
+        );
+      });
     },
     fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;
@@ -178,7 +183,7 @@ export default {
         childMessages => {
           // align last message to the top (pushes the new messages just above the TMF viewport)
           dispatch('focusOnMessage', {
-            message: childMessages[childMessages.length - 1],
+            id: childMessages[childMessages.length - 1].id,
             block: 'start'
           });
           if (childMessages.length < FETCH_MESSAGES_LIMIT)
@@ -194,7 +199,7 @@ export default {
       dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
         childMessages => {
           // align last message to the bottom (pushes the new messages just below the TMF viewport)
-          dispatch('focusOnMessage', { message: childMessages[0], block: 'end' });
+          dispatch('focusOnMessage', { id: childMessages[0].id, block: 'end' });
           if (childMessages.length < FETCH_MESSAGES_LIMIT)
             commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
         }
@@ -204,7 +209,7 @@ export default {
       const parentIdBeforeFetch = state.parentId;
       return dispatch('fetchChildMessages').then(childMessages => {
         const lastMessage = childMessages[childMessages.length - 1];
-        if (lastMessage) dispatch('focusOnMessage', { message: lastMessage, block: 'end' });
+        if (lastMessage) dispatch('focusOnMessage', { id: lastMessage.id, block: 'end' });
         commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
         if (childMessages.length < FETCH_MESSAGES_LIMIT) {
           commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
