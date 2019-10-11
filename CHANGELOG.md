@@ -1,4 +1,4 @@
-# 20.5.0 - *upcoming*
+# 20.5.0 - 2019-10-10
 
  - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
  - Fix a condition that triggers update of group avatars, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1611
