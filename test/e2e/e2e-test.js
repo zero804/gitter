@@ -12,6 +12,10 @@ assert(
   'baseUrl is not defined (make sure to pass it in via --env or CYPRESS_baseUrl environment variable)'
 );
 
+Cypress.on('uncaught:exception', (err, runnable) => {
+  cy.log('err', err);
+});
+
 describe('e2e tests', function() {
   beforeEach(() => {
     // Remember the feature toggle cookie

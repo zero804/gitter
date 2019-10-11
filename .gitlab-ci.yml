@@ -88,6 +88,8 @@ test-all:
     ENABLE_FIXTURE_ENDPOINTS: 1
     DISABLE_GITHUB_API: 1
     NODE_ENV: test-docker
+    # For Cypress, see https://github.com/cypress-io/cypress/issues/3199#issuecomment-492728331
+    ELECTRON_ENABLE_LOGGING: 1
   script:
     # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
     - apt-get update -q -y
