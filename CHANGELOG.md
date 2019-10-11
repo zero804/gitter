@@ -1,3 +1,7 @@
+# 20.6.0 - *upcoming*
+
+ - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
+
 # 20.5.0 - 2019-10-10
 
  - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
