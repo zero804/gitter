@@ -1,6 +1,7 @@
 # 20.6.0 - *upcoming*
 
  - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
+ - Add room-scoped feature toggle for threaded-conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1620
 
 Developer facing:
 
