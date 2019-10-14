@@ -11,7 +11,8 @@ var TroupeMetaSchema = new Schema(
     welcomeMessage: {
       html: String,
       text: String
-    }
+    },
+    threadedConversations: { type: Boolean, default: false }
   },
   { strict: true }
 );

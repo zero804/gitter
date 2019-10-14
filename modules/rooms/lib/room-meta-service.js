@@ -4,22 +4,18 @@ var assert = require('assert');
 var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
-function findMetaByTroupeId(troupeId, metaKey) {
+async function findMetaByTroupeId(troupeId, metaKeys) {
   assert(mongoUtils.isLikeObjectId(troupeId));
-  assert(metaKey);
+  assert(metaKeys);
   troupeId = mongoUtils.asObjectID(troupeId);
 
-  var select = { _id: 0 };
-  select[metaKey] = 1;
+  const selectId = { _id: 0 };
+  const select = metaKeys.reduce((acc, key) => ({ ...acc, [key]: 1 }), selectId);
 
-  return persistence.TroupeMeta.findOne({ troupeId: troupeId }, select)
-    .select(metaKey)
+  const meta = await persistence.TroupeMeta.findOne({ troupeId: troupeId }, select)
     .lean()
-    .exec()
-    .then(function(result) {
-      if (!result) return null;
-      return result[metaKey];
-    });
+    .exec();
+  return meta || {}; // empty object instead of undefined allows safe destructuring in clients
 }
 
 function upsertMetaKey(troupeId, metaKey, value) {

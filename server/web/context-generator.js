@@ -8,6 +8,57 @@ var userService = require('gitter-web-users');
 var roomMetaService = require('gitter-web-rooms/lib/room-meta-service');
 var contextGeneratorRequest = require('./context-generator-request');
 
+function serializeUser(user) {
+  var strategy = new restSerializer.UserStrategy({
+    exposeRawDisplayName: true,
+    includeScopes: true,
+    includePermissions: true,
+    showPremiumStatus: true,
+    includeProviders: true
+  });
+
+  return restSerializer.serializeObject(user, strategy);
+}
+
+function serializeTroupe(troupe, user) {
+  var strategy = new restSerializer.TroupeStrategy({
+    currentUserId: user ? user.id : null,
+    currentUser: user,
+    includePermissions: true,
+    includeOwner: true,
+    includeProviders: true,
+    includeGroups: true,
+    includeBackend: true,
+    includeAssociatedRepo: true
+  });
+
+  return restSerializer.serializeObject(troupe, strategy);
+}
+
+function serializeGroup(group, user) {
+  var strategy = new restSerializer.GroupStrategy({
+    currentUser: user,
+    currentUserId: user && user._id
+  });
+
+  return restSerializer.serializeObject(group, strategy);
+}
+
+function serializeTroupeId(troupeId, user) {
+  var strategy = new restSerializer.TroupeIdStrategy({
+    currentUserId: user ? user.id : null,
+    currentUser: user,
+    includePermissions: true,
+    includeOwner: true,
+    includeProviders: true,
+    includeGroups: true,
+    includeBackend: true,
+    includeAssociatedRepo: true
+  });
+
+  return restSerializer.serializeObject(troupeId, strategy);
+}
+
 /**
  * Returns the promise of a mini-context
  */
@@ -99,8 +150,10 @@ function generateTroupeContext(req, extras) {
     contextGeneratorRequest(req),
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
-    troupe && troupe._id ? roomMetaService.findMetaByTroupeId(troupe._id, 'welcomeMessage') : false
-  ]).spread(function(reqContextHash, serializedUser, serializedTroupe, welcomeMessage) {
+    troupe && troupe._id
+      ? roomMetaService.findMetaByTroupeId(troupe._id, ['welcomeMessage'])
+      : false
+  ]).spread(function(reqContextHash, serializedUser, serializedTroupe, { welcomeMessage }) {
     var roomHasWelcomeMessage = !!(
       welcomeMessage &&
       welcomeMessage.text &&
@@ -119,57 +172,6 @@ function generateTroupeContext(req, extras) {
       extras
     );
   });
-}
-
-function serializeUser(user) {
-  var strategy = new restSerializer.UserStrategy({
-    exposeRawDisplayName: true,
-    includeScopes: true,
-    includePermissions: true,
-    showPremiumStatus: true,
-    includeProviders: true
-  });
-
-  return restSerializer.serializeObject(user, strategy);
-}
-
-function serializeGroup(group, user) {
-  var strategy = new restSerializer.GroupStrategy({
-    currentUser: user,
-    currentUserId: user && user._id
-  });
-
-  return restSerializer.serializeObject(group, strategy);
-}
-
-function serializeTroupeId(troupeId, user) {
-  var strategy = new restSerializer.TroupeIdStrategy({
-    currentUserId: user ? user.id : null,
-    currentUser: user,
-    includePermissions: true,
-    includeOwner: true,
-    includeProviders: true,
-    includeGroups: true,
-    includeBackend: true,
-    includeAssociatedRepo: true
-  });
-
-  return restSerializer.serializeObject(troupeId, strategy);
-}
-
-function serializeTroupe(troupe, user) {
-  var strategy = new restSerializer.TroupeStrategy({
-    currentUserId: user ? user.id : null,
-    currentUser: user,
-    includePermissions: true,
-    includeOwner: true,
-    includeProviders: true,
-    includeGroups: true,
-    includeBackend: true,
-    includeAssociatedRepo: true
-  });
-
-  return restSerializer.serializeObject(troupe, strategy);
 }
 
 module.exports = {
