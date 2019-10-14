@@ -220,20 +220,35 @@ describe('room-with-policy-service', function() {
     });
   });
 
-  describe('welcome message', function() {
-    it('should allow you to create a welcome message', function() {
-      var welcomeMessage = 'this is a test';
-      var r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
-      return r
-        .updateRoomWelcomeMessage({ welcomeMessage: welcomeMessage })
-        .then(function() {
-          return r.getRoomWelcomeMessage();
-        })
-        .then(function(result) {
-          assert(result.text);
-          assert(result.html);
-          assert.equal(result.text, welcomeMessage);
-        });
+  describe('meta', function() {
+    it('should allow you to set a welcome message', async function() {
+      const welcomeMessageText = 'this is a test';
+      const r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
+      await r.updateRoomMeta({ welcomeMessage: welcomeMessageText });
+
+      const { welcomeMessage } = await r.getMeta();
+      assert(welcomeMessage.text);
+      assert(welcomeMessage.html);
+      assert.equal(welcomeMessage.text, welcomeMessageText);
+    });
+
+    it('should allow you to set the threadedConversations toggle', async function() {
+      const r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
+      await r.updateRoomMeta({ threadedConversations: true });
+
+      const { threadedConversations } = await r.getMeta();
+      assert(threadedConversations);
+      assert.equal(threadedConversations, true);
+    });
+
+    it('should retrieve room metadata', async () => {
+      const r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
+      await r.updateRoomMeta({ welcomeMessage: 'hello', threadedConversations: false });
+      const result = await r.getMeta();
+      assert.deepStrictEqual(result, {
+        welcomeMessage: { text: 'hello', html: 'hello' },
+        threadedConversations: false
+      });
     });
   });
 

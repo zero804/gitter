@@ -280,28 +280,48 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
 /**
  *  GET room meta/welcome-message
  */
-RoomWithPolicyService.prototype.getRoomWelcomeMessage = secureMethod([allowJoin], function() {
-  return roomMetaService.findMetaByTroupeId(this.room.id, 'welcomeMessage').then(function(result) {
-    result = result || { text: '', html: '' };
-    return result;
-  });
+RoomWithPolicyService.prototype.getMeta = secureMethod([allowJoin], async function() {
+  const { welcomeMessage, threadedConversations } = await roomMetaService.findMetaByTroupeId(
+    this.room.id,
+    ['welcomeMessage', 'threadedConversations']
+  );
+
+  return {
+    welcomeMessage: welcomeMessage || { text: '', html: '' },
+    threadedConversations: threadedConversations || false
+  };
 });
 
 /**
  * Update the welcome message for a room
  */
-RoomWithPolicyService.prototype.updateRoomWelcomeMessage = secureMethod([allowAdmin], function(
-  data
-) {
-  if (!data || (!data.welcomeMessage && data.welcomeMessage !== '')) throw new StatusError(400);
+RoomWithPolicyService.prototype.updateRoomMeta = secureMethod([allowAdmin], async function({
+  welcomeMessage,
+  threadedConversations
+} = {}) {
+  const result = {};
 
-  return processText(data.welcomeMessage)
-    .bind(this)
-    .then(function(welcomeMessage) {
-      return roomMetaService
-        .upsertMetaKey(this.room.id, 'welcomeMessage', welcomeMessage)
-        .return({ welcomeMessage: welcomeMessage });
-    });
+  if (welcomeMessage) {
+    const resultantWelcomeMessage = await processText('' + welcomeMessage);
+
+    await roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', resultantWelcomeMessage);
+
+    result.welcomeMessage = resultantWelcomeMessage;
+  }
+
+  if (threadedConversations === true || threadedConversations === false) {
+    const resultantThreadedConversations = !!threadedConversations;
+
+    await roomMetaService.upsertMetaKey(
+      this.room.id,
+      'threadedConversations',
+      resultantThreadedConversations
+    );
+
+    result.threadedConversations = resultantThreadedConversations;
+  }
+
+  return result;
 });
 
 /**
