@@ -2,6 +2,10 @@
 
  - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
 
+Developer facing:
+
+- `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
+
 # 20.5.0 - 2019-10-10
 
  - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
