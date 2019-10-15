@@ -30,7 +30,7 @@ var View = Marionette.ItemView.extend({
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
     apiClient.room
-      .get('/meta/all')
+      .get('/meta')
       .then(({ welcomeMessage = { text: '', html: '' }, threadedConversations = false }) => {
         if (welcomeMessage.text.length) {
           this.initWithMessage(welcomeMessage);
@@ -129,7 +129,7 @@ var View = Marionette.ItemView.extend({
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
-      apiClient.room.put('/meta/all', {
+      apiClient.room.post('/meta', {
         welcomeMessage: welcomeMessageContent,
         threadedConversations
       })
