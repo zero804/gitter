@@ -30,9 +30,9 @@ var View = Marionette.ItemView.extend({
   },
 
   onRender: function() {
-    apiClient.room.get('/meta/welcome-message').then(
-      function(welcomeMessage) {
-        this.ui.welcomeMessage.html(welcomeMessage.html);
+    apiClient.room.get('/meta').then(
+      function(roomMetadata) {
+        this.ui.welcomeMessage.html(roomMetadata.welcomeMessage.html);
       }.bind(this)
     );
   },

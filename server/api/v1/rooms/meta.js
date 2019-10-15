@@ -8,7 +8,7 @@ var loadTroupeFromParam = require('./load-troupe-param');
 module.exports = {
   id: 'roomMetaKey',
 
-  show: async function(req) {
+  index: async function(req) {
     if (!req.user) {
       throw new StatusError(401);
     }
@@ -18,7 +18,7 @@ module.exports = {
     return await roomWithPolicyService.getMeta();
   },
 
-  update: async function(req) {
+  create: async function(req) {
     if (!req.user) {
       throw new StatusError(401);
     }
