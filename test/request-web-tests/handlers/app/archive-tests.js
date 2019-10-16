@@ -26,17 +26,17 @@ describe('handlers/app/archive', () => {
   });
 
   describe('chat archive', () => {
-    it('GET /{troupe.uri}/archives/2018/01/03?at={messageId} returns archive in Australia', async function() {
+    it('GET /{troupe.uri}/archives/2018/01/02?at={messageId} returns archive', async function() {
       // this test takes around 100ms when run in the whole suite
       // when running only this suite it can take around 3s
       this.timeout(5000);
       return request(app)
-        .get(`/${fixture.troupe1.uri}/archives/2018/01/03?at=${fixture.message1.id}`)
+        .get(`/${fixture.troupe1.uri}/archives/2018/01/02?at=${fixture.message1.id}`)
         .set('Cookie', ['gitter_tz=-1000:Australian Eastern Standard Time:Australia/Melbourne'])
         .expect(200);
     });
 
-    it('GET /{troupe.uri}/archives/2018/01/03?at={messageId} redirects to previous day archive in CET', async function() {
+    it('GET /{troupe.uri}/archives/2018/01/03?at={messageId} redirects to previous day archive', async function() {
       const response = await request(app)
         .get(`/${fixture.troupe1.uri}/archives/2018/01/03?at=${fixture.message1.id}`)
         .set('Cookie', ['gitter_tz=-0200:Central European Summer Time:Europe/Prague'])

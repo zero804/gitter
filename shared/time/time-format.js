@@ -2,47 +2,45 @@
 
 var moment = require('moment');
 
+// checks whether two moment times are on the same date
+const isSameDay = (a, b) =>
+  a.date() === b.date() && a.month() === b.month() && a.year() === b.year();
+
 /**
  * Returns an abbreviated time format.
  *
  * * If the date is today, returns the time
  * * If the date is this year, returns the full date without a year
  * * Otherwise returns the full
+ *
+ * option.now makes testing easier
  */
-module.exports = function timeFormat(time, options) {
+module.exports = function timeFormat(time, { lang, tzOffset, compact, now, forceUtc } = {}) {
   if (!time) return '';
 
-  var lang, tzOffset, compact, now;
-  if (options) {
-    lang = options.lang;
-    tzOffset = options.tzOffset;
-    compact = options.compact;
-    now = options.now; // Makes testing easier
-  }
-
-  time = moment(time);
+  const momentTime = moment(time);
   if (lang) {
-    time.locale(lang === 'en' ? 'en-gb' : lang);
+    momentTime.locale(lang === 'en' ? 'en-gb' : lang);
   }
 
-  if (tzOffset !== undefined) {
-    time.utcOffset(-tzOffset);
+  const parsedOffset = forceUtc ? 0 : tzOffset;
+  if (parsedOffset !== undefined) {
+    momentTime.utcOffset(-parsedOffset);
   }
 
-  var today = moment(now).utcOffset(time.utcOffset());
+  const today = moment(now).utcOffset(momentTime.utcOffset());
 
-  if (
-    time.date() === today.date() &&
-    time.month() === today.month() &&
-    time.year() === today.year()
-  ) {
+  // UTC suffix is used in archive to indicate the timestamp not being local time
+  const utcSuffix = forceUtc ? ' [UTC]' : '';
+  const formatHoursAndMinutes = compact ? '' : ' HH:mm';
+  if (isSameDay(momentTime, today)) {
     // TODO: deal with american `10:20 PM`
-    return time.format('HH:mm');
+    return momentTime.format(`HH:mm${utcSuffix}`);
   }
 
-  if (time.year() === today.year()) {
-    return time.format(compact ? 'MMM DD' : 'MMM DD HH:mm');
+  if (momentTime.year() === today.year()) {
+    return momentTime.format(`MMM DD${formatHoursAndMinutes}${utcSuffix}`);
   }
 
-  return time.format(compact ? 'MMM DD YYYY' : 'MMM DD YYYY HH:mm');
+  return momentTime.format(`MMM DD YYYY${formatHoursAndMinutes}${utcSuffix}`);
 };
