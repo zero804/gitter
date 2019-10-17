@@ -173,7 +173,7 @@ function createTroupe(fixtureName, f, fixture) {
 
 function createTroupes(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
-    if (key.match(/^troupe/)) {
+    if (key.match(/^troupe(?!Meta)/)) {
       var expectedTroupe = expected[key];
 
       expectedTroupe.userIds =
