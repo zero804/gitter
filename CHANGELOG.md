@@ -1,13 +1,12 @@
-# 20.6.0 - *upcoming*
-
+# 20.6.0 - 2019-10-18
  - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
  - Add room-scoped feature toggle for threaded-conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1620
  - Fix: Welcome message stopped showing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1624
  - Fix "Google search results usually link to the wrong place", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1608
-Developer facing:
--  Use room based threaded conversations toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1622
+ - Use room based threaded conversations toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1622
 
-- `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
+Developer facing:
+ - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
 
 # 20.5.0 - 2019-10-10
 
