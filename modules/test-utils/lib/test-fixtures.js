@@ -19,6 +19,7 @@ var fixtureSteps = [
   require('./create-identities'),
   require('./create-groups'),
   require('./create-troupes'),
+  require('./create-troupe-meta'),
   require('./create-messages'),
   require('./create-message-reports')
 ];

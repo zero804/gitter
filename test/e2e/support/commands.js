@@ -75,6 +75,22 @@ Cypress.Commands.add('toggleFeature', (featureName, force) => {
     });
 });
 
+Cypress.Commands.add('enableThreadedConversations', (user, room) => {
+  cy.log(`Enabling threaded conversations`);
+  // Make sure the feature toggle already exists
+  cy.request({
+    url: urlJoin(gitterApiBaseUrl, 'v1/rooms/', room._id, '/meta/all'),
+    method: 'PUT',
+    body: {
+      threadedConversations: true
+    },
+    headers: {
+      Authorization: `Bearer ${user.accessToken}`,
+      'Content-Type': 'application/json'
+    }
+  });
+});
+
 Cypress.Commands.add('sendMessage', (user, room, messageText, attributes) => {
   cy.log(`Sending message in ${room._id}: "${messageText}"`);
 

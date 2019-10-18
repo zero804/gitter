@@ -19,6 +19,7 @@ var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy')
 var GroupIdStrategy = require('./group-id-strategy');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 var AssociatedRepoStrategy = require('./troupes/associated-repo-strategy');
+const TroupeMetaIdStrategy = require('./troupes/troupe-meta-id-strategy');
 
 function getAvatarUrlForTroupe(serializedTroupe, options) {
   if (serializedTroupe.oneToOne && options && options.user) {
@@ -133,6 +134,7 @@ function TroupeStrategy(options) {
   var groupIdStrategy;
   var securityDescriptorStrategy;
   var associatedRepoStrategy;
+  var troupeMetaIdStrategy;
 
   this.preload = function(items) {
     // eslint-disable-line max-statements
@@ -215,6 +217,11 @@ function TroupeStrategy(options) {
       associatedRepoStrategy = new AssociatedRepoStrategy();
       strategies.push(associatedRepoStrategy.preload(items));
     }
+
+    // TODO this can be commented out/removed after [threaded conversations] ships
+    // troupe metadata
+    troupeMetaIdStrategy = new TroupeMetaIdStrategy();
+    strategies.push(troupeMetaIdStrategy.preload(troupeIds));
 
     return Promise.all(strategies);
   };
@@ -349,6 +356,8 @@ function TroupeStrategy(options) {
       backend: securityDescriptorStrategy ? securityDescriptorStrategy.map(item.sd) : undefined,
       public: isPublic,
       exists: options.includeExists ? !!id : undefined,
+      // TODO meta can be commented out/removed after [threaded conversations] ships
+      meta: troupeMetaIdStrategy.map(id) || {},
       v: getVersion(item)
     };
   };

@@ -18,6 +18,12 @@ async function findMetaByTroupeId(troupeId, metaKeys) {
   return meta || {}; // empty object instead of undefined allows safe destructuring in clients
 }
 
+async function findMetaByTroupeIds(troupeIds) {
+  return persistence.TroupeMeta.find({ troupeId: { $in: troupeIds } }, { _id: 0, __v: 0 })
+    .lean()
+    .exec();
+}
+
 function upsertMetaKey(troupeId, metaKey, value) {
   assert(troupeId && mongoUtils.isLikeObjectId(troupeId));
 
@@ -31,6 +37,7 @@ function upsertMetaKey(troupeId, metaKey, value) {
 }
 
 module.exports = {
-  findMetaByTroupeId: findMetaByTroupeId,
-  upsertMetaKey: upsertMetaKey
+  findMetaByTroupeId,
+  findMetaByTroupeIds,
+  upsertMetaKey
 };

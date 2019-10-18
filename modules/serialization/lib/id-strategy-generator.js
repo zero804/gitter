@@ -1,13 +1,12 @@
 'use strict';
 
 var collections = require('gitter-web-utils/lib/collections');
-var Promise = require('bluebird');
 var debug = require('debug')('gitter:infra:serializer:id-loader');
 var Lazy = require('lazy.js');
 var util = require('util');
 
-function BaseIdStrategy(stategyName, strategy, loaderFunction) {
-  this.stategyName = stategyName;
+function BaseIdStrategy(strategyName, strategy, loaderFunction) {
+  this.strategyName = strategyName;
   this.strategy = strategy;
   this.loaderFunction = loaderFunction;
   this.objectHash = null;
@@ -20,27 +19,20 @@ function BaseIdStrategy(stategyName, strategy, loaderFunction) {
 }
 
 BaseIdStrategy.prototype = {
-  preload: Promise.method(function(ids) {
+  preload: async function(ids) {
     if (ids.isEmpty()) return;
 
     var time = debug.enabled && Date.now();
 
     var idArray = ids.toArray();
-    return this.loaderFunction(idArray)
-      .bind({
-        time: time,
-        self: this
-      })
-      .then(function(fullObjects) {
-        var self = this.self;
-        var duration = debug.enabled && Date.now() - this.time;
-        debug('%s loaded %s items from ids in %sms', self.stategyName, idArray.length, duration);
+    const fullObjects = await this.loaderFunction(idArray);
+    var duration = debug.enabled && Date.now() - time;
+    debug('%s loaded %s items from ids in %sms', this.strategyName, idArray.length, duration);
 
-        self.objectHash = collections.indexById(fullObjects);
+    this.objectHash = collections.indexById(fullObjects);
 
-        return self.strategy.preload(Lazy(fullObjects));
-      });
-  }),
+    return this.strategy.preload(Lazy(fullObjects));
+  },
 
   map: function(id) {
     if (!this.objectHash) return undefined;
