@@ -81,7 +81,7 @@ function checkForAvatarUpdate(groupId, group, githubUsername) {
   if (
     !group.avatarVersion ||
     !group.avatarCheckedDate ||
-    group.avatarCheckedDate - Date.now() > AVATAR_VERSION_CHECK_TIMEOUT
+    Date.now() - group.avatarCheckedDate > AVATAR_VERSION_CHECK_TIMEOUT
   ) {
     debug(
       'Attempting to fetch group avatar for groupId=%s for github user=%s',

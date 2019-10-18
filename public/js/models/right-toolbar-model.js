@@ -16,6 +16,7 @@ var RightToolbarModel = Backbone.Model.extend({
 
   toJSON: function() {
     // Get around circular structure
+    //eslint-disable-next-line
     var attrs = this.attributes;
     return Object.keys(this.defaults).reduce(function(memo, key) {
       memo[key] = attrs[key];

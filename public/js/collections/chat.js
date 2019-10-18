@@ -61,6 +61,7 @@ var ChatModel = Backbone.Model.extend({
   },
 
   toJSON: function() {
+    //eslint-disable-next-line
     var d = _.clone(this.attributes);
     var sent = this.get('sent');
     if (sent) {

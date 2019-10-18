@@ -48,11 +48,9 @@ module.exports = Backbone.Model.extend({
   },
 
   toJSON: function() {
-    var attrs = this.attributes;
-
     return {
-      roomMenuIsPinned: attrs.roomMenuIsPinned,
-      hasDismissedSuggestions: attrs.hasDismissedSuggestions
+      roomMenuIsPinned: this.get('roomMenuIsPinned'),
+      hasDismissedSuggestions: this.get('hasDismissedSuggestions')
     };
   },
 

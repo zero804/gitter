@@ -1,3 +1,49 @@
+# 20.5.0 - 2019-10-10
+
+ - Sending a message focuses thread message feed on it, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1604
+ - Fix a condition that triggers update of group avatars, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1611
+
+Developer facing:
+
+ - Use more robust security CI includes which will work on [`dev.gitlab.org`](https://dev.gitlab.org/), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1607
+ - Update docker-compose file to version 3, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1609
+ - Remove bluebird usage from delete-user script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1605
+ - Fix iOS asset build, including embedded chat startup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1610
+    - Thanks to [@puremourning](https://gitlab.com/puremourning) for the contribution
+ - Exclude non-production code from SAST scans, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1612
+ - Generate DAST security reports in CI (for [GitLab security dashboard](https://gitlab.com/help/user/application_security/security_dashboard/index.md)), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1613
+ - Introduce backbone eslint plugin, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1615
+ - Update to `cypress@3.4.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1616
+
+
+# 20.4.4 - 2019-10-10
+
+ - Security fix related to OAuth client authorization flow, https://gitlab.com/gitlab-org/gitter/webapp/issues/2305
+    - Thanks to [@gregxsunday](https://hackerone.com/gregxsunday) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/40
+
+
+# 20.4.3 - 2019-10-2
+
+ - Fix Twitter share link in create room email, https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/36
+
+
+# 20.4.2 - 2019-10-2
+
+ - Security fix related to email templates, https://gitlab.com/gitlab-org/gitter/webapp/issues/2086
+    - Thanks to [@paresh_parmar](https://hackerone.com/paresh_parmar) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/30
+ - Security fix related to uploads, https://gitlab.com/gitlab-org/gitter/webapp/issues/2114
+    - Thanks to [@iframe](https://hackerone.com/iframe) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/34
+
+# 20.4.1 - 2019-9-26
+
+ - Security fix related to message text processing, https://gitlab.com/gitlab-org/gitter/webapp/issues/2083
+    - Thanks to [@jaykpatel](https://hackerone.com/jaykpatel) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/29
+
+
 # 20.4.0 - 2019-9-25
 
  - Clarify how `@/all` can be used, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1594

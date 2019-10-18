@@ -8,8 +8,8 @@
     "ecmaVersion": 2018,
     "sourceType": "script"
   },
-  "plugins": ["jquery", "jest"],
-  "extends": ["plugin:jest/recommended"],
+  "plugins": ["jquery", "jest", "backbone"],
+  "extends": ["plugin:jest/recommended", "plugin:backbone/recommended"],
   "rules": {
     "node/no-unpublished-require": "off",
     "node/no-unsupported-features": "off",
@@ -52,6 +52,9 @@
     "jquery/no-trim": 2,
     "jquery/no-val": "off",
     "jquery/no-wrap": 2,
+
+    "backbone/collection-model": 1,
+    "backbone/model-defaults": 1,
 
     "vue/html-self-closing": [
       "error",

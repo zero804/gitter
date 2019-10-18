@@ -6,7 +6,9 @@ COPY output/app.tar.gz /tmp/app.tar.gz
 
 RUN tar -xvzf /tmp/app.tar.gz -C /app && \
     rm -rf node_modules npm-shrinkwrap.json package-lock.json && \
-    npm install --production
+    # Normally we use `npm install --production` but we need the
+    # devDependencies(like webpack) installed so we can run in NODE_ENV=test-docker
+    npm install
 
 RUN rm -rf /tmp/* /npm_cache /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null
 

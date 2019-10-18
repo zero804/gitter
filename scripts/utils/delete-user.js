@@ -26,12 +26,14 @@ userRemovalService
   .removeByUsername(opts.username, {
     ghost: opts.ghost
   })
-  .delay(5000)
+  // wait 5 seconds to allow for asynchronous `event-listeners` to finish
+  // https://github.com/troupe/gitter-webapp/issues/580#issuecomment-147445395
+  // https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1605#note_222861592
+  .then(() => new Promise(resolve => setTimeout(resolve, 5000)))
   .then(function() {
     shutdown.shutdownGracefully();
   })
   .catch(function(err) {
     console.error('Error: ' + err, err);
     shutdown.shutdownGracefully(1);
-  })
-  .done();
+  });
