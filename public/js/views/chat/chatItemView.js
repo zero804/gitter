@@ -32,8 +32,6 @@ const statusItemTemplate = require('./tmpl/statusItemView.hbs');
 const actionsTemplate = require('./tmpl/actionsView.hbs');
 const ChatEditView = require('../chat/chat-edit-view');
 
-const useThreadedConversations = context.hasFeature('threaded-conversations');
-
 require('../behaviors/unread-items');
 require('../behaviors/widgets');
 require('../behaviors/highlight');
@@ -197,7 +195,7 @@ module.exports = (function() {
       }
       data.isPermalinkable = this.isPermalinkable;
       data.showItemActions = !this.isArchive();
-      data.useThreadedConversations = useThreadedConversations;
+      data.useThreadedConversations = context.useThreadedConversations();
       return data;
     },
 
@@ -559,7 +557,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: useThreadedConversations ? '125px' : '100px'
+        width: context.useThreadedConversations() ? '125px' : '100px'
       });
 
       this.listenTo(actions, 'render', function() {
@@ -834,7 +832,7 @@ module.exports = (function() {
 
       const actions = [];
 
-      if (useThreadedConversations) {
+      if (context.useThreadedConversations()) {
         const threadMessageCount = this.model.get('threadMessageCount');
         actions.push({
           name: 'threadReply',

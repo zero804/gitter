@@ -113,7 +113,7 @@ function createGroups(expected, fixture) {
     return null;
   }).then(function() {
     return Promise.map(Object.keys(expected), function(key) {
-      if (key.match(/^troupe/)) {
+      if (key.match(/^troupe(?!Meta)/)) {
         return createExtraGroups(expected, fixture, key);
       }
 

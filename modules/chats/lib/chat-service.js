@@ -202,19 +202,16 @@ async function newChatMessageToTroupe(troupe, user, data) {
     .done();
 
   // Async add unread items
-  // TODO: enable thread messages notifications after https://gitlab.com/gitlab-org/gitter/webapp/issues/2309
-  if (!data.parentId) {
-    unreadItemService
-      .createChatUnreadItems(user.id, troupe, chatMessage)
-      .catch(function(err) {
-        errorReporter(
-          err,
-          { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
-          { module: 'chat-service' }
-        );
-      })
-      .done();
-  }
+  unreadItemService
+    .createChatUnreadItems(user.id, troupe, chatMessage)
+    .catch(function(err) {
+      errorReporter(
+        err,
+        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+        { module: 'chat-service' }
+      );
+    })
+    .done();
 
   const statMetadata = _.extend(
     {

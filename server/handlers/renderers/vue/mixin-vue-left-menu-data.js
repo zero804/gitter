@@ -43,13 +43,10 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     storeData
   });
 
-  const useThreadedConversations = req.fflip.has('threaded-conversations');
-  const threadMessageFeedHtmlOutput = useThreadedConversations
-    ? await vueRenderToString({
-        moduleToRender: 'thread-message-feed',
-        storeData
-      })
-    : null;
+  const threadMessageFeedHtmlOutput = await vueRenderToString({
+    moduleToRender: 'thread-message-feed',
+    storeData
+  });
 
   return {
     ...existingData,

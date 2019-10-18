@@ -72,6 +72,7 @@ describe('GithubOrgStrategy', function() {
             security: 'PUBLIC',
             noindex: false,
             public: true,
+            meta: {},
             v: 1
           },
           premium: false

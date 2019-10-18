@@ -150,6 +150,7 @@ function generateTroupeContext(req, extras) {
     contextGeneratorRequest(req),
     user ? serializeUser(user) : null,
     troupe ? serializeTroupe(troupe, user) : undefined,
+    // TODO: if we keep serializing troupes with metadata, we can replace following with troupe.meta.welcomeMessage
     troupe && troupe._id
       ? roomMetaService.findMetaByTroupeId(troupe._id, ['welcomeMessage'])
       : false
