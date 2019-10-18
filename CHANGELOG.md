@@ -5,6 +5,7 @@
  - Fix: Welcome message stopped showing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1624
  - Fix "Google search results usually link to the wrong place", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1608
 Developer facing:
+-  Use room based threaded conversations toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1622
 
 - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
 
