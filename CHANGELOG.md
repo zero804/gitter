@@ -1,4 +1,11 @@
+# 20.7.0 - *Upcoming*
+
+ - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+
+
 # 20.6.0 - 2019-10-18
+
  - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
  - Add room-scoped feature toggle for threaded-conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1620
  - Fix: Welcome message stopped showing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1624
@@ -7,6 +14,7 @@
 
 Developer facing:
  - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
+
 
 # 20.5.0 - 2019-10-10
 
