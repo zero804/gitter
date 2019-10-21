@@ -10,7 +10,6 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context = require('gitter-web-client-context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
-const useThreadedConversations = context.hasFeature('threaded-conversations');
 
 require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
@@ -256,10 +255,17 @@ module.exports = (function() {
     },
 
     scrollToChat: function(chat) {
-      var view = this.children.findByModel(chat);
-      if (!view) return;
-      this.rollers.scrollToElement(view.el, { centre: true });
-      return true;
+      const parentId = chat.get('parentId');
+      if (parentId && context.useThreadedConversations()) {
+        appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
+          id: chat.id
+        });
+        this.scrollToChatId(parentId);
+      } else {
+        const view = this.children.findByModel(chat);
+        if (!view) return;
+        this.rollers.scrollToElement(view.el, { centre: true });
+      }
     },
 
     scrollToChatId: function(id) {
@@ -385,7 +391,7 @@ module.exports = (function() {
 
         // if permalink points to a child message
         const parentId = model.get('parentId');
-        if (parentId && useThreadedConversations) {
+        if (parentId && context.useThreadedConversations()) {
           appEvents.trigger('dispatchVueAction', 'threadMessageFeed/highlightChildMessage', {
             parentId,
             id: model.id

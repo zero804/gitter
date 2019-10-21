@@ -13,6 +13,7 @@ var View = Marionette.ItemView.extend({
 
   ui: {
     githubOnly: '#github-only',
+    threadedConversations: '#threaded-conversations-toggle',
     welcomeMessage: '#room-welcome-message',
     welcomeMessagePreviewButton: '#preview-welcome-message',
     welcomeMessagePreviewContainer: '#welcome-message-preview-container',
@@ -29,16 +30,16 @@ var View = Marionette.ItemView.extend({
   initialize: function() {
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
     apiClient.room
-      .get('/meta/welcome-message')
-      .then(
-        function(welcomeMessage) {
-          welcomeMessage = welcomeMessage || { text: '', html: '' };
-          if (welcomeMessage.text.length) {
-            return this.initWithMessage(welcomeMessage);
-          }
-          return this.initEmptyTextArea();
-        }.bind(this)
-      )
+      .get('/meta')
+      .then(({ welcomeMessage = { text: '', html: '' }, threadedConversations = false }) => {
+        if (welcomeMessage.text.length) {
+          this.initWithMessage(welcomeMessage);
+        } else {
+          this.initEmptyTextArea();
+        }
+
+        this.initThreadedConversations(threadedConversations);
+      })
       .catch(this.showError.bind(this));
   },
 
@@ -70,6 +71,10 @@ var View = Marionette.ItemView.extend({
 
   initWithMessage: function(msg) {
     this.ui.welcomeMessage.val(msg.text);
+  },
+
+  initThreadedConversations: function(threadedConversations) {
+    this.ui.threadedConversations.prop('checked', threadedConversations);
   },
 
   onRender: function() {
@@ -119,11 +124,15 @@ var View = Marionette.ItemView.extend({
 
   formSubmit: function() {
     var providers = this.ui.githubOnly.is(':checked') ? ['github'] : [];
+    const threadedConversations = this.ui.threadedConversations.is(':checked');
     var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
-      apiClient.room.put('/meta/welcome-message', { welcomeMessage: welcomeMessageContent })
+      apiClient.room.post('/meta', {
+        welcomeMessage: welcomeMessageContent,
+        threadedConversations
+      })
     ])
       .spread(
         function(updatedTroupe /*, metaResponse*/) {

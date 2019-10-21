@@ -158,6 +158,36 @@ describe('room-api', function() {
       .expect(200);
   });
 
+  describe('meta', () => {
+    it('GET /v1/rooms/:roomId/meta', function() {
+      const room = fixture.troupe1;
+
+      return request(app)
+        .get(`/v1/rooms/${room.id}/meta`)
+        .set('x-access-token', fixture.user1.accessToken)
+        .expect(200)
+        .then(function(result) {
+          assert.deepEqual(result.body, {
+            welcomeMessage: { text: '', html: '' },
+            threadedConversations: false
+          });
+        });
+    });
+
+    it('POST /v1/rooms/:roomId/meta', function() {
+      const room = fixture.troupe1;
+
+      return request(app)
+        .post(`/v1/rooms/${room.id}/meta`)
+        .send({
+          welcomeMessage: 'asdf',
+          threadedConversations: true
+        })
+        .set('x-access-token', fixture.user3.accessToken)
+        .expect(200);
+    });
+  });
+
   it("POST /v1/rooms/:roomId/invites with a user doesn't leak email", function() {
     // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
     // This test is under a conditional instead of skipped

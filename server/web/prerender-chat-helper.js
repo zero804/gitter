@@ -18,7 +18,7 @@ var chatWrapper = compileTemplate.compileString(
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');
 var statusItemTemplate = compileTemplate('/js/views/chat/tmpl/statusItemView.hbs');
 
-function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
+function getFormattedTime(model, lang, tz, tzOffset, isArchive) {
   /* In the chat environment, we don't want to prerender the time
    * when we don't know what timezone the user is in: we'll just wait
    * until the javascript kicks in and render it then.
@@ -27,11 +27,11 @@ function getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone) {
    * for SEO and also because the chats are not re-rendered, so no
    * times will be shown.
    */
-  if (!tz && !showDatesWithoutTimezone) {
+  if (!tz && !isArchive) {
     return '';
   }
 
-  return timeFormat(model.sent, { lang: lang, tzOffset: tzOffset });
+  return timeFormat(model.sent, { lang: lang, tzOffset: tzOffset, forceUtc: isArchive });
 }
 
 module.exports = exports = function(model, params) {
@@ -46,7 +46,6 @@ module.exports = exports = function(model, params) {
   var locale = root.locale;
   var tz = root.tz;
   var tzOffset = root.tzOffset;
-  var showDatesWithoutTimezone = root.showDatesWithoutTimezone;
 
   var text = model.text || '';
   var html = model.html || model.text || '';
@@ -57,7 +56,7 @@ module.exports = exports = function(model, params) {
     deletedClass = 'deleted';
   }
 
-  var sentTimeFormatted = getFormattedTime(model, lang, tz, tzOffset, showDatesWithoutTimezone);
+  const sentTimeFormatted = getFormattedTime(model, lang, tz, tzOffset, isArchive);
   // TODO: add sentTimeFull
 
   var m = _.extend({}, model, {
@@ -70,7 +69,6 @@ module.exports = exports = function(model, params) {
     locale: locale,
     tz: tz,
     tzOffset: tzOffset,
-    showDatesWithoutTimezone: showDatesWithoutTimezone,
     permalinkUrl: generatePermalink(troupeName, model.id, model.sent, isArchive),
     showItemActions: !isArchive
   });

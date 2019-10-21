@@ -426,7 +426,6 @@ module.exports = (function() {
       var modelsInRange = this.findModelsInViewport(topBound, bottomBound);
       modelsInRange.forEach(function(model) {
         if (!model.get('unread')) return;
-
         self._store.markItemRead(model.id);
       });
 
@@ -478,7 +477,7 @@ module.exports = (function() {
         return view.el.offsetTop;
       });
 
-      return remainingChildren.slice(0, bottomIndex);
+      return remainingChildren.slice(0, bottomIndex).filter(model => !model.get('parentId')); //ignore thread messages that are for some reason marked as visible
     },
 
     _resetFoldModel: function() {
@@ -488,14 +487,14 @@ module.exports = (function() {
         hasUnreadBelow: false,
         hasUnreadAbove: false,
         oldestUnreadItemId: null,
-        mostRecentUnreadItemId: null,
+        firstUnreadItemIdBelow: null,
 
         mentionsAbove: 0,
         mentionsBelow: 0,
         hasMentionsAbove: false,
         hasMentionsBelow: false,
         oldestMentionId: null,
-        mostRecentMentionId: null
+        firstMentionIdBelow: null
       });
     },
 
@@ -514,12 +513,6 @@ module.exports = (function() {
         return;
       }
 
-      var above = 0;
-      var below = 0;
-
-      var mentionsAbove = 0;
-      var mentionsBelow = 0;
-
       var scrollElement = this._scrollElement;
 
       var topBound = scrollElement.scrollTop;
@@ -536,48 +529,44 @@ module.exports = (function() {
       }
 
       var first = modelsInRange[0];
-      var last = modelsInRange[modelsInRange.length - 1];
       var firstItemId = first.id;
-      var lastItemId = last.id;
 
-      var oldestUnreadItemId = null;
-      var mostRecentUnreadItemId = null;
-      var oldestMentionId = null;
-      var mostRecentMentionId = null;
+      const mentions = store.getMentions();
 
-      chats.forEach(function(itemId) {
-        if (itemId < firstItemId) {
-          above++;
-          if (!oldestUnreadItemId) oldestUnreadItemId = itemId;
-          if (store._items[itemId]) {
-            mentionsAbove++;
-            oldestMentionId = itemId;
-          }
-        }
-        if (itemId > lastItemId) {
-          below++;
-          if (!mostRecentUnreadItemId) mostRecentUnreadItemId = itemId;
-          if (store._items[itemId]) {
-            mentionsBelow++;
-            if (!mostRecentMentionId) mostRecentMentionId = itemId;
-          }
-        }
-      });
+      const isMoreRecentThanFirstVisibleId = itemId => itemId < firstItemId;
+
+      const chatsAbove = chats.filter(isMoreRecentThanFirstVisibleId);
+      const aboveCount = chatsAbove.length;
+      const oldestUnreadItemId = chatsAbove[0];
+
+      const mentionsAbove = mentions.filter(isMoreRecentThanFirstVisibleId);
+      const mentionsAboveCount = mentionsAbove.length;
+      const oldestMentionId = mentionsAbove[0];
+
+      /*
+        This logic used to take last visible item in the viewport and look for unreads older
+        than that. But since the introduction of thread messages there is a chance that there is
+        a thread message that is in the range between first and last visible item and so we repurposed
+        the below count to include unreads below the main message viewport + threaded messages
+      */
+      const isOlderThanFirstVisibleId = itemId => itemId > firstItemId;
+      const firstUnreadItemIdBelow = chats.filter(isOlderThanFirstVisibleId)[0];
+      const firstMentionIdBelow = mentions.filter(isOlderThanFirstVisibleId)[0];
 
       acrossTheFoldModel.set({
-        unreadAbove: above,
-        unreadBelow: below,
-        hasUnreadAbove: above > 0,
-        hasUnreadBelow: below > 0,
+        unreadAbove: aboveCount,
+        unreadBelow: chats.length - aboveCount,
+        hasUnreadAbove: aboveCount > 0,
+        hasUnreadBelow: chats.length - aboveCount > 0,
         oldestUnreadItemId: oldestUnreadItemId,
-        mostRecentUnreadItemId: mostRecentUnreadItemId,
+        firstUnreadItemIdBelow: firstUnreadItemIdBelow,
 
-        mentionsAbove: mentionsAbove,
-        mentionsBelow: mentionsBelow,
-        hasMentionsAbove: mentionsAbove > 0,
-        hasMentionsBelow: mentionsBelow > 0,
+        mentionsAbove: mentionsAboveCount,
+        mentionsBelow: mentions.length - mentionsAboveCount,
+        hasMentionsAbove: mentionsAboveCount > 0,
+        hasMentionsBelow: mentions.length - mentionsAboveCount > 0,
         oldestMentionId: oldestMentionId,
-        mostRecentMentionId: mostRecentMentionId
+        firstMentionIdBelow: firstMentionIdBelow
       });
     },
     _eyeballStateChange: function(newState) {
@@ -721,6 +710,11 @@ module.exports = (function() {
       });
     },
 
+    markItemRead: function(itemId) {
+      const unreadItemStore = getUnreadItemStoreReq();
+      unreadItemStore.markItemRead(itemId);
+    },
+
     syncCollections: function(collections) {
       var unreadItemStore = getUnreadItemStoreReq();
       new CollectionSync(unreadItemStore, collections.chat);
@@ -730,7 +724,9 @@ module.exports = (function() {
       var unreadItemStore = getUnreadItemStoreReq();
       new LurkActivityMonitor(_unreadItemStore, collectionView.collection);
       return new TroupeUnreadItemsViewportMonitor($el, unreadItemStore, collectionView);
-    }
+    },
+
+    _TestOnlyTroupeUnreadItemsViewportMonitor: TroupeUnreadItemsViewportMonitor
   };
 
   // Mainly useful for testing

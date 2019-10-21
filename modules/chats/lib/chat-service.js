@@ -201,20 +201,17 @@ async function newChatMessageToTroupe(troupe, user, data) {
     })
     .done();
 
-  // TODO: thread messages trigger unread for their parent https://gitlab.com/gitlab-org/gitter/webapp/issues/2244
-  if (!data.parentId) {
-    // Async add unread items
-    unreadItemService
-      .createChatUnreadItems(user.id, troupe, chatMessage)
-      .catch(function(err) {
-        errorReporter(
-          err,
-          { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
-          { module: 'chat-service' }
-        );
-      })
-      .done();
-  }
+  // Async add unread items
+  unreadItemService
+    .createChatUnreadItems(user.id, troupe, chatMessage)
+    .catch(function(err) {
+      errorReporter(
+        err,
+        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+        { module: 'chat-service' }
+      );
+    })
+    .done();
 
   const statMetadata = _.extend(
     {

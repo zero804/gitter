@@ -60,6 +60,7 @@
     "no-unneeded-ternary": "error",
     "no-use-before-define": ["warn", { "variables": true, "functions": true, "classes": true }],
     "no-undef": "error",
+    "no-param-reassign": "warn",
     "no-multi-spaces": [
       "warn",
       {

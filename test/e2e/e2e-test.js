@@ -27,13 +27,19 @@ describe('e2e tests', function() {
         user1: {
           accessToken: 'web-internal'
         },
+        user2: {
+          accessToken: 'web-internal'
+        },
         group1: {
           securityDescriptor: {
             extraAdmins: ['user1']
           }
         },
-        troupe1: { users: ['user1'] },
-        troupeInGroup1: { group: 'group1', users: ['user1'] },
+        troupe1: {
+          users: ['user1', 'user2'],
+          securityDescriptor: { extraAdmins: ['user1'] }
+        },
+        troupeInGroup1: { group: 'group1', users: ['user1', 'user2'] },
 
         message1: {
           user: 'user1',
@@ -207,12 +213,27 @@ describe('e2e tests', function() {
     // So it is disabled for now.
     // FIXME: enable the test when https://gitlab.com/gitlab-org/gitter/webapp/issues/2276 is fixed
     xit('permalinks in main message feed and thread message feed', () => {
-      cy.toggleFeature('threaded-conversations', true);
+      cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
       cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
       cy.get('#chat-container .chat-item__highlighted').contains('hello from the parent');
       cy.get('#js-thread-message-feed-root .chat-item__highlighted').contains(
         'hello from the child'
       );
+    });
+
+    // TODO: enable thread messages notifications after https://gitlab.com/gitlab-org/gitter/webapp/issues/2309
+    it.only('clicking unread thread message notification opens thread message feed', () => {
+      cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
+      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+      cy.sendMessage(fixtures.user2, fixtures.troupe1, 'child message for notification', {
+        parentId: fixtures.message1._id
+      });
+      cy.get('.banner-wrapper.bottom')
+        .should('be.visible')
+        .click();
+      cy.get('.js-thread-message-feed-root')
+        .should('be.visible')
+        .contains('child message for notification');
     });
   });
 });
