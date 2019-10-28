@@ -3,6 +3,10 @@
  - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
 
+Developer facing:
+
+ - Fix `cy.enableThreadedConversations(user, room)` in failing e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1630
+
 
 # 20.6.0 - 2019-10-18
 
@@ -13,7 +17,8 @@
  - Use room based threaded conversations toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1622
 
 Developer facing:
- - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
+
+ - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621
 
 
 # 20.5.0 - 2019-10-10
