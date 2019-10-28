@@ -2,6 +2,8 @@
 
  - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Fix right toolbar activity time color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1629
+     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
 
 Developer facing:
 
