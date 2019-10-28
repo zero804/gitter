@@ -4,9 +4,15 @@ const assert = require('assert');
 const urlJoin = require('url-join');
 
 const gitterBaseUrl = Cypress.env('baseUrl');
-assert(gitterBaseUrl);
+assert(
+  gitterBaseUrl,
+  'baseUrl is not defined (make sure to pass it in via --env or CYPRESS_baseUrl environment variable)'
+);
 const gitterApiBaseUrl = Cypress.env('apiBaseUrl');
-assert(gitterApiBaseUrl);
+assert(
+  gitterApiBaseUrl,
+  'gitterApiBaseUrl is not defined (make sure to pass it in via --env or CYPRESS_gitterApiBaseUrl environment variable)'
+);
 
 // ***********************************************
 // This example commands.js shows you how to
@@ -79,8 +85,8 @@ Cypress.Commands.add('enableThreadedConversations', (user, room) => {
   cy.log(`Enabling threaded conversations`);
   // Make sure the feature toggle already exists
   cy.request({
-    url: urlJoin(gitterApiBaseUrl, 'v1/rooms/', room._id, '/meta/all'),
-    method: 'PUT',
+    url: urlJoin(gitterApiBaseUrl, 'v1/rooms/', room._id, '/meta'),
+    method: 'POST',
     body: {
       threadedConversations: true
     },
