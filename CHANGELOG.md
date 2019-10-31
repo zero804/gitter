@@ -1,4 +1,4 @@
-# 20.7.0 - *Upcoming*
+# 20.7.0 - 2019-10-30
 
  - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
