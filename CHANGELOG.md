@@ -9,6 +9,7 @@ Developer facing:
 
  - Fix `cy.enableThreadedConversations(user, room)` in failing e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1630
  - Update to `cypress@3.5.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1631
+ - Run `npm audit fix` to update some dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1617
 
 
 # 20.6.0 - 2019-10-18
