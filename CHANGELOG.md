@@ -1,3 +1,9 @@
+# 20.8.0 - *upcoming*
+
+Developer facing:
+
+ -  GitHub repo rooms can be renamed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1623
+
 # 20.7.0 - 2019-10-30
 
  - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
