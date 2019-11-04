@@ -1,8 +1,11 @@
 # 20.8.0 - *upcoming*
 
+ - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633
+
 Developer facing:
 
  -  GitHub repo rooms can be renamed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1623
+
 
 # 20.7.0 - 2019-10-30
 
