@@ -1,7 +1,7 @@
 'use strict';
 
 const presets = ['@babel/preset-env'];
-const plugins = [];
+const plugins = ['@babel/plugin-transform-runtime'];
 
 // Jest is running in node environment, so we need additional plugins
 const isJest = !!process.env.JEST_WORKER_ID;
@@ -10,12 +10,7 @@ if (isJest) {
 }
 
 module.exports = {
+  sourceType: 'unambiguous', // supports mixing commonjs and es modules https://github.com/webpack/webpack/issues/4039#issuecomment-498033015
   plugins,
-  presets,
-  env: {
-    test: {
-      // from https://github.com/facebook/jest/issues/3126#issuecomment-465926747
-      plugins: ['@babel/plugin-transform-runtime']
-    }
-  }
+  presets
 };
