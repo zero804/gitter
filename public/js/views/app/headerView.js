@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
 var autolink = require('autolink'); // eslint-disable-line node/no-missing-require
+const debug = require('debug-proxy')('app:chat-header-view');
 var clientEnv = require('gitter-client-env');
 var context = require('gitter-web-client-context');
 const log = require('../../utils/log');
@@ -50,19 +51,16 @@ var HeaderView = Marionette.ItemView.extend({
     topicActivator: '.js-room-topic-edit-activator',
     name: '.js-chat-name',
     favourite: '.js-favourite-button',
-    orgrooms: '.js-chat-header-org-page-action',
-    toggleRightToolbarButton: '.js-right-toolbar-toggle-button'
+    orgrooms: '.js-chat-header-org-page-action'
   },
 
   events: {
     'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
     'click @ui.cog': 'showDropdown',
-    'click #leave-room': 'leaveRoom',
     'click @ui.favourite': 'toggleFavourite',
-    'dblclick @ui.topicActivator': 'showInput',
-    'keydown textarea': 'detectKeys',
     'click @ui.orgrooms': 'goToOrgRooms',
-    'click @ui.toggleRightToolbarButton': 'toggleRightToolbar'
+    'dblclick @ui.topicActivator': 'showInput',
+    'keydown textarea': 'detectKeys'
   },
 
   keyboardEvents: {
@@ -83,8 +81,6 @@ var HeaderView = Marionette.ItemView.extend({
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
-
-    this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
 
   serializeData: function() {
@@ -132,17 +128,6 @@ var HeaderView = Marionette.ItemView.extend({
     }
   },
 
-  onPanelPinStateChange: function() {
-    // Archives don't have certain actions
-    if (this.ui.toggleRightToolbarButton.length > 0) {
-      toggleClass(
-        this.ui.toggleRightToolbarButton[0],
-        'pinned',
-        this.rightToolbarModel.get('isPinned')
-      );
-    }
-  },
-
   getChatNameTitle: function() {
     var model = this.model;
     if (model.get('public')) {
@@ -179,8 +164,6 @@ var HeaderView = Marionette.ItemView.extend({
     if (topicEl) {
       autolink(topicEl);
     }
-
-    this.onPanelPinStateChange();
   },
 
   showDropdown: function() {
@@ -288,6 +271,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   goToOrgRooms: function(e) {
+    debug(`goToOrgRooms (isArchive=${this.isArchive()})`);
     // archive router is not ready to handle app events yet.
     if (this.isArchive()) return;
 
@@ -311,12 +295,6 @@ var HeaderView = Marionette.ItemView.extend({
     var isFavourite = !!this.model.get('favourite');
 
     apiClient.userRoom.put('', { favourite: isFavourite });
-  },
-
-  toggleRightToolbar: function() {
-    this.rightToolbarModel.set({
-      isPinned: !this.rightToolbarModel.get('isPinned')
-    });
   },
 
   saveTopic: function() {

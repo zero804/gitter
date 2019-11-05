@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var Backbone = require('backbone');
+const debug = require('debug-proxy')('app:spa-room-switcher');
 var urlParser = require('../utils/url-parser');
 const log = require('../utils/log');
 
@@ -44,11 +45,13 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
         // TODO this line seems to be the only remaining functionality of room switcher
         // we could remove the whole class and just replace  the on('switch') listener in router-app
         // with valid code from this method
+        debug('_change -> switch', newTroupe);
         return this.trigger('switch', newTroupe);
       }
     }
 
     // Else fallback to just redirecting
+    debug('_change -> redirecting', targetInfo.roomUrl);
     window.location.assign(targetInfo.roomUrl);
   },
 
