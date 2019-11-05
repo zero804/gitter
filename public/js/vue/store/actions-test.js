@@ -523,7 +523,7 @@ describe('actions', () => {
     });
   });
 
-  describe('changeDisplayedRoom', () => {
+  describe('changeDisplayedRoomById', () => {
     it('room we do not know about will not send appEvents', async () => {
       const payload = '5cf8efbc4dfb4240048b768e';
 
@@ -533,7 +533,7 @@ describe('actions', () => {
       });
 
       await testAction(
-        actions.changeDisplayedRoom,
+        actions.changeDisplayedRoomById,
         payload,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: payload }],
@@ -564,7 +564,7 @@ describe('actions', () => {
       });
 
       await testAction(
-        actions.changeDisplayedRoom,
+        actions.changeDisplayedRoomById,
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
@@ -586,7 +586,7 @@ describe('actions', () => {
       window.location.assign = jest.fn();
 
       await testAction(
-        actions.changeDisplayedRoom,
+        actions.changeDisplayedRoomById,
         roomObject.id,
         state,
         [{ type: types.CHANGE_DISPLAYED_ROOM, payload: roomObject.id }],
@@ -597,6 +597,28 @@ describe('actions', () => {
       );
 
       expect(window.location.assign).toHaveBeenCalledWith(roomObject.url);
+    });
+  });
+
+  describe('changeDisplayedRoomByUrl', () => {
+    it('finds room and uses its url for the switch', async () => {
+      const roomObject = createSerializedRoomFixture('community/room1');
+
+      state.roomMap[roomObject.id] = roomObject;
+
+      await testAction(
+        actions.changeDisplayedRoomByUrl,
+        '/community/room1',
+        state,
+        [],
+        [{ type: 'changeDisplayedRoomById', payload: roomObject.id }]
+      );
+    });
+    it('falls back to redirecting if the room is not present', async () => {
+      window.location.assign = jest.fn();
+
+      await testAction(actions.changeDisplayedRoomByUrl, '/community/room1', state, [], []);
+      expect(window.location.assign).toHaveBeenCalledWith('/community/room1');
     });
   });
 

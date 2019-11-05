@@ -4,7 +4,6 @@ var _ = require('lodash');
 var Backbone = require('backbone');
 var urlParser = require('../utils/url-parser');
 const log = require('../utils/log');
-const appEvents = require('../utils/appevents');
 
 function SpaRoomSwitcher(troupesCollection, baseUrl, locationDelegate, windowLocationDelegate) {
   this._troupes = troupesCollection;
@@ -42,7 +41,9 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
       // Try find the room in the collection
       var newTroupe = this._troupes.findWhere({ url: targetInfo.roomUrl });
       if (newTroupe) {
-        appEvents.trigger('dispatchVueAction', 'changeDisplayedRoom', newTroupe.id);
+        // TODO this line seems to be the only remaining functionality of room switcher
+        // we could remove the whole class and just replace  the on('switch') listener in router-app
+        // with valid code from this method
         return this.trigger('switch', newTroupe);
       }
     }

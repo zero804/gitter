@@ -95,7 +95,7 @@ describe('list-item', () => {
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('calls store action "changeDisplayedRoom" and "toggleLeftMenu" when item is clicked', () => {
+  it('calls store action "changeDisplayedRoomById" and "toggleLeftMenu" when item is clicked', () => {
     const room = createSerializedRoomFixture('my-community/community');
     const { wrapper, stubbedActions } = mount(ListItem, {
       item: room
@@ -103,7 +103,7 @@ describe('list-item', () => {
 
     wrapper.find({ ref: 'link' }).trigger('click');
 
-    expect(stubbedActions.changeDisplayedRoom).toHaveBeenCalledWith(
+    expect(stubbedActions.changeDisplayedRoomById).toHaveBeenCalledWith(
       expect.anything(),
       room.id,
       undefined

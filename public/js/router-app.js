@@ -106,8 +106,6 @@ onready(function() {
   roomSwitcher.on('switch', function(troupe) {
     debug('Room switch: switch to %s', troupe.attributes);
 
-    context.setTroupeId(troupe.id);
-
     // Set the last access time immediately to prevent
     // delay in hidden rooms becoming visible only
     // once we get the server-side update
