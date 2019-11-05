@@ -37,9 +37,9 @@ export default {
   },
 
   methods: {
-    ...mapActions(['toggleLeftMenu', 'changeDisplayedRoom']),
+    ...mapActions(['toggleLeftMenu', 'changeDisplayedRoomById']),
     roomClick(room) {
-      this.changeDisplayedRoom(room.id);
+      this.changeDisplayedRoomById(room.id);
 
       // After we choose a room, collapse the left menu if it isn't pinned
       this.toggleLeftMenu(false);
