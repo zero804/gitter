@@ -235,7 +235,11 @@ var HeaderView = Marionette.ItemView.extend({
         href: 'https://www.github.com' + url,
         target: '_blank'
       });
-      menuBuilder.add({ title: 'Community home', href: '#community-home' });
+      menuBuilder.add({
+        title: 'Community home',
+        href: '#community-home',
+        dataset: { disableRouting: 1 }
+      });
 
       menuBuilder.addDivider();
 
