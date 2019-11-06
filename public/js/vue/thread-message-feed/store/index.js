@@ -163,58 +163,54 @@ export default {
      * `block` is scrollIntoView block argument ('start', 'end', 'center', 'nearest')
      * https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
      */
-    focusOnMessage: ({ dispatch, commit, rootState }, { id, block }) => {
+    focusOnMessage: async ({ dispatch, commit, rootState }, { id, block }) => {
       const message = rootState.messageMap[id];
       if (!message) return;
       // this might be later conditional. If this is not child message, don't call open.
-      dispatch('open', message.parentId).then(() => {
-        commit(
-          rootTypes.UPDATE_MESSAGE,
-          { id, focusedAt: { block, timestamp: Date.now() } },
-          { root: true }
-        );
-      });
+      await dispatch('open', message.parentId);
+      commit(
+        rootTypes.UPDATE_MESSAGE,
+        { id, focusedAt: { block, timestamp: Date.now() } },
+        { root: true }
+      );
     },
-    fetchOlderMessages: ({ dispatch, state, getters, commit }) => {
+    fetchOlderMessages: async ({ dispatch, state, getters, commit }) => {
       if (state.atTop || !canStartFetchingMessages(state)) return;
       if (!getters.childMessages.length) return;
       const parentIdBeforeFetch = state.parentId;
-      dispatch('fetchChildMessages', { beforeId: getters.childMessages[0].id }).then(
-        childMessages => {
-          // align last message to the top (pushes the new messages just above the TMF viewport)
-          dispatch('focusOnMessage', {
-            id: childMessages[childMessages.length - 1].id,
-            block: 'start'
-          });
-          if (childMessages.length < FETCH_MESSAGES_LIMIT)
-            commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
-        }
-      );
-    },
-    fetchNewerMessages: ({ dispatch, state, getters, commit }) => {
-      if (state.atBottom || !canStartFetchingMessages(state)) return;
-      const childMessages = getters.childMessages;
-      if (!childMessages.length) return;
-      const parentIdBeforeFetch = state.parentId;
-      dispatch('fetchChildMessages', { afterId: childMessages[childMessages.length - 1].id }).then(
-        childMessages => {
-          // align last message to the bottom (pushes the new messages just below the TMF viewport)
-          dispatch('focusOnMessage', { id: childMessages[0].id, block: 'end' });
-          if (childMessages.length < FETCH_MESSAGES_LIMIT)
-            commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
-        }
-      );
-    },
-    fetchInitialMessages: ({ dispatch, state, commit }) => {
-      const parentIdBeforeFetch = state.parentId;
-      return dispatch('fetchChildMessages').then(childMessages => {
-        const lastMessage = childMessages[childMessages.length - 1];
-        if (lastMessage) dispatch('focusOnMessage', { id: lastMessage.id, block: 'end' });
-        commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
-        if (childMessages.length < FETCH_MESSAGES_LIMIT) {
-          commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
-        }
+      const childMessages = await dispatch('fetchChildMessages', {
+        beforeId: getters.childMessages[0].id
       });
+      // align last message to the top (pushes the new messages just above the TMF viewport)
+      dispatch('focusOnMessage', {
+        id: childMessages[childMessages.length - 1].id,
+        block: 'start'
+      });
+      if (childMessages.length < FETCH_MESSAGES_LIMIT)
+        commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
+    },
+    fetchNewerMessages: async ({ dispatch, state, getters, commit }) => {
+      if (state.atBottom || !canStartFetchingMessages(state)) return;
+      const localChildMessages = getters.childMessages;
+      if (!localChildMessages.length) return;
+      const parentIdBeforeFetch = state.parentId;
+      const childMessages = await dispatch('fetchChildMessages', {
+        afterId: localChildMessages[localChildMessages.length - 1].id
+      });
+      // align last message to the bottom (pushes the new messages just below the TMF viewport)
+      dispatch('focusOnMessage', { id: childMessages[0].id, block: 'end' });
+      if (childMessages.length < FETCH_MESSAGES_LIMIT)
+        commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
+    },
+    fetchInitialMessages: async ({ dispatch, state, commit }) => {
+      const parentIdBeforeFetch = state.parentId;
+      const childMessages = await dispatch('fetchChildMessages');
+      const lastMessage = childMessages[childMessages.length - 1];
+      if (lastMessage) dispatch('focusOnMessage', { id: lastMessage.id, block: 'end' });
+      commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
+      if (childMessages.length < FETCH_MESSAGES_LIMIT) {
+        commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
+      }
     }
   }
 };
