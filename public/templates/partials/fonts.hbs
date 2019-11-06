@@ -1,7 +1,9 @@
 {{#if fonts}}
   {{! pre-load all fonts }}
   {{#each fonts.preload as |font|}}
-    <link rel="preload" href="{{font.fontPath}}" as="font" type="font/{{font.format}}">
+    {{#each font.formats as |format|}}
+      <link rel="preload" href="{{font.fontPath}}.{{format}}" as="font" type="font/{{format}}">
+    {{/each}}
   {{/each}}
 
   {{! define all font face rules in the head}}
