@@ -45,13 +45,13 @@ _.extend(SpaRoomSwitcher.prototype, Backbone.Events, {
         // TODO this line seems to be the only remaining functionality of room switcher
         // we could remove the whole class and just replace  the on('switch') listener in router-app
         // with valid code from this method
-        debug('_change -> switch', newTroupe);
+        debug('found room in collection, switching to room:', newTroupe);
         return this.trigger('switch', newTroupe);
       }
     }
 
     // Else fallback to just redirecting
-    debug('_change -> redirecting', targetInfo.roomUrl);
+    debug('unable to find room in collection, redirecting to url:', targetInfo.roomUrl);
     window.location.assign(targetInfo.roomUrl);
   },
 
