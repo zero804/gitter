@@ -108,7 +108,7 @@ var LOCAL_FONTS = [
 ];
 
 function getFonts() {
-  return { local: LOCAL_FONTS, preload: FONTS, cdnFonts: [...FONTS, ...KATEX] };
+  return { local: LOCAL_FONTS, cdnFonts: [...FONTS, ...KATEX] };
 }
 
 function hasCachedFonts(cookies) {

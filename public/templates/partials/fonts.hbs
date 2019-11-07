@@ -1,9 +1,4 @@
 {{#if fonts}}
-  {{! pre-load all fonts }}
-  {{#each fonts.preload as |font|}}
-    <link rel="preload" href="{{font.fontPath}}" as="font" type="font/{{font.format}}">
-  {{/each}}
-
   {{! define all font face rules in the head}}
   <style>
   {{! Rule for local fonts as we bundle copies with the OSX Desktop app}}
