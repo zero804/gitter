@@ -103,6 +103,10 @@ var HeaderView = Marionette.ItemView.extend({
   buildDropdown: function() {
     if (context.isLoggedIn()) {
       this.dropdown = new Dropdown({
+        // `allowClickPropagation` is true because some of the dropdown items are
+        // handled by the global public/js/components/link-handler.js
+        // If you don't want an item handled by the `link-handler` then
+        // add `data-disable-routing` (`dataset: { disableRouting: 1 }`) to the item
         allowClickPropagation: true,
         collection: this.menuItemsCollection,
         placement: 'right'
@@ -111,6 +115,7 @@ var HeaderView = Marionette.ItemView.extend({
         // change. We'll set it dynamically before showing the dropdown
       });
 
+      // Other dropdown items may be handled by the global link-handler navigation
       this.listenTo(this.dropdown, 'selected', function(e) {
         var href = e.get('href');
         if (href === '#leave') {
@@ -238,6 +243,8 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.add({
         title: 'Community home',
         href: '#community-home',
+        // We don't want the global link-handler catching this because we
+        // handle the navigation ourselves in `goToOrgRooms`
         dataset: { disableRouting: 1 }
       });
 
