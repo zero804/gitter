@@ -76,8 +76,8 @@ module.exports = (function() {
 
       this.trigger('selectClicked');
 
-      e.preventDefault();
       if (!this.options.allowClickPropagation) {
+        e.preventDefault();
         e.stopPropagation();
       }
     },

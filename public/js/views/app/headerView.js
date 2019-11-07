@@ -5,7 +5,6 @@ var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
 var cocktail = require('backbone.cocktail');
 var autolink = require('autolink'); // eslint-disable-line node/no-missing-require
-const debug = require('debug-proxy')('app:chat-header-view');
 var clientEnv = require('gitter-client-env');
 var context = require('gitter-web-client-context');
 const log = require('../../utils/log');
@@ -58,7 +57,6 @@ var HeaderView = Marionette.ItemView.extend({
     'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
     'click @ui.cog': 'showDropdown',
     'click @ui.favourite': 'toggleFavourite',
-    'click @ui.orgrooms': 'goToOrgRooms',
     'dblclick @ui.topicActivator': 'showInput',
     'keydown textarea': 'detectKeys'
   },
@@ -124,8 +122,6 @@ var HeaderView = Marionette.ItemView.extend({
           this.hideRoom();
         } else if (href === '#notifications') {
           this.requestBrowserNotificationsPermission();
-        } else if (href === '#community-home') {
-          this.goToOrgRooms();
         } else if (href === '#favourite') {
           this.toggleFavourite();
         }
@@ -240,12 +236,13 @@ var HeaderView = Marionette.ItemView.extend({
         href: 'https://www.github.com' + url,
         target: '_blank'
       });
+
+      const group = this.model.get('group');
+      if (!group) return;
+      const homeUri = group.homeUri;
       menuBuilder.add({
         title: 'Community home',
-        href: '#community-home',
-        // We don't want the global link-handler catching this because we
-        // handle the navigation ourselves in `goToOrgRooms`
-        dataset: { disableRouting: 1 }
+        href: `/${homeUri}`
       });
 
       menuBuilder.addDivider();
@@ -279,24 +276,6 @@ var HeaderView = Marionette.ItemView.extend({
         text: `Check the devtools console for more details: ${err.message}`
       });
     });
-  },
-
-  goToOrgRooms: function(e) {
-    debug(`goToOrgRooms (isArchive=${this.isArchive()})`);
-    // archive router is not ready to handle app events yet.
-    if (this.isArchive()) return;
-
-    if (e) {
-      e.preventDefault();
-    }
-
-    var group = this.model.get('group');
-    if (!group) return;
-    var homeUri = group.homeUri;
-
-    if (!homeUri) return;
-
-    appEvents.trigger('navigation', '/' + homeUri, 'iframe', group.uri);
   },
 
   toggleFavourite: function() {
