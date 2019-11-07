@@ -3,6 +3,7 @@
  - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633
  - Remove cyclic invocation from room navigation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1625
  - Remove font preloading, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1637
+ - Flex wrap the share buttons on Spread the word, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1638
 
 Developer facing:
 
