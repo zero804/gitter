@@ -1,4 +1,19 @@
+# 20.7.0 - 2019-10-30
+
+ - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Fix right toolbar activity time color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1629
+     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
+
+Developer facing:
+
+ - Fix `cy.enableThreadedConversations(user, room)` in failing e2e tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1630
+ - Update to `cypress@3.5.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1631
+ - Run `npm audit fix` to update some dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1617
+
+
 # 20.6.0 - 2019-10-18
+
  - Unread notifications for child messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1606
  - Add room-scoped feature toggle for threaded-conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1620
  - Fix: Welcome message stopped showing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1624
@@ -6,7 +21,9 @@
  - Use room based threaded conversations toggle, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1622
 
 Developer facing:
- - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621 
+
+ - `eslint`: `no-param-reassign` rule, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1621
+
 
 # 20.5.0 - 2019-10-10
 

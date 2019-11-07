@@ -6,7 +6,11 @@ const urlJoin = require('url-join');
 const generateFixtures = require('./support/generate-fixtures');
 
 const gitterBaseUrl = Cypress.env('baseUrl');
-assert(gitterBaseUrl);
+
+assert(
+  gitterBaseUrl,
+  'baseUrl is not defined (make sure to pass it in via --env or CYPRESS_baseUrl environment variable)'
+);
 
 describe('e2e tests', function() {
   beforeEach(() => {
@@ -215,22 +219,26 @@ describe('e2e tests', function() {
     xit('permalinks in main message feed and thread message feed', () => {
       cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
       cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
+
       cy.get('#chat-container .chat-item__highlighted').contains('hello from the parent');
       cy.get('#js-thread-message-feed-root .chat-item__highlighted').contains(
         'hello from the child'
       );
     });
 
-    // TODO: enable thread messages notifications after https://gitlab.com/gitlab-org/gitter/webapp/issues/2309
-    it.only('clicking unread thread message notification opens thread message feed', () => {
+    it('clicking unread thread message notification opens thread message feed', () => {
       cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
       cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+
       cy.sendMessage(fixtures.user2, fixtures.troupe1, 'child message for notification', {
         parentId: fixtures.message1._id
       });
-      cy.get('.banner-wrapper.bottom')
+
+      cy.get('#bottom-unread-banner .banner-wrapper button.main')
         .should('be.visible')
+        .click()
         .click();
+
       cy.get('.js-thread-message-feed-root')
         .should('be.visible')
         .contains('child message for notification');

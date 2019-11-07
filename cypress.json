@@ -5,5 +5,7 @@
   "pluginsFile": "test/e2e/plugins",
   "screenshotsFolder": "test/e2e/screenshots",
   "supportFile": "test/e2e/support",
-  "videosFolder": "test/e2e/videos"
+  "videosFolder": "test/e2e/videos",
+
+  "env": { "baseUrl": "http://localhost:5000", "apiBaseUrl": "http://localhost:5000/api" }
 }
