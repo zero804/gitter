@@ -5,6 +5,7 @@
  - Remove font preloading, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1637
  - Flex wrap the share buttons on Spread the word, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1638
  - Move favourite and community home header actions to room settings dropdown when mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1614
+ - Add left-menu toggle to the mobile chat header, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1639
 
 Developer facing:
 
