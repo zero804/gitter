@@ -246,7 +246,6 @@ describe('e2e tests', function() {
 
       cy.get('#bottom-unread-banner .banner-wrapper button.main')
         .should('be.visible')
-        .click()
         .click();
 
       cy.get('.js-thread-message-feed-root')
