@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:chat-input-box-view');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/chat-input-box.hbs');
 var drafty = require('../../components/drafty');
@@ -12,6 +13,7 @@ var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var appEvents = require('../../utils/appevents');
 var context = require('gitter-web-client-context');
 var isMobile = require('../../utils/is-mobile');
+const toggleClass = require('../../utils/toggle-class');
 
 require('jquery-textcomplete'); // eslint-disable-line node/no-missing-require
 
@@ -88,14 +90,18 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.addTextareaExtensions();
 
     if (!isMobile()) {
-      var self = this;
-      RAF(function() {
+      RAF(() => {
         // firefox only respects the "autofocus" attr if it is present on source html
         // also, dont show keyboard right away on mobile
         // Also, move the cursor to the end of the textarea text
 
-        self.setCaretPosition();
-        self.ui.textarea.focus();
+        this.setCaretPosition();
+        this.ui.textarea.focus();
+
+        // We add this to always be consistent with size after initialization.
+        // Otherwise we are relying on the `blur` event to run this which isn't
+        // consistent in e2e tests
+        this.resetTextareaSize();
       });
     }
   },
@@ -317,16 +323,24 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   resetTextareaSize: function() {
+    debug('resetTextareaSize');
+
+    this.ui.textarea.css('height', '');
     this.shrinkTextarea();
     this.expandTextareaIfNeeded();
+
+    // We only use this in our e2e tests to ensure the layout won't shift around
+    toggleClass(this.ui.textarea[0], 'js-reset-textarea-size', true);
   },
 
   shrinkTextarea: function() {
+    debug('shrinkTextarea');
     this.ui.textarea.css('height', '');
     appEvents.trigger('chatCollectionView:viewportResize', false);
   },
 
   expandTextareaIfNeeded: function() {
+    debug('expandTextareaIfNeeded');
     var $textarea = this.ui.textarea;
     var textarea = $textarea[0];
     var currentHeight = textarea.offsetHeight;

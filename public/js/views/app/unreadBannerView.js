@@ -134,6 +134,10 @@ var BottomBannerView = TopBannerView.extend({
     this.listenTo(appEvents, 'atBottomChanged', this.toggleScrollHelper);
   },
 
+  onAttach: function() {
+    debug(`BottomBannerView.onAttach`);
+  },
+
   toggleScrollHelper: function(atBottom) {
     this.actAsScrollHelper = !atBottom;
     this.updateVisibility();
@@ -144,17 +148,17 @@ var BottomBannerView = TopBannerView.extend({
 
     var mentionId = this.model.get('firstMentionIdBelow');
     if (mentionId) {
-      debug(`onMainButtonClick going to unread mention=${mentionId}`);
+      debug(`BottomBannerView.onMainButtonClick going to unread mention=${mentionId}`);
       return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
     }
 
     var itemId = this.model.get('firstUnreadItemIdBelow');
     if (itemId) {
-      debug(`onMainButtonClick going to unread message=${itemId}`);
+      debug(`BottomBannerView.onMainButtonClick going to unread message=${itemId}`);
       return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
     }
 
-    debug(`onMainButtonClick scrolling to bottom of chats`);
+    debug(`BottomBannerView.onMainButtonClick scrolling to bottom of chats`);
     appEvents.trigger('chatCollectionView:scrollToBottom');
   },
 
