@@ -4,6 +4,7 @@
  - Remove cyclic invocation from room navigation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1625
  - Remove font preloading, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1637
  - Flex wrap the share buttons on Spread the word, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1638
+ - Move favourite and community home header actions to room settings dropdown when mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1614
 
 Developer facing:
 
