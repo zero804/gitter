@@ -37,6 +37,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   ui: {
+    leftMenuToggle: '.js-chat-header-left-menu-toggle',
     avatarImage: '.js-chat-header-avatar-image',
     groupAvatarUploadForm: '.js-chat-header-group-avatar-upload-form',
     groupAvatarFileInput: '.js-chat-header-group-avatar-upload-input',
@@ -54,6 +55,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   events: {
+    'click @ui.leftMenuToggle': 'onLeftMenuToggleClick',
     'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
     'click @ui.cog': 'showDropdown',
     'click @ui.favourite': 'toggleFavourite',
@@ -387,6 +389,10 @@ var HeaderView = Marionette.ItemView.extend({
       // If it is a new chat header, we can edit the topic again
       this.editingTopic = false;
     }
+  },
+
+  onLeftMenuToggleClick() {
+    appEvents.trigger('dispatchVueAction', 'toggleLeftMenu', true);
   },
 
   onGroupAvatarUploadChange: function() {
