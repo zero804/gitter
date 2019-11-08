@@ -50,19 +50,15 @@ var HeaderView = Marionette.ItemView.extend({
     topicActivator: '.js-room-topic-edit-activator',
     name: '.js-chat-name',
     favourite: '.js-favourite-button',
-    orgrooms: '.js-chat-header-org-page-action',
-    toggleRightToolbarButton: '.js-right-toolbar-toggle-button'
+    orgrooms: '.js-chat-header-org-page-action'
   },
 
   events: {
     'change @ui.groupAvatarFileInput': 'onGroupAvatarUploadChange',
     'click @ui.cog': 'showDropdown',
-    'click #leave-room': 'leaveRoom',
     'click @ui.favourite': 'toggleFavourite',
     'dblclick @ui.topicActivator': 'showInput',
-    'keydown textarea': 'detectKeys',
-    'click @ui.orgrooms': 'goToOrgRooms',
-    'click @ui.toggleRightToolbarButton': 'toggleRightToolbar'
+    'keydown textarea': 'detectKeys'
   },
 
   keyboardEvents: {
@@ -83,8 +79,6 @@ var HeaderView = Marionette.ItemView.extend({
     this.rightToolbarModel = options.rightToolbarModel;
     this.menuItemsCollection = new Backbone.Collection([]);
     this.buildDropdown();
-
-    this.listenTo(this.rightToolbarModel, 'change:isPinned', this.onPanelPinStateChange, this);
   },
 
   serializeData: function() {
@@ -107,6 +101,10 @@ var HeaderView = Marionette.ItemView.extend({
   buildDropdown: function() {
     if (context.isLoggedIn()) {
       this.dropdown = new Dropdown({
+        // `allowClickPropagation` is true because some of the dropdown items are
+        // handled by the global public/js/components/link-handler.js
+        // If you don't want an item handled by the `link-handler` then
+        // add `data-disable-routing` (`dataset: { disableRouting: 1 }`) to the item
         allowClickPropagation: true,
         collection: this.menuItemsCollection,
         placement: 'right'
@@ -115,6 +113,7 @@ var HeaderView = Marionette.ItemView.extend({
         // change. We'll set it dynamically before showing the dropdown
       });
 
+      // Other dropdown items may be handled by the global link-handler navigation
       this.listenTo(this.dropdown, 'selected', function(e) {
         var href = e.get('href');
         if (href === '#leave') {
@@ -123,19 +122,10 @@ var HeaderView = Marionette.ItemView.extend({
           this.hideRoom();
         } else if (href === '#notifications') {
           this.requestBrowserNotificationsPermission();
+        } else if (href === '#favourite') {
+          this.toggleFavourite();
         }
       });
-    }
-  },
-
-  onPanelPinStateChange: function() {
-    // Archives don't have certain actions
-    if (this.ui.toggleRightToolbarButton.length > 0) {
-      toggleClass(
-        this.ui.toggleRightToolbarButton[0],
-        'pinned',
-        this.rightToolbarModel.get('isPinned')
-      );
     }
   },
 
@@ -175,8 +165,6 @@ var HeaderView = Marionette.ItemView.extend({
     if (topicEl) {
       autolink(topicEl);
     }
-
-    this.onPanelPinStateChange();
   },
 
   showDropdown: function() {
@@ -201,6 +189,7 @@ var HeaderView = Marionette.ItemView.extend({
     }
   },
 
+  // eslint-disable-next-line max-statements
   createMenu: function() {
     var c = context();
     var isStaff = context.isStaff();
@@ -218,6 +207,10 @@ var HeaderView = Marionette.ItemView.extend({
     menuBuilder.addConditional(!isOneToOne, { title: 'Add people to this room', href: '#add' });
     menuBuilder.addConditional(!isOneToOne, { title: 'Share this chat room', href: '#share' });
     menuBuilder.addDivider();
+    menuBuilder.addConditional(isRoomMember, {
+      title: `${this.model.get('favourite') ? 'Unfavourite' : 'Favourite'} room`,
+      href: '#favourite'
+    });
     menuBuilder.addConditional(isRoomMember, { title: 'Notifications', href: '#notifications' });
 
     if (!isOneToOne) {
@@ -243,6 +236,15 @@ var HeaderView = Marionette.ItemView.extend({
         href: 'https://www.github.com' + url,
         target: '_blank'
       });
+
+      const group = this.model.get('group');
+      if (group) {
+        const homeUri = group.homeUri;
+        menuBuilder.add({
+          title: 'Community home',
+          href: `/${homeUri}`
+        });
+      }
 
       menuBuilder.addDivider();
 
@@ -277,20 +279,6 @@ var HeaderView = Marionette.ItemView.extend({
     });
   },
 
-  goToOrgRooms: function(e) {
-    // archive router is not ready to handle app events yet.
-    if (this.isArchive()) return;
-
-    e.preventDefault();
-    var group = this.model.get('group');
-    if (!group) return;
-    var homeUri = group.homeUri;
-
-    if (!homeUri) return;
-
-    appEvents.trigger('navigation', '/' + homeUri, 'iframe', group.uri);
-  },
-
   toggleFavourite: function() {
     if (!context.isLoggedIn()) return;
 
@@ -298,12 +286,6 @@ var HeaderView = Marionette.ItemView.extend({
     var isFavourite = !!this.model.get('favourite');
 
     apiClient.userRoom.put('', { favourite: isFavourite });
-  },
-
-  toggleRightToolbar: function() {
-    this.rightToolbarModel.set({
-      isPinned: !this.rightToolbarModel.get('isPinned')
-    });
   },
 
   saveTopic: function() {

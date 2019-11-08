@@ -1,9 +1,9 @@
-@import (reference) "base-zindex-levels";
-@import (reference) "colors.less";
-@import (reference) "trp3Vars.less";
-@import (reference) "trpButtons.less";
+@import (reference) 'base-zindex-levels';
+@import (reference) 'colors.less';
+@import (reference) 'trp3Vars.less';
+@import (reference) 'trpButtons.less';
 
-@import "../controls/dropdown";
+@import '../controls/dropdown';
 
 @chat-header-heading-font-size: 24px;
 @chat-header-heading-line-height: 40px;
@@ -11,37 +11,39 @@
 @chat-header-topic-line-height: 25px;
 @chat-header-topic-color: white;
 
-
 // The space above the chat header
-@chat-header-space-to-heading: (@chat-frame-desktop-header-height - @chat-header-heading-line-height) / 2;
+@chat-header-space-to-heading: (
+    @chat-frame-desktop-header-height - @chat-header-heading-line-height
+  ) / 2;
 // The difference between line-height and font-size bounds
-@chat-header-font-vertical-padding: (@chat-header-heading-line-height - @chat-header-heading-font-size) / 2;
+@chat-header-font-vertical-padding: (
+    @chat-header-heading-line-height - @chat-header-heading-font-size
+  ) / 2;
 // The extra amount needed to align the topic to the baseline of the heading
-@vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~"+" @chat-header-heading-font-size ~"-" @chat-header-topic-line-height;
+@vert-diff-baseline-offset-between-header-and-topic: @chat-header-font-vertical-padding ~'+' @chat-header-heading-font-size
+  ~'-' @chat-header-topic-line-height;
 // Actual margin value to align the topic to the baseline of the heading
 // Extra `.125` is for account for desenders to match baseline
 // This needs to be split out of the calc so we can re-use it in a calc
-@topic-margin-calc-value: @chat-header-space-to-heading ~"+" @vert-diff-baseline-offset-between-header-and-topic ~"+" .125em;
+@topic-margin-calc-value: @chat-header-space-to-heading ~'+' @vert-diff-baseline-offset-between-header-and-topic
+  ~'+' 0.125em;
 @topic-margin-top: calc(@topic-margin-calc-value);
-@topic-margin-bottom: calc(~"(" @topic-margin-calc-value ~")" ~"/" 2);
-
+@topic-margin-bottom: calc(~'(' @topic-margin-calc-value ~')' ~'/' 2);
 
 // Position of the arrow from the left side of the icon
 @chat-header-right-toolbar-toggle-icon-arrow-base-position: 16.6%;
 // The amount of travel when transitioning in and out
 @chat-header-right-toolbar-toggle-icon-arrow-delta: 18%;
 
-
-
 .chat-header {
-  box-sizing:       border-box;
-  position:         absolute;
-  display:          flex;
-  width:            100%;
-  padding-left:     @desktop-menu-left-padding;
+  box-sizing: border-box;
+  position: absolute;
+  display: flex;
+  width: 100%;
+  padding-left: @desktop-menu-left-padding;
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
-  border-bottom:    1px solid rgba(0,0,0,0.05);
-  z-index:          @zIndexChatHeader;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  z-index: @zIndexChatHeader;
 }
 
 .chat-header-inner {
@@ -59,7 +61,6 @@
   height: @chat-frame-desktop-header-height;
 }
 
-
 .chat-header__info-grouping {
   .chat-header__main-grouping();
   overflow: hidden;
@@ -69,7 +70,7 @@
   height: auto;
   max-height: @chat-frame-desktop-header-height;
 
-  transition: max-height .3s ease;
+  transition: max-height 0.3s ease;
 
   &:hover,
   &:focus {
@@ -130,7 +131,7 @@
   color: fade(@chat-header-topic-color, 0);
   white-space: nowrap;
 
-  transition: color .2s ease;
+  transition: color 0.2s ease;
 
   &.is-editing {
     width: 100%;
@@ -146,7 +147,7 @@
       margin-top: @topic-margin-top;
       margin-left: 1em;
       color: inherit;
-      opacity: .6;
+      opacity: 0.6;
       font-family: 'fontello';
     }
 
@@ -167,17 +168,16 @@
   max-height: @chat-header-topic-line-height;
   margin: 0;
   // For the italic overflow
-  padding-right: .25rem;
+  padding-right: 0.25rem;
 
   color: white;
-  opacity: .8;
+  opacity: 0.8;
   font-size: @chat-header-topic-font-size;
   line-height: @chat-header-topic-line-height;
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  transition: max-height .3s ease-in-out;
-
+  transition: max-height 0.3s ease-in-out;
 
   &:not(:empty) {
     margin-top: @topic-margin-top;
@@ -204,7 +204,6 @@
     width: 100%;
   }
 
-
   .chat-header__info-grouping:hover &,
   .chat-header__info-grouping:focus & {
     // plenty of room to auto expand into
@@ -213,7 +212,6 @@
     white-space: normal;
     word-wrap: break-word;
   }
-
 
   & .topic-input {
     box-sizing: border-box;
@@ -241,13 +239,14 @@
   font-size: 16px;
 }
 
-.chat-header__permission-icon, .chat-header__title {
+.chat-header__permission-icon,
+.chat-header__title {
   vertical-align: middle;
 }
 
 .chat-header__permission-icon {
   color: white;
-  opacity: .6;
+  opacity: 0.6;
 }
 
 .chat-header__action-grouping {
@@ -258,7 +257,9 @@
 .chat-header__favourite,
 .chat-header__settings,
 .chat-header__right-toolbar-toggle {
-  body.embedded & { visibility: hidden; }
+  body.embedded & {
+    visibility: hidden;
+  }
 
   display: inline-block;
   display: flex;
@@ -276,9 +277,7 @@
   text-align: center;
   cursor: pointer;
 
-  transition:
-    background-color .2s ease-in-out,
-    color .2s ease-in-out;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 
   &:hover {
     color: rgba(51, 51, 51, 1);
@@ -288,7 +287,7 @@
 
     & > .chat-header__action-icon,
     & > .chat-header__right-toolbar-toggle-icon {
-      background-color: rgba(0, 0, 0, .05);
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
 }
@@ -306,10 +305,7 @@
 .chat-header__right-toolbar-toggle-icon {
   color: inherit;
 
-  transition:
-    background-color .2s ease,
-    border-color .2s ease,
-    color .2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 
   // Spacing that doesn't affect width
   border-width: 4px 6px;
@@ -328,8 +324,7 @@
   justify-content: center;
   align-items: center;
   width: @right-toolbar-collapsed-width;
-  margin-left: .7rem;
-
+  margin-left: 0.7rem;
 
   &.pinned {
     & .chat-header__right-toolbar-toggle-icon-arrow-collapse {
@@ -338,7 +333,8 @@
     }
 
     & .chat-header__right-toolbar-toggle-icon-arrow-expand {
-      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position + @chat-header-right-toolbar-toggle-icon-arrow-delta;
+      left: @chat-header-right-toolbar-toggle-icon-arrow-base-position +
+        @chat-header-right-toolbar-toggle-icon-arrow-delta;
       opacity: 0;
     }
   }
@@ -354,7 +350,7 @@
     display: block;
     height: 1.5em;
 
-    border-left: 1px solid rgba(0, 0, 0, .1);
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -383,15 +379,14 @@
   width: auto;
   height: 42.85%;
 
-  transition:
-    left .2s ease,
-    opacity .15s ease;
+  transition: left 0.2s ease, opacity 0.15s ease;
 }
 
 .chat-header__right-toolbar-toggle-icon-arrow-collapse {
   .chat-header__right-toolbar-toggle-icon-arrow();
 
-  left: @chat-header-right-toolbar-toggle-icon-arrow-base-position - @chat-header-right-toolbar-toggle-icon-arrow-delta;
+  left: @chat-header-right-toolbar-toggle-icon-arrow-base-position -
+    @chat-header-right-toolbar-toggle-icon-arrow-delta;
   opacity: 0;
 }
 
@@ -401,8 +396,11 @@
   transform: translateY(-50%);
 }
 
-
 .chat-header__org-page {
+  @media (max-width: 650px) {
+    display: none;
+  }
+
   .chat-header__action-icon {
     /* To make the icon equal with the other font-icons */
     margin-left: 0.18em;
@@ -411,6 +409,10 @@
 }
 
 .chat-header__favourite {
+  @media (max-width: 650px) {
+    display: none;
+  }
+
   &.favourite {
     color: @trpYellow;
   }
@@ -451,7 +453,7 @@
   overflow: hidden;
   background-color: white;
   border-radius: 4px;
-  padding: .3rem;
+  padding: 0.3rem;
 }
 
 .chat-header__group-avatar-upload-progress {
@@ -465,12 +467,10 @@
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 
-  transition:
-    width .3s ease,
-    background-color .2s ease;
+  transition: width 0.3s ease, background-color 0.2s ease;
 
   animation-name: avatar-upload-progress-pulse;
-  animation-duration: .4s;
+  animation-duration: 0.4s;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-direction: alternate;
