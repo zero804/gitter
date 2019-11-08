@@ -238,12 +238,13 @@ var HeaderView = Marionette.ItemView.extend({
       });
 
       const group = this.model.get('group');
-      if (!group) return;
-      const homeUri = group.homeUri;
-      menuBuilder.add({
-        title: 'Community home',
-        href: `/${homeUri}`
-      });
+      if (group) {
+        const homeUri = group.homeUri;
+        menuBuilder.add({
+          title: 'Community home',
+          href: `/${homeUri}`
+        });
+      }
 
       menuBuilder.addDivider();
 
