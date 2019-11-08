@@ -8,7 +8,7 @@ var debug = require('debug')('gitter:tests:test-fixtures');
 function createGroup(fixtureName, f) {
   debug('Creating %s', fixtureName);
 
-  var uri = f.uri || fixtureUtils.generateGroupUri();
+  var uri = f.uri || fixtureUtils.generateGroupUri(fixtureName);
 
   var avatarVersion;
   if (f.hasOwnProperty('avatarVersion')) {
