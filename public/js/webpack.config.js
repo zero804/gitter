@@ -50,7 +50,6 @@ const webpackConfig = merge(baseConfig, {
     alias: {
       jquery: require.resolve('jquery'),
       vue$: 'vue/dist/vue.esm.js',
-      emojify: path.resolve(path.join(__dirname, '../repo/emojify/emojify.js')),
       'jquery-textcomplete': path.resolve(
         path.join(__dirname, '../repo/jquery-textcomplete/jquery.textcomplete.js')
       ),
