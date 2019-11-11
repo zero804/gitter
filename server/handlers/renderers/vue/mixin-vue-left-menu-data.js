@@ -15,13 +15,19 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     generateUserThemeSnapshot(req)
   ]);
 
+  const uriContext = req.uriContext;
+  const currentRoom = uriContext && uriContext.troupe;
+
   const roomMap = {};
+
+  // the roomMap will contain the current room
+  if (currentRoom) {
+    roomMap[currentRoom.id] = currentRoom;
+  }
+
   rooms.forEach(room => {
     roomMap[room.id] = room;
   });
-
-  const uriContext = req.uriContext;
-  const room = uriContext && uriContext.troupe;
 
   const isMobile = req.isPhone;
 
@@ -32,7 +38,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     darkTheme: userThemeSnapshot.theme === 'gitter-dark',
 
     roomMap,
-    displayedRoomId: room && room.id,
+    displayedRoomId: currentRoom && currentRoom.id,
 
     leftMenuPinnedState: !isMobile,
     leftMenuExpandedState: false
