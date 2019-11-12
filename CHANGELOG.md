@@ -1,3 +1,10 @@
+# 20.9.0 - *upcoming*
+
+Developer facing:
+
+ - Update to `cypress@3.6.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1646
+
+
 # 20.8.0 - 2019-11-11
 
  - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633
