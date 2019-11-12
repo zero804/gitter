@@ -15,8 +15,5 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-// cypress/support/index.js
-require('cypress-failed-log');
-
 // Alternatively you can use CommonJS syntax:
 require('./commands');
