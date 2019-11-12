@@ -47,6 +47,9 @@ require('./views/widgets/avatar');
 userNotifications.initUserNotifications();
 
 onready(function() {
+  const user = context.user();
+  debug(`user=${user.get('username')}(${user.get('id')})`);
+
   const roomMenuModel = new RoomMenuModel(
     _.extend(
       {},

@@ -37,9 +37,14 @@ require('./components/focus-events');
 require('./components/ping');
 
 onready(function() {
+  const user = context.user();
+  debug(`user=${user.get('username')}(${user.get('id')})`);
+
   require('./components/link-handler').installLinkHandler();
+  const troupe = context.troupe();
+  debug(`Rendering app with troupe`, troupe.attributes);
   var appView = new ChatToolbarInputLayout({
-    model: context.troupe(),
+    model: troupe,
     template: false,
     el: 'body',
     chatCollection: chatCollection

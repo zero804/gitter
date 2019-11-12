@@ -4,6 +4,7 @@ var persistence = require('gitter-web-persistence');
 var assert = require('assert');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
+const debug = require('debug')('gitter:app:troupe-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var roomMembershipService = require('./room-membership-service');
 
@@ -68,10 +69,16 @@ function findByIdLeanWithMembership(troupeId, userId) {
     return Promise.join(
       persistence.Troupe.findOne({ _id: troupeId }, {}, { lean: true }).exec(),
       roomMembershipService.checkRoomMembership(troupeId, userId),
-      function(leanTroupe, access) {
-        if (!leanTroupe) return [null, false];
+      function(leanTroupe, roomMember) {
+        if (!leanTroupe) {
+          debug(`findByIdLeanWithMembership found no troupe`);
+          return [null, false];
+        }
         leanTroupe.id = mongoUtils.serializeObjectId(leanTroupe._id);
-        return [leanTroupe, access];
+        debug(
+          `findByIdLeanWithMembership found ${JSON.stringify(leanTroupe)} roomMember=${roomMember}`
+        );
+        return [leanTroupe, roomMember];
       }
     );
   }
