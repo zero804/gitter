@@ -13,18 +13,18 @@ function RoomMembershipStrategy(options) {
 }
 
 RoomMembershipStrategy.prototype = {
-  preload: function(troupeIds) {
+  preload: async function(troupeIds) {
     // Shortcut logic
     if (this.nonMemberTroupeIds || this.predefinedValue) {
       return;
     }
 
-    return roomMembershipService
-      .findUserMembershipInRooms(this.userId, troupeIds.toArray())
-      .bind(this)
-      .then(function(memberTroupeIds) {
-        this.memberships = collections.hashArray(memberTroupeIds);
-      });
+    const memberTroupeIds = await roomMembershipService.findUserMembershipInRooms(
+      this.userId,
+      troupeIds.toArray()
+    );
+
+    this.memberships = collections.hashArray(memberTroupeIds);
   },
 
   map: function(id) {

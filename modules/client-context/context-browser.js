@@ -9,6 +9,7 @@ var debug = require('debug-proxy')('app:client-context');
 
 var ctx = window.troupeContext || {};
 var snapshots = ctx.snapshots || {};
+debug('window.troupeContext', ctx);
 
 function getGroupModel() {
   var groupData;

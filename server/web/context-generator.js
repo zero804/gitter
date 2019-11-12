@@ -3,6 +3,7 @@
 var assert = require('assert');
 var Promise = require('bluebird');
 var _ = require('lodash');
+const debug = require('debug')('gitter:app:context-generator');
 var restSerializer = require('../serializers/rest-serializer');
 var userService = require('gitter-web-users');
 var roomMetaService = require('gitter-web-rooms/lib/room-meta-service');
@@ -145,6 +146,12 @@ function generateTroupeContext(req, extras) {
   var uriContext = req.uriContext;
   var troupe = uriContext && uriContext.troupe;
   var roomMember = uriContext && uriContext.roomMember;
+
+  debug(
+    `generateTroupeContext -> roomMember=${roomMember} ${
+      troupe ? `troupe=${troupe.lcUri}(${troupe._id})` : ''
+    } ${user ? `user=${user.username}(${user._id})` : ''}`
+  );
 
   return Promise.all([
     contextGeneratorRequest(req),
