@@ -1,4 +1,4 @@
-# 20.8.0 - *upcoming*
+# 20.8.0 - 2019-11-11
 
  - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633
  - Remove cyclic invocation from room navigation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1625
