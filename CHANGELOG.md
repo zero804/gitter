@@ -1,5 +1,7 @@
 # 20.9.0 - *upcoming*
 
+ - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
+
 Developer facing:
 
  - Update to `cypress@3.6.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1646
