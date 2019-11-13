@@ -6,6 +6,7 @@ const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const pushState = require('../../../utils/browser/pushState');
 const linkDecorator = require('../../../views/chat/decorators/linkDecorator');
+const emojiDecorator = require('../../../views/chat/decorators/emojiDecorator');
 import Intersect from './intersect';
 
 export default {
@@ -73,7 +74,7 @@ export default {
       this.$el.scrollIntoView({ block, behavior });
     },
     decorate: function() {
-      linkDecorator.decorate(this);
+      [linkDecorator, emojiDecorator].forEach(d => d.decorate(this));
     },
     onViewportEnter: function() {
       if (this.message.unread) {
