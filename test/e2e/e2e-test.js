@@ -235,9 +235,11 @@ describe('e2e tests', function() {
         parentId: fixtures.message1._id
       });
 
+      // Ensure the layout is done shifting
+      cy.get('#chat-input-textarea').should('have.class', 'js-reset-textarea-size');
+
       cy.get('#bottom-unread-banner .banner-wrapper button.main')
         .should('be.visible')
-        .click()
         .click();
 
       cy.get('.js-thread-message-feed-root')

@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:unread-banner-view');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/unreadBannerTemplate.hbs');
 var appEvents = require('../../utils/appevents');
@@ -104,13 +105,20 @@ var TopBannerView = Marionette.ItemView.extend({
 
   onMainButtonClick: function() {
     var mentionId = this.model.get('oldestMentionId');
-    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+    if (mentionId) {
+      debug(`onMainButtonClick scrolling to unread mention=${mentionId}`);
+      return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+    }
 
     var itemId = this.model.get('oldestUnreadItemId');
-    if (itemId) appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+    if (itemId) {
+      debug(`onMainButtonClick scrolling to unread message=${itemId}`);
+      appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+    }
   },
 
   onSideButtonClick: function() {
+    debug(`onSideButtonClick marking all messages as read`);
     unreadItemsClient.markAllRead();
   }
 });
@@ -122,7 +130,12 @@ var BottomBannerView = TopBannerView.extend({
   actAsScrollHelper: false,
 
   initialize: function() {
+    debug(`BottomBanner initialized`);
     this.listenTo(appEvents, 'atBottomChanged', this.toggleScrollHelper);
+  },
+
+  onAttach: function() {
+    debug(`BottomBannerView.onAttach`);
   },
 
   toggleScrollHelper: function(atBottom) {
@@ -134,11 +147,18 @@ var BottomBannerView = TopBannerView.extend({
     this.toggleScrollHelper(true);
 
     var mentionId = this.model.get('firstMentionIdBelow');
-    if (mentionId) return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+    if (mentionId) {
+      debug(`BottomBannerView.onMainButtonClick scrolling to unread mention=${mentionId}`);
+      return appEvents.trigger('chatCollectionView:scrollToChatId', mentionId);
+    }
 
     var itemId = this.model.get('firstUnreadItemIdBelow');
-    if (itemId) return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+    if (itemId) {
+      debug(`BottomBannerView.onMainButtonClick scrolling to unread message=${itemId}`);
+      return appEvents.trigger('chatCollectionView:scrollToChatId', itemId);
+    }
 
+    debug(`BottomBannerView.onMainButtonClick scrolling to bottom of chats`);
     appEvents.trigger('chatCollectionView:scrollToBottom');
   },
 
