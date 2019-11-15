@@ -7,6 +7,7 @@ Developer facing:
 
  - Update to `cypress@3.6.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1646
  - Fix unread badge click open thread e2e test, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1642
+ - Make create room e2e test more robust, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1643
 
 
 # 20.8.0 - 2019-11-11
