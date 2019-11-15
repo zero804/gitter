@@ -27,8 +27,8 @@ function generateGithubId() {
   return ++counter + seed;
 }
 
-function generateGroupUri() {
-  return '_group' + ++counter + Date.now();
+function generateGroupUri(optionalName) {
+  return `_${optionalName || 'group'}-${++counter}${Date.now()}`;
 }
 
 module.exports = {
