@@ -29,7 +29,7 @@ describe('chat-snapshot-options', function() {
     assert.deepEqual(result, {
       limit: 50,
       aroundId: undefined,
-      unread: false
+      overrideUnreadTo: false
     });
   });
 
@@ -65,6 +65,6 @@ describe('chat-snapshot-options', function() {
   it('passes through unread', async () => {
     mockUnreadItems([]);
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, true);
-    assert.equal(result.unread, true);
+    assert.equal(result.overrideUnreadTo, true);
   });
 });

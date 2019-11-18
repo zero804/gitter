@@ -52,7 +52,7 @@ function serializeTroupesForUser(userId, callback) {
 async function serializeChatsForTroupe(
   troupeId,
   userId,
-  { limit = DEFAULT_CHAT_COUNT_LIMIT, lean, aroundId, unread, lookups, beforeInclId }
+  { limit = DEFAULT_CHAT_COUNT_LIMIT, lean, aroundId, overrideUnreadTo, lookups, beforeInclId }
 ) {
   const chatMessages = await chatService.findChatMessagesForTroupe(troupeId, {
     limit,
@@ -64,7 +64,7 @@ async function serializeChatsForTroupe(
     initialId: aroundId,
     currentUserId: userId,
     troupeId,
-    unread,
+    overrideUnreadTo,
     lean,
     lookups
   });
