@@ -35,7 +35,12 @@ async function renderChat(req, res, next, options) {
     lean: true,
     limit: ROSTER_SIZE
   };
-  const chatSnapshotOptions = await getChatSnapshotOptions(userId, troupe.id, req, options.unread);
+  const chatSnapshotOptions = await getChatSnapshotOptions(
+    userId,
+    troupe.id,
+    req,
+    options.overrideUnreadTo
+  );
 
   const [
     troupeContext,

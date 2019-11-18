@@ -189,6 +189,7 @@ describe('chat-strategy-test', function() {
           text: 'B'
         }
       });
+
       it('should propagate threadMessageCount attribute', async () => {
         const { message1, troupe1 } = threadFixtures;
         const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
@@ -200,6 +201,17 @@ describe('chat-strategy-test', function() {
         const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
         const serialized = await serialize([message2], strategy);
         assert.equal(serialized[0].parentId, message1.id);
+      });
+    });
+
+    it('should override unread to given value', async () => {
+      var strategy = new ChatStrategy({
+        currentUserId: fixture.user1.id,
+        troupeId: fixture.troupe1.id,
+        overrideUnreadTo: true
+      });
+      return serialize([fixture.message1], strategy).then(function(s) {
+        assertUtils.assertSerializedEqual(s, [{ ...expected1[0], unread: true }]);
       });
     });
 

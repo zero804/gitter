@@ -254,7 +254,7 @@ exports.chatArchive = [
       nextDateUTC
     );
     const strategy = new restSerializer.ChatStrategy({
-      unread: false, // All chats are read in the archive
+      overrideUnreadTo: false, // All chats are read in the archive
       troupeId: troupeId
     });
 

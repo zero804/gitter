@@ -28,7 +28,7 @@ function renderSecondaryView(req, res, next, options) {
     fetchEvents: false,
     fetchUsers: false,
     generateContext: false,
-    unread: false, // Embedded users see chats as read
+    overrideUnreadTo: false, // Embedded users see chats as read
     classNames: ['card'],
     filterChats: function(chats) {
       // Only show the burst
