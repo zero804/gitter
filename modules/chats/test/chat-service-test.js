@@ -37,9 +37,15 @@ describe('chatService', function() {
         /StatusError: Unknown room/
       );
     });
-    it('should validate non empty message', async () => {
+    it('should validate that text exists', async () => {
       await assert.rejects(
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: null }),
+        /StatusError: Text is required/
+      );
+    });
+    it('should validate that text is not empty', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, { text: '' }),
         /StatusError: Text is required/
       );
     });
@@ -518,6 +524,43 @@ describe('chatService', function() {
           assert.strictEqual(messages.length, 0);
           assert.strictEqual(messageBackups.length, 1);
         });
+    });
+  });
+
+  describe('deleting thread messages', () => {
+    it('should decrement threadMessageCount on parent', async () => {
+      const { troupe1, user1 } = fixture;
+      const parent = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'A'
+      });
+      assert(!parent.threadMessageCount);
+      const threadMessage = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'B',
+        parentId: parent.id
+      });
+      const oneChildParent = await chatService.findById(parent.id);
+      assert.equal(oneChildParent.threadMessageCount, 1);
+      await chatService.deleteMessageFromRoom(troupe1, threadMessage);
+      const zeroChildParent = await chatService.findById(parent.id);
+      assert.equal(zeroChildParent.threadMessageCount, 0);
+    });
+
+    it('parent message content is replaced with empty string instead of deleting', async () => {
+      const { troupe1, user1 } = fixture;
+      const parent = await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'A'
+      });
+      await chatService.newChatMessageToTroupe(troupe1, user1, {
+        text: 'B',
+        parentId: parent.id
+      });
+      const oneChildParent = await chatService.findById(parent.id);
+
+      await chatService.deleteMessageFromRoom(troupe1, oneChildParent);
+
+      const deletedParent = await chatService.findById(parent.id);
+      assert.equal(deletedParent.text, '');
+      assert.equal(deletedParent.html, '');
     });
   });
 });

@@ -320,6 +320,13 @@ describe('mutations', () => {
     expect(state.messageMap).toEqual({ [message1.id]: message1 });
   });
 
+  it('REMOVE_MESSAGE', () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    state.messageMap = { [message1.id]: message1 };
+    mutations[types.REMOVE_MESSAGE](state, { id: message1.id });
+    expect(state.messageMap).toEqual({});
+  });
+
   it('UPDATE_MESSAGE', () => {
     const message1 = { id: '5cf8ef111111111111111111' };
     state.messageMap = { [message1.id]: message1 };

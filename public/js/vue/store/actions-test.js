@@ -665,4 +665,15 @@ describe('actions', () => {
       }
     ]);
   });
+
+  it('removeMessage', async () => {
+    const message1 = { id: '5cf8ef111111111111111111' };
+    const payload = [message1];
+    await testAction(actions.removeMessage, payload, state, [
+      {
+        type: types.REMOVE_MESSAGE,
+        payload
+      }
+    ]);
+  });
 });

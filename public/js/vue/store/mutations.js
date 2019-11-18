@@ -118,6 +118,9 @@ export default {
       Vue.set(state.messageMap, message.id, message);
     });
   },
+  [types.REMOVE_MESSAGE](state, message) {
+    Vue.delete(state.messageMap, message.id);
+  },
   [types.UPDATE_MESSAGE](state, newMessageState) {
     const { id } = newMessageState;
     if (!id) return;

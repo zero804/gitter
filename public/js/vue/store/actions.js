@@ -266,3 +266,7 @@ export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM
 export const addMessages = ({ commit }, messages) => {
   commit(types.ADD_TO_MESSAGE_MAP, messages);
 };
+
+export const removeMessage = ({ commit }, message) => {
+  commit(types.REMOVE_MESSAGE, message);
+};

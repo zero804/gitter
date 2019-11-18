@@ -123,12 +123,13 @@ function resolveMentions(troupe, user, parsedMessage) {
   });
 }
 
-async function incrementThreadMessageCount(parentId, troupeId) {
+async function addToThreadMessageCount(parentId, troupeId, count) {
   const parent = await ChatMessage.findById(parentId).exec();
   if (!parent || !mongoUtils.objectIDsEqual(parent.toTroupeId, troupeId)) {
-    throw new StatusError(400, "Parent message with doesn't exist");
+    throw new StatusError(400, `Parent message ${parentId} doesn't exist in troupe ${troupeId}`);
   }
-  parent.threadMessageCount = parent.threadMessageCount + 1 || 1;
+  const currentValue = parent.threadMessageCount || 0;
+  parent.threadMessageCount = Math.max(0, currentValue + count); // safe guard against decrementing below 0
   return parent.save();
 }
 
@@ -145,15 +146,14 @@ async function newChatMessageToTroupe(troupe, user, data) {
   if (!troupe) throw new StatusError(404, 'Unknown room');
 
   /* You have to have text */
-  if (!data.text && data.text !== '' /* Allow empty strings for now */)
-    throw new StatusError(400, 'Text is required');
+  if (!data.text) throw new StatusError(400, 'Text is required');
   if (data.text.length > MAX_CHAT_MESSAGE_LENGTH)
     throw new StatusError(400, 'Message exceeds maximum size');
   if (data.parentId && !mongoUtils.isLikeObjectId(data.parentId))
     throw new StatusError(400, 'parentId must be a valid message ID');
 
   if (data.parentId) {
-    await incrementThreadMessageCount(data.parentId, troupe.id);
+    await addToThreadMessageCount(data.parentId, troupe.id, 1);
   }
   const parsedMessage = await processText(data.text);
   const mentions = await resolveMentions(troupe, user, parsedMessage);
@@ -613,41 +613,47 @@ function searchChatMessagesForRoom(troupeId, textQuery, options) {
     });
 }
 
-function deleteMessage(message) {
+async function deleteMessage(message) {
+  // parent message won't be completely deleted till it's got threaded messages
+  if (message.threadMessageCount > 0) {
+    message.text = '';
+    message.html = '';
+    return message.save();
+  }
   // `_.omit` because of `Cannot update '__v' and '__v' at the same time` error
-  return mongooseUtils
-    .upsert(ChatMessageBackup, { _id: message._id }, _.omit(message.toObject(), '__v'))
-    .then(() => {
-      return message.remove();
-    });
+  await mongooseUtils.upsert(
+    ChatMessageBackup,
+    { _id: message._id },
+    _.omit(message.toObject(), '__v')
+  );
+  await message.remove();
+  if (message.parentId) {
+    await addToThreadMessageCount(message.parentId, message.toTroupeId, -1);
+  }
 }
 
-function deleteMessageFromRoom(room, chatMessage) {
-  return unreadItemService
-    .removeItem(chatMessage.fromUserId, room, chatMessage)
-    .then(() => deleteMessage(chatMessage))
-    .return(null);
+async function deleteMessageFromRoom(room, chatMessage) {
+  await unreadItemService.removeItem(chatMessage.fromUserId, room, chatMessage);
+  await deleteMessage(chatMessage);
 }
 
-function removeAllMessagesForUserId(userId) {
-  return ChatMessage.find({ fromUserId: userId })
-    .exec()
-    .then(function(messages) {
-      logger.info(
-        'removeAllMessagesForUserId(' + userId + '): Removing ' + messages.length + ' messages'
-      );
-      const troupeMap = {};
-      // Clear any unreads and delete the messages
-      return Promise.map(messages, function(message) {
-        const toTroupeId = message.toTroupeId;
-        return Promise.resolve(
-          troupeMap[toTroupeId] || troupeService.findById(message.toTroupeId)
-        ).then(function(troupe) {
-          troupeMap[toTroupeId] = troupe;
-          return deleteMessageFromRoom(troupe, message);
-        });
-      });
-    });
+async function removeAllMessagesForUserId(userId) {
+  const messages = await ChatMessage.find({ fromUserId: userId }).exec();
+  logger.info(
+    'removeAllMessagesForUserId(' + userId + '): Removing ' + messages.length + ' messages'
+  );
+  const troupeMap = {};
+  const getTroupe = async id => {
+    if (troupeMap[id]) return troupeMap[id];
+    const troupe = await troupeService.findById(id);
+    troupeMap[troupe._id] = troupe;
+    return troupe;
+  };
+  // Clear any unreads and delete the messages
+  for (const message of messages) {
+    const troupe = await getTroupe(message.toTroupeId);
+    await deleteMessageFromRoom(troupe, message);
+  }
 }
 
 function removeAllMessagesForUserIdInRoomId(userId, roomId) {

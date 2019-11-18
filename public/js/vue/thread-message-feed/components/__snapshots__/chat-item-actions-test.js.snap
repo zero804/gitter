@@ -1,0 +1,88 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`thread-message-feed chat-item-actions matches snapshot 1`] = `
+<div
+  class="chat-item__actions"
+>
+  <b-popover-stub
+    boundary="scrollParent"
+    boundarypadding="5"
+    container="chat-actions-5d147ea84dad9dfbc522317a"
+    delay="0"
+    fallbackplacement="flip"
+    offset="0"
+    placement="left"
+    target="chat-actions-5d147ea84dad9dfbc522317a"
+    title=""
+    triggers="focus"
+  >
+    <div
+      class="popover-item__action-disabled"
+    >
+      
+      Edit
+    
+    </div>
+     
+    <div
+      class="popover-item__action-disabled"
+    >
+      Delete
+    </div>
+  </b-popover-stub>
+   
+  <button
+    class="chat-item-actions-button"
+    id="chat-actions-5d147ea84dad9dfbc522317a"
+  >
+    <i
+      class="chat-item__icon icon-ellipsis"
+    />
+  </button>
+</div>
+`;
+
+exports[`thread-message-feed chat-item-actions user can delete the message matches snapshot 1`] = `
+<div
+  class="chat-item__actions"
+>
+  <b-popover-stub
+    boundary="scrollParent"
+    boundarypadding="5"
+    container="chat-actions-5d147ea84dad9dfbc522317a"
+    delay="0"
+    fallbackplacement="flip"
+    offset="0"
+    placement="left"
+    target="chat-actions-5d147ea84dad9dfbc522317a"
+    title=""
+    triggers="focus"
+  >
+    <div
+      class="popover-item__action-disabled"
+    >
+      
+      Edit
+    
+    </div>
+     
+    <button
+      class="popover-item__action"
+      title="Delete this message"
+    >
+      
+      Delete
+    
+    </button>
+  </b-popover-stub>
+   
+  <button
+    class="chat-item-actions-button"
+    id="chat-actions-5d147ea84dad9dfbc522317a"
+  >
+    <i
+      class="chat-item__icon icon-ellipsis"
+    />
+  </button>
+</div>
+`;
