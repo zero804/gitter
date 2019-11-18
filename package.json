@@ -19,6 +19,7 @@
     "batch-stream": "^0.1.2",
     "bluebird": "^3.5.1",
     "body-parser": "^1.13.2",
+    "bootstrap-vue": "^2.0.4",
     "classnames": "^2.2.5",
     "cld": "^2.4.5",
     "cliff": "^0.1.10",

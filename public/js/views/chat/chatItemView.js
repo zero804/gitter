@@ -31,6 +31,7 @@ const chatItemTemplate = require('./tmpl/chatItemView.hbs');
 const statusItemTemplate = require('./tmpl/statusItemView.hbs');
 const actionsTemplate = require('./tmpl/actionsView.hbs');
 const ChatEditView = require('../chat/chat-edit-view');
+const ChatItemPolicy = require('./chat-item-policy');
 
 require('../behaviors/unread-items');
 require('../behaviors/widgets');
@@ -155,6 +156,12 @@ module.exports = (function() {
       }
 
       this.listenToOnce(this, 'messageInViewport', this.decorate);
+
+      this.chatItemPolicy = new ChatItemPolicy(this.model.attributes, {
+        isEmbedded: context().embedded,
+        currentUserId: context.getUserId(),
+        isTroupeAdmin: context.isTroupeAdmin()
+      });
     },
 
     onDestroy: function() {
@@ -207,6 +214,11 @@ module.exports = (function() {
     },
 
     onChange: function() {
+      this.chatItemPolicy = new ChatItemPolicy(this.model.attributes, {
+        isEmbedded: context().embedded,
+        currentUserId: context.getUserId(),
+        isTroupeAdmin: context.isTroupeAdmin()
+      });
       this.updateRender(this.model.changed);
     },
 
@@ -329,10 +341,6 @@ module.exports = (function() {
     handleUpdateMessageStateChanges: function(changes) {
       var model = this.model;
 
-      if (!changes || 'fromUser' in changes) {
-        toggleClass(this.el, 'isViewers', this.isOwnMessage());
-      }
-
       if (!changes || 'editedAt' in changes) {
         toggleClass(this.el, 'hasBeenEdited', this.hasBeenEdited());
       }
@@ -397,11 +405,6 @@ module.exports = (function() {
       }
     },
 
-    isOwnMessage: function() {
-      if (!this.model.get('fromUser')) return false;
-      return this.model.get('fromUser').id === context.getUserId();
-    },
-
     isInEditablePeriod: function() {
       var sent = this.model.get('sent');
 
@@ -418,13 +421,10 @@ module.exports = (function() {
 
     canEdit: function() {
       return (
-        this.model.id && this.isOwnMessage() && this.isInEditablePeriod() && !this.isEmbedded()
-      );
-    },
-
-    canDelete: function() {
-      return (
-        this.model.id && !this.isEmbedded() && (this.isOwnMessage() || context.isTroupeAdmin())
+        this.model.id &&
+        this.chatItemPolicy.isOwnMessage() &&
+        this.isInEditablePeriod() &&
+        !this.isEmbedded()
       );
     },
 
@@ -824,11 +824,9 @@ module.exports = (function() {
       var deleted = !this.model.get('text');
       var isPersisted = !!this.model.id;
       var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
-      var canDelete = this.chatItemView.canDelete() && isPersisted;
+      const canDelete = this.chatItemView.chatItemPolicy.canDelete();
 
-      const currentUser = context.user();
-      const messageAuthor = this.model.get('fromUser');
-      const isOwnMessage = messageAuthor && currentUser && messageAuthor.id === currentUser.id;
+      const isOwnMessage = this.chatItemView.chatItemPolicy.isOwnMessage();
 
       const actions = [];
 
