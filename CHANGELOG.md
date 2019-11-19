@@ -3,7 +3,8 @@
  - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
  - Add emoji support to thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1644
  - Remove router-nli-app and don't fingerprint anonymous users, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1650
- -  Delete thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1634
+ - Add "Delete" action for thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1634
+ - Update homepage with some more pertinent feature details, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1655
 
 Developer facing:
 
