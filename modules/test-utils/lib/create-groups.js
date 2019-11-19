@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var Group = require('gitter-web-persistence').Group;
 var fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function createGroup(fixtureName, f) {
   debug('Creating %s', fixtureName);
@@ -92,17 +93,29 @@ function createGroups(expected, fixture) {
 
       var expectedSecurityDescriptor = expectedGroup && expectedGroup.securityDescriptor;
       if (expectedSecurityDescriptor) {
-        expectedSecurityDescriptor.extraMembers =
-          expectedSecurityDescriptor.extraMembers &&
-          expectedSecurityDescriptor.extraMembers.map(function(user) {
-            return fixture[user]._id;
-          });
+        expectedSecurityDescriptor.extraMembers = (
+          (expectedSecurityDescriptor.extraMemberIds &&
+            expectedSecurityDescriptor.extraMemberIds.map(id => mongoUtils.asObjectID(id))) ||
+          []
+        ).concat(
+          (expectedSecurityDescriptor.extraMembers &&
+            expectedSecurityDescriptor.extraMembers.map(function(user) {
+              return fixture[user]._id;
+            })) ||
+            []
+        );
 
-        expectedSecurityDescriptor.extraAdmins =
-          expectedSecurityDescriptor.extraAdmins &&
-          expectedSecurityDescriptor.extraAdmins.map(function(user) {
-            return fixture[user]._id;
-          });
+        expectedSecurityDescriptor.extraAdmins = (
+          (expectedSecurityDescriptor.extraAdminIds &&
+            expectedSecurityDescriptor.extraAdminIds.map(id => mongoUtils.asObjectID(id))) ||
+          []
+        ).concat(
+          (expectedSecurityDescriptor.extraAdmins &&
+            expectedSecurityDescriptor.extraAdmins.map(function(user) {
+              return fixture[user]._id;
+            })) ||
+            []
+        );
       }
 
       return createGroup(key, expectedGroup).then(function(createdGroup) {

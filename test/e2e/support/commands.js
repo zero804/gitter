@@ -42,6 +42,11 @@ assert(
 
 Cypress.Commands.add('login', accessToken => {
   cy.log(`Logging in with token ${accessToken}`);
+
+  // Clear out any previous user session
+  cy.clearCookie('d_auth');
+  cy.clearCookie('d_session');
+
   cy.request({
     url: gitterBaseUrl,
     method: 'GET',
@@ -55,12 +60,6 @@ Cypress.Commands.add('login', accessToken => {
 
 Cypress.Commands.add('loginUser', user => {
   cy.log(`Logging in as user ${user.username} -> ${user.accessToken}`);
-
-  // Clear out any previous user session
-  cy.clearCookie('d_auth');
-  cy.clearCookie('d_session');
-
-  // Now we can sign in with the new user
   cy.login(user.accessToken);
 });
 

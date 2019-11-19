@@ -6,6 +6,7 @@ var TroupeUser = require('gitter-web-persistence').TroupeUser;
 var fixtureUtils = require('./fixture-utils');
 const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 var debug = require('debug')('gitter:tests:test-fixtures');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 // This corresponds with require("giter-web-rooms/lib/room-membership-flags").MODES.all
 var DEFAULT_ROOM_MEMBERSHIP_FLAGS = 109;
@@ -172,29 +173,47 @@ function createTroupe(fixtureName, f, fixture) {
 }
 
 function createTroupes(expected, fixture) {
+  // eslint-disable-next-line complexity
   return Promise.map(Object.keys(expected), function(key) {
     if (key.match(/^troupe(?!Meta)/)) {
       var expectedTroupe = expected[key];
 
-      expectedTroupe.userIds =
-        expectedTroupe.users &&
-        expectedTroupe.users.map(function(user) {
-          return fixture[user]._id;
-        });
+      expectedTroupe.userIds = (
+        (expectedTroupe.userIds && expectedTroupe.userIds.map(id => mongoUtils.asObjectID(id))) ||
+        []
+      ).concat(
+        (expectedTroupe.users &&
+          expectedTroupe.users.map(function(user) {
+            return fixture[user]._id;
+          })) ||
+          []
+      );
 
       var expectedSecurityDescriptor = expectedTroupe && expectedTroupe.securityDescriptor;
       if (expectedSecurityDescriptor) {
-        expectedSecurityDescriptor.extraMembers =
-          expectedSecurityDescriptor.extraMembers &&
-          expectedSecurityDescriptor.extraMembers.map(function(user) {
-            return fixture[user]._id;
-          });
+        expectedSecurityDescriptor.extraMembers = (
+          (expectedSecurityDescriptor.extraMemberIds &&
+            expectedSecurityDescriptor.extraMemberIds.map(id => mongoUtils.asObjectID(id))) ||
+          []
+        ).concat(
+          (expectedSecurityDescriptor.extraMembers &&
+            expectedSecurityDescriptor.extraMembers.map(function(user) {
+              return fixture[user]._id;
+            })) ||
+            []
+        );
 
-        expectedSecurityDescriptor.extraAdmins =
-          expectedSecurityDescriptor.extraAdmins &&
-          expectedSecurityDescriptor.extraAdmins.map(function(user) {
-            return fixture[user]._id;
-          });
+        expectedSecurityDescriptor.extraAdmins = (
+          (expectedSecurityDescriptor.extraAdminIds &&
+            expectedSecurityDescriptor.extraAdminIds.map(id => mongoUtils.asObjectID(id))) ||
+          []
+        ).concat(
+          (expectedSecurityDescriptor.extraAdmins &&
+            expectedSecurityDescriptor.extraAdmins.map(function(user) {
+              return fixture[user]._id;
+            })) ||
+            []
+        );
       }
 
       return createTroupe(key, expectedTroupe, fixture).then(function(troupe) {

@@ -2,6 +2,7 @@
 
 var ChatMessage = require('gitter-web-persistence').ChatMessage;
 var debug = require('debug')('gitter:tests:test-fixtures');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
 function createMessage(f) {
   debug('Creating %s', f.fixtureName);
@@ -27,8 +28,10 @@ function createMessage(f) {
 
 async function createMessages(expected, fixtures) {
   function linkExpectedWithFixtures(expectedMessage) {
-    expectedMessage.fromUserId = fixtures[expectedMessage.user]._id;
-    expectedMessage.toTroupeId = fixtures[expectedMessage.troupe]._id;
+    expectedMessage.fromUserId =
+      mongoUtils.asObjectID(expectedMessage.fromUserId) || fixtures[expectedMessage.user]._id;
+    expectedMessage.toTroupeId =
+      mongoUtils.asObjectID(expectedMessage.toTroupeId) || fixtures[expectedMessage.troupe]._id;
     if (expectedMessage.parent) {
       expectedMessage.parentId = fixtures[expectedMessage.parent]._id;
     }
