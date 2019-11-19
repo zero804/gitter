@@ -12,6 +12,7 @@ Developer facing:
  - Fix unread badge click open thread e2e test, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1642
  - Make create room e2e test more robust, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1643
  - Rename ChatStrategy unread option, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1651
+ - Add tests for anonymous access to API, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1654
 
 
 # 20.8.0 - 2019-11-11
