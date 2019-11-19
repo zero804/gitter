@@ -1,34 +1,50 @@
 'use strict';
 
-var Promise = require('bluebird');
 var debug = require('debug')('gitter:tests:test-fixtures');
 var crypto = require('crypto');
-var OAuthAccessToken = require('gitter-web-persistence').OAuthAccessToken;
+const assert = require('assert');
+const anonymousTokenProvider = require('gitter-web-oauth/lib/tokens/anonymous-token-provider');
+const { OAuthAccessToken } = require('gitter-web-persistence');
 
-function createOAuthAccessToken(fixtureName, f) {
+const OAUTH_ACCESS_TOKEN = /^oAuthAccessToken/;
+
+function createOAuthAccessToken({ fixtureName, token, userId, clientId }) {
   debug('Creating %s', fixtureName);
-
-  return OAuthAccessToken.create({
-    token: f.token || crypto.randomBytes(20).toString('hex'),
-    userId: f.userId,
-    clientId: f.clientId
-  });
+  assert(clientId);
+  if (userId) {
+    return OAuthAccessToken.create({
+      token: token || crypto.randomBytes(20).toString('hex'),
+      userId,
+      clientId
+    });
+  } else {
+    return anonymousTokenProvider.getToken(null, clientId);
+  }
 }
 
-function createOAuthAccessTokens(expected, fixture) {
-  return Promise.map(Object.keys(expected), function(key) {
-    if (key.match(/^oAuthAccessToken/)) {
-      var expectedOAuthAccessToken = expected[key];
-      expectedOAuthAccessToken.userId = fixture[expectedOAuthAccessToken.user]._id;
-      expectedOAuthAccessToken.clientId = fixture[expectedOAuthAccessToken.client]._id;
+/**
+ * Generates oauth access token. Requires an OAuth client to be created first
+ * the `user` argument is optional. If missing, anonymous token is created.
+ *
+ * @example:
+ * fixtureLoader.setup({
+ *   oAuthClient1: {},
+ *   user1: {},
+ *   oAuthAccessToken1: { user: 'user1', client: 'oAuthClient1' }
+ * });
+ */
+async function createOAuthAccessTokens(expected, fixture) {
+  const expectedTokens = Object.keys(expected)
+    .filter(fixtureName => fixtureName.match(OAUTH_ACCESS_TOKEN))
+    .map(fixtureName => ({ fixtureName, ...expected[fixtureName] }));
 
-      return createOAuthAccessToken(key, expectedOAuthAccessToken).then(function(oAuthAccessToken) {
-        fixture[key] = oAuthAccessToken;
-      });
-    }
-
-    return null;
-  });
+  for (const expectedToken of expectedTokens) {
+    const userId = expectedToken.user && fixture[expectedToken.user]._id;
+    const clientId = fixture[expectedToken.client]._id;
+    const { fixtureName, token } = expectedToken;
+    const tokenFixture = await createOAuthAccessToken({ userId, clientId, fixtureName, token });
+    fixture[fixtureName] = tokenFixture;
+  }
 }
 
 module.exports = createOAuthAccessTokens;

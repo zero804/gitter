@@ -21,6 +21,10 @@ describe('chat-api', function() {
   });
 
   var fixture = fixtureLoader.setup({
+    oAuthClient1: {},
+    oAuthAccessTokenAnon: {
+      client: 'oAuthClient1'
+    },
     user1: {
       accessToken: 'web-internal'
     },
@@ -278,5 +282,27 @@ describe('chat-api', function() {
         assert.strictEqual(body.messageId, fixture.messageBad2.id);
         assert.strictEqual(body.messageText, fixture.messageBad2.text);
       });
+  });
+
+  describe('anonymous token access', () => {
+    it('GET /v1/rooms/:roomId/chatMessages', async () => {
+      const { body } = await request(app)
+        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages')
+        .set('x-access-token', fixture.oAuthAccessTokenAnon)
+        .expect(200);
+
+      assert(Array.isArray(body), 'response body needs to be an array of messages');
+      assert(body.length > 0, 'API should return some messages for anonymous token');
+    });
+
+    it('PUT /v1/rooms/:roomId/chatMessages should get denied for anonymous token', async () => {
+      await request(app)
+        .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages')
+        .send({
+          text: 'Hello there'
+        })
+        .set('x-access-token', fixture.oAuthAccessTokenAnon)
+        .expect(401);
+    });
   });
 });
