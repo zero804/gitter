@@ -14,6 +14,15 @@ assert(
 
 describe('e2e tests', function() {
   beforeEach(() => {
+    // Remove this when https://github.com/cypress-io/cypress/issues/781 is solved
+    // Workaround from https://github.com/cypress-io/cypress/issues/781#issuecomment-389508520
+    cy.visit(gitterBaseUrl);
+    cy.clearCookies();
+    //cy.getCookies().should('be.empty');
+    cy.reload();
+  });
+
+  beforeEach(() => {
     // Remember the feature toggle cookie
     Cypress.Cookies.preserveOnce('fflip');
   });
