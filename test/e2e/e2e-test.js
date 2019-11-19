@@ -76,7 +76,7 @@ describe('e2e tests', function() {
     });
 
     it('shows chat page', function() {
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+      cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
       // Ensure the left-menu is loaded
       cy.get('.js-left-menu-root').contains(/All conversations/i);
@@ -87,7 +87,7 @@ describe('e2e tests', function() {
     });
 
     it('can send message', function() {
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+      cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
       const MESSAGE_CONTENT = 'my new message';
 
@@ -102,7 +102,7 @@ describe('e2e tests', function() {
 
     describe('receiving messages', () => {
       it('can receive a message', function() {
-        cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+        cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
         const MESSAGE_CONTENT = 'my new message';
 
@@ -120,7 +120,10 @@ describe('e2e tests', function() {
       it('stops receiving messages after token is destroyed', function() {
         cy.login(fixtures.oAuthAccessTokenToBeDeleted1.token);
 
-        cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+        cy.visitAndEnsureUser(
+          urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri),
+          fixtures.userToBeTokenDeleted1
+        );
 
         const MESSAGE_CONTENT = 'my new message';
 
@@ -169,7 +172,7 @@ describe('e2e tests', function() {
     });
 
     it('can create a room', function() {
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupeInGroup1.lcUri));
+      cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupeInGroup1.lcUri), fixtures.user1);
 
       const NEW_ROOM_NAME = 'my-new-room';
 
@@ -200,7 +203,7 @@ describe('e2e tests', function() {
     });
 
     it('can delete account', function() {
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+      cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
       cy.get('#profile-menu').click();
 
@@ -225,7 +228,10 @@ describe('e2e tests', function() {
     // FIXME: enable the test when https://gitlab.com/gitlab-org/gitter/webapp/issues/2276 is fixed
     xit('permalinks in main message feed and thread message feed', () => {
       cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`));
+      cy.visitAndEnsureUser(
+        urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`),
+        fixtures.user1
+      );
 
       cy.get('#chat-container .chat-item__highlighted').contains('hello from the parent');
       cy.get('#js-thread-message-feed-root .chat-item__highlighted').contains(
@@ -235,7 +241,7 @@ describe('e2e tests', function() {
 
     it('clicking unread thread message notification opens thread message feed', () => {
       cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
-      cy.visit(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri));
+      cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
       cy.sendMessage(fixtures.user2, fixtures.troupe1, 'child message for notification', {
         parentId: fixtures.message1._id
