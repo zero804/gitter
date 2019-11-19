@@ -55,7 +55,20 @@ Cypress.Commands.add('login', accessToken => {
 
 Cypress.Commands.add('loginUser', user => {
   cy.log(`Logging in as user ${user.username} -> ${user.accessToken}`);
+
+  // Clear out any previous user session
+  cy.clearCookie('d_auth');
+  cy.clearCookie('d_session');
+
+  // Now we can sign in with the new user
   cy.login(user.accessToken);
+});
+
+Cypress.Commands.add('visitAndEnsureUser', (url, user) => {
+  cy.visit(url);
+  cy.window()
+    .its('troupeContext.user.id')
+    .should('equal', user._id);
 });
 
 Cypress.Commands.add('toggleFeature', (featureName, force) => {
