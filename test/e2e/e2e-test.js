@@ -190,7 +190,7 @@ describe('e2e tests', function() {
       cy.get('.js-chat-action-create-room').click();
 
       // Enter the community
-      cy.get('.js-create-room-group-input').click();
+      cy.get('.js-create-room-group-input .js-group-select-view').click();
       cy.get('.create-room-group-typeahead-dropdown')
         .contains(fixtures.group1.lcUri)
         .click();

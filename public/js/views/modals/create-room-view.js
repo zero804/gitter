@@ -7,6 +7,7 @@ var fuzzysearch = require('fuzzysearch');
 var urlJoin = require('url-join');
 var SimpleFilteredCollection = require('gitter-realtime-client/lib/simple-filtered-collection');
 var fastdom = require('fastdom');
+const debug = require('debug-proxy')('app:create-rooom-view');
 var toggleClass = require('../../utils/toggle-class');
 var getOrgNameFromUri = require('gitter-web-shared/get-org-name-from-uri');
 var getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
@@ -277,12 +278,14 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onGroupSelected: function(group) {
+    debug(`onGroupSelected ${group.get('id')}`);
     this.model.set({
       groupId: group.get('id')
     });
   },
 
   onRepoSelected: function(repo) {
+    debug(`onRepoSelected ${repo.get('name')}`);
     var roomName = getRoomNameFromTroupeName(repo.get('name'));
     this.model.set({
       roomName: roomName,
@@ -366,8 +369,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   onRoomNameChange: function() {
+    const group = this.getGroupFromId(this.model.get('groupId'));
     if (group) {
-      var group = this.getGroupFromId(this.model.get('groupId'));
       var repoUriToFind = group.get('uri') + '/' + this.model.get('roomName');
       var matchingRepo = this.repoCollection.findWhere({ uri: repoUriToFind });
       // Auto-associate repo if the name matches
@@ -525,7 +528,9 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   filterReposForSelectedGroup: function() {
-    var selectedGroup = this.getGroupFromId(this.model.get('groupId'));
+    const groupId = this.model.get('groupId');
+    debug(`filterReposForSelectedGroup ${groupId}`);
+    const selectedGroup = this.getGroupFromId(groupId);
     if (selectedGroup) {
       this.filteredRepoCollection.setFilter(function(model) {
         return (
@@ -537,10 +542,11 @@ var CreateRoomView = Marionette.LayoutView.extend({
   },
 
   selectInitialGroup: function() {
+    const initialGroupId = this.model.get('initialGroupId');
+    debug(`selectInitialGroup ${initialGroupId}`);
     this.filterReposForSelectedGroup();
 
     if (this.groupSelect) {
-      var initialGroupId = this.model.get('initialGroupId');
       this.groupSelect.selectGroupId(initialGroupId);
     }
   }
