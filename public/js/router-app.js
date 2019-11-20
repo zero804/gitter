@@ -30,6 +30,7 @@ var createRoutes = require('./routes/create-routes');
 var upgradeAccessRoutes = require('./routes/upgrade-access-routes');
 var userRoutes = require('./routes/user-routes');
 const pushState = require('./utils/browser/pushState');
+const replaceState = require('./utils/browser/replaceState');
 
 require('./components/statsc');
 require('./views/widgets/preload');
@@ -83,7 +84,7 @@ onready(function() {
   /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
    * first page of gitter, we know what the original URL was (instead of null)
    */
-  window.history.replaceState(window.location.href, '', window.location.href);
+  replaceState(window.location.href, '');
 
   /* TODO: add the link handler here? */
   require('./components/link-handler').installLinkHandler();
@@ -106,8 +107,6 @@ onready(function() {
   roomSwitcher.on('switch', function(troupe) {
     debug('Room switch: switch to %s', troupe.attributes);
 
-    context.setTroupeId(troupe.id);
-
     // Set the last access time immediately to prevent
     // delay in hidden rooms becoming visible only
     // once we get the server-side update
@@ -125,6 +124,7 @@ onready(function() {
   /* Deal with the popstate */
   window.onpopstate = function(e) {
     var iframeUrl = e.state;
+    debug(`onpopstate iframeUrl=${iframeUrl}`);
     if (!iframeUrl) return;
 
     //generate title

@@ -3,6 +3,7 @@
 var $ = require('jquery');
 var context = require('gitter-web-client-context');
 var clientEnv = require('gitter-client-env');
+const debug = require('debug-proxy')('app:link-handler');
 var appEvents = require('../utils/appevents');
 var isValidRoomUri = require('../utils/valid-room-uri');
 var dataset = require('../utils/dataset-shim');
@@ -22,6 +23,7 @@ function routeLink(target, options) {
       location.pathname === target.pathname &&
       location.search === target.search
     ) {
+      debug(`routeLink hash change -> window.location=${target.href}`);
       window.location = target.href;
       return true;
     }
@@ -35,7 +37,9 @@ function routeLink(target, options) {
     if (uri === context.user().get('username')) {
       type = 'home';
     }
-    appEvents.trigger('navigation', target.pathname + target.search, type, uri);
+    const newUrl = target.pathname + target.search;
+    debug(`routeLink internal link navigation=${newUrl}`);
+    appEvents.trigger('navigation', newUrl, type, uri);
     return true;
   }
 }

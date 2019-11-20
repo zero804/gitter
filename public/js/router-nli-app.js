@@ -15,6 +15,7 @@ var debug = require('debug-proxy')('app:router-nli-app');
 var modalRegion = require('./components/modal-region');
 var Router = require('./routes/router');
 const pushState = require('./utils/browser/pushState');
+const replaceState = require('./utils/browser/replaceState');
 
 require('./views/widgets/preload');
 require('./template/helpers/all');
@@ -64,7 +65,7 @@ onready(function() {
   /* Replace the `null` state on startup with the real state, so that when a client clicks back to the
    * first page of gitter, we know what the original URL was (instead of null)
    */
-  window.history.replaceState(chatIFrame.src, '', window.location.href);
+  replaceState(window.location.href, '');
 
   function updateContent(state) {
     if (state) {

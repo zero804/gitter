@@ -33,7 +33,7 @@ module.exports = (function() {
       'click #button-onetoone': function() {
         this.parentPopover.hide();
         var username = this.model.get('username');
-        appEvents.trigger('navigation', '/' + username, 'chat', username, this.model.id);
+        appEvents.trigger('dispatchVueAction', 'changeDisplayedRoomByUrl', `/${username}`);
       },
       'click #button-mention': function() {
         this.parentPopover.hide();

@@ -26,8 +26,8 @@ describe('e2e tests', function() {
 
   describe('signed in', () => {
     let fixtures;
-    beforeEach(() => {
-      return generateFixtures({
+    beforeEach(done => {
+      generateFixtures({
         user1: {
           accessToken: 'web-internal'
         },
@@ -67,6 +67,7 @@ describe('e2e tests', function() {
         }
       }).then(newFixtures => {
         fixtures = newFixtures;
+        done();
       });
     });
 

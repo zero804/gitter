@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:push-state');
 const appEvents = require('../appevents');
 
 /**
@@ -8,7 +9,9 @@ const appEvents = require('../appevents');
  */
 module.exports = (url, title = undefined) => {
   // Don't repush the same state
-  if (url === window.history.state) return; // don't navigate if the state hasn't changed
+  const isSameState = url === window.history.state;
+  debug(`${url} (isSameState=${isSameState})`);
+  if (isSameState) return; // don't navigate if the state hasn't changed
   window.history.pushState(url, title || window.title, url);
   appEvents.trigger('track', url);
 };

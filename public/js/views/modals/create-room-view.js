@@ -228,13 +228,13 @@ var CreateRoomView = Marionette.LayoutView.extend({
     apiClient
       .post(apiUrl, payload)
       .then(
-        function(data) {
-          if (data.extra && data.extra.hookCreationFailedDueToMissingScope) {
+        function(room) {
+          if (room.extra && room.extra.hookCreationFailedDueToMissingScope) {
             setTimeout(promptForHook, 1500);
           }
           this.dialog.hide();
           // url, type, title
-          appEvents.trigger('navigation', urlJoin('/', data.uri), 'chat#add', data.uri);
+          appEvents.trigger('dispatchVueAction', 'changeDisplayedRoomById', room.id);
         }.bind(this)
       )
       .catch(

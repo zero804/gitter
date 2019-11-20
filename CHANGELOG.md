@@ -1,3 +1,20 @@
+# 20.8.0 - 2019-11-11
+
+ - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633
+ - Remove cyclic invocation from room navigation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1625
+ - Remove font preloading, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1637
+ - Flex wrap the share buttons on Spread the word, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1638
+ - Move favourite and community home header actions to room settings dropdown when mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1614
+ - Add left-menu toggle to the mobile chat header, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1639
+
+Developer facing:
+
+ - GitHub repo rooms can be renamed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1623
+ - Support both commonJS and ES modules during server side render, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1635
+    - Fix server crashes from @babel/runtime not being available to production bundle during Vue SSR render, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1649
+ - Update to `cypress@3.6.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1640
+ - Avoid Cypress warnings about mixing promise and cy commands, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1641
+
 # 20.7.0 - 2019-10-30
 
  - Update @gitterhq/translations to 1.12.0, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1627

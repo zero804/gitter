@@ -211,7 +211,7 @@ export const fetchMessageSearchResults = ({ state, commit }) => {
   }
 };
 
-export const changeDisplayedRoom = ({ state, commit, dispatch }, newRoomId) => {
+export const changeDisplayedRoomById = ({ state, commit, dispatch }, newRoomId) => {
   dispatch('threadMessageFeed/close');
   commit(types.CHANGE_DISPLAYED_ROOM, newRoomId);
 
@@ -230,6 +230,24 @@ export const changeDisplayedRoom = ({ state, commit, dispatch }, newRoomId) => {
       // We are using `window.location.assign` so we can easily mock/spy in the tests
       window.location.assign(newRoom.url);
     }
+  }
+};
+
+/**
+ * Changes the displayed room without reloading the page if the URL belongs to any
+ * room stored in messageMap. Otherwise it just changes window location to the URL.
+ *
+ * TODO: this has been implemented for supporting one-to-one room switching from the legacy code
+ *       it can be removed once we move the `userPopoverView.js` to Vue
+ */
+export const changeDisplayedRoomByUrl = ({ state, dispatch }, roomUrl) => {
+  const newRoom = Object.values(state.roomMap).find(room => room.url === roomUrl);
+
+  if (newRoom) {
+    dispatch('changeDisplayedRoomById', newRoom.id);
+  } else {
+    // Fallback to just redirecting
+    window.location.assign(roomUrl);
   }
 };
 

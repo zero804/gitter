@@ -10,6 +10,7 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context = require('gitter-web-client-context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
+const unreadItemsClient = require('../../components/unread-items-client');
 
 require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
@@ -256,11 +257,15 @@ module.exports = (function() {
 
     scrollToChat: function(chat) {
       const parentId = chat.get('parentId');
-      if (parentId && context.useThreadedConversations()) {
-        appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
-          id: chat.id
-        });
-        this.scrollToChatId(parentId);
+      if (parentId) {
+        if (context.useThreadedConversations()) {
+          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
+            id: chat.id
+          });
+          this.scrollToChatId(parentId);
+        } else {
+          unreadItemsClient.markItemRead(chat.id);
+        }
       } else {
         const view = this.children.findByModel(chat);
         if (!view) return;

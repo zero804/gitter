@@ -23,6 +23,11 @@ var opts = require('yargs')
     required: true,
     description: 'New uri for the room'
   })
+  .option('force', {
+    alias: 'f',
+    type: 'boolean',
+    description: 'Performing changes that caused warnings before'
+  })
   .help('help')
   .alias('help', 'h').argv;
 
@@ -69,18 +74,19 @@ Promise.join(
     if (lcNew === lcNewGroup) {
       throw new Error('Trying to rename room to a group: ' + lcNewGroup);
     }
-
-    if (room.githubType === 'REPO') {
-      // This has not been tested
-      throw new Error('Do not rename repo rooms using this script');
+    if (room.githubType === 'REPO' && !opts.force) {
+      throw new Error(`
+        WARNING: This repository is associated to a GitHub repository,
+        please check that the new name reflects the new GitHub repository name.
+        You can force this change with -f option.
+      `);
     }
 
     console.log('BEFORE', {
       uri: room.uri,
       lcUri: room.lcUri,
       groupId: room.groupId,
-      renamedLcUris: room.renamedLcUris,
-      githubType: room.githubType
+      renamedLcUris: room.renamedLcUris
     });
 
     room.uri = newUri;
@@ -96,8 +102,7 @@ Promise.join(
       uri: room.uri,
       lcUri: room.lcUri,
       groupId: room.groupId,
-      renamedLcUris: room.renamedLcUris,
-      githubType: room.githubType
+      renamedLcUris: room.renamedLcUris
     });
 
     return confirm().return(room);
