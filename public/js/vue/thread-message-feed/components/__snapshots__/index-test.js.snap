@@ -216,3 +216,49 @@ exports[`thread-message-feed index missing parent message - matches snapshot 1`]
   </section>
 </div>
 `;
+
+exports[`thread-message-feed index not room member - matches snapshot 1`] = `
+<div
+  class="js-thread-message-feed-root root opened"
+>
+  <section
+    class="body"
+  >
+    <thread-header-stub />
+     
+    <section
+      class="content"
+    >
+      <div
+        class="chat-messages"
+      >
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <!---->
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+         
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+        <chat-item-stub
+          message="[object Object]"
+          usecompactstyles="true"
+        />
+         
+        <intersect-stub>
+          <div />
+        </intersect-stub>
+      </div>
+       
+      <!---->
+    </section>
+  </section>
+</div>
+`;

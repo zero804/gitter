@@ -1,4 +1,5 @@
 <script>
+import { mapState, mapGetters } from 'vuex';
 import Avatar from './avatar.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
@@ -24,6 +25,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      displayedRoom: 'displayedRoom'
+    }),
+    ...mapState({
+      isLoggedIn: state => state.isLoggedIn
+    }),
     sentTimeFormatted: function() {
       return timeFormat(this.message.sent);
     },
@@ -31,8 +38,7 @@ export default {
       return fullTimeFormat(this.message.sent);
     },
     permalinkUrl: function() {
-      const troupeUri = this.$store.getters.displayedRoom.uri;
-      return generatePermalink(troupeUri, this.message.id, this.message.sent);
+      return generatePermalink(this.displayedRoom.uri, this.message.id, this.message.sent);
     },
     isEmpty: function() {
       const content = this.message.html || this.message.text;
@@ -104,7 +110,11 @@ export default {
             <avatar :user="message.fromUser" />
           </div>
         </div>
-        <chat-item-actions :message="message" :use-compact-styles="useCompactStyles" />
+        <chat-item-actions
+          v-if="isLoggedIn"
+          :message="message"
+          :use-compact-styles="useCompactStyles"
+        />
         <div class="chat-item__content">
           <div class="chat-item__details">
             <div class="chat-item__from">{{ message.fromUser.displayName }}</div>

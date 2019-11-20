@@ -80,7 +80,7 @@ describe('chat-strategy-test', function() {
           staff: false,
           v: 1
         },
-        unread: true,
+        unread: false,
         readBy: 0,
         urls: [],
         mentions: [],
@@ -118,7 +118,7 @@ describe('chat-strategy-test', function() {
           staff: false,
           v: 1
         },
-        unread: true,
+        unread: false,
         readBy: 0,
         urls: [],
         initial: true,
