@@ -24,8 +24,7 @@ function renderView(req, res, next, options) {
       return renderChat(req, res, next, {
         uriContext: uriContext,
         template: 'chat-nli-template',
-        script: 'router-nli-chat',
-        overrideUnreadTo: false // Not logged in users see chats as read
+        script: 'router-nli-chat'
       });
     }
   }

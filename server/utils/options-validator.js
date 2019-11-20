@@ -13,7 +13,7 @@ const logger = require('gitter-web-env').logger;
  * @example
  * createOptionsValidator(
  *   'restful.serializeChatsForTroupe',
- *   {limit: true, overrideUnreadTo: true}
+ *   { limit: true }
  * )(options)
  */
 const createOptionsValidator = (validatorName, expectedOptionNames) => options => {

@@ -204,17 +204,6 @@ describe('chat-strategy-test', function() {
       });
     });
 
-    it('should override unread to given value', async () => {
-      var strategy = new ChatStrategy({
-        currentUserId: fixture.user1.id,
-        troupeId: fixture.troupe1.id,
-        overrideUnreadTo: true
-      });
-      return serialize([fixture.message1], strategy).then(function(s) {
-        assertUtils.assertSerializedEqual(s, [{ ...expected1[0], unread: true }]);
-      });
-    });
-
     it('should serialize a message for anonymous', function() {
       var strategy = new ChatStrategy({ currentUserId: null, troupeId: fixture.troupe1.id });
       return serialize([fixture.message1], strategy).then(function(s) {
