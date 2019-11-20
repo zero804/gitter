@@ -28,9 +28,9 @@ Developer facing:
 
  - GitHub repo rooms can be renamed, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1623
  - Support both commonJS and ES modules during server side render, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1635
+    - Fix server crashes from @babel/runtime not being available to production bundle during Vue SSR render, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1649
  - Update to `cypress@3.6.0`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1640
  - Avoid Cypress warnings about mixing promise and cy commands, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1641
-
 
 # 20.7.0 - 2019-10-30
 
