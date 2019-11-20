@@ -107,6 +107,12 @@ test-all:
       - test/e2e/screenshots
       - cypress/logs
     expire_in: 1 day
+  tags:
+    # Run the on Gitter internal runner so our Cypress video doesn't have gaps/freezing,
+    # see https://github.com/cypress-io/cypress/issues/4722#issuecomment-526313109
+    # Maybe in the future, Cypress will detect and give a warning when this happens,
+    # see https://github.com/cypress-io/cypress/issues/5061
+    - internal
   retry: 2
 
 test_e2e_manual:
