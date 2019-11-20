@@ -1,4 +1,4 @@
-# 20.9.0 - *upcoming*
+# 20.9.0 - 2019-11-20
 
  - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
  - Add emoji support to thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1644
