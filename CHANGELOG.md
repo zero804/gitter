@@ -5,6 +5,7 @@
  - Remove router-nli-app and don't fingerprint anonymous users, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1650
  - Add "Delete" action for thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1634
  - Update homepage with some more pertinent feature details, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1655
+ - Not logged in view on threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1653
 
 Developer facing:
 
