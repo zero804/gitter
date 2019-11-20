@@ -18,6 +18,8 @@ describe('chat-api', function() {
   });
 
   var fixture = fixtureLoader.setup({
+    oAuthClient1: {},
+    oAuthAccessTokenAnonymous: { client: 'oAuthClient1', user: null },
     user1: {
       accessToken: 'web-internal'
     },
@@ -107,5 +109,19 @@ describe('chat-api', function() {
       .get(`/v1/rooms/${fixture.troupe2.id}/chatMessages/${fixture.message4.id}/thread`)
       .set('x-access-token', fixture.user2.accessToken)
       .expect(403);
+  });
+
+  it('GET /v1/rooms/:roomId/chatMessages/:parentId/thread - anonymous', async () => {
+    const response = await request(app)
+      .get(`/v1/rooms/${fixture.troupe1.id}/chatMessages/${fixture.message1.id}/thread`)
+      .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
+      .expect(200);
+    const messages = response.body;
+    assert.deepEqual(messages.map(m => m.id), [fixture.message2.id, fixture.message3.id]);
+    assert.equal(
+      messages.find(m => m.unread),
+      undefined,
+      'anonymous users should have all messages read'
+    );
   });
 });

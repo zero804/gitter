@@ -22,9 +22,7 @@ describe('chat-api', function() {
 
   var fixture = fixtureLoader.setup({
     oAuthClient1: {},
-    oAuthAccessTokenAnon: {
-      client: 'oAuthClient1'
-    },
+    oAuthAccessTokenAnonymous: { client: 'oAuthClient1', user: null },
     user1: {
       accessToken: 'web-internal'
     },
@@ -286,13 +284,18 @@ describe('chat-api', function() {
 
   describe('anonymous token access', () => {
     it('GET /v1/rooms/:roomId/chatMessages', async () => {
-      const { body } = await request(app)
+      const response = await request(app)
         .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages')
-        .set('x-access-token', fixture.oAuthAccessTokenAnon)
+        .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
         .expect(200);
-
-      assert(Array.isArray(body), 'response body needs to be an array of messages');
-      assert(body.length > 0, 'API should return some messages for anonymous token');
+      const messages = response.body;
+      assert(Array.isArray(messages), 'response body needs to be an array of messages');
+      assert(messages.length > 0, 'API should return some messages for anonymous token');
+      assert.equal(
+        messages.find(m => m.unread),
+        undefined,
+        'anonymous users should have all messages read'
+      );
     });
 
     it('PUT /v1/rooms/:roomId/chatMessages should get denied for anonymous token', async () => {
@@ -301,7 +304,7 @@ describe('chat-api', function() {
         .send({
           text: 'Hello there'
         })
-        .set('x-access-token', fixture.oAuthAccessTokenAnon)
+        .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
         .expect(401);
     });
   });

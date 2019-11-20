@@ -68,8 +68,8 @@ module.exports = {
         currentUserId: userId,
         troupeId: troupeId,
         initialId: aroundId,
-        lean: lean,
-        lookups: lookups
+        lean,
+        lookups
       });
 
       return restSerializer.serialize(chatMessages, strategy);

@@ -71,7 +71,7 @@ function ChatStrategy({
 
   var userStrategy, unreadItemStrategy;
 
-  var defaultUnreadStatus = overrideUnreadTo === undefined ? true : !!overrideUnreadTo;
+  const defaultUnreadStatus = overrideUnreadTo === undefined ? false : !!overrideUnreadTo;
 
   this.preload = function(items) {
     if (items.isEmpty()) return;

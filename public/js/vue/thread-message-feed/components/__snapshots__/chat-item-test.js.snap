@@ -579,6 +579,74 @@ exports[`thread-message-feed chat-item snapshot message flags unread 1`] = `
 </intersect-stub>
 `;
 
+exports[`thread-message-feed chat-item snapshot not logged in user (no message actions) 1`] = `
+<intersect-stub>
+  <div
+    class="chat-item burstStart deleted"
+  >
+    <div
+      class="chat-item__container"
+    >
+      <div
+        class="chat-item__aside"
+      >
+        <div
+          class="chat-item__avatar"
+        >
+          <avatar-stub
+            size="s"
+            user="[object Object]"
+          />
+        </div>
+      </div>
+       
+      <!---->
+       
+      <div
+        class="chat-item__content"
+      >
+        <div
+          class="chat-item__details"
+        >
+          <div
+            class="chat-item__from"
+          >
+            Tomas Vik
+          </div>
+           
+          <div
+            class="chat-item__username"
+          >
+            @viktomas_gitlab
+          </div>
+           
+          <a
+            class="chat-item__time"
+            href="/abc/def?at=5d147ea84dad9dfbc522317a"
+            title="May 18, 2016 3:48 AM"
+          >
+            May 18 2016 03:48
+          </a>
+           
+          <!---->
+        </div>
+         
+        <div
+          class="chat-item__text"
+        >
+          
+          
+          
+          <i>
+            This message was deleted
+          </i>
+        </div>
+      </div>
+    </div>
+  </div>
+</intersect-stub>
+`;
+
 exports[`thread-message-feed chat-item snapshot with default props 1`] = `
 <intersect-stub>
   <div

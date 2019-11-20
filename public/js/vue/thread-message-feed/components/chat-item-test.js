@@ -82,6 +82,20 @@ describe('thread-message-feed chat-item', () => {
       );
       expect(wrapper.element).toMatchSnapshot();
     });
+    it('not logged in user (no message actions)', () => {
+      const { wrapper } = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, text: '', html: '' }
+        },
+        store => {
+          addRoomToStore(store);
+          store.state.isLoggedIn = false;
+        }
+      );
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
   it('focusedAt - scrolls into view', () => {
     const scrollIntoViewMock = jest.fn();
