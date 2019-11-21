@@ -28,8 +28,7 @@ describe('chat-snapshot-options', function() {
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, false);
     assert.deepEqual(result, {
       limit: 50,
-      aroundId: undefined,
-      overrideUnreadTo: false
+      aroundId: undefined
     });
   });
 
@@ -60,11 +59,5 @@ describe('chat-snapshot-options', function() {
       false
     );
     assert.equal(result.aroundId, '5d2ebf1d4f7f9e219c0aef0d');
-  });
-
-  it('passes through unread', async () => {
-    mockUnreadItems([]);
-    const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, true);
-    assert.equal(result.overrideUnreadTo, true);
   });
 });

@@ -38,20 +38,10 @@ UnreadItemStrategy.prototype = {
 };
 
 /**
- * `overrideUnreadTo` can have 3 states:
- *     - `undefined` - either the default value or unreadItemStrategy is used
- *     - `true` - all chat items are going to have  `unread: true`
- *     - `false` - all chat items are going to have `unread: false`
+ * Serializes chat into JSON
+ * - if there is no `currentUserId`, all the messages are going to have default {unread: false}
  */
-function ChatStrategy({
-  lookups,
-  lean,
-  overrideUnreadTo,
-  user,
-  currentUserId,
-  troupeId,
-  initialId
-} = {}) {
+function ChatStrategy({ lookups, lean, user, currentUserId, troupeId, initialId } = {}) {
   // useLookups will be set to true if there are any lookups that this strategy
   // understands. Currently it only knows about user lookups.
   var useLookups = false;
@@ -71,8 +61,6 @@ function ChatStrategy({
 
   var userStrategy, unreadItemStrategy;
 
-  const defaultUnreadStatus = overrideUnreadTo === undefined ? false : !!overrideUnreadTo;
-
   this.preload = function(items) {
     if (items.isEmpty()) return;
 
@@ -88,8 +76,7 @@ function ChatStrategy({
       strategies.push(userStrategy.preload(users));
     }
 
-    /* If the option overrideUnreadTo has been set, we don't need a strategy */
-    if (currentUserId && overrideUnreadTo === undefined) {
+    if (currentUserId) {
       unreadItemStrategy = new UnreadItemStrategy({
         userId: currentUserId,
         roomId: troupeId
@@ -124,7 +111,7 @@ function ChatStrategy({
   }
 
   this.map = function(item) {
-    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : defaultUnreadStatus;
+    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : false; // if there is no unread strategy, mark as read
 
     var castArray = lean ? undefinedForEmptyArray : safeArray;
 

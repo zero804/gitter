@@ -8,7 +8,7 @@ const INITIAL_CHAT_COUNT = 50;
 const getPermalinkMessageId = request => fixMongoIdQueryParam(request.query.at);
 
 /* which messages and how many of them should be fetched */
-const getChatSnapshotOptions = async (userId, troupeId, req, overrideUnreadTo) => {
+const getChatSnapshotOptions = async (userId, troupeId, req) => {
   // It's ok if there's no user (logged out), unreadItems will be 0
   const unreadItems = await unreadItemService.getUnreadItemsForUser(userId, troupeId);
 
@@ -19,8 +19,7 @@ const getChatSnapshotOptions = async (userId, troupeId, req, overrideUnreadTo) =
 
   return {
     limit,
-    aroundId: getPermalinkMessageId(req),
-    overrideUnreadTo // Unread can be true, false or undefined
+    aroundId: getPermalinkMessageId(req)
   };
 };
 

@@ -33,9 +33,7 @@ function renderSecondaryView(req, res, next, options) {
         return renderChat(req, res, next, {
           ...baseOptions,
           template: 'chat-nli-embed-template',
-          script: 'router-nli-embed-chat',
-          // Embedded users see chats as read
-          overrideUnreadTo: false
+          script: 'router-nli-embed-chat'
         });
       }
     })
