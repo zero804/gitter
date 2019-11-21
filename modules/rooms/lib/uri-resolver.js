@@ -75,6 +75,8 @@ function uriResolver(userId, uri, options) {
 
     // Resolve the object from the uriLookup
     return resolveFromLookup(uriLookup, userId).tap(function(resolved) {
+      debug(`${uri} resolved to ${JSON.stringify(resolved)}`);
+
       // Lookup returned a dud? Remove it...
       if (!resolved) {
         return uriLookupService.removeBadUri(uri);
