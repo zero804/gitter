@@ -233,7 +233,8 @@ var CreateRoomView = Marionette.LayoutView.extend({
             setTimeout(promptForHook, 1500);
           }
           this.dialog.hide();
-          // url, type, title
+
+          appEvents.trigger('dispatchVueAction', 'upsertRoom', room);
           appEvents.trigger('dispatchVueAction', 'changeDisplayedRoomById', room.id);
         }.bind(this)
       )

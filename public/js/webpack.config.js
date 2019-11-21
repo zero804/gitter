@@ -17,7 +17,6 @@ const webpackConfig = merge(baseConfig, {
   entry: {
     default: [path.resolve(path.join(__dirname, './default'))],
 
-    'router-nli-app': path.resolve(path.join(__dirname, './router-nli-app.js')),
     'router-nli-chat': path.resolve(path.join(__dirname, './router-nli-chat.js')),
     'router-app': path.resolve(path.join(__dirname, './router-app.js')),
     'router-chat': path.resolve(path.join(__dirname, './router-chat.js')),
@@ -50,7 +49,6 @@ const webpackConfig = merge(baseConfig, {
     alias: {
       jquery: require.resolve('jquery'),
       vue$: 'vue/dist/vue.esm.js',
-      emojify: path.resolve(path.join(__dirname, '../repo/emojify/emojify.js')),
       'jquery-textcomplete': path.resolve(
         path.join(__dirname, '../repo/jquery-textcomplete/jquery.textcomplete.js')
       ),

@@ -177,6 +177,12 @@ describe('e2e tests', function() {
       cy.get('.js-left-menu-root .item-create').click();
       cy.get('.js-chat-action-create-room').click();
 
+      // Enter the community
+      cy.get('.js-create-room-group-input').click();
+      cy.get('.create-room-group-typeahead-dropdown')
+        .contains(fixtures.group1.lcUri)
+        .click();
+
       // Enter the room name
       cy.get('#create-room-name-input').type(NEW_ROOM_NAME);
 
@@ -235,9 +241,11 @@ describe('e2e tests', function() {
         parentId: fixtures.message1._id
       });
 
+      // Ensure the layout is done shifting
+      cy.get('#chat-input-textarea').should('have.class', 'js-reset-textarea-size');
+
       cy.get('#bottom-unread-banner .banner-wrapper button.main')
         .should('be.visible')
-        .click()
         .click();
 
       cy.get('.js-thread-message-feed-root')

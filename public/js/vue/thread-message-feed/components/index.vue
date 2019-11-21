@@ -18,7 +18,8 @@ export default {
   computed: {
     ...mapGetters({
       parentMessage: 'threadMessageFeed/parentMessage',
-      childMessages: 'threadMessageFeed/childMessages'
+      childMessages: 'threadMessageFeed/childMessages',
+      displayedRoom: 'displayedRoom'
     }),
     ...mapState({
       isVisible: state => state.threadMessageFeed.isVisible,
@@ -65,7 +66,7 @@ export default {
             <div></div>
           </intersect>
         </div>
-        <chat-input :user="user" thread />
+        <chat-input v-if="displayedRoom.roomMember" :user="user" thread />
       </section>
       <section v-else class="content">
         <span class="error-text error-box">

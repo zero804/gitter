@@ -1,4 +1,5 @@
 <script>
+import { mapState, mapGetters } from 'vuex';
 import Avatar from './avatar.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
@@ -6,16 +7,14 @@ const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const pushState = require('../../../utils/browser/pushState');
 const linkDecorator = require('../../../views/chat/decorators/linkDecorator');
+const emojiDecorator = require('../../../views/chat/decorators/emojiDecorator');
+import ChatItemActions from './chat-item-actions.vue';
 import Intersect from './intersect';
 
 export default {
   name: 'ChatItem',
-  components: { Avatar, LoadingSpinner, Intersect },
+  components: { Avatar, LoadingSpinner, Intersect, ChatItemActions },
   props: {
-    showItemActions: {
-      type: Boolean,
-      default: false
-    },
     message: {
       type: Object,
       required: true
@@ -26,6 +25,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      displayedRoom: 'displayedRoom'
+    }),
+    ...mapState({
+      isLoggedIn: state => state.isLoggedIn
+    }),
     sentTimeFormatted: function() {
       return timeFormat(this.message.sent);
     },
@@ -33,8 +38,11 @@ export default {
       return fullTimeFormat(this.message.sent);
     },
     permalinkUrl: function() {
-      const troupeUri = this.$store.getters.displayedRoom.uri;
-      return generatePermalink(troupeUri, this.message.id, this.message.sent);
+      return generatePermalink(this.displayedRoom.uri, this.message.id, this.message.sent);
+    },
+    isEmpty: function() {
+      const content = this.message.html || this.message.text;
+      return content.length === 0;
     }
   },
   watch: {
@@ -73,7 +81,7 @@ export default {
       this.$el.scrollIntoView({ block, behavior });
     },
     decorate: function() {
-      linkDecorator.decorate(this);
+      [linkDecorator, emojiDecorator].forEach(d => d.decorate(this));
     },
     onViewportEnter: function() {
       if (this.message.unread) {
@@ -92,6 +100,7 @@ export default {
         compact: useCompactStyles,
         syncerror: message.error,
         unread: message.unread,
+        deleted: isEmpty,
         'chat-item__highlighted': message.highlighted
       }"
     >
@@ -101,10 +110,11 @@ export default {
             <avatar :user="message.fromUser" />
           </div>
         </div>
-        <div v-if="showItemActions" class="chat-item__actions">
-          <i class="chat-item__icon icon-check chat-item__icon--read"></i>
-          <i class="chat-item__icon icon-ellipsis"></i>
-        </div>
+        <chat-item-actions
+          v-if="isLoggedIn"
+          :message="message"
+          :use-compact-styles="useCompactStyles"
+        />
         <div class="chat-item__content">
           <div class="chat-item__details">
             <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
@@ -119,7 +129,10 @@ export default {
             <loading-spinner v-if="message.loading" class="message-loading-icon" />
           </div>
           <div v-if="message.html" class="chat-item__text" v-html="message.html"></div>
-          <div v-else class="chat-item__text">{{ message.text }}</div>
+          <div v-else class="chat-item__text">
+            {{ message.text }}
+            <i v-if="isEmpty">This message was deleted</i>
+          </div>
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ import {
 import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
 import appEvents from '../../utils/appevents';
+import log from '../../utils/log';
 import * as leftMenuConstants from '../left-menu/constants';
 import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
 
@@ -230,6 +231,8 @@ export const changeDisplayedRoomById = ({ state, commit, dispatch }, newRoomId) 
       // We are using `window.location.assign` so we can easily mock/spy in the tests
       window.location.assign(newRoom.url);
     }
+  } else {
+    log.error(`Unable to change to room that is not in our roomMap: ${newRoomId}`);
   }
 };
 
@@ -262,4 +265,8 @@ export const upsertRoom = ({ commit }, newRoomState) => commit(types.UPDATE_ROOM
 
 export const addMessages = ({ commit }, messages) => {
   commit(types.ADD_TO_MESSAGE_MAP, messages);
+};
+
+export const removeMessage = ({ commit }, message) => {
+  commit(types.REMOVE_MESSAGE, message);
 };

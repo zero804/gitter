@@ -25,7 +25,7 @@ function renderView(req, res, next, options) {
         uriContext: uriContext,
         template: 'chat-nli-template',
         script: 'router-nli-chat',
-        unread: false // Not logged in users see chats as read
+        overrideUnreadTo: false // Not logged in users see chats as read
       });
     }
   }

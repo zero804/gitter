@@ -9,7 +9,6 @@ function setupDataBridge(store) {
   });
 
   troupeCollections.troupes.on('add change', newRoom => {
-    //console.log('change troupes', newRoom);
     store.dispatch('upsertRoom', newRoom.attributes);
   });
 
@@ -21,6 +20,10 @@ function setupDataBridge(store) {
 
     chatCollection.on('add', message => {
       store.dispatch('addMessages', [message.attributes]);
+    });
+
+    chatCollection.on('remove', message => {
+      store.dispatch('removeMessage', message.attributes);
     });
   }
 }

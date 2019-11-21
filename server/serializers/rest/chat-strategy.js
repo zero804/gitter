@@ -37,29 +37,41 @@ UnreadItemStrategy.prototype = {
   name: 'UnreadItemStrategy'
 };
 
-function ChatStrategy(options) {
-  if (!options) options = {};
-
+/**
+ * `overrideUnreadTo` can have 3 states:
+ *     - `undefined` - either the default value or unreadItemStrategy is used
+ *     - `true` - all chat items are going to have  `unread: true`
+ *     - `false` - all chat items are going to have `unread: false`
+ */
+function ChatStrategy({
+  lookups,
+  lean,
+  overrideUnreadTo,
+  user,
+  currentUserId,
+  troupeId,
+  initialId
+} = {}) {
   // useLookups will be set to true if there are any lookups that this strategy
   // understands. Currently it only knows about user lookups.
   var useLookups = false;
   var userLookups;
-  if (options.lookups && options.lookups.indexOf('user') !== -1) {
+  if (lookups && lookups.indexOf('user') !== -1) {
     useLookups = true;
     userLookups = {};
   }
 
   if (useLookups) {
-    if (options.lean) {
+    if (lean) {
       // we're breaking users out, but then not returning their displayNames
       // which kinda defeats the purpose
-      logger.warn('ChatStrategy was called with lookups, but also with lean', options);
+      logger.warn('ChatStrategy was called with lookups, but also with lean', { lookups, lean });
     }
   }
 
   var userStrategy, unreadItemStrategy;
 
-  var defaultUnreadStatus = options.unread === undefined ? true : !!options.unread;
+  const defaultUnreadStatus = overrideUnreadTo === undefined ? false : !!overrideUnreadTo;
 
   this.preload = function(items) {
     if (items.isEmpty()) return;
@@ -67,8 +79,8 @@ function ChatStrategy(options) {
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
-    if (!options.user) {
-      userStrategy = new UserIdStrategy({ lean: options.lean });
+    if (!user) {
+      userStrategy = new UserIdStrategy({ lean });
 
       var users = items.map(function(i) {
         return i.fromUserId;
@@ -76,11 +88,11 @@ function ChatStrategy(options) {
       strategies.push(userStrategy.preload(users));
     }
 
-    /* If options.unread has been set, we don't need a strategy */
-    if (options.currentUserId && options.unread === undefined) {
+    /* If the option overrideUnreadTo has been set, we don't need a strategy */
+    if (currentUserId && overrideUnreadTo === undefined) {
       unreadItemStrategy = new UnreadItemStrategy({
-        userId: options.currentUserId,
-        roomId: options.troupeId
+        userId: currentUserId,
+        roomId: troupeId
       });
       strategies.push(unreadItemStrategy.preload());
     }
@@ -114,11 +126,11 @@ function ChatStrategy(options) {
   this.map = function(item) {
     var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : defaultUnreadStatus;
 
-    var castArray = options.lean ? undefinedForEmptyArray : safeArray;
+    var castArray = lean ? undefinedForEmptyArray : safeArray;
 
     var initial;
-    if (options.initialId) {
-      initial = mongoUtils.objectIDsEqual(item._id, options.initialId);
+    if (initialId) {
+      initial = mongoUtils.objectIDsEqual(item._id, initialId);
     }
 
     return {
@@ -128,7 +140,7 @@ function ChatStrategy(options) {
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
-      fromUser: options.user ? options.user : mapUser(item.fromUserId),
+      fromUser: user ? user : mapUser(item.fromUserId),
       parentId: item.parentId,
       threadMessageCount: item.threadMessageCount,
       unread: unread,

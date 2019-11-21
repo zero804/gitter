@@ -108,6 +108,28 @@ describe('thread message feed store', () => {
           }
         ]);
       });
+
+      it('sendMessage does not do anything when the draft message is empty', async () => {
+        apiClient.room.post.mockRejectedValue(null);
+        await testAction(actions.sendMessage, undefined, { ...initialState, draftMessage: '' }, []);
+      });
+    });
+
+    it('deleteMessage', async () => {
+      apiClient.room.delete.mockReset();
+
+      const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
+      apiClient.room.delete.mockResolvedValue(null);
+
+      await testAction(
+        actions.deleteMessage,
+        storedMessage,
+        {},
+        [{ type: rootTypes.REMOVE_MESSAGE, payload: storedMessage }],
+        []
+      );
+
+      expect(apiClient.room.delete).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}`);
     });
 
     describe('fetchChildMessages', () => {

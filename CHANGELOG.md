@@ -1,3 +1,21 @@
+# 20.9.0 - 2019-11-20
+
+ - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
+ - Add emoji support to thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1644
+ - Remove router-nli-app and don't fingerprint anonymous users, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1650
+ - Add "Delete" action for thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1634
+ - Update homepage with some more pertinent feature details, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1655
+ - Not logged in view on threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1653
+
+Developer facing:
+
+ - Update to `cypress@3.6.1`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1646
+ - Fix unread badge click open thread e2e test, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1642
+ - Make create room e2e test more robust, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1643
+ - Rename ChatStrategy unread option, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1651
+ - Add tests for anonymous access to API, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1654
+
+
 # 20.8.0 - 2019-11-11
 
  - Just mark thread chat read if the feature toggle is off, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1633

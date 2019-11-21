@@ -108,6 +108,7 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, newDraftMessage);
     },
     sendMessage: ({ state, commit, dispatch, rootState }) => {
+      if (!state.draftMessage) return;
       const messagePayload = {
         text: state.draftMessage,
         parentId: state.parentId
@@ -134,6 +135,11 @@ export default {
           });
         });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
+    },
+    deleteMessage: ({ commit }, message) => {
+      return apiClient.room.delete(`/chatMessages/${message.id}`).then(() => {
+        commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
+      });
     },
     fetchChildMessages: (
       { state, commit },
