@@ -259,6 +259,9 @@ describe('e2e tests', function() {
       // Ensure the layout is done shifting
       cy.get('#chat-input-textarea').should('have.class', 'js-reset-textarea-size');
 
+      // Click somewhere on the page so any blur handlers get triggered
+      cy.get('.right-toolbar__body').click();
+
       cy.get('#bottom-unread-banner .banner-wrapper button.main')
         .should('be.visible')
         .click();
