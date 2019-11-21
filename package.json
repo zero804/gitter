@@ -208,7 +208,6 @@
     "csswring": "^6.0.0",
     "cumberbatch-name": "^1.2.1",
     "cypress": "^3.6.1",
-    "cypress-failed-log": "^2.5.1",
     "datadog-metrics": "^0.8.1",
     "del": "^3.0.0",
     "eslint": "^5.9.0",
