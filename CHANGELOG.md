@@ -1,3 +1,11 @@
+# 20.10.0 - *upcoming*
+
+Developer facing:
+
+ - Fix wrong user signed in with e2e tests (Cypress cookie sharing), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1657
+ - Remove `cypress-failed-log` dependency to clean up Cypress devtools console and output, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1658
+
+
 # 20.9.0 - 2019-11-20
 
  - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
