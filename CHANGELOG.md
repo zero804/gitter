@@ -6,6 +6,7 @@ Developer facing:
  - Remove `cypress-failed-log` dependency to clean up Cypress devtools console and output, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1658
  - Fix iOS build script when isn't an existing webpack bundle built (`npm run build-ios-assets`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1662
      - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
+ - Remove overrideUnreadTo for chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
 
 
 # 20.9.0 - 2019-11-20
