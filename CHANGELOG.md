@@ -6,10 +6,11 @@
 Developer facing:
 
  - Fix wrong user signed in with e2e tests (Cypress cookie sharing), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1657
+ - Fix flakiness in create room e2e test, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1656
  - Remove `cypress-failed-log` dependency to clean up Cypress devtools console and output, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1658
  - Fix iOS build script when isn't an existing webpack bundle built (`npm run build-ios-assets`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1662
      - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
- - Remove overrideUnreadTo for chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
+ - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
 
 
 # 20.9.0 - 2019-11-20
