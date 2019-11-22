@@ -1,5 +1,7 @@
 # 20.10.0 - *upcoming*
 
+ - Add intersection-observer polyfill, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
+
 Developer facing:
 
  - Fix wrong user signed in with e2e tests (Cypress cookie sharing), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1657
