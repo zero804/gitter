@@ -13,7 +13,6 @@ var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 var desktopRenderer = require('../renderers/desktop-renderer');
 var embedRenderer = require('../renderers/embed-renderer');
-var cardRenderer = require('../renderers/card-renderer');
 
 function saveRoom(req) {
   var userId = req.user && req.user.id;
@@ -72,18 +71,6 @@ var embedMiddlewarePipeline = [
   redirectErrorMiddleware
 ];
 
-var cardMiddlewarePipeline = [
-  identifyRoute('app-card-frame'),
-  uriContextResolverMiddleware,
-  timezoneMiddleware,
-  function(req, res, next) {
-    return cardRenderer.renderSecondaryView(req, res, next, {
-      uriContext: req.uriContext
-    });
-  },
-  redirectErrorMiddleware
-];
-
 var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 ['/:roomPart1', '/:roomPart1/:roomPart2', '/:roomPart1/:roomPart2/:roomPart3'].forEach(function(
@@ -95,9 +82,6 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
   // Secondary view
   router.get(path + '/~(chat|iframe)', frameMiddlewarePipeline);
-
-  // Twitter Card
-  router.get(path + '/~card', cardMiddlewarePipeline);
 
   // Embedded View
   router.get(path + '/~embed', embedMiddlewarePipeline);

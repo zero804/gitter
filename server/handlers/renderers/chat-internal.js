@@ -45,12 +45,10 @@ async function renderChat(req, res, next, options) {
     rightToolbarSnapshot,
     userThemeSnapshot
   ] = await Promise.all([
-    options.generateContext === false
-      ? {}
-      : contextGenerator.generateTroupeContext(req, {
-          snapshots: { chat: chatSnapshotOptions },
-          permalinkChatId: getPermalinkMessageId(req)
-        }),
+    contextGenerator.generateTroupeContext(req, {
+      snapshots: { chat: chatSnapshotOptions },
+      permalinkChatId: getPermalinkMessageId(req)
+    }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
     options.fetchUsers === false

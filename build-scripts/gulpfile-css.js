@@ -58,7 +58,6 @@ var cssWebStyleBuilder = styleBuilder(
     'public/less/router-nli-chat.less',
     'public/less/router-embed-chat.less',
     'public/less/router-nli-embed-chat.less',
-    'public/less/chat-card.less',
     'public/less/router-archive-home.less',
     'public/less/router-archive-links.less',
     'public/less/router-archive-chat.less',
