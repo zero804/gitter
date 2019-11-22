@@ -1,6 +1,7 @@
 # 20.10.0 - *upcoming*
 
  - Add intersection-observer polyfill, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
+ - Remove `/~card` route, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1660
 
 Developer facing:
 
