@@ -13,6 +13,12 @@ Developer facing:
  - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
 
 
+# 20.9.1 - 2019-11-26
+
+ - Security fix related to avatar API, https://gitlab.com/gitlab-org/gitter/webapp/issues/2311
+     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/42
+
+
 # 20.9.0 - 2019-11-20
 
  - Fix "Thread message feed not showing when user isn't room member", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1645
