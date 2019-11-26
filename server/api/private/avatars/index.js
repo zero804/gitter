@@ -169,13 +169,13 @@ router.get(
   '/gl/u/:username',
   identifyRoute('api-private-gitlab-username'),
   sendAvatar(function(req) {
-    var username = req.params.username;
+    const { username } = req.params;
     if (!username) return null;
 
     // Gravatar or https://gitlab.com/uploads/-/system/user/avatar/:userid/avatar.png
     return request({
       method: 'GET',
-      uri: 'https://gitlab.com/api/v4/users?username=' + username,
+      uri: 'https://gitlab.com/api/v4/users?username=' + encodeURIComponent(username),
       json: true
     }).then(res => {
       return {

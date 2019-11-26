@@ -4,6 +4,9 @@ process.env.DISABLE_API_LISTEN = '1';
 
 var assert = require('assert');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const proxyquireNoCallThru = require('proxyquire').noCallThru();
+const sinon = require('sinon');
+const express = require('express');
 
 describe('avatar-api', function() {
   var app, request;
@@ -153,6 +156,33 @@ describe('avatar-api', function() {
             assert.strictEqual(response.headers['x-accel-redirect'], META.proxyRedirect);
           });
       });
+    });
+  });
+
+  describe('GitLab user avatar', () => {
+    it('GET /private/avatars/gl/u/:username direct', async () => {
+      const requestStub = sinon.stub();
+      requestStub.callsArgWith(1, null, {
+        body: {
+          avatar_url: 'http://example.com/avatar'
+        }
+      });
+      const avatarIndex = proxyquireNoCallThru('../../server/api/private/avatars/index.js', {
+        request: requestStub
+      });
+      const app = express();
+      app.use(avatarIndex);
+
+      // testing both valid characters and characters that need to be escaped
+      const response = await request(app)
+        .get('/gl/u/validUsername~_.-no%C4%A0')
+        .expect(302);
+
+      assert.strictEqual(response.headers['location'], 'http://example.com/avatar');
+      assert.deepStrictEqual(
+        requestStub.firstCall.args[0].uri,
+        'https://gitlab.com/api/v4/users?username=validUsername~_.-no%C4%A0'
+      );
     });
   });
 });
