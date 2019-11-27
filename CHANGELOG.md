@@ -1,6 +1,6 @@
 # 20.10.0 - *upcoming*
 
- - Add intersection-observer polyfill, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
+ - Add `IntersectionObserver` polyfill, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
  - Remove `/~card` route, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1660
 
 Developer facing:
@@ -11,6 +11,7 @@ Developer facing:
  - Fix iOS build script when isn't an existing webpack bundle built (`npm run build-ios-assets`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1662
      - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
  - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
+ - Remove `scripts/utils/trim-one-to-one-rooms.js` in favor of `scripts/utils/clean-up-users-old-one-to-one.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1666
 
 
 # 20.9.1 - 2019-11-26
