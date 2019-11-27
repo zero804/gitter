@@ -1,4 +1,4 @@
-# 20.10.0 - *upcoming*
+# 20.10.0 - 2019-11-27
 
  - Fix stuck unread notification(unable to dismiss) for thread message in desktop app (add `IntersectionObserver` polyfill), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
  - Remove `/~card` route, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1660
