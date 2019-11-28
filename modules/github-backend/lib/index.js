@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('bluebird');
 var _ = require('lodash');
 const urlJoin = require('url-join');
 
@@ -17,7 +16,7 @@ GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
   return gitHubEmailAddressService(this.user, preferStoredEmail);
 };
 
-GitHubBackend.prototype.findOrgs = Promise.method(function() {
+GitHubBackend.prototype.findOrgs = function() {
   var user = this.user;
   var ghUser = new GithubMe(user);
 
@@ -33,7 +32,7 @@ GitHubBackend.prototype.findOrgs = Promise.method(function() {
       };
     });
   });
-});
+};
 
 GitHubBackend.prototype.getProfile = function() {
   // the minimum response
