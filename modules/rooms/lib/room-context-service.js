@@ -82,26 +82,7 @@ function findContextForUri(user, uri, options) {
       return policyFactory.createPolicyForRoom(user, resolvedTroupe).then(function(policy) {
         return policy.canRead().then(function(access) {
           if (!access) {
-            // If the user has reached the org room
-            // but does not have access, redirect them
-            // to the group home
-            if (uri.indexOf('/') < 0 && resolvedTroupe.groupId) {
-              debug('Redirecting on ORG room permission denied');
-
-              return groupService
-                .findById(resolvedTroupe.groupId, { lean: true })
-                .then(function(group) {
-                  if (group && group.homeUri) {
-                    var err = new StatusError(301);
-                    err.path = '/' + group.homeUri;
-                    throw err;
-                  }
-
-                  throw new StatusError(404);
-                });
-            } else {
-              throw new StatusError(404);
-            }
+            throw new StatusError(404);
           }
 
           return {
