@@ -6,6 +6,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 const asyncHandler = require('express-async-handler');
 
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var contextGenerator = require('../../web/context-generator');
 var restful = require('../../services/restful');
 var burstCalculator = require('../../utils/burst-calculator');
@@ -18,10 +19,25 @@ var generateUserThemeSnapshot = require('../snapshots/user-theme-snapshot');
 var getHeaderViewOptions = require('gitter-web-shared/templates/get-header-view-options');
 const mixinHbsDataForVueLeftMenu = require('./vue/mixin-vue-left-menu-data');
 const getChatSnapshotOptions = require('./chat/chat-snapshot-options');
+const socialMetadataGenerator = require('../social-metadata-generator');
 
-var ROSTER_SIZE = 25;
+const ROSTER_SIZE = 25;
 
 const getPermalinkMessageId = request => fixMongoIdQueryParam(request.query.at);
+
+function getSocialMetaDataForRoom(room, permalinkChatSerialized) {
+  let socialMetadata;
+  if (room && permalinkChatSerialized) {
+    socialMetadata = socialMetadataGenerator.getMetadataForChatPermalink({
+      room,
+      chat: permalinkChatSerialized
+    });
+  } else if (room) {
+    socialMetadata = socialMetadataGenerator.getMetadata({ room });
+  }
+
+  return socialMetadata;
+}
 
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
@@ -37,6 +53,8 @@ async function renderChat(req, res, next, options) {
   };
   const chatSnapshotOptions = await getChatSnapshotOptions(userId, troupe.id, req);
 
+  const permalinkChatId = getPermalinkMessageId(req);
+
   const [
     troupeContext,
     chats,
@@ -47,7 +65,7 @@ async function renderChat(req, res, next, options) {
   ] = await Promise.all([
     contextGenerator.generateTroupeContext(req, {
       snapshots: { chat: chatSnapshotOptions },
-      permalinkChatId: getPermalinkMessageId(req)
+      permalinkChatId
     }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
@@ -62,6 +80,11 @@ async function renderChat(req, res, next, options) {
     return chat.initial;
   });
   var initialBottom = !initialChat;
+
+  const permalinkChatSerialized = _.find(chats, function(chat) {
+    return mongoUtils.objectIDsEqual(chat.id, permalinkChatId);
+  });
+
   var classNames = options.classNames || [];
   var isStaff = req.user && req.user.staff;
 
@@ -100,6 +123,8 @@ async function renderChat(req, res, next, options) {
     isRightToolbarPinned = true;
   }
 
+  const socialMetadata = getSocialMetaDataForRoom(troupeContext.troupe, permalinkChatSerialized);
+
   var renderOptions = await mixinHbsDataForVueLeftMenu(
     req,
     _.extend(
@@ -108,6 +133,7 @@ async function renderChat(req, res, next, options) {
         hasDarkTheme: userThemeSnapshot.theme === 'gitter-dark',
         hasCachedFonts: fonts.hasCachedFonts(req.cookies),
         fonts: fonts.getFonts(),
+        socialMetadata,
         isRepo: troupe.sd.type === 'GH_REPO', // Used by chat_toolbar patial
         bootScriptName: script,
         cssFileName: cssFileName,
