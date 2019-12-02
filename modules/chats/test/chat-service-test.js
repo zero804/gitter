@@ -117,24 +117,38 @@ describe('chatService', function() {
   });
 
   describe('updateChatMessage', function() {
-    it('should update a recent chat message sent by the same user', async function() {
-      const chatMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+    let testMessage;
+    beforeEach(async () => {
+      testMessage = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
         text: 'Hello'
       });
-      assert(!chatMessage.editedAt, 'Expected editedAt to be null');
-
+      assert(!testMessage.editedAt, 'Expected editedAt to be null');
+    });
+    it('should update a recent chat message sent by the same user', async function() {
       const chatMessage2 = await chatService.updateChatMessage(
         fixture.troupe1,
-        chatMessage,
+        testMessage,
         fixture.user1,
         'Goodbye'
       );
       assert(chatMessage2.text === 'Goodbye', 'Expected new text in message');
-      assert(chatMessage.sent === chatMessage2.sent, 'Expected time to remain the same');
+      assert(testMessage.sent === chatMessage2.sent, 'Expected time to remain the same');
       assert(chatMessage2.editedAt, 'Expected edited at time to be populated');
       assert(
         chatMessage2.editedAt > chatMessage2.sent,
         'Expected edited at time to be after sent time'
+      );
+    });
+
+    it('should not update message when the new text is too long', () =>
+      assert.rejects(() =>
+        chatService.updateChatMessage(fixture.troupe1, testMessage, fixture.user1, 'x'.repeat(4097))
+      ));
+
+    it('should not update if the message was created too long ago', async () => {
+      testMessage.sent = Date.parse('2019-11-29T00:00:00.000Z');
+      await assert.rejects(() =>
+        chatService.updateChatMessage(fixture.troupe1, testMessage, fixture.user1, 'Good bye')
       );
     });
   });
