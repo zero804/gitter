@@ -1,3 +1,8 @@
+# 20.11.0 - *upcoming*
+
+ - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
+
+
 # 20.10.0 - 2019-11-27
 
  - Fix stuck unread notification(unable to dismiss) for thread message in desktop app (add `IntersectionObserver` polyfill), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
