@@ -2,6 +2,10 @@
 
  - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
 
+Developer facing:
+
+ - Resolve "Aggregating Gitter community data into reports", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1668
+
 
 # 20.10.0 - 2019-11-27
 
@@ -17,6 +21,7 @@ Developer facing:
      - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
  - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
  - Remove `scripts/utils/trim-one-to-one-rooms.js` in favor of `scripts/utils/clean-up-users-old-one-to-one.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1666
+
 
 
 # 20.9.1 - 2019-11-26
