@@ -5,6 +5,7 @@
 Developer facing:
 
  - Resolve "Aggregating Gitter community data into reports", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1668
+ - Update message API endpoint cleanup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1670
 
 
 # 20.10.0 - 2019-11-27
