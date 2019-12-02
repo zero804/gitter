@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:join-room-view');
 var Marionette = require('backbone.marionette');
 var template = require('./tmpl/join-room-view.hbs');
 var context = require('gitter-web-client-context');
@@ -7,17 +8,6 @@ var apiClient = require('../../components/api-client');
 var urlParse = require('url-parse');
 var userCanJoinRoom = require('gitter-web-shared/rooms/user-can-join-room');
 var makeRoomProviderSentence = require('gitter-web-shared/rooms/make-room-provider-sentence');
-
-function hasParentFrameSameOrigin() {
-  if (window.parent === window) return false; // This is the top window
-  try {
-    // This should always return true if you can access the parent origin
-    return window.location.host === window.parent.location.host;
-  } catch (e) {
-    // Cross-origin. So No.
-    return false;
-  }
-}
 
 var JoinRoomView = Marionette.ItemView.extend({
   template: template,
@@ -36,23 +26,28 @@ var JoinRoomView = Marionette.ItemView.extend({
   },
 
   joinRoom: function(e) {
-    var isEmbedded = false;
+    var isEmbedded = context().embedded;
     var roomPostOptions = {
       id: context.getTroupeId()
     };
 
-    if (hasParentFrameSameOrigin()) {
-      var parsed = urlParse(window.parent.location.href, true);
-      roomPostOptions.source = parsed.query.source;
-    } else {
-      isEmbedded = true;
+    if (isEmbedded) {
       roomPostOptions.source = '~embed';
+    } else {
+      const parsed = urlParse(window.location.href, true);
+      roomPostOptions.source = parsed.query.source;
     }
 
     //If the room has a welcome message
     //and we aren't in an embedded frame
     //get outta here and let the browser do its thing
-    if (context.roomHasWelcomeMessage() && !isEmbedded) {
+    const hasWelcomeMessage = context.roomHasWelcomeMessage();
+    debug(
+      `joinRoom hasWelcomeMessage=${hasWelcomeMessage} isEmbedded=${isEmbedded} roomPostOptions=${JSON.stringify(
+        roomPostOptions
+      )}`
+    );
+    if (hasWelcomeMessage && !isEmbedded) {
       return;
     }
 

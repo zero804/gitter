@@ -41,7 +41,7 @@ function getSocialMetaDataForRoom(room, permalinkChatSerialized) {
 
 // eslint-disable-next-line max-statements, complexity
 async function renderChat(req, res, next, options) {
-  var uriContext = options.uriContext;
+  const { uriContext, embedded } = options;
 
   var troupe = uriContext.troupe;
   var user = req.user;
@@ -65,7 +65,9 @@ async function renderChat(req, res, next, options) {
   ] = await Promise.all([
     contextGenerator.generateTroupeContext(req, {
       snapshots: { chat: chatSnapshotOptions },
-      permalinkChatId
+      permalinkChatId,
+      // Are we using /~embed ?
+      embedded
     }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
