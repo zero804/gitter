@@ -49,4 +49,42 @@ describe('ChatItemPolicy', () => {
       assert(!chatItemPolicy.isOwnMessage());
     });
   });
+  describe('canEdit', () => {
+    const minutesAgo = minutes => new Date(Date.now() - minutes * 60 * 1000);
+    const testAttributes = {
+      id: '1',
+      text: 'hello',
+      sent: minutesAgo(9),
+      fromUser: { id: 'user1' }
+    };
+    it('can be edited by author when in the 10 minute period', () => {
+      const chatItemPolicy = new ChatItemPolicy(testAttributes, { currentUserId: 'user1' });
+      assert(chatItemPolicy.canEdit());
+    });
+    it('cannot be edited when in embed experience', () => {
+      const chatItemPolicy = new ChatItemPolicy(testAttributes, {
+        currentUserId: 'user1',
+        isEmbedded: true
+      });
+      assert(!chatItemPolicy.canEdit());
+    });
+    it('cannot be edited when outside of the edit period', () => {
+      const chatItemPolicy = new ChatItemPolicy(
+        { ...testAttributes, sent: minutesAgo(11) },
+        { currentUserId: 'user1' }
+      );
+      assert(!chatItemPolicy.canEdit());
+    });
+    it('cannot be edited by other users', () => {
+      const chatItemPolicy = new ChatItemPolicy(testAttributes, { currentUserId: 'user2' });
+      assert(!chatItemPolicy.canEdit());
+    });
+    it('cannot edit "deleted" message', () => {
+      const chatItemPolicy = new ChatItemPolicy(
+        { ...testAttributes, text: '' },
+        { currentUserId: 'user1' }
+      );
+      assert(!chatItemPolicy.canEdit());
+    });
+  });
 });

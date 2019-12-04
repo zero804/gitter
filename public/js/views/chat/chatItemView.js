@@ -45,10 +45,6 @@ module.exports = (function() {
     return 'model-id-' + id;
   };
 
-  // This needs to be adjusted in chatInputView as well as chat-server on the server
-  /* @const */
-  var EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
-
   var mouseEvents = {
     'click .js-chat-item-edit': 'toggleEdit',
     'click .js-chat-item-readby': 'showReadBy',
@@ -148,13 +144,6 @@ module.exports = (function() {
       // fastclick destroys double tap events
       this.doubleTapper = new DoubleTapper();
 
-      if (this.isInEditablePeriod()) {
-        // update once the message is not editable
-        var sent = this.model.get('sent');
-        var notEditableInMS = sent ? sent.valueOf() - Date.now() + EDIT_WINDOW : EDIT_WINDOW;
-        this.timeChangeTimeout = setTimeout(this.timeChange.bind(this), notEditableInMS + 50);
-      }
-
       this.listenToOnce(this, 'messageInViewport', this.decorate);
 
       this.chatItemPolicy = new ChatItemPolicy(this.model.attributes, {
@@ -162,10 +151,6 @@ module.exports = (function() {
         currentUserId: context.getUserId(),
         isTroupeAdmin: context.isTroupeAdmin()
       });
-    },
-
-    onDestroy: function() {
-      clearTimeout(this.timeChangeTimeout);
     },
 
     template: function(data) {
@@ -264,14 +249,6 @@ module.exports = (function() {
 
     onRender: function() {
       this.updateRender();
-      this.timeChange();
-    },
-
-    timeChange: function() {
-      var canEdit = this.canEdit();
-      this.$el.toggleClass('isEditable', this.isInEditablePeriod());
-      this.$el.toggleClass('canEdit', canEdit);
-      // this.$el.toggleClass('cantEdit', !canEdit);
     },
 
     _requiresFullRender: function(changes) {
@@ -393,7 +370,7 @@ module.exports = (function() {
 
     onEditSave: function(newText) {
       if (this.isEditing) {
-        if (this.canEdit() && newText !== this.model.get('text')) {
+        if (this.chatItemPolicy.canEdit() && newText !== this.model.get('text')) {
           this.model.set('text', newText);
           this.model.set('html', null);
           this.model.save();
@@ -405,28 +382,7 @@ module.exports = (function() {
       }
     },
 
-    isInEditablePeriod: function() {
-      var sent = this.model.get('sent');
-
-      if (!sent) return true; // No date means the message has not been sent
-      var age = Date.now() - sent.valueOf();
-      return age <= EDIT_WINDOW;
-    },
-
-    isEmbedded: function() {
-      return context().embedded;
-    },
-
     isArchive: () => !!context().archive,
-
-    canEdit: function() {
-      return (
-        this.model.id &&
-        this.chatItemPolicy.isOwnMessage() &&
-        this.isInEditablePeriod() &&
-        !this.isEmbedded()
-      );
-    },
 
     hasBeenEdited: function() {
       return !!this.model.get('editedAt');
@@ -447,7 +403,7 @@ module.exports = (function() {
         this.stopListening(appEvents, 'focus.request.chat.edit');
         appEvents.trigger('chat.edit.hide');
       } else {
-        if (this.canEdit()) {
+        if (this.chatItemPolicy.canEdit()) {
           var self = this;
           this.isEditing = true;
           this.showInput();
@@ -461,7 +417,7 @@ module.exports = (function() {
     },
 
     subst: function(search, replace, global) {
-      if (!this.canEdit()) return;
+      if (!this.chatItemPolicy.canEdit()) return;
 
       var reString = search.replace(/(^|[^\[])\^/g, '$1');
       var re = new RegExp(reString, global ? 'gi' : 'i');
@@ -823,7 +779,7 @@ module.exports = (function() {
 
       var deleted = !this.model.get('text');
       var isPersisted = !!this.model.id;
-      var canEdit = !deleted && this.chatItemView.canEdit() && isPersisted;
+      const canEdit = this.chatItemView.chatItemPolicy.canEdit();
       const canDelete = this.chatItemView.chatItemPolicy.canDelete();
 
       const isOwnMessage = this.chatItemView.chatItemPolicy.isOwnMessage();
