@@ -147,7 +147,6 @@ module.exports = (function() {
       this.listenToOnce(this, 'messageInViewport', this.decorate);
 
       this.chatItemPolicy = new ChatItemPolicy(this.model.attributes, {
-        isEmbedded: context().embedded,
         currentUserId: context.getUserId(),
         isTroupeAdmin: context.isTroupeAdmin()
       });
@@ -200,7 +199,6 @@ module.exports = (function() {
 
     onChange: function() {
       this.chatItemPolicy = new ChatItemPolicy(this.model.attributes, {
-        isEmbedded: context().embedded,
         currentUserId: context.getUserId(),
         isTroupeAdmin: context.isTroupeAdmin()
       });

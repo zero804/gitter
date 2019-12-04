@@ -20,7 +20,6 @@ export default {
   computed: {
     chatItemPolicy: function() {
       return new ChatItemPolicy(this.message, {
-        isEmbedded: context().embedded,
         currentUserId: context.getUserId(),
         isTroupeAdmin: context.isTroupeAdmin()
       });

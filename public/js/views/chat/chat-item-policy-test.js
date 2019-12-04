@@ -24,14 +24,6 @@ describe('ChatItemPolicy', () => {
       });
       assert(chatItemPolicy.canDelete());
     });
-
-    it('can not be deleted when in embedded mode', () => {
-      const chatItemPolicy = new ChatItemPolicy(testAttributes, {
-        currentUserId: 'user1',
-        isEmbedded: true
-      });
-      assert(!chatItemPolicy.canDelete());
-    });
   });
   describe('isOwnMessage', () => {
     it('is own message when author matches current user', () => {
@@ -60,13 +52,6 @@ describe('ChatItemPolicy', () => {
     it('can be edited by author when in the 10 minute period', () => {
       const chatItemPolicy = new ChatItemPolicy(testAttributes, { currentUserId: 'user1' });
       assert(chatItemPolicy.canEdit());
-    });
-    it('cannot be edited when in embed experience', () => {
-      const chatItemPolicy = new ChatItemPolicy(testAttributes, {
-        currentUserId: 'user1',
-        isEmbedded: true
-      });
-      assert(!chatItemPolicy.canEdit());
     });
     it('cannot be edited when outside of the edit period', () => {
       const chatItemPolicy = new ChatItemPolicy(
