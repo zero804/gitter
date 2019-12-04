@@ -7,14 +7,14 @@ exports[`thread-message-feed chat-item-actions matches snapshot 1`] = `
   <b-popover-stub
     boundary="scrollParent"
     boundarypadding="5"
-    container="chat-actions-5d147ea84dad9dfbc522317a"
+    customclass="chat-item-actions-popover"
     delay="0"
     fallbackplacement="flip"
     offset="0"
     placement="left"
     target="chat-actions-5d147ea84dad9dfbc522317a"
     title=""
-    triggers="focus"
+    triggers="click blur"
   >
     <div
       class="popover-item__action-disabled"
@@ -49,14 +49,14 @@ exports[`thread-message-feed chat-item-actions user can delete the message match
   <b-popover-stub
     boundary="scrollParent"
     boundarypadding="5"
-    container="chat-actions-5d147ea84dad9dfbc522317a"
+    customclass="chat-item-actions-popover"
     delay="0"
     fallbackplacement="flip"
     offset="0"
     placement="left"
     target="chat-actions-5d147ea84dad9dfbc522317a"
     title=""
-    triggers="focus"
+    triggers="click blur"
   >
     <div
       class="popover-item__action-disabled"
