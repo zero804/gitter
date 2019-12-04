@@ -211,8 +211,8 @@ exports.chatArchive = [
 
     const startDateUTC = moment({ year: yyyy, month: mm - 1, day: dd });
 
-    let nextDateUTC = moment(startDateUTC).add(1, 'days');
-    let previousDateUTC = moment(startDateUTC).subtract(1, 'days');
+    const nextDateUTC = moment(startDateUTC).add(1, 'days');
+    const previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
     const aroundId = fixMongoIdQueryParam(req.query.at);
     const chatMessage = await chatService.findById(aroundId);
@@ -225,25 +225,8 @@ exports.chatArchive = [
       }
     }
 
-    const today = moment().endOf('day');
-    if (
-      moment(nextDateUTC)
-        .endOf('day')
-        .isAfter(today)
-    ) {
-      nextDateUTC = null;
-    }
-
-    if (
-      moment(previousDateUTC)
-        .startOf('day')
-        .isBefore(moment([2013, 11, 1]))
-    ) {
-      previousDateUTC = null;
-    }
-
     debug(
-      'Archive searching for messages in troupe %s in date range %s-%s',
+      'Archive searching for messages in troupe %s in date range %s <-> %s',
       troupeId,
       startDateUTC,
       nextDateUTC
@@ -277,8 +260,6 @@ exports.chatArchive = [
       language = 'en-uk';
     }
 
-    const p = previousDateUTC && moment(previousDateUTC);
-    const n = nextDateUTC && moment(nextDateUTC);
     const uri = req.uriContext.uri;
 
     const startDateLocale = moment(startDateUTC).locale(language);
@@ -293,11 +274,20 @@ exports.chatArchive = [
       ordinalPart = '';
     }
 
+    const today = moment().endOf('day');
     const dayNameFormatted = numericDate;
     const dayOrdinalFormatted = ordinalPart;
-    const previousDateLink = p && '/' + uri + '/archives/' + p.format('YYYY/MM/DD');
-    const nextDateLink = n && '/' + uri + '/archives/' + n.format('YYYY/MM/DD');
     const monthYearFormatted = startDateLocale.format('MMM YYYY');
+
+    let previousDateLink;
+    if (previousDateUTC.isAfter(moment([2013, 11, 1]))) {
+      previousDateLink = '/' + uri + '/archives/' + previousDateUTC.format('YYYY/MM/DD');
+    }
+
+    let nextDateLink;
+    if (nextDateUTC.endOf('day').isSameOrBefore(today)) {
+      nextDateLink = '/' + uri + '/archives/' + nextDateUTC.format('YYYY/MM/DD');
+    }
 
     const roomUrl = '/api/v1/rooms/' + troupe.id;
 
