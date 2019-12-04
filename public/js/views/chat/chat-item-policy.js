@@ -4,17 +4,17 @@
 const EDIT_WINDOW = 1000 * 60 * 10; // 10 minutes
 
 class ChatItemPolicy {
-  constructor({ id, fromUser, sent, text }, { isEmbedded, currentUserId, isTroupeAdmin }) {
+  constructor({ id, fromUser, sent, text }, { currentUserId, isTroupeAdmin }) {
     this.id = id;
     this.fromUser = fromUser;
     this.sent = sent;
     this.text = text;
-    this.environment = { isEmbedded, currentUserId, isTroupeAdmin };
+    this.environment = { currentUserId, isTroupeAdmin };
   }
 
   canDelete() {
-    const { isEmbedded, isTroupeAdmin } = this.environment;
-    return this.id && !isEmbedded && (this.isOwnMessage() || isTroupeAdmin);
+    const { isTroupeAdmin } = this.environment;
+    return this.id && (this.isOwnMessage() || isTroupeAdmin);
   }
 
   isOwnMessage() {
@@ -23,8 +23,7 @@ class ChatItemPolicy {
   }
 
   canEdit() {
-    const { isEmbedded } = this.environment;
-    return this.id && this.text && !isEmbedded && this.isOwnMessage() && this._isInEditablePeriod;
+    return this.id && this.text && this.isOwnMessage() && this._isInEditablePeriod;
   }
 
   /**
