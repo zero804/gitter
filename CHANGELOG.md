@@ -1,6 +1,7 @@
 # 20.11.0 - *upcoming*
 
  - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
+ - Fix welcome message not showing when joining a room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1671
 
 Developer facing:
 
