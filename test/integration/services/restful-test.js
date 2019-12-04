@@ -1,5 +1,6 @@
 'use strict';
 
+const proxyquireNoCallThru = require('proxyquire').noCallThru();
 var testRequire = require('../test-require');
 var restful = testRequire('./services/restful');
 var userService = testRequire('gitter-web-users');
@@ -123,12 +124,64 @@ describe('restful #slow', function() {
     );
   });
 
-  it('serializes orgs', function() {
-    return restful.serializeOrgsForUserId(fixture.user1.id);
-  });
+  describe('serializeOrgsForUser', () => {
+    it('serializes orgs', async () => {
+      await restful.serializeOrgsForUserId(fixture.user1.id);
+    });
 
-  it('serializes orgs', function() {
-    return restful.serializeOrgsForUserId(fixture.user1.id);
+    it('serializes orgs from different backends', async () => {
+      const restfulWithMocks = proxyquireNoCallThru('../../../server/services/restful', {
+        './org-service': {
+          getOrgsForUser: () => {
+            return [
+              {
+                login: 'gitlabhq',
+                id: 1086321,
+                node_id: 'MDEyOk9yZ2FuaXphdGlvbjEwODYzMjE=',
+                url: 'https://api.github.com/orgs/gitlabhq',
+                repos_url: 'https://api.github.com/orgs/gitlabhq/repos',
+                events_url: 'https://api.github.com/orgs/gitlabhq/events',
+                hooks_url: 'https://api.github.com/orgs/gitlabhq/hooks',
+                issues_url: 'https://api.github.com/orgs/gitlabhq/issues',
+                members_url: 'https://api.github.com/orgs/gitlabhq/members{/member}',
+                public_members_url: 'https://api.github.com/orgs/gitlabhq/public_members{/member}',
+                avatar_url: 'https://avatars2.githubusercontent.com/u/1086321?v=4',
+                description: '',
+                backend: 'github',
+                absoluteUri: 'https://github.com/'
+              },
+              {
+                backend: 'gitlab',
+                id: 3678287,
+                name: 'EricGitLabTester-Group1',
+                avatar_url: null,
+                uri: 'EricGitLabTester-Group1',
+                absoluteUri: 'https://gitlab.com/groups/EricGitLabTester-Group1'
+              }
+            ];
+          }
+        }
+      });
+
+      const orgs = await restfulWithMocks.serializeOrgsForUser(fixture.user1.id);
+
+      assert.deepEqual(orgs, [
+        {
+          id: 1086321,
+          name: 'gitlabhq',
+          avatar_url: 'https://avatars2.githubusercontent.com/u/1086321?v=4',
+          absoluteUri: 'https://github.com/',
+          room: null,
+          premium: false
+        },
+        {
+          id: 3678287,
+          name: 'EricGitLabTester-Group1',
+          avatar_url: null,
+          absoluteUri: 'https://gitlab.com/groups/EricGitLabTester-Group1'
+        }
+      ]);
+    });
   });
 
   describe('serializeGroupsForUserId', function() {

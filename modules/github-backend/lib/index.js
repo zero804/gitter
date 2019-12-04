@@ -1,7 +1,7 @@
 'use strict';
 
-var Promise = require('bluebird');
 var _ = require('lodash');
+const urlJoin = require('url-join');
 
 var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
@@ -16,7 +16,7 @@ GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
   return gitHubEmailAddressService(this.user, preferStoredEmail);
 };
 
-GitHubBackend.prototype.findOrgs = Promise.method(function() {
+GitHubBackend.prototype.findOrgs = function() {
   var user = this.user;
   var ghUser = new GithubMe(user);
 
@@ -24,9 +24,15 @@ GitHubBackend.prototype.findOrgs = Promise.method(function() {
 
   return ghUser.getOrgs().then(function(ghOrgs) {
     // TODO: change these to be in a standard internal format
-    return ghOrgs;
+    return ghOrgs.map(org => {
+      return {
+        ...org,
+        backend: 'github',
+        absoluteUri: urlJoin('https://github.com', org.name)
+      };
+    });
   });
-});
+};
 
 GitHubBackend.prototype.getProfile = function() {
   // the minimum response
