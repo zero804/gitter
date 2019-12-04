@@ -42,11 +42,11 @@ export default {
   <div class="chat-item__actions">
     <b-popover
       :target="chatActionsId"
-      :container="chatActionsId"
-      placement="left"
-      triggers="focus"
+      triggers="click blur"
       delay="0"
+      placement="left"
       title=""
+      custom-class="chat-item-actions-popover"
     >
       <div class="popover-item__action-disabled">
         Edit
@@ -56,7 +56,7 @@ export default {
         v-if="chatItemPolicy.canDelete()"
         class="popover-item__action"
         title="Delete this message"
-        @click.stop.prevent="deleteMessage(message)"
+        @click="deleteMessage(message)"
       >
         Delete
       </button>
@@ -74,6 +74,8 @@ export default {
 </template>
 
 <style lang="less" scoped>
+@import (reference) 'colors';
+
 .remove-button-styles {
   border: none;
   background: inherit;
@@ -87,8 +89,14 @@ export default {
 .chat-item-actions-button {
   .remove-button-styles();
   padding: 0px;
+  &:focus {
+    .chat-item__icon {
+      visibility: visible;
+      color: @blue;
+    }
+  }
 }
-.chat-item__actions::v-deep .popover-body {
+.chat-item-actions-popover::v-deep .popover-body {
   width: 70px;
 }
 .popover-item__action {
