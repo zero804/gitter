@@ -1,7 +1,7 @@
 'use strict';
 
 const debug = require('debug')('gitter:app:gitlab:group-service');
-const { Groups } = require('gitlab');
+const { Groups, GroupMembers } = require('gitlab');
 const cacheWrapper = require('gitter-web-cache-wrapper');
 const getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
 const getPublicTokenFromPool = require('./get-public-token-from-pool');
@@ -66,6 +66,30 @@ GitLabGroupService.prototype.getGroup = async function(id) {
   const group = await resource.show(id);
 
   return standardizeGroupResponse(group);
+};
+
+GitLabGroupService.prototype.isMember = async function(groupId, gitlabUserId) {
+  const accessToken = await this.getAccessTokenPromise;
+  const gitlabLibOpts = {
+    oauthToken: accessToken,
+    token: getPublicTokenFromPool()
+  };
+  const groupMembers = new GroupMembers(gitlabLibOpts);
+
+  try {
+    // TODO: Update this to use `/groups/:id/members/all/:user_id` which also accounts for inherited permissions
+    // But I don't think the npm `gitlab` package can handle this
+    // See https://docs.gitlab.com/ee/api/members.html#get-a-member-of-a-group-or-project-including-inherited-members
+    await groupMembers.show(groupId, gitlabUserId);
+
+    return true;
+  } catch (err) {
+    if (err.response.status === 404) {
+      return false;
+    }
+
+    throw err;
+  }
 };
 
 module.exports = cacheWrapper('GitLabGroupService', GitLabGroupService, {

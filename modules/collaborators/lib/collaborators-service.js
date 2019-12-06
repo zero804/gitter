@@ -14,6 +14,10 @@ function backedTypeFactory(user, type, linkPath) {
 
     case 'GH_ORG':
       return new GitHubOrgCollaboratorService(user, linkPath);
+
+    case 'GL_GROUP':
+      // TODO: GL_GROUP
+      return undefined;
   }
 }
 

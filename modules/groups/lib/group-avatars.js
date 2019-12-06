@@ -101,56 +101,57 @@ function checkForAvatarUpdate(groupId, group, githubUsername) {
   }
 }
 
-function getAvatarUrlForGroupId(groupId, size) {
-  return findOnSecondaryOrPrimary(groupId).then(function(group) {
-    if (!group) return null;
+async function getAvatarUrlForGroupId(groupId, size) {
+  const group = await findOnSecondaryOrPrimary(groupId);
+  if (!group) return null;
 
-    // Use the custom URL if we have one
-    var avatarUrl;
-    if (group.avatarUrl) {
-      avatarUrl = getAvatarUrlForSize(group.avatarUrl, size);
+  // Use the custom URL if we have one
+  var avatarUrl;
+  if (group.avatarUrl) {
+    avatarUrl = getAvatarUrlForSize(group.avatarUrl, size);
 
-      // Tack on a version param otherwise the S3 url is always the same and
-      // you always get the cached avatar from nginx's cache.
-      if (group.avatarVersion) {
-        return avatarUrl + '?v=' + group.avatarVersion;
-      } else {
-        return avatarUrl;
-      }
-    }
-
-    // Use the Security Descriptor to
-    // generate an avatar
-    var type = group.sd && group.sd.type;
-    var linkPath = group.sd && group.sd.linkPath;
-
-    if (!linkPath) return null;
-
-    var githubUsername;
-
-    switch (type) {
-      case 'GH_ORG':
-      case 'GH_USER':
-        githubUsername = linkPath;
-        break;
-
-      case 'GH_REPO':
-        githubUsername = linkPath.split('/')[0];
-    }
-
-    if (!githubUsername) return null;
-    checkForAvatarUpdate(groupId, group, githubUsername);
-
-    avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
-
+    // Tack on a version param otherwise the S3 url is always the same and
+    // you always get the cached avatar from nginx's cache.
     if (group.avatarVersion) {
-      avatarUrl = avatarUrl + '&v=' + group.avatarVersion;
-
-      return avatarUrl;
+      return avatarUrl + '?v=' + group.avatarVersion;
     } else {
       return avatarUrl;
     }
-  });
+  }
+
+  // Use the Security Descriptor to
+  // generate an avatar
+  var type = group.sd && group.sd.type;
+  var linkPath = group.sd && group.sd.linkPath;
+
+  if (!linkPath) return null;
+
+  var githubUsername;
+
+  // TODO: GL_GROUP
+
+  switch (type) {
+    case 'GH_ORG':
+    case 'GH_USER':
+      githubUsername = linkPath;
+      break;
+
+    case 'GH_REPO':
+      githubUsername = linkPath.split('/')[0];
+  }
+
+  if (!githubUsername) return null;
+  checkForAvatarUpdate(groupId, group, githubUsername);
+
+  avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
+
+  if (group.avatarVersion) {
+    avatarUrl = avatarUrl + '&v=' + group.avatarVersion;
+
+    return avatarUrl;
+  } else {
+    return avatarUrl;
+  }
 }
 
 module.exports = {

@@ -42,19 +42,43 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
     });
 
     it('should fetch groups', async () => {
-      const glService = new GitLabGroupService(FAKE_USER);
-      const groups = await glService.getGroups();
+      const glGroupService = new GitLabGroupService(FAKE_USER);
+      const groups = await glGroupService.getGroups();
       assert(groups.length > 0);
       groups.forEach(group => {
         assert.strictEqual(group.backend, 'gitlab', 'group has not gone through the standardized');
       });
     });
 
-    it('should fetch group', () => {
-      const glService = new GitLabGroupService(FAKE_USER);
-      return glService.getGroup('gitter-integration-tests-group').then(group => {
-        assert.equal(group.backend, 'gitlab', 'group has not gone through the standardized');
-        assert.equal(group.name, 'gitter-integration-tests-group');
+    it('should fetch group', async () => {
+      const glGroupService = new GitLabGroupService(FAKE_USER);
+      const group = await glGroupService.getGroup('gitter-integration-tests-group');
+      assert.equal(group.backend, 'gitlab', 'group has not gone through the standardized');
+      assert.equal(group.name, 'gitter-integration-tests-group');
+    });
+
+    describe('group member', () => {
+      it('should fetch group member', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        // User: https://gitlab.com/gitter-integration-tests
+        const gitterIntegrationTestsUserId = '2619770';
+        const isMember = await glGroupService.isMember(
+          'gitter-integration-tests-group',
+          gitterIntegrationTestsUserId
+        );
+
+        assert.strictEqual(isMember, true);
+      });
+
+      it('should fail for non-existant group member', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        const nonExistantUserId = '999999';
+        const isMember = await glGroupService.isMember(
+          'gitter-integration-tests-group',
+          nonExistantUserId
+        );
+
+        assert.strictEqual(isMember, false);
       });
     });
   });

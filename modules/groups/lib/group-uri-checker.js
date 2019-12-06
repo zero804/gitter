@@ -107,6 +107,7 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
 
   return Promise.join(
     checkLocalUri(uri),
+    // TODO: Remove after we split from GitHub URIs
     checkGitHubUri(user, uri, obtainAccessFromGitHubRepo),
     function(localUriExists, info) {
       var githubInfo = info && info.githubInfo;
