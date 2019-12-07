@@ -12,8 +12,6 @@ var CommunityCreatMainStepViewModel = require('./main-step/community-create-main
 var CommunityCreateGitHubProjectsStepViewModel = require('./github-projects-step/community-create-github-projects-step-view-model');
 var CommunityCreationMainView = require('./main-step/community-creation-main-view');
 var CommunityCreationGithubProjectsView = require('./github-projects-step/community-creation-github-projects-view');
-var CommunityCreationInvitePeopleView = require('./invite-step/community-creation-invite-people-view');
-var CommunityCreationInviteConfirmationView = require('./invite-confirmation-step/community-creation-invite-confirmation-view');
 var CommunityCreationOverviewView = require('./overview-step/community-creation-overview-view');
 
 require('../behaviors/isomorphic');
@@ -30,14 +28,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
   behaviors: {
     Isomorphic: {
       mainStepView: { el: '.js-community-create-main-step-root', init: 'initMainStepView' },
-      invitePeopleStepView: {
-        el: '.js-community-create-invite-people-step-root',
-        init: 'initInvitePeopleView'
-      },
-      inviteConfirmationStepView: {
-        el: '.js-community-create-invite-confirmation-step-root',
-        init: 'initInviteConfirmationView'
-      },
       githubProjectsStepView: {
         el: '.js-community-create-github-projects-step-root',
         init: 'initGitHubProjectsView'
@@ -66,27 +56,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     );
 
     return this.githubProjectsStepView;
-  },
-
-  initInvitePeopleView: function(optionsForRegion) {
-    this.invitePeopleStepView = new CommunityCreationInvitePeopleView(
-      optionsForRegion({
-        model: this.invitePeopleStepViewModel,
-        communityCreateModel: this.model
-      })
-    );
-
-    return this.invitePeopleStepView;
-  },
-
-  initInviteConfirmationView: function(optionsForRegion) {
-    this.invitePeopleStepView = new CommunityCreationInviteConfirmationView(
-      optionsForRegion({
-        model: this.inviteConfirmationStepViewModel,
-        communityCreateModel: this.model
-      })
-    );
-    return this.invitePeopleStepView;
   },
 
   initOverviewView: function(optionsForRegion) {
@@ -124,16 +93,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
       active: false
     });
 
-    this.invitePeopleStepViewModel = new CommunityCreateStepViewModel({
-      communityCreateModel: communityCreateModel,
-      active: false
-    });
-
-    this.inviteConfirmationStepViewModel = new CommunityCreateStepViewModel({
-      communityCreateModel: communityCreateModel,
-      active: false
-    });
-
     this.overviewStepViewModel = new CommunityCreateStepViewModel({
       communityCreateModel: communityCreateModel,
       active: false
@@ -149,10 +108,6 @@ var CommunityCreateView = Marionette.LayoutView.extend({
     this.mainStepViewModel.set({ active: newStepState === stepConstants.MAIN });
     this.githubProjectsStepViewModel.set({
       active: newStepState === stepConstants.GITHUB_PROJECTS
-    });
-    this.invitePeopleStepViewModel.set({ active: newStepState === stepConstants.INVITE });
-    this.inviteConfirmationStepViewModel.set({
-      active: newStepState === stepConstants.INVITE_CONFIRMATION
     });
     this.overviewStepViewModel.set({ active: newStepState === stepConstants.OVERVIEW });
   },

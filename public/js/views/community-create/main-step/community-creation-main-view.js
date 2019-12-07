@@ -109,7 +109,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   nextStep: function() {
     if (this.model.isValid()) {
-      return stepConstants.INVITE;
+      return stepConstants.OVERVIEW;
     }
   },
 
