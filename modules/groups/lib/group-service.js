@@ -114,6 +114,10 @@ async function checkGroupUri(user, uri, options) {
     throw new StatusError(409, 'User is not allowed to create a group for this URI.');
   }
 
+  // TODO: Do we need to worry about GL_GROUP?
+  // My guess is not since this is the URL reservtation type of stuff which
+  // we probably need to get rid of
+  // TODO: Remove after we split from GitHub URIs (#github-uri-split)
   if (info.type === 'GH_ORG') {
     if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
       // the frontend code should have prevented you from getting here
