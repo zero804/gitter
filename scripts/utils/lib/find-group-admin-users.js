@@ -8,7 +8,7 @@ const adminFilter = require('gitter-web-permissions/lib/known-external-access/ad
 // Looks through all room members in the group and finds any group admin
 //
 // You may also be interested in
-//    - require('gitter-web-permissions/lib/admin-discovery').findModelsForOrgAdmin
+//    - require('gitter-web-permissions/lib/admin-discovery').findModelsForGithubOrgAdmin
 //    - require('gitter-web-permissions/lib/admin-discovery').findModelsForExtraAdmin
 function findGroupAdminUsers(group) {
   return groupService

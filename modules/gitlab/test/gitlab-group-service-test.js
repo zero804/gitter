@@ -5,6 +5,9 @@ const assert = require('assert');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
+// https://docs.gitlab.com/ee/api/access_requests.html
+const OWNER_ACCESS_LEVEL = 50;
+
 describe('gitlab-group-service #flakey #slow #gitlab', function() {
   // These tests timeout at 10000 sometimes otherwise
   this.timeout(30000);
@@ -41,12 +44,31 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
       oauthToken = fixtureLoader.GITLAB_USER_TOKEN;
     });
 
-    it('should fetch groups', async () => {
-      const glGroupService = new GitLabGroupService(FAKE_USER);
-      const groups = await glGroupService.getGroups();
-      assert(groups.length > 0);
-      groups.forEach(group => {
-        assert.strictEqual(group.backend, 'gitlab', 'group has not gone through the standardized');
+    describe('getGroups', () => {
+      it('should fetch groups', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        const groups = await glGroupService.getGroups();
+        assert(groups.length > 0);
+        groups.forEach(group => {
+          assert.strictEqual(
+            group.backend,
+            'gitlab',
+            'group has not gone through the standardized'
+          );
+        });
+      });
+
+      it('should fetch groups with parameters', async () => {
+        const glService = new GitLabGroupService(FAKE_USER);
+        const allGroups = await glService.getGroups();
+        const ownerGroups = await glService.getGroups({ min_access_level: OWNER_ACCESS_LEVEL });
+
+        // We expect the GitLab integration user to be part of many groups but
+        // only an owner in some of those groups
+        assert(
+          allGroups.length > ownerGroups.length,
+          `Expected allGroups(${allGroups.length}) > ownerGroups(${ownerGroups.length})`
+        );
       });
     });
 
