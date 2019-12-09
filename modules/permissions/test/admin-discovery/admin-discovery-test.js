@@ -9,11 +9,12 @@ describe('admin-discovery', function() {
   describe('integration tests #slow', function() {
     fixtureLoader.disableMongoTableScans();
 
-    var adminDiscovery;
-    var githubOrgs;
-    var URI = fixtureLoader.generateUri();
+    let adminDiscovery;
+    let githubOrgs;
+    let gitlabGroups;
+    let URI = fixtureLoader.generateUri();
 
-    var fixture = fixtureLoader.setup({
+    const fixture = fixtureLoader.setup({
       user1: {},
       user2: {},
       group1: {
@@ -31,7 +32,11 @@ describe('admin-discovery', function() {
 
     beforeEach(function() {
       githubOrgs = null;
+      gitlabGroups = null;
       adminDiscovery = proxyquireNoCallThru('../../lib/admin-discovery/index', {
+        './gitlab-group-org': function() {
+          return Promise.resolve(gitlabGroups);
+        },
         './github-org': function() {
           return Promise.resolve(githubOrgs);
         }

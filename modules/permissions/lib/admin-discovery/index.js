@@ -3,6 +3,7 @@
 var assert = require('assert');
 var Promise = require('bluebird');
 var githubOrgAdminDiscovery = require('./github-org');
+const gitlabGroupAdminDiscovery = require('./gitlab-group');
 var Group = require('gitter-web-persistence').Group;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var adminGroupFinder = require('../known-external-access/admin-group-finder');
@@ -44,7 +45,7 @@ function descriptorSearchAsQuery(descriptorSearch) {
  * Find models of the supplied type for which the user
  * is a GitHub org admin
  */
-function findModelsForOrgAdmin(Model, user) {
+function findModelsForGithubOrgAdmin(Model, user) {
   return githubOrgAdminDiscovery(user).then(function(descriptorSearch) {
     if (!descriptorSearch) return;
 
@@ -53,6 +54,20 @@ function findModelsForOrgAdmin(Model, user) {
       .lean()
       .exec();
   });
+}
+
+/**
+ * Find models of the supplied type for which the user
+ * is a GitHub org admin
+ */
+async function findModelsForGitlabGroupAdmin(Model, user) {
+  const descriptorSearch = await gitlabGroupAdminDiscovery(user);
+  if (!descriptorSearch) return;
+
+  const query = descriptorSearchAsQuery(descriptorSearch);
+  return Model.find(query)
+    .lean()
+    .exec();
 }
 
 /**
@@ -71,7 +86,8 @@ function discoverAdminGroups(user) {
   var userId = user._id || user.id;
 
   return Promise.join(
-    findModelsForOrgAdmin(Group, user),
+    findModelsForGitlabGroupAdmin(Group, user),
+    findModelsForGithubOrgAdmin(Group, user),
     adminGroupFinder.findAdminGroupsOfTypeForUserId('GH_REPO', userId),
     findModelsForExtraAdmin(Group, userId),
     function(orgModels, repoModels, extraAdminModels) {
