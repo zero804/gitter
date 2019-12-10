@@ -38,6 +38,7 @@ function serializeTroupesForUser(userId, callback) {
     .spread(function(allTroupeIds, nonMemberTroupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
+        includePermissions: true,
         // This will save the troupeId strategy
         // from having to do a second query
         nonMemberTroupeIds: nonMemberTroupeIds,
