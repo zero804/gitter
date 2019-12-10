@@ -7,6 +7,7 @@
  - Fix archive not showing messages in the current day, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1675
  - Remove community creation invite step, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1677
  - Include room permissions with the Vuex seed data (fix delete message conetxt menu), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1682
+ - Edit thread message UI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1676
 
 Developer facing:
 
