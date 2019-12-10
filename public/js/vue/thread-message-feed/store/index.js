@@ -1,10 +1,12 @@
+import Vue from 'vue';
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
 import moment from 'moment';
 import composeQueryString from 'gitter-web-qs/compose';
 import * as rootTypes from '../../store/mutation-types';
-import VuexApiRequest from '../../store/vuex-api-request';
+import VuexApiRequest, { getInitialRequestState } from '../../store/vuex-api-request';
 import { generateChildMessageTmpId } from '../../store/mutations';
+import ChatItemPolicy from '../../../views/chat/chat-item-policy';
 
 const FETCH_MESSAGES_LIMIT = 50;
 
@@ -13,6 +15,7 @@ export const childMessagesVuexRequest = new VuexApiRequest(
   'CHILD_MESSAGES',
   'childMessagesRequest'
 );
+export const updateMessageVuexRequest = new VuexApiRequest('UPDATE_MESSAGE', 'messageEditState');
 
 const canStartFetchingMessages = state =>
   !state.childMessagesRequest.loading && !state.childMessagesRequest.error;
@@ -29,6 +32,10 @@ const setTemporaryMessageProp = (commit, id, propName, propValue = true) => {
     5000
   );
 };
+
+/* we only use `loading` attribute from the request state */
+const getDefaultMessageEditState = () => ({ id: null, text: null, ...getInitialRequestState() });
+
 // Exported for testing
 export const types = {
   TOGGLE_THREAD_MESSAGE_FEED: 'TOGGLE_THREAD_MESSAGE_FEED',
@@ -37,7 +44,10 @@ export const types = {
   SET_AT_TOP_IF_SAME_PARENT: 'SET_AT_TOP_IF_SAME_PARENT',
   SET_AT_BOTTOM_IF_SAME_PARENT: 'SET_AT_BOTTOM_IF_SAME_PARENT',
   RESET_THREAD_STATE: 'RESET_THREAD_STATE',
-  ...childMessagesVuexRequest.types // just for completeness, the types are referenced as `childMessagesVuexRequest.successType`
+  UPDATE_MESSAGE_EDIT_STATE: 'UPDATE_MESSAGE_EDIT_STATE',
+  // just for completeness, the types are referenced using the request class e.g. `childMessagesVuexRequest.successType`
+  ...childMessagesVuexRequest.types,
+  ...updateMessageVuexRequest.types
 };
 
 export default {
@@ -45,6 +55,7 @@ export default {
   state: () => ({
     isVisible: false,
     draftMessage: '',
+    messageEditState: getDefaultMessageEditState(),
     atTop: false,
     atBottom: false,
     parentId: null,
@@ -75,8 +86,13 @@ export default {
       state.draftMessage = '';
       state.atTop = false;
       state.atBottom = false;
+      state.messageEditState = getDefaultMessageEditState();
     },
-    ...childMessagesVuexRequest.mutations
+    [types.UPDATE_MESSAGE_EDIT_STATE](state, newProperties) {
+      Vue.set(state, 'messageEditState', { ...state.messageEditState, ...newProperties });
+    },
+    ...childMessagesVuexRequest.mutations,
+    ...updateMessageVuexRequest.mutations
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
@@ -140,6 +156,46 @@ export default {
       return apiClient.room.delete(`/chatMessages/${message.id}`).then(() => {
         commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
       });
+    },
+    updateMessage: ({ commit, state, rootState, dispatch }) => {
+      const { messageEditState } = state;
+      commit(updateMessageVuexRequest.requestType);
+      return apiClient.room
+        .put(`/chatMessages/${messageEditState.id}`, { text: messageEditState.text })
+        .then(updatedMessage => {
+          commit(rootTypes.ADD_TO_MESSAGE_MAP, [updatedMessage], { root: true });
+          commit(updateMessageVuexRequest.successType);
+          dispatch('cancelEdit');
+        })
+        .catch(() => {
+          const originalMessage = rootState.messageMap[state.messageEditState.id];
+          commit(
+            rootTypes.ADD_TO_MESSAGE_MAP,
+            [{ ...originalMessage, error: true, text: messageEditState.text, html: undefined }],
+            {
+              root: true
+            }
+          );
+          commit(updateMessageVuexRequest.errorType);
+          dispatch('cancelEdit');
+        });
+    },
+    editMessage: ({ commit }, message) => {
+      commit(types.UPDATE_MESSAGE_EDIT_STATE, { id: message.id, text: message.text });
+    },
+    cancelEdit: ({ commit }) =>
+      commit(types.UPDATE_MESSAGE_EDIT_STATE, getDefaultMessageEditState()),
+    updateEditedText: ({ commit }, text) => {
+      commit(types.UPDATE_MESSAGE_EDIT_STATE, { text });
+    },
+    editLastMessage: ({ dispatch, getters, rootState }) => {
+      const isEditable = message => {
+        const policy = new ChatItemPolicy(message, { currentUserId: rootState.user._id });
+        return policy.canEdit();
+      };
+      const lastEditableMessage = [...getters.childMessages].reverse().find(isEditable);
+      if (!lastEditableMessage) return;
+      dispatch('editMessage', lastEditableMessage);
     },
     fetchChildMessages: (
       { state, commit },

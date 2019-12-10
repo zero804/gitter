@@ -62,7 +62,13 @@ module.exports = Marionette.LayoutView.extend({
 
   onClick: function(e) {
     var hasTextSelected = window.getSelection().toString().length > 0;
-    if (!hasTextSelected && e.target.tagName.toLowerCase() !== 'textarea') {
+    if (
+      !hasTextSelected &&
+      e.target.tagName.toLowerCase() !== 'textarea' &&
+      // we want to focus a TMF input if user opens the TMF by clicking on
+      // parent message indicator
+      !e.target.className.match(/js-parent-message-indicator/)
+    ) {
       appEvents.trigger('focus.request.chat');
     }
   }
