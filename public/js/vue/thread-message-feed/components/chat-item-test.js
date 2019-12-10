@@ -97,6 +97,43 @@ describe('thread-message-feed chat-item', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
   });
+  describe('editing', () => {
+    let wrapper, stubbedActions;
+    beforeEach(() => {
+      const mountResult = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: { ...message, text: '', html: '' }
+        },
+        store => {
+          addRoomToStore(store);
+          store.state.threadMessageFeed = {
+            messageEditState: {
+              id: message.id,
+              text: 'updated text',
+              loading: true
+            }
+          };
+        }
+      );
+      wrapper = mountResult.wrapper;
+      stubbedActions = mountResult.stubbedActions;
+    });
+
+    it('matches snapshot', () => {
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('pressing enter submits the message for update', () => {
+      wrapper.find({ ref: 'chatItemEditTextArea' }).trigger('keydown.enter');
+      expect(stubbedActions.threadMessageFeed.updateMessage).toHaveBeenCalled();
+    });
+    it('pressing esc cancels editing', () => {
+      wrapper.find({ ref: 'chatItemEditTextArea' }).trigger('keydown.esc');
+      expect(stubbedActions.threadMessageFeed.cancelEdit).toHaveBeenCalled();
+    });
+  });
   it('focusedAt - scrolls into view', () => {
     const scrollIntoViewMock = jest.fn();
     mount(

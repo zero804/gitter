@@ -7,7 +7,7 @@ class ChatItemPolicy {
   constructor({ id, fromUser, sent, text }, { currentUserId, isTroupeAdmin }) {
     this.id = id;
     this.fromUser = fromUser;
-    this.sent = sent;
+    this.sent = new Date(sent);
     this.text = text;
     this.environment = { currentUserId, isTroupeAdmin };
   }

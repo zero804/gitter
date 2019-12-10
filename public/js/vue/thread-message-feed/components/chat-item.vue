@@ -1,5 +1,5 @@
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 import Avatar from './avatar.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
@@ -29,7 +29,8 @@ export default {
       displayedRoom: 'displayedRoom'
     }),
     ...mapState({
-      isLoggedIn: state => state.isLoggedIn
+      isLoggedIn: state => state.isLoggedIn,
+      messageEditState: state => state.threadMessageFeed.messageEditState
     }),
     sentTimeFormatted: function() {
       return timeFormat(this.message.sent);
@@ -43,6 +44,20 @@ export default {
     isEmpty: function() {
       const content = this.message.html || this.message.text;
       return content.length === 0;
+    },
+    editMessageModel: {
+      get() {
+        return this.messageEditState.text;
+      },
+      set(text) {
+        this.updateEditedText(text);
+      }
+    },
+    isBeingEdited: function() {
+      return this.message.id === this.messageEditState.id;
+    },
+    isLoading: function() {
+      return this.message.loading || (this.isBeingEdited && this.messageEditState.loading);
     }
   },
   watch: {
@@ -62,6 +77,7 @@ export default {
   },
   updated: function() {
     this.decorate();
+    if (this.isBeingEdited) this.$refs.chatItemEditTextArea.focus();
   },
   mounted: function() {
     // highlighted is used for bringing users attention to permalinked message
@@ -74,6 +90,11 @@ export default {
     this.decorate();
   },
   methods: {
+    ...mapActions({
+      updateMessage: 'threadMessageFeed/updateMessage',
+      updateEditedText: 'threadMessageFeed/updateEditedText',
+      cancelEdit: 'threadMessageFeed/cancelEdit'
+    }),
     setPermalinkLocation: function() {
       pushState(this.permalinkUrl);
     },
@@ -126,9 +147,17 @@ export default {
               @click.stop.prevent="setPermalinkLocation"
               >{{ sentTimeFormatted }}</a
             >
-            <loading-spinner v-if="message.loading" class="message-loading-icon" />
+            <loading-spinner v-if="isLoading" class="message-loading-icon" />
           </div>
-          <div v-if="message.html" class="chat-item__text" v-html="message.html"></div>
+          <textarea
+            v-if="isBeingEdited"
+            ref="chatItemEditTextArea"
+            v-model="editMessageModel"
+            class="trpChatInput"
+            @keydown.enter.prevent="updateMessage()"
+            @keydown.esc="cancelEdit()"
+          ></textarea>
+          <div v-else-if="message.html" class="chat-item__text" v-html="message.html"></div>
           <div v-else class="chat-item__text">
             {{ message.text }}
             <i v-if="isEmpty">This message was deleted</i>

@@ -31,7 +31,8 @@ export default {
 
   methods: {
     ...mapActions({
-      deleteMessage: 'threadMessageFeed/deleteMessage'
+      deleteMessage: 'threadMessageFeed/deleteMessage',
+      editMessage: 'threadMessageFeed/editMessage'
     })
   }
 };
@@ -47,13 +48,21 @@ export default {
       title=""
       custom-class="chat-item-actions-popover"
     >
-      <div class="popover-item__action-disabled">
+      <button
+        v-if="chatItemPolicy.canEdit()"
+        class="popover-item__action js-chat-item-edit-action"
+        title="Edit this message"
+        @click="editMessage(message)"
+      >
+        Edit
+      </button>
+      <div v-else class="popover-item__action-disabled">
         Edit
       </div>
 
       <button
         v-if="chatItemPolicy.canDelete()"
-        class="popover-item__action"
+        class="popover-item__action js-chat-item-delete-action"
         title="Delete this message"
         @click="deleteMessage(message)"
       >

@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+export const getInitialRequestState = () => ({ loading: false, error: false, results: [] });
 export default class VuexApiRequest {
   /**
    *
@@ -25,7 +26,7 @@ export default class VuexApiRequest {
 
   get initialState() {
     const result = {};
-    _.set(result, this._requestStatePath, { loading: false, error: false, results: [] });
+    _.set(result, this._requestStatePath, getInitialRequestState());
     return result;
   }
 

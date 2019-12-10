@@ -27,7 +27,8 @@ export default {
   },
   computed: {
     ...mapState({
-      draftMessage: state => state.threadMessageFeed.draftMessage
+      draftMessage: state => state.threadMessageFeed.draftMessage,
+      messageEditState: state => state.threadMessageFeed.messageEditState
     }),
     draftMessageModel: {
       get() {
@@ -43,13 +44,28 @@ export default {
         : 'Click here to type a chat message.';
     }
   },
+  watch: {
+    messageEditState: function(newState, oldState) {
+      // After the message is done being edited, go back to focusing the thread message input
+      if (oldState.id && !newState.id) {
+        this.$refs.chatInputTextArea.focus();
+      }
+    }
+  },
+  mounted() {
+    this.$refs.chatInputTextArea.focus();
+  },
   methods: {
     ...mapActions({
       sendMessage: 'threadMessageFeed/sendMessage',
-      updateDraftMessage: 'threadMessageFeed/updateDraftMessage'
+      updateDraftMessage: 'threadMessageFeed/updateDraftMessage',
+      editLastMessageAction: 'threadMessageFeed/editLastMessage'
     }),
     textAreaChanged(event) {
       this.updateDraftMessage(event.target.value);
+    },
+    editLastMessage() {
+      if (!this.draftMessage) this.editLastMessageAction();
     }
   }
 };
@@ -64,8 +80,13 @@ export default {
         </div>
         <div id="chat-input-box-region" class="chat-input-box__region">
           <form class="chat-input__box" name="chat">
+            <!--
+              the @keyup.up is keyUP on purpose. See the issues with alternatives:
+              - @keydown.up -> would open the message edit textarea and the keyup.up event would happen in the newly opened edit message textarea which would put the cursor at the start
+              - @keydown.up.prevent -> if there was multiline text, we couldn't use UP arrow to move the cursor
+            -->
             <textarea
-              ref="chat-input"
+              ref="chatInputTextArea"
               v-model="draftMessageModel"
               class="chat-input__text-area"
               name="chat"
@@ -75,6 +96,7 @@ export default {
               autofocus
               maxlength="4096"
               @keydown.enter.prevent="sendMessage()"
+              @keyup.up="editLastMessage()"
             ></textarea>
           </form>
         </div>
