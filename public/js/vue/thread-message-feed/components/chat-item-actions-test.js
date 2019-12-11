@@ -13,9 +13,19 @@ describe('thread-message-feed chat-item-actions', () => {
     context.mockImplementation(() => ({}));
   });
 
-  it('matches snapshot', () => {
-    const { wrapper } = mount(ChatItemActions, { message });
-    expect(wrapper.element).toMatchSnapshot();
+  describe('user is not the author of the message', () => {
+    it('matches snapshot', () => {
+      const { wrapper } = mount(ChatItemActions, { message });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('triggers report option if the report option is clicked', () => {
+      const { wrapper, stubbedActions } = mount(ChatItemActions, { message });
+      // removing the original implementation to prevent an API call
+      stubbedActions.threadMessageFeed.reportMessage.mockImplementation(() => {});
+      wrapper.find('.js-chat-item-report-action').trigger('click');
+      expect(stubbedActions.threadMessageFeed.reportMessage).toHaveBeenCalled();
+    });
   });
 
   describe('user can delete the message', () => {
