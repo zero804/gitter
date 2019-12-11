@@ -26,12 +26,36 @@ export default {
     },
     chatActionsId: function() {
       return `chat-actions-${this.message.id}`;
+    },
+    actionItems: function() {
+      const { message, chatItemPolicy } = this;
+      return [
+        {
+          label: 'Edit',
+          slug: 'edit',
+          enabled: chatItemPolicy.canEdit(),
+          action: () => this.editMessage(message)
+        },
+        {
+          label: 'Delete',
+          slug: 'delete',
+          enabled: chatItemPolicy.canDelete(),
+          action: () => this.deleteMessage(message)
+        },
+        {
+          label: 'Report',
+          slug: 'report',
+          enabled: chatItemPolicy.canReport(),
+          action: () => this.reportMessage(message)
+        }
+      ];
     }
   },
 
   methods: {
     ...mapActions({
       deleteMessage: 'threadMessageFeed/deleteMessage',
+      reportMessage: 'threadMessageFeed/reportMessage',
       editMessage: 'threadMessageFeed/editMessage'
     })
   }
@@ -48,27 +72,19 @@ export default {
       title=""
       custom-class="chat-item-actions-popover"
     >
-      <button
-        v-if="chatItemPolicy.canEdit()"
-        class="popover-item__action js-chat-item-edit-action"
-        title="Edit this message"
-        @click="editMessage(message)"
-      >
-        Edit
-      </button>
-      <div v-else class="popover-item__action-disabled">
-        Edit
+      <div v-for="actionItem in actionItems" :key="actionItem.slug">
+        <button
+          v-if="actionItem.enabled"
+          :class="`popover-item__action js-chat-item-${actionItem.slug}-action`"
+          :title="`${actionItem.label} this message`"
+          @click="actionItem.action()"
+        >
+          {{ actionItem.label }}
+        </button>
+        <div v-else class="popover-item__action-disabled">
+          {{ actionItem.label }}
+        </div>
       </div>
-
-      <button
-        v-if="chatItemPolicy.canDelete()"
-        class="popover-item__action js-chat-item-delete-action"
-        title="Delete this message"
-        @click="deleteMessage(message)"
-      >
-        Delete
-      </button>
-      <div v-else class="popover-item__action-disabled">Delete</div>
     </b-popover>
     <button
       :id="chatActionsId"

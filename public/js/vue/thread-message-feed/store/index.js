@@ -152,10 +152,13 @@ export default {
         });
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
-    deleteMessage: ({ commit }, message) => {
-      return apiClient.room.delete(`/chatMessages/${message.id}`).then(() => {
-        commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
-      });
+    deleteMessage: async ({ commit }, message) => {
+      await apiClient.room.delete(`/chatMessages/${message.id}`);
+      commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
+    },
+    reportMessage: async ({ commit }, message) => {
+      await apiClient.room.post(`/chatMessages/${message.id}/report`);
+      commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
     },
     updateMessage: ({ commit, state, rootState, dispatch }) => {
       const { messageEditState } = state;
