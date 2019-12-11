@@ -1,3 +1,9 @@
+# 20.12.0 - *upcoming*
+
+Developer facing:
+ - Add VuexApiRequest error to the store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1683
+
+
 # 20.11.0 - 2019-12-10
 
  - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
