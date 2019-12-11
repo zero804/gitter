@@ -139,13 +139,7 @@ describe('thread message feed store', () => {
       const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
       apiClient.room.post.mockResolvedValue(null);
 
-      await testAction(
-        actions.reportMessage,
-        storedMessage,
-        {},
-        [{ type: rootTypes.REMOVE_MESSAGE, payload: storedMessage }],
-        []
-      );
+      await testAction(actions.reportMessage, storedMessage);
 
       expect(apiClient.room.post).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}/report`);
     });
