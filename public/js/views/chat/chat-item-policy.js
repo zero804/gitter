@@ -26,6 +26,10 @@ class ChatItemPolicy {
     return this.id && this.text && this.isOwnMessage() && this._isInEditablePeriod;
   }
 
+  canReport() {
+    return !this.isOwnMessage();
+  }
+
   /**
    * PRIVATE METHOD: Returns true if this chat item can still be edited.
    */

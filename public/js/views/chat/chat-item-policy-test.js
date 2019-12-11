@@ -25,20 +25,22 @@ describe('ChatItemPolicy', () => {
       assert(chatItemPolicy.canDelete());
     });
   });
-  describe('isOwnMessage', () => {
-    it('is own message when author matches current user', () => {
+  describe('isOwnMessage and canReport', () => {
+    it('is own message when author matches current user - user cannot report it', () => {
       const chatItemPolicy = new ChatItemPolicy(
         { fromUser: { id: 'user1' } },
         { currentUserId: 'user1' }
       );
       assert(chatItemPolicy.isOwnMessage());
+      assert(!chatItemPolicy.canReport());
     });
-    it('is not own message when author differs from current user', () => {
+    it('is not own message when author differs from current user - user can report it', () => {
       const chatItemPolicy = new ChatItemPolicy(
         { fromUser: { id: 'user1' } },
         { currentUserId: 'user2' }
       );
       assert(!chatItemPolicy.isOwnMessage());
+      assert(chatItemPolicy.canReport());
     });
   });
   describe('canEdit', () => {
