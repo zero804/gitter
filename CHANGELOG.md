@@ -1,7 +1,9 @@
 # 20.12.0 - *upcoming*
 
 Developer facing:
- - Add VuexApiRequest error to the store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1683
+
+ - Add `VuexApiRequest` `error` to the store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1683
+ - Add permissions `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1679
 
 
 # 20.11.0 - 2019-12-10
