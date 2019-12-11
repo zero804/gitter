@@ -14,6 +14,7 @@ Developer facing:
  - Remove community creation invite step, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1677
  - Include room permissions with the VueX seed data (fix delete message context menu), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1682
  - Edit thread message UI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1676
+ - Add Quote and Report actions to thread messages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1686
 
 Developer facing:
 
