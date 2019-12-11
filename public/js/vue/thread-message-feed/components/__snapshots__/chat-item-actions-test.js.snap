@@ -17,6 +17,16 @@ exports[`thread-message-feed chat-item-actions user can delete the message match
     triggers="click blur"
   >
     <div>
+      <button
+        class="popover-item__action js-chat-item-quote-action"
+        title="Quote this message"
+      >
+        
+        Quote
+      
+      </button>
+    </div>
+    <div>
       <div
         class="popover-item__action-disabled"
       >
@@ -75,6 +85,16 @@ exports[`thread-message-feed chat-item-actions user can edit the message matches
   >
     <div>
       <button
+        class="popover-item__action js-chat-item-quote-action"
+        title="Quote this message"
+      >
+        
+        Quote
+      
+      </button>
+    </div>
+    <div>
+      <button
         class="popover-item__action js-chat-item-edit-action"
         title="Edit this message"
       >
@@ -131,6 +151,16 @@ exports[`thread-message-feed chat-item-actions user is not the author of the mes
     title=""
     triggers="click blur"
   >
+    <div>
+      <button
+        class="popover-item__action js-chat-item-quote-action"
+        title="Quote this message"
+      >
+        
+        Quote
+      
+      </button>
+    </div>
     <div>
       <div
         class="popover-item__action-disabled"

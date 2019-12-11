@@ -36,6 +36,7 @@ exports[`thread-message-feed chat-input matches snapshot for thread 1`] = `
             maxlength="4096"
             name="chat"
             placeholder="Click here to type a chat message."
+            style="height: 0px;"
           />
         </form>
       </div>
