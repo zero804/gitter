@@ -65,15 +65,13 @@ function findLurkingRoomIdsForUserId(userId) {
 /**
  * Returns true iff the user is a member of the room
  */
-function checkRoomMembership(troupeId, userId) {
+async function checkRoomMembership(troupeId, userId) {
   assert(troupeId);
   assert(userId);
 
-  return TroupeUser.count({ troupeId: troupeId, userId: userId })
-    .exec()
-    .then(function(count) {
-      return count > 0;
-    });
+  const count = await TroupeUser.count({ troupeId: troupeId, userId: userId }).exec();
+  debug(`checkRoomMembership(troupeId=${troupeId} userId=${userId}) -> ${count}`);
+  return count > 0;
 }
 
 /**

@@ -29,7 +29,10 @@ var groupService = require('gitter-web-groups/lib/group-service');
  * 404: access denied
  */
 function findContextForUri(user, uri, options) {
-  debug('findRoomContext %s %s %j', user && user.username, uri, options);
+  debug(
+    `findRoomContext user=${user && user.username}(${user &&
+      user.id}) uri=${uri} options=${options}`
+  );
 
   var userId = user && user.id;
 

@@ -68,7 +68,7 @@ gulp.task('embedded:compile:copy-files', function() {
     .pipe(gulp.dest(buildPath));
 });
 
-gulp.task('embedded:compile:markup', function() {
+gulp.task('embedded:compile:markup', ['clientapp:compile:webpack'], function() {
   const args = [
     path.join(__dirname, './render-embedded-chat.js'),
     '--output',

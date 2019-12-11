@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:chat-toolbar-input');
 var context = require('gitter-web-client-context');
 var appEvents = require('../../utils/appevents');
 var ChatInputView = require('../chat/chatInputView');
@@ -68,6 +69,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
 
   initInputRegion: function(optionsForRegion) {
     if (this.model.get('roomMember')) {
+      debug('Already a room member so showing chat input');
       return new ChatInputView(
         optionsForRegion({
           model: context.troupe(),
@@ -75,6 +77,7 @@ var ChatToolbarInputLayout = ChatToolbarLayout.extend({
         })
       );
     } else {
+      debug('Not a room member so showing join room button');
       return new JoinRoomView(optionsForRegion({}, { rerender: true }));
     }
   },

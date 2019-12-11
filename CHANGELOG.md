@@ -1,7 +1,24 @@
+# 20.10.0 - 2019-11-27
+
+ - Fix stuck unread notification(unable to dismiss) for thread message in desktop app (add `IntersectionObserver` polyfill), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
+ - Remove `/~card` route, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1660
+
+Developer facing:
+
+ - Fix wrong user signed in with e2e tests (Cypress cookie sharing), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1657
+ - Fix flakiness in create room e2e test, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1656
+ - Remove `cypress-failed-log` dependency to clean up Cypress devtools console and output, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1658
+ - Fix iOS build script when isn't an existing webpack bundle built (`npm run build-ios-assets`), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1662
+     - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
+ - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
+ - Remove `scripts/utils/trim-one-to-one-rooms.js` in favor of `scripts/utils/clean-up-users-old-one-to-one.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1666
+
+
 # 20.9.1 - 2019-11-26
 
  - Security fix related to avatar API, https://gitlab.com/gitlab-org/gitter/webapp/issues/2311
      - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/42
+
 
 # 20.9.0 - 2019-11-20
 

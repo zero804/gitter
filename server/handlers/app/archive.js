@@ -253,8 +253,8 @@ exports.chatArchive = [
       startDateUTC,
       nextDateUTC
     );
+    // If `currentUserId` isn't specified, all chats are `unread: false` as expected
     const strategy = new restSerializer.ChatStrategy({
-      overrideUnreadTo: false, // All chats are read in the archive
       troupeId: troupeId
     });
 

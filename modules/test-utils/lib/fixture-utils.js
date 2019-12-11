@@ -8,19 +8,19 @@ function generateEmail() {
 }
 
 function generateName() {
-  return 'Test ' + ++counter + ' ' + seed;
+  return `Test ${++counter} ${seed}`;
 }
 
 function generateUri(roomType) {
   if (roomType === 'REPO') {
-    return '_test_' + ++counter + seed + '/_repo_' + ++counter + Date.now();
+    return `_test_${++counter}${seed}/_repo_${++counter}${Date.now()}`;
   }
 
   return '_test_' + ++counter + seed;
 }
 
 function generateUsername() {
-  return '_testuser_' + ++counter + seed;
+  return `_testuser_${++counter}${seed}`;
 }
 
 function generateGithubId() {

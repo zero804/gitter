@@ -1,6 +1,7 @@
 'use strict';
 var Backbone = require('backbone');
 var Marionette = require('backbone.marionette');
+const debug = require('debug-proxy')('app:typeahead');
 var Dropdown = require('./dropdown');
 var liveSearch = require('./live-search');
 
@@ -54,12 +55,14 @@ var TypeaheadView = Marionette.ItemView.extend({
   },
 
   show: function() {
+    debug('show');
     if (this.dropdown) {
       this.dropdown.show();
     }
   },
 
   hide: function() {
+    debug('hide');
     if (this.dropdown) {
       this.dropdown.hide();
     }

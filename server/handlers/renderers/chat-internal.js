@@ -35,12 +35,7 @@ async function renderChat(req, res, next, options) {
     lean: true,
     limit: ROSTER_SIZE
   };
-  const chatSnapshotOptions = await getChatSnapshotOptions(
-    userId,
-    troupe.id,
-    req,
-    options.overrideUnreadTo
-  );
+  const chatSnapshotOptions = await getChatSnapshotOptions(userId, troupe.id, req);
 
   const [
     troupeContext,
@@ -50,12 +45,10 @@ async function renderChat(req, res, next, options) {
     rightToolbarSnapshot,
     userThemeSnapshot
   ] = await Promise.all([
-    options.generateContext === false
-      ? {}
-      : contextGenerator.generateTroupeContext(req, {
-          snapshots: { chat: chatSnapshotOptions },
-          permalinkChatId: getPermalinkMessageId(req)
-        }),
+    contextGenerator.generateTroupeContext(req, {
+      snapshots: { chat: chatSnapshotOptions },
+      permalinkChatId: getPermalinkMessageId(req)
+    }),
     restful.serializeChatsForTroupe(troupe.id, userId, chatSnapshotOptions),
     options.fetchEvents === false ? null : restful.serializeEventsForTroupe(troupe.id, userId),
     options.fetchUsers === false
