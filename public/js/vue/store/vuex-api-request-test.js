@@ -17,7 +17,7 @@ describe('VuexApiRequest', () => {
     it('should create nested structure', () => {
       const initialState = testInstance.initialState;
       assert.deepEqual(initialState, {
-        path: { to: { state: { loading: false, error: false, results: [] } } }
+        path: { to: { state: { loading: false, error: null, results: [] } } }
       });
     });
   });
@@ -44,6 +44,15 @@ describe('VuexApiRequest', () => {
       testInstance.mutations[testInstance.errorType](testState);
       assert.deepEqual(testState, {
         path: { to: { state: { loading: false, error: true, results: [] } } }
+      });
+    });
+
+    it('should correctly add error object to the state', () => {
+      const testState = testInstance.initialState;
+      const testError = new Error();
+      testInstance.mutations[testInstance.errorType](testState, testError);
+      assert.deepEqual(testState, {
+        path: { to: { state: { loading: false, error: testError, results: [] } } }
       });
     });
   });

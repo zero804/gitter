@@ -458,8 +458,10 @@ describe('actions', () => {
     it('searches value error', async () => {
       state.search.searchInputValue = 'special';
 
-      apiClient.user.get.mockImplementation(() => Promise.reject(true));
-      apiClient.get.mockImplementation(() => Promise.reject(true));
+      const testError = new Error();
+
+      apiClient.user.get.mockImplementation(() => Promise.reject(testError));
+      apiClient.get.mockImplementation(() => Promise.reject(testError));
 
       testAction(
         actions.fetchRoomSearchResults,
@@ -470,9 +472,9 @@ describe('actions', () => {
           { type: roomSearchRepoRequest.requestType },
           { type: roomSearchRoomRequest.requestType },
           { type: roomSearchPeopleRequest.requestType },
-          { type: roomSearchRepoRequest.errorType, payload: true },
-          { type: roomSearchRoomRequest.errorType, payload: true },
-          { type: roomSearchPeopleRequest.errorType, payload: true }
+          { type: roomSearchRepoRequest.errorType, payload: testError },
+          { type: roomSearchRoomRequest.errorType, payload: testError },
+          { type: roomSearchPeopleRequest.errorType, payload: testError }
         ],
         [{ type: 'trackStat', payload: 'left-menu.search.input' }]
       );
