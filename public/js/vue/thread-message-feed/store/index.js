@@ -156,9 +156,8 @@ export default {
       await apiClient.room.delete(`/chatMessages/${message.id}`);
       commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
     },
-    reportMessage: async ({ commit }, message) => {
+    reportMessage: async (_, message) => {
       await apiClient.room.post(`/chatMessages/${message.id}/report`);
-      commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
     },
     updateMessage: ({ commit, state, rootState, dispatch }) => {
       const { messageEditState } = state;
