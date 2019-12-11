@@ -50,10 +50,22 @@ export default {
       if (oldState.id && !newState.id) {
         this.$refs.chatInputTextArea.focus();
       }
+    },
+    draftMessage: function(newDraft) {
+      if (newDraft === '') {
+        this.shrink();
+      }
     }
   },
   mounted() {
     this.$refs.chatInputTextArea.focus();
+    this.expandIfNeeded();
+  },
+  updated() {
+    // if something programatically changes draft, we'll focus on the input
+    // e.g. when user selects "Quote" from the chat item context menu
+    this.$refs.chatInputTextArea.focus();
+    this.expandIfNeeded();
   },
   methods: {
     ...mapActions({
@@ -66,6 +78,16 @@ export default {
     },
     editLastMessage() {
       if (!this.draftMessage) this.editLastMessageAction();
+    },
+    shrink() {
+      this.$refs.chatInputTextArea.style.height = '';
+    },
+    expandIfNeeded() {
+      const maxHeight = window.innerHeight / 2;
+      const newHeight = Math.min(this.$refs.chatInputTextArea.scrollHeight, maxHeight);
+      // inspired by https://medium.com/@adamorlowskipoland/vue-auto-resize-textarea-3-different-approaches-8bbda5d074ce
+      this.$refs.chatInputTextArea.style.height = 'auto';
+      this.$refs.chatInputTextArea.style.height = `${newHeight}px`;
     }
   }
 };
