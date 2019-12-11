@@ -779,8 +779,7 @@ module.exports = (function() {
       var isPersisted = !!this.model.id;
       const canEdit = this.chatItemView.chatItemPolicy.canEdit();
       const canDelete = this.chatItemView.chatItemPolicy.canDelete();
-
-      const isOwnMessage = this.chatItemView.chatItemPolicy.isOwnMessage();
+      const canReport = this.chatItemView.chatItemPolicy.canReport();
 
       const actions = [];
 
@@ -801,7 +800,7 @@ module.exports = (function() {
 
       actions.push({ name: 'edit', description: 'Edit', disabled: !canEdit });
       actions.push({ name: 'delete', description: 'Delete', disabled: !canDelete });
-      actions.push({ name: 'report', description: 'Report', disabled: isOwnMessage });
+      actions.push({ name: 'report', description: 'Report', disabled: !canReport });
 
       return { actions };
     }
