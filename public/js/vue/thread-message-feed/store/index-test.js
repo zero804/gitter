@@ -133,7 +133,7 @@ describe('thread message feed store', () => {
       expect(apiClient.room.delete).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}`);
     });
 
-    it('report', async () => {
+    it('reportMessage', async () => {
       apiClient.room.post.mockReset();
 
       const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
@@ -142,6 +142,37 @@ describe('thread message feed store', () => {
       await testAction(actions.reportMessage, storedMessage);
 
       expect(apiClient.room.post).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}/report`);
+    });
+
+    describe('quoteMessage', () => {
+      const storedMessage = createSerializedMessageFixture({
+        id: '5d147ea84dad9dfbc522317a',
+        text: 'hello\nline2'
+      });
+
+      it('puts quote at the draft beginning if the message draft is empty', async () => {
+        await testAction(
+          actions.quoteMessage,
+          storedMessage,
+          { draftMessage: '' },
+          [{ type: types.UPDATE_DRAFT_MESSAGE, payload: '> hello\n> line2\n\n' }],
+          []
+        );
+      });
+
+      it('separates quote from existing message draft by empty line', async () => {
+        const storedMessage = createSerializedMessageFixture({
+          id: '5d147ea84dad9dfbc522317a',
+          text: 'hello\nline2'
+        });
+        await testAction(
+          actions.quoteMessage,
+          storedMessage,
+          { draftMessage: 'original draft' },
+          [{ type: types.UPDATE_DRAFT_MESSAGE, payload: 'original draft\n> hello\n> line2\n\n' }],
+          []
+        );
+      });
     });
 
     describe('updateMessage', () => {

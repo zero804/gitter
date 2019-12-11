@@ -159,6 +159,18 @@ export default {
     reportMessage: async (_, message) => {
       await apiClient.room.post(`/chatMessages/${message.id}/report`);
     },
+    quoteMessage: ({ commit, state }, message) => {
+      const formattedText = message.text
+        .split(/\r?\n/)
+        .map(line => `> ${line}`)
+        .join('\n');
+      const { draftMessage } = state;
+      if (draftMessage) {
+        commit(types.UPDATE_DRAFT_MESSAGE, `${draftMessage}\n${formattedText}\n\n`);
+      } else {
+        commit(types.UPDATE_DRAFT_MESSAGE, `${formattedText}\n\n`);
+      }
+    },
     updateMessage: ({ commit, state, rootState, dispatch }) => {
       const { messageEditState } = state;
       commit(updateMessageVuexRequest.requestType);
