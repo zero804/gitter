@@ -1,4 +1,4 @@
-# 20.11.0 - *upcoming*
+# 20.11.0 - 2019-12-10
 
  - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
  - Fix welcome message not showing when joining a room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1671
@@ -11,7 +11,7 @@
 
 Developer facing:
 
- - Resolve "Aggregating Gitter community data into reports", https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1668
+ - Add scripts to aggregate Gitter community data into reports (stats), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1668
  - Update message API endpoint cleanup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1670
  - Add GitLab API backend for groups -> `/api/v1/user/:userId/orgs` endpoint, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1559
  - Use `ChatItemPolicy` to handle edit state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1673
