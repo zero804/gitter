@@ -31,6 +31,12 @@ export default {
       const { message, chatItemPolicy } = this;
       return [
         {
+          label: 'Quote',
+          slug: 'quote',
+          enabled: !!message.id, // is persisted
+          action: () => this.quoteMessage(message)
+        },
+        {
           label: 'Edit',
           slug: 'edit',
           enabled: chatItemPolicy.canEdit(),
@@ -54,6 +60,7 @@ export default {
 
   methods: {
     ...mapActions({
+      quoteMessage: 'threadMessageFeed/quoteMessage',
       deleteMessage: 'threadMessageFeed/deleteMessage',
       reportMessage: 'threadMessageFeed/reportMessage',
       editMessage: 'threadMessageFeed/editMessage'
