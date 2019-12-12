@@ -227,6 +227,9 @@ async function newChatMessageToTroupe(troupe, user, data) {
   );
 
   stats.event('new_chat', statMetadata);
+  if (chatMessage.parentId) {
+    stats.event('new_thread_chat', statMetadata);
+  }
 
   return chatMessage;
 }
