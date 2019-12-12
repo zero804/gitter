@@ -4,6 +4,7 @@ Developer facing:
 
  - Add `VuexApiRequest` `error` to the store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1683
  - Add permissions `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1679
+ - Avoid using `authenticate bearer` for the API, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1652
 
 
 # 20.11.0 - 2019-12-10
