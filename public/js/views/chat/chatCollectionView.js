@@ -259,28 +259,40 @@ module.exports = (function() {
       const parentId = chat.get('parentId');
       if (parentId) {
         if (context.useThreadedConversations()) {
+          debug(
+            `scrollToChat(${chat.id}) is in threaded conversation, scrolling to ${parentId} and opening thread`
+          );
           appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
             id: chat.id
           });
           this.scrollToChatId(parentId);
         } else {
+          debug(
+            `scrollToChat(${chat.id}) is in threaded conversation but threads are not enabled in this room, marking message as read`
+          );
           unreadItemsClient.markItemRead(chat.id);
         }
       } else {
         const view = this.children.findByModel(chat);
-        if (!view) return;
+        if (!view) {
+          debug(`scrollToChat(${chat.id}) does not have view in the collectionView, doing nothing`);
+          return;
+        }
+        debug(`scrollToChat(${chat.id}) to center of screen`);
         this.rollers.scrollToElement(view.el, { centre: true });
       }
     },
 
     scrollToChatId: function(id) {
       var model = this.collection.get(id);
+      debug(`scrollToChatId(${id}) ->`, model);
       if (model) return this.scrollToChat(model);
       var self = this;
       this.collection.ensureLoaded(
         id,
         function() {
           var model = self.collection.get(id);
+          debug(`scrollToChatId(${id}) -> ensureLoaded ->`, model);
           if (model) return this.scrollToChat(model);
         }.bind(this)
       );
