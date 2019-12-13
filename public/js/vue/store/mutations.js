@@ -26,9 +26,6 @@ export default {
   [types.SET_INITIAL_DATA](state, data) {
     Object.assign(state, data);
   },
-  [types.SET_TEST](state, testValue) {
-    state.test = testValue;
-  },
 
   [types.TOGGLE_DARK_THEME](state, newState) {
     state.darkTheme = newState;

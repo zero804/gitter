@@ -99,11 +99,6 @@ describe('actions', () => {
     );
   });
 
-  it('setTest', async () => {
-    const payload = 'newTestValue';
-    testAction(actions.setTest, payload, state, [{ type: types.SET_TEST, payload: payload }], []);
-  });
-
   describe('toggleDarkTheme', () => {
     it('sets the state', async () => {
       const payload = true;

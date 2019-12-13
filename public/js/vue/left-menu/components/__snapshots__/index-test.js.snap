@@ -66,14 +66,6 @@ exports[`left-menu index all state matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <h2
         class="room-list-title"
       >
@@ -156,14 +148,6 @@ exports[`left-menu index dark-theme matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <h2
         class="room-list-title"
       >
@@ -246,14 +230,6 @@ exports[`left-menu index mobile mobile matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <h2
         class="room-list-title"
       >
@@ -580,14 +556,6 @@ exports[`left-menu index people state matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <!---->
        
       <h2
@@ -670,14 +638,6 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <h2
         class="room-list-title"
       >
@@ -760,14 +720,6 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <h2
         class="room-list-title"
       >
@@ -850,14 +802,6 @@ exports[`left-menu index search state matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <div
-        class="hide"
-      >
-        
-        initialTestValue
-      
-      </div>
-       
       <search-body-stub />
     </section>
   </section>
