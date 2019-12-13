@@ -7,6 +7,7 @@ Developer facing:
  - Avoid using `authenticate bearer` for the API, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1652
  - Add stats for threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1689
  - Add some debug tracing for the unread banner and scrolling to chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1688
+ - Remove Vue test value, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1685
 
 
 # 20.11.0 - 2019-12-10
