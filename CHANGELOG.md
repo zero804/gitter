@@ -5,7 +5,6 @@ Developer facing:
  - Add `VuexApiRequest` `error` to the store, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1683
  - Add permissions `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1679
  - Avoid using `authenticate bearer` for the API, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1652
- - Add stats for threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1689
  - Add some debug tracing for the unread banner and scrolling to chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1688
  - Remove Vue test value, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1685
  - Add GitLab group admin discovery, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1681
@@ -29,6 +28,7 @@ Developer facing:
  - Add GitLab API backend for groups -> `/api/v1/user/:userId/orgs` endpoint, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1559
  - Use `ChatItemPolicy` to handle edit state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1673
  - Add notes about splitting from GitHub URI reservation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1680
+ - Add stats for threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1689
 
 
 # 20.10.0 - 2019-11-27
