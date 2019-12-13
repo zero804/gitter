@@ -169,3 +169,17 @@ Once you are sure the above is done, preform the following:
 2. `npm install`
 3. `make sprites`
 4. Commit your changes and release!
+
+## Miscellaneous tips & tricks
+
+- You can access the homepage even when signed in by using the `?redirect=no` query - https://gitter.im/?redirect=no (http://localhost:5000/?redirect=no)
+
+### Easily get your access token
+
+1. You can get your access token by running `troupeContext.accessToken` in the browser's DevTools console
+
+### Sign in with access token
+
+1. Open Gitter in a different browser using the `access_token` query parameter, `https://gitter.im/?access_token=<your token>`
+
+If you are using the desktop app, you can follow [these steps to manually authorize](https://gitlab.com/gitlab-org/gitter/desktop/#manually-sign-inauthorize)
