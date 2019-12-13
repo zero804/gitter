@@ -72,9 +72,9 @@ GitLabGroupService.prototype._getGroupResource = async function() {
   return this._groupsResource;
 };
 
-GitLabGroupService.prototype.getGroups = cacheFunction('getGroups', async function() {
+GitLabGroupService.prototype.getGroups = cacheFunction('getGroups', async function(params) {
   const resource = await this._getGroupResource();
-  const res = await resource.all();
+  const res = await resource.all(params);
 
   return standardizeResponse(res);
 });

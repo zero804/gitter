@@ -11,6 +11,7 @@ var SecurityDescriptorSchema = new Schema(
       enum: [
         null, // No association
         'ONE_TO_ONE',
+        'GL_GROUP', // Associated with GitLab group
         'GH_REPO', // Associated with a GitHub repo
         'GH_ORG', // Associated with a GitHub org
         'GH_USER', // Associated with a GitHub user
@@ -25,6 +26,7 @@ var SecurityDescriptorSchema = new Schema(
         'PUBLIC', // Anyone
         'INVITE', // Only invited users can join (private)
         'INVITE_OR_ADMIN', // Invited users or admins
+        'GL_GROUP_MEMBER', // for GL_GROUP, must be member of group
         'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
         'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER' // for GH_ORG, must be org member
@@ -35,6 +37,7 @@ var SecurityDescriptorSchema = new Schema(
       enum: [
         null, // For one-to-one rooms
         'MANUAL', // Only users in extraUserIds are admins
+        'GL_GROUP_MAINTAINER', // for GL_GROUP, must be maintainer in group
         'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER', // for GH_ORG, must be org member
         'GH_USER_SAME', // For GH_USER, user is same
