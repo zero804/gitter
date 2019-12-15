@@ -98,18 +98,6 @@
     "namespace": "resque-test",
     "queuePrefix": "test"
   },
-  "transloadit": {
-    "bucket": "",
-    "key": "",
-    "secret": "",
-    "template_id": "",
-    "template_image_id": "",
-    "template_avatar_id": "",
-    "cname": "",
-    "avatars": {
-      "bucket": ""
-    }
-  },
   "tokens": {
     "anonymousPassword": "abc123"
   }

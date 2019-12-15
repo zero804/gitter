@@ -13,7 +13,7 @@ var githubUserByUsername = require('./github-user-by-username');
 var gravatarByEmail = require('./gravatar-by-email');
 var gravatarByHash = require('./gravatar-by-hash');
 var twitterByIds = require('./twitter-by-ids');
-var groupById = require('./group-by-id');
+const groupAvatars = require('gitter-web-groups/lib/group-avatars');
 var userByUsername = require('./user-by-username');
 
 var DEFAULT_SIZE = 128;
@@ -96,10 +96,17 @@ router.get(
 router.get(
   '/group/i/:groupId',
   identifyRoute('api-private-avatar-group-id'),
-  sendAvatar(function(req, size) {
+  sendAvatar(async (req, size) => {
     var groupId = fixMongoIdQueryParam(req.params.groupId);
     if (!groupId) return null;
-    return groupById(groupId, size, false);
+
+    const avatarUrl = await groupAvatars.getAvatarUrlForGroupId(groupId, size);
+    if (!avatarUrl) return null;
+
+    return {
+      url: avatarUrl,
+      longTermCachable: false
+    };
   })
 );
 
@@ -109,11 +116,18 @@ router.get(
 router.get(
   '/group/iv/:version/:groupId',
   identifyRoute('api-private-avatar-group-id-versioned'),
-  sendAvatar(function(req, size) {
+  sendAvatar(async (req, size) => {
     // Ignore the version it's only used as a cache-buster
     var groupId = fixMongoIdQueryParam(req.params.groupId);
     if (!groupId) return null;
-    return groupById(groupId, size, true);
+
+    const avatarUrl = await groupAvatars.getAvatarUrlForGroupId(groupId, size);
+    if (!avatarUrl) return null;
+
+    return {
+      url: avatarUrl,
+      longTermCachable: true
+    };
   })
 );
 

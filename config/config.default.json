@@ -158,6 +158,11 @@
     "defaultQueryTimeout": 1000,
     "sniffOnStart": true
   },
+  "transloadit": {
+    "avatars": {
+      "bucket": "gitter-avatars-dev"
+    }
+  },
   "project-splitsville": {
     "enabled": false
   },
