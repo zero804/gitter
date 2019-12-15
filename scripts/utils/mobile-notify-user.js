@@ -1,17 +1,16 @@
 #!/usr/bin/env node
-/*jslint node: true */
 'use strict';
 
-var userService = require('gitter-web-users');
-var troupeService = require('gitter-web-rooms/lib/troupe-service');
-var chatService = require('gitter-web-chats');
-var pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
-var serializer = require('../../server/serializers/notification-serializer');
-var oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
-var shutdown = require('shutdown');
-var Promise = require('bluebird');
+const userService = require('gitter-web-users');
+const troupeService = require('gitter-web-rooms/lib/troupe-service');
+const chatService = require('gitter-web-chats');
+const pushNotificationGateway = require('../../server/gateways/push-notification-gateway');
+const serializer = require('../../server/serializers/notification-serializer');
+const oneToOneRoomService = require('gitter-web-rooms/lib/one-to-one-room-service');
+const shutdown = require('shutdown');
+const Promise = require('bluebird');
 
-var opts = require('yargs')
+const opts = require('yargs')
   .option('username', {
     description: 'username to look up e.g trevorah',
     required: true,
@@ -26,69 +25,54 @@ var opts = require('yargs')
   .help('help')
   .alias('help', 'h').argv;
 
-var promise;
-
-function findRoom(user, opts) {
+async function findRoom(user, opts) {
   if (opts.roomUri) {
     return troupeService.findByUri(opts.roomUri);
   }
 
   if (opts.otherUser) {
-    return userService.findByUsername(opts.otherUser).then(function(otherUser) {
-      return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
-    });
+    const otherUser = await userService.findByUsername(opts.otherUser);
+    return oneToOneRoomService.findOneToOneRoom(user._id, otherUser._id);
   }
 
   throw new Error('Require either other user or roomUri');
 }
 
-if (opts.username) {
-  promise = userService
-    .findByUsername(opts.username)
-    .bind({})
-    .then(function(user) {
-      this.user = user;
-      return findRoom(user, opts);
-    })
-    .then(function(room) {
-      this.room = room;
+async function exec() {
+  if (opts.username) {
+    const user = await userService.findByUsername(opts.username).bind({});
 
-      return chatService.findChatMessagesForTroupe(room._id, {
-        limit: 2
-      });
-    })
-    .then(function(chats) {
-      var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: this.user._id });
-      var chatStrategy = new serializer.ChatIdStrategy();
+    const room = await findRoom(user, opts);
 
-      return [
-        serializer.serializeObject(this.room._id, troupeStrategy),
-        serializer.serialize(
-          chats.map(function(x) {
-            return x._id;
-          }),
-          chatStrategy
-        )
-      ];
-    })
-    .then(function([room, chats]) {
-      var user = this.user;
-
-      return pushNotificationGateway.sendUserNotification('new_chat', user.id, {
-        chats: chats,
-        room: room,
-        hasMentions: false
-      });
+    const chats = await chatService.findChatMessagesForTroupe(room._id, {
+      limit: 2
     });
-} else {
-  promise = Promise.try(function() {
-    throw new Error('username or appleToken required');
-  });
+    var troupeStrategy = new serializer.TroupeIdStrategy({ recipientUserId: user._id });
+    var chatStrategy = new serializer.ChatIdStrategy();
+
+    const serializedRoom = await serializer.serializeObject(room._id, troupeStrategy);
+    const serializedChats = await serializer.serialize(
+      chats.map(function(x) {
+        return x._id;
+      }),
+      chatStrategy
+    );
+
+    return pushNotificationGateway.sendUserNotification('new_chat', user.id, {
+      chats: serializedChats,
+      room: serializedRoom,
+      hasMentions: false
+    });
+  } else {
+    return Promise.try(function() {
+      throw new Error('username or appleToken required');
+    });
+  }
 }
 
-promise
+exec()
   .catch(function(err) {
-    console.error(err.stack);
+    console.error(err, err.stack);
   })
   .finally(function() {
     shutdown.shutdownGracefully();
