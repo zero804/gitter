@@ -1,4 +1,4 @@
-# 20.12.0 - *upcoming*
+# 20.12.0 - 2019-12-17
 
 Developer facing:
 
