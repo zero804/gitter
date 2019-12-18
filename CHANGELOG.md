@@ -1,5 +1,8 @@
 # 20.13.0 - *upcoming*
 
+ - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695
+     - Thanks to [@basisbit](https://gitlab.com/basisbit) for the contribution
+
 Developer facing:
 
  - Android push notification updates for gcm to fcm, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1690
