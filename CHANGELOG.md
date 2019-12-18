@@ -1,3 +1,10 @@
+# 20.13.0 - *upcoming*
+
+Developer facing:
+
+ - Android push notification updates for gcm to fcm, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1690
+
+
 # 20.12.0 - 2019-12-17
 
 Developer facing:
