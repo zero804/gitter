@@ -26,6 +26,7 @@ body.logged-out .popover-footer-content {
 
 .b-popover {
     display: block; // bootstrap-vue doesn't use `.show`. If the DOM element exists we should show it.
+    transition: none; // we want the popover to hide instantly.
 }
 
 .popover-body {

@@ -1,3 +1,23 @@
+# 20.11.0 - 2019-12-10
+
+ - Restore social metadata to rooms/chats, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1665
+ - Fix welcome message not showing when joining a room, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1671
+ - Improve action popover implementation - hiding/showing + styles, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1669
+ - Allow editing and deleting messages in Sidecar, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1674
+ - Fix archive not showing messages in the current day, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1675
+ - Remove community creation invite step, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1677
+ - Include room permissions with the Vuex seed data (fix delete message conetxt menu), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1682
+ - Edit thread message UI, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1676
+
+Developer facing:
+
+ - Add scripts to aggregate Gitter community data into reports (stats), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1668
+ - Update message API endpoint cleanup, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1670
+ - Add GitLab API backend for groups -> `/api/v1/user/:userId/orgs` endpoint, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1559
+ - Use `ChatItemPolicy` to handle edit state, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1673
+ - Add notes about splitting from GitHub URI reservation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1680
+
+
 # 20.10.0 - 2019-11-27
 
  - Fix stuck unread notification(unable to dismiss) for thread message in desktop app (add `IntersectionObserver` polyfill), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1664
@@ -12,6 +32,7 @@ Developer facing:
      - Thanks to [@dtogias](https://gitlab.com/dtogias) for the contribution
  - Remove `overrideUnreadTo` in chat serialization, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1661
  - Remove `scripts/utils/trim-one-to-one-rooms.js` in favor of `scripts/utils/clean-up-users-old-one-to-one.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1666
+
 
 
 # 20.9.1 - 2019-11-26

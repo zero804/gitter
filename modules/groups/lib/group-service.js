@@ -90,7 +90,7 @@ function upsertGroup(user, groupInfo, securityDescriptor) {
     });
 }
 
-function checkGroupUri(user, uri, options) {
+async function checkGroupUri(user, uri, options) {
   assert(user, 'user required');
   assert(uri, 'uri required');
 
@@ -101,31 +101,35 @@ function checkGroupUri(user, uri, options) {
   var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
 
   // run the same validation that gets used by the group uri checker service
-  return checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo).then(function(info) {
-    if (!info.allowCreate) {
-      // the frontend code should have prevented you from getting here
-      /*
+  const info = await checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo);
+
+  if (!info.allowCreate) {
+    // the frontend code should have prevented you from getting here
+    /*
         NOTE: 409 because an invalid group uri would already have raised 400,
         so the reason why you can't create the group is either because a group
         or user already took that uri or because another github org or user
         took that uri. This means it also mirrors the check-group-uri endpount.
         */
-      throw new StatusError(409, 'User is not allowed to create a group for this URI.');
-    }
+    throw new StatusError(409, 'User is not allowed to create a group for this URI.');
+  }
 
-    if (info.type === 'GH_ORG') {
-      if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
-        // the frontend code should have prevented you from getting here
-        throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
-      }
+  // TODO: Do we need to worry about GL_GROUP?
+  // My guess is not since this is the URL reservtation type of stuff which
+  // we probably need to get rid of
+  // TODO: Remove after we split from GitHub URIs (#github-uri-split)
+  if (info.type === 'GH_ORG') {
+    if (type !== 'GH_ORG' && type !== 'GH_GUESS') {
+      // the frontend code should have prevented you from getting here
+      throw new StatusError(400, 'Group must be type GH_ORG: ' + type);
     }
-  });
+  }
 }
 
 /**
  * @private
  */
-function ensureAccessAndFetchGroupInfo(user, options) {
+async function ensureAccessAndFetchGroupInfo(user, options) {
   options = options || {};
 
   var name = options.name;
@@ -143,31 +147,28 @@ function ensureAccessAndFetchGroupInfo(user, options) {
     throw new StatusError(400, 'Invalid group security: ' + security);
   }
 
-  return checkGroupUri(user, uri, options).then(function() {
-    return ensureAccessAndFetchDescriptor(user, options).then(function(securityDescriptor) {
-      return [
-        {
-          name: name,
-          uri: uri,
-          useHomeUriSuffix: options.useHomeUriSuffix
-        },
-        securityDescriptor
-      ];
-    });
-  });
+  // This will throw if there are any problems
+  await checkGroupUri(user, uri, options);
+
+  const securityDescriptor = await ensureAccessAndFetchDescriptor(user, options);
+
+  return [
+    {
+      name: name,
+      uri: uri,
+      useHomeUriSuffix: options.useHomeUriSuffix
+    },
+    securityDescriptor
+  ];
 }
 
 /**
  * Create a new group
  */
-function createGroup(user, options) {
-  return ensureAccessAndFetchGroupInfo(user, options).spread(function(
-    groupInfo,
-    securityDescriptor
-  ) {
-    debug('Upserting %j with securityDescriptor=%j', groupInfo, securityDescriptor);
-    return upsertGroup(user, groupInfo, securityDescriptor);
-  });
+async function createGroup(user, options) {
+  const [groupInfo, securityDescriptor] = await ensureAccessAndFetchGroupInfo(user, options);
+  debug('Upserting %j with securityDescriptor=%j', groupInfo, securityDescriptor);
+  return upsertGroup(user, groupInfo, securityDescriptor);
 }
 
 /**

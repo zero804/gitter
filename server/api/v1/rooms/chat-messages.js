@@ -107,22 +107,29 @@ module.exports = {
     });
   },
 
-  update: function(req) {
-    return Promise.all([loadTroupeFromParam(req), chatService.findById(req.params.chatMessageId)])
-      .spread(function(troupe, chatMessage) {
-        if (!chatMessage) throw new StatusError(404);
-        if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId))
-          throw new StatusError(404);
+  update: async function(req) {
+    const [troupe, chatMessage] = await Promise.all([
+      loadTroupeFromParam(req),
+      chatService.findById(req.params.chatMessageId)
+    ]);
 
-        return chatService.updateChatMessage(troupe, chatMessage, req.user, req.body.text);
-      })
-      .then(function(chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({
-          currentUserId: req.user.id,
-          troupeId: req.params.troupeId
-        });
-        return restSerializer.serializeObject(chatMessage, strategy);
-      });
+    if (!chatMessage) throw new StatusError(404);
+    if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId))
+      throw new StatusError(404);
+    if (!mongoUtils.objectIDsEqual(chatMessage.fromUserId, req.user.id)) throw new StatusError(403);
+
+    const updatedMessage = await chatService.updateChatMessage(
+      troupe,
+      chatMessage,
+      req.user,
+      req.body.text
+    );
+
+    var strategy = new restSerializer.ChatStrategy({
+      currentUserId: req.user.id,
+      troupeId: req.params.troupeId
+    });
+    return restSerializer.serializeObject(updatedMessage, strategy);
   },
 
   destroy: function(req, res) {

@@ -18,6 +18,7 @@ describe('thread message feed store', () => {
     beforeEach(() => {
       appEvents.trigger.mockReset();
       apiClient.room.get.mockReset();
+      apiClient.room.put.mockReset();
     });
 
     it('open shows TMF, clears state, hides right toolbar, sets parent id ', async () => {
@@ -130,6 +131,147 @@ describe('thread message feed store', () => {
       );
 
       expect(apiClient.room.delete).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}`);
+    });
+
+    it('reportMessage', async () => {
+      apiClient.room.post.mockReset();
+
+      const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
+      apiClient.room.post.mockResolvedValue(null);
+
+      await testAction(actions.reportMessage, storedMessage);
+
+      expect(apiClient.room.post).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}/report`);
+    });
+
+    describe('quoteMessage', () => {
+      const storedMessage = createSerializedMessageFixture({
+        id: '5d147ea84dad9dfbc522317a',
+        text: 'hello\nline2'
+      });
+
+      it('puts quote at the draft beginning if the message draft is empty', async () => {
+        await testAction(
+          actions.quoteMessage,
+          storedMessage,
+          { draftMessage: '' },
+          [{ type: types.UPDATE_DRAFT_MESSAGE, payload: '> hello\n> line2\n\n' }],
+          []
+        );
+      });
+
+      it('separates quote from existing message draft by empty line', async () => {
+        const storedMessage = createSerializedMessageFixture({
+          id: '5d147ea84dad9dfbc522317a',
+          text: 'hello\nline2'
+        });
+        await testAction(
+          actions.quoteMessage,
+          storedMessage,
+          { draftMessage: 'original draft' },
+          [{ type: types.UPDATE_DRAFT_MESSAGE, payload: 'original draft\n> hello\n> line2\n\n' }],
+          []
+        );
+      });
+    });
+
+    describe('updateMessage', () => {
+      it('success', async () => {
+        const updatedApiResponseMessage = createSerializedMessageFixture({ id: '5d111' });
+
+        apiClient.room.put.mockResolvedValue(updatedApiResponseMessage);
+
+        await testAction(
+          actions.updateMessage,
+          null,
+          { messageEditState: { id: '5d111', text: 'updated text' } },
+          [
+            { type: 'REQUEST_UPDATE_MESSAGE' },
+            { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [updatedApiResponseMessage] },
+            { type: 'RECEIVE_UPDATE_MESSAGE_SUCCESS' }
+          ],
+          [{ type: 'cancelEdit' }]
+        );
+
+        expect(apiClient.room.put).toHaveBeenCalledWith(`/chatMessages/5d111`, {
+          text: 'updated text'
+        });
+      });
+      it('failure', async () => {
+        const originalMessage = createSerializedMessageFixture({ id: '5d111' });
+
+        apiClient.room.put.mockRejectedValue(null);
+
+        await testAction(
+          actions.updateMessage,
+          null,
+          {
+            messageEditState: { id: '5d111', text: 'updated text' },
+            messageMap: { '5d111': originalMessage }
+          },
+          [
+            { type: 'REQUEST_UPDATE_MESSAGE' },
+            {
+              type: rootTypes.ADD_TO_MESSAGE_MAP,
+              payload: [{ ...originalMessage, text: 'updated text', html: undefined, error: true }]
+            },
+            { type: 'RECEIVE_UPDATE_MESSAGE_ERROR' }
+          ],
+          [{ type: 'cancelEdit' }]
+        );
+
+        expect(apiClient.room.put).toHaveBeenCalledWith(`/chatMessages/5d111`, {
+          text: 'updated text'
+        });
+      });
+    });
+
+    it('editMessage', async () => {
+      const testMessage = createSerializedMessageFixture({ id: '5dabc', text: 'hello' });
+      await testAction(actions.editMessage, testMessage, {}, [
+        { type: types.UPDATE_MESSAGE_EDIT_STATE, payload: { id: '5dabc', text: 'hello' } }
+      ]);
+    });
+
+    it('cancelEdit', async () => {
+      await testAction(actions.cancelEdit, null, {}, [
+        {
+          type: types.UPDATE_MESSAGE_EDIT_STATE,
+          payload: { id: null, text: null, loading: false, error: false, results: [] }
+        }
+      ]);
+    });
+
+    it('updateEditedText', async () => {
+      await testAction(actions.updateEditedText, 'edited text', {}, [
+        { type: types.UPDATE_MESSAGE_EDIT_STATE, payload: { text: 'edited text' } }
+      ]);
+    });
+
+    it('editLastMessage', async () => {
+      const createTestMessage = (id, userId, sentDateISOString) =>
+        createSerializedMessageFixture({
+          id,
+          fromUser: { id: userId },
+          sent: sentDateISOString
+        });
+      const state = {
+        user: { _id: 'currentUserId' },
+        childMessages: [
+          createTestMessage('5d111', 'currentUserId', '2018-03-11:00:00:00.000Z'),
+          //this is the latest message (latest as in order of `childMessages` array) that can be edited by currentUser
+          createTestMessage('5d222', 'currentUserId', new Date().toISOString()),
+          createTestMessage('5d333', 'currentUserId', '2018-03-11:00:00:00.000Z'),
+          createTestMessage('5d444', 'otherUserId', new Date().toISOString())
+        ]
+      };
+      await testAction(
+        actions.editLastMessage,
+        null,
+        state,
+        [],
+        [{ type: 'editMessage', payload: state.childMessages[1] }]
+      );
     });
 
     describe('fetchChildMessages', () => {
@@ -380,7 +522,19 @@ describe('thread message feed store', () => {
         atBottom: true
       };
       mutations[types.RESET_THREAD_STATE](state);
-      expect(state).toEqual({ parentId: null, draftMessage: '', atTop: false, atBottom: false });
+      expect(state).toEqual({
+        parentId: null,
+        draftMessage: '',
+        atTop: false,
+        atBottom: false,
+        messageEditState: { id: null, text: null, error: false, loading: false, results: [] }
+      });
+    });
+
+    it('SET_MESSAGE_EDIT_STATE', () => {
+      const state = {};
+      mutations[types.UPDATE_MESSAGE_EDIT_STATE](state, { id: '5d123', text: 'hello' });
+      expect(state.messageEditState).toEqual({ id: '5d123', text: 'hello' });
     });
 
     it('includes childMessageVuexRequest', () => {

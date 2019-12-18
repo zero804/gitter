@@ -20,19 +20,50 @@ export default {
   computed: {
     chatItemPolicy: function() {
       return new ChatItemPolicy(this.message, {
-        isEmbedded: context().embedded,
         currentUserId: context.getUserId(),
         isTroupeAdmin: context.isTroupeAdmin()
       });
     },
     chatActionsId: function() {
       return `chat-actions-${this.message.id}`;
+    },
+    actionItems: function() {
+      const { message, chatItemPolicy } = this;
+      return [
+        {
+          label: 'Quote',
+          slug: 'quote',
+          enabled: !!message.id, // is persisted
+          action: () => this.quoteMessage(message)
+        },
+        {
+          label: 'Edit',
+          slug: 'edit',
+          enabled: chatItemPolicy.canEdit(),
+          action: () => this.editMessage(message)
+        },
+        {
+          label: 'Delete',
+          slug: 'delete',
+          enabled: chatItemPolicy.canDelete(),
+          action: () => this.deleteMessage(message)
+        },
+        {
+          label: 'Report',
+          slug: 'report',
+          enabled: chatItemPolicy.canReport(),
+          action: () => this.reportMessage(message)
+        }
+      ];
     }
   },
 
   methods: {
     ...mapActions({
-      deleteMessage: 'threadMessageFeed/deleteMessage'
+      quoteMessage: 'threadMessageFeed/quoteMessage',
+      deleteMessage: 'threadMessageFeed/deleteMessage',
+      reportMessage: 'threadMessageFeed/reportMessage',
+      editMessage: 'threadMessageFeed/editMessage'
     })
   }
 };
@@ -42,25 +73,25 @@ export default {
   <div class="chat-item__actions">
     <b-popover
       :target="chatActionsId"
-      :container="chatActionsId"
-      placement="left"
-      triggers="focus"
+      triggers="click blur"
       delay="0"
+      placement="left"
       title=""
+      custom-class="chat-item-actions-popover"
     >
-      <div class="popover-item__action-disabled">
-        Edit
+      <div v-for="actionItem in actionItems" :key="actionItem.slug">
+        <button
+          v-if="actionItem.enabled"
+          :class="`popover-item__action js-chat-item-${actionItem.slug}-action`"
+          :title="`${actionItem.label} this message`"
+          @click="actionItem.action()"
+        >
+          {{ actionItem.label }}
+        </button>
+        <div v-else class="popover-item__action-disabled">
+          {{ actionItem.label }}
+        </div>
       </div>
-
-      <button
-        v-if="chatItemPolicy.canDelete()"
-        class="popover-item__action"
-        title="Delete this message"
-        @click.stop.prevent="deleteMessage(message)"
-      >
-        Delete
-      </button>
-      <div v-else class="popover-item__action-disabled">Delete</div>
     </b-popover>
     <button
       :id="chatActionsId"
@@ -74,6 +105,8 @@ export default {
 </template>
 
 <style lang="less" scoped>
+@import (reference) 'colors';
+
 .remove-button-styles {
   border: none;
   background: inherit;
@@ -87,8 +120,14 @@ export default {
 .chat-item-actions-button {
   .remove-button-styles();
   padding: 0px;
+  &:focus {
+    .chat-item__icon {
+      visibility: visible;
+      color: @blue;
+    }
+  }
 }
-.chat-item__actions::v-deep .popover-body {
+.chat-item-actions-popover::v-deep .popover-body {
   width: 70px;
 }
 .popover-item__action {

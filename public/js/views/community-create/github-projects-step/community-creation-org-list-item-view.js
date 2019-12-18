@@ -1,7 +1,6 @@
 'use strict';
 
 var Marionette = require('backbone.marionette');
-var urlJoin = require('url-join');
 var toggleClass = require('../../../utils/toggle-class');
 var resolveRoomAvatarSrcSet = require('gitter-web-shared/avatars/resolve-room-avatar-srcset');
 
@@ -24,7 +23,6 @@ var CommunityCreationOrgListItemView = Marionette.ItemView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
-    data.absoluteUri = urlJoin('https://github.com', data.name);
     data.avatarSrcset = resolveRoomAvatarSrcSet({ uri: data.name }, ORG_LIST_AVATAR_SIZE);
 
     return data;

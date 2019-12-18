@@ -2,6 +2,7 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
+const stats = env.stats;
 var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
 var getMaxTagLength = require('gitter-web-shared/validation/validate-tag').getMaxTagLength;
@@ -317,6 +318,17 @@ RoomWithPolicyService.prototype.updateRoomMeta = secureMethod([allowAdmin], asyn
       'threadedConversations',
       resultantThreadedConversations
     );
+
+    const statMetadata = {
+      userId: this.user._id,
+      groupId: this.room.groupId,
+      roomId: this.room.id
+    };
+    if (threadedConversations === true) {
+      stats.event('threaded_conversations_enabled', statMetadata);
+    } else {
+      stats.event('threaded_conversations_disabled', statMetadata);
+    }
 
     result.threadedConversations = resultantThreadedConversations;
   }

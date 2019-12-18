@@ -3,6 +3,7 @@
 var env = require('gitter-web-env');
 var nconf = env.config;
 var avatars = require('gitter-web-avatars');
+const truncateText = require('gitter-web-shared/truncate-text');
 
 var facebookAppId = nconf.get('facebook:appId');
 
@@ -21,8 +22,8 @@ function getMetadata(options) {
     'fb:app_id': facebookAppId,
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
-    'twitter:title': title,
-    'twitter:description': description,
+    'twitter:title': truncateText(title, 70),
+    'twitter:description': truncateText(description, 200),
     'twitter:image': imageUrl
   };
 }
@@ -47,8 +48,8 @@ function getMetadataForChatPermalink(options) {
     'fb:app_id': facebookAppId,
     'twitter:card': 'summary',
     'twitter:site': '@gitchat',
-    'twitter:title': title,
-    'twitter:description': description,
+    'twitter:title': truncateText(title, 70),
+    'twitter:description': truncateText(description, 200),
     'twitter:image': imageUrl
   };
 }

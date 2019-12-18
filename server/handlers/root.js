@@ -12,7 +12,7 @@ const ensureLoggedIn = require('../web/middlewares/ensure-logged-in');
 const preventClickjackingMiddleware = require('../web/middlewares/prevent-clickjacking');
 const langs = require('langs');
 const loginUtils = require('../web/login-utils');
-const social = require('./social-metadata');
+const socialMetadataGenerator = require('./social-metadata-generator');
 const fonts = require('../web/fonts');
 const contextGenerator = require('../web/context-generator');
 const generateAdminChatMessageReportSnapshot = require('./snapshots/admin-chat-message-report-snapshot');
@@ -72,7 +72,7 @@ router.get(
       translated: translatedBy,
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies),
-      socialMetadata: social.getMetadata()
+      socialMetadata: socialMetadataGenerator.getMetadata()
     });
   }
 );

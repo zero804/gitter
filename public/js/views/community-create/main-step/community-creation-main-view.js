@@ -82,13 +82,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function() {
     _super.initialize.apply(this, arguments);
 
-    var user = context.getUser();
-    this.hasGitHubProvider =
-      user &&
-      user.providers &&
-      user.providers.some(function(provider) {
-        return provider === 'github';
-      });
+    this.hasGitHubProvider = this.hasProvider('github');
+    this.hasGitlabProvider = this.hasProvider('gitlab');
 
     this.listenTo(
       this.communityCreateModel,
@@ -106,6 +101,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   serializeData: function() {
     var data = this.model.toJSON();
+    data.hasGitlabProvider = this.hasGitlabProvider;
     data.hasGitHubProvider = this.hasGitHubProvider;
 
     return data;
@@ -113,7 +109,7 @@ module.exports = CommunityCreateBaseStepView.extend({
 
   nextStep: function() {
     if (this.model.isValid()) {
-      return stepConstants.INVITE;
+      return stepConstants.OVERVIEW;
     }
   },
 
@@ -297,6 +293,17 @@ module.exports = CommunityCreateBaseStepView.extend({
         status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED ||
         status === slugAvailabilityStatusConstants.UNAVAILABLE ||
         status === slugAvailabilityStatusConstants.INVALID
+    );
+  },
+
+  hasProvider: provider => {
+    const user = context.getUser();
+
+    return (
+      user &&
+      (user.providers || []).some(p => {
+        return p === provider;
+      })
     );
   }
 });

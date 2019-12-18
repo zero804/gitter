@@ -1,5 +1,70 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`thread-message-feed chat-item editing matches snapshot 1`] = `
+<intersect-stub>
+  <div
+    class="chat-item burstStart deleted"
+  >
+    <div
+      class="chat-item__container"
+    >
+      <div
+        class="chat-item__aside"
+      >
+        <div
+          class="chat-item__avatar"
+        >
+          <avatar-stub
+            size="s"
+            user="[object Object]"
+          />
+        </div>
+      </div>
+       
+      <chat-item-actions-stub
+        message="[object Object]"
+      />
+       
+      <div
+        class="chat-item__content"
+      >
+        <div
+          class="chat-item__details"
+        >
+          <div
+            class="chat-item__from"
+          >
+            Tomas Vik
+          </div>
+           
+          <div
+            class="chat-item__username"
+          >
+            @viktomas_gitlab
+          </div>
+           
+          <a
+            class="chat-item__time"
+            href="/abc/def?at=5d147ea84dad9dfbc522317a"
+            title="May 18, 2016 3:48 AM"
+          >
+            May 18 2016 03:48
+          </a>
+           
+          <loading-spinner-stub
+            class="message-loading-icon"
+          />
+        </div>
+         
+        <textarea
+          class="trpChatInput"
+        />
+      </div>
+    </div>
+  </div>
+</intersect-stub>
+`;
+
 exports[`thread-message-feed chat-item snapshot component flags showItemActions 1`] = `
 <intersect-stub
   showitemactions="true"

@@ -32,7 +32,9 @@ const markdownMajorVersion = require('gitter-markdown-processor').version.split(
 
 var useHints = true;
 
-var MAX_CHAT_MESSAGE_LENGTH = 4096;
+const validateChatMessageLength = m => {
+  if (m.length > 4096) throw new StatusError(400, 'Message exceeds maximum size');
+};
 
 var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 
@@ -147,8 +149,7 @@ async function newChatMessageToTroupe(troupe, user, data) {
 
   /* You have to have text */
   if (!data.text) throw new StatusError(400, 'Text is required');
-  if (data.text.length > MAX_CHAT_MESSAGE_LENGTH)
-    throw new StatusError(400, 'Message exceeds maximum size');
+  validateChatMessageLength(data.text);
   if (data.parentId && !mongoUtils.isLikeObjectId(data.parentId))
     throw new StatusError(400, 'parentId must be a valid message ID');
 
@@ -226,6 +227,9 @@ async function newChatMessageToTroupe(troupe, user, data) {
   );
 
   stats.event('new_chat', statMetadata);
+  if (chatMessage.parentId) {
+    stats.event('new_thread_chat', statMetadata);
+  }
 
   return chatMessage;
 }
@@ -262,72 +266,51 @@ function getRecentPublicChats() {
 /**
  * NB: It is the callers responsibility to ensure that the user has access to the room!
  */
-function updateChatMessage(troupe, chatMessage, user, newText, callback) {
-  return Promise.try(function() {
-    newText = newText || '';
+async function updateChatMessage(troupe, chatMessage, user, newText = '') {
+  validateChatMessageLength(newText);
 
-    if (newText.length > MAX_CHAT_MESSAGE_LENGTH) {
-      throw new StatusError(400, 'Message exceeds maximum size');
-    }
+  const age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
+  if (age > MAX_CHAT_EDIT_AGE_SECONDS) {
+    throw new StatusError(400, 'You can no longer edit this message');
+  }
 
-    var age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
-    if (age > MAX_CHAT_EDIT_AGE_SECONDS) {
-      throw new StatusError(400, 'You can no longer edit this message');
-    }
+  chatMessage.text = newText;
+  const parsedMessage = await processText(newText);
+  const mentions = await resolveMentions(troupe, user, parsedMessage);
 
-    if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, troupe.id)) {
-      throw new StatusError(403, 'Permission to edit this chat message is denied.');
-    }
+  chatMessage.html = parsedMessage.html;
+  chatMessage.editedAt = new Date();
+  chatMessage.lang = parsedMessage.lang;
 
-    if (!mongoUtils.objectIDsEqual(chatMessage.fromUserId, user.id)) {
-      throw new StatusError(403, 'Permission to edit this chat message is denied.');
-    }
+  // Metadata
+  chatMessage.urls = parsedMessage.urls;
+  const originalMentions = chatMessage.mentions;
+  chatMessage.mentions = mentions;
+  chatMessage.issues = parsedMessage.issues;
+  chatMessage._md = parsedMessage.markdownProcessingFailed
+    ? -CURRENT_META_DATA_VERSION
+    : CURRENT_META_DATA_VERSION;
 
-    chatMessage.text = newText;
-    return processText(newText);
-  })
-    .then(function(parsedMessage) {
-      return Promise.all([parsedMessage, resolveMentions(troupe, user, parsedMessage)]);
-    })
-    .spread(function(parsedMessage, mentions) {
-      chatMessage.html = parsedMessage.html;
-      chatMessage.editedAt = new Date();
-      chatMessage.lang = parsedMessage.lang;
+  await chatMessage.save();
 
-      // Metadata
-      chatMessage.urls = parsedMessage.urls;
-      var originalMentions = chatMessage.mentions;
-      chatMessage.mentions = mentions;
-      chatMessage.issues = parsedMessage.issues;
-      chatMessage._md = parsedMessage.markdownProcessingFailed
-        ? -CURRENT_META_DATA_VERSION
-        : CURRENT_META_DATA_VERSION;
+  // Async add unread items
+  unreadItemService
+    .updateChatUnreadItems(user.id, troupe, chatMessage, originalMentions)
+    .catch(function(err) {
+      errorReporter(
+        err,
+        { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage },
+        { module: 'chat-service' }
+      );
+    });
 
-      return chatMessage
-        .save()
-        .then(function() {
-          // Async add unread items
-          unreadItemService
-            .updateChatUnreadItems(user.id, troupe, chatMessage, originalMentions)
-            .catch(function(err) {
-              errorReporter(
-                err,
-                { operation: 'unreadItemService.updateChatUnreadItems', chat: chatMessage },
-                { module: 'chat-service' }
-              );
-            });
+  stats.event('edit_chat', {
+    userId: user.id,
+    troupeId: troupe.id,
+    username: user.username
+  });
 
-          stats.event('edit_chat', {
-            userId: user.id,
-            troupeId: troupe.id,
-            username: user.username
-          });
-
-          return null;
-        })
-        .thenReturn(chatMessage);
-    })
-    .nodeify(callback);
+  return chatMessage;
 }
 
 function findById(id, callback) {

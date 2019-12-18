@@ -47,7 +47,7 @@ function wrapFunction(cache, moduleName, func, funcName, getInstanceIdFunc) {
         cache.lookup(
           key,
           function(cb) {
-            func.apply(self, args).nodeify(cb);
+            Promise.resolve(func.apply(self, args)).nodeify(cb);
           },
           function(err, result) {
             if (err) return reject(err);

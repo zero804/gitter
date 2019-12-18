@@ -6,7 +6,6 @@ var appEvents = require('../../../utils/appevents');
 var stepConstants = require('../step-constants');
 var template = require('./community-creation-overview-view.hbs');
 var CommunityCreateBaseStepView = require('../shared/community-creation-base-step-view');
-var InviteListView = require('../shared/community-creation-people-list-view');
 var apiClient = require('../../../components/api-client');
 
 require('@gitterhq/styleguide/css/components/headings.css');
@@ -18,25 +17,6 @@ module.exports = CommunityCreateBaseStepView.extend({
   template: template,
 
   className: 'community-create-step-wrapper community-create-overview-step-wrapper',
-
-  behaviors: {
-    Isomorphic: {
-      inviteListView: {
-        el: '.community-create-overview-invite-list-root',
-        init: 'initInviteListView'
-      }
-    }
-  },
-
-  initInviteListView: function(optionsForRegion) {
-    this.inviteListView = new InviteListView(
-      optionsForRegion({
-        collection: this.communityCreateModel.invites,
-        communityCreateModel: this.communityCreateModel
-      })
-    );
-    return this.inviteListView;
-  },
 
   ui: _.extend({}, _super.ui, {
     communityNameHeading: '.community-create-overview-community-name',
@@ -87,12 +67,7 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   prevStep: function() {
-    if (this.communityCreateModel.hasInvitesRequiringEmailEntry()) {
-      // Only go back to confirmation if there was trouble initially
-      return stepConstants.INVITE_CONFIRMATION;
-    } else {
-      return stepConstants.INVITE;
-    }
+    return stepConstants.MAIN;
   },
 
   onCommunityDataChange: function() {

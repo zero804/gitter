@@ -38,6 +38,7 @@ function serializeTroupesForUser(userId, callback) {
     .spread(function(allTroupeIds, nonMemberTroupeIds) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
+        includePermissions: true,
         // This will save the troupeId strategy
         // from having to do a second query
         nonMemberTroupeIds: nonMemberTroupeIds,
@@ -147,15 +148,24 @@ function serializeEventsForTroupe(troupeId, userId, callback) {
     .nodeify(callback);
 }
 
-function serializeOrgsForUser(user) {
-  return orgService.getOrgsForUser(user).then(function(orgs) {
-    // TODO: not all organisations are going to be github ones in future!
-    var strategy = new restSerializer.GithubOrgStrategy({
-      currentUserId: user && user._id
-    });
+async function serializeOrgsForUser(user) {
+  const orgs = await orgService.getOrgsForUser(user);
 
-    return restSerializer.serialize(orgs, strategy);
+  const strategyMap = {
+    gitlab: new restSerializer.GitlabGroupStrategy(),
+    github: new restSerializer.GithubOrgStrategy({
+      currentUserId: user && user._id
+    })
+  };
+
+  const serializeOrgPromises = orgs.map(org => {
+    const strategy = strategyMap[org.backend];
+
+    return restSerializer.serializeObject(org, strategy);
   });
+
+  const arrays = await Promise.all(serializeOrgPromises);
+  return Array.prototype.concat(...arrays);
 }
 
 function serializeOrgsForUserId(userId, options) {
