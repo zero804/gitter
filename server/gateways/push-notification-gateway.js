@@ -72,46 +72,31 @@ function sendNotificationToDevice(notificationType, notificationDetails, device)
     });
 }
 
-function sendUserNotification(notificationType, userId, options) {
-  return pushNotificationService
-    .findEnabledDevicesForUsers([userId])
-    .bind({
-      devices: null,
-      options: options,
-      notificationType: notificationType
-    })
-    .then(function(devices) {
-      if (!devices.length) return;
-      this.devices = devices;
+async function sendUserNotification(notificationType, userId, options) {
+  const devices = await pushNotificationService.findEnabledDevicesForUsers([userId]);
 
-      var hasDevicesSupportingBadges = _.some(devices, function(device) {
-        return device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV';
-      });
+  if (!devices || !devices.length) return;
 
-      // Skip badge calculation if we don't need it....
-      if (!hasDevicesSupportingBadges) return null;
+  const hasDevicesSupportingBadges = devices.some(device => {
+    return device.deviceType === 'APPLE' || device.deviceType === 'APPLE-DEV';
+  });
 
-      return unreadItemService.getBadgeCountsForUserIds([userId]);
-    })
-    .then(function(counts) {
-      var devices = this.devices;
-      if (!devices || !devices.length) return;
-      var options = this.options;
-      var notificationType = this.notificationType;
+  let counts = null;
+  // Skip badge calculation if we don't need it....
+  if (hasDevicesSupportingBadges) {
+    counts = await unreadItemService.getBadgeCountsForUserIds([userId]);
+  }
 
-      var badgeCount = (counts && counts[userId]) || 0;
+  const badgeCount = (counts && counts[userId]) || 0;
 
-      var notificationDetails = _.extend(
-        {
-          badgeCount: badgeCount
-        },
-        options
-      );
+  const notificationDetails = {
+    badgeCount: badgeCount,
+    ...options
+  };
 
-      return Promise.map(devices, function(device) {
-        return sendNotificationToDevice(notificationType, notificationDetails, device);
-      });
-    });
+  return Promise.map(devices, device => {
+    return sendNotificationToDevice(notificationType, notificationDetails, device);
+  });
 }
 
 function sendUsersBadgeUpdates(userIds) {
