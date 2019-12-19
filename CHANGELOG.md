@@ -2,6 +2,7 @@
 
  - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695
      - Thanks to [@basisbit](https://gitlab.com/basisbit) for the contribution
+ - Variable thread message feed width, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1696
 
 Developer facing:
 
