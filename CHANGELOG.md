@@ -7,6 +7,7 @@ Developer facing:
 
  - Android push notification updates for gcm to fcm, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1690
  - Add `GL_GROUP` to admin filter, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1691
+ - Add `GL_GROUP` group avatars (auto-update), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1692
 
 
 # 20.12.0 - 2019-12-17
