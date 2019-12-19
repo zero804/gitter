@@ -17,6 +17,14 @@ describe('admin-filter', function() {
         user1: {},
         user2: {},
         user3: {},
+
+        userGitlab1: {},
+        identityGitlab1: {
+          user: 'userGitlab1',
+          provider: 'gitlab',
+          providerKey: fixtureLoader.generateGithubId()
+        },
+
         group1: {
           securityDescriptor: {
             type: 'GH_ORG',
@@ -42,6 +50,16 @@ describe('admin-filter', function() {
             type: 'GH_REPO',
             members: 'PUBLIC',
             admins: 'GH_REPO_PUSH',
+            public: true,
+            linkPath: URI2,
+            externalId: null
+          }
+        },
+        groupGitlab1: {
+          securityDescriptor: {
+            type: 'GL_GROUP',
+            members: 'PUBLIC',
+            admins: 'GL_GROUP_MAINTAINER',
             public: true,
             linkPath: URI2,
             externalId: null
@@ -114,7 +132,7 @@ describe('admin-filter', function() {
           });
       });
 
-      it('should work with non-backed security descriptors', function() {
+      it('recognizes user in sd.extraAdmins as non-backed(null) admin', function() {
         var userId1 = fixture.user1._id;
         var userId2 = fixture.user2._id;
         var userId3 = fixture.user3._id;
@@ -124,7 +142,7 @@ describe('admin-filter', function() {
         });
       });
 
-      it('should work with GH_REPO security descriptors', function() {
+      it('recognizes user with GH_REPO_PUSH access as an GH_REPO admin', function() {
         var userId1 = fixture.user1._id;
         var userId2 = fixture.user2._id;
         var userId3 = fixture.user3._id;
@@ -139,6 +157,25 @@ describe('admin-filter', function() {
           })
           .then(function(filtered) {
             assert.deepEqual(filtered.map(String), [userId2].map(String));
+          });
+      });
+
+      it('recognizes user with GL_GROUP_MAINTAINER access as an GL_GROUP admin', () => {
+        const userId1 = fixture.user1._id;
+        const userId2 = fixture.user2._id;
+        const userId3 = fixture.user3._id;
+        const userGitLabId1 = fixture.userGitlab1._id;
+
+        // This also tests objects with no extraAdmins....
+
+        return recorder.testOnly
+          .handle(userGitLabId1, 'GL_GROUP', 'GL_GROUP_MAINTAINER', URI2, 'external_xx', true)
+          .delay(100) // Mongodb slave wait
+          .then(function() {
+            return adminFilter(fixture.groupGitlab1, [userId1, userId2, userId3, userGitLabId1]);
+          })
+          .then(function(filtered) {
+            assert.deepEqual(filtered.map(String), [userGitLabId1].map(String));
           });
       });
     });

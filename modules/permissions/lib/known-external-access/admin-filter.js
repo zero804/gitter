@@ -20,48 +20,29 @@ function createHashFor(userIds) {
   );
 }
 
-/**
- * Build a query for KnownExternalAccess given a GH_REPO security descriptor
- */
-function getQueryForGhRepo(securityDescriptor) {
-  if (securityDescriptor.admins === 'GH_REPO_PUSH') {
-    return {
-      type: 'GH_REPO',
-      policyName: securityDescriptor.admins,
-      linkPath: securityDescriptor.linkPath,
-      externalId: securityDescriptor.externalId
-    };
-  }
-}
-
-/**
- * Build a query for KnownExternalAccess given a GH_ORG security descriptor
- */
-function getQueryForGhOrg(securityDescriptor) {
-  if (securityDescriptor.admins === 'GH_ORG_MEMBER') {
-    return {
-      type: 'GH_ORG',
-      policyName: securityDescriptor.admins,
-      linkPath: securityDescriptor.linkPath,
-      externalId: securityDescriptor.externalId
-    };
-  }
+function validateAdminsForSecurityDescriptor(securityDescriptor) {
+  const validAdminMap = {
+    GH_REPO: 'GH_REPO_PUSH',
+    GH_ORG: 'GH_ORG_MEMBER',
+    GL_GROUP: 'GL_GROUP_MAINTAINER'
+  };
+  return validAdminMap[securityDescriptor.type] === securityDescriptor.admins;
 }
 
 /**
  * Build a query for KnownExternalAccess given a security descriptor
  */
 function getQueryForDescriptor(securityDescriptor) {
-  switch (securityDescriptor.type) {
-    case 'GH_REPO':
-      return getQueryForGhRepo(securityDescriptor);
-
-    case 'GH_ORG':
-      return getQueryForGhOrg(securityDescriptor);
-
-    default:
-      return null;
+  if (!validateAdminsForSecurityDescriptor(securityDescriptor)) {
+    return null;
   }
+
+  return {
+    type: securityDescriptor.type,
+    policyName: securityDescriptor.admins,
+    linkPath: securityDescriptor.linkPath,
+    externalId: securityDescriptor.externalId
+  };
 }
 
 /**
@@ -156,7 +137,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
         });
     }
   } else {
-    // Not a group, deal with GH_ORG, GH_REPO and null here
+    // Not a group, deal with GL_GROUP, GH_ORG, GH_REPO and null here
     var query = getQueryForDescriptor(securityDescriptor);
 
     if (query) {
