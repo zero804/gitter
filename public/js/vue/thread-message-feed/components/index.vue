@@ -84,6 +84,8 @@ export default {
 @import (reference) 'dark-theme';
 @import (reference) '../styles/variables';
 
+@thread-panel-max-width: 600px;
+
 .root {
   .right-toolbar-position();
 
@@ -91,7 +93,14 @@ export default {
   &.opened {
     display: flex;
   }
-  width: @right-toolbar-full-width;
+  /*
+  The TMF width changes between 300px and 600px boundaries.
+  Within this boundary it tries to be 40% of the space taken by
+  both panels (MMF - 60%, TMF - 40%)
+  */
+  min-width: @right-toolbar-full-width;
+  max-width: @thread-panel-max-width;
+  width: 40%;
 
   color: @trpDarkGrey;
   text-align: left;
