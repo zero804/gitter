@@ -64,7 +64,13 @@ export default {
       deleteMessage: 'threadMessageFeed/deleteMessage',
       reportMessage: 'threadMessageFeed/reportMessage',
       editMessage: 'threadMessageFeed/editMessage'
-    })
+    }),
+    closePopover() {
+      // "report" and "failed delete" actions don't change
+      // the parent component or focuses other element so
+      // we need to close the popover manually
+      this.$refs.actionsPopover.$emit('close');
+    }
   }
 };
 </script>
@@ -72,6 +78,7 @@ export default {
 <template>
   <div class="chat-item__actions">
     <b-popover
+      ref="actionsPopover"
       :target="chatActionsId"
       triggers="click blur"
       delay="0"
@@ -84,7 +91,10 @@ export default {
           v-if="actionItem.enabled"
           :class="`popover-item__action js-chat-item-${actionItem.slug}-action`"
           :title="`${actionItem.label} this message`"
-          @click="actionItem.action()"
+          @click="
+            actionItem.action();
+            closePopover();
+          "
         >
           {{ actionItem.label }}
         </button>

@@ -55,9 +55,6 @@ export default {
     },
     isBeingEdited: function() {
       return this.message.id === this.messageEditState.id;
-    },
-    isLoading: function() {
-      return this.message.loading || (this.isBeingEdited && this.messageEditState.loading);
     }
   },
   watch: {
@@ -147,7 +144,7 @@ export default {
               @click.stop.prevent="setPermalinkLocation"
               >{{ sentTimeFormatted }}</a
             >
-            <loading-spinner v-if="isLoading" class="message-loading-icon" />
+            <loading-spinner v-if="message.loading" class="message-loading-icon" />
           </div>
           <textarea
             v-if="isBeingEdited"
