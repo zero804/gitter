@@ -1,5 +1,6 @@
 jest.mock('../../../utils/appevents');
 jest.mock('../../../components/api-client');
+jest.mock('../../../utils/log'); // don't show error messages in the test output
 jest.spyOn(Date, 'now').mockImplementation(() => 1479427200000);
 
 const testAction = require('../../store/__test__/vuex-action-helper');
@@ -19,6 +20,8 @@ describe('thread message feed store', () => {
       appEvents.trigger.mockReset();
       apiClient.room.get.mockReset();
       apiClient.room.put.mockReset();
+      apiClient.room.delete.mockReset();
+      apiClient.room.post.mockReset();
     });
 
     it('open shows TMF, clears state, hides right toolbar, sets parent id ', async () => {
@@ -116,32 +119,53 @@ describe('thread message feed store', () => {
       });
     });
 
-    it('deleteMessage', async () => {
-      apiClient.room.delete.mockReset();
-
+    describe('deleteMessage', () => {
       const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
-      apiClient.room.delete.mockResolvedValue(null);
+      const { id } = storedMessage;
 
-      await testAction(
-        actions.deleteMessage,
-        storedMessage,
-        {},
-        [{ type: rootTypes.REMOVE_MESSAGE, payload: storedMessage }],
-        []
-      );
+      it('success', async () => {
+        apiClient.room.delete.mockResolvedValue(null);
 
-      expect(apiClient.room.delete).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}`);
+        await testAction(actions.deleteMessage, storedMessage, {}, [
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: true, error: false } },
+          { type: rootTypes.REMOVE_MESSAGE, payload: storedMessage }
+        ]);
+
+        expect(apiClient.room.delete).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}`);
+      });
+      it('error', async () => {
+        apiClient.room.delete.mockRejectedValue(null);
+
+        await testAction(actions.deleteMessage, storedMessage, {}, [
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: true, error: false } },
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: false, error: true } }
+        ]);
+      });
     });
-
-    it('reportMessage', async () => {
-      apiClient.room.post.mockReset();
-
+    describe('reportMessage', () => {
       const storedMessage = createSerializedMessageFixture({ id: '5d147ea84dad9dfbc522317a' });
-      apiClient.room.post.mockResolvedValue(null);
+      const { id } = storedMessage;
 
-      await testAction(actions.reportMessage, storedMessage);
+      it('success', async () => {
+        apiClient.room.post.mockResolvedValue(null);
 
-      expect(apiClient.room.post).toHaveBeenCalledWith(`/chatMessages/${storedMessage.id}/report`);
+        await testAction(actions.reportMessage, storedMessage, {}, [
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: true, error: false } },
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: false, error: false } }
+        ]);
+
+        expect(apiClient.room.post).toHaveBeenCalledWith(
+          `/chatMessages/${storedMessage.id}/report`
+        );
+      });
+      it('error', async () => {
+        apiClient.room.post.mockRejectedValue(null);
+
+        await testAction(actions.reportMessage, storedMessage, {}, [
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: true, error: false } },
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id, loading: false, error: true } }
+        ]);
+      });
     });
 
     describe('quoteMessage', () => {
@@ -186,9 +210,11 @@ describe('thread message feed store', () => {
           null,
           { messageEditState: { id: '5d111', text: 'updated text' } },
           [
-            { type: 'REQUEST_UPDATE_MESSAGE' },
-            { type: rootTypes.ADD_TO_MESSAGE_MAP, payload: [updatedApiResponseMessage] },
-            { type: 'RECEIVE_UPDATE_MESSAGE_SUCCESS' }
+            { type: 'UPDATE_MESSAGE', payload: { id: '5d111', loading: true, error: false } },
+            {
+              type: 'UPDATE_MESSAGE',
+              payload: { id: '5d111', loading: false, error: false, ...updatedApiResponseMessage }
+            }
           ],
           [{ type: 'cancelEdit' }]
         );
@@ -199,9 +225,7 @@ describe('thread message feed store', () => {
       });
       it('failure', async () => {
         const originalMessage = createSerializedMessageFixture({ id: '5d111' });
-
-        const testError = new Error();
-        apiClient.room.put.mockRejectedValue(testError);
+        apiClient.room.put.mockRejectedValue(null);
 
         await testAction(
           actions.updateMessage,
@@ -211,19 +235,20 @@ describe('thread message feed store', () => {
             messageMap: { '5d111': originalMessage }
           },
           [
-            { type: 'REQUEST_UPDATE_MESSAGE' },
+            { type: 'UPDATE_MESSAGE', payload: { id: '5d111', loading: true, error: false } },
             {
-              type: rootTypes.ADD_TO_MESSAGE_MAP,
-              payload: [{ ...originalMessage, text: 'updated text', html: undefined, error: true }]
-            },
-            { type: 'RECEIVE_UPDATE_MESSAGE_ERROR', payload: testError }
+              type: 'UPDATE_MESSAGE',
+              payload: {
+                id: '5d111',
+                loading: false,
+                error: true,
+                text: 'updated text',
+                html: undefined
+              }
+            }
           ],
           [{ type: 'cancelEdit' }]
         );
-
-        expect(apiClient.room.put).toHaveBeenCalledWith(`/chatMessages/5d111`, {
-          text: 'updated text'
-        });
       });
     });
 
@@ -238,7 +263,7 @@ describe('thread message feed store', () => {
       await testAction(actions.cancelEdit, null, {}, [
         {
           type: types.UPDATE_MESSAGE_EDIT_STATE,
-          payload: { id: null, text: null, loading: false, error: null, results: [] }
+          payload: { id: null, text: null }
         }
       ]);
     });
@@ -529,7 +554,7 @@ describe('thread message feed store', () => {
         draftMessage: '',
         atTop: false,
         atBottom: false,
-        messageEditState: { id: null, text: null, error: null, loading: false, results: [] }
+        messageEditState: { id: null, text: null }
       });
     });
 

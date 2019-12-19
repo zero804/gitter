@@ -1,12 +1,14 @@
 import Vue from 'vue';
 import appEvents from '../../../utils/appevents';
 import apiClient from '../../../components/api-client';
+import log from '../../../utils/log';
 import moment from 'moment';
 import composeQueryString from 'gitter-web-qs/compose';
 import * as rootTypes from '../../store/mutation-types';
-import VuexApiRequest, { getInitialRequestState } from '../../store/vuex-api-request';
+import VuexApiRequest from '../../store/vuex-api-request';
 import { generateChildMessageTmpId } from '../../store/mutations';
 import ChatItemPolicy from '../../../views/chat/chat-item-policy';
+import VuexMessageRequest from '../../store/vuex-message-request';
 
 const FETCH_MESSAGES_LIMIT = 50;
 
@@ -15,7 +17,6 @@ export const childMessagesVuexRequest = new VuexApiRequest(
   'CHILD_MESSAGES',
   'childMessagesRequest'
 );
-export const updateMessageVuexRequest = new VuexApiRequest('UPDATE_MESSAGE', 'messageEditState');
 
 const canStartFetchingMessages = state =>
   !state.childMessagesRequest.loading && !state.childMessagesRequest.error;
@@ -34,7 +35,7 @@ const setTemporaryMessageProp = (commit, id, propName, propValue = true) => {
 };
 
 /* we only use `loading` attribute from the request state */
-const getDefaultMessageEditState = () => ({ id: null, text: null, ...getInitialRequestState() });
+const getDefaultMessageEditState = () => ({ id: null, text: null });
 
 // Exported for testing
 export const types = {
@@ -46,8 +47,7 @@ export const types = {
   RESET_THREAD_STATE: 'RESET_THREAD_STATE',
   UPDATE_MESSAGE_EDIT_STATE: 'UPDATE_MESSAGE_EDIT_STATE',
   // just for completeness, the types are referenced using the request class e.g. `childMessagesVuexRequest.successType`
-  ...childMessagesVuexRequest.types,
-  ...updateMessageVuexRequest.types
+  ...childMessagesVuexRequest.types
 };
 
 export default {
@@ -91,8 +91,7 @@ export default {
     [types.UPDATE_MESSAGE_EDIT_STATE](state, newProperties) {
       Vue.set(state, 'messageEditState', { ...state.messageEditState, ...newProperties });
     },
-    ...childMessagesVuexRequest.mutations,
-    ...updateMessageVuexRequest.mutations
+    ...childMessagesVuexRequest.mutations
   },
   getters: {
     parentMessage: (state, getters, rootState) => {
@@ -145,7 +144,8 @@ export default {
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [message], { root: true });
           dispatch('focusOnMessage', { id: message.id, block: 'end' });
         })
-        .catch(() => {
+        .catch(err => {
+          log.error(err);
           commit(rootTypes.ADD_TO_MESSAGE_MAP, [{ ...tmpMessage, error: true, loading: false }], {
             root: true
           });
@@ -153,11 +153,26 @@ export default {
       commit(types.UPDATE_DRAFT_MESSAGE, '');
     },
     deleteMessage: async ({ commit }, message) => {
-      await apiClient.room.delete(`/chatMessages/${message.id}`);
-      commit(rootTypes.REMOVE_MESSAGE, message, { root: true });
+      const messageRequest = new VuexMessageRequest(message.id);
+      commit(...messageRequest.loadingMutation());
+      apiClient.room
+        .delete(`/chatMessages/${message.id}`)
+        .then(() => commit(rootTypes.REMOVE_MESSAGE, message, { root: true }))
+        .catch(err => {
+          log.error(err);
+          commit(...messageRequest.errorMutation());
+        });
     },
-    reportMessage: async (_, message) => {
-      await apiClient.room.post(`/chatMessages/${message.id}/report`);
+    reportMessage: async ({ commit }, message) => {
+      const messageRequest = new VuexMessageRequest(message.id);
+      commit(...messageRequest.loadingMutation());
+      apiClient.room
+        .post(`/chatMessages/${message.id}/report`)
+        .then(() => commit(...messageRequest.successMutation()))
+        .catch(err => {
+          log.error(err);
+          commit(...messageRequest.errorMutation());
+        });
     },
     quoteMessage: ({ commit, state }, message) => {
       const formattedText = message.text
@@ -171,28 +186,18 @@ export default {
         commit(types.UPDATE_DRAFT_MESSAGE, `${formattedText}\n\n`);
       }
     },
-    updateMessage: ({ commit, state, rootState, dispatch }) => {
+    updateMessage: ({ commit, state, dispatch }) => {
       const { messageEditState } = state;
-      commit(updateMessageVuexRequest.requestType);
+      const messageRequest = new VuexMessageRequest(messageEditState.id);
+      commit(...messageRequest.loadingMutation());
       return apiClient.room
         .put(`/chatMessages/${messageEditState.id}`, { text: messageEditState.text })
-        .then(updatedMessage => {
-          commit(rootTypes.ADD_TO_MESSAGE_MAP, [updatedMessage], { root: true });
-          commit(updateMessageVuexRequest.successType);
-          dispatch('cancelEdit');
-        })
+        .then(updatedMessage => commit(...messageRequest.successMutation(updatedMessage)))
         .catch(err => {
-          const originalMessage = rootState.messageMap[state.messageEditState.id];
-          commit(
-            rootTypes.ADD_TO_MESSAGE_MAP,
-            [{ ...originalMessage, error: true, text: messageEditState.text, html: undefined }],
-            {
-              root: true
-            }
-          );
-          commit(updateMessageVuexRequest.errorType, err);
-          dispatch('cancelEdit');
-        });
+          log.error(err);
+          commit(...messageRequest.errorMutation({ text: messageEditState.text, html: undefined }));
+        })
+        .finally(() => dispatch('cancelEdit'));
     },
     editMessage: ({ commit }, message) => {
       commit(types.UPDATE_MESSAGE_EDIT_STATE, { id: message.id, text: message.text });
@@ -225,7 +230,7 @@ export default {
           return childMessages;
         })
         .catch(err => {
-          // error is reported by apiClient
+          log.error(err);
           commit(childMessagesVuexRequest.errorType, err);
         });
     },
