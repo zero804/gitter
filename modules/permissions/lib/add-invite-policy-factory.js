@@ -9,6 +9,7 @@ var StaticContextDelegate = require('./context-delegates/static-context-delegate
 var GhRepoPolicyDelegate = require('./policies/gh-repo-policy-delegate');
 var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
 var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
+const GlGroupPolicyDelegate = require('./policies/gl-group-policy-delegate');
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor');
 var userLoaderFactory = require('./user-loader-factory');
@@ -29,6 +30,9 @@ function getDelegateForSecurityDescriptor(userId, user, securityDescriptor) {
 
     case 'GH_USER':
       return new GhUserPolicyDelegate(userId, userLoader, securityDescriptor);
+
+    case 'GL_GROUP':
+      return new GlGroupPolicyDelegate(userId, userLoader, securityDescriptor);
 
     default:
       return null;

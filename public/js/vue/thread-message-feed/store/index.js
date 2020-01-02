@@ -181,7 +181,7 @@ export default {
           commit(updateMessageVuexRequest.successType);
           dispatch('cancelEdit');
         })
-        .catch(() => {
+        .catch(err => {
           const originalMessage = rootState.messageMap[state.messageEditState.id];
           commit(
             rootTypes.ADD_TO_MESSAGE_MAP,
@@ -190,7 +190,7 @@ export default {
               root: true
             }
           );
-          commit(updateMessageVuexRequest.errorType);
+          commit(updateMessageVuexRequest.errorType, err);
           dispatch('cancelEdit');
         });
     },
@@ -224,9 +224,9 @@ export default {
           commit(rootTypes.ADD_TO_MESSAGE_MAP, childMessages, { root: true });
           return childMessages;
         })
-        .catch((/* error */) => {
+        .catch(err => {
           // error is reported by apiClient
-          commit(childMessagesVuexRequest.errorType);
+          commit(childMessagesVuexRequest.errorType, err);
         });
     },
     /* opens TMF and highlights the permalinked child message */

@@ -17,17 +17,9 @@ describe('mutations', () => {
   });
 
   it('SET_INITIAL_DATA adds/updates all keys in payload', () => {
-    const newValue = 'newTestValue';
-    mutations[types.SET_INITIAL_DATA](state, { test: newValue, a: 1, b: 2 });
-    expect(state.test).toEqual(newValue);
+    mutations[types.SET_INITIAL_DATA](state, { a: 1, b: 2 });
     expect(state.a).toEqual(1);
     expect(state.b).toEqual(2);
-  });
-
-  it('SET_TEST', () => {
-    const newValue = 'newTestValue';
-    mutations[types.SET_TEST](state, newValue);
-    expect(state.test).toEqual(newValue);
   });
 
   it('TOGGLE_DARK_THEME', () => {

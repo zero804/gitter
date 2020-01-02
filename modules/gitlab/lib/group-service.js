@@ -1,10 +1,18 @@
 'use strict';
 
 const debug = require('debug')('gitter:app:gitlab:group-service');
-const { Groups } = require('gitlab');
+const { Groups, GroupMembers } = require('gitlab');
 const cacheWrapper = require('gitter-web-cache-wrapper');
 const getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
 const getPublicTokenFromPool = require('./get-public-token-from-pool');
+
+function cacheFunction(name, obj) {
+  return cacheWrapper(`GitLabGroupService:${name}`, obj, {
+    getInstanceId: function(gitLabGroupService) {
+      return gitLabGroupService.getAccessTokenPromise;
+    }
+  });
+}
 
 /*
 {
@@ -45,31 +53,64 @@ function GitLabGroupService(user) {
   this.getAccessTokenPromise = getGitlabAccessTokenFromUser(user);
 }
 
-GitLabGroupService.prototype.getGroupResource = async function() {
+GitLabGroupService.prototype._getGitlabOpts = async function() {
   const accessToken = await this.getAccessTokenPromise;
-  const gitlabLibOpts = {
+  return {
     oauthToken: accessToken,
     token: getPublicTokenFromPool()
   };
-  return new Groups(gitlabLibOpts);
 };
 
-GitLabGroupService.prototype.getGroups = async function() {
-  const resource = await this.getGroupResource();
-  const res = await resource.all();
+GitLabGroupService.prototype._getGroupResource = async function() {
+  if (this._groupsResource) {
+    return this._groupsResource;
+  }
+
+  const gitlabLibOpts = await this._getGitlabOpts();
+  this._groupsResource = new Groups(gitlabLibOpts);
+
+  return this._groupsResource;
+};
+
+GitLabGroupService.prototype.getGroups = cacheFunction('getGroups', async function(params) {
+  const resource = await this._getGroupResource();
+  const res = await resource.all(params);
 
   return standardizeResponse(res);
-};
+});
 
-GitLabGroupService.prototype.getGroup = async function(id) {
-  const resource = await this.getGroupResource();
+GitLabGroupService.prototype.getGroup = cacheFunction('getGroup', async function(id) {
+  const resource = await this._getGroupResource();
   const group = await resource.show(id);
 
   return standardizeGroupResponse(group);
-};
+});
 
-module.exports = cacheWrapper('GitLabGroupService', GitLabGroupService, {
-  getInstanceId: function(gitLabGroupService) {
-    return gitLabGroupService.getAccessTokenPromise;
+GitLabGroupService.prototype.isMember = cacheFunction('isMember', async function(
+  groupId,
+  gitlabUserId
+) {
+  const gitlabLibOpts = await this._getGitlabOpts();
+  const groupMembers = new GroupMembers(gitlabLibOpts);
+
+  try {
+    const groupMember = await groupMembers.show(groupId, gitlabUserId, {
+      includeInherited: true
+    });
+    debug('isMember groupMember response =>', groupMember);
+
+    // We could simply check that the `groupMembers.show(...)` succeeds but this
+    // is an extra check to make sure some other response or redirect don't give
+    // us a false-positive
+    return [10, 20, 30, 40, 50].some(accessLevel => accessLevel === groupMember.access_level);
+  } catch (err) {
+    debug('isMember error =>', err);
+    if (err && err.response && err.response.status === 404) {
+      return false;
+    }
+
+    throw err;
   }
 });
+
+module.exports = GitLabGroupService;

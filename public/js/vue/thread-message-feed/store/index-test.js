@@ -200,7 +200,8 @@ describe('thread message feed store', () => {
       it('failure', async () => {
         const originalMessage = createSerializedMessageFixture({ id: '5d111' });
 
-        apiClient.room.put.mockRejectedValue(null);
+        const testError = new Error();
+        apiClient.room.put.mockRejectedValue(testError);
 
         await testAction(
           actions.updateMessage,
@@ -215,7 +216,7 @@ describe('thread message feed store', () => {
               type: rootTypes.ADD_TO_MESSAGE_MAP,
               payload: [{ ...originalMessage, text: 'updated text', html: undefined, error: true }]
             },
-            { type: 'RECEIVE_UPDATE_MESSAGE_ERROR' }
+            { type: 'RECEIVE_UPDATE_MESSAGE_ERROR', payload: testError }
           ],
           [{ type: 'cancelEdit' }]
         );
@@ -237,7 +238,7 @@ describe('thread message feed store', () => {
       await testAction(actions.cancelEdit, null, {}, [
         {
           type: types.UPDATE_MESSAGE_EDIT_STATE,
-          payload: { id: null, text: null, loading: false, error: false, results: [] }
+          payload: { id: null, text: null, loading: false, error: null, results: [] }
         }
       ]);
     });
@@ -290,14 +291,15 @@ describe('thread message feed store', () => {
       });
 
       it('error', async () => {
-        apiClient.room.get.mockImplementation(() => Promise.reject(null));
+        const testError = new Error();
+        apiClient.room.get.mockImplementation(() => Promise.reject(testError));
         await testAction(
           actions.fetchChildMessages,
           undefined,
           { parentId: '5d11d571a2405419771cd3ee' },
           [
             { type: childMessagesVuexRequest.requestType },
-            { type: childMessagesVuexRequest.errorType }
+            { type: childMessagesVuexRequest.errorType, payload: testError }
           ]
         );
       });
@@ -527,7 +529,7 @@ describe('thread message feed store', () => {
         draftMessage: '',
         atTop: false,
         atBottom: false,
-        messageEditState: { id: null, text: null, error: false, loading: false, results: [] }
+        messageEditState: { id: null, text: null, error: null, loading: false, results: [] }
       });
     });
 

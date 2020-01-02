@@ -60,11 +60,43 @@ function configureLocals(app) {
   locals.dnsPrefetch = (config.get('cdn:hosts') || []).concat([config.get('ws:hostname')]);
 }
 
+/**
+ * Configure express app with settings and middlewares needed by both API and WEB (excluding passport and user related logic).
+ */
+function installBase(app) {
+  app.disable('x-powered-by');
+  app.set('trust proxy', true);
+
+  app.use(env.middlewares.accessLogger);
+
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(methodOverride());
+
+  app.use(require('./middlewares/pending-request'));
+  app.use(require('./middlewares/ie6-post-caching'));
+  app.use(require('./middlewares/i18n'));
+}
+
+// middleware wrapped in `skipForApi` is not used on API requests
+const skipForApi = handler => (req, res, next) => {
+  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl; // https://stackoverflow.com/a/10185427/606571
+  const apiBasePath = config.get('web:apiBasePath');
+
+  if (fullUrl.indexOf(apiBasePath) === 0) {
+    next();
+  } else {
+    handler(req, res, next);
+  }
+};
+
 module.exports = {
   /**
-   * Configure express for the full web application
+   * Configure express for the full web application.
    */
   installFull: function(app) {
+    installBase(app);
+
     require('./register-helpers')(expressHbs);
 
     configureLocals(app);
@@ -80,11 +112,8 @@ module.exports = {
         contentHelperName: 'content'
       })
     );
-
-    app.disable('x-powered-by');
     app.set('view engine', 'hbs');
     app.set('views', resolveStatic('/templates'));
-    app.set('trust proxy', true);
 
     if (config.get('express:viewCache')) {
       app.enable('view cache');
@@ -95,15 +124,7 @@ module.exports = {
       require('./express-static').install(app);
     }
 
-    app.use(env.middlewares.accessLogger);
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
-
     app.use(cookieParser());
-    app.use(methodOverride());
-    app.use(require('./middlewares/pending-request'));
-    app.use(require('./middlewares/ie6-post-caching'));
-    app.use(require('./middlewares/i18n'));
 
     app.use(
       session({
@@ -125,7 +146,8 @@ module.exports = {
     app.use(passport.initialize());
     app.use(passport.session());
 
-    app.use(require('./middlewares/authenticate-bearer'));
+    //anonymous tokens can be still valid for accessing API
+    app.use(skipForApi(require('./middlewares/authenticate-bearer')));
     app.use(rememberMe.rememberMeMiddleware);
     app.use(require('./middlewares/rate-limiter'));
     app.use(require('./middlewares/record-client-usage-stats'));
@@ -140,20 +162,10 @@ module.exports = {
   },
 
   installApi: function(app) {
-    app.disable('x-powered-by');
-    app.set('trust proxy', true);
-
-    app.use(env.middlewares.accessLogger);
-
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: false }));
-    app.use(methodOverride());
-
-    app.use(require('./middlewares/pending-request'));
-    app.use(require('./middlewares/ie6-post-caching'));
-    app.use(require('./middlewares/i18n'));
+    installBase(app);
 
     app.use(passport.initialize());
+
     app.use(require('./middlewares/rate-limiter'));
     app.use(require('./middlewares/record-client-usage-stats'));
   },

@@ -17,7 +17,6 @@ export default {
   iconLogoText,
   computed: {
     ...mapState([
-      'test',
       'isMobile',
       'isLoggedIn',
       'darkTheme',
@@ -130,10 +129,6 @@ export default {
         <menu-bar-body />
       </section>
       <section class="body-main-menu layout-main-menu scroller">
-        <div class="hide">
-          {{ test }}
-        </div>
-
         <search-body v-if="isSearchState" />
         <template v-else>
           <h2 v-if="isAllState" class="room-list-title">All conversations</h2>

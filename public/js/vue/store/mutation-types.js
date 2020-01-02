@@ -1,7 +1,5 @@
 export const SET_INITIAL_DATA = 'SET_INITIAL_DATA';
 
-export const SET_TEST = 'SET_TEST';
-
 export const TOGGLE_DARK_THEME = 'TOGGLE_DARK_THEME';
 
 export const SWITCH_LEFT_MENU_STATE = 'SWITCH_LEFT_MENU_STATE';

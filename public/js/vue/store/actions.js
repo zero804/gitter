@@ -13,7 +13,6 @@ import * as leftMenuConstants from '../left-menu/constants';
 import calculateFavouriteUpdates from 'gitter-web-rooms/lib/calculate-favourite-updates';
 
 export const setInitialData = ({ commit }, data) => commit(types.SET_INITIAL_DATA, data);
-export const setTest = ({ commit }, testValue) => commit(types.SET_TEST, testValue);
 
 export const trackStat = (actionMeta, statName) => {
   appEvents.trigger('stats.event', statName);

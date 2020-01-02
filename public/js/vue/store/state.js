@@ -14,8 +14,6 @@ function state() {
     roomSearchPeopleRequest.initialState,
     messageSearchRequest.initialState,
     {
-      test: 'initialTestValue',
-
       isMobile: false,
       // `true` just for the sake of easy tests
       isLoggedIn: true,

@@ -1,6 +1,7 @@
 'use strict';
 var _ = require('lodash');
 var Backbone = require('backbone');
+const debug = require('debug-proxy')('app:unread-items-client-store');
 
 function limit(fn, context, timeout) {
   return _.throttle(fn.bind(context), timeout || 30, { leading: false });
@@ -87,6 +88,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
    * options: { silent } will not trigger a recount or events
    */
   _unreadItemAdded: function(itemId, mention, options) {
+    debug('_unreadItemAdded', itemId, mention, options);
     // Four options here:
     // 0 - The item has already been marked as read
     // 1 - new item
@@ -132,6 +134,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
   },
 
   _unreadItemRemoved: function(itemId) {
+    debug('_unreadItemRemoved', itemId);
     if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
 
     delete this._items[itemId];
@@ -142,6 +145,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
   },
 
   _mentionRemoved: function(itemId) {
+    debug('_mentionRemoved', itemId);
     if (!this._items.hasOwnProperty(itemId)) return; // Does not exist
     this._items[itemId] = false;
     this.notifyCountLimited();
@@ -150,6 +154,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
   },
 
   markItemRead: function(itemId) {
+    debug('markItemRead', itemId);
     var inStore = this._items.hasOwnProperty(itemId);
     var lurkMode = this._lurkMode;
 
@@ -242,6 +247,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
   },
 
   markAllRead: function() {
+    debug('markAllRead');
     var lurkMode = this._lurkMode;
 
     Object.keys(this._items).forEach(function(itemId) {
@@ -257,8 +263,9 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
     this.notifyCountLimited();
   },
 
-  /* Realtime notification that everything was marked as ready somewhere else */
+  /* Realtime notification that everything was marked as read somewhere else */
   markAllReadNotification: function() {
+    debug('markAllReadNotification');
     Object.keys(this._items).forEach(function(itemId) {
       // Notify that all are read
       this.trigger('unreadItemRemoved', itemId);

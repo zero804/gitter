@@ -60,11 +60,20 @@ function createBaseFixture() {
 function createExpectedFixtures(expected) {
   if (!expected) throw new Error('Please provide a fixture');
 
-  return Promise.try(createBaseFixture).then(function(fixture) {
-    return Promise.mapSeries(fixtureSteps, function(step) {
-      return step(expected, fixture);
-    }).return(fixture);
-  });
+  return Promise.try(createBaseFixture)
+    .then(function(fixture) {
+      return Promise.mapSeries(fixtureSteps, function(step) {
+        return step(expected, fixture);
+      }).return(fixture);
+    })
+    .catch(err => {
+      // Give more information about what failed in the Mongoose validation failure
+      if (err && err.name === 'ValidationError') {
+        logger.error(err);
+      }
+
+      throw err;
+    });
 }
 
 function fixtureLoaderManual(fixture, expected) {
