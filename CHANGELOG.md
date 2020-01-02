@@ -11,6 +11,8 @@ Developer facing:
  - Add `GL_GROUP` to admin filter, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1691
  - Add `GL_GROUP` group avatars (auto-update), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1692
  - Better document what `troupe.providers` is used for, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1698
+ - Remove unused sd utils `isType()` method, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1701
+
 
 # 20.12.0 - 2019-12-17
 
