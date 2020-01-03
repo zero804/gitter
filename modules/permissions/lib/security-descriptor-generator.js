@@ -13,7 +13,7 @@ function usernameMatchesUri(user, linkPath) {
   return currentUserName.toLowerCase() === linkPath.toLowerCase();
 }
 
-function generateUserSecurityDescriptor(user, options) {
+function generateGhUserSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
@@ -56,7 +56,7 @@ function generateUserSecurityDescriptor(user, options) {
   }
 }
 
-function generateOrgSecurityDescriptor(user, options) {
+function generateGhOrgSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
@@ -90,7 +90,7 @@ function generateOrgSecurityDescriptor(user, options) {
   }
 }
 
-function generateRepoSecurityDescriptor(user, options) {
+function generateGhRepoSecurityDescriptor(user, options) {
   var externalId = options.externalId;
   var linkPath = options.linkPath;
   var security = options.security;
@@ -113,6 +113,40 @@ function generateRepoSecurityDescriptor(user, options) {
         type: 'GH_REPO',
         members: 'GH_REPO_ACCESS',
         admins: 'GH_REPO_PUSH',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+}
+
+function generateGlGroupSecurityDescriptor(user, options) {
+  var externalId = options.externalId;
+  var linkPath = options.linkPath;
+  var security = options.security;
+
+  assert(linkPath, 'linkPath required');
+
+  switch (security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GL_GROUP',
+        members: 'PUBLIC',
+        admins: 'GL_GROUP_MAINTAINER',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GL_GROUP',
+        members: 'GL_GROUP_MEMBER',
+        admins: 'GL_GROUP_MAINTAINER',
         public: false,
         linkPath: linkPath,
         externalId: externalId
@@ -205,13 +239,16 @@ function generate(user, options) {
       return generateGroupSecurityDescriptor(user, options);
 
     case 'GH_USER':
-      return generateUserSecurityDescriptor(user, options);
+      return generateGhUserSecurityDescriptor(user, options);
 
     case 'GH_REPO':
-      return generateRepoSecurityDescriptor(user, options);
+      return generateGhRepoSecurityDescriptor(user, options);
 
     case 'GH_ORG':
-      return generateOrgSecurityDescriptor(user, options);
+      return generateGhOrgSecurityDescriptor(user, options);
+
+    case 'GL_GROUP':
+      return generateGlGroupSecurityDescriptor(user, options);
 
     default:
       throw new StatusError(500, 'Unknown type: ' + options.type);
