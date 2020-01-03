@@ -152,8 +152,8 @@ module.exports = {
     app.use(require('./middlewares/rate-limiter'));
     app.use(require('./middlewares/record-client-usage-stats'));
 
-    app.use(require('./middlewares/configure-csrf'));
-    app.use(require('./middlewares/enforce-csrf'));
+    app.use(skipForApi(require('./middlewares/configure-csrf')));
+    app.use(skipForApi(require('./middlewares/enforce-csrf')));
 
     // NOTE: it might be better to just drop this middleware entirely or at
     // least substantially change the behavior, because not having github
