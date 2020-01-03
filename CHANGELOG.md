@@ -13,6 +13,7 @@ Developer facing:
  - Better document what `troupe.providers` is used for, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1698
  - Remove unused sd utils `isType()` method, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1701
  - Skip CSRF for API - local development, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1704
+ - Add `GL_GROUP` to `security-descriptor-generator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1700
 
 
 # 20.12.0 - 2019-12-17
