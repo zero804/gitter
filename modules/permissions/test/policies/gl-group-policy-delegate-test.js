@@ -27,6 +27,20 @@ describe('gl-group-policy-delegate', () => {
       expectedResult: false
     },
     {
+      name: 'is group maintainer',
+      group: GROUP1,
+      user: GROUP1_USER,
+      policy: 'GL_GROUP_MAINTAINER',
+      expectedResult: true
+    },
+    {
+      name: 'is not group maintainer',
+      group: GROUP1,
+      user: NOT_GROUP1_USER,
+      policy: 'GL_GROUP_MAINTAINER',
+      expectedResult: false
+    },
+    {
       name: 'is not a GitLab user',
       group: GROUP1,
       user: NON_GITLAB_USER,
@@ -65,18 +79,28 @@ describe('gl-group-policy-delegate', () => {
 
   let GlGroupPolicyDelegate;
   function StubGitLabGroupService(user) {
-    this.isMember = async (uri, username) => {
+    this.getMembership = async (uri, username) => {
       if (user === USER_API_THROWS_ERROR) {
         throw new Error('My fake StubGitLabGroupService error from USER_API_THROWS_ERROR');
       }
 
       if (uri === GROUP1) {
         if (user === GROUP1_USER && username === user.username) {
-          return true;
+          return {
+            accessLevel: 50,
+            isMember: true,
+            isMaintainer: true,
+            isOwner: true
+          };
         }
       }
 
-      return false;
+      return {
+        accessLevel: 0,
+        isMember: false,
+        isMaintainer: false,
+        isOwner: false
+      };
     };
   }
 

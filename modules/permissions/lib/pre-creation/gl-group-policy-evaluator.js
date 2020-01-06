@@ -48,7 +48,11 @@ class GitlabGroupPolicyEvaluator {
 
     const gitlabGroupService = new GitLabGroupService(this.user);
     try {
-      this._canAccessResult = gitlabGroupService.isMaintainer(this.uri, gitLabIdentity.providerKey);
+      const membership = await gitlabGroupService.getMembership(
+        this.uri,
+        gitLabIdentity.providerKey
+      );
+      this._canAccessResult = membership.isMaintainer;
       return this._canAccessResult;
     } catch (err) {
       debug('Exeception while fetching group');
