@@ -79,7 +79,7 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
       assert.equal(group.name, 'gitter-integration-tests-group');
     });
 
-    describe('group member', () => {
+    describe('isMember', () => {
       it('should fetch group member', async () => {
         const glGroupService = new GitLabGroupService(FAKE_USER);
         // User: https://gitlab.com/gitter-integration-tests
@@ -113,6 +113,32 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
         );
 
         assert.strictEqual(isMember, false);
+      });
+    });
+
+    describe('isMaintainer', () => {
+      it('should fetch group maintainer', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        // User: https://gitlab.com/gitter-integration-tests
+        const gitterIntegrationTestsUserId = '2619770';
+        const isMaintainer = await glGroupService.isMaintainer(
+          'gitter-integration-tests-group',
+          gitterIntegrationTestsUserId
+        );
+
+        assert.strictEqual(isMaintainer, true);
+      });
+
+      it('should fail for non group-maintainer', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        // User: https://gitlab.com/gitter-integration-tests
+        const gitterIntegrationTestsUserId = '2619770';
+        const isMaintainer = await glGroupService.isMaintainer(
+          'gitter-org/gitter',
+          gitterIntegrationTestsUserId
+        );
+
+        assert.strictEqual(isMaintainer, false);
       });
     });
   });
