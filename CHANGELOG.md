@@ -3,6 +3,7 @@
 Developer facing:
 
  - Add `GL_GROUP` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1699
+ - Add `GL_GROUP` support to `policy-delegate-factory`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1710
 
 
 # 20.13.0 - 2020-01-03
