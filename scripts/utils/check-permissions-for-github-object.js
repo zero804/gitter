@@ -3,7 +3,7 @@
 'use strict';
 
 var Promise = require('bluebird');
-var validateUri = require('gitter-web-github').GitHubUriValidator;
+var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
 var userService = require('gitter-web-users');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
@@ -17,7 +17,7 @@ function execute(username, uri) {
       this.user = user;
       if (!user) throw new Error('User not found');
 
-      return validateUri(user, uri);
+      return validateGithubUri(user, uri);
     })
     .then(function(githubInfo) {
       if (!githubInfo) throw new Error('Unable to find GitHub object: ' + uri);

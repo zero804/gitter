@@ -2,11 +2,20 @@
 
 const GitLabGroupService = require('./group-service');
 const GitLabUserService = require('./user-service');
-const debug = require('debug')('gitter:app:github:github-uri-validator');
+const debug = require('debug')('gitter:app:github:gitlab-uri-validator');
+
+// If it's a network or permissions problem, throw the error
+// We don't care about the errors when it does not find a user because it could
+// be a group or project or vice versa
+function throwNetworkErrors(err) {
+  if (err.response && err.response.status && err.response.status !== 404) {
+    throw err;
+  }
+}
 
 /**
- * Given a uri, is it a valid repo or valid org?
- * @returns promise of ORG / REPO or null
+ * Given a uri, is it a valid GitLab group, user, or project
+ * @returns promise of GROUP / USER / PROJECT or null
  */
 async function validateGitlabUri(user, uri) {
   debug('validateUri: %s', uri);
@@ -23,7 +32,7 @@ async function validateGitlabUri(user, uri) {
       externalId: parseInt(gitlabUser.id, 10) || undefined
     };
   } catch (err) {
-    // no-op
+    throwNetworkErrors(err);
   }
 
   try {
@@ -38,7 +47,7 @@ async function validateGitlabUri(user, uri) {
       externalId: parseInt(group.id, 10) || undefined
     };
   } catch (err) {
-    // no-op
+    throwNetworkErrors(err);
   }
 
   // TODO: GL_PROJECT
@@ -46,7 +55,7 @@ async function validateGitlabUri(user, uri) {
     debug('validateUri -> project: %s', uri);
     throw new Error('validateProjectUri: GL_PROJECT not implemented yet');
   } catch (err) {
-    // no-op
+    throwNetworkErrors(err);
   }
 
   return null;

@@ -3,7 +3,7 @@
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var Group = require('gitter-web-persistence').Group;
-var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
+var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
 var validateGroupUri = require('gitter-web-validators/lib/validate-group-uri');
 var debug = require('debug')('gitter:app:groups:group-uri-checker');
 var policyFactory = require('gitter-web-permissions/lib/policy-factory');
@@ -36,7 +36,7 @@ function checkLocalUri(uri) {
 
 function checkGitHubUri(user, uri, obtainAccessFromGitHubRepo) {
   // check gh orgs and users
-  return validateGitHubUri(user, uri).then(function(githubInfo) {
+  return validateGithubUri(user, uri).then(function(githubInfo) {
     var policy;
     if (githubInfo && githubInfo.type === 'ORG') {
       // also check if you can actually admin the org.
