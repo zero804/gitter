@@ -1,3 +1,10 @@
+# 20.14.0 - *upcoming*
+
+Developer facing:
+
+ - Add `GL_GROUP` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1699
+
+
 # 20.13.0 - 2020-01-03
 
  - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695
