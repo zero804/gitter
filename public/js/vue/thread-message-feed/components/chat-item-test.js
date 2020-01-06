@@ -111,8 +111,7 @@ describe('thread-message-feed chat-item', () => {
           store.state.threadMessageFeed = {
             messageEditState: {
               id: message.id,
-              text: 'updated text',
-              loading: true
+              text: 'updated text'
             }
           };
         }

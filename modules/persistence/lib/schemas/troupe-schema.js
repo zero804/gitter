@@ -74,6 +74,8 @@ module.exports = {
         githubId: { type: Number, default: null },
         lang: { type: String }, // Human language of this room
         renamedLcUris: [String],
+        // Used to restrict access to certain kind of users (ex. GitHub only rooms)
+        // Eventually, we want to move this to the security descriptor
         providers: [String],
         sd: { type: securityDescriptor.Schema, required: false },
         _tv: { type: 'MongooseNumber', default: 0 }

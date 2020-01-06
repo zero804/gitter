@@ -1,3 +1,21 @@
+# 20.13.0 - 2020-01-03
+
+ - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695
+     - Thanks to [@basisbit](https://gitlab.com/basisbit) for the contribution
+ - Variable thread message feed width, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1696
+ - Unify Vuex message API request logic, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1693
+
+Developer facing:
+
+ - Android push notification updates for gcm to fcm, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1690
+ - Add `GL_GROUP` to admin filter, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1691
+ - Add `GL_GROUP` group avatars (auto-update), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1692
+ - Better document what `troupe.providers` is used for, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1698
+ - Remove unused sd utils `isType()` method, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1701
+ - Skip CSRF for API - local development, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1704
+ - Add `GL_GROUP` to `security-descriptor-generator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1700
+
+
 # 20.12.0 - 2019-12-17
 
 Developer facing:

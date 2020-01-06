@@ -2,12 +2,14 @@
 
 var env = require('gitter-web-env');
 var errorReporter = env.errorReporter;
+const logger = env.logger;
 var Group = require('gitter-web-persistence').Group;
 var url = require('url');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
-var groupAvatarUpdater = require('./group-avatar-updater');
+var updateGroupAvatar = require('./update-group-avatar');
 var debug = require('debug')('gitter:app:groups:group-avatars');
-var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+const getGithubUsernameFromGroup = require('./get-github-username-from-group');
+const isGitterInternalAvatarUrl = require('./is-gitter-internal-group-avatar-url');
 
 /**
  * Check on avatars once a week. In future, we may bring this
@@ -19,15 +21,18 @@ var AVATAR_VERSION_CHECK_TIMEOUT = 7 * 86400 * 1000;
 var KNOWN_AVATAR_SIZES = [22, 40, 44, 48, 64, 80, 96, 128];
 
 // Just in case
-KNOWN_AVATAR_SIZES.sort();
+KNOWN_AVATAR_SIZES.sort((a, b) => {
+  return a - b;
+});
 
 var SELECT_FIELDS = {
-  _id: 0,
+  _id: 1,
   avatarUrl: 1,
   avatarVersion: 1,
   avatarCheckedDate: 1,
   'sd.type': 1,
-  'sd.linkPath': 1
+  'sd.linkPath': 1,
+  'sd.externalId': 1
 };
 
 /** Return the best size for the requested avatar size */
@@ -43,18 +48,37 @@ function getBestSizeFor(size) {
 /**
  * Returns the optimal avatar url to return for the given size
  */
-function getAvatarUrlForSize(avatarUrl, size) {
-  var bestSize = getBestSizeFor(size);
+function getGroupAvatarUrlForSize(group, size) {
+  const avatarUrl = group.avatarUrl;
 
-  // Just use the original
-  if (!bestSize) return avatarUrl;
+  const parsed = url.parse(avatarUrl);
 
-  var parsed = url.parse(avatarUrl);
-  var pathParts = parsed.pathname.split('/');
-  pathParts.pop();
-  pathParts.push(bestSize);
-  parsed.pathname = pathParts.join('/');
-  return url.format(parsed);
+  // Tack on a version param otherwise the S3 url is always the same and
+  // you always get the cached avatar from nginx's cache.
+  parsed.query = parsed.query || {};
+  if (group.avatarVersion) {
+    parsed.query.v = group.avatarVersion;
+  }
+
+  if (isGitterInternalAvatarUrl(avatarUrl)) {
+    const bestSize = getBestSizeFor(size);
+
+    // Just use the original
+    if (!bestSize) return avatarUrl;
+
+    var pathParts = parsed.pathname.split('/');
+    pathParts.pop();
+    pathParts.push(bestSize);
+    parsed.pathname = pathParts.join('/');
+    return url.format(parsed);
+  } else if (group.sd.type === 'GL_GROUP') {
+    if (size) {
+      // This doesn't actually work but these parameters are added in the GitLab UI
+      parsed.query.width = size;
+    }
+
+    return url.format(parsed);
+  }
 }
 
 /**
@@ -72,28 +96,28 @@ function findOnSecondaryOrPrimary(groupId) {
     });
 }
 
-function checkForAvatarUpdate(groupId, group, githubUsername) {
-  groupId = mongoUtils.asObjectID(groupId);
+async function checkForAvatarUpdate(group) {
+  const groupId = group._id;
 
-  // No need to check github if we manage the URL ourselves
-  if (group.avatarUrl) return;
+  // No need to check GitLab/GitHub if we manage the URL ourselves
+  if (group.avatarUrl && isGitterInternalAvatarUrl(group.avatarUrl)) {
+    debug("Skipping avatar update for groupId=%s because it's an internal Gitter avatar", groupId);
+    return;
+  }
 
   if (
     !group.avatarVersion ||
     !group.avatarCheckedDate ||
     Date.now() - group.avatarCheckedDate > AVATAR_VERSION_CHECK_TIMEOUT
   ) {
-    debug(
-      'Attempting to fetch group avatar for groupId=%s for github user=%s',
-      groupId,
-      githubUsername
-    );
-    return groupAvatarUpdater(groupId, githubUsername).catch(function(err) {
+    debug('Attempting to fetch group avatar for groupId=%s', groupId);
+
+    return updateGroupAvatar(group).catch(function(err) {
+      logger.error(err, err.response && `${err.response.status} ${err.response.url}`);
       errorReporter(
         err,
         {
-          groupId: groupId,
-          githubUsername: githubUsername
+          groupId: groupId
         },
         { module: 'group-avatar' }
       );
@@ -101,56 +125,40 @@ function checkForAvatarUpdate(groupId, group, githubUsername) {
   }
 }
 
-function getAvatarUrlForGroupId(groupId, size) {
-  return findOnSecondaryOrPrimary(groupId).then(function(group) {
-    if (!group) return null;
+// Use the custom group avatar URL if we have one
+function _getAvatarFromGroup(group, size) {
+  if (group.avatarUrl) {
+    return getGroupAvatarUrlForSize(group, size);
+  }
+}
 
-    // Use the custom URL if we have one
-    var avatarUrl;
-    if (group.avatarUrl) {
-      avatarUrl = getAvatarUrlForSize(group.avatarUrl, size);
+function _getAvatarFromSecurityDescriptor(group, size) {
+  // Use the Security Descriptor to
+  // generate an avatar
+  const linkPath = group.sd && group.sd.linkPath;
 
-      // Tack on a version param otherwise the S3 url is always the same and
-      // you always get the cached avatar from nginx's cache.
-      if (group.avatarVersion) {
-        return avatarUrl + '?v=' + group.avatarVersion;
-      } else {
-        return avatarUrl;
-      }
-    }
+  if (!linkPath) return null;
 
-    // Use the Security Descriptor to
-    // generate an avatar
-    var type = group.sd && group.sd.type;
-    var linkPath = group.sd && group.sd.linkPath;
+  const githubUsername = getGithubUsernameFromGroup(group);
+  let avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
 
-    if (!linkPath) return null;
+  if (group.avatarVersion) {
+    avatarUrl = avatarUrl + '&v=' + group.avatarVersion;
 
-    var githubUsername;
+    return avatarUrl;
+  } else {
+    return avatarUrl;
+  }
+}
 
-    switch (type) {
-      case 'GH_ORG':
-      case 'GH_USER':
-        githubUsername = linkPath;
-        break;
+async function getAvatarUrlForGroupId(groupId, size) {
+  const group = await findOnSecondaryOrPrimary(groupId);
 
-      case 'GH_REPO':
-        githubUsername = linkPath.split('/')[0];
-    }
+  if (!group) return null;
 
-    if (!githubUsername) return null;
-    checkForAvatarUpdate(groupId, group, githubUsername);
+  checkForAvatarUpdate(group);
 
-    avatarUrl = 'https://avatars.githubusercontent.com/' + githubUsername + '?s=' + size;
-
-    if (group.avatarVersion) {
-      avatarUrl = avatarUrl + '&v=' + group.avatarVersion;
-
-      return avatarUrl;
-    } else {
-      return avatarUrl;
-    }
-  });
+  return _getAvatarFromGroup(group, size) || _getAvatarFromSecurityDescriptor(group, size);
 }
 
 module.exports = {

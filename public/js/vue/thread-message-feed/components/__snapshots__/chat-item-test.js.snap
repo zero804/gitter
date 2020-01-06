@@ -51,9 +51,7 @@ exports[`thread-message-feed chat-item editing matches snapshot 1`] = `
             May 18 2016 03:48
           </a>
            
-          <loading-spinner-stub
-            class="message-loading-icon"
-          />
+          <!---->
         </div>
          
         <textarea
