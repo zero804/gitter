@@ -12,6 +12,7 @@ Developer facing:
  - Add `glGroupService.isMaintainer` for `GL_GROUP_MAINTAINER` admins, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1712
  - Remove Bluebird promise usage for async/await `gl-group-policy-delegate.js` compatibility, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1714
  - Add `#integrationGitlabUser1` for easy GitLab integration testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1709
+ - Add GitLab user service, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1707
 
 
 # 20.13.0 - 2020-01-03
