@@ -1,6 +1,7 @@
 # 20.14.0 - *upcoming*
 
  - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713
+ - Prevent notification email replies to go to support@gitter.im, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1589
 
 Developer facing:
 
