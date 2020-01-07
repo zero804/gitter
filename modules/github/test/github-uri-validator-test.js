@@ -4,7 +4,7 @@ var assert = require('assert');
 var githubUriValidator = require('..').GitHubUriValidator;
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
-describe('github-user-service #slow #github', function() {
+describe('github-uri-validator #slow #github', function() {
   fixtureLoader.ensureIntegrationEnvironment(
     'GITTER_INTEGRATION_USERNAME',
     'GITTER_INTEGRATION_USER_SCOPE_TOKEN'
@@ -20,7 +20,7 @@ describe('github-user-service #slow #github', function() {
       assert(result);
       assert.strictEqual(result.type, 'ORG');
       assert.strictEqual(result.uri, 'gitterHQ');
-      assert.strictEqual(result.githubId, 5990364);
+      assert.strictEqual(result.externalId, 5990364);
     });
   });
 
@@ -28,7 +28,7 @@ describe('github-user-service #slow #github', function() {
     return githubUriValidator(FAKE_USER, 'suprememoocow').then(function(result) {
       assert.deepEqual(result, {
         description: 'Andrew Newdigate',
-        githubId: 594566,
+        externalId: 594566,
         type: 'USER',
         uri: 'suprememoocow'
       });
@@ -40,7 +40,7 @@ describe('github-user-service #slow #github', function() {
       assert(result);
       assert.strictEqual(result.type, 'REPO');
       assert.strictEqual(result.uri, 'gitterHQ/gitter');
-      assert.strictEqual(result.githubId, 14863998);
+      assert.strictEqual(result.externalId, 14863998);
     });
   });
 

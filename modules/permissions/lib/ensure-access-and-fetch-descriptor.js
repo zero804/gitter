@@ -2,7 +2,7 @@
 
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
-var validateGitHubUri = require('gitter-web-github').GitHubUriValidator;
+var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
 var securityDescriptorGenerator = require('./security-descriptor-generator');
 var policyFactory = require('./policy-factory');
 
@@ -60,7 +60,7 @@ function validateAndFetchBackingInfoForGitHub(user, options) {
     throw new StatusError(400, 'GitHub objects must have a linkPath');
   }
 
-  return validateGitHubUri(user, options.linkPath).then(function(githubInfo) {
+  return validateGithubUri(user, options.linkPath).then(function(githubInfo) {
     if (!githubInfo) throw new StatusError(404);
     var type = validateGitHubType(options.type, githubInfo.type);
 
@@ -109,11 +109,11 @@ function ensureAccessAndFetchDescriptor(user, options) {
   var linkPath = options.linkPath;
   var internalId = options.internalId;
 
-  return validateAndFetchBackingInfo(user, options).spread(function(type, githubInfo) {
+  return validateAndFetchBackingInfo(user, options).spread(function(type, info) {
     return securityDescriptorGenerator.generate(user, {
       type: type,
       linkPath: linkPath,
-      externalId: githubInfo && githubInfo.githubId,
+      externalId: info && info.externalId,
       internalId: internalId,
       security: security
     });
