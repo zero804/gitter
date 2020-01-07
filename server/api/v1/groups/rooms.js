@@ -33,6 +33,7 @@ function getCreateOptions(input) {
 
       case 'GH_REPO':
       case 'GH_ORG':
+      case 'GL_GROUP':
         assert(linkPath, 'linkPath required');
         break;
     }
