@@ -9,7 +9,8 @@ Developer facing:
  - Add `GL_GROUP` to create room server input validation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1717
  - Remove unused `permission-combinations.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1719
  - Add `glGroupService.isMaintainer` for `GL_GROUP_MAINTAINER` admins, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1712
-
+ - Remove Bluebird promise usage for async/await `gl-group-policy-delegate.js` compatibility, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1714
+ 
 
 # 20.13.0 - 2020-01-03
 
