@@ -32,10 +32,11 @@
     "viewCache": true
   },
   "email": {
-    "domain": "beta.gitter.im",
     "emailBasePath": "https://beta.gitter.im"
   },
   "notifications": {
+    "notificationsSender": "support@beta.gitter.im",
+    "replyToAddress":  "no-reply@beta.gitter.im",
     "emailNotificationsAfterMins": 1,
     "timeBeforeNextEmailNotificationMins": 5
   },
