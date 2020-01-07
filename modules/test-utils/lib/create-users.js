@@ -11,7 +11,7 @@ var integrationFixtures = require('./integration-fixtures');
 
 var userCounter = 0;
 
-function getIntegrationConfig(f) {
+function getIntegrationConfig(expected, fixtureName, f) {
   if (f === '#integrationUser1') {
     return {
       doc: {
@@ -19,7 +19,7 @@ function getIntegrationConfig(f) {
         githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
         accessToken: 'web-internal'
       },
-      deleteQuery: {
+      removeQuery: {
         username: integrationFixtures.fixtures.GITTER_INTEGRATION_USERNAME
       }
     };
@@ -32,23 +32,47 @@ function getIntegrationConfig(f) {
         githubToken: integrationFixtures.fixtures.GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN,
         accessToken: 'web-internal'
       },
-      deleteQuery: {
+      removeQuery: {
         username: integrationFixtures.GITTER_INTEGRATION_COLLAB_USERNAME
       }
     };
   }
+  if (f === '#integrationGitlabUser1') {
+    // Push the backing identity that will be created down the line in `create-identities.js`
+    expected[`identity${fixtureName}`] = {
+      user: fixtureName,
+      provider: 'gitlab',
+      providerKey: integrationFixtures.fixtures.GITLAB_USER_ID,
+      username: integrationFixtures.fixtures.GITLAB_USER_USERNAME,
+      accessToken: integrationFixtures.fixtures.GITLAB_USER_TOKEN
+    };
+
+    const username = `${integrationFixtures.fixtures.GITLAB_USER_USERNAME}_gitlab`;
+    return {
+      doc: {
+        username,
+        accessToken: 'web-internal',
+        githubId: undefined
+      },
+      removeQuery: {
+        username
+      }
+    };
+  }
 }
-function createUser(fixtureName, f) {
+
+function createUser(expected, fixtureName) {
+  let f = expected[fixtureName];
   debug('Creating %s', fixtureName);
 
   var preremove = null;
 
-  var integrationConfig = getIntegrationConfig(f);
+  var integrationConfig = getIntegrationConfig(expected, fixtureName, f);
   if (integrationConfig) {
     f = integrationConfig.doc;
-    if (integrationConfig.deleteQuery) {
+    if (integrationConfig.removeQuery) {
       preremove = function() {
-        return User.remove(integrationConfig.deleteQuery);
+        return User.remove(integrationConfig.removeQuery);
       };
     }
   }
@@ -162,7 +186,7 @@ function createExtraUsers(expected, fixture, key) {
       if (expected[user]) return; // Already specified at the top level
 
       expected[user] = {};
-      return createUser(user, {}).then(function(createdUser) {
+      return createUser(expected, user).then(function(createdUser) {
         fixture[user] = createdUser;
       });
     }
@@ -173,7 +197,7 @@ function createExtraUsers(expected, fixture, key) {
 
     debug('creating extra user %s', fixtureName);
 
-    return createUser(fixtureName, user).then(function(user) {
+    return createUser(expected, fixtureName).then(function(user) {
       fixture[fixtureName] = user;
     });
   }).then(function() {
@@ -194,7 +218,7 @@ function createExtraUsers(expected, fixture, key) {
 function createUsers(expected, fixture) {
   return Promise.map(Object.keys(expected), function(key) {
     if (key.match(/^user/)) {
-      return createUser(key, expected[key]).then(function(user) {
+      return createUser(expected, key).then(function(user) {
         fixture[key] = user;
       });
     }

@@ -29,7 +29,8 @@ describe('identityService', function() {
     identity1: {
       user: 'user1',
       provider: 'google',
-      providerKey: 'google-identity'
+      providerKey: 'google-identity',
+      username: 'some-google-username'
     }
   });
 
@@ -68,7 +69,13 @@ describe('identityService', function() {
           assert.deepEqual(identities, [
             {
               provider: 'google',
-              providerKey: 'google-identity'
+              providerKey: 'google-identity',
+              username: 'some-google-username',
+              displayName: null,
+              email: null,
+              accessToken: null,
+              refreshToken: null,
+              avatar: null
             }
           ]);
         });

@@ -36,8 +36,11 @@ var configurationMappings = {
   TWITTER_CONSUMER_KEY: 'twitteroauth:consumer_key',
   TWITTER_CONSUMER_SECRET: 'twitteroauth:consumer_secret',
 
+  GITLAB_USER_ID: 'integrationTests:gitlabTestUser:id',
   GITLAB_USER_USERNAME: 'integrationTests:gitlabTestUser:username',
   GITLAB_USER_TOKEN: 'integrationTests:gitlabTestUser:token',
+  GITLAB_GROUP1_ID: 'integrationTests:gitlabGroup1:id',
+  GITLAB_GROUP1_URI: 'integrationTests:gitlabGroup1:uri',
   GITLAB_PUBLIC_PROJECT1_URI: 'integrationTests:gitlabPublicProject1:uri',
   GITLAB_PRIVATE_PROJECT1_URI: 'integrationTests:gitlabPrivateProject1:uri',
   GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI: 'integrationTests:gitlabUnauthorizedPrivateProject1:uri'
@@ -53,6 +56,7 @@ var configSets = {
     'GITTER_INTEGRATION_COLLAB_USERNAME',
     'GITTER_INTEGRATION_COLLAB_USER_SCOPE_TOKEN'
   ],
+  '#integrationGitlabUser1': ['GITLAB_USER_ID', 'GITLAB_USER_USERNAME', 'GITLAB_USER_TOKEN'],
   '#oauthTokens': [
     'GITHUB_PRIVATE_CLIENT_ID',
     'GITHUB_PRIVATE_CLIENT_SECRET',
