@@ -4,45 +4,51 @@ var mongoose = require('gitter-web-mongoose-bluebird');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
+const TYPES = [
+  null, // No association
+  'ONE_TO_ONE',
+  'GL_GROUP', // Associated with GitLab group
+  'GH_REPO', // Associated with a GitHub repo
+  'GH_ORG', // Associated with a GitHub org
+  'GH_USER', // Associated with a GitHub user
+  'GROUP' // Associated with a Gitter community
+];
+
+const MEMBERS = [
+  null, // For one-to-one
+  'PUBLIC', // Anyone
+  'INVITE', // Only invited users can join (private)
+  'INVITE_OR_ADMIN', // Invited users or admins
+  'GL_GROUP_MEMBER', // for GL_GROUP, must be member of group
+  'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
+  'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
+  'GH_ORG_MEMBER' // for GH_ORG, must be org member
+];
+
+const ADMINS = [
+  null, // For one-to-one rooms
+  'MANUAL', // Only users in extraUserIds are admins
+  'GL_GROUP_MAINTAINER', // for GL_GROUP, must be maintainer in group
+  'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
+  'GH_ORG_MEMBER', // for GH_ORG, must be org member
+  'GH_USER_SAME', // For GH_USER, user is same
+  'GROUP_ADMIN' // for GROUP, must be a group admin
+];
+
 var SecurityDescriptorSchema = new Schema(
   {
     type: {
       type: String,
-      enum: [
-        null, // No association
-        'ONE_TO_ONE',
-        'GL_GROUP', // Associated with GitLab group
-        'GH_REPO', // Associated with a GitHub repo
-        'GH_ORG', // Associated with a GitHub org
-        'GH_USER', // Associated with a GitHub user
-        'GROUP' // Associated with a Gitter community
-      ],
+      enum: TYPES,
       required: false
     },
     members: {
       type: String,
-      enum: [
-        null, // For one-to-one
-        'PUBLIC', // Anyone
-        'INVITE', // Only invited users can join (private)
-        'INVITE_OR_ADMIN', // Invited users or admins
-        'GL_GROUP_MEMBER', // for GL_GROUP, must be member of group
-        'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
-        'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
-        'GH_ORG_MEMBER' // for GH_ORG, must be org member
-      ]
+      enum: MEMBERS
     },
     admins: {
       type: String,
-      enum: [
-        null, // For one-to-one rooms
-        'MANUAL', // Only users in extraUserIds are admins
-        'GL_GROUP_MAINTAINER', // for GL_GROUP, must be maintainer in group
-        'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
-        'GH_ORG_MEMBER', // for GH_ORG, must be org member
-        'GH_USER_SAME', // For GH_USER, user is same
-        'GROUP_ADMIN' // for GROUP, must be a group admin
-      ]
+      enum: ADMINS
     },
     public: { type: Boolean },
     linkPath: { type: String },
@@ -100,5 +106,8 @@ SecurityDescriptorSchema.extraIndices = [
 ];
 
 module.exports = {
-  Schema: SecurityDescriptorSchema
+  Schema: SecurityDescriptorSchema,
+  TYPES,
+  MEMBERS,
+  ADMINS
 };

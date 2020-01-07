@@ -4,18 +4,12 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var userId = mongoUtils.getNewObjectIdString();
 var groupId = mongoUtils.getNewObjectIdString();
 var securityDescriptorValidator = require('../lib/security-descriptor-validator');
+const {
+  TYPES,
+  MEMBERS,
+  ADMINS
+} = require('gitter-web-persistence/lib/schemas/security-descriptor-subdocument');
 
-var TYPES = ['GROUP', 'GH_REPO', 'GH_ORG', 'ONE_TO_ONE', 'GH_USER', null];
-var MEMBERS = [
-  'PUBLIC',
-  'INVITE',
-  'INVITE_OR_ADMIN',
-  'GH_REPO_ACCESS',
-  'GH_REPO_PUSH',
-  'GH_ORG_MEMBER',
-  null
-];
-var ADMINS = ['GROUP_ADMIN', 'MANUAL', 'GH_REPO_PUSH', 'GH_ORG_MEMBER', 'GH_USER_SAME', null];
 var PUBLICS = [true, false, undefined, null];
 var LINK_PATHS = ['gitterHQ', 'gitterHQ/test', null];
 var EXTERNAL_IDS = ['1', null];
