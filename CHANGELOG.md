@@ -14,6 +14,7 @@ Developer facing:
  - Add `#integrationGitlabUser1` for easy GitLab integration testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1709
  - Add GitLab user service, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1707
  - Add `pre-creation/gl-group-policy-evaluator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1708
+ - Update groups API doc with `GL_GROUP` backing type, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1716
 
 
 # 20.13.0 - 2020-01-03
