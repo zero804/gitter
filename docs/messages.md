@@ -84,6 +84,21 @@ We support a few /commands and will continue to add new ones. At the moment, you
  - `/unban @username`: Unbans a user from a conversation. Only available to owners/admins in public rooms.
 
 
+
+## Threaded conversations **[BETA]**
+
+> This feature is currently in beta and needs to be turned on by the room admin.
+> In the future, we plan to roll this out to everyone by default
+>
+> See the [rooms doc enable threaded discussion section](./rooms.md#enable-threaded-conversations-beta)
+
+You can have a threaded conversation by using the **Start a thread**/**Reply in thread** option in the message `...` dropdown in the top-right of every message.
+
+We only support one-level of threading from the main message feed.
+
+![](https://i.imgur.com/wZ2TbCV.png) ![](https://i.imgur.com/BAfwC6v.png)
+
+
 ## Edit messages
 
 You can edit your own messages within the 5 minute edit window. The **Edit** option is available in the message `...` dropdown in the top-right of every message.
