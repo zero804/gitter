@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const debug = require('debug')('gitter:app:permissions:gl-group-policy-delegate');
 const { GitLabGroupService } = require('gitter-web-gitlab');
 const PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 const identityService = require('gitter-web-identity');
@@ -16,19 +17,25 @@ class GlGroupPolicyDelegate {
   }
 
   async hasPolicy(policyName) {
-    if (policyName !== 'GL_GROUP_MEMBER') {
-      return false;
-    }
-
     if (!this._isValidUser()) {
       return false;
     }
 
-    if (this._cachedIsMember === undefined) {
-      this._cachedIsMember = await this._checkMembership();
+    if (this._cachedMembership === undefined) {
+      this._cachedMembership = await this._checkMembership();
     }
 
-    return this._cachedIsMember;
+    switch (policyName) {
+      case 'GL_GROUP_MEMBER':
+        return !!(this._cachedMembership && this._cachedMembership.isMember);
+
+      case 'GL_GROUP_MAINTAINER':
+        return !!(this._cachedMembership && this._cachedMembership.isMaintainer);
+
+      default:
+        debug(`Unknown permission ${policyName}, denying access`);
+        return false;
+    }
   }
 
   getAccessDetails() {
@@ -60,13 +67,12 @@ class GlGroupPolicyDelegate {
     const gitLabIdentity = await identityService.getIdentityForUser(user, 'gitlab');
 
     if (!gitLabIdentity) {
-      return false;
+      return null;
     }
 
     try {
       const glGroupService = new GitLabGroupService(user);
-      const isMember = await glGroupService.isMember(uri, gitLabIdentity.providerKey);
-      return isMember;
+      return await glGroupService.getMembership(uri, gitLabIdentity.providerKey);
     } catch (err) {
       throw new PolicyDelegateTransportError(err.message);
     }
