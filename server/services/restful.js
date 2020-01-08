@@ -176,15 +176,6 @@ function serializeOrgsForUserId(userId, options) {
   });
 }
 
-function serializeUnusedOrgsForUser(user) {
-  return orgService.getUnusedOrgsForUser(user).then(function(orgs) {
-    var strategy = new restSerializer.GithubOrgStrategy({
-      currentUserId: user && user._id
-    });
-    return restSerializer.serialize(orgs, strategy);
-  });
-}
-
 function serializeReposForUser(user) {
   return repoService.getReposForUser(user).then(function(repos) {
     var strategy = new restSerializer.GithubRepoStrategy({
@@ -280,7 +271,6 @@ module.exports = {
   serializeEventsForTroupe: serializeEventsForTroupe,
   serializeOrgsForUser: serializeOrgsForUser,
   serializeOrgsForUserId: serializeOrgsForUserId,
-  serializeUnusedOrgsForUser: serializeUnusedOrgsForUser,
   serializeReposForUser: serializeReposForUser,
   serializeUnusedReposForUser: serializeUnusedReposForUser,
   serializeAdminReposForUser: serializeAdminReposForUser,
