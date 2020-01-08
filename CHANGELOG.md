@@ -19,6 +19,7 @@ Developer facing:
  - Remove orphaned "unused org" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1715
  - Remove orphaned "unused repo" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1720
  - Add `GL_GROUP_MAINTAINER` permissions to the `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1711
+ - Add `GL_GROUP` support to `ensure-access-and-fetch-descriptor`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1702
 
 
 # 20.13.0 - 2020-01-03
