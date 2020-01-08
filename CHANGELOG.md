@@ -18,6 +18,7 @@ Developer facing:
  - Add `gitlab-uri-validator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1706
  - Remove orphaned "unused org" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1715
  - Remove orphaned "unused repo" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1720
+ - Add `GL_GROUP_MAINTAINER` permissions to the `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1711
 
 
 # 20.13.0 - 2020-01-03
