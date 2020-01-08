@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
+const validateGitlabUri = require('gitter-web-gitlab').GitLabUriValidator;
 var securityDescriptorGenerator = require('./security-descriptor-generator');
 var policyFactory = require('./policy-factory');
 
@@ -12,7 +13,7 @@ var policyFactory = require('./policy-factory');
  * `GH_GUESS` option
  * @private
  */
-function validateGitHubType(requestedType, actualGitHubType) {
+function validateGithubType(requestedType, actualGitHubType) {
   var expectedGitHubType;
 
   switch (requestedType) {
@@ -55,14 +56,46 @@ function validateGitHubType(requestedType, actualGitHubType) {
   return requestedType;
 }
 
-function validateAndFetchBackingInfoForGitHub(user, options) {
+/**
+ * Ensures the security descriptor type matches the backend object type
+ * and resolves the backend type in the case of the nasty
+ * @private
+ */
+function validateGitlabType(requestedType, actualGitlabType) {
+  var expectedGitlabType;
+
+  switch (requestedType) {
+    case 'GL_GROUP':
+      expectedGitlabType = 'GROUP';
+      break;
+
+    // TODO: `GL_PROJECT`
+    //case 'GL_PROJECT':
+    //  expectedGitlabType = 'PROJECT';
+    //  break;
+
+    default:
+      throw new StatusError('Unknown type:' + requestedType);
+  }
+
+  if (expectedGitlabType !== actualGitlabType) {
+    throw new StatusError(
+      400,
+      'Backing object does not match type: ' + expectedGitlabType + ' vs ' + actualGitlabType
+    );
+  }
+
+  return requestedType;
+}
+
+function validateAndFetchBackingInfoForGithub(user, options) {
   if (!options.linkPath) {
     throw new StatusError(400, 'GitHub objects must have a linkPath');
   }
 
   return validateGithubUri(user, options.linkPath).then(function(githubInfo) {
     if (!githubInfo) throw new StatusError(404);
-    var type = validateGitHubType(options.type, githubInfo.type);
+    var type = validateGithubType(options.type, githubInfo.type);
 
     var policyEvaluator;
     if (options.obtainAccessFromGitHubRepo) {
@@ -84,6 +117,23 @@ function validateAndFetchBackingInfoForGitHub(user, options) {
   });
 }
 
+async function validateAndFetchBackingInfoForGitlab(user, options) {
+  if (!options.linkPath) {
+    throw new StatusError(400, 'GitLab objects must have a linkPath');
+  }
+
+  const gitlabInfo = await validateGitlabUri(user, options.linkPath);
+  if (!gitlabInfo) throw new StatusError(404);
+  const type = validateGitlabType(options.type, gitlabInfo.type);
+
+  var policyEvaluator = policyFactory.getPreCreationPolicyEvaluator(user, type, options.linkPath);
+
+  const isAdmin = await policyEvaluator.canAdmin();
+  if (!isAdmin) throw new StatusError(403);
+
+  return [type, gitlabInfo];
+}
+
 function validateAndFetchBackingInfo(user, options) {
   switch (options.type || null) {
     case null:
@@ -94,7 +144,10 @@ function validateAndFetchBackingInfo(user, options) {
     case 'GH_REPO':
     case 'GH_USER':
     case 'GH_GUESS':
-      return validateAndFetchBackingInfoForGitHub(user, options);
+      return validateAndFetchBackingInfoForGithub(user, options);
+
+    case 'GL_GROUP':
+      return validateAndFetchBackingInfoForGitlab(user, options);
 
     case 'GROUP':
       return Promise.resolve(['GROUP', null]);
@@ -104,19 +157,19 @@ function validateAndFetchBackingInfo(user, options) {
   }
 }
 
-function ensureAccessAndFetchDescriptor(user, options) {
-  var security = options.security || 'PUBLIC';
-  var linkPath = options.linkPath;
-  var internalId = options.internalId;
+async function ensureAccessAndFetchDescriptor(user, options) {
+  const security = options.security || 'PUBLIC';
+  const linkPath = options.linkPath;
+  const internalId = options.internalId;
 
-  return validateAndFetchBackingInfo(user, options).spread(function(type, info) {
-    return securityDescriptorGenerator.generate(user, {
-      type: type,
-      linkPath: linkPath,
-      externalId: info && info.externalId,
-      internalId: internalId,
-      security: security
-    });
+  const [type, info] = await validateAndFetchBackingInfo(user, options);
+
+  return securityDescriptorGenerator.generate(user, {
+    type,
+    linkPath,
+    externalId: info && info.externalId,
+    internalId,
+    security
   });
 }
 

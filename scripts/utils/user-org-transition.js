@@ -9,7 +9,7 @@ var roomService = require('gitter-web-rooms');
 var userService = require('gitter-web-users');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
-var validateUri = require('gitter-web-github').GitHubUriValidator;
+var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
 // var permissionsModel = require('gitter-web-permissions/lib/permissions-model');
 var permissionsModel = null;
 // THIS SCRIPT NEEDS REWRITING
@@ -47,7 +47,7 @@ function performUserToOrgTransition(usernameForConversion, firstUserUsername, dr
       context.userForConversion = userForConversion;
       context.firstUser = firstUser;
       return [
-        validateUri(firstUser, usernameForConversion),
+        validateGithubUri(firstUser, usernameForConversion),
         permissionsModel(firstUser, 'create', usernameForConversion, 'ORG', null)
       ];
     })
