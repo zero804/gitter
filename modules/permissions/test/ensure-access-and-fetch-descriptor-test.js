@@ -31,12 +31,10 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   });
 
   it('should throw an error if you give it an unknown type', async () => {
-    try {
-      await ensureAccessAndFetchDescriptor(fixture.user1, { type: 'foo' });
-      assert.ok(false, 'Expected error');
-    } catch (err) {
+    await assert.rejects(ensureAccessAndFetchDescriptor(fixture.user1, { type: 'foo' }), err => {
       assert.strictEqual(err.status, 400);
-    }
+      return true;
+    });
   });
 
   describe('GitHub', () => {
@@ -116,45 +114,45 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     });
 
     it('should throw an error if the returned github type does not match as expected', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.user1, {
+      await assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.user1, {
           type: 'GH_ORG',
           linkPath: fixtureLoader.GITTER_INTEGRATION_REPO_FULL,
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 400);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 400);
+          return true;
+        }
+      );
     });
 
     it('should throw an error if the user does not have access', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.user1, {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.user1, {
           type: 'GH_ORG',
           linkPath: 'gitterHQ',
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 403);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 403);
+          return true;
+        }
+      );
     });
 
     it('should throw an error if the github object does not exist', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.user1, {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.user1, {
           type: 'GH_ORG',
           linkPath: 'foo-foo-does-not-exist',
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 404);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 404);
+          return true;
+        }
+      );
     });
   });
 
@@ -177,45 +175,45 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     });
 
     it('should throw an error if the returned GitLab type does not match as expected', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
           type: 'GL_GROUP',
           linkPath: fixtureLoader.GITLAB_USER_USERNAME,
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 400);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 400);
+          return true;
+        }
+      );
     });
 
     it('should throw an error if the user does not have access', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
           type: 'GL_GROUP',
           linkPath: 'gitlab-org/gitter',
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 403);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 403);
+          return true;
+        }
+      );
     });
 
     it('should throw an error if the GitLab object does not exist', async () => {
-      try {
-        await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
           type: 'GL_GROUP',
           linkPath: 'foo-foo-does-not-exist',
           security: 'PUBLIC'
-        });
-
-        assert.ok(false, 'Expected error');
-      } catch (err) {
-        assert.strictEqual(err.status, 404);
-      }
+        }),
+        err => {
+          assert.strictEqual(err.status, 404);
+          return true;
+        }
+      );
     });
   });
 });
