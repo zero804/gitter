@@ -10,11 +10,9 @@
     "test": "mocha test/"
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
     "gitter-web-cdn": "file:../cdn",
     "gitter-web-env": "file:../env",
-    "gitter-web-templates": "file:../templates",
-    "lodash": "^3.2.0"
+    "gitter-web-templates": "file:../templates"
   },
   "private": true
 }

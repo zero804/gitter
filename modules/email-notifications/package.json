@@ -17,8 +17,6 @@
     "gitter-web-email-addresses": "file:../email-addresses",
     "gitter-web-shared": "file:../../shared",
     "gitter-web-persistence-utils": "file:../persistence-utils",
-    "moment": "^2.10.3",
-    "bluebird": "^3.5.1",
     "gitter-web-i18n": "file:../i18n",
     "gitter-web-permissions": "file:../permissions"
   },

@@ -11,6 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.5.1"
+
   }
 }
