@@ -70,11 +70,11 @@ describe('thread message feed store', () => {
         initialState = {
           parentId: '5d11d571a2405419771cd3ee',
           draftMessage: 'testMessage',
-          user: { _id: 'userId' }
+          user: { id: 'userId' }
         };
         tmpMessage = {
           id: `tmp-5d11d571a2405419771cd3ee-userId-testMessage`,
-          fromUser: { _id: 'userId' },
+          fromUser: { id: 'userId' },
           text: initialState.draftMessage,
           parentId: initialState.parentId,
           sent: new Date(Date.now()),
@@ -282,7 +282,7 @@ describe('thread message feed store', () => {
           sent: sentDateISOString
         });
       const state = {
-        user: { _id: 'currentUserId' },
+        user: { id: 'currentUserId' },
         childMessages: [
           createTestMessage('5d111', 'currentUserId', '2018-03-11:00:00:00.000Z'),
           //this is the latest message (latest as in order of `childMessages` array) that can be edited by currentUser
