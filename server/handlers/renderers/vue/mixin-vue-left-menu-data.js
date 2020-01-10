@@ -2,13 +2,21 @@
 const Promise = require('bluebird');
 const vueRenderToString = require('../vue-ssr-renderer');
 const restful = require('../../../services/restful');
-var contextGenerator = require('../../../web/context-generator');
-var generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
+const restSerializer = require('../../../serializers/rest-serializer');
+const contextGenerator = require('../../../web/context-generator');
+const generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot');
 
 async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const user = req.user;
   const userId = user && user.id;
-  const [groups, rooms, baseTroupeContext, userThemeSnapshot] = await Promise.all([
+  const [
+    serializedUser,
+    serializedGroups,
+    serializedRooms,
+    baseTroupeContext,
+    userThemeSnapshot
+  ] = await Promise.all([
+    restSerializer.serializeObject(user, new restSerializer.UserStrategy()),
     restful.serializeGroupsForUserId(userId),
     restful.serializeTroupesForUser(userId),
     contextGenerator.generateTroupeContext(req),
@@ -25,7 +33,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     roomMap[currentRoom.id] = currentRoom;
   }
 
-  rooms.forEach(room => {
+  serializedRooms.forEach(room => {
     roomMap[room.id] = room;
   });
 
@@ -34,7 +42,7 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const storeData = {
     isMobile,
     isLoggedIn: !!user,
-    user,
+    user: serializedUser,
     darkTheme: userThemeSnapshot.theme === 'gitter-dark',
 
     roomMap,
@@ -67,8 +75,8 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
       ...(existingData.troupeContext || {}),
       snapshots: {
         ...((existingData.troupeContext || {}).snapshots || {}),
-        allRooms: rooms,
-        groups: groups
+        allRooms: serializedRooms,
+        groups: serializedGroups
       }
     }
   };
