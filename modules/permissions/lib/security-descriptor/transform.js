@@ -61,6 +61,9 @@ function validateTransformation(Model, sd, newType, groupId) {
   }
 }
 
+// Migrate a security descritpor to another type
+// You can currently only go from a backed(GitHub, GitLab) group/room to a unbacked(null, Group) group/room
+//
 // eslint-disable-next-line complexity
 function transform(Model, sd, newType, options) {
   var groupId = options && options.groupId;
@@ -81,6 +84,8 @@ function transform(Model, sd, newType, options) {
       if (newType !== 'GROUP') break;
       return transformToGroup(sd, groupId);
 
+    // TODO: GL_PROJECT
+    case 'GL_GROUP':
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':
