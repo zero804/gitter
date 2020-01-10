@@ -174,12 +174,54 @@ Once you are sure the above is done, preform the following:
 
 - You can access the homepage even when signed in by using the `?redirect=no` query - https://gitter.im/?redirect=no (http://localhost:5000/?redirect=no)
 
-### Easily get your access token
+### Easily get your Gitter access token
 
 1. You can get your access token by running `troupeContext.accessToken` in the browser's DevTools console
 
-### Sign in with access token
+### Sign in with Gitter access token
 
 1. Open Gitter in a different browser using the `access_token` query parameter, `https://gitter.im/?access_token=<your token>`
 
 If you are using the desktop app, you can follow [these steps to manually authorize](https://gitlab.com/gitlab-org/gitter/desktop/#manually-sign-inauthorize)
+
+### Invalidate Gitter access token
+
+You can use the handy utility script: `scripts/utils/delete-token.js`
+
+Or you can simply delete the token from the database,
+
+```sh
+$ ssh mongo-replica-01.prod.gitter
+$ mongo mongo-replica-01.prod.gitter
+
+> use gitter
+> db.oauthaccesstokens.findOne({ token: 'xxx' })
+> db.oauthaccesstokens.remove({ token: 'xxx' })
+```
+
+
+### Invalidate a GitHub access token
+
+If a GitHub token leaks, we can invalidate with the https://developer.github.com/v3/apps/oauth_applications/#delete-an-app-token API
+
+To grab the `clientId` and `clientSecret` for the request below, use the following links:
+
+ - For `user.githubUserToken` -> `Gitter Public Repo Access`: https://github.com/organizations/gitterHQ/settings/applications/70282
+ - For `user.githubToken` -> `Gitter Private Repo Access`: https://github.com/organizations/gitterHQ/settings/applications/69324
+
+Then fire off the request to delete the GitHub token:
+```
+DELETE https://api.github.com/applications/:clientId/token
+
+Basic authentication
+Username: <clientId>
+Password: <clientSecret>
+
+Accept: application/vnd.github.doctor-strange-preview+json
+Content-Type: application/json
+
+Body:
+{
+	"access_token": "xxxtokentorevoke"
+}
+```
