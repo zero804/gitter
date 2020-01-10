@@ -21,6 +21,7 @@ Developer facing:
  - Add `GL_GROUP_MAINTAINER` permissions to the `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1711
  - Add `GL_GROUP` support to `ensure-access-and-fetch-descriptor`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1702
  - Use `assert.rejects()` for standard promise rejection assertion, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1723
+ - Add `GL_GROUP` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1721
 
 
 # 20.13.0 - 2020-01-03
