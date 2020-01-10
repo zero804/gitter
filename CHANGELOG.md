@@ -24,6 +24,11 @@ Developer facing:
  - Add `GL_GROUP` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1721
 
 
+# 20.13.1 - 2020-01-10
+
+- Serialize user before passing to Vue initial state frontend, https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/44
+
+
 # 20.13.0 - 2020-01-03
 
  - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695
