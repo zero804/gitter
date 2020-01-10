@@ -131,7 +131,7 @@ export default {
       const fromUser = rootState.user;
       const tmpMessage = {
         ...messagePayload,
-        id: generateChildMessageTmpId(state.parentId, fromUser._id, state.draftMessage),
+        id: generateChildMessageTmpId(state.parentId, fromUser.id, state.draftMessage),
         fromUser,
         sent: new Date(Date.now())
       };
@@ -209,7 +209,7 @@ export default {
     },
     editLastMessage: ({ dispatch, getters, rootState }) => {
       const isEditable = message => {
-        const policy = new ChatItemPolicy(message, { currentUserId: rootState.user._id });
+        const policy = new ChatItemPolicy(message, { currentUserId: rootState.user.id });
         return policy.canEdit();
       };
       const lastEditableMessage = [...getters.childMessages].reverse().find(isEditable);
