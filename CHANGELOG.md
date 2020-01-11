@@ -1,3 +1,10 @@
+# 20.15.0 - *upcoming*
+
+Developer facing:
+
+ - Defer to root `package.json` for npm packages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1724
+
+
 # 20.14.0 - 2019-01-10
 
  - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713
