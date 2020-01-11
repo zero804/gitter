@@ -11,8 +11,7 @@
   },
   "private": true,
   "dependencies": {
-    "gitter-web-backend-muxer": "file:../backend-muxer",
-    "bluebird": "^3.5.1"
+    "gitter-web-backend-muxer": "file:../backend-muxer"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"

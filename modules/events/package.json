@@ -12,10 +12,7 @@
   "private": true,
   "dependencies": {
     "gitter-web-persistence": "file:../persistence",
-    "gitter-web-text-processor": "file:../text-processor",
-    "mongodb": "^2.2.35",
-    "bluebird": "^3.5.1",
-    "statuserror": "^0.1.3"
+    "gitter-web-text-processor": "file:../text-processor"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"

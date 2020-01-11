@@ -11,8 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "debug": "^2.2.0",
     "gitter-web-avatars": "file:../avatars",
     "gitter-web-env": "file:../env",
     "gitter-web-github": "file:../github",
@@ -20,10 +18,7 @@
     "gitter-web-permissions": "file:../permissions",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils",
-    "gitter-web-validators": "file:../validators",
-    "lazy.js": "^0.4.2",
-    "lodash": "^3.2.0",
-    "statuserror": "^0.1.3"
+    "gitter-web-validators": "file:../validators"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"

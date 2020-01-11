@@ -11,11 +11,8 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "gitter-markdown-processor": "^15.0.0",
     "gitter-web-env": "file:../env",
-    "gitter-web-github": "file:../github",
-    "shutdown": "^0.2.3"
+    "gitter-web-github": "file:../github"
   },
   "devDependencies": {}
 }

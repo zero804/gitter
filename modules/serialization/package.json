@@ -10,11 +10,8 @@
     "test": "mocha test/"
   },
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "debug": "^2.2.0",
     "gitter-web-env": "file:../env",
-    "gitter-web-utils": "file:../utils",
-    "lazy.js": "^0.4.2"
+    "gitter-web-utils": "file:../utils"
   },
   "devDependencies": {
     "gitter-web-persistence-utils": "file:../persistence-utils",
