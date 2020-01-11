@@ -11,7 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.5.1",
     "gitter-web-github-backend": "file:../github-backend",
     "gitter-web-gitlab-backend": "file:../gitlab-backend",
     "gitter-web-google-backend": "file:../google-backend",

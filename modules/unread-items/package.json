@@ -11,12 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "lodash": "^3.2.0",
-    "bluebird": "^3.5.1",
-    "mongodb-unique-ids": "^0.2.0",
-    "debug": "^2.2.0",
-    "lazy.js": "^0.4.2",
-    "moment": "^2.10.3",
     "gitter-web-env": "file:../env",
     "gitter-web-appevents": "file:../appevents",
     "gitter-web-persistence-utils": "file:../persistence-utils",
@@ -26,8 +20,7 @@
     "gitter-web-push-notification-filter": "file:../push-notification-filter",
     "gitter-web-presence": "file:../presence",
     "gitter-web-permissions": "file:../permissions",
-    "gitter-web-live-collection-events": "file:../live-collection-events",
-    "gitter-redis-scripto": "^0.2.2"
+    "gitter-web-live-collection-events": "file:../live-collection-events"
   },
   "devDependencies": {
     "gitter-web-test-utils": "file:../test-utils"

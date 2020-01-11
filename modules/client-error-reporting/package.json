@@ -10,8 +10,7 @@
     "test": "mocha test/"
   },
   "dependencies": {
-    "gitter-client-env": "file:../client-env",
-    "raven-js": "^3.24.2"
+    "gitter-client-env": "file:../client-env"
   },
   "private": true
 }
