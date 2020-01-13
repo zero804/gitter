@@ -3,6 +3,7 @@
 Developer facing:
 
  - Defer to root `package.json` for npm packages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1724
+ - Add docs on how to invalidate a GitHub and Gitter access tokens, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1725
 
 
 # 20.14.0 - 2019-01-10
