@@ -73,7 +73,7 @@ describe('room-service', function() {
         .then(function() {
           assert(false, 'Expected an exception');
         })
-        .catch(StatusError, function(err) {
+        .catch(err => {
           assert.strictEqual(err.status, 403);
         });
     });
@@ -119,12 +119,12 @@ describe('room-service', function() {
         .then(function() {
           assert(false, 'Expected an exception');
         })
-        .catch(StatusError, function(err) {
+        .catch(err => {
           assert.strictEqual(err.status, 403);
         });
     });
 
-    it('should find or create a room for an organization', function() {
+    it('should find or create a room for an organization', async () => {
       var groupId = new ObjectID();
       var uriResolver = mockito.mockFunction();
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
@@ -168,55 +168,54 @@ describe('room-service', function() {
           return Promise.resolve(null);
         });
 
-      return roomService
-        .createRoomByUri(fixture.user1, 'gitterTest')
-        .bind({})
-        .then(function(uriContext) {
-          this.uriContext = uriContext;
-          assert(uriContext.didCreate);
-          assert.equal(uriContext.troupe.uri, 'gitterTest');
-          assert.equal(uriContext.troupe.userCount, 0);
+      try {
+        const uriContext = await roomService.createRoomByUri(fixture.user1, 'gitterTest');
+        this.uriContext = uriContext;
+        assert(uriContext.didCreate);
+        assert.equal(uriContext.troupe.uri, 'gitterTest');
+        assert.equal(uriContext.troupe.userCount, 0);
 
-          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
-        })
-        .then(function(securityDescriptor) {
-          securityDescriptorValidator(securityDescriptor);
-          assert.deepEqual(securityDescriptor, {
-            admins: 'GH_ORG_MEMBER',
-            externalId: this.uriContext.troupe.githubId,
-            linkPath: 'gitterTest',
-            members: 'GH_ORG_MEMBER',
-            public: false,
-            type: 'GH_ORG'
-          });
-        })
-        .finally(function() {
-          return persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
+        const securityDescriptor = await securityDescriptorService.room.findById(
+          uriContext.troupe._id,
+          fixture.user1._id
+        );
+
+        securityDescriptorValidator(securityDescriptor);
+        assert.deepEqual(securityDescriptor, {
+          admins: 'GH_ORG_MEMBER',
+          externalId: this.uriContext.troupe.githubId,
+          linkPath: 'gitterTest',
+          members: 'GH_ORG_MEMBER',
+          public: false,
+          type: 'GH_ORG'
         });
+      } catch (err) {
+        throw err;
+      } finally {
+        await persistence.Troupe.remove({ uri: 'gitterTest' }).exec();
+      }
     });
 
-    it('should find or create a room for a person', function() {
+    it('should find or create a room for a person', async () => {
       var securityDescriptorService = require('gitter-web-permissions/lib/security-descriptor');
       var roomService = require('../lib/room-service');
 
-      return roomService
-        .createRoomByUri(fixture.user1, fixture.user2.username)
-        .bind({})
-        .then(function(uriContext) {
-          this.uriContext = uriContext;
-          assert(uriContext.troupe);
-          return securityDescriptorService.room.findById(uriContext.troupe._id, fixture.user1._id);
-        })
-        .then(function(securityDescriptor) {
-          securityDescriptorValidator(securityDescriptor);
+      const uriContext = await roomService.createRoomByUri(fixture.user1, fixture.user2.username);
+      this.uriContext = uriContext;
+      assert(uriContext.troupe);
+      const securityDescriptor = await securityDescriptorService.room.findById(
+        uriContext.troupe._id,
+        fixture.user1._id
+      );
 
-          assert.deepEqual(securityDescriptor, {
-            // extraAdmins: [],
-            // extraMembers: [],
-            public: false,
-            type: 'ONE_TO_ONE'
-          });
-        });
+      securityDescriptorValidator(securityDescriptor);
+
+      assert.deepEqual(securityDescriptor, {
+        // extraAdmins: [],
+        // extraMembers: [],
+        public: false,
+        type: 'ONE_TO_ONE'
+      });
     });
 
     it('should create a room for a repo', function() {
@@ -439,7 +438,7 @@ describe('room-service', function() {
         .then(function() {
           assert.ok(false, 'Expected an exception');
         })
-        .catch(StatusError, function(err) {
+        .catch(err => {
           assert.strictEqual(err.status, 404);
         });
     });
@@ -471,7 +470,7 @@ describe('room-service', function() {
         .then(function() {
           assert(false, 'Expected exception');
         })
-        .catch(StatusError, function(err) {
+        .catch(err => {
           assert.strictEqual(err.status, 403);
         });
     });
@@ -497,7 +496,7 @@ describe('room-service', function() {
         .then(function() {
           assert(false, 'Expected exception');
         })
-        .catch(StatusError, function(err) {
+        .catch(err => {
           assert.strictEqual(err.status, 403);
         });
     });
@@ -1529,7 +1528,7 @@ describe('room-service', function() {
           .then(function() {
             assert.ok(false, 'Expected an exception');
           })
-          .catch(StatusError, function() {
+          .catch(() => {
             // This is what we want...
           })
           .then(function() {

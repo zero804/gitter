@@ -256,121 +256,106 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
  *
  * @return { troupe: ..., uri: ..., policy: ..., roomMember: ..., accessDenied: ... }
  */
-function createRoomByUri(user, uri, options) {
+// eslint-disable-next-line complexity, max-statements
+async function createRoomByUri(user, uri, options = {}) {
   debug('createRoomByUri %s %s %j', user && user.username, uri, options);
 
-  var userId = user && user.id;
-  options = options || {};
+  const userId = user && user.id;
   validate.expect(uri, 'uri required');
 
   /* First off, try use local data to figure out what this url is for */
-  return uriResolver(user && user.id, uri, options).then(function(resolved) {
-    var resolvedUser = resolved && resolved.user;
-    var resolvedTroupe = resolved && resolved.room;
-    var resolvedGroup = resolved && resolved.group;
+  const resolved = await uriResolver(user && user.id, uri, options);
+  const resolvedUser = resolved && resolved.user;
+  const resolvedTroupe = resolved && resolved.room;
+  const resolvedGroup = resolved && resolved.group;
 
-    // We resolved only a group. There will never be a room at this URI
-    if (resolvedGroup && !resolvedTroupe) throw new StatusError(404);
+  // We resolved only a group. There will never be a room at this URI
+  if (resolvedGroup && !resolvedTroupe) throw new StatusError(404);
 
-    /* Deal with the case of the anonymous user first */
-    if (!user) {
-      if (resolvedUser) {
-        debug('uriResolver returned user for uri=%s', uri);
-        throw new StatusError(401);
-      }
-
-      if (resolvedTroupe) {
-        debug('uriResolver returned troupe for uri=%s', uri);
-
-        return policyFactory
-          .createPolicyForRoom(user, resolvedTroupe)
-          .then(function(policy) {
-            return policy.canRead();
-          })
-          .then(function(viewAccess) {
-            if (!viewAccess) throw new StatusError(404);
-
-            return {
-              troupe: resolvedTroupe
-            };
-          });
-      }
-
-      throw new StatusError(404);
-    }
-
-    // If the Uri Lookup returned a user, do a one-to-one
+  /* Deal with the case of the anonymous user first */
+  if (!user) {
     if (resolvedUser) {
-      if (mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-        debug('localUriLookup returned own user for uri=%s', uri);
-        throw new StatusError(404);
-      }
-
-      debug('localUriLookup returned user for uri=%s. Finding or creating one-to-one', uri);
-
-      return oneToOneRoomService
-        .findOrCreateOneToOneRoom(user, resolvedUser._id)
-        .spread(function(troupe /*, resolvedUser */) {
-          return {
-            troupe: troupe
-          };
-        });
+      debug('uriResolver returned user for uri=%s', uri);
+      throw new StatusError(401);
     }
 
     if (resolvedTroupe) {
-      return policyFactory
-        .createPolicyForRoom(user, resolvedTroupe)
-        .then(function(policy) {
-          return policy.canRead();
-        })
-        .then(function(access) {
-          if (!access) throw new StatusError(403);
+      debug('uriResolver returned troupe for uri=%s', uri);
 
-          return {
-            troupe: resolvedTroupe
-          };
-        });
+      const policy = await policyFactory.createPolicyForRoom(user, resolvedTroupe);
+      const viewAccess = await policy.canRead();
+
+      if (!viewAccess) throw new StatusError(404);
+
+      return {
+        troupe: resolvedTroupe
+      };
     }
 
-    // The room does not exist, lets attempt to create it
-    debug('Room does not exist for uri %s, attempting upsert', uri);
-    return createRoomForGitHubUri(user, uri, options).then(function(findOrCreateResult) {
-      var troupe = findOrCreateResult.troupe;
-      var hookCreationFailedDueToMissingScope =
-        findOrCreateResult.hookCreationFailedDueToMissingScope;
-      var didCreate = findOrCreateResult.didCreate;
+    throw new StatusError(404);
+  }
 
-      if (didCreate) {
-        emailNotificationService
-          .createdRoomNotification(user, troupe) // now the san email to the room', wne
-          .catch(function(err) {
-            logger.error('Unable to send create room notification: ' + err, { exception: err });
-          });
+  // If the Uri Lookup returned a user, do a one-to-one
+  if (resolvedUser) {
+    if (mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
+      debug('localUriLookup returned own user for uri=%s', uri);
+      throw new StatusError(404);
+    }
 
-        stats.event('create_room', {
-          uri: uri,
-          roomId: troupe.id,
-          groupId: troupe.groupId,
-          userId: user.id,
-          roomType: 'github-room'
-        });
-      }
+    debug('localUriLookup returned user for uri=%s. Finding or creating one-to-one', uri);
 
-      return ensureAccessControl(user, troupe, true).then(function(userRoomMembershipChanged) {
-        // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
-        if (userRoomMembershipChanged) {
-          /* Note that options.tracking is never sent as a param */
-          sendJoinStats(user, troupe, options.tracking);
-        }
+    const [troupe] = await oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser._id);
+    return {
+      troupe
+    };
+  }
 
-        return {
-          troupe: troupe,
-          hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope,
-          didCreate: didCreate
-        };
+  if (resolvedTroupe) {
+    const policy = await policyFactory.createPolicyForRoom(user, resolvedTroupe);
+    const access = await policy.canRead();
+    if (!access) throw new StatusError(403);
+
+    return {
+      troupe: resolvedTroupe
+    };
+  }
+
+  // The room does not exist, lets attempt to create it
+  debug('Room does not exist for uri %s, attempting upsert', uri);
+  const findOrCreateResult = await createRoomForGitHubUri(user, uri, options);
+  const troupe = findOrCreateResult.troupe;
+  const hookCreationFailedDueToMissingScope =
+    findOrCreateResult.hookCreationFailedDueToMissingScope;
+  const didCreate = findOrCreateResult.didCreate;
+
+  if (didCreate) {
+    emailNotificationService
+      .createdRoomNotification(user, troupe) // now the san email to the room', wne
+      .catch(function(err) {
+        logger.error('Unable to send create room notification: ' + err, { exception: err });
       });
+
+    stats.event('create_room', {
+      uri,
+      roomId: troupe.id,
+      groupId: troupe.groupId,
+      userId: user.id,
+      roomType: 'github-room'
     });
-  });
+  }
+
+  const userRoomMembershipChanged = await ensureAccessControl(user, troupe, true);
+  // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
+  if (userRoomMembershipChanged) {
+    /* Note that options.tracking is never sent as a param */
+    sendJoinStats(user, troupe, options.tracking);
+  }
+
+  return {
+    troupe,
+    hookCreationFailedDueToMissingScope,
+    didCreate
+  };
 }
 
 /**
