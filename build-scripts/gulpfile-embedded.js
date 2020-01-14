@@ -58,6 +58,7 @@ gulp.task('embedded:compile:copy-files', function() {
       [
         'public/images/emoji/*',
         // 'public/sprites/**',
+        'public/images/svg/corner-down-right.svg',
         'public/repo/katex/**'
       ],
       {

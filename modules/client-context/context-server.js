@@ -68,4 +68,6 @@ context.getSnapshot = function() {};
 
 context.roomHasWelcomeMessage = function() {};
 
+context.isMobile = function() {};
+
 module.exports = context;

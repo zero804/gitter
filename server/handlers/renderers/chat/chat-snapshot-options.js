@@ -19,7 +19,8 @@ const getChatSnapshotOptions = async (userId, troupeId, req) => {
 
   return {
     limit,
-    aroundId: getPermalinkMessageId(req)
+    aroundId: getPermalinkMessageId(req),
+    includeThreads: req.isPhone
   };
 };
 

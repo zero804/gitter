@@ -155,11 +155,11 @@ var ChatCollection = LiveCollection.extend({
   },
 
   getQuery: function() {
-    return { lookups: ['user'] };
+    return { lookups: ['user'], includeThreads: context.isMobile() };
   },
 
   getSnapshotExtras: function() {
-    return { lookups: ['user'] };
+    return { lookups: ['user'], includeThreads: context.isMobile() };
   },
 
   parse: function(collection) {

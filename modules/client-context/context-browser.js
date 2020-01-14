@@ -309,4 +309,9 @@ context.roomHasWelcomeMessage = function() {
   return ctx.roomHasWelcomeMessage;
 };
 
+context.isMobile = function() {
+  // https://stackoverflow.com/a/3540295/606571
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
 module.exports = context;

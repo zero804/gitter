@@ -53,12 +53,13 @@ function serializeTroupesForUser(userId, callback) {
 async function serializeChatsForTroupe(
   troupeId,
   userId,
-  { limit = DEFAULT_CHAT_COUNT_LIMIT, lean, aroundId, lookups, beforeInclId }
+  { limit = DEFAULT_CHAT_COUNT_LIMIT, lean, aroundId, lookups, beforeInclId, includeThreads }
 ) {
   const chatMessages = await chatService.findChatMessagesForTroupe(troupeId, {
     limit,
     aroundId,
-    beforeInclId
+    beforeInclId,
+    includeThreads
   });
   const strategy = new restSerializer.ChatStrategy({
     notLoggedIn: !userId,
