@@ -102,130 +102,110 @@ function ensureGroupForGitHubRoom(user, githubType, uri) {
  *
  * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
  */
-function createRoomForGitHubUri(user, uri, options) {
+// eslint-disable-next-line complexity, max-statements
+async function createRoomForGitHubUri(user, uri, options = {}) {
   debug('createRoomForGitHubUri: %s options: %j', uri, options);
 
-  if (!options) options = {};
-
   /* From here on we're going to be doing a create */
-  return validateGithubUri(user, uri).then(function(githubInfo) {
-    debug('GitHub information for %s is %j', uri, githubInfo);
+  const githubInfo = await validateGithubUri(user, uri);
+  debug('GitHub information for %s is %j', uri, githubInfo);
 
-    /* If we can't determine the type, skip it */
-    if (!githubInfo) throw new StatusError(404);
+  /* If we can't determine the type, skip it */
+  if (!githubInfo) throw new StatusError(404);
 
-    var githubType = githubInfo.type;
-    var backendType;
+  const githubType = githubInfo.type;
+  let backendType;
+  switch (githubType) {
+    case 'ORG':
+      backendType = 'GH_ORG';
+      break;
 
-    switch (githubType) {
-      case 'ORG':
-        backendType = 'GH_ORG';
-        break;
+    case 'REPO':
+      backendType = 'GH_REPO';
+      break;
 
-      case 'REPO':
-        backendType = 'GH_REPO';
-        break;
+    case 'USER':
+      // We got back a user. Since we've managed to get this far,
+      // it means that the user is on GitHub but not gitter, so
+      // we'll 404
+      // In future, it might be worth bring up a page.
+      throw new StatusError(404);
+  }
 
-      case 'USER':
-        // We got back a user. Since we've managed to get this far,
-        // it means that the user is on GitHub but not gitter, so
-        // we'll 404
-        // In future, it might be worth bring up a page.
-        throw new StatusError(404);
-    }
+  const officialUri = githubInfo.uri;
+  const lcUri = officialUri.toLowerCase();
+  const security = githubInfo.security || null;
+  const externalId = githubInfo.externalId || null;
+  const topic = githubInfo.description;
 
-    var officialUri = githubInfo.uri;
-    var lcUri = officialUri.toLowerCase();
-    var security = githubInfo.security || null;
-    var externalId = githubInfo.externalId || null;
-    var topic = githubInfo.description;
+  debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
 
-    debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
+  if (
+    !options.ignoreCase &&
+    officialUri !== uri &&
+    officialUri.toLowerCase() === uri.toLowerCase()
+  ) {
+    debug('Redirecting client from %s to official uri %s', uri, officialUri);
+    throw extendStatusError(301, { path: '/' + officialUri });
+  }
 
-    if (
-      !options.ignoreCase &&
-      officialUri !== uri &&
-      officialUri.toLowerCase() === uri.toLowerCase()
-    ) {
-      debug('Redirecting client from %s to official uri %s', uri, officialUri);
-      throw extendStatusError(301, { path: '/' + officialUri });
-    }
+  /* Room does not yet exist */
+  const policy = policyFactory.getPreCreationPolicyEvaluator(user, backendType, officialUri);
 
-    /* Room does not yet exist */
-    var policy = policyFactory.getPreCreationPolicyEvaluator(user, backendType, officialUri);
-    return policy
-      .canAdmin()
-      .bind({
-        troupe: null,
-        updateExisting: null,
-        groupId: null
-      })
-      .then(function(access) {
-        debug('Does the user have access to create room %s? %s', uri, access);
+  const access = await policy.canAdmin();
+  debug('Does the user have access to create room %s? %s', uri, access);
 
-        // If the user is not allowed to create this room, go no further
-        if (!access) throw new StatusError(403);
+  // If the user is not allowed to create this room, go no further
+  if (!access) throw new StatusError(403);
 
-        return ensureGroupForGitHubRoom(user, githubType, officialUri);
-      })
-      .then(function(group) {
-        var groupId = (this.groupId = group._id);
+  const group = await ensureGroupForGitHubRoom(user, githubType, officialUri);
 
-        var sd = securityDescriptorGenerator.generate(user, {
-          linkPath: officialUri,
-          type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
-          externalId: externalId,
-          security: githubType === 'ORG' ? 'PRIVATE' : security
-        });
+  const groupId = group._id;
 
-        return mongooseUtils.upsert(
-          persistence.Troupe,
-          { lcUri: lcUri },
-          {
-            $setOnInsert: {
-              lcUri: lcUri,
-              groupId: groupId,
-              uri: officialUri,
-              githubType: githubType,
-              githubId: externalId,
-              topic: topic || '',
-              security: security,
-              dateLastSecurityCheck: new Date(),
-              userCount: 0,
-              sd: sd
-            }
-          }
-        );
-      })
-      .tap(function(upsertResult) {
-        var troupe = (this.troupe = upsertResult[0]);
-        var updateExisting = (this.updateExisting = upsertResult[1]);
-
-        /* Next stage - post creation tasks */
-
-        if (updateExisting) return;
-
-        if (!options.associateWithGitHubRepo) return;
-
-        return roomRepoService.associateRoomToRepo(troupe, user, {
-          repoUri: options.associateWithGitHubRepo,
-          addBadge: options.addBadge
-        });
-      })
-      .then(function(postCreationResults) {
-        /* Finally, return the results to the user */
-        var troupe = this.troupe;
-        var updateExisting = this.updateExisting;
-        var hookCreationFailedDueToMissingScope =
-          postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
-
-        return {
-          troupe: troupe,
-          didCreate: !updateExisting,
-          hookCreationFailedDueToMissingScope: hookCreationFailedDueToMissingScope
-        };
-      });
+  const sd = securityDescriptorGenerator.generate(user, {
+    linkPath: officialUri,
+    type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
+    externalId: externalId,
+    security: githubType === 'ORG' ? 'PRIVATE' : security
   });
+
+  const [troupe, updateExisting] = await mongooseUtils.upsert(
+    persistence.Troupe,
+    { lcUri: lcUri },
+    {
+      $setOnInsert: {
+        lcUri: lcUri,
+        groupId: groupId,
+        uri: officialUri,
+        githubType: githubType,
+        githubId: externalId,
+        topic: topic || '',
+        security: security,
+        dateLastSecurityCheck: new Date(),
+        userCount: 0,
+        sd: sd
+      }
+    }
+  );
+
+  /* Next stage - post creation tasks */
+  let postCreationResults;
+  if (!updateExisting && options.associateWithGitHubRepo) {
+    postCreationResults = await roomRepoService.associateRoomToRepo(troupe, user, {
+      repoUri: options.associateWithGitHubRepo,
+      addBadge: options.addBadge
+    });
+  }
+
+  /* Finally, return the results to the user */
+  const hookCreationFailedDueToMissingScope =
+    postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
+
+  return {
+    troupe,
+    didCreate: !updateExisting,
+    hookCreationFailedDueToMissingScope
+  };
 }
 
 /**
