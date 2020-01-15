@@ -170,6 +170,25 @@ Once you are sure the above is done, preform the following:
 3. `make sprites`
 4. Commit your changes and release!
 
+
+## Troubleshooting
+
+### `npm ERR! Maximum call stack size exceeded`
+
+If you are running into `npm ERR! Maximum call stack size exceeded`
+
+```bash
+# Remove nested `node_modules` directories
+$ find . -name "node_modules" -exec rm -rf '{}' +
+
+# Remove nested `package-lock.json`
+$ find . -name "package-lock.json" -exec rm -rf '{}' +
+
+# Try installing again
+$ npm install
+```
+
+
 ## Miscellaneous tips & tricks
 
 - You can access the homepage even when signed in by using the `?redirect=no` query - https://gitter.im/?redirect=no (http://localhost:5000/?redirect=no)
