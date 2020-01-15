@@ -76,10 +76,12 @@ var ExploreView = Marionette.LayoutView.extend({
     dialogRegion: 'body'
   },
   ui: {
+    leftMenuToggle: '.js-header-view-left-menu-toggle',
     signInButton: '.js-sign-in',
     createRoomButton: '.js-explore-create-button'
   },
   events: {
+    'click @ui.leftMenuToggle': 'onLeftMenuToggleClick',
     'click @ui.signInButton': 'popSignInModal',
     'click @ui.createRoomButton': 'popCreate'
   },
@@ -124,6 +126,10 @@ var ExploreView = Marionette.LayoutView.extend({
       //Render it
       this.profileMenu.render();
     }
+  },
+
+  onLeftMenuToggleClick() {
+    appEvents.trigger('dispatchVueAction', 'toggleLeftMenu', true);
   },
 
   popSignInModal: function(e) {

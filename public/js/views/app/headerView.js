@@ -37,7 +37,7 @@ var HeaderView = Marionette.ItemView.extend({
   },
 
   ui: {
-    leftMenuToggle: '.js-chat-header-left-menu-toggle',
+    leftMenuToggle: '.js-header-view-left-menu-toggle',
     avatarImage: '.js-chat-header-avatar-image',
     groupAvatarUploadForm: '.js-chat-header-group-avatar-upload-form',
     groupAvatarFileInput: '.js-chat-header-group-avatar-upload-input',
