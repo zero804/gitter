@@ -48,7 +48,7 @@ export default {
         <div class="chat-messages">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
           <div v-if="childMessagesRequest.error" class="error-text error-box">
-            Error: Therad messages can't be fetched.
+            Error: Thread messages can't be fetched.
           </div>
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
