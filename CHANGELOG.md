@@ -8,6 +8,7 @@ Developer facing:
  - Add docs on how to invalidate a GitHub and Gitter access tokens, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1725
  - Fix Mongo table scans when using `OAuthAccessToken.find({ clientId });`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1722
  - Move npm troubleshooting to developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1731
+ - Renovate: Keep using semver for package versions, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1703
 
 
 # 20.14.0 - 2019-01-10
