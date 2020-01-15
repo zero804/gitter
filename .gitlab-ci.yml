@@ -388,6 +388,8 @@ dependency_scanning:
 container_scanning:
   stage: security
   variables:
+    DOCKERFILE_PATH: Dockerfile-app-base
+    GIT_STRATEGY: fetch
     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 

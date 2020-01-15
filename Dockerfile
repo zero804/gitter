@@ -1,4 +1,4 @@
-FROM node:10.15.3
+FROM node:10.19.0-alpine
 
 RUN mkdir -p /app
 RUN mkdir -p /npm_cache
