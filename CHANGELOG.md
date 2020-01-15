@@ -1,5 +1,7 @@
 # 20.15.0 - *upcoming*
 
+ - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
+
 Developer facing:
 
  - Defer to root `package.json` for npm packages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1724
