@@ -24,7 +24,7 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
           class="error-text error-box"
         >
           
-          Error: Therad messages can't be fetched.
+          Error: Thread messages can't be fetched.
         
         </div>
          
