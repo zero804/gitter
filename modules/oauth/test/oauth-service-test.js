@@ -8,6 +8,8 @@ const oauthService = require('../lib/oauth-service');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 describe('oauth-service', function() {
+  fixtureLoader.disableMongoTableScans();
+
   var fixture = fixtureLoader.setup({
     user1: {},
     oAuthClientRevoked1: {
