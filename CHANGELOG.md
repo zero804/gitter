@@ -2,6 +2,7 @@
 
  - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
  - Add left-menu mobile toggle to explore page (sign-in landing page), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1729
+ - Open TMF on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1733
 
 Developer facing:
 
