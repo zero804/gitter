@@ -11,6 +11,7 @@ Developer facing:
  - Move npm troubleshooting to developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1731
  - Renovate: Keep using semver for package versions, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1703
  - Update dependency `keyword-extractor` to `v0.0.18`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1504
+ - Add process for testing renovate changes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1736
 
 
 # 20.14.0 - 2019-01-10
