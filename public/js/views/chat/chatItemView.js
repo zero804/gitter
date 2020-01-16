@@ -61,13 +61,15 @@ module.exports = (function() {
     // click events are delayed in horrible ways for <iOS 9.3
     touchstart: 'onTouchstart',
     touchmove: 'onTouchmove',
-    touchend: 'onTouchend'
+    touchend: 'onTouchend',
+    'click .js-parent-message-indicator': 'openThread'
   };
 
   var androidTouchEvents = {
     // WebViews in android will only show the keyboard for a focus() if
     // it happens via a click event, but not for a touch event
-    click: 'onTap'
+    click: 'onTap',
+    'click .js-parent-message-indicator': 'openThread'
   };
 
   const sendOpenThreadAction = chatId =>
