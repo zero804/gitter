@@ -13,6 +13,7 @@ Developer facing:
  - Renovate: Keep using semver for package versions, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1703
  - Update dependency `keyword-extractor` to `v0.0.18`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1504
  - Add process for testing renovate changes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1736
+ - Add `GL_GROUP` support to the `scripts/utils/rename-group.js` utility script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1734
 
 
 # 20.14.0 - 2019-01-10
