@@ -1166,7 +1166,7 @@ describe('room-service', function() {
               type: 'REPO',
               uri: renamedUrl4,
               description: 'renamed',
-              githubId: fixture.generateGithubId(),
+              externalId: fixture.generateGithubId(),
               security: 'PUBLIC'
             });
           });
@@ -1217,7 +1217,7 @@ describe('room-service', function() {
               type: 'REPO',
               uri: renamedUrl2,
               description: 'renamed',
-              githubId: fixture.troupeRepo2.githubId,
+              externalId: fixture.troupeRepo2.githubId,
               security: 'PUBLIC'
             });
           });
@@ -1304,7 +1304,7 @@ describe('room-service', function() {
           return Promise.resolve({
             type: 'ORG',
             uri: orgUri,
-            githubId: githubId,
+            externalId: githubId,
             description: 'renamed',
             security: 'PUBLIC'
           });
@@ -1335,7 +1335,7 @@ describe('room-service', function() {
           return Promise.resolve({
             type: fixture.troupeOrg1.githubType,
             uri: fixture.troupeOrg1.uri,
-            githubId: fixture.troupeOrg1.githubId,
+            externalId: fixture.troupeOrg1.githubId,
             description: 'renamed',
             security: 'PUBLIC'
           });
@@ -1366,7 +1366,7 @@ describe('room-service', function() {
           return Promise.resolve({
             type: 'REPO',
             uri: fixture.troupeDup2.uri,
-            githubId: duplicateGithubId,
+            externalId: duplicateGithubId,
             description: 'renamed',
             security: 'PUBLIC'
           });

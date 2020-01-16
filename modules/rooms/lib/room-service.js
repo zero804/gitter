@@ -17,7 +17,7 @@ var userService = require('gitter-web-users');
 var troupeService = require('./troupe-service');
 var oneToOneRoomService = require('./one-to-one-room-service');
 var userDefaultFlagsService = require('./user-default-flags-service');
-var validateUri = require('gitter-web-github').GitHubUriValidator;
+var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
 var validate = require('./validate');
 var collections = require('gitter-web-utils/lib/collections');
 var StatusError = require('statuserror');
@@ -108,7 +108,7 @@ function createRoomForGitHubUri(user, uri, options) {
   if (!options) options = {};
 
   /* From here on we're going to be doing a create */
-  return validateUri(user, uri).then(function(githubInfo) {
+  return validateGithubUri(user, uri).then(function(githubInfo) {
     debug('GitHub information for %s is %j', uri, githubInfo);
 
     /* If we can't determine the type, skip it */
@@ -137,7 +137,7 @@ function createRoomForGitHubUri(user, uri, options) {
     var officialUri = githubInfo.uri;
     var lcUri = officialUri.toLowerCase();
     var security = githubInfo.security || null;
-    var githubId = githubInfo.githubId || null;
+    var externalId = githubInfo.externalId || null;
     var topic = githubInfo.description;
 
     debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
@@ -174,7 +174,7 @@ function createRoomForGitHubUri(user, uri, options) {
         var sd = securityDescriptorGenerator.generate(user, {
           linkPath: officialUri,
           type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
-          externalId: githubId,
+          externalId: externalId,
           security: githubType === 'ORG' ? 'PRIVATE' : security
         });
 
@@ -187,7 +187,7 @@ function createRoomForGitHubUri(user, uri, options) {
               groupId: groupId,
               uri: officialUri,
               githubType: githubType,
-              githubId: githubId,
+              githubId: externalId,
               topic: topic || '',
               security: security,
               dateLastSecurityCheck: new Date(),

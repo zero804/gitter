@@ -86,7 +86,7 @@ GitLabGroupService.prototype.getGroup = cacheFunction('getGroup', async function
   return standardizeGroupResponse(group);
 });
 
-GitLabGroupService.prototype.isMember = cacheFunction('isMember', async function(
+GitLabGroupService.prototype._getGroupMember = cacheFunction('_getGroupMember', async function(
   groupId,
   gitlabUserId
 ) {
@@ -98,11 +98,7 @@ GitLabGroupService.prototype.isMember = cacheFunction('isMember', async function
       includeInherited: true
     });
     debug('isMember groupMember response =>', groupMember);
-
-    // We could simply check that the `groupMembers.show(...)` succeeds but this
-    // is an extra check to make sure some other response or redirect don't give
-    // us a false-positive
-    return [10, 20, 30, 40, 50].some(accessLevel => accessLevel === groupMember.access_level);
+    return groupMember;
   } catch (err) {
     debug('isMember error =>', err);
     if (err && err.response && err.response.status === 404) {
@@ -112,5 +108,21 @@ GitLabGroupService.prototype.isMember = cacheFunction('isMember', async function
     throw err;
   }
 });
+
+GitLabGroupService.prototype.getMembership = async function(groupId, gitlabUserId) {
+  const groupMember = await this._getGroupMember(groupId, gitlabUserId);
+  let accessLevel = 0;
+  if (groupMember) {
+    accessLevel = groupMember.access_level;
+  }
+
+  // https://docs.gitlab.com/ee/api/access_requests.html
+  return {
+    accessLevel,
+    isMember: [10, 20, 30, 40, 50].some(level => level === accessLevel),
+    isMaintainer: [40, 50].some(level => level === accessLevel),
+    isOwner: accessLevel === 50
+  };
+};
 
 module.exports = GitLabGroupService;

@@ -166,14 +166,14 @@ function validateGhOrgDescriptor(descriptor) {
       throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
   }
 
+  if (!usesGH) {
+    throw new StatusError(403, 'Unused reference type: GH_ORG');
+  }
+
   if (descriptor.public) {
     if (descriptor.members !== 'PUBLIC') {
       throw new StatusError(403, 'Invalid public attribute');
     }
-  }
-
-  if (!usesGH) {
-    throw new StatusError(403, 'Unused reference type: GH_ORG');
   }
 
   if (descriptor.internalId) {
@@ -216,14 +216,14 @@ function validateGhUserDescriptor(descriptor) {
       throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
   }
 
+  if (!usesGH) {
+    throw new StatusError(403, 'Unused reference type: GH_USER');
+  }
+
   if (descriptor.public) {
     if (descriptor.members !== 'PUBLIC') {
       throw new StatusError(403, 'Invalid public attribute');
     }
-  }
-
-  if (!usesGH) {
-    throw new StatusError(403, 'Unused reference type: GH_USER');
   }
 
   if (descriptor.internalId) {
@@ -231,6 +231,57 @@ function validateGhUserDescriptor(descriptor) {
   }
 
   validateGhUserLinkPath(descriptor.linkPath);
+  validateExtraUserIds(descriptor);
+}
+
+function validateGlGroupDescriptor(descriptor) {
+  let usesGl = false;
+  switch (descriptor.members) {
+    case 'PUBLIC':
+    case 'INVITE':
+    case 'INVITE_OR_ADMIN':
+      break;
+    case 'GL_GROUP_MEMBER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
+  }
+
+  switch (descriptor.admins) {
+    case 'MANUAL':
+      break;
+    case 'GL_GROUP_MAINTAINER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (!usesGl) {
+    throw new StatusError(
+      403,
+      'The members or admin attributes need to be set with some GL_XXX values when using the GL_GROUP type'
+    );
+  }
+
+  if (descriptor.public) {
+    if (descriptor.members !== 'PUBLIC') {
+      throw new StatusError(403, 'Invalid public attribute');
+    }
+  }
+
+  if (descriptor.internalId) {
+    throw new StatusError(
+      403,
+      'internalId(for referencing Gitter internal entities) attribute is present but should not be used with a GL_GROUP(use externalId to reference a GitLab entity): ' +
+        descriptor.internalId
+    );
+  }
+
+  if (!descriptor.linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for GitLab group');
+  }
   validateExtraUserIds(descriptor);
 }
 
@@ -318,6 +369,9 @@ function validate(descriptor) {
 
     case 'GH_USER':
       return validateGhUserDescriptor(descriptor);
+
+    case 'GL_GROUP':
+      return validateGlGroupDescriptor(descriptor);
 
     case 'ONE_TO_ONE':
       return validateOneToOneDescriptor(descriptor);

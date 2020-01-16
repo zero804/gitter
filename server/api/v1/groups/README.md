@@ -7,7 +7,7 @@
  - `name`: Group name.
  - `uri`: Group URI on Gitter.
  - `backedBy`: Security descriptor. Describes the backing object we get permissions from.
-    - `type`: `[null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER']`
+    - `type`: `[null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER'|'GL_GROUP']`
     - `linkPath`: Represents how we find the backing object given the type
  - `avatarUrl`: Base avatar URL (add `s` parameter to size)
 
@@ -68,7 +68,7 @@ Try it from the CLI:
  - **`name`**: Group name.
  - **`uri`**: Group URI on Gitter.
  - `security`: Security descriptor. Describes the backing object we get permissions from.
-    - `type`: `[null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER']`
+    - `type`: `[null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER'|'GL_GROUP']`
     - `linkPath`: Represents how we find the backing object given the type
  - `invites`: Array of user objects. Below is a list of properties you can include on each object to invite on various platforms
     - `username`: Gitter username
@@ -125,7 +125,7 @@ Create room nested under the specified group.
  - `topic`: Room topic/description
  - `security`: Security descriptor. Describes the backing object we get permissions from. (defaults to `'PUBLIC'`)
     - `security`: `'PUBLIC'|'PRIVATE'`
-    - `type`: `null|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER'`
+    - `type`: `null|'GROUP'|'ONE_TO_ONE'|'GH_REPO'|'GH_ORG'|'GH_USER'`
     - `linkPath`: Represents how we find the backing object given the type
  - `source`: Tracking info for stats
 

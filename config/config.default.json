@@ -43,6 +43,8 @@
     "privateKey": ""
   },
   "notifications": {
+    "notificationsSender": "support@gitter.im",
+    "replyToAddress":  "no-reply@gitter.im",
     "minimumUserAlertInterval": 57600,
     "notificationDelay": 20,
     "notificationDelay2": 180,

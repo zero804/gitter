@@ -1,3 +1,34 @@
+# 20.14.0 - 2019-01-10
+
+ - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713
+ - Prevent notification email replies to go to support@gitter.im, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1589
+
+Developer facing:
+
+ - Add `GL_GROUP` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1699
+ - Add `GL_GROUP` support to `policy-delegate-factory`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1710
+ - Add `GL_GROUP` to create room server input validation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1717
+ - Remove unused `permission-combinations.js`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1719
+ - Add `glGroupService.isMaintainer` for `GL_GROUP_MAINTAINER` admins, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1712
+ - Remove Bluebird promise usage for async/await `gl-group-policy-delegate.js` compatibility, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1714
+ - Add `#integrationGitlabUser1` for easy GitLab integration testing, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1709
+ - Add GitLab user service, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1707
+ - Add `pre-creation/gl-group-policy-evaluator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1708
+ - Update groups API doc with `GL_GROUP` backing type, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1716
+ - Add `gitlab-uri-validator`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1706
+ - Remove orphaned "unused org" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1715
+ - Remove orphaned "unused repo" server code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1720
+ - Add `GL_GROUP_MAINTAINER` permissions to the `gl-group-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1711
+ - Add `GL_GROUP` support to `ensure-access-and-fetch-descriptor`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1702
+ - Use `assert.rejects()` for standard promise rejection assertion, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1723
+ - Add `GL_GROUP` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1721
+
+
+# 20.13.1 - 2020-01-10
+
+- Serialize user before passing to Vue initial state frontend, https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/44
+
+
 # 20.13.0 - 2020-01-03
 
  - Fix "Last message gets covered by text input box", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1695

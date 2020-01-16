@@ -5,7 +5,53 @@ var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
 
 describe('security-descriptor-write-validator', function() {
-  it('should validate correctly', function() {
+  it('should validate GL_GROUP correctly', function() {
+    const sd = {
+      type: 'GL_GROUP',
+      externalId: '3281315',
+      linkPath: 'gitter-integration-tests-group',
+      public: true,
+      admins: 'GL_GROUP_MAINTAINER',
+      members: 'PUBLIC'
+    };
+
+    securityDescriptorWriteValidator(sd);
+  });
+
+  it('should validate sub-group GL_GROUP correctly', function() {
+    const sd = {
+      type: 'GL_GROUP',
+      externalId: '1540914',
+      linkPath: 'gitlab-org/gitter',
+      public: true,
+      admins: 'GL_GROUP_MAINTAINER',
+      members: 'PUBLIC'
+    };
+
+    securityDescriptorWriteValidator(sd);
+  });
+
+  // Just a sanity check that it fails for some invalid data that could happen
+  // from some manual database tinkering
+  it('should fail for invalid GL_GROUP', function() {
+    const sd = {
+      type: 'GL_GROUP',
+      internalId: '3281315',
+      linkPath: 'gitter-integration-tests-group',
+      public: true,
+      admins: 'MANUAL',
+      members: 'PUBLIC'
+    };
+
+    try {
+      securityDescriptorWriteValidator(sd);
+      assert.ok(false);
+    } catch (e) {
+      assert.strictEqual(e.status, 403);
+    }
+  });
+
+  it('should validate GH_REPO correctly', function() {
     var sd = {
       type: 'GH_REPO',
       linkPath: 'gitterHQ/gitter',

@@ -65,6 +65,34 @@ describe('transform-test', function() {
       groupId: groupId
     },
     {
+      name: 'room switch from GitLab to group, public',
+      Model: persistence.Troupe,
+      newType: 'GROUP',
+      in: {
+        type: 'GL_GROUP',
+        members: 'PUBLIC',
+        admins: 'GL_GROUP_MAINTAINER',
+        public: true,
+        linkPath: 'x/y',
+        internalId: null,
+        externalId: '1',
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      out: {
+        type: 'GROUP',
+        members: 'PUBLIC',
+        admins: 'GROUP_ADMIN',
+        public: true,
+        linkPath: null,
+        internalId: groupId,
+        externalId: null,
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      groupId: groupId
+    },
+    {
       name: 'room switch from github to group, public',
       Model: persistence.Troupe,
       newType: 'GROUP',
@@ -114,6 +142,34 @@ describe('transform-test', function() {
         public: false,
         linkPath: null,
         internalId: null,
+        externalId: null,
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      groupId: groupId
+    },
+    {
+      name: 'room switch from GitLab to group, private',
+      Model: persistence.Troupe,
+      newType: 'GROUP',
+      in: {
+        type: 'GL_GROUP',
+        members: 'GL_GROUP_MEMBER',
+        admins: 'GL_GROUP_MAINTAINER',
+        public: false,
+        linkPath: 'x/y',
+        internalId: null,
+        externalId: '1',
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      out: {
+        type: 'GROUP',
+        members: 'INVITE_OR_ADMIN',
+        admins: 'GROUP_ADMIN',
+        public: false,
+        linkPath: null,
+        internalId: groupId,
         externalId: null,
         extraAdmins: ['a'],
         extraMembers: ['b']

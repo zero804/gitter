@@ -8,10 +8,6 @@ module.exports = {
   index: function(req) {
     if (!req.user) throw new StatusError(403);
 
-    if (req.query.type === 'unused') {
-      return restful.serializeUnusedOrgsForUser(req.user);
-    }
-
     return restful.serializeOrgsForUser(req.user);
   }
 };

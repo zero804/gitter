@@ -6,6 +6,8 @@ var logger = env.logger;
 var mailerService = require('gitter-web-mailer');
 var crypto = require('crypto');
 var passphrase = config.get('email:unsubscribeNotificationsSecret');
+const senderAddress = config.get('notifications:notificationsSender');
+const replyToAddress = config.get('notifications:replyToAddress');
 var userSettingsService = require('gitter-web-user-settings');
 var emailAddressService = require('gitter-web-email-addresses');
 var roomNameTrimmer = require('gitter-web-shared/room-name-trimmer');
@@ -89,8 +91,9 @@ function sendInvite(invitingUser, invite, room, isReminder, template, eventName)
 
   return mailerService.sendEmail({
     templateFile: template,
-    from: senderName + ' <support@gitter.im>',
+    from: `${senderName} <${senderAddress}>`,
     fromName: senderName,
+    replyTo: replyToAddress,
     to: email,
     subject: subject,
     tracking: {
@@ -156,7 +159,8 @@ module.exports = {
         return mailerService
           .sendEmail({
             templateFile: 'unread_notification',
-            from: 'Gitter Notifications <support@gitter.im>',
+            from: `Gitter Notifications <${senderAddress}>`,
+            replyTo: replyToAddress,
             to: email,
             unsubscribe: unsubscribeUrl,
             subject: subject,
@@ -238,7 +242,8 @@ module.exports = {
 
         return mailerService.sendEmail({
           templateFile: 'created_room',
-          from: 'Gitter Notifications <support@gitter.im>',
+          from: `Gitter Notifications <${senderAddress}>`,
+          replyTo: replyToAddress,
           to: email,
           unsubscribe: unsubscribeUrl,
           subject: 'Your new chat room on Gitter',
@@ -299,8 +304,9 @@ module.exports = {
 
           return mailerService.sendEmail({
             templateFile: 'added_to_room',
-            from: senderName + ' <support@gitter.im>',
+            from: `${senderName} <${senderAddress}>`,
             fromName: fromName,
+            replyTo: replyToAddress,
             to: email,
             subject: '[' + room.uri + "] You've been added to a new room on Gitter",
             tracking: {

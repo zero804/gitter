@@ -32,45 +32,48 @@ function createBasePolicy(userId, user, securityDescriptor, policyDelegate, cont
     assert(mongoUtils.isLikeObjectId(userId), 'userId must be an ObjectID');
   }
 
-  const _checkPolicyCacheResult = function(policyName) {
-    return policyDelegate.hasPolicy(policyName).tap(function(access) {
-      if (userId) {
-        // Cache the access for admin user lookups
-        var accessDetails = policyDelegate.getAccessDetails(policyName);
-        if (accessDetails) {
-          // This is not chained to the promise
-          knownAccessRecorder(
-            userId,
-            accessDetails.type,
-            policyName,
-            accessDetails.linkPath,
-            accessDetails.externalId,
-            access
-          );
-        }
-      }
+  const _checkPolicyCacheResult = async function(policyName) {
+    const access = await policyDelegate.hasPolicy(policyName);
 
-      if (access) {
-        // If successful, cache the result for a short period
-        var rateLimitKey = policyDelegate.getPolicyRateLimitKey(policyName);
-
-        if (rateLimitKey) {
-          return policyCheckRateLimiter.recordSuccessfulCheck(
-            rateLimitKey,
-            SUCCESS_RESULT_CACHE_TIME
-          );
-        }
+    if (userId) {
+      // Cache the access for admin user lookups
+      const accessDetails = policyDelegate.getAccessDetails(policyName);
+      if (accessDetails) {
+        // This is not chained to the promise
+        knownAccessRecorder(
+          userId,
+          accessDetails.type,
+          policyName,
+          accessDetails.linkPath,
+          accessDetails.externalId,
+          access
+        );
       }
-    });
+    }
+
+    if (access) {
+      // If successful, cache the result for a short period
+      const rateLimitKey = policyDelegate.getPolicyRateLimitKey(policyName);
+
+      if (rateLimitKey) {
+        policyCheckRateLimiter.recordSuccessfulCheck(rateLimitKey, SUCCESS_RESULT_CACHE_TIME);
+      }
+    }
+
+    return access;
   };
-  const _checkAuthedAdminWithFullCheck = function() {
+  const _checkAuthedAdminWithFullCheck = async () => {
     var adminPolicy = securityDescriptor.admins;
 
-    return _checkPolicyCacheResult(adminPolicy).catch(PolicyDelegateTransportError, function(err) {
-      logger.error('Error communicating with policy delegate backend' + err, { exception: err });
+    try {
+      return await _checkPolicyCacheResult(adminPolicy);
+    } catch (err) {
+      if (err instanceof PolicyDelegateTransportError) {
+        logger.error('Error communicating with policy delegate backend' + err, { exception: err });
+      }
 
       return false;
-    });
+    }
   };
 
   const _checkAuthedAdminWithGoodFaith = function() {
@@ -154,19 +157,20 @@ function createBasePolicy(userId, user, securityDescriptor, policyDelegate, cont
   /**
    * Authenticated user can access the room, with full check
    */
-  const _checkAuthedMembershipWithFullCheck = function() {
+  const _checkAuthedMembershipWithFullCheck = async () => {
     var membersPolicy = securityDescriptor.members;
 
-    return _checkPolicyCacheResult(membersPolicy).catch(PolicyDelegateTransportError, function(
-      err
-    ) {
-      logger.error('Error communicating with policy delegate backend' + err, { exception: err });
+    try {
+      return await _checkPolicyCacheResult(membersPolicy);
+    } catch (err) {
+      if (err instanceof PolicyDelegateTransportError) {
+        logger.error('Error communicating with policy delegate backend' + err, { exception: err });
 
-      if (!contextDelegate) {
-        return false;
-      }
+        if (!contextDelegate) {
+          return false;
+        }
 
-      return contextDelegate.isMember().then(function(isMember) {
+        const isMember = await contextDelegate.isMember();
         if (isMember) {
           logger.error(
             'Backend down but allowing user to access room on account of already being a member'
@@ -175,8 +179,8 @@ function createBasePolicy(userId, user, securityDescriptor, policyDelegate, cont
         }
 
         return false;
-      });
-    });
+      }
+    }
   };
 
   /**

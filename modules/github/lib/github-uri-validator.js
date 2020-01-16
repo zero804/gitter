@@ -17,7 +17,7 @@ function validateUserOrOrgUri(user, uri) {
           type: 'ORG',
           uri: user.login,
           description: user.name,
-          githubId: parseInt(user.id, 10) || undefined
+          externalId: parseInt(user.id, 10) || undefined
         };
 
       case 'User':
@@ -25,7 +25,7 @@ function validateUserOrOrgUri(user, uri) {
           type: 'USER',
           uri: user.login,
           description: user.name,
-          githubId: parseInt(user.id, 10) || undefined
+          externalId: parseInt(user.id, 10) || undefined
         };
 
       default:
@@ -45,7 +45,7 @@ function validateRepoUri(user, uri) {
       type: 'REPO',
       uri: repo.full_name,
       description: repo.description,
-      githubId: parseInt(repo.id, 10) || undefined,
+      externalId: parseInt(repo.id, 10) || undefined,
       security: repo.private ? 'PRIVATE' : 'PUBLIC'
     };
   });

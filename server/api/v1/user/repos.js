@@ -37,9 +37,7 @@ module.exports = {
       return indexQuery(req);
     }
 
-    if (req.query.type === 'unused') {
-      return restful.serializeUnusedReposForUser(req.user);
-    } else if (req.query.type === 'admin') {
+    if (req.query.type === 'admin') {
       return restful.serializeAdminReposForUser(req.user);
     }
 

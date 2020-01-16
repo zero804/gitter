@@ -31,7 +31,6 @@
     "viewCache": true
   },
   "email": {
-    "domain": "gitter.im",
     "emailBasePath": "https://gitter.im"
   },
   "runtime": {
@@ -44,6 +43,8 @@
     "hosts": ["cdn01.gitter.im", "cdn02.gitter.im", "cdn03.gitter.im"]
   },
   "notifications": {
+    "notificationsSender": "support@gitter.im",
+    "replyToAddress":  "no-reply@gitter.im",
     "filterTestValues": false,
     "emailNotificationsAfterMins": 60,
     "timeBeforeNextEmailNotificationMins": 1440

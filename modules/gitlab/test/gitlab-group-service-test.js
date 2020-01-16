@@ -79,40 +79,72 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
       assert.equal(group.name, 'gitter-integration-tests-group');
     });
 
-    describe('group member', () => {
+    describe('getMembership', () => {
       it('should fetch group member', async () => {
         const glGroupService = new GitLabGroupService(FAKE_USER);
         // User: https://gitlab.com/gitter-integration-tests
         const gitterIntegrationTestsUserId = '2619770';
-        const isMember = await glGroupService.isMember(
+        const membership = await glGroupService.getMembership(
           'gitter-integration-tests-group',
           gitterIntegrationTestsUserId
         );
 
-        assert.strictEqual(isMember, true);
+        assert.deepEqual(membership, {
+          accessLevel: 50,
+          isMember: true,
+          isMaintainer: true,
+          isOwner: true
+        });
       });
 
       it('should fetch group member from inherited members', async () => {
         const glGroupService = new GitLabGroupService(FAKE_USER);
         // User: https://gitlab.com/gitter-integration-tests
         const gitterIntegrationTestsUserId = '2619770';
-        const isMember = await glGroupService.isMember(
+        const membership = await glGroupService.getMembership(
           'gitter-integration-tests-group/subgroup-inherited-members',
           gitterIntegrationTestsUserId
         );
 
-        assert.strictEqual(isMember, true);
+        assert.deepEqual(membership, {
+          accessLevel: 50,
+          isMember: true,
+          isMaintainer: true,
+          isOwner: true
+        });
       });
 
-      it('should fail for non-existant group member', async () => {
+      it('should return false for non-existant group member', async () => {
         const glGroupService = new GitLabGroupService(FAKE_USER);
         const nonExistantUserId = '999999';
-        const isMember = await glGroupService.isMember(
+        const membership = await glGroupService.getMembership(
           'gitter-integration-tests-group',
           nonExistantUserId
         );
 
-        assert.strictEqual(isMember, false);
+        assert.deepEqual(membership, {
+          accessLevel: 0,
+          isMember: false,
+          isMaintainer: false,
+          isOwner: false
+        });
+      });
+
+      it('should not be isOwner when only maintainer', async () => {
+        const glGroupService = new GitLabGroupService(FAKE_USER);
+        // User: https://gitlab.com/gitter-integration-tests
+        const gitterIntegrationTestsUserId = '2619770';
+        const membership = await glGroupService.getMembership(
+          'gitter-integration-tests-maintainer-group',
+          gitterIntegrationTestsUserId
+        );
+
+        assert.deepEqual(membership, {
+          accessLevel: 40,
+          isMember: true,
+          isMaintainer: true,
+          isOwner: false
+        });
       });
     });
   });

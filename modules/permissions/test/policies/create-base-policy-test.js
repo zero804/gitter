@@ -1,7 +1,6 @@
 'use strict';
 
 var assert = require('assert');
-var Promise = require('bluebird');
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var PolicyDelegateTransportError = require('../../lib/policies/policy-delegate-transport-error');
 var ObjectID = require('mongodb').ObjectID;
@@ -435,18 +434,18 @@ describe('create-base-policy', function() {
     /* eslint complexity: ["error", 13] */
     it(name, function() {
       var stubRateLimiter = {
-        checkForRecentSuccess: Promise.method(function(rateLimitKey) {
+        checkForRecentSuccess: async function(rateLimitKey) {
           if (meta.recentSuccess && meta.recentSuccess.hasOwnProperty(rateLimitKey)) {
             return meta.recentSuccess[rateLimitKey];
           }
           assert.ok(false, 'Unexpected call to checkForRecentSuccess');
-        }),
-        recordSuccessfulCheck: Promise.method(function() {
+        },
+        recordSuccessfulCheck: async function() {
           this.recordSuccessfulCheckCount++;
           if (!meta.expectRecordSuccessfulCheck) {
             assert.ok(false, 'Unexpected call to recordSuccessfulCheck');
           }
-        }),
+        },
         recordSuccessfulCheckCount: 0
       };
 
@@ -478,17 +477,17 @@ describe('create-base-policy', function() {
       // Only real users have a context delegate
       if (userId) {
         contextDelegate = {
-          isMember: Promise.method(function() {
+          isMember: async function() {
             return meta.inRoom;
-          }),
+          },
 
-          handleReadAccessFailure: Promise.method(function() {
+          handleReadAccessFailure: async function() {
             assert(meta.handleReadAccessFailure, 'Unexpected call to handleReadAccessFailure');
             didCallHandleReadAccessFailure++;
             if (meta.inRoom) {
               didRemoveUserFromRoom = true;
             }
-          })
+          }
         };
       }
 
@@ -512,7 +511,7 @@ describe('create-base-policy', function() {
       var policyDelegate;
       if (meta.hasPolicyDelegate) {
         policyDelegate = {
-          hasPolicy: Promise.method(function(policyName) {
+          hasPolicy: async function(policyName) {
             assert(policyName);
 
             if (meta.expectedPolicy1 === policyName) {
@@ -531,7 +530,7 @@ describe('create-base-policy', function() {
             }
 
             assert.ok(false, 'Unexpected policy: ' + policyName);
-          }),
+          },
 
           getPolicyRateLimitKey: function(policyName) {
             return policyName;
@@ -557,7 +556,7 @@ describe('create-base-policy', function() {
         meta.join !== undefined && basePolicy.canJoin(),
         meta.admin !== undefined && basePolicy.canAdmin(),
         meta.addUser !== undefined && basePolicy.canAddUser()
-      ]).spread(function(read, write, join, admin, addUser) {
+      ]).then(function([read, write, join, admin, addUser]) {
         var expected = {};
         var results = {};
         if (meta.read !== undefined) {
