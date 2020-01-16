@@ -177,6 +177,15 @@ context.user = function() {
   return user;
 };
 
+context.hasProvider = provider => {
+  return (
+    user &&
+    (user.get('providers') || []).some(p => {
+      return p === provider;
+    })
+  );
+};
+
 /**
  * DEPRECATED
  */
