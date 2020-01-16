@@ -91,6 +91,11 @@ export default {
 
   display: none;
   &.opened {
+    .mobile & {
+      position: absolute;
+      z-index: 1001;
+      width: 100%;
+    }
     display: flex;
   }
   /*
