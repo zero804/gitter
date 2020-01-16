@@ -418,7 +418,11 @@ module.exports = (function() {
         }
         // if this is a parent message, open TMF as well as highlighting the parent message
         if (model.get('threadMessageCount')) {
-          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', model.id);
+          appEvents.trigger(
+            'dispatchVueAction',
+            'threadMessageFeed/openAndHighlightParent',
+            model.id
+          );
         }
 
         var models = isolateBurst(self.collection, model);

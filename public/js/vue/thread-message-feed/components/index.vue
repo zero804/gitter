@@ -53,8 +53,8 @@ export default {
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
-          <intersect @enter="fetchOlderMessages()">
-            <div></div>
+          <intersect v-if="!childMessagesRequest.loading" @enter="fetchOlderMessages()">
+            <span></span>
           </intersect>
           <chat-item
             v-for="message in childMessages"
@@ -63,7 +63,7 @@ export default {
             :use-compact-styles="true"
           />
           <intersect @enter="fetchNewerMessages()">
-            <div></div>
+            <span></span>
           </intersect>
         </div>
         <chat-input v-if="displayedRoom.roomMember" :user="user" thread />

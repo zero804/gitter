@@ -115,6 +115,20 @@ export default {
       appEvents.trigger('vue:right-toolbar:toggle', false);
       return dispatch('fetchInitialMessages');
     },
+    openAndHighlightParent: async ({ commit, dispatch, state }, parentId) => {
+      if (state.isVisible && state.parentId === parentId) return;
+      commit(types.RESET_THREAD_STATE);
+      commit(types.TOGGLE_THREAD_MESSAGE_FEED, true);
+      commit(types.SET_PARENT_MESSAGE_ID, parentId);
+      appEvents.trigger('vue:right-toolbar:toggle', false);
+      const childMessages = await dispatch('fetchChildMessages', {
+        afterId: parentId
+      });
+      commit(types.SET_AT_TOP_IF_SAME_PARENT, parentId);
+      setTemporaryMessageProp(commit, parentId, 'highlighted');
+      if (childMessages.length < FETCH_MESSAGES_LIMIT)
+        commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentId);
+    },
     close: ({ commit }) => {
       commit(types.TOGGLE_THREAD_MESSAGE_FEED, false);
       appEvents.trigger('vue:right-toolbar:toggle', true);

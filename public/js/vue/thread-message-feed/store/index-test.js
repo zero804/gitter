@@ -50,6 +50,25 @@ describe('thread message feed store', () => {
       );
     });
 
+    it('openAndHighlightParent shows TMF, loads oldes messages and highlights parent', async () => {
+      const parentId = '5d147ea84dad9dfbc522317a';
+      await testAction(
+        actions.openAndHighlightParent,
+        parentId,
+        {},
+        [
+          { type: types.RESET_THREAD_STATE },
+          { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
+          { type: types.SET_PARENT_MESSAGE_ID, payload: parentId },
+          { type: types.SET_AT_TOP_IF_SAME_PARENT, payload: parentId },
+          { type: rootTypes.UPDATE_MESSAGE, payload: { id: parentId, highlighted: true } }
+        ],
+        [{ type: 'fetchChildMessages', payload: { afterId: parentId } }],
+        { fetchChildMessages: generateSequenceWithIds(50) }
+      );
+      expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
+    });
+
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
       await testAction(actions.close, undefined, {}, [
         { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: false }

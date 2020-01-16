@@ -29,11 +29,11 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
         </div>
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
           
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
       </div>
        
@@ -75,12 +75,10 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
           <loading-spinner-stub />
         </div>
          
-        <intersect-stub>
-          <div />
-        </intersect-stub>
+        <!---->
           
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
       </div>
        
@@ -117,7 +115,7 @@ exports[`thread-message-feed index child messages opened - matches snapshot 1`] 
         <!---->
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
          
         <chat-item-stub
@@ -130,7 +128,7 @@ exports[`thread-message-feed index child messages opened - matches snapshot 1`] 
         />
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
       </div>
        
@@ -175,11 +173,11 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
         <!---->
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
           
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
       </div>
        
@@ -240,7 +238,7 @@ exports[`thread-message-feed index not room member - matches snapshot 1`] = `
         <!---->
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
          
         <chat-item-stub
@@ -253,7 +251,7 @@ exports[`thread-message-feed index not room member - matches snapshot 1`] = `
         />
          
         <intersect-stub>
-          <div />
+          <span />
         </intersect-stub>
       </div>
        
