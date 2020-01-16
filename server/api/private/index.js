@@ -164,13 +164,6 @@ router.get(
   require('./check-group-uri')
 );
 
-router.post(
-  '/create-github-room',
-  authMiddleware,
-  identifyRoute('api-private-create-github-room'),
-  require('./create-github-room')
-);
-
 router.post('/fp', authMiddleware, identifyRoute('api-private-fp'), require('./fingerprint'));
 
 router.get(

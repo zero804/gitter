@@ -11,14 +11,10 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
 var uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var addInvitePolicyFactory = require('gitter-web-permissions/lib/add-invite-policy-factory');
 var userService = require('gitter-web-users');
 var troupeService = require('./troupe-service');
-var oneToOneRoomService = require('./one-to-one-room-service');
 var userDefaultFlagsService = require('./user-default-flags-service');
-var validateGithubUri = require('gitter-web-github').GitHubUriValidator;
-var validate = require('./validate');
 var collections = require('gitter-web-utils/lib/collections');
 var StatusError = require('statuserror');
 var emailNotificationService = require('gitter-web-email-notifications');
@@ -30,10 +26,7 @@ var unreadItemService = require('gitter-web-unread-items');
 var debug = require('debug')('gitter:app:room-service');
 var roomMembershipService = require('./room-membership-service');
 var recentRoomService = require('./recent-room-service');
-var uriResolver = require('./uri-resolver');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
-var groupService = require('gitter-web-groups/lib/group-service');
-var securityDescriptorGenerator = require('gitter-web-permissions/lib/security-descriptor-generator');
 var liveCollections = require('gitter-web-live-collection-events');
 var roomRepoService = require('./room-repo-service');
 
@@ -53,174 +46,6 @@ function sendJoinStats(user, room, tracking) {
     troupeId: room.id,
     groupId: room.groupId
   });
-}
-
-function extendStatusError(statusCode, options) {
-  var err = new StatusError(statusCode);
-  _.extend(err, options);
-  return err;
-}
-
-function getOwnerFromRepoFullName(repoName) {
-  assert(repoName, 'repoName required');
-  var owner = repoName.split('/')[0];
-  return owner;
-}
-
-/**
- * During communities API migration phase, finds or creates a group for the
- * given uri.
- */
-function ensureGroupForGitHubRoom(user, githubType, uri) {
-  debug('ensureGroupForGitHubRoom: type=%s uri=%s', githubType, uri);
-  var options;
-  switch (githubType) {
-    case 'REPO':
-      options = {
-        uri: getOwnerFromRepoFullName(uri),
-        obtainAccessFromGitHubRepo: uri
-      };
-      break;
-
-    case 'ORG':
-      options = {
-        useHomeUriSuffix: true,
-        uri: uri
-      };
-      break;
-
-    default:
-      throw new StatusError(400, 'Cannot create a group for ' + githubType);
-  }
-
-  return groupService.migration.ensureGroupForGitHubRoomCreation(user, options);
-}
-
-/**
- * Assuming that oneToOne uris have been handled already,
- * Figure out what this troupe is for
- *
- * @returns Promise of [troupe, hasJoinPermission] if the user is able to join/create the troupe
- */
-// eslint-disable-next-line complexity, max-statements
-async function createRoomForGitHubUri(user, uri, options = {}) {
-  debug('createRoomForGitHubUri: %s options: %j', uri, options);
-
-  /* From here on we're going to be doing a create */
-  const githubInfo = await validateGithubUri(user, uri);
-  debug('GitHub information for %s is %j', uri, githubInfo);
-
-  /* If we can't determine the type, skip it */
-  if (!githubInfo) throw new StatusError(404);
-
-  const githubType = githubInfo.type;
-  let backendType;
-  switch (githubType) {
-    case 'ORG':
-      backendType = 'GH_ORG';
-      break;
-
-    case 'REPO':
-      backendType = 'GH_REPO';
-      break;
-
-    case 'USER':
-      // We got back a user. Since we've managed to get this far,
-      // it means that the user is on GitHub but not gitter, so
-      // we'll 404
-      // In future, it might be worth bring up a page.
-      throw new StatusError(404);
-  }
-
-  const officialUri = githubInfo.uri;
-  const lcUri = officialUri.toLowerCase();
-  const security = githubInfo.security || null;
-  const externalId = githubInfo.externalId || null;
-  const topic = githubInfo.description;
-
-  debug('URI validation %s returned type=%s uri=%s', uri, githubType, officialUri);
-
-  if (
-    !options.ignoreCase &&
-    officialUri !== uri &&
-    officialUri.toLowerCase() === uri.toLowerCase()
-  ) {
-    debug('Redirecting client from %s to official uri %s', uri, officialUri);
-    throw extendStatusError(301, { path: '/' + officialUri });
-  }
-
-  /* Room does not yet exist */
-  const policy = policyFactory.getPreCreationPolicyEvaluator(user, backendType, officialUri);
-
-  const access = await policy.canAdmin();
-  debug('Does the user have access to create room %s? %s', uri, access);
-
-  // If the user is not allowed to create this room, go no further
-  if (!access) throw new StatusError(403);
-
-  const group = await ensureGroupForGitHubRoom(user, githubType, officialUri);
-
-  const groupId = group._id;
-
-  const sd = securityDescriptorGenerator.generate(user, {
-    linkPath: officialUri,
-    type: 'GH_' + githubType, // GH_USER, GH_ORG or GH_REPO
-    externalId: externalId,
-    security: githubType === 'ORG' ? 'PRIVATE' : security
-  });
-
-  const [troupe, updateExisting] = await mongooseUtils.upsert(
-    persistence.Troupe,
-    { lcUri: lcUri },
-    {
-      $setOnInsert: {
-        lcUri: lcUri,
-        groupId: groupId,
-        uri: officialUri,
-        githubType: githubType,
-        githubId: externalId,
-        topic: topic || '',
-        security: security,
-        dateLastSecurityCheck: new Date(),
-        userCount: 0,
-        sd: sd
-      }
-    }
-  );
-
-  /* Next stage - post creation tasks */
-  let postCreationResults;
-  if (!updateExisting && options.associateWithGitHubRepo) {
-    postCreationResults = await roomRepoService.associateRoomToRepo(troupe, user, {
-      repoUri: options.associateWithGitHubRepo,
-      addBadge: options.addBadge
-    });
-  }
-
-  /* Finally, return the results to the user */
-  const hookCreationFailedDueToMissingScope =
-    postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
-
-  return {
-    troupe,
-    didCreate: !updateExisting,
-    hookCreationFailedDueToMissingScope
-  };
-}
-
-/**
- * Grant or remove the users access to a room
- * Makes the troupe reflect the users access to a room
- *
- * Returns true if changes were made
- */
-function ensureAccessControl(user, troupe, access) {
-  if (access) {
-    var flags = userDefaultFlagsService.getDefaultFlagsForUser(user);
-    return roomMembershipService.addRoomMember(troupe._id, user._id, flags, troupe.groupId);
-  } else {
-    return roomMembershipService.removeRoomMember(troupe._id, user._id, troupe.groupId);
-  }
 }
 
 /**
@@ -246,116 +71,6 @@ function findAllRoomsIdsForUserIncludingMentions(userId, callback) {
       return [Object.keys(hash), nonMemberRooms];
     })
     .asCallback(callback);
-}
-
-/**
- * Add a user to a room.
- * - If the room does not exist, will create the room if the user has permission
- * - If the room does exist, will add the user to the room if the user has permission
- * - If the user does not have access, will return null
- *
- * @return { troupe: ..., uri: ..., policy: ..., roomMember: ..., accessDenied: ... }
- */
-// eslint-disable-next-line complexity, max-statements
-async function createRoomByUri(user, uri, options = {}) {
-  debug('createRoomByUri %s %s %j', user && user.username, uri, options);
-
-  const userId = user && user.id;
-  validate.expect(uri, 'uri required');
-
-  /* First off, try use local data to figure out what this url is for */
-  const resolved = await uriResolver(user && user.id, uri, options);
-  const resolvedUser = resolved && resolved.user;
-  const resolvedTroupe = resolved && resolved.room;
-  const resolvedGroup = resolved && resolved.group;
-
-  // We resolved only a group. There will never be a room at this URI
-  if (resolvedGroup && !resolvedTroupe) throw new StatusError(404);
-
-  /* Deal with the case of the anonymous user first */
-  if (!user) {
-    if (resolvedUser) {
-      debug('uriResolver returned user for uri=%s', uri);
-      throw new StatusError(401);
-    }
-
-    if (resolvedTroupe) {
-      debug('uriResolver returned troupe for uri=%s', uri);
-
-      const policy = await policyFactory.createPolicyForRoom(user, resolvedTroupe);
-      const viewAccess = await policy.canRead();
-
-      if (!viewAccess) throw new StatusError(404);
-
-      return {
-        troupe: resolvedTroupe
-      };
-    }
-
-    throw new StatusError(404);
-  }
-
-  // If the Uri Lookup returned a user, do a one-to-one
-  if (resolvedUser) {
-    if (mongoUtils.objectIDsEqual(resolvedUser.id, userId)) {
-      debug('localUriLookup returned own user for uri=%s', uri);
-      throw new StatusError(404);
-    }
-
-    debug('localUriLookup returned user for uri=%s. Finding or creating one-to-one', uri);
-
-    const [troupe] = await oneToOneRoomService.findOrCreateOneToOneRoom(user, resolvedUser._id);
-    return {
-      troupe
-    };
-  }
-
-  if (resolvedTroupe) {
-    const policy = await policyFactory.createPolicyForRoom(user, resolvedTroupe);
-    const access = await policy.canRead();
-    if (!access) throw new StatusError(403);
-
-    return {
-      troupe: resolvedTroupe
-    };
-  }
-
-  // The room does not exist, lets attempt to create it
-  debug('Room does not exist for uri %s, attempting upsert', uri);
-  const findOrCreateResult = await createRoomForGitHubUri(user, uri, options);
-  const troupe = findOrCreateResult.troupe;
-  const hookCreationFailedDueToMissingScope =
-    findOrCreateResult.hookCreationFailedDueToMissingScope;
-  const didCreate = findOrCreateResult.didCreate;
-
-  if (didCreate) {
-    emailNotificationService
-      .createdRoomNotification(user, troupe) // now the san email to the room', wne
-      .catch(function(err) {
-        logger.error('Unable to send create room notification: ' + err, { exception: err });
-      });
-
-    stats.event('create_room', {
-      uri,
-      roomId: troupe.id,
-      groupId: troupe.groupId,
-      userId: user.id,
-      roomType: 'github-room'
-    });
-  }
-
-  const userRoomMembershipChanged = await ensureAccessControl(user, troupe, true);
-  // if the user has been granted access to the room, send join stats for the cases of being the owner or just joining the room
-  if (userRoomMembershipChanged) {
-    /* Note that options.tracking is never sent as a param */
-    sendJoinStats(user, troupe, options.tracking);
-  }
-
-  return {
-    troupe,
-    hookCreationFailedDueToMissingScope,
-    didCreate
-  };
 }
 
 /**
@@ -736,7 +451,6 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
       });
     })
     .then(function(postCreationResults) {
-      // mimicking createRoomByUri's response here
       var hookCreationFailedDueToMissingScope =
         postCreationResults && postCreationResults.hookCreationFailedDueToMissingScope;
       return {
@@ -760,7 +474,6 @@ function updateTopic(roomId, topic) {
 
 module.exports = {
   findAllRoomsIdsForUserIncludingMentions: findAllRoomsIdsForUserIncludingMentions,
-  createRoomByUri: createRoomByUri,
   joinRoom: Promise.method(joinRoom),
   addUserToRoom: addUserToRoom,
   removeUserFromRoom: Promise.method(removeUserFromRoom),
@@ -773,7 +486,6 @@ module.exports = {
   createGroupRoom: createGroupRoom,
   updateTopic: updateTopic,
   testOnly: {
-    updateUserDateAdded: updateUserDateAdded,
-    createRoomForGitHubUri: createRoomForGitHubUri
+    updateUserDateAdded: updateUserDateAdded
   }
 };

@@ -8,19 +8,6 @@ function createRoutes(options) {
   var roomMenuModel = options.roomMenuModel;
 
   return {
-    'confirm/*uri': function(uri) {
-      var dialogRegion = this.dialogRegion;
-
-      require.ensure(['../views/modals/confirm-repo-room-view'], function(require) {
-        var confirmRepoRoomView = require('../views/modals/confirm-repo-room-view');
-        dialogRegion.show(
-          new confirmRepoRoomView.Modal({
-            uri: uri
-          })
-        );
-      });
-    },
-
     'createroom(/:name)': function(initialRoomName) {
       var dialogRegion = this.dialogRegion;
 
