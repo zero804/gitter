@@ -244,3 +244,36 @@ Body:
 	"access_token": "xxxtokentorevoke"
 }
 ```
+
+## Working with renovate configuration
+
+### Testing renovate before merging
+
+`renovate` can be run locally
+
+Install it as a global package/command
+
+```
+$ npm i -g renovate
+```
+
+The issue is that renovate reads the config from the repository itself and it always uses default branch (`develop` for webapp). AFAIK there isn't away to point it to a different branch. There is an [issue for interactive MR for config changes](https://github.com/renovatebot/renovate/issues/547) that will remove need for this local/fork testing process.
+
+#### Pointing renovate to your fork
+
+```
+git remote add myfork <url of your fork>
+git push renovate-range-strategy myfork
+```
+
+Go to your fork's repository settings (`<myfork url>/-/settings/repository`) and set `renovate-range-strategy` as default branch.
+
+Add `"renovateFork": true,` to your `renovate.json` and push it on top of `myfork/renovate-range-strategy` branch.
+
+Create a token for your user and give it these scopes `api, read_user, read_repository`.
+
+Now you can run renovate
+
+```
+renovate --platform gitlab --dry-run true --print-config true --token "<token>" viktomas/webapp
+```
