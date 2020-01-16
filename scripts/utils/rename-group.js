@@ -101,7 +101,7 @@ onMongoConnect()
             group.homeUri = `${lcNew}/home`;
             group.lcHomeUri = group.homeUri.toLowerCase();
             // Assumes the new name is also the org name
-            if (group.sd.type === 'GH_ORG') {
+            if (group.sd.type === 'GH_ORG' || group.sd.type === 'GL_GROUP') {
               group.sd.linkPath = opts.new;
             }
 
@@ -128,7 +128,7 @@ onMongoConnect()
                   room.lcOwner = opts.new;
                 }
 
-                if (room.sd.type === 'GH_ORG') {
+                if (room.sd.type === 'GH_ORG' || room.sd.type === 'GL_GROUP') {
                   room.sd.linkPath = opts.new;
                 } else if (room.sd.type === 'GH_REPO') {
                   var linkpathPieces = room.sd.linkPath.split('/');
