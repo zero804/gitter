@@ -198,63 +198,6 @@ describe('group-service', function() {
       });
     });
 
-    describe('ensureGroupForGitHubRoomCreation', function() {
-      var fixture = fixtureLoader.setup({
-        deleteDocuments: {
-          Group: [{ lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() }]
-        },
-        user1: '#integrationUser1'
-      });
-
-      it('should create a room for a repo', function() {
-        return groupService.migration
-          .ensureGroupForGitHubRoomCreation(fixture.user1, {
-            uri: fixtureLoader.GITTER_INTEGRATION_ORG,
-            name: 'BOB',
-            obtainAccessFromGitHubRepo: fixtureLoader.GITTER_INTEGRATION_REPO_FULL
-          })
-          .then(function(group) {
-            return securityDescriptorService.group.findById(group._id, fixture.user1._id);
-          })
-          .then(function(securityDescriptor) {
-            assert.deepEqual(
-              {
-                admins: 'GH_ORG_MEMBER',
-                externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
-                linkPath: 'gitter-integration-tests-organisation',
-                members: 'PUBLIC',
-                public: true,
-                type: 'GH_ORG'
-              },
-              securityDescriptor
-            );
-          });
-      });
-
-      it('should create a room for a user', function() {
-        return groupService.migration
-          .ensureGroupForGitHubRoomCreation(fixture.user1, {
-            uri: fixture.user1.username,
-            name: 'BOB'
-          })
-          .then(function(group) {
-            return securityDescriptorService.group.findById(group._id, fixture.user1._id);
-          })
-          .then(function(securityDescriptor) {
-            assert.strictEqual(securityDescriptor.admins, 'GH_USER_SAME');
-            assert.strictEqual(
-              securityDescriptor.externalId,
-              fixtureLoader.GITTER_INTEGRATION_USER_ID
-            );
-            assert.deepEqual(securityDescriptor.extraAdmins, []);
-            assert.equal(securityDescriptor.public, true);
-            assert.equal(securityDescriptor.members, 'PUBLIC');
-            assert.equal(securityDescriptor.linkPath, fixtureLoader.GITTER_INTEGRATION_USERNAME);
-            assert.equal(securityDescriptor.type, 'GH_USER');
-          });
-      });
-    });
-
     describe('findRoomsIdForGroup', function() {
       var fixture = fixtureLoader.setup({
         user1: {},

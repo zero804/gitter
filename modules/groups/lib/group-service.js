@@ -9,7 +9,6 @@ var Troupe = require('gitter-web-persistence').Troupe;
 var liveCollections = require('gitter-web-live-collection-events');
 var validateGroupName = require('gitter-web-validators/lib/validate-group-name');
 var StatusError = require('statuserror');
-var policyFactory = require('gitter-web-permissions/lib/policy-factory');
 var debug = require('debug')('gitter:app:groups:group-service');
 var mongooseUtils = require('gitter-web-persistence-utils/lib/mongoose-utils');
 var ensureAccessAndFetchDescriptor = require('gitter-web-permissions/lib/ensure-access-and-fetch-descriptor');
@@ -171,65 +170,6 @@ async function createGroup(user, options) {
   return upsertGroup(user, groupInfo, securityDescriptor);
 }
 
-/**
- * @private
- */
-function canUserAdminGroup(user, group, obtainAccessFromGitHubRepo) {
-  return policyFactory
-    .createPolicyForGroupIdWithRepoFallback(user, group._id, obtainAccessFromGitHubRepo)
-    .then(function(policy) {
-      return policy.canAdmin();
-    });
-}
-
-/**
- * During the migration only
- *
- * Ensures that a group exists
- */
-function ensureGroupForGitHubRoomCreation(user, options) {
-  var uri = options.uri;
-  var name = options.name || uri;
-  var useHomeUriSuffix = options.useHomeUriSuffix;
-  var obtainAccessFromGitHubRepo = options.obtainAccessFromGitHubRepo;
-
-  debug(
-    'ensureGroupForGitHubRoomCreation: name=%s uri=%s obtainAccessFromGitHubRepo=%s',
-    name,
-    uri,
-    obtainAccessFromGitHubRepo
-  );
-  assert(user, 'user required');
-  assert(uri, 'name required');
-
-  return findByUri(uri).then(function(existingGroup) {
-    if (existingGroup) {
-      debug('Existing group found');
-      return canUserAdminGroup(user, existingGroup, obtainAccessFromGitHubRepo).then(function(
-        adminAccess
-      ) {
-        debug('Has admin access? %s', adminAccess);
-
-        if (!adminAccess) throw new StatusError(403, 'Cannot create a room under ' + uri);
-        return existingGroup;
-      });
-    }
-
-    debug(
-      'No existing group. Will create. obtainAccessFromGitHubRepo=%s',
-      obtainAccessFromGitHubRepo
-    );
-    return createGroup(user, {
-      type: 'GH_GUESS', // how do we know if it is a GH_ORG or GH_USER? or GH_REPO?
-      name: name,
-      uri: uri,
-      useHomeUriSuffix: useHomeUriSuffix,
-      linkPath: uri.split('/')[0], // does this make sense? or rather uri?
-      obtainAccessFromGitHubRepo: obtainAccessFromGitHubRepo
-    });
-  });
-}
-
 function findRoomsIdForGroup(groupId, userId) {
   assert(groupId, 'groupId is required');
 
@@ -291,8 +231,5 @@ module.exports = {
   findRoomsIdForGroup: Promise.method(findRoomsIdForGroup),
   setAvatarForGroup: setAvatarForGroup,
   findFavouriteGroupsForUser: groupFavouritesCore.findFavouriteGroupsForUser,
-  updateFavourite: updateFavourite,
-  migration: {
-    ensureGroupForGitHubRoomCreation: ensureGroupForGitHubRoomCreation
-  }
+  updateFavourite: updateFavourite
 };
