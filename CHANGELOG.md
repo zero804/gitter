@@ -1,4 +1,4 @@
-# 20.15.0 - *upcoming*
+# 20.15.0 - 2019-01-16
 
  - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
  - Add left-menu mobile toggle to explore page (sign-in landing page), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1729
