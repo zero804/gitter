@@ -50,23 +50,45 @@ describe('thread message feed store', () => {
       );
     });
 
-    it('openAndHighlightParent shows TMF, loads oldes messages and highlights parent', async () => {
-      const parentId = '5d147ea84dad9dfbc522317a';
-      await testAction(
-        actions.openAndHighlightParent,
-        parentId,
-        {},
-        [
-          { type: types.RESET_THREAD_STATE },
-          { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
-          { type: types.SET_PARENT_MESSAGE_ID, payload: parentId },
-          { type: types.SET_AT_TOP_IF_SAME_PARENT, payload: parentId },
-          { type: rootTypes.UPDATE_MESSAGE, payload: { id: parentId, highlighted: true } }
-        ],
-        [{ type: 'fetchChildMessages', payload: { afterId: parentId } }],
-        { fetchChildMessages: generateSequenceWithIds(50) }
-      );
-      expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
+    describe('openAndHighlightParent', () => {
+      it('shows TMF, loads oldest messages and highlights parent', async () => {
+        const parentId = '5d147ea84dad9dfbc522317a';
+        await testAction(
+          actions.openAndHighlightParent,
+          parentId,
+          {},
+          [
+            { type: types.RESET_THREAD_STATE },
+            { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
+            { type: types.SET_PARENT_MESSAGE_ID, payload: parentId },
+            { type: types.SET_AT_TOP_IF_SAME_PARENT, payload: parentId },
+            { type: rootTypes.UPDATE_MESSAGE, payload: { id: parentId, highlighted: true } }
+          ],
+          [{ type: 'fetchChildMessages', payload: { afterId: parentId } }],
+          { fetchChildMessages: generateSequenceWithIds(50) }
+        );
+        expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
+      });
+
+      it('sets at top and at bottom flags if there is less than 50 child messages', async () => {
+        const parentId = '5d147ea84dad9dfbc522317a';
+        await testAction(
+          actions.openAndHighlightParent,
+          parentId,
+          {},
+          [
+            { type: types.RESET_THREAD_STATE },
+            { type: types.TOGGLE_THREAD_MESSAGE_FEED, payload: true },
+            { type: types.SET_PARENT_MESSAGE_ID, payload: parentId },
+            { type: types.SET_AT_TOP_IF_SAME_PARENT, payload: parentId },
+            { type: rootTypes.UPDATE_MESSAGE, payload: { id: parentId, highlighted: true } },
+            { type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: parentId }
+          ],
+          [{ type: 'fetchChildMessages', payload: { afterId: parentId } }],
+          { fetchChildMessages: generateSequenceWithIds(10) }
+        );
+        expect(appEvents.trigger).toHaveBeenCalledWith('vue:right-toolbar:toggle', false);
+      });
     });
 
     it('close hides TMF, shows right toolbar, unsets parent id', async () => {
