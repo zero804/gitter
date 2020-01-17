@@ -1,5 +1,7 @@
 # 20.16.0 - *upcoming*
 
+ - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735
+
 Developer facing:
 
  - Add `GL_GROUP` support to the `scripts/utils/rename-group.js` utility script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1734
