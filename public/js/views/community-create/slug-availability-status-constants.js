@@ -3,7 +3,7 @@
 var slugAvailabilityStatusConstants = {
   PENDING: 'pending',
   AVAILABLE: 'available',
-  NEEDS_MORE_PERMISSIONS: 'needs-more-permissions',
+  GITHUB_CLASH: 'github-clash',
   AUTHENTICATION_FAILED: 'authentication-failed',
   UNAVAILABLE: 'unavailable',
   INVALID: 'invalid'

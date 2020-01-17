@@ -130,10 +130,23 @@ function checkIfGroupUriExists(user, uri, obtainAccessFromGitHubRepo) {
         allowCreate = true;
       }
 
+      let type = null;
+      switch (githubInfo && githubInfo.type) {
+        case 'ORG':
+          type = 'GH_ORG';
+          break;
+        case 'REPO':
+          type = 'GH_REPO';
+          break;
+        case 'USER':
+          type = 'GH_USER';
+          break;
+      }
+
       return {
         // The future group will either be org-based or of type null which
         // is just the new types that aren't backed by GitHub.
-        type: githubInfo && githubInfo.type === 'ORG' ? 'GH_ORG' : null,
+        type,
         allowCreate: allowCreate,
         localUriExists: localUriExists
       };
