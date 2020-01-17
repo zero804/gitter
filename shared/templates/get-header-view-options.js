@@ -1,9 +1,17 @@
 'use strict';
 
-function getGithubLinkUrl(serializedTroupe) {
-  var backend = serializedTroupe.backend;
+function getHeaderLinkUrl(serializedTroupe) {
+  let backend = serializedTroupe.backend;
   if (!backend) return;
+
+  // When the room security descriptor is referencing the group, use that security descriptor instead
+  if (serializedTroupe.backend.type === 'GROUP') {
+    backend = serializedTroupe.group.backedBy;
+  }
+
   switch (backend.type) {
+    case 'GL_GROUP':
+      return 'https://gitlab.com/' + backend.linkPath;
     case 'GH_REPO':
     case 'GH_ORG':
       return 'https://github.com/' + backend.linkPath;
@@ -33,7 +41,7 @@ function getHeaderViewOptions(serializedTroupe) {
     avatarUrl: serializedTroupe.avatarUrl,
     group: group,
     groupPageUrl: groupPageUrl,
-    githubLink: getGithubLinkUrl(serializedTroupe)
+    headerLink: getHeaderLinkUrl(serializedTroupe)
   };
 }
 
