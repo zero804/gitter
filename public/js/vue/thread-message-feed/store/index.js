@@ -29,7 +29,7 @@ const canStartFetchingMessages = state =>
 const setTemporaryMessageProp = (commit, id, propName, propValue = true) => {
   commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: propValue }, { root: true });
   setTimeout(
-    () => commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: propValue }, { root: true }),
+    () => commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: undefined }, { root: true }),
     5000
   );
 };
