@@ -28,7 +28,7 @@ GitHubBackend.prototype.findOrgs = function() {
       return {
         ...org,
         backend: 'github',
-        absoluteUri: urlJoin('https://github.com', org.name)
+        absoluteUri: urlJoin('https://github.com', org.login)
       };
     });
   });
