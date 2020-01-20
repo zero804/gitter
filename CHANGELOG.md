@@ -10,6 +10,14 @@ Developer facing:
  - Remove unused `roomService.createRoomByUri()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1727
 
 
+# 20.15.1 - 2019-01-20
+
+Developer facing:
+
+ - Disallow `Transfer-Encoding: chunked` for any API request, https://gitlab.com/gitlab-org/gitter/webapp/issues/2292
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/46
+
+
 # 20.15.0 - 2019-01-16
 
  - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
