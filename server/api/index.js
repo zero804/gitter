@@ -28,6 +28,8 @@ router.get('/', function(req, res) {
 router.use(cors(corsOptions));
 router.options('*', cors(corsOptions));
 
+router.use(require('../web/middlewares/disallow-transfer-encoding-chunked'));
+
 router.use('/v1', require('./v1'));
 router.use('/private', require('./private'));
 
