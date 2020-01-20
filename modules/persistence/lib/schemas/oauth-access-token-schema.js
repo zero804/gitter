@@ -12,6 +12,7 @@ var OAuthAccessTokenSchema = new Schema({
 });
 
 OAuthAccessTokenSchema.index({ userId: 1, clientId: 1 }, { sparse: true }); // can't be unique due to mongo fail
+OAuthAccessTokenSchema.index({ clientId: 1 });
 OAuthAccessTokenSchema.schemaTypeName = 'OAuthAccessTokenSchema';
 
 module.exports = {

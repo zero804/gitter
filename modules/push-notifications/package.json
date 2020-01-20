@@ -11,10 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "lodash": "^3.2.0",
-    "bluebird": "^3.5.1",
-    "mongodb-unique-ids": "^0.2.0",
-    "debug": "^2.2.0",
     "gitter-web-persistence": "file:../persistence",
     "gitter-web-persistence-utils": "file:../persistence-utils"
   },

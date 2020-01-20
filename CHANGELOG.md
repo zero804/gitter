@@ -1,3 +1,20 @@
+# 20.15.0 - 2019-01-16
+
+ - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
+ - Add left-menu mobile toggle to explore page (sign-in landing page), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1729
+ - Open TMF on mobile, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1733
+
+Developer facing:
+
+ - Defer to root `package.json` for npm packages, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1724
+ - Add docs on how to invalidate a GitHub and Gitter access tokens, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1725
+ - Fix Mongo table scans when using `OAuthAccessToken.find({ clientId });`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1722
+ - Move npm troubleshooting to developer FAQ, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1731
+ - Renovate: Keep using semver for package versions, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1703
+ - Update dependency `keyword-extractor` to `v0.0.18`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1504
+ - Add process for testing renovate changes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1736
+
+
 # 20.14.0 - 2019-01-10
 
  - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713

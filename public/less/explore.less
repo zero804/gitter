@@ -13,6 +13,7 @@
 
 @import '../js/views/modals/login-view';
 @import '../js/views/profile-menu/profile-menu-view';
+@import (reference) '../js/views/app/headerView';
 
 @page-bg-color: #ffffff;
 
@@ -97,10 +98,13 @@ body {
   margin-left: auto;
   margin-right: auto;
   padding-top: 0;
-  padding-left: @page-wrapper-horizontal-padding;
   padding-right: @page-wrapper-horizontal-padding;
 
   background-image: linear-gradient(to left, @header-grad-bg-color, @header-base-bg-color);
+
+  body:not(.mobile) & {
+    padding-left: @page-wrapper-horizontal-padding;
+  }
 }
 
 .explore-header__heading {
@@ -108,6 +112,22 @@ body {
   color: white;
   font-weight: 300;
   font-size: 24px;
+}
+
+.chat-header__main-grouping {
+  &:extend(.chat-header__main-grouping all);
+}
+
+.chat-header__left-menu-toggle-grouping {
+  &:extend(.chat-header__left-menu-toggle-grouping all);
+}
+
+.chat-header__left-menu-toggle {
+  &:extend(.chat-header__left-menu-toggle all);
+}
+
+.chat-header__action-icon {
+  &:extend(.chat-header__action-icon all);
 }
 
 .explore-main {

@@ -11,10 +11,6 @@
   },
   "private": true,
   "dependencies": {
-    "bluebird": "^3.5.1",
-    "debug": "^2.2.0",
-    "gitter-web-persistence": "file:../persistence",
-    "uuid": "^3.3.2",
-    "slug": "^0.9.1"
+    "gitter-web-persistence": "file:../persistence"
   }
 }
