@@ -20,7 +20,7 @@ async function expect(user, uri, expected) {
 }
 
 describe('gl-group-policy-evaluator #slow #gitlab', function() {
-  fixtureLoader.ensureIntegrationEnvironment('#integrationGitlabUser1');
+  fixtureLoader.ensureIntegrationEnvironment('#integrationGitlabUser1', 'GITLAB_GROUP1_URI');
 
   const fixture = fixtureLoader.setup({
     userGitlab1: '#integrationGitlabUser1',

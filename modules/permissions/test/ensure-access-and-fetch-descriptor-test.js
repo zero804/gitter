@@ -8,7 +8,12 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   this.timeout(10000);
 
   fixtureLoader.disableMongoTableScans();
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', '#integrationGitlabUser1');
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    '#integrationGitlabUser1',
+    'GITLAB_GROUP1_ID',
+    'GITLAB_GROUP1_URI'
+  );
 
   var fixture = fixtureLoader.setup({
     user1: '#integrationUser1',

@@ -30,8 +30,11 @@ describe('group-service', function() {
   describe('integration tests #slow', function() {
     fixtureLoader.ensureIntegrationEnvironment(
       '#integrationUser1',
+      '#integrationGitlabUser1',
       'GITTER_INTEGRATION_ORG',
-      'GITTER_INTEGRATION_USERNAME'
+      'GITTER_INTEGRATION_USERNAME',
+      'GITLAB_GROUP1_ID',
+      'GITLAB_GROUP1_URI'
     );
 
     describe('createGroup', function() {
@@ -45,35 +48,62 @@ describe('group-service', function() {
             { lcUri: 'bob' }
           ]
         },
-        user1: '#integrationUser1'
+        user1: '#integrationUser1',
+        userGitlab1: '#integrationGitlabUser1'
       });
 
-      it('should create a group for a GitHub org', function() {
-        var groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
-        var user = fixture.user1;
-        return groupService
-          .createGroup(user, {
-            type: 'GH_ORG',
-            name: 'Bob',
-            uri: groupUri,
-            linkPath: groupUri
-          })
-          .then(function(group) {
-            assert.strictEqual(group.name, 'Bob');
-            assert.strictEqual(group.uri, groupUri);
-            assert.strictEqual(group.lcUri, groupUri.toLowerCase());
-            return securityDescriptorService.group.findById(group._id, null);
-          })
-          .then(function(securityDescriptor) {
-            assert.deepEqual(securityDescriptor, {
-              admins: 'GH_ORG_MEMBER',
-              externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
-              linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
-              members: 'PUBLIC',
-              public: true,
-              type: 'GH_ORG'
-            });
-          });
+      it('should create a group for a GitLab group', async () => {
+        const groupUri = fixtureLoader.GITLAB_GROUP1_URI;
+        const user = fixture.userGitlab1;
+
+        const group = await groupService.createGroup(user, {
+          type: 'GL_GROUP',
+          name: 'Some GitLab group',
+          uri: groupUri,
+          linkPath: groupUri
+        });
+
+        assert.strictEqual(group.name, 'Some GitLab group');
+        assert.strictEqual(group.uri, groupUri);
+        assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+
+        const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
+
+        assert.deepEqual(securityDescriptor, {
+          admins: 'GL_GROUP_MAINTAINER',
+          externalId: fixtureLoader.GITLAB_GROUP1_ID,
+          linkPath: fixtureLoader.GITLAB_GROUP1_URI,
+          members: 'PUBLIC',
+          public: true,
+          type: 'GL_GROUP'
+        });
+      });
+
+      it('should create a group for a GitHub org', async () => {
+        const groupUri = fixtureLoader.GITTER_INTEGRATION_ORG;
+        const user = fixture.user1;
+
+        const group = await groupService.createGroup(user, {
+          type: 'GH_ORG',
+          name: 'Bob',
+          uri: groupUri,
+          linkPath: groupUri
+        });
+
+        assert.strictEqual(group.name, 'Bob');
+        assert.strictEqual(group.uri, groupUri);
+        assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+
+        const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
+
+        assert.deepEqual(securityDescriptor, {
+          admins: 'GH_ORG_MEMBER',
+          externalId: fixtureLoader.GITTER_INTEGRATION_ORG_ID,
+          linkPath: fixtureLoader.GITTER_INTEGRATION_ORG,
+          members: 'PUBLIC',
+          public: true,
+          type: 'GH_ORG'
+        });
       });
 
       it('should create a group for a GitHub repo', function() {
