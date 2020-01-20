@@ -35,6 +35,8 @@ var configurationMappings = {
   GITHUB_ANON_CLIENT_SECRET: 'github:anonymous_app:client_secret',
   TWITTER_CONSUMER_KEY: 'twitteroauth:consumer_key',
   TWITTER_CONSUMER_SECRET: 'twitteroauth:consumer_secret',
+  GITLAB_OAUTH_CLIENT_ID: 'gitlaboauth:client_id',
+  GITLAB_OAUTH_CLIENT_SECRET: 'gitlaboauth:client_secret',
 
   GITLAB_USER_ID: 'integrationTests:gitlabTestUser:id',
   GITLAB_USER_USERNAME: 'integrationTests:gitlabTestUser:username',
@@ -65,7 +67,9 @@ var configSets = {
     'GITHUB_ANON_CLIENT_ID',
     'GITHUB_ANON_CLIENT_SECRET',
     'TWITTER_CONSUMER_KEY',
-    'TWITTER_CONSUMER_SECRET'
+    'TWITTER_CONSUMER_SECRET',
+    'GITLAB_OAUTH_CLIENT_ID',
+    'GITLAB_OAUTH_CLIENT_SECRET'
   ]
 };
 
