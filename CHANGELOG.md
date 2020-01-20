@@ -8,6 +8,8 @@ Developer facing:
 
  - Add `GL_GROUP` support to the `scripts/utils/rename-group.js` utility script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1734
  - Remove unused `roomService.createRoomByUri()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1727
+ - Add test for GitLab group creation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1739
+ - Add user orgs test for GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1740
 
 
 # 20.15.1 - 2019-01-20
