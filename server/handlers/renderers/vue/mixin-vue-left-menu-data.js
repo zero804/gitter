@@ -9,44 +9,47 @@ const generateUserThemeSnapshot = require('../../snapshots/user-theme-snapshot')
 async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const user = req.user;
   const userId = user && user.id;
+
+  const uriContext = req.uriContext;
+  const currentRoom = uriContext && uriContext.troupe;
+
   const [
     serializedUser,
+    serializedCurrentRoom,
     serializedGroups,
     serializedRooms,
     baseTroupeContext,
     userThemeSnapshot
   ] = await Promise.all([
     restSerializer.serializeObject(user, new restSerializer.UserStrategy()),
+    restSerializer.serializeObject(currentRoom, new restSerializer.TroupeStrategy()),
     restful.serializeGroupsForUserId(userId),
     restful.serializeTroupesForUser(userId),
     contextGenerator.generateTroupeContext(req),
     generateUserThemeSnapshot(req)
   ]);
 
-  const uriContext = req.uriContext;
-  const currentRoom = uriContext && uriContext.troupe;
-
-  const roomMap = {};
+  const serializedRoomMap = {};
 
   // the roomMap will contain the current room
-  if (currentRoom) {
-    roomMap[currentRoom.id] = currentRoom;
+  if (serializedCurrentRoom) {
+    serializedRoomMap[serializedCurrentRoom.id] = serializedCurrentRoom;
   }
 
-  serializedRooms.forEach(room => {
-    roomMap[room.id] = room;
+  serializedRooms.forEach(serializedRoom => {
+    serializedRoomMap[serializedRoom.id] = serializedRoom;
   });
 
   const isMobile = req.isPhone;
 
   const storeData = {
     isMobile,
-    isLoggedIn: !!user,
+    isLoggedIn: !!serializedUser,
     user: serializedUser,
     darkTheme: userThemeSnapshot.theme === 'gitter-dark',
 
-    roomMap,
-    displayedRoomId: currentRoom && currentRoom.id,
+    roomMap: serializedRoomMap,
+    displayedRoomId: serializedCurrentRoom && serializedCurrentRoom.id,
 
     leftMenuPinnedState: !isMobile,
     leftMenuExpandedState: false
