@@ -75,7 +75,9 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
           <loading-spinner-stub />
         </div>
          
-        <!---->
+        <intersect-stub>
+          <span />
+        </intersect-stub>
           
         <intersect-stub>
           <span />

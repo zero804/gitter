@@ -53,7 +53,7 @@ export default {
           <div v-else-if="childMessagesRequest.loading" class="loading-message">
             Loading thread <loading-spinner />
           </div>
-          <intersect v-if="!childMessagesRequest.loading" @enter="fetchOlderMessages()">
+          <intersect @enter="fetchOlderMessages()">
             <span></span>
           </intersect>
           <chat-item
