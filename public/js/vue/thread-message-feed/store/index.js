@@ -29,7 +29,7 @@ const canStartFetchingMessages = state =>
 const setTemporaryMessageProp = (commit, id, propName, propValue = true) => {
   commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: propValue }, { root: true });
   setTimeout(
-    () => commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: propValue }, { root: true }),
+    () => commit(rootTypes.UPDATE_MESSAGE, { id, [propName]: undefined }, { root: true }),
     5000
   );
 };
@@ -262,13 +262,15 @@ export default {
       const childMessages = await dispatch('fetchChildMessages', {
         beforeId: getters.childMessages[0].id
       });
-      // align last message to the top (pushes the new messages just above the TMF viewport)
-      dispatch('focusOnMessage', {
-        id: childMessages[childMessages.length - 1].id,
-        block: 'start'
-      });
       if (childMessages.length < FETCH_MESSAGES_LIMIT)
         commit(types.SET_AT_TOP_IF_SAME_PARENT, parentIdBeforeFetch);
+      if (childMessages.length) {
+        // align last message to the top (pushes the new messages just above the TMF viewport)
+        dispatch('focusOnMessage', {
+          id: childMessages[childMessages.length - 1].id,
+          block: 'start'
+        });
+      }
     },
     fetchNewerMessages: async ({ dispatch, state, getters, commit }) => {
       if (state.atBottom || !canStartFetchingMessages(state)) return;
@@ -278,10 +280,12 @@ export default {
       const childMessages = await dispatch('fetchChildMessages', {
         afterId: localChildMessages[localChildMessages.length - 1].id
       });
-      // align last message to the bottom (pushes the new messages just below the TMF viewport)
-      dispatch('focusOnMessage', { id: childMessages[0].id, block: 'end' });
       if (childMessages.length < FETCH_MESSAGES_LIMIT)
         commit(types.SET_AT_BOTTOM_IF_SAME_PARENT, parentIdBeforeFetch);
+      if (childMessages.length) {
+        // align last message to the bottom (pushes the new messages just below the TMF viewport)
+        dispatch('focusOnMessage', { id: childMessages[0].id, block: 'end' });
+      }
     },
     fetchInitialMessages: async ({ dispatch, state, commit }) => {
       const parentIdBeforeFetch = state.parentId;
