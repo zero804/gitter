@@ -73,9 +73,6 @@ export default {
       updateDraftMessage: 'threadMessageFeed/updateDraftMessage',
       editLastMessageAction: 'threadMessageFeed/editLastMessage'
     }),
-    textAreaChanged(event) {
-      this.updateDraftMessage(event.target.value);
-    },
     editLastMessage() {
       if (!this.draftMessage) this.editLastMessageAction();
     },
