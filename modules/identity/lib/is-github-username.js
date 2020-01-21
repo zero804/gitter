@@ -2,7 +2,7 @@
 
 /**
  * @deprecated
- * TODO: remove this
+ * TODO: remove this (#github-uri-split)
  */
 function isGitHubUsername(username) {
   return username && username.indexOf('_') < 0;
