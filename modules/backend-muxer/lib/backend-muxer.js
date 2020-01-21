@@ -79,7 +79,7 @@ function getFirstResultForBackends(method, args) {
       if (i >= backends.length) return Promise.resolve();
 
       var nextBackend = backends[i];
-      return nextBackend[method].apply(nextBackend, args).then(function(result) {
+      return Promise.resolve(nextBackend[method].apply(nextBackend, args)).then(function(result) {
         if (result) return result;
 
         i++;
