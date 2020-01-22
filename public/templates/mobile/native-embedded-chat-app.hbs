@@ -18,13 +18,18 @@
 
 </head>
 <body class="mobile">
-
+<div class="chat-and-toolbar-wrapper root" style="height: 100%;">
+  {{{threadMessageFeedHtml}}}
+  <div
+    class="js-thread-message-feed-root root"
+  ></div>
   <div id="mainPage" class="chat-app">
     {{> chat_content}}
     {{#if isAndroidBuild}}
       {{> chat_input}}
     {{/if}}
   </div>
+</div>
 
   {{{ bootScript "mobile-native-embedded-chat" root="../" }}}
 

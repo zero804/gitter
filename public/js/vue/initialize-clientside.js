@@ -6,12 +6,20 @@ const renderThreadMessageFeed = require('./thread-message-feed').default;
 const setupDataBridge = require('./store/data-bridge').default;
 
 const store = createStore();
+const mutationTypes = require('./store/mutation-types');
 
 // We initialize the store state with the data injected from the server
 // This comes from `context.renderState()`
 if (window.__INITIAL_STATE__) {
   store.replaceState(window.__INITIAL_STATE__);
   delete window.__INITIAL_STATE__;
+}
+
+const urlParams = new URLSearchParams(window.location.search);
+const troupeId = urlParams.get('troupeId');
+console.log('could be setting troupe', troupeId);
+if (troupeId) {
+  store.commit(mutationTypes.CHANGE_DISPLAYED_ROOM, troupeId);
 }
 
 setupDataBridge(store);

@@ -188,7 +188,6 @@ module.exports = (function() {
       }
       data.isPermalinkable = this.isPermalinkable;
       data.showItemActions = !this.isArchive();
-      data.useThreadedConversations = context.useThreadedConversations();
       return data;
     },
 
@@ -555,6 +554,7 @@ module.exports = (function() {
     },
 
     openThread: function() {
+      console.log('opening thread');
       sendOpenThreadAction(this.model.get('id'));
     },
 

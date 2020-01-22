@@ -37,6 +37,7 @@ onready(function() {
   unreadItemsClient.syncCollections({
     chat: chatCollection
   });
+  require('./vue/initialize-clientside');
 
   unreadItemsClient.monitorViewForUnreadItems($('#content-frame'), chatCollectionView);
 
