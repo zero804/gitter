@@ -9,8 +9,6 @@ var PeopleCollectionView = require('../people/peopleCollectionView');
 var RepoInfoView = require('./repoInfo');
 var ActivityCompositeView = require('./activityCompositeView');
 var RepoInfoModel = require('../../collections/repo-info');
-var cocktail = require('backbone.cocktail');
-const closeViewMixin = require('./close-view/close-view-mixin');
 const appEvents = require('../../utils/appevents');
 
 require('../behaviors/isomorphic');
@@ -38,9 +36,7 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
     'click #people-header': 'showPeopleList',
     'click #info-header': 'showRepoInfo',
     'submit #upload-form': 'upload',
-    'click @ui.toggleIcon': 'toggleMenu',
-    'mouseenter @ui.toggleIcon': 'toggleMenuEnter',
-    'mouseleave @ui.toggleIcon': 'toggleMenuLeave'
+    'click @ui.toggleIcon': 'toggleMenu'
   },
 
   childEvents: {
@@ -96,9 +92,6 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
 
   onPanelPinStateChange: function() {
     toggleClass(this.el, 'collapsed', !this.model.get('isPinned'));
-    var isPinned = this.getPinnedState();
-    toggleClass(this.ui.toggleIcon[0], this.iconOpts.pinStateClass, isPinned);
-    this.deflectArms();
   },
 
   showPeopleList: function() {
@@ -136,22 +129,7 @@ var RightToolbarLayout = Marionette.LayoutView.extend({
 
   toggleToolbar: function(newVisibleState) {
     toggleClass(this.el, 'hidden', !newVisibleState);
-  },
-
-  getPinnedState: function() {
-    return !!this.model.get('isPinned');
-  },
-
-  toggleMenuEnter: function() {
-    this.iconHover = true;
-    this.deflectArms();
-  },
-
-  toggleMenuLeave: function() {
-    this.iconHover = false;
-    this.deflectArms();
   }
 });
 
-cocktail.mixin(RightToolbarLayout, closeViewMixin);
 module.exports = RightToolbarLayout;
