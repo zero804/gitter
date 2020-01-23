@@ -12,6 +12,9 @@ describe('group-api', function() {
   fixtureLoader.ensureIntegrationEnvironment(
     '#integrationUser1',
     'GITTER_INTEGRATION_ORG',
+    '#integrationGitlabUser1',
+    'GITLAB_GROUP1_ID',
+    'GITLAB_GROUP1_URI',
     '#oauthTokens'
   );
 
@@ -30,6 +33,7 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
+        { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() },
         { lcUri: 'repo-group' },
         { lcUri: '_repo-group' }
       ],
@@ -42,6 +46,7 @@ describe('group-api', function() {
         },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/community' },
+        { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() + '/community' },
         { lcUri: 'repo-group/community' },
         { lcUri: '_repo-group/community' }
       ]
@@ -51,6 +56,7 @@ describe('group-api', function() {
       githubToken: fixtureLoader.GITTER_INTEGRATION_USER_SCOPE_TOKEN,
       accessToken: 'web-internal'
     },
+    userGitlab1: '#integrationGitlabUser1',
     group1: {
       uri: fixtureLoader.GITTER_INTEGRATION_USERNAME,
       lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase(),
@@ -110,6 +116,25 @@ describe('group-api', function() {
           fixtureLoader.GITTER_INTEGRATION_COMMUNITY + '/community'
         );
       });
+  });
+
+  it('POST /v1/groups (GitLab group based)', async () => {
+    const result = await request(app)
+      .post('/v1/groups')
+      .send({
+        uri: fixtureLoader.GITLAB_GROUP1_URI,
+        name: 'Test',
+        security: {
+          type: 'GL_GROUP',
+          linkPath: fixtureLoader.GITLAB_GROUP1_URI
+        }
+      })
+      .set('x-access-token', fixture.userGitlab1.accessToken)
+      .expect(200);
+
+    const group = result.body;
+    assert.strictEqual(group.uri, fixtureLoader.GITLAB_GROUP1_URI);
+    assert.strictEqual(group.defaultRoom.uri, `${fixtureLoader.GITLAB_GROUP1_URI}/community`);
   });
 
   it('POST /v1/groups (github org based)', function() {
