@@ -35,7 +35,7 @@ describe('thread-message-feed chat-input', () => {
 
     it('should trigger send action when enter key is pressed', () => {
       const { wrapper, stubbedActions } = mount(ChatInput, defaultProps, store => {
-        store.state.user = { _id: 'userId' };
+        store.state.user = { id: 'userId' };
       });
       wrapper.find({ ref: 'chatInputTextArea' }).trigger('keydown.enter');
       expect(stubbedActions.threadMessageFeed.sendMessage).toHaveBeenCalled();
@@ -44,7 +44,7 @@ describe('thread-message-feed chat-input', () => {
 
   it('should edit last message when key up is pressed', () => {
     const { wrapper, stubbedActions } = mount(ChatInput, defaultProps, store => {
-      store.state.user = { _id: 'userId' };
+      store.state.user = { id: 'userId' };
     });
     wrapper.find({ ref: 'chatInputTextArea' }).trigger('keyup.up');
     expect(stubbedActions.threadMessageFeed.editLastMessage).toHaveBeenCalled();
