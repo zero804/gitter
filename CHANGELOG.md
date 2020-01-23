@@ -14,6 +14,8 @@ Developer facing:
  - Add notes about splitting from GitHub URI reservation to `userScopes.isGitHubUser()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1743
  - Remove unused `chat-input` `updateDraftMessage()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1744
  - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
+ - Remove unused `getGitHubPath()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1749
+ - Refactor `group-with-policy-service` tests to `async`/`await`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1748
 
 
 # 20.15.2 - 2020-01-23
