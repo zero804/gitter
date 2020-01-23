@@ -15,14 +15,14 @@ Developer facing:
  - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
 
 
-# 20.15.2 - 2019-01-23
+# 20.15.2 - 2020-01-23
 
 Developer facing:
 
  - Serialize current room before passing to Vue initial state frontend, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/48
 
 
-# 20.15.1 - 2019-01-20
+# 20.15.1 - 2020-01-20
 
 Developer facing:
 
@@ -30,7 +30,7 @@ Developer facing:
     - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/46
 
 
-# 20.15.0 - 2019-01-16
+# 20.15.0 - 2020-01-16
 
  - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
  - Add left-menu mobile toggle to explore page (sign-in landing page), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1729
@@ -47,7 +47,7 @@ Developer facing:
  - Add process for testing renovate changes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1736
 
 
-# 20.14.0 - 2019-01-10
+# 20.14.0 - 2020-01-10
 
  - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713
  - Prevent notification email replies to go to support@gitter.im, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1589
