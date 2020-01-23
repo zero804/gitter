@@ -3,6 +3,7 @@
  - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735
  - Add `GL_GROUP` and inherited `GROUP` support for the chat header link, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1738
  - Permalink to parent message opens thread message feed at the bottom, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1741
+ - Fix right-toolbar toggle hover flicker v2 -> simplify toggle button, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1747
 
 Developer facing:
 
