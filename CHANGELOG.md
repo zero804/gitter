@@ -15,6 +15,13 @@ Developer facing:
  - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
 
 
+# 20.15.2 - 2019-01-23
+
+Developer facing:
+
+ - Serialize current room before passing to Vue initial state frontend, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/48
+
+
 # 20.15.1 - 2019-01-20
 
 Developer facing:
