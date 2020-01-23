@@ -12,6 +12,7 @@ Developer facing:
  - Add user orgs test for GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1740
  - Add notes about splitting from GitHub URI reservation to `userScopes.isGitHubUser()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1743
  - Remove unused `chat-input` `updateDraftMessage()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1744
+ - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
 
 
 # 20.15.1 - 2019-01-20
