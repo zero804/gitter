@@ -197,12 +197,9 @@ var HeaderView = Marionette.ItemView.extend({
     var isStaff = context.isStaff();
     var isAdmin = context.isTroupeAdmin();
     var isRoomMember = context.isRoomMember();
-    var backend = this.model.get('backend');
-    var type = backend && backend.type;
     var isOneToOne = this.model.get('oneToOne');
     var url = this.model.get('url');
     var staffOrAdmin = isStaff || isAdmin;
-    var isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
 
     var menuBuilder = new MenuBuilder();
 
@@ -233,9 +230,25 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.addDivider();
 
       menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank' });
+
+      let backend = this.model.get('backend');
+      // When the room security descriptor is referencing the group, use that security descriptor instead
+      if (backend && backend.type === 'GROUP') {
+        backend = this.model.get('group').backedBy;
+      }
+      const type = backend && backend.type;
+      const linkPath = backend && backend.linkPath;
+
+      const isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
       menuBuilder.addConditional(isGitHubObject, {
         title: 'Open in GitHub',
-        href: 'https://www.github.com' + url,
+        href: `https://www.github.com/${linkPath}`,
+        target: '_blank'
+      });
+      const isGitlabObject = type === 'GL_GROUP';
+      menuBuilder.addConditional(isGitlabObject, {
+        title: 'Open in GitLab',
+        href: `https://gitlab.com/${linkPath}`,
         target: '_blank'
       });
 
