@@ -8,6 +8,7 @@ var autolink = require('autolink'); // eslint-disable-line node/no-missing-requi
 var clientEnv = require('gitter-client-env');
 var context = require('gitter-web-client-context');
 const log = require('../../utils/log');
+const { getBackendForRoom } = require('gitter-web-shared/backend-utils');
 var toggleClass = require('../../utils/toggle-class');
 var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
@@ -231,11 +232,7 @@ var HeaderView = Marionette.ItemView.extend({
 
       menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank' });
 
-      let backend = this.model.get('backend');
-      // When the room security descriptor is referencing the group, use that security descriptor instead
-      if (backend && backend.type === 'GROUP') {
-        backend = this.model.get('group').backedBy;
-      }
+      const backend = getBackendForRoom(this.model);
       const type = backend && backend.type;
       const linkPath = backend && backend.linkPath;
 

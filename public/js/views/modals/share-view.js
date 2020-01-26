@@ -10,7 +10,7 @@ var ModalView = require('./modal');
 var cdn = require('gitter-web-cdn');
 var template = require('./tmpl/share-view.hbs');
 var ZeroClipboard = require('zeroclipboard'); // eslint-disable-line node/no-missing-require
-var backendUtils = require('../../utils/backend-utils');
+var backendUtils = require('gitter-web-shared/backend-utils');
 
 require('@gitterhq/styleguide/css/components/buttons.css');
 
