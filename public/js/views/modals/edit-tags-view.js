@@ -29,25 +29,24 @@ var View = Marionette.LayoutView.extend({
     //jp 5/8/15
     //detect OS to get meta key value
     //var meta = /^MacIntel/.test(navigator.platform) ? 'cmd' : 'ctrl';
-    var meta = 'ctrl';
+    const metaKey = 'ctrl';
 
     var tagCollection = new TagCollection();
     var errorModel = new Backbone.Model({
-      message: 'Press ' + meta + '+backspace or delete to remove the last tag',
+      message: 'Press ' + metaKey + '+backspace or delete to remove the last tag',
       class: 'message'
     });
 
     this.model = new Backbone.Model({
       tagCollection: tagCollection,
       errorModel: errorModel,
-      meta: meta
+      metaKey
     });
 
     //get existing tags
     ////TODO need to add error states to the below request
     apiClient.get('/v1/rooms/' + this.options.roomId).then(
       function(data) {
-        this.model.set(data);
         var tags = data.tags.filter(function(tagValue) {
           var testTag = new TagModel().set('value', tagValue, { silent: true });
           return testTag.isValid();
@@ -91,7 +90,7 @@ var View = Marionette.LayoutView.extend({
 
   onTagEmpty: function() {
     this.model.get('errorModel').set({
-      message: 'Press ' + this.model.get('meta') + '+backspace or delete to remove the last tag',
+      message: 'Press ' + this.model.get('metaKey') + '+backspace or delete to remove the last tag',
       isError: false
     });
   },
