@@ -69,7 +69,6 @@ async function performUpdateToUserRoom(req) {
     currentUserId: userId,
     // include all these because it will replace the troupe in the context
     includeTags: true,
-    includeProviders: true,
     includeGroups: true
   });
 
@@ -117,7 +116,6 @@ module.exports = {
           currentUserId: req.user._id,
           currentUser: req.user,
           includePermissions: true,
-          includeProviders: true,
           includeGroups: true,
           includeBackend: true,
           includeAssociatedRepo: true

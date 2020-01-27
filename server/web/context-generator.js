@@ -27,7 +27,6 @@ function serializeTroupe(troupe, user) {
     currentUser: user,
     includePermissions: true,
     includeOwner: true,
-    includeProviders: true,
     includeGroups: true,
     includeBackend: true,
     includeAssociatedRepo: true
@@ -51,7 +50,6 @@ function serializeTroupeId(troupeId, user) {
     currentUser: user,
     includePermissions: true,
     includeOwner: true,
-    includeProviders: true,
     includeGroups: true,
     includeBackend: true,
     includeAssociatedRepo: true

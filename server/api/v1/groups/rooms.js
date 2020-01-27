@@ -100,7 +100,6 @@ module.exports = {
         includeBackend: true,
         // include all these because it will replace the troupe in the context
         includeTags: true,
-        includeProviders: true,
         includeGroups: true
       });
 
