@@ -4,7 +4,8 @@ import {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
   roomSearchPeopleRequest,
-  messageSearchRequest
+  messageSearchRequest,
+  joinRoomRequest
 } from './requests';
 
 function state() {
@@ -13,6 +14,7 @@ function state() {
     roomSearchRoomRequest.initialState,
     roomSearchPeopleRequest.initialState,
     messageSearchRequest.initialState,
+    joinRoomRequest.initialState,
     {
       isMobile: false,
       // `true` just for the sake of easy tests

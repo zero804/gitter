@@ -5,7 +5,8 @@ const {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
   roomSearchPeopleRequest,
-  messageSearchRequest
+  messageSearchRequest,
+  joinRoomRequest
 } = require('../../../../public/js/vue/store/requests');
 
 jest.mock('gitter-web-client-context');
@@ -84,6 +85,7 @@ describe('actions', () => {
     state = createState();
     context.troupe.mockReset();
     apiClient.user.get.mockReset();
+    apiClient.user.post.mockReset();
     apiClient.get.mockReset();
     apiClient.user.patch.mockReset();
   });
@@ -672,5 +674,73 @@ describe('actions', () => {
         payload
       }
     ]);
+  });
+
+  describe('joinRoom', () => {
+    it('when welcome message and not embed', async () => {
+      context.mockImplementation(() => ({}));
+      window.location.assign = jest.fn();
+      const room = createSerializedRoomFixture('test-room', { meta: { welcomeMessage: 'hey' } });
+
+      await testAction(actions.joinRoom, undefined, {
+        displayedRoom: room
+      });
+
+      expect(window.location.assign).toHaveBeenCalledWith('#welcome-message');
+    });
+
+    it('when no welcome message', async () => {
+      context.mockImplementation(() => ({}));
+      const room = createSerializedRoomFixture('test-room');
+      apiClient.user.post.mockImplementation(() => Promise.resolve(room));
+
+      await testAction(
+        actions.joinRoom,
+        undefined,
+        {
+          displayedRoom: room
+        },
+        [{ type: joinRoomRequest.requestType }, { type: joinRoomRequest.successType }]
+      );
+
+      expect(apiClient.user.post).toHaveBeenCalledWith('/rooms', { id: room.id });
+      expect(context.setTroupe).toHaveBeenCalledWith(room);
+    });
+
+    it('when embedded', async () => {
+      context.mockImplementation(() => ({ embedded: true }));
+      const room = createSerializedRoomFixture('test-room', { meta: { welcomeMessage: 'hey' } });
+      apiClient.user.post.mockImplementation(() => Promise.resolve(room));
+
+      await testAction(
+        actions.joinRoom,
+        undefined,
+        {
+          displayedRoom: room
+        },
+        [{ type: joinRoomRequest.requestType }, { type: joinRoomRequest.successType }]
+      );
+
+      expect(apiClient.user.post).toHaveBeenCalledWith('/rooms', { id: room.id, source: '~embed' });
+      expect(context.setTroupe).toHaveBeenCalledWith(room);
+    });
+
+    it('commits error to the store', async () => {
+      context.mockImplementation(() => ({}));
+      const error = new Error('problem');
+      const room = createSerializedRoomFixture('test-room');
+      apiClient.user.post.mockImplementation(() => Promise.reject(error));
+
+      await testAction(
+        actions.joinRoom,
+        undefined,
+        {
+          displayedRoom: room
+        },
+        [{ type: joinRoomRequest.requestType }, { type: joinRoomRequest.errorType, payload: error }]
+      );
+
+      expect(apiClient.user.post).toHaveBeenCalledWith('/rooms', { id: room.id });
+    });
   });
 });

@@ -257,7 +257,7 @@ exports[`thread-message-feed index not room member - matches snapshot 1`] = `
         </intersect-stub>
       </div>
        
-      <!---->
+      <join-or-sign-in-button-stub />
     </section>
   </section>
 </div>
