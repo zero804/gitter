@@ -25,7 +25,7 @@
     {{#if hasGitHubProvider}}
       <p class="community-create-associated-project-copy active js-community-create-add-associated-project-copy">
         do you want to start a community for one of your
-        <a href="#0" class="community-create-general-link js-community-create-from-github-project-link">
+        <a href="#0" class="community-create-general-link js-community-create-from-associated-project-link">
           GitHub projects?
         </a>
       </p>
@@ -47,7 +47,29 @@
             </label>
           </p>
         </div>
-        <a href="#0" class="community-create-change-github-project-button secondary-button-caribbean js-community-create-from-github-project-link">
+        <a href="#0" class="community-create-change-associated-project-button secondary-button-caribbean js-community-create-from-associated-project-link">
+          change
+        </a>
+      </div>
+
+    {{/if}}
+
+    {{#if hasGitLabProvider}}
+      <p class="community-create-associated-project-copy active js-community-create-add-associated-project-copy">
+        do you want to start a community for one of your
+        <a href="#0" class="community-create-general-link js-community-create-from-associated-project-link">
+          GitLab projects?
+        </a>
+      </p>
+      <div class="community-create-has-associated-project-copy js-community-create-has-associated-project-copy">
+        Associated with
+        <div class="community-create-associated-project-main-area">
+          <a href="#0" class="community-create-general-link js-community-create-associated-project-link" target="_blank" data-disable-routing="1" >
+            <i class="icon-gitlab-circled"></i>
+            <span class="js-community-create-associated-project-name"></span>
+          </a>
+        </div>
+        <a href="#0" class="community-create-change-associated-project-button secondary-button-caribbean js-community-create-from-associated-project-link">
           change
         </a>
       </div>

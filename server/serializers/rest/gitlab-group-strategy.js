@@ -8,6 +8,7 @@ function GitlabGroupStrategy(/*options*/) {
   this.map = function(item) {
     debug('map', item);
     return {
+      type: 'GL_GROUP',
       id: item.id,
       name: item.name,
       avatar_url: item.avatar_url,

@@ -34,12 +34,13 @@ var CommunityCreateMainStepViewModel = CommunityCreateStepViewModel.extend({
       errors.communitySlug =
         'Authentication Failed. It is probably a GitHub app scope mismatch between public/private on your own user and the org';
     } else if (slugAvailabilityStatus === slugAvailabilityStatusConstants.GITHUB_CLASH) {
-      const githubInfo = this.communityCreateModel.getGithubProjectInfo();
+      const selectedModel = this.communityCreateModel.get('selectedModel');
 
       // If you select the `foo/bar` repo, it fills in the community URI as `bar` and then tells you don't have proper permissions for `bar` because the `bar` org already exists on GitHub.
-      if (githubInfo.type === 'GH_REPO') {
-        const repoName = githubInfo.linkPath.split('/').pop();
-        errors.communitySlug = `The name of the GitHub repo you selected conflicts with the name of a GitHub org/user. When you select the a repo "${githubInfo.linkPath}", it fills out the community URI as "${repoName}" which clashes another GitHub org/user. Change your community URI to proceed.`;
+      if (selectedModel && selectedModel.get('type') === 'GH_REPO') {
+        const repoUri = selectedModel.get('uri');
+        const repoName = repoUri.split('/').pop();
+        errors.communitySlug = `The name of the GitHub repo you selected conflicts with the name of a GitHub org/user. When you select the a repo "${repoUri}", it fills out the community URI as "${repoName}" which clashes another GitHub org/user. Change your community URI to proceed.`;
       }
       // If they are a GitHub user, they just need more permissions to resolve the clash (#github-uri-split)
       else if (context.hasProvider('github')) {

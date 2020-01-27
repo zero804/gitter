@@ -29,7 +29,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     _super.initialize.apply(this, arguments);
     this.listenTo(
       this.communityCreateModel,
-      'change:communityName change:communitySlug change:githubOrgId',
+      'change:communityName change:communitySlug change:selectedModel',
       this.onCommunityDataChange,
       this
     );
@@ -40,9 +40,9 @@ module.exports = CommunityCreateBaseStepView.extend({
     data.communityName = this.communityCreateModel.get('communityName');
     data.communitySlug = this.communityCreateModel.get('communitySlug');
 
-    var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
-    data.githubName = githubProjectInfo.name || '';
-    data.githubLink = githubProjectInfo.url || '';
+    const selectedModel = this.communityCreateModel.get('selectedModel');
+    data.backingProjectName = (selectedModel && selectedModel.get('name')) || '';
+    data.backingProjectAbsoluteUri = (selectedModel && selectedModel.get('absoluteUri')) || '';
 
     return data;
   },

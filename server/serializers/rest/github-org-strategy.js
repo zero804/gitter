@@ -44,6 +44,7 @@ function GitHubOrgStrategy(options) {
   this.map = function(item) {
     var plan = planStrategy.map(item.login);
     return {
+      type: 'GH_ORG',
       id: item.id,
       name: item.login,
       avatar_url: item.avatar_url,

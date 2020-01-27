@@ -16,8 +16,7 @@ var CommunityCreateModel = Backbone.Model.extend({
     communitySlugAvailabilityStatus: null,
     isUsingCustomSlug: false,
     isUsingExplicitGitHubProject: false,
-    githubOrgId: null,
-    githubRepoId: null,
+    selectedModel: null,
     allowBadger: true,
     allowTweetBadger: true
   },
@@ -27,49 +26,15 @@ var CommunityCreateModel = Backbone.Model.extend({
     this.repos = options.repos;
   },
 
-  getGithubProjectInfo: function() {
-    var githubOrgId = this.get('githubOrgId');
-
-    // Org based?
-    if (githubOrgId) {
-      var selectedOrg = this.orgs.find(function(org) {
-        return org.get('id') === githubOrgId;
-      });
-
-      return {
-        type: 'GH_ORG',
-        linkPath: selectedOrg.get('name'),
-        name: selectedOrg.get('name'),
-        url: urlJoin('https://github.com', selectedOrg.get('name'))
-      };
-    }
-
-    // Repo based?
-    var githubRepoId = this.get('githubRepoId');
-    if (githubRepoId) {
-      var selectedRepo = this.repos.find(function(repo) {
-        return repo.get('id') === githubRepoId;
-      });
-
-      return {
-        type: 'GH_REPO',
-        linkPath: selectedRepo.get('uri'),
-        name: selectedRepo.get('name'),
-        url: urlJoin('https://github.com', selectedRepo.get('uri'))
-      };
-    }
-
-    return {
-      type: null
-    };
-  },
-
   getSecurityData: function() {
-    var githubInfo = this.getGithubProjectInfo();
-    if (githubInfo && githubInfo.type) {
+    const selectedModel = this.get('selectedModel');
+    const selectedType = selectedModel && selectedModel.get('type');
+    const selectedLinkPath = (selectedModel && selectedModel.get('uri')) || '';
+
+    if (selectedType) {
       return {
-        type: githubInfo.type,
-        linkPath: githubInfo.linkPath
+        type: selectedType,
+        linkPath: selectedLinkPath
       };
     }
 

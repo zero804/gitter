@@ -28,6 +28,7 @@ function GithubRepoStrategy(options) {
   this.map = function(item) {
     var room = troupesIndexed[item.full_name];
     return {
+      type: 'GH_REPO',
       id: item.id,
       name: item.full_name,
       description: item.description,

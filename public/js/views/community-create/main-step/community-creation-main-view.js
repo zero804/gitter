@@ -60,7 +60,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
     communitySlugInputWrapper: '.community-creation-slug-input-wrapper',
-    githubProjectLink: '.js-community-create-from-github-project-link',
+    associatedProjectLink: '.js-community-create-from-associated-project-link',
 
     addAssociatedProjectCopy: '.js-community-create-add-associated-project-copy',
     hasAssociatedProjectCopy: '.js-community-create-has-associated-project-copy',
@@ -75,7 +75,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     'submit @ui.mainForm': 'onStepNext',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
-    'click @ui.githubProjectLink': 'onGitHubProjectLinkActivated',
+    'click @ui.associatedProjectLink': 'onassociatedProjectLinkActivated',
     'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
@@ -122,7 +122,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onGitHubProjectLinkActivated: function(e) {
+  onassociatedProjectLinkActivated: function(e) {
     // Move to the pick github project views
     this.communityCreateModel.set('stepState', stepConstants.GITHUB_PROJECTS);
 
@@ -142,13 +142,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     updateElementValueAndMaintatinSelection(this.ui.communityNameInput[0], communityName);
     updateElementValueAndMaintatinSelection(this.ui.communitySlugInput[0], communitySlug);
 
-    if (this.hasGitHubProvider) {
-      var githubProjectInfo = this.communityCreateModel.getGithubProjectInfo();
+    if (this.hasGitHubProvider || this.hasGitlabProvider) {
+      const selectedModel = this.communityCreateModel.get('selectedModel');
 
-      var name = githubProjectInfo.name || '';
-      var url = githubProjectInfo.url || '';
-      var hasGitHubAssociation = !!githubProjectInfo.type;
-      var isBackedByRepo = githubProjectInfo.type === 'GH_REPO';
+      const name = (selectedModel && selectedModel.get('name')) || '';
+      const url = (selectedModel && selectedModel.get('absoluteUri')) || '';
+      const type = selectedModel && selectedModel.get('type');
+      const hasGitHubAssociation = !!type;
+      const isBackedByRepo = type === 'GH_REPO';
 
       this.ui.associatedProjectName[0].textContent = name;
       this.ui.associatedProjectLink[0].setAttribute('href', url);
@@ -209,14 +210,8 @@ module.exports = CommunityCreateBaseStepView.extend({
     var communityCreateModel = this.communityCreateModel;
     var model = this.model;
     var slug = communityCreateModel.get('communitySlug');
-    var githubOrgId = communityCreateModel.get('githubOrgId');
-    var githubRepoId = communityCreateModel.get('githubRepoId');
-    var type = null;
-    if (githubOrgId) {
-      type = 'GH_ORG';
-    } else if (githubRepoId) {
-      type = 'GH_REPO';
-    }
+    const selectedModel = communityCreateModel.get('selectedModel');
+    const type = selectedModel && selectedModel.get('type');
 
     communityCreateModel.set(
       'communitySlugAvailabilityStatus',

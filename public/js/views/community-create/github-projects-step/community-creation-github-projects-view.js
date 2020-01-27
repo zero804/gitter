@@ -40,8 +40,8 @@ module.exports = CommunityCreateBaseStepView.extend({
         collection: this.communityCreateModel.orgs
       })
     );
-    this.listenTo(this.orgListView, 'org:activated', this.onOrgSelectionChange, this);
-    this.listenTo(this.orgListView, 'org:cleared', this.onOrgSelectionChange, this);
+    this.listenTo(this.orgListView, 'org:activated', this.onSelectionChange, this);
+    this.listenTo(this.orgListView, 'org:cleared', this.onSelectionChange, this);
     return this.orgListView;
   },
 
@@ -51,8 +51,8 @@ module.exports = CommunityCreateBaseStepView.extend({
         collection: this.filteredRepos
       })
     );
-    this.listenTo(this.repoListView, 'repo:activated', this.onRepoSelectionChange, this);
-    this.listenTo(this.repoListView, 'repo:cleared', this.onRepoSelectionChange, this);
+    this.listenTo(this.repoListView, 'repo:activated', this.onSelectionChange, this);
+    this.listenTo(this.repoListView, 'repo:cleared', this.onSelectionChange, this);
     return this.repoListView;
   },
 
@@ -103,29 +103,15 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   setSelectedGitHubProjectCommunityState: function() {
-    if (this.model.get('isOrgAreaActive')) {
-      var selectedOrgId = this.model.get('selectedOrgId');
-      var selectedOrgName = this.model.get('selectedOrgName') || '';
-      this.communityCreateModel.set({
-        communityName: selectedOrgName,
-        communitySlug: slugger(selectedOrgName),
-        isUsingCustomSlug: false,
-        githubOrgId: selectedOrgId,
-        githubRepoId: null,
-        isUsingExplicitGitHubProject: !!selectedOrgName
-      });
-    } else if (this.model.get('isRepoAreaActive')) {
-      var selectedRepoId = this.model.get('selectedRepoId');
-      var selectedRepoName = getRoomNameFromTroupeName(this.model.get('selectedRepoName') || '');
-      this.communityCreateModel.set({
-        communityName: selectedRepoName,
-        communitySlug: slugger(selectedRepoName),
-        isUsingCustomSlug: false,
-        githubOrgId: null,
-        githubRepoId: selectedRepoId,
-        isUsingExplicitGitHubProject: !!selectedRepoId
-      });
-    }
+    const selectedModel = this.model.get('selectedModel');
+    const selectedType = selectedModel.get('type');
+    const selectedName = selectedModel.get('name') || '';
+    this.communityCreateModel.set({
+      communityName: selectedName,
+      communitySlug: slugger(selectedName),
+      isUsingCustomSlug: false,
+      isUsingExplicitGitHubProject: selectedType === 'GH_ORG' || selectedType === 'GH_REPO'
+    });
   },
 
   onOrgsAreaToggle: function() {
@@ -154,57 +140,16 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onOrgSelectionChange: function(activeModel) {
-    var selectedOrgId = null;
-    var selectedOrgName = null;
-    if (activeModel) {
-      selectedOrgId = activeModel.get('id');
-      selectedOrgName = activeModel.get('name');
-    }
-
-    // Set any repo item that may be selected inactive
-    var previousActiveRepoModel = this.communityCreateModel.repos.findWhere({ active: true });
-    if (previousActiveRepoModel) {
-      previousActiveRepoModel.set('active', false);
-    }
+  onSelectionChange: function(activeModel) {
+    // Set any previous org/repo item that may be selected inactive
+    this.model.get('selectedModel').set('active', false);
 
     this.model.set({
-      selectedOrgId: selectedOrgId,
-      selectedOrgName: selectedOrgName,
-      selectedRepoId: null,
-      selectedRepoName: null
+      selectedModel: activeModel
     });
 
     this.setSelectedGitHubProjectCommunityState();
     // Clicking a org moves you onto the next step and fills in the data
-    if (activeModel) {
-      this.onStepNext();
-    }
-  },
-
-  onRepoSelectionChange: function(activeModel) {
-    var selectedRepoId = null;
-    var selectedRepoName = null;
-    if (activeModel) {
-      selectedRepoId = activeModel.get('id');
-      selectedRepoName = activeModel.get('name');
-    }
-
-    // Set any org item that may be selected inactive
-    var previousActiveOrgModel = this.communityCreateModel.orgs.findWhere({ active: true });
-    if (previousActiveOrgModel) {
-      previousActiveOrgModel.set('active', false);
-    }
-
-    this.model.set({
-      selectedOrgId: null,
-      selectedOrgName: null,
-      selectedRepoId: selectedRepoId,
-      selectedRepoName: selectedRepoName
-    });
-
-    this.setSelectedGitHubProjectCommunityState();
-    // Clicking a repo moves you onto the next step and fills in the data
     if (activeModel) {
       this.onStepNext();
     }
