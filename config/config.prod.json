@@ -42,6 +42,10 @@
     "prefixFile": "/var/log/gitter/cdn-version",
     "hosts": ["cdn01.gitter.im", "cdn02.gitter.im", "cdn03.gitter.im"]
   },
+  "camo": {
+    "camoUrl": "https://user-content.gitter-static.net",
+    "camoSecret": "<see Gitter secrets repo>"
+  },
   "notifications": {
     "notificationsSender": "support@gitter.im",
     "replyToAddress":  "no-reply@gitter.im",
