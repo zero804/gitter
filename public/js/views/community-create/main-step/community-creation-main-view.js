@@ -60,7 +60,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     communityNameInput: '.primary-community-name-input',
     communitySlugInput: '.community-creation-slug-input',
     communitySlugInputWrapper: '.community-creation-slug-input-wrapper',
-    associatedProjectLink: '.js-community-create-from-associated-project-link',
+    changeAssociatedProjectLink: '.js-community-change-associated-project-link',
 
     addAssociatedProjectCopy: '.js-community-create-add-associated-project-copy',
     hasAssociatedProjectCopy: '.js-community-create-has-associated-project-copy',
@@ -75,7 +75,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     'submit @ui.mainForm': 'onStepNext',
     'input @ui.communityNameInput': 'onCommunityNameInputChange',
     'input @ui.communitySlugInput': 'onCommunitSlugInputChange',
-    'click @ui.associatedProjectLink': 'onassociatedProjectLinkActivated',
+    'click @ui.changeAssociatedProjectLink': 'onChangeAssociatedProjectLinkActivated',
     'change @ui.associatedProjectBadgerOptionInput': 'onBadgerInputChange'
   }),
 
@@ -122,7 +122,7 @@ module.exports = CommunityCreateBaseStepView.extend({
     });
   },
 
-  onassociatedProjectLinkActivated: function(e) {
+  onChangeAssociatedProjectLinkActivated: function(e) {
     // Move to the pick github project views
     this.communityCreateModel.set('stepState', stepConstants.GITHUB_PROJECTS);
 
