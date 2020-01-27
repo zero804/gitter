@@ -196,7 +196,10 @@ exports.install = function() {
 
     // User is not a member of the room but they're just been mentioned.
     // We need to send them a create to add the room to their collection
-    var strategy = new restSerializer.TroupeIdStrategy({ currentUserId: userId });
+    var strategy = new restSerializer.TroupeIdStrategy({
+      currentUserId: userId,
+      includeProviders: true
+    });
 
     var mentionUrl = '/api/v1/user/' + userId + '/rooms';
 

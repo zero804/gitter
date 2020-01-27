@@ -22,7 +22,10 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     userThemeSnapshot
   ] = await Promise.all([
     restSerializer.serializeObject(user, new restSerializer.UserStrategy()),
-    restSerializer.serializeObject(currentRoom, new restSerializer.TroupeStrategy()),
+    restSerializer.serializeObject(
+      currentRoom,
+      new restSerializer.TroupeStrategy({ includeProviders: true })
+    ),
     restful.serializeGroupsForUserId(userId),
     restful.serializeTroupesForUser(userId),
     contextGenerator.generateTroupeContext(req),

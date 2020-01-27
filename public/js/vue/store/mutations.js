@@ -4,7 +4,8 @@ import {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
   roomSearchPeopleRequest,
-  messageSearchRequest
+  messageSearchRequest,
+  joinRoomRequest
 } from './requests';
 import fuzzysearch from 'fuzzysearch';
 
@@ -83,6 +84,8 @@ export default {
   ...roomSearchPeopleRequest.mutations,
 
   ...messageSearchRequest.mutations,
+
+  ...joinRoomRequest.mutations,
 
   [types.CHANGE_DISPLAYED_ROOM](state, newRoomId) {
     state.displayedRoomId = newRoomId;

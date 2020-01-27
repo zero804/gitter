@@ -9,12 +9,12 @@ exports[`search-body-message-result-item matches snapshot 1`] = `
   >
     <a
       class="message-search-item-detail-author-link"
-      href="/awbacker"
+      href="/viktomas_gitlab"
     >
-      Andrew Backer
+      Tomas Vik
       
       <span>
-        @awbacker
+        @viktomas_gitlab
       </span>
     </a>
      

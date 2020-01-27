@@ -39,6 +39,7 @@ function serializeTroupesForUser(userId, callback) {
       var strategy = new restSerializer.TroupeIdStrategy({
         currentUserId: userId,
         includePermissions: true,
+        includeProviders: true,
         // This will save the troupeId strategy
         // from having to do a second query
         nonMemberTroupeIds: nonMemberTroupeIds,

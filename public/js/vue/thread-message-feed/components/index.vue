@@ -5,6 +5,7 @@ import ChatInput from './chat-input.vue';
 import ChatItem from './chat-item.vue';
 import LoadingSpinner from '../../components/loading-spinner.vue';
 import Intersect from './intersect';
+import JoinOrSignInButton from './join-or-sign-in-button.vue';
 
 export default {
   name: 'ThreadMessageFeed',
@@ -13,7 +14,8 @@ export default {
     ThreadHeader,
     LoadingSpinner,
     ChatItem,
-    Intersect
+    Intersect,
+    JoinOrSignInButton
   },
   computed: {
     ...mapGetters({
@@ -67,6 +69,7 @@ export default {
           </intersect>
         </div>
         <chat-input v-if="displayedRoom.roomMember" :user="user" thread />
+        <join-or-sign-in-button v-else />
       </section>
       <section v-else class="content">
         <span class="error-text error-box">
