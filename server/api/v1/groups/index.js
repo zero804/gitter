@@ -113,7 +113,6 @@ module.exports = {
         currentUserId: req.user.id,
         includeTags: true,
         includePermissions: true,
-        includeProviders: true,
         includeBackend: true
       });
 

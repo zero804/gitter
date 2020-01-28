@@ -50,7 +50,6 @@ module.exports = {
       currentUserId: req.user && req.user.id,
       includeTags: true,
       includePermissions: true,
-      includeProviders: true,
       includeGroups: true,
       includeBackend: true,
       includeAssociatedRepo: true
@@ -79,7 +78,6 @@ module.exports = {
         includeRolesForTroupe: room,
         // include all these because it will replace the troupe in the context
         includeTags: true,
-        includeProviders: true,
         includeGroups: true
       });
 
@@ -122,7 +120,6 @@ module.exports = {
           currentUser: req.user,
           includePermissions: true,
           includeOwner: true,
-          includeProviders: true,
           includeGroups: true,
           includeBackend: true
         });

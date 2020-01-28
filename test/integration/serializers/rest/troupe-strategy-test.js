@@ -101,8 +101,8 @@ describe('TroupeStrategy', function() {
     });
   });
 
-  it('should serialize providers with includeProviders', function() {
-    var strategy = new TroupeStrategy({ includeProviders: true });
+  it('should always serialize providers', function() {
+    var strategy = new TroupeStrategy();
     var t = fixture.troupe3;
     return serialize([t], strategy).then(function(s) {
       assert.equal(s[0].providers[0], 'github');
