@@ -20,6 +20,7 @@ Developer facing:
  - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
  - Remove unused `getGitHubPath()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1749
  - Refactor `group-with-policy-service` tests to `async`/`await`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1748
+ - Always serialize providers for Troupe, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1755
 
 
 # 20.15.3 - 2020-01-27
