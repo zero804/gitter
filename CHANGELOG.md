@@ -7,6 +7,7 @@
  - Add "Join room" and "Sign in to start talking" buttons to thread message panel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1742
  - Add "Open in GitLab" option to room settings dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1750
  - Fix object serialized for empty error message in tags modal(`[object Object]`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1754
+ - Follow GitHub association from inherited group security descriptor for repo info section in the right-toolbar, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1753
 
 Developer facing:
 
