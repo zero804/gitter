@@ -130,10 +130,51 @@ function createSerializedMessageFixture(overrides) {
   };
 }
 
+function createOrgGitlabGroupFixture(uri) {
+  return {
+    type: 'GL_GROUP',
+    id: `1540914-${uri}`,
+    name: uri,
+    avatar_url:
+      'https://assets.gitlab-static.net/uploads/-/system/group/avatar/1540914/icon_128x128.png',
+    uri,
+    absoluteUri: `https://gitlab.com/groups/${uri}`
+  };
+}
+
+function createOrgGithubOrgFixture(uri) {
+  return {
+    type: 'GH_ORG',
+    id: `1086321-${uri}`,
+    name: uri,
+    avatar_url: 'https://avatars2.githubusercontent.com/u/1086321?v=4',
+    uri,
+    absoluteUri: `https://github.com/${uri}`
+  };
+}
+
+function createRepoGithubRepoFixture(uri) {
+  return {
+    type: 'GH_REPO',
+    id: `14863998-${uri}`,
+    name: uri,
+    description: `Some repo for my project ${uri}`,
+    absoluteUri: `https://github.com/${uri}`,
+    uri,
+    private: false,
+    exists: false,
+    avatar_url: 'https://avatars0.githubusercontent.com/u/5990364?v=4'
+  };
+}
+
 module.exports = {
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture,
   createSerializedMessageFixture,
   createSerializedMessageSearchResultFixture,
-  createSerializedUserFixture
+  createSerializedUserFixture,
+
+  createOrgGitlabGroupFixture,
+  createOrgGithubOrgFixture,
+  createRepoGithubRepoFixture
 };

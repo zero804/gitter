@@ -1,65 +1,43 @@
 'use strict';
 
-var appEvents = require('../utils/appevents');
+const debug = require('debug-proxy')('app:present-community-create-dialog');
+const appEvents = require('../utils/appevents');
 
-function presentCommunityCreateDialog(options) {
-  var dialogRegion = options.dialogRegion;
+function presentCommunityCreateDialog() {
+  debug('Starting');
 
-  require.ensure(
-    [
-      '../views/community-create/community-create-view',
-      '../views/community-create/community-create-model',
-      '../collections/repos',
-      '../collections/orgs'
-    ],
-    function(require) {
-      var CommunityCreateView = require('../views/community-create/community-create-view');
-      var CommunityCreateModel = require('../views/community-create/community-create-model');
-      var repoModels = require('../collections/repos');
-      var orgModels = require('../collections/orgs');
+  require.ensure(['../vue/create-community', '../vue/store/store-instance'], function(require) {
+    debug('Dependencies loaded');
+    const store = require('../vue/store/store-instance');
+    const renderCreateCommunityView = require('../vue/create-community').default;
 
-      var RepoCollection = repoModels.ReposCollection;
-      var OrgCollection = orgModels.OrgCollection;
+    // Create an element for our create community flow to render into
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div class="js-create-community-view-root"></div>'
+    );
 
-      var repos = new RepoCollection();
-      var orgs = new OrgCollection();
-
-      var communityCreateModel = new CommunityCreateModel(
-        {
-          active: true
-        },
-        {
-          orgs: orgs,
-          repos: repos
-        }
-      );
-
-      communityCreateModel.refreshGitHubCollections();
-
-      var communityCreateView = new CommunityCreateView({
-        model: communityCreateModel
-      });
-
-      // Track this event
-      appEvents.trigger('stats.event', 'community.create.enter');
-      appEvents.trigger('track-event', 'community.create.enter');
-
-      function onActiveChange() {
-        if (communityCreateModel.get('active')) return;
-        communityCreateModel.stopListening(communityCreateModel, 'change:active', onActiveChange);
-
-        var stepState = communityCreateModel.get('stepState');
-        appEvents.trigger('stats.event', 'community.create.exit.' + stepState);
-        appEvents.trigger('track-event', 'community.create.exit.' + stepState);
-
-        window.location = '#';
-      }
-
-      communityCreateModel.listenTo(communityCreateModel, 'change:active', onActiveChange);
-
-      dialogRegion.show(communityCreateView);
+    const createCommunityViewRootEl = document.querySelector('.js-create-community-view-root');
+    if (!createCommunityViewRootEl) {
+      throw new Error('Root lement does not exist in DOM for the create community flow');
     }
-  );
+
+    store.dispatch('createCommunity/fetchInitial');
+    const vm = renderCreateCommunityView(createCommunityViewRootEl, store);
+    debug('Rendered', vm);
+
+    appEvents.once('destroy-create-community-view', () => {
+      debug('destroy-create-community-view', vm);
+
+      // Destroy the vue listeners, etc
+      vm.$destroy();
+      // Remove the element from the DOM
+      vm.$el.parentNode.removeChild(vm.$el);
+
+      // Change the URL back to `#`
+      appEvents.trigger('route', '');
+    });
+  });
 }
 
 module.exports = presentCommunityCreateDialog;
