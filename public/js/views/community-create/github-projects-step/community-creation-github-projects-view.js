@@ -102,10 +102,14 @@ module.exports = CommunityCreateBaseStepView.extend({
     this.onAreaActiveChange();
   },
 
-  setSelectedGitHubProjectCommunityState: function() {
+  setSelectedProjectCommunityState: function() {
     const selectedModel = this.model.get('selectedModel');
     const selectedType = selectedModel.get('type');
-    const selectedName = selectedModel.get('name') || '';
+    let selectedName = selectedModel.get('name') || '';
+    if (selectedType === 'GH_REPO') {
+      selectedName = getRoomNameFromTroupeName(selectedName);
+    }
+
     this.communityCreateModel.set({
       communityName: selectedName,
       communitySlug: slugger(selectedName),
@@ -141,14 +145,17 @@ module.exports = CommunityCreateBaseStepView.extend({
   },
 
   onSelectionChange: function(activeModel) {
+    const selectedModel = this.model.get('selectedModel');
     // Set any previous org/repo item that may be selected inactive
-    this.model.get('selectedModel').set('active', false);
+    if (selectedModel) {
+      selectedModel.set('active', false);
+    }
 
     this.model.set({
       selectedModel: activeModel
     });
 
-    this.setSelectedGitHubProjectCommunityState();
+    this.setSelectedProjectCommunityState();
     // Clicking a org moves you onto the next step and fills in the data
     if (activeModel) {
       this.onStepNext();

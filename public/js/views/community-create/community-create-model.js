@@ -1,7 +1,6 @@
 'use strict';
 
 var Backbone = require('backbone');
-var urlJoin = require('url-join');
 var stepConstants = require('./step-constants');
 var Promise = require('bluebird');
 
