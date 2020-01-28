@@ -6,6 +6,7 @@
  - Fix right-toolbar toggle hover flicker v2 -> simplify toggle button, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1747
  - Add "Join room" and "Sign in to start talking" buttons to thread message panel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1742
  - Add "Open in GitLab" option to room settings dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1750
+ - Fix object serialized for empty error message in tags modal(`[object Object]`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1754
 
 Developer facing:
 
