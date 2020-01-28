@@ -2,7 +2,7 @@
 
 var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
 var Marionette = require('backbone.marionette');
-var backendUtils = require('gitter-web-shared/backend-utils');
+const { getBackendForRoom } = require('gitter-web-shared/backend-utils');
 
 module.exports = Marionette.ItemView.extend({
   template: repoInfoTemplate,
@@ -19,17 +19,19 @@ module.exports = Marionette.ItemView.extend({
   },
 
   onRoomChange: function() {
-    var linkPath = backendUtils.getLinkPathCond('GH_REPO', this.roomModel);
-    this.triggerMethod('repoInfo:changeVisible', !!linkPath);
+    const backend = getBackendForRoom(this.roomModel);
 
-    if (!linkPath) {
+    const shouldShowRepoInfo = backend && backend.type === 'GH_REPO';
+    this.triggerMethod('repoInfo:changeVisible', shouldShowRepoInfo);
+    if (!shouldShowRepoInfo) {
       this.model.clear();
       return;
     }
 
     this.model.fetch({
       data: {
-        repo: linkPath
+        type: backend.type,
+        linkPath: backend.linkPath
       }
     });
   }
