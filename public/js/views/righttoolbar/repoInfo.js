@@ -2,7 +2,7 @@
 
 var repoInfoTemplate = require('./tmpl/repoInfo.hbs');
 var Marionette = require('backbone.marionette');
-var backendUtils = require('../../utils/backend-utils');
+var backendUtils = require('gitter-web-shared/backend-utils');
 
 module.exports = Marionette.ItemView.extend({
   template: repoInfoTemplate,

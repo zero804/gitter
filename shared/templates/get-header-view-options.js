@@ -1,13 +1,10 @@
 'use strict';
 
-function getHeaderLinkUrl(serializedTroupe) {
-  let backend = serializedTroupe.backend;
-  if (!backend) return;
+const { getBackendForRoom } = require('gitter-web-shared/backend-utils');
 
-  // When the room security descriptor is referencing the group, use that security descriptor instead
-  if (serializedTroupe.backend.type === 'GROUP') {
-    backend = serializedTroupe.group.backedBy;
-  }
+function getHeaderLinkUrl(serializedTroupe) {
+  const backend = getBackendForRoom(serializedTroupe);
+  if (!backend) return;
 
   switch (backend.type) {
     case 'GL_GROUP':
