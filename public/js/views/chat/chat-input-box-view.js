@@ -173,11 +173,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onBlur: function() {
     if (this.isTypeaheadShowing()) return;
 
-    if (isMobile()) {
-      this.processInput();
-    } else {
-      this.resetTextareaSize();
-    }
+    this.resetTextareaSize();
   },
 
   onTouchend: function() {
