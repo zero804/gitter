@@ -1,4 +1,4 @@
-# 20.16.0 - *upcoming*
+# 20.16.0 - 2020-01-29
 
  - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735
  - Add `GL_GROUP` and inherited `GROUP` support for the chat header link, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1738
