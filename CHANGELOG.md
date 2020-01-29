@@ -8,7 +8,7 @@
  - Add "Open in GitLab" option to room settings dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1750
  - Fix object serialized for empty error message in tags modal(`[object Object]`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1754
  - Follow GitHub association from inherited group security descriptor for repo info section in the right-toolbar, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1753
- - Link to private repo access grant page("Allow private Repo Access") in commit popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1752
+ - Link to private repo access grant page("Allow Private Repo Access") in commit popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1752
      - Thanks to [@redsandro](https://gitlab.com/redsandro) for the contribution
 
 Developer facing:
