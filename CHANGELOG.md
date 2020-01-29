@@ -10,6 +10,7 @@
  - Follow GitHub association from inherited group security descriptor for repo info section in the right-toolbar, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1753
  - Link to private repo access grant page("Allow Private Repo Access") in commit popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1752
      - Thanks to [@redsandro](https://gitlab.com/redsandro) for the contribution
+ - Fix mobile bug where message was sent on chat-message input blur, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1758
 
 Developer facing:
 
