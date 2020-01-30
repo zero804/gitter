@@ -6,9 +6,11 @@ import MenuBarBody from './menu-bar-body.vue';
 import SearchBody from './search-body.vue';
 import RoomList from './room-list.vue';
 import iconLogoText from '../../../../images/svg/gitter-logos/logo-white-lettering.svg';
+import fingerSwipeMixin from '../mixins/finger-swipe';
 
 export default {
   name: 'LeftMenu',
+  mixins: [fingerSwipeMixin],
   components: {
     MenuBarBody,
     SearchBody,
@@ -58,34 +60,10 @@ export default {
     }
   },
 
-  mounted() {
-    this.hammer = require('hammerjs')(document.body);
-
-    this.hammer.on('swipeleft', this.onSwipeLeft);
-    this.hammer.on('swiperight', this.onSwipeRight);
-  },
-
-  beforeDestroy() {
-    this.hammer.off('swipeleft', this.onSwipeLeft);
-    this.hammer.off('swiperight', this.onSwipeRight);
-  },
-
   methods: {
     ...mapActions(['toggleLeftMenu']),
     onMouseleave() {
       this.toggleLeftMenu(false);
-    },
-    onSwipeLeft() {
-      // Always unpinned on mobile, so you can only collapse
-      if (this.isMobile) {
-        this.toggleLeftMenu(false);
-      }
-    },
-    onSwipeRight() {
-      // Always unpinned on mobile, so you can only expand
-      if (this.isMobile) {
-        this.toggleLeftMenu(true);
-      }
     }
   }
 };
@@ -101,6 +79,10 @@ export default {
       'dark-theme': darkTheme,
       unpinned: !isPinned,
       expanded: isExpanded
+    }"
+    :style="{
+      transform: transformCssValue,
+      transition: transitionCssValue
     }"
     @mouseleave="onMouseleave"
   >
@@ -166,10 +148,12 @@ export default {
 .root {
   box-sizing: border-box;
   z-index: @zIndexLeftMenu;
+
   display: flex;
   flex-direction: column;
   height: 100%;
 
+  will-change: transform;
   transition: transform 0.05s ease;
 
   &::v-deep *,
