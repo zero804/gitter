@@ -45,10 +45,6 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
   const isMobile = req.isPhone;
 
   let leftMenuPinnedState = !isMobile;
-  // We set this to unpinned because it works better with the NLI styles
-  if (!isLoggedIn) {
-    leftMenuPinnedState = false;
-  }
 
   const storeData = {
     isMobile,

@@ -186,6 +186,8 @@ export default {
   transition: transform 0.1s ease;
 
   @media not all and (max-width: @left-menu-mobile-breakpoint) {
+    // .logged-in is here so the left-menu header stays in one piece regardless of pinned
+    // The NLI left-menu does not have a pinned state, just mobile and not mobile
     .root:not(.pinned).logged-in & {
       position: absolute;
       left: 7.5rem;
