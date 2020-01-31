@@ -1,3 +1,8 @@
+# 20.17.0 - *upcoming*
+
+ - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761
+
+
 # 20.16.0 - 2020-01-29
 
  - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735
