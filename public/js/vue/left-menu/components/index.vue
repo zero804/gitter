@@ -163,13 +163,13 @@ export default {
   }
 
   @media (max-width: @left-menu-mobile-breakpoint) {
-    &:not(.pinned) {
+    & {
       position: absolute;
 
       transform: translateX(-100%);
     }
 
-    &:not(.pinned).expanded {
+    &.expanded {
       transform: translateX(0%);
     }
   }
