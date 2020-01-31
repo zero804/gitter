@@ -29,6 +29,8 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
     generateUserThemeSnapshot(req)
   ]);
 
+  const isLoggedIn = !!serializedUser;
+
   const serializedRoomMap = {};
 
   // the roomMap will contain the current room
@@ -42,16 +44,22 @@ async function mixinHbsDataForVueLeftMenu(req, existingData) {
 
   const isMobile = req.isPhone;
 
+  let leftMenuPinnedState = !isMobile;
+  // We set this to unpinned because it works better with the NLI styles
+  if (!isLoggedIn) {
+    leftMenuPinnedState = false;
+  }
+
   const storeData = {
     isMobile,
-    isLoggedIn: !!serializedUser,
+    isLoggedIn,
     user: serializedUser,
     darkTheme: userThemeSnapshot.theme === 'gitter-dark',
 
     roomMap: serializedRoomMap,
     displayedRoomId: serializedCurrentRoom && serializedCurrentRoom.id,
 
-    leftMenuPinnedState: !isMobile,
+    leftMenuPinnedState,
     leftMenuExpandedState: false
   };
 

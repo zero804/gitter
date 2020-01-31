@@ -39,7 +39,7 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   z-index: @zIndexChatHeader;
 
-  body:not(.mobile) & {
+  @media not all and (max-width: @left-menu-mobile-breakpoint) {
     padding-left: @desktop-menu-left-padding;
   }
 }
@@ -338,7 +338,7 @@
 }
 
 .chat-header__left-menu-toggle-grouping {
-  body:not(.mobile) & {
+  @media not all and (max-width: @left-menu-mobile-breakpoint) {
     display: none;
   }
 }

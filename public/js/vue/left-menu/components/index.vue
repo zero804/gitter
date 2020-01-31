@@ -19,7 +19,6 @@ export default {
   iconLogoText,
   computed: {
     ...mapState([
-      'isMobile',
       'isLoggedIn',
       'darkTheme',
       'leftMenuState',
@@ -74,10 +73,9 @@ export default {
     ref="root"
     class="root js-left-menu-root"
     :class="{
-      mobile: isMobile,
       'logged-in': isLoggedIn,
       'dark-theme': darkTheme,
-      unpinned: !isPinned,
+      pinned: isPinned,
       expanded: isExpanded
     }"
     :style="{
@@ -120,21 +118,23 @@ export default {
         </template>
       </section>
     </section>
-    <section v-else class="nli-body">
-      <h2 class="nli-primary-heading">Where communities thrive</h2>
+    <section v-else class="body">
+      <div class="nli-body">
+        <h2 class="nli-primary-heading">Where communities thrive</h2>
 
-      <br />
+        <br />
 
-      <ul class="nli-info-block">
-        <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
-        <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
-        <li class="nli-info-block-item">Free <strong>without limits</strong></li>
-        <li class="nli-info-block-item">Create <strong>your own community</strong></li>
-      </ul>
+        <ul class="nli-info-block">
+          <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
+          <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
+          <li class="nli-info-block-item">Free <strong>without limits</strong></li>
+          <li class="nli-info-block-item">Create <strong>your own community</strong></li>
+        </ul>
 
-      <ul class="nli-info-block">
-        <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
-      </ul>
+        <ul class="nli-info-block">
+          <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
+        </ul>
+      </div>
     </section>
   </div>
 </template>
@@ -162,18 +162,16 @@ export default {
     box-sizing: inherit;
   }
 
-  &:not(.logged-in).mobile {
-    display: none;
-  }
+  @media (max-width: @left-menu-mobile-breakpoint) {
+    &:not(.pinned) {
+      position: absolute;
 
-  &.unpinned.mobile {
-    position: absolute;
+      transform: translateX(-100%);
+    }
 
-    transform: translateX(-100%);
-  }
-
-  &.unpinned.expanded.mobile {
-    transform: translateX(0%);
+    &:not(.pinned).expanded {
+      transform: translateX(0%);
+    }
   }
 }
 
@@ -187,15 +185,17 @@ export default {
 
   transition: transform 0.1s ease;
 
-  .unpinned:not(.mobile) & {
-    position: absolute;
-    left: 7.5rem;
+  @media not all and (max-width: @left-menu-mobile-breakpoint) {
+    .root:not(.pinned).logged-in & {
+      position: absolute;
+      left: 7.5rem;
 
-    transform: translateX(-100%);
-  }
+      transform: translateX(-100%);
+    }
 
-  .unpinned.expanded:not(.mobile) & {
-    transform: translateX(0%);
+    .root.expanded:not(.pinned).logged-in & {
+      transform: translateX(0%);
+    }
   }
 }
 
@@ -292,6 +292,7 @@ export default {
 .nli-body {
   flex: 1;
   width: 34rem;
+  height: 100%;
   padding: 20px;
 
   background-color: @header-base-bg-color;
