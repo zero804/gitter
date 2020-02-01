@@ -2,7 +2,7 @@
 
 exports[`left-menu index all state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -84,7 +84,7 @@ exports[`left-menu index all state matches snapshot 1`] = `
 
 exports[`left-menu index dark-theme matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in dark-theme"
+  class="root js-left-menu-root logged-in dark-theme pinned"
 >
   <header
     class="header"
@@ -166,7 +166,7 @@ exports[`left-menu index dark-theme matches snapshot 1`] = `
 
 exports[`left-menu index mobile mobile matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root mobile logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -248,7 +248,7 @@ exports[`left-menu index mobile mobile matches snapshot 1`] = `
 
 exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root"
+  class="root js-left-menu-root pinned"
 >
   <header
     class="header"
@@ -301,76 +301,80 @@ exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
   </header>
    
   <section
-    class="nli-body"
+    class="body"
   >
-    <h2
-      class="nli-primary-heading"
+    <div
+      class="nli-body"
     >
-      Where communities thrive
-    </h2>
-     
-    <br />
-     
-    <ul
-      class="nli-info-block"
-    >
-      <li
-        class="nli-info-block-item"
+      <h2
+        class="nli-primary-heading"
       >
-        Join over 
-        <strong>
-          1.5M+ people
-        </strong>
-      </li>
+        Where communities thrive
+      </h2>
        
-      <li
-        class="nli-info-block-item"
-      >
-        Join over 
-        <strong>
-          100K+ communities
-        </strong>
-      </li>
+      <br />
        
-      <li
-        class="nli-info-block-item"
+      <ul
+        class="nli-info-block"
       >
-        Free 
-        <strong>
-          without limits
-        </strong>
-      </li>
-       
-      <li
-        class="nli-info-block-item"
-      >
-        Create 
-        <strong>
-          your own community
-        </strong>
-      </li>
-    </ul>
-     
-    <ul
-      class="nli-info-block"
-    >
-      <li
-        class="nli-info-block-item"
-      >
-        <a
-          href="/explore"
+        <li
+          class="nli-info-block-item"
         >
-          Explore more communities
-        </a>
-      </li>
-    </ul>
+          Join over 
+          <strong>
+            1.5M+ people
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Join over 
+          <strong>
+            100K+ communities
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Free 
+          <strong>
+            without limits
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Create 
+          <strong>
+            your own community
+          </strong>
+        </li>
+      </ul>
+       
+      <ul
+        class="nli-info-block"
+      >
+        <li
+          class="nli-info-block-item"
+        >
+          <a
+            href="/explore"
+          >
+            Explore more communities
+          </a>
+        </li>
+      </ul>
+    </div>
   </section>
 </div>
 `;
 
 exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root mobile"
+  class="root js-left-menu-root pinned"
 >
   <header
     class="header"
@@ -423,76 +427,80 @@ exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
   </header>
    
   <section
-    class="nli-body"
+    class="body"
   >
-    <h2
-      class="nli-primary-heading"
+    <div
+      class="nli-body"
     >
-      Where communities thrive
-    </h2>
-     
-    <br />
-     
-    <ul
-      class="nli-info-block"
-    >
-      <li
-        class="nli-info-block-item"
+      <h2
+        class="nli-primary-heading"
       >
-        Join over 
-        <strong>
-          1.5M+ people
-        </strong>
-      </li>
+        Where communities thrive
+      </h2>
        
-      <li
-        class="nli-info-block-item"
-      >
-        Join over 
-        <strong>
-          100K+ communities
-        </strong>
-      </li>
+      <br />
        
-      <li
-        class="nli-info-block-item"
+      <ul
+        class="nli-info-block"
       >
-        Free 
-        <strong>
-          without limits
-        </strong>
-      </li>
-       
-      <li
-        class="nli-info-block-item"
-      >
-        Create 
-        <strong>
-          your own community
-        </strong>
-      </li>
-    </ul>
-     
-    <ul
-      class="nli-info-block"
-    >
-      <li
-        class="nli-info-block-item"
-      >
-        <a
-          href="/explore"
+        <li
+          class="nli-info-block-item"
         >
-          Explore more communities
-        </a>
-      </li>
-    </ul>
+          Join over 
+          <strong>
+            1.5M+ people
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Join over 
+          <strong>
+            100K+ communities
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Free 
+          <strong>
+            without limits
+          </strong>
+        </li>
+         
+        <li
+          class="nli-info-block-item"
+        >
+          Create 
+          <strong>
+            your own community
+          </strong>
+        </li>
+      </ul>
+       
+      <ul
+        class="nli-info-block"
+      >
+        <li
+          class="nli-info-block-item"
+        >
+          <a
+            href="/explore"
+          >
+            Explore more communities
+          </a>
+        </li>
+      </ul>
+    </div>
   </section>
 </div>
 `;
 
 exports[`left-menu index people state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -574,7 +582,7 @@ exports[`left-menu index people state matches snapshot 1`] = `
 
 exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
 <div
-  class="root js-left-menu-root logged-in unpinned"
+  class="root js-left-menu-root logged-in"
 >
   <header
     class="header"
@@ -656,7 +664,7 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
 
 exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
 <div
-  class="root js-left-menu-root logged-in unpinned expanded"
+  class="root js-left-menu-root logged-in expanded"
 >
   <header
     class="header"
@@ -738,7 +746,7 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
 
 exports[`left-menu index search state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
