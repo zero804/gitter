@@ -57,8 +57,10 @@ gulp.task('embedded:compile:copy-files', function() {
     .src(
       [
         'public/images/emoji/*',
-        // 'public/sprites/**',
+        // these icons are for thread message indicator
+        'public/images/svg/corner-up-left.svg',
         'public/images/svg/corner-down-right.svg',
+
         'public/repo/katex/**'
       ],
       {

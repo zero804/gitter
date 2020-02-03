@@ -171,6 +171,7 @@ module.exports = (function() {
 
       data.sentTimeFormatted = timeFormat(data.sent, { forceUtc: this.isArchive() });
       data.permalinkUrl = this.getPermalinkUrl();
+      data.parentPermalinkUrl = this.getParentPermalinkUrl();
       data.sentTimeFormattedFull = fullTimeFormat(data.sent);
 
       data.readByText = this.getReadByText(data.readBy);
@@ -622,6 +623,14 @@ module.exports = (function() {
       const sent = moment(this.model.get('sent'), moment.defaultFormat);
 
       return generatePermalink(uri, modelId, sent, this.isArchive());
+    },
+
+    getParentPermalinkUrl: function() {
+      const parentId = this.model.get('parentId');
+      if (!parentId) return '';
+      var uri = context.troupe().get('uri');
+      if (!uri) return '';
+      return generatePermalink(uri, parentId);
     },
 
     getSentTimeTooltip: function() {
