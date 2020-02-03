@@ -171,7 +171,6 @@ var ChatCollection = LiveCollection.extend({
       return burstCalculator.parse(chats);
     } else {
       return burstCalculator.parse(collection);
-      gi;
     }
   },
 
