@@ -8,8 +8,10 @@ const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const pushState = require('../../../utils/browser/pushState');
 const linkDecorator = require('../../../views/chat/decorators/linkDecorator');
 const emojiDecorator = require('../../../views/chat/decorators/emojiDecorator');
+const DoubleTapper = require('../../../utils/double-tapper');
 import ChatItemActions from './chat-item-actions.vue';
 import Intersect from './intersect';
+import isTouch from '../../../utils/is-touch';
 
 export default {
   name: 'ChatItem',
@@ -24,6 +26,10 @@ export default {
       default: false
     }
   },
+  data: () => ({
+    isDragging: false,
+    doubleTapper: new DoubleTapper()
+  }),
   computed: {
     ...mapGetters({
       displayedRoom: 'displayedRoom'
@@ -90,8 +96,12 @@ export default {
     ...mapActions({
       updateMessage: 'threadMessageFeed/updateMessage',
       updateEditedText: 'threadMessageFeed/updateEditedText',
+      editMessage: 'threadMessageFeed/editMessage',
       cancelEdit: 'threadMessageFeed/cancelEdit'
     }),
+    cancelEditOnTouchDevice: function() {
+      if (isTouch) this.cancelEdit();
+    },
     setPermalinkLocation: function() {
       pushState(this.permalinkUrl);
     },
@@ -104,6 +114,32 @@ export default {
     onViewportEnter: function() {
       if (this.message.unread) {
         this.unreadItemsClient.markItemRead(this.message.id);
+      }
+    },
+    onTouchstart: function() {
+      this.isDragging = false;
+    },
+    onTouchmove: function() {
+      this.isDragging = true;
+    },
+    onTouchend: function(e) {
+      if (this.isDragging) {
+        // just a drag finishing. not a tap.
+        this.isDragging = false;
+      } else {
+        // its a tap!
+        this.onTap(e);
+      }
+    },
+    onTap: function(e) {
+      const tapCount = this.doubleTapper.registerTap();
+      if (tapCount === 2) {
+        if (!this.isBeingEdited) {
+          this.editMessage(this.message);
+        }
+        // otherwise the normal tap is recognised and blurs the text area
+        e.preventDefault();
+        e.stopPropagation();
       }
     }
   }
@@ -121,6 +157,9 @@ export default {
         deleted: isEmpty,
         'chat-item__highlighted': message.highlighted
       }"
+      @touchstart="onTouchstart"
+      @touchmove="onTouchmove"
+      @touchend="onTouchend"
     >
       <div class="chat-item__container">
         <div class="chat-item__aside">
@@ -153,6 +192,7 @@ export default {
             class="trpChatInput"
             @keydown.enter.prevent="updateMessage()"
             @keydown.esc="cancelEdit()"
+            @blur="cancelEditOnTouchDevice()"
           ></textarea>
           <div v-else-if="message.html" class="chat-item__text" v-html="message.html"></div>
           <div v-else class="chat-item__text">
@@ -205,6 +245,20 @@ export default {
 
 .dark-theme .chat-item__text {
   color: @dark-theme-chat-main-text-color;
+}
+
+.trpChatInput {
+  display: block;
+  width: 100%;
+  outline: none;
+  padding-left: 5px;
+  border: 0px;
+  resize: none;
+  margin: 1px;
+  box-shadow: none;
+  min-height: 44px;
+  outline: 1px solid @trpLightBlue;
+  line-height: 1.5;
 }
 
 .message-loading-icon {

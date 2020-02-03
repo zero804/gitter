@@ -1,6 +1,5 @@
 <script>
-import { mapActions } from 'vuex';
-const context = require('gitter-web-client-context');
+import { mapActions, mapGetters, mapState } from 'vuex';
 const ChatItemPolicy = require('../../../views/chat/chat-item-policy');
 import { BPopover } from 'bootstrap-vue';
 
@@ -18,10 +17,12 @@ export default {
     }
   },
   computed: {
+    ...mapGetters(['isDisplayedRoomAdmin']),
+    ...mapState(['user']),
     chatItemPolicy: function() {
       return new ChatItemPolicy(this.message, {
-        currentUserId: context.getUserId(),
-        isTroupeAdmin: context.isTroupeAdmin()
+        currentUserId: this.user.id,
+        isTroupeAdmin: this.isDisplayedRoomAdmin
       });
     },
     chatActionsId: function() {
