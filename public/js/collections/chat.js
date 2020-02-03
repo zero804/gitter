@@ -156,10 +156,12 @@ var ChatCollection = LiveCollection.extend({
   },
 
   getQuery: function() {
+    // includeThreads is for inline-threads-for-mobile-embedded
     return { lookups: ['user'], includeThreads: isMobileEmbedded() };
   },
 
   getSnapshotExtras: function() {
+    // includeThreads is for inline-threads-for-mobile-embedded
     return { lookups: ['user'], includeThreads: isMobileEmbedded() };
   },
 

@@ -58,6 +58,7 @@ gulp.task('embedded:compile:copy-files', function() {
       [
         'public/images/emoji/*',
         // these icons are for thread message indicator
+        // inline-threads-for-mobile-embedded
         'public/images/svg/corner-up-left.svg',
         'public/images/svg/corner-down-right.svg',
 

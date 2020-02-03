@@ -442,6 +442,7 @@ async function findChatMessagesInRange(
   }
   if (afterId) addAfterFilter(q, afterId);
   if (!includeThreads) {
+    // inline-threads-for-mobile-embedded
     q.where('parentId').exists(false);
   }
   if (useHints) {
@@ -502,6 +503,7 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit, i
     .where('_id')
     .lte(searchMessageId);
   if (!includeThreads) {
+    // inline-threads-for-mobile-embedded
     q1.where('parentId').exists(false);
   }
   q1.sort({ sent: 'desc' })
@@ -514,6 +516,7 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit, i
     .where('_id')
     .gt(searchMessageId);
   if (!includeThreads) {
+    // inline-threads-for-mobile-embedded
     q2.where('parentId').exists(false);
   }
   q2.sort({ sent: 'asc' })

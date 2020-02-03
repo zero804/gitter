@@ -42,6 +42,7 @@
           <img class="chat-item__pmi-icon" src="{{cdn 'images/svg/corner-down-right.svg'}}" /> {{threadMessageCount}} {{ pluralize threadMessageCount 'reply' 'replies' }}
         </div>
       {{/if}}
+      {{! inline-threads-for-mobile-embedded }}
       {{#if parentId}}
         <div class='chat-item__thread-message-indicator'>
           <a href="{{parentPermalinkUrl}}"><img class="chat-item__pmi-icon" src="{{cdn 'images/svg/corner-up-left.svg'}}" /> go to thread</a>

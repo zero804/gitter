@@ -70,7 +70,8 @@ module.exports = (function() {
     attributes: function() {
       var classMap = {
         'chat-item': true,
-        // Hiding child messages from the main message feed
+        // inline-threads-for-mobile-embedded
+        // Hiding (or treating) child messages from the main message feed
         // Chosen as an easier alternative to creating a new filtered LiveCollection for chat messages
         'threaded-conversation-chat-item': !!this.model.get('parentId')
       };
@@ -625,6 +626,7 @@ module.exports = (function() {
       return generatePermalink(uri, modelId, sent, this.isArchive());
     },
 
+    // inline-threads-for-mobile-embedded
     getParentPermalinkUrl: function() {
       const parentId = this.model.get('parentId');
       if (!parentId) return '';
