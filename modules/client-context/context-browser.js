@@ -249,6 +249,9 @@ context.isStaff = function() {
   return user.get('staff');
 };
 
+/**
+ * @deprecated use Vuex root getter `isDisplayedRoomAdmin`
+ */
 context.isTroupeAdmin = function() {
   var permissions = troupe.get('permissions');
   if (!permissions) return false;

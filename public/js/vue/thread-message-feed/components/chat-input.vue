@@ -1,6 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import Avatar from './avatar.vue';
+import isTouch from '../../../utils/is-touch';
 
 export default {
   name: 'ChatInput',
@@ -58,13 +59,19 @@ export default {
     }
   },
   mounted() {
-    this.$refs.chatInputTextArea.focus();
+    // we don't ever want to open virtual (touch) keyboard for user
+    if (!isTouch()) {
+      this.$refs.chatInputTextArea.focus();
+    }
     this.expandIfNeeded();
   },
   updated() {
     // if something programatically changes draft, we'll focus on the input
     // e.g. when user selects "Quote" from the chat item context menu
-    this.$refs.chatInputTextArea.focus();
+    // but we don't ever want to open virtual (touch) keyboard for user
+    if (!isTouch()) {
+      this.$refs.chatInputTextArea.focus();
+    }
     this.expandIfNeeded();
   },
   methods: {

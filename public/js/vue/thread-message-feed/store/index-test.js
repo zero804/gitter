@@ -253,8 +253,12 @@ describe('thread message feed store', () => {
     });
 
     it('editMessage', async () => {
-      const testMessage = createSerializedMessageFixture({ id: '5dabc', text: 'hello' });
-      await testAction(actions.editMessage, testMessage, {}, [
+      const testMessage = createSerializedMessageFixture({
+        id: '5dabc',
+        text: 'hello',
+        sent: new Date()
+      });
+      await testAction(actions.editMessage, testMessage, { user: testMessage.fromUser }, [
         { type: types.UPDATE_MESSAGE_EDIT_STATE, payload: { id: '5dabc', text: 'hello' } }
       ]);
     });

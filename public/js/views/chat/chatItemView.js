@@ -16,7 +16,6 @@ const dataset = require('../../utils/dataset-shim');
 const toggleClass = require('../../utils/toggle-class');
 const RAF = require('../../utils/raf');
 const isMobile = require('../../utils/is-mobile');
-const isAndroid = require('../../utils/is-android');
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
@@ -57,18 +56,10 @@ module.exports = (function() {
     'click .js-parent-message-indicator': 'openThread'
   };
 
-  var touchEvents = {
-    // click events are delayed in horrible ways for <iOS 9.3
+  const mobileEvents = {
     touchstart: 'onTouchstart',
     touchmove: 'onTouchmove',
     touchend: 'onTouchend',
-    'click .js-parent-message-indicator': 'openThread'
-  };
-
-  var androidTouchEvents = {
-    // WebViews in android will only show the keyboard for a focus() if
-    // it happens via a click event, but not for a touch event
-    click: 'onTap',
     'click .js-parent-message-indicator': 'openThread'
   };
 
@@ -123,7 +114,7 @@ module.exports = (function() {
 
     events: function() {
       if (isMobile()) {
-        return isAndroid() ? androidTouchEvents : touchEvents;
+        return mobileEvents;
       } else {
         return mouseEvents;
       }
@@ -574,35 +565,23 @@ module.exports = (function() {
       this.isDragging = true;
     },
 
-    onTouchend: function() {
+    onTouchend: function(e) {
       if (this.isDragging) {
         // just a drag finishing. not a tap.
         this.isDragging = false;
       } else {
         // its a tap!
-        this.onTap();
+        this.onTap(e);
       }
     },
 
-    onTap: function() {
-      var tapCount = this.doubleTapper.registerTap();
-
-      switch (tapCount) {
-        case 1:
-          // single click
-          // this calls onSelected
-          this.triggerMethod('selected', this.model);
-          break;
-        case 2:
-          // double click
-          this.toggleEdit();
-          break;
-      }
-    },
-
-    onTouchEditBlur: function() {
-      if (this.inputBox) {
-        this.toggleEdit();
+    onTap: function(e) {
+      const tapCount = this.doubleTapper.registerTap();
+      if (tapCount === 2) {
+        this.toggleEdit(); // edit on double tap
+        // otherwise the normal tap is recognised and blurs the text area
+        e.preventDefault();
+        e.stopPropagation();
       }
     },
 

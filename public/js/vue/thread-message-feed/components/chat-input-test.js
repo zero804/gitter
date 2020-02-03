@@ -1,11 +1,18 @@
+jest.mock('../../../utils/is-touch');
+
 const mount = require('../../__test__/vuex-mount');
 const { default: ChatInput } = require('./chat-input.vue');
+import isTouch from '../../../utils/is-touch';
 
 describe('thread-message-feed chat-input', () => {
   const defaultProps = {
     user: { displayName: 'John Smith' },
     thread: true
   };
+
+  beforeEach(() => {
+    isTouch.mockReturnValue(false);
+  });
 
   it('matches snapshot for thread', () => {
     const { wrapper } = mount(ChatInput, defaultProps);

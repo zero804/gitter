@@ -34,6 +34,13 @@ const setTemporaryMessageProp = (commit, id, propName, propValue = true) => {
   );
 };
 
+const isMessageEditable = (message, rootState) => {
+  const policy = new ChatItemPolicy(message, {
+    currentUserId: rootState.user.id
+  });
+  return policy.canEdit();
+};
+
 /* we only use `loading` attribute from the request state */
 const getDefaultMessageEditState = () => ({ id: null, text: null });
 
@@ -199,8 +206,10 @@ export default {
         })
         .finally(() => dispatch('cancelEdit'));
     },
-    editMessage: ({ commit }, message) => {
-      commit(types.UPDATE_MESSAGE_EDIT_STATE, { id: message.id, text: message.text });
+    editMessage: ({ commit, rootState }, message) => {
+      if (isMessageEditable(message, rootState)) {
+        commit(types.UPDATE_MESSAGE_EDIT_STATE, { id: message.id, text: message.text });
+      }
     },
     cancelEdit: ({ commit }) =>
       commit(types.UPDATE_MESSAGE_EDIT_STATE, getDefaultMessageEditState()),
@@ -208,11 +217,9 @@ export default {
       commit(types.UPDATE_MESSAGE_EDIT_STATE, { text });
     },
     editLastMessage: ({ dispatch, getters, rootState }) => {
-      const isEditable = message => {
-        const policy = new ChatItemPolicy(message, { currentUserId: rootState.user.id });
-        return policy.canEdit();
-      };
-      const lastEditableMessage = [...getters.childMessages].reverse().find(isEditable);
+      const lastEditableMessage = [...getters.childMessages]
+        .reverse()
+        .find(m => isMessageEditable(m, rootState));
       if (!lastEditableMessage) return;
       dispatch('editMessage', lastEditableMessage);
     },
