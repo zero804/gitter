@@ -1,6 +1,7 @@
 # 20.17.0 - *upcoming*
 
  - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761
+ - Fix "Double-tap to edit a message on mobile not working", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1760
 
 
 # 20.16.0 - 2020-01-29
