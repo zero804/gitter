@@ -206,6 +206,11 @@ context.popEvent = function(name) {
 
 context.getAccessToken = Promise.method(function() {
   var iterations = 0;
+  // This check is here so we can call `/api/private/sample-chats` anonymously from the homepage for the world map
+  // This is mixed into the `clientEnv` from the handlebars templates. See homepage.hbs
+  //
+  // This is only used for the homepage.
+  // When viewing a chat room NLI, users still have a token for the realtime connection and API calls
   if (clientEnv['anonymous']) {
     return;
   }
