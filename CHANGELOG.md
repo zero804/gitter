@@ -9,6 +9,10 @@ Developer facing:
 
  - Clarify why `clientEnv['anonymous']` is used in `context.getAccessToken()`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1764
 
+# 20.16.1 - 2020-02-07
+
+ - Security fix related to burst messages, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/51
+
 
 # 20.16.0 - 2020-01-29
 
