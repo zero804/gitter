@@ -1,7 +1,8 @@
 'use strict';
 
+const _ = require('lodash');
 var Promise = require('bluebird');
-var Identity = require('gitter-web-persistence').Identity;
+const { User, Identity } = require('gitter-web-persistence');
 const fixtureUtils = require('./fixture-utils');
 var debug = require('debug')('gitter:tests:test-fixtures');
 
@@ -42,16 +43,29 @@ function createIdentities(expected, fixture) {
 
       expectedIdentity.userId = fixture[expectedIdentity.user]._id;
 
-      return createIdentity(key, expectedIdentity).then(function(identity) {
+      return createIdentity(key, expectedIdentity).then(async identity => {
         fixture[key] = identity;
 
         // Add the identity back on the user object
-        fixture[expectedIdentity.user].identities = (
-          fixture[expectedIdentity.user].identities || []
-        ).concat({
-          provider: identity.provider,
-          providerKey: identity.providerKey
-        });
+        const updatedUser = await User.findOneAndUpdate(
+          {
+            _id: fixture[expectedIdentity.user]._id
+          },
+          {
+            $push: {
+              identities: {
+                provider: identity.provider,
+                providerKey: identity.providerKey
+              }
+            }
+          },
+          { new: true }
+        );
+
+        fixture[expectedIdentity.user] = _.extend(
+          fixture[expectedIdentity.user],
+          updatedUser.toJSON()
+        );
       });
     }
 

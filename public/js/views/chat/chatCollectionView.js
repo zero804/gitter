@@ -416,6 +416,10 @@ module.exports = (function() {
           self.highlightPermalinkChat(parentId);
           return;
         }
+        // if this is a parent message, open TMF as well as highlighting the parent message
+        if (model.get('threadMessageCount')) {
+          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/open', model.id);
+        }
 
         var models = isolateBurst(self.collection, model);
         models.forEach(function(model) {

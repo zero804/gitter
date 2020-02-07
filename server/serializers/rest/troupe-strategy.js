@@ -257,17 +257,6 @@ function TroupeStrategy(options) {
     return otherUser;
   }
 
-  function resolveProviders(item) {
-    // mongoose is upgrading old undefineds to [] on load and we don't want to
-    // send through that no providers are allowed in that case
-
-    if (options.includeProviders && item.providers && item.providers.length) {
-      return item.providers;
-    } else {
-      return undefined;
-    }
-  }
-
   // eslint-disable-next-line complexity
   this.map = function(item) {
     var id = item.id || item._id;
@@ -296,7 +285,10 @@ function TroupeStrategy(options) {
     }
 
     var unreadCounts = unreadItemStrategy && unreadItemStrategy.map(id);
-    var providers = resolveProviders(item);
+
+    // mongoose is upgrading old undefineds to [] on load and we don't want to
+    // send through that no providers are allowed in that case
+    const providers = item.providers && item.providers.length ? item.providers : undefined;
 
     var isLurking;
     var hasActivity;
@@ -371,7 +363,6 @@ TroupeStrategy.createSuggestionStrategy = function() {
   return new TroupeStrategy({
     includePremium: false,
     includeTags: true,
-    includeProviders: true,
     includeExists: true,
     // TODO: remove this option in future
     includeDescription: true,

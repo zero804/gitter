@@ -38,6 +38,8 @@ context.getUser = function() {};
 
 context.user = function() {};
 
+context.hasProvider = function() {};
+
 context.getTroupe = function() {};
 
 context.popEvent = function() {};

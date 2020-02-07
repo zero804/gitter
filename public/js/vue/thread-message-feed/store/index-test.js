@@ -420,6 +420,18 @@ describe('thread message feed store', () => {
           []
         );
       });
+
+      // this happens when we close and open fully loaded thread
+      it('can handle receiving empty list of messages', async () => {
+        await testAction(
+          actions.fetchOlderMessages,
+          undefined,
+          { childMessages, childMessagesRequest: {}, parentId: 'parent-a1b2c3' },
+          [{ type: types.SET_AT_TOP_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
+          [{ type: 'fetchChildMessages', payload: { beforeId: '1' } }],
+          { fetchChildMessages: [] }
+        );
+      });
     });
 
     describe('fetchNewerMessages', () => {
@@ -471,6 +483,18 @@ describe('thread message feed store', () => {
           { childMessages: [], childMessagesRequest: {} },
           [],
           []
+        );
+      });
+
+      // this happens when we close and open fully loaded thread
+      it('can handle receiving empty list of messages', async () => {
+        await testAction(
+          actions.fetchNewerMessages,
+          undefined,
+          { childMessages, childMessagesRequest: {}, parentId: 'parent-a1b2c3' },
+          [{ type: types.SET_AT_BOTTOM_IF_SAME_PARENT, payload: 'parent-a1b2c3' }],
+          [{ type: 'fetchChildMessages', payload: { afterId: '2' } }],
+          { fetchChildMessages: [] }
         );
       });
     });

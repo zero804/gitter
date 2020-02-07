@@ -8,6 +8,7 @@ var autolink = require('autolink'); // eslint-disable-line node/no-missing-requi
 var clientEnv = require('gitter-client-env');
 var context = require('gitter-web-client-context');
 const log = require('../../utils/log');
+const { getBackendForRoom } = require('gitter-web-shared/backend-utils');
 var toggleClass = require('../../utils/toggle-class');
 var MenuBuilder = require('../../utils/menu-builder');
 var appEvents = require('../../utils/appevents');
@@ -197,12 +198,9 @@ var HeaderView = Marionette.ItemView.extend({
     var isStaff = context.isStaff();
     var isAdmin = context.isTroupeAdmin();
     var isRoomMember = context.isRoomMember();
-    var backend = this.model.get('backend');
-    var type = backend && backend.type;
     var isOneToOne = this.model.get('oneToOne');
     var url = this.model.get('url');
     var staffOrAdmin = isStaff || isAdmin;
-    var isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
 
     var menuBuilder = new MenuBuilder();
 
@@ -233,9 +231,21 @@ var HeaderView = Marionette.ItemView.extend({
       menuBuilder.addDivider();
 
       menuBuilder.add({ title: 'Archives', href: url + '/archives/all', target: '_blank' });
+
+      const backend = getBackendForRoom(this.model);
+      const type = backend && backend.type;
+      const linkPath = backend && backend.linkPath;
+
+      const isGitHubObject = type === 'GH_REPO' || type === 'GH_ORG';
       menuBuilder.addConditional(isGitHubObject, {
         title: 'Open in GitHub',
-        href: 'https://www.github.com' + url,
+        href: `https://www.github.com/${linkPath}`,
+        target: '_blank'
+      });
+      const isGitlabObject = type === 'GL_GROUP';
+      menuBuilder.addConditional(isGitlabObject, {
+        title: 'Open in GitLab',
+        href: `https://gitlab.com/${linkPath}`,
         target: '_blank'
       });
 

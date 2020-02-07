@@ -33,7 +33,7 @@
       {{#if archives}}
       <a href="{{ headerView.url }}" class="chat-header__title">{{ headerView.troupeName }}</a>
       {{else}}
-      <a {{#if headerView.githubLink}}href="{{ headerView.githubLink }}"{{/if}} class="chat-header__title" target="_blank">{{ headerView.troupeName }}</a>
+      <a {{#if headerView.headerLink}}href="{{ headerView.headerLink }}"{{/if}} class="chat-header__title" target="_blank">{{ headerView.troupeName }}</a>
       {{/if}}
       {{#if headerView.isPrivate}}
         <i class='octicon octicon-lock chat-header__permission-icon'></i>

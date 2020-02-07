@@ -82,8 +82,8 @@ module.exports = CommunityCreateBaseStepView.extend({
   initialize: function() {
     _super.initialize.apply(this, arguments);
 
-    this.hasGitHubProvider = this.hasProvider('github');
-    this.hasGitlabProvider = this.hasProvider('gitlab');
+    this.hasGitHubProvider = context.hasProvider('github');
+    this.hasGitlabProvider = context.hasProvider('gitlab');
 
     this.listenTo(
       this.communityCreateModel,
@@ -255,7 +255,7 @@ module.exports = CommunityCreateBaseStepView.extend({
         } else if (status === 403) {
           communityCreateModel.set(
             'communitySlugAvailabilityStatus',
-            slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS
+            slugAvailabilityStatusConstants.GITHUB_CLASH
           );
         } else if (status === 401) {
           communityCreateModel.set(
@@ -289,21 +289,10 @@ module.exports = CommunityCreateBaseStepView.extend({
     );
     this.ui.communitySlugInputWrapper.toggleClass(
       'unavailable',
-      status === slugAvailabilityStatusConstants.NEEDS_MORE_PERMISSIONS ||
+      status === slugAvailabilityStatusConstants.GITHUB_CLASH ||
         status === slugAvailabilityStatusConstants.AUTHENTICATION_FAILED ||
         status === slugAvailabilityStatusConstants.UNAVAILABLE ||
         status === slugAvailabilityStatusConstants.INVALID
-    );
-  },
-
-  hasProvider: provider => {
-    const user = context.getUser();
-
-    return (
-      user &&
-      (user.providers || []).some(p => {
-        return p === provider;
-      })
     );
   }
 });

@@ -1,4 +1,57 @@
-# 20.15.0 - 2019-01-16
+# 20.16.0 - 2020-01-29
+
+ - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735
+ - Add `GL_GROUP` and inherited `GROUP` support for the chat header link, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1738
+ - Permalink to parent message opens thread message feed at the bottom, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1741
+ - Fix right-toolbar toggle hover flicker v2 -> simplify toggle button, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1747
+ - Add "Join room" and "Sign in to start talking" buttons to thread message panel, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1742
+ - Add "Open in GitLab" option to room settings dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1750
+ - Fix object serialized for empty error message in tags modal(`[object Object]`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1754
+ - Follow GitHub association from inherited group security descriptor for repo info section in the right-toolbar, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1753
+ - Link to private repo access grant page("Allow Private Repo Access") in commit popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1752
+     - Thanks to [@redsandro](https://gitlab.com/redsandro) for the contribution
+ - Fix mobile bug where message was sent on chat-message input blur, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1758
+
+Developer facing:
+
+ - Add `GL_GROUP` support to the `scripts/utils/rename-group.js` utility script, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1734
+ - Remove unused `roomService.createRoomByUri()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1727
+ - Add test for GitLab group creation, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1739
+ - Add user orgs test for GitLab, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1740
+ - Add notes about splitting from GitHub URI reservation to `userScopes.isGitHubUser()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1743
+ - Remove unused `chat-input` `updateDraftMessage()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1744
+ - Add `GL_GROUP` test case to the group API tests, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1745
+ - Remove unused `getGitHubPath()`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1749
+ - Refactor `group-with-policy-service` tests to `async`/`await`, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1748
+ - Always serialize providers for Troupe, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1755
+
+
+# 20.15.3 - 2020-01-27
+
+Developer facing:
+
+ - Security fix related to image content, https://gitlab.com/gitlab-org/gitter/webapp/issues/2037
+    - Add Camo to proxy image assets, https://user-content.gitter-static.net/
+    - Thanks to [@iframe](https://hackerone.com/iframe) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/39
+
+
+# 20.15.2 - 2020-01-23
+
+Developer facing:
+
+ - Serialize current room before passing to Vue initial state frontend, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/48
+
+
+# 20.15.1 - 2020-01-20
+
+Developer facing:
+
+ - Disallow `Transfer-Encoding: chunked` for any API request, https://gitlab.com/gitlab-org/gitter/webapp/issues/2292
+    - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/46
+
+
+# 20.15.0 - 2020-01-16
 
  - Fix typo in failed to fetch thread error, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1730
  - Add left-menu mobile toggle to explore page (sign-in landing page), https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1729
@@ -15,7 +68,7 @@ Developer facing:
  - Add process for testing renovate changes, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1736
 
 
-# 20.14.0 - 2019-01-10
+# 20.14.0 - 2020-01-10
 
  - Add some docs on usage and enable threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1713
  - Prevent notification email replies to go to support@gitter.im, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1589

@@ -66,6 +66,7 @@ function getGitHubToken(user, scope) {
 }
 
 function isGitHubUser(user) {
+  // TODO: replace this with something more "provider-aware" (#github-uri-split)
   return isGitHubUsername(user.username);
 }
 

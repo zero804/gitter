@@ -9,8 +9,11 @@ function checkGroupUri(req, res, next) {
         res.send({
           type: info.type
         });
-        // This is clearly a GitHub permsisions issue
-      } else if (!info.localUriExists && info.type === 'GH_ORG') {
+        // This is clearly a GitHub permsisions issue (#github-uri-split)
+      } else if (
+        !info.localUriExists &&
+        (info.type === 'GH_ORG' || info.type === 'GH_REPO' || info.type === 'GH_USER')
+      ) {
         res.sendStatus(403);
       } else {
         res.sendStatus(409);

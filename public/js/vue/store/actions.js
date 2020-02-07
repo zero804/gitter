@@ -3,7 +3,8 @@ import {
   roomSearchRepoRequest,
   roomSearchRoomRequest,
   roomSearchPeopleRequest,
-  messageSearchRequest
+  messageSearchRequest,
+  joinRoomRequest
 } from './requests';
 import context from 'gitter-web-client-context';
 import apiClient from '../../components/api-client';
@@ -268,4 +269,29 @@ export const addMessages = ({ commit }, messages) => {
 
 export const removeMessage = ({ commit }, message) => {
   commit(types.REMOVE_MESSAGE, message);
+};
+
+export const joinRoom = async ({ commit, getters }) => {
+  const isEmbedded = context().embedded;
+  const welcomeMessage = getters.displayedRoom.meta && getters.displayedRoom.meta.welcomeMessage;
+  // If the room has a welcome message then use normal browser navigation to show the welcome message modal(#welcome-message)
+  // If the user is in an embedded view, just let them join without reading the welcome message
+  if (welcomeMessage && !isEmbedded) {
+    // Flows out to legacy backbone router to show welcome message modal
+    window.location.assign('#welcome-message');
+    return;
+  }
+
+  const roomPostOptions = {
+    id: getters.displayedRoom.id,
+    source: isEmbedded ? '~embed' : undefined
+  };
+  commit(joinRoomRequest.requestType);
+  apiClient.user
+    .post('/rooms', roomPostOptions)
+    .then(body => {
+      commit(joinRoomRequest.successType);
+      context.setTroupe(body);
+    })
+    .catch(e => commit(joinRoomRequest.errorType, e));
 };

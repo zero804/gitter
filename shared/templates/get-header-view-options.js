@@ -1,9 +1,14 @@
 'use strict';
 
-function getGithubLinkUrl(serializedTroupe) {
-  var backend = serializedTroupe.backend;
+const { getBackendForRoom } = require('gitter-web-shared/backend-utils');
+
+function getHeaderLinkUrl(serializedTroupe) {
+  const backend = getBackendForRoom(serializedTroupe);
   if (!backend) return;
+
   switch (backend.type) {
+    case 'GL_GROUP':
+      return 'https://gitlab.com/' + backend.linkPath;
     case 'GH_REPO':
     case 'GH_ORG':
       return 'https://github.com/' + backend.linkPath;
@@ -33,7 +38,7 @@ function getHeaderViewOptions(serializedTroupe) {
     avatarUrl: serializedTroupe.avatarUrl,
     group: group,
     groupPageUrl: groupPageUrl,
-    githubLink: getGithubLinkUrl(serializedTroupe)
+    headerLink: getHeaderLinkUrl(serializedTroupe)
   };
 }
 
