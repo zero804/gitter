@@ -317,10 +317,6 @@ module.exports = (function() {
         toggleClass(this.el, 'burstStart', !!model.get('burstStart'));
         toggleClass(this.el, 'burstContinued', !model.get('burstStart'));
       }
-
-      if (!changes || 'burstFinal' in changes) {
-        toggleClass(this.el, 'burstFinal', !!model.get('burstFinal'));
-      }
     },
     handleUpdateReadbyStateChanges: function(changes) {
       /* Don't run on the initial (changed=undefined) as its done in the template */
