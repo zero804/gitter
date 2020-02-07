@@ -72,7 +72,6 @@ var ChatModel = Backbone.Model.extend({
     }
 
     delete d.burstStart;
-    delete d.burstFinal;
     delete d.fromUser;
     // No need to send html back to the server
     delete d.html;
