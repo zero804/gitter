@@ -1,16 +1,6 @@
 'use strict';
 
 /**
- * setBurstFinal() sets the final burst class for the previous chat item once a new burst happens
- *
- * chatItem `Object` chat-item to be set as burst final
- * void
- */
-var setBurstFinal = function(chatItem) {
-  chatItem.burstFinal = true;
-};
-
-/**
  * IMPORTANT: this version differs from client-side calculateBursts() due to backbone access methods!
  * calculateBursts() calculates what chat messages are 'bursts'.
  *
@@ -24,7 +14,8 @@ var calculateBursts = function(chats) {
 
   var burstUser, burstStart;
 
-  chats.forEach(function(chat, index) {
+  chats.forEach(function(chat) {
+    if (chat.parentId) return; // ignore thread messages for now
     var newUser = chat.fromUser && chat.fromUser.username;
     var newSentTime = chat.sent;
 
@@ -32,16 +23,6 @@ var calculateBursts = function(chats) {
     if (chat.status) {
       burstUser = null;
       chat.burstStart = true;
-      if (index !== 0) setBurstFinal(chats[index - 1]);
-      return;
-    }
-
-    // if the message is by a there is not a burst user then we're starting a burst
-    if (!burstUser) {
-      burstUser = newUser;
-      burstStart = newSentTime;
-      chat.burstStart = true;
-      if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
     }
 
@@ -53,7 +34,6 @@ var calculateBursts = function(chats) {
       burstUser = newUser;
       burstStart = newSentTime;
       chat.burstStart = true;
-      if (index !== 0) setBurstFinal(chats[index - 1]);
       return;
     }
 

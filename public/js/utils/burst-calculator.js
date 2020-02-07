@@ -84,31 +84,23 @@ module.exports = (function() {
 
     if (chat.get('status')) {
       state.burstStart = true;
-      state.prevFinal = true;
-      state.time = time;
-      return;
-    }
-
-    if (!state.user) {
-      state.burstStart = true;
-      state.prevFinal = true;
-      state.user = user;
+      state.status = true;
       state.time = time;
       return;
     }
 
     var outsideBurstWindow = time - state.time > BURST_WINDOW;
 
-    if (state.prevIsStatus || user !== state.user || outsideBurstWindow) {
+    if (state.status || user !== state.user || outsideBurstWindow) {
       state.burstStart = true;
-      state.prevFinal = true;
       state.user = user;
       state.time = time;
-      return; /*{ burstStart: true, prevFinal: true, user: user, time: time };*/
+
+      state.status = false; // resetting the status, because it might have been true
+      return;
     }
 
     state.burstStart = false;
-    state.prevFinal = false;
     state.user = user;
     return;
   }
@@ -133,22 +125,15 @@ module.exports = (function() {
     var state = {
       user: null,
       burstStart: false,
-      prevFinal: false,
-      prevIsStatus: false,
-      time: null
+      status: false,
+      time: null,
+      parentId: null
     };
 
-    collection.slice(start, end + 1).forEach(function(chat, index) {
-      // IMPORTANT: index is modified, to cater for the use of `slice()`
-      index = index + start;
-
-      if (index > 0) state.prevIsStatus = collection.at(index - 1).get('status');
+    collection.slice(start, end + 1).forEach(function(chat) {
+      if (chat.get('parentId')) return; // ignore thread messages for now
       calculateBurst(chat, state);
-
       chat.set('burstStart', state.burstStart);
-      // chat.set('burstFinal', false);
-
-      if (index > 0) collection.at(index - 1).set('burstFinal', state.prevFinal);
     });
 
     return collection.toJSON();
