@@ -11,7 +11,7 @@ These are scripts that can help you answer questions like "What's this user's ey
 
 ## Spam on Gitter (fighting abuse)
 
-See https://gitlab.com/gitlab-com/gl-security/runbooks/blob/master/gitter_spam.md
+See https://gitlab.com/gitlab-com/gl-security/runbooks/-/blob/master/abuse/gitter_spam.md
 
 
 ## Utility scripts
