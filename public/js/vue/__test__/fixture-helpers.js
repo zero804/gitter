@@ -125,7 +125,6 @@ function createSerializedMessageFixture(overrides) {
     meta: [],
     v: 1,
     burstStart: true,
-    burstFinal: true,
     ...overrides
   };
 }
