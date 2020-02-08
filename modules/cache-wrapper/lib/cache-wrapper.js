@@ -84,7 +84,7 @@ function wrapClass(cache, moduleName, Klass, getInstanceIdFunc) {
   return Wrapped;
 }
 
-module.exports = function(moduleName, module, options) {
+module.exports = function(moduleName, module, options = {}) {
   var cache = new SnappyCache({
     prefix: 'sc:',
     redis: getRedisCachingClient(),
@@ -99,7 +99,13 @@ module.exports = function(moduleName, module, options) {
       return wrapClass(cache, moduleName, module, options.getInstanceId);
     } else {
       // its a function
-      return wrapFunction(cache, moduleName, module);
+      return wrapFunction(
+        cache,
+        moduleName,
+        module,
+        `${moduleName}-function`,
+        options.getInstanceId
+      );
     }
   } else if (typeof module === 'object') {
     // its a collection of functions

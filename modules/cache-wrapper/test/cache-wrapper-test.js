@@ -20,7 +20,7 @@ describe('cache-wrapper', function() {
 
     it('looks up correct key', function(done) {
       var wrapper = getWrapper(function(key) {
-        assert.equal(key, 'my-module:::world');
+        assert.equal(key, 'my-module::my-module-function:world');
         done();
       });
 
@@ -28,9 +28,49 @@ describe('cache-wrapper', function() {
       wrapped('world');
     });
 
+    it('looks up correct key with custom getInstanceId() for function', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module:my-custom-instance-id:my-module-function:world');
+        done();
+      });
+
+      var wrapped = wrapper('my-module', module, {
+        getInstanceId: () => {
+          return 'my-custom-instance-id';
+        }
+      });
+      wrapped('world');
+    });
+
+    it('looks up correct key with custom getInstanceId(this) for object prototype function', done => {
+      const wrapper = getWrapper(key => {
+        assert.equal(key, 'getSomething:instance-id-123foobarbaztoken:getSomething-function');
+        done();
+      });
+
+      function ExampleService() {
+        this.myToken = '123foobarbaztoken';
+      }
+
+      ExampleService.prototype.getSomething = wrapper(
+        'getSomething',
+        async function() {
+          return 'something';
+        },
+        {
+          getInstanceId: exampleService => {
+            return `instance-id-${exampleService.myToken}`;
+          }
+        }
+      );
+
+      const exampleService = new ExampleService();
+      exampleService.getSomething();
+    });
+
     it('encodes colons (eww, gross!) in the key', function(done) {
       var wrapper = getWrapper(function(key) {
-        assert.equal(key, 'my-module:::look%3Aat%3Amy%3Acolons');
+        assert.equal(key, 'my-module::my-module-function:look%3Aat%3Amy%3Acolons');
         done();
       });
 

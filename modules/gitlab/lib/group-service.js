@@ -8,8 +8,9 @@ const getPublicTokenFromPool = require('./get-public-token-from-pool');
 
 function cacheFunction(name, obj) {
   return cacheWrapper(`GitLabGroupService:${name}`, obj, {
-    getInstanceId: function(gitLabGroupService) {
-      return gitLabGroupService.getAccessTokenPromise;
+    getInstanceId: async gitLabGroupService => {
+      const accessToken = await gitLabGroupService.getAccessTokenPromise;
+      return accessToken;
     }
   });
 }
