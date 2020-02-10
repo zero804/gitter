@@ -2,7 +2,8 @@ const { mapActions } = require('vuex');
 const raf = require('../../../utils/raf');
 
 const SWIPE_THRESHOLD = 5;
-const INTENT_THRESHOLD = 15;
+const SWIPE_INTENT_THRESHOLD = 60;
+const VERTICAL_SCROLL_INTENT_THRESHOLD = 15;
 
 const fingerSwipeMixin = {
   data() {
@@ -13,6 +14,8 @@ const fingerSwipeMixin = {
       leftMenuWidth: null,
       // Stores the X position where the touch starts
       touchStartX: null,
+      // Stores the Y position where the touch starts
+      touchStartY: null,
       // Stores the X position where the touch is currently at
       touchCurrentX: null,
       // Stores the X position where the touch begins to go in one direction.
@@ -22,6 +25,9 @@ const fingerSwipeMixin = {
       // We use this to determine the users intention and finish off their swipe
       // to completely expand/collapse the left-menu based on their direction intention
       directionStartX: null,
+      // When we detect vertical panning instead of horizontal, we cancel the whole touch/swipe
+      // because the user is probably scrolling instead of working the left-menu
+      currentTouchActionCancelled: false,
       transformCssValue: '',
       transitionCssValue: ''
     };
@@ -58,7 +64,7 @@ const fingerSwipeMixin = {
       if (
         this.directionStartX &&
         this.touchCurrentX &&
-        Math.abs(this.directionStartX - this.touchCurrentX) > INTENT_THRESHOLD
+        Math.abs(this.directionStartX - this.touchCurrentX) > SWIPE_INTENT_THRESHOLD
       ) {
         if (this.directionStartX - this.touchCurrentX > 0) {
           this.toggleLeftMenu(false);
@@ -72,11 +78,6 @@ const fingerSwipeMixin = {
       this.transformCssValue = '';
       this.transitionCssValue = '';
 
-      // Reset the touch details
-      this.touchStartX = null;
-      this.touchCurrentX = null;
-      this.directionStartX = null;
-
       // Clear up any enqueued animation since the touch is done, the final state is already set above
       if (this.rafTimeoutAnimateLeftMenuFingerSwipe) {
         raf.cancel(this.rafTimeoutAnimateLeftMenuFingerSwipe);
@@ -85,12 +86,26 @@ const fingerSwipeMixin = {
 
     touchstartCallback(e) {
       this.touchStartX = e.touches[0].clientX;
+      this.touchStartY = e.touches[0].clientY;
       this.directionStartX = this.touchStartX;
     },
 
     touchmoveCallback(e) {
+      if (this.currentTouchActionCancelled) {
+        return;
+      }
+
       const touchPreviousX = this.touchCurrentX;
       this.touchCurrentX = e.touches[0].clientX;
+      const touchCurrentY = e.touches[0].clientY;
+
+      // If someone is panning vertically, cancel this whole touch/swipe
+      // because the user is probably scrolling, not opening the left-menu
+      if (Math.abs(this.touchStartY - touchCurrentY) > VERTICAL_SCROLL_INTENT_THRESHOLD) {
+        this.animateStop();
+        this.currentTouchActionCancelled = true;
+        return;
+      }
 
       // If someone is changing direction in the middle of their touch/swipe
       // Record it so we know their new direction intention
@@ -110,6 +125,19 @@ const fingerSwipeMixin = {
 
         this.rafTimeoutAnimateLeftMenuFingerSwipe = raf(this.animateLeftMenuFingerSwipe);
       }
+    },
+
+    touchendCallback() {
+      if (!this.currentTouchActionCancelled) {
+        this.animateStop();
+      }
+
+      // Reset the touch details
+      this.touchStartX = null;
+      this.touchStartY = null;
+      this.touchCurrentX = null;
+      this.directionStartX = null;
+      this.currentTouchActionCancelled = false;
     }
   },
 
@@ -118,8 +146,8 @@ const fingerSwipeMixin = {
 
     document.addEventListener('touchstart', this.touchstartCallback, { passive: true });
     document.addEventListener('touchmove', this.touchmoveCallback, { passive: true });
-    document.addEventListener('touchcancel', this.animateStop);
-    document.addEventListener('touchend', this.animateStop);
+    document.addEventListener('touchcancel', this.touchendCallback);
+    document.addEventListener('touchend', this.touchendCallback);
   },
 
   beforeDestroy() {
@@ -127,8 +155,8 @@ const fingerSwipeMixin = {
       passive: true
     });
     document.removeEventListener('touchmove', this.touchmoveCallback, { passive: true });
-    document.removeEventListener('touchcancel', this.animateStop);
-    document.removeEventListener('touchend', this.animateStop);
+    document.removeEventListener('touchcancel', this.touchendCallback);
+    document.removeEventListener('touchend', this.touchendCallback);
   }
 };
 
