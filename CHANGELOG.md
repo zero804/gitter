@@ -4,11 +4,13 @@
  - Fix "Double-tap to edit a message on mobile not working", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1760
  - Add GitLab group(`GL_GROUP`) support to the permission settings view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1763
  - Add GitLab group(`GL_GROUP`) support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1751
+ - Left-menu mobile styles now trigger based on device width instead of `user-agent`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1762
 
 Developer facing:
 
  - Clarify why `clientEnv['anonymous']` is used in `context.getAccessToken()`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1764
  - Update link for Gitter spam runbook for abuse team, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1765
+
 
 # 20.16.1 - 2020-02-07
 
