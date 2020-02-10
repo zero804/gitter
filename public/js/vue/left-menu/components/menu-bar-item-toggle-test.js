@@ -2,8 +2,8 @@ const leftMenuConstants = require('../constants');
 const mount = require('../../__test__/vuex-mount');
 const { default: MenuBarItemToggle } = require('./menu-bar-item-toggle.vue');
 
-jest.mock('../mixins/check-mobile-breakpoint');
-const checkMobileBreakpoint = require('../mixins/check-mobile-breakpoint');
+jest.mock('../../../utils/is-mobile-breakpoint');
+const isMobileBreakpoint = require('../../../utils/is-mobile-breakpoint');
 
 describe('menu-bar-item-toggle', () => {
   it('toggle matches snapshot', () => {
@@ -15,7 +15,7 @@ describe('menu-bar-item-toggle', () => {
 
   it('On desktop, calls store action "toggleLeftMenuPinnedState" when item is clicked', () => {
     // Set as desktop
-    checkMobileBreakpoint.mockImplementation(() => false);
+    isMobileBreakpoint.mockImplementation(() => false);
 
     const beforePinnedState = false;
     const { wrapper, stubbedActions } = mount(
@@ -39,7 +39,7 @@ describe('menu-bar-item-toggle', () => {
 
   it('On mobile, calls store action "toggleLeftMenu" when item is clicked', () => {
     // Set as mobile
-    checkMobileBreakpoint.mockImplementation(() => true);
+    isMobileBreakpoint.mockImplementation(() => true);
 
     const beforeExpandedState = false;
     const { wrapper, stubbedActions } = mount(

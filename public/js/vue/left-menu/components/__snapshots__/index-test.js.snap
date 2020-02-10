@@ -301,73 +301,69 @@ exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
   </header>
    
   <section
-    class="body"
+    class="body nli-body"
   >
-    <div
-      class="nli-body"
+    <h2
+      class="nli-primary-heading"
     >
-      <h2
-        class="nli-primary-heading"
+      Where communities thrive
+    </h2>
+     
+    <br />
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
       >
-        Where communities thrive
-      </h2>
+        Join over 
+        <strong>
+          1.5M+ people
+        </strong>
+      </li>
        
-      <br />
-       
-      <ul
-        class="nli-info-block"
+      <li
+        class="nli-info-block-item"
       >
-        <li
-          class="nli-info-block-item"
-        >
-          Join over 
-          <strong>
-            1.5M+ people
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Join over 
-          <strong>
-            100K+ communities
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Free 
-          <strong>
-            without limits
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Create 
-          <strong>
-            your own community
-          </strong>
-        </li>
-      </ul>
+        Join over 
+        <strong>
+          100K+ communities
+        </strong>
+      </li>
        
-      <ul
-        class="nli-info-block"
+      <li
+        class="nli-info-block-item"
       >
-        <li
-          class="nli-info-block-item"
+        Free 
+        <strong>
+          without limits
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Create 
+        <strong>
+          your own community
+        </strong>
+      </li>
+    </ul>
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
+      >
+        <a
+          href="/explore"
         >
-          <a
-            href="/explore"
-          >
-            Explore more communities
-          </a>
-        </li>
-      </ul>
-    </div>
+          Explore more communities
+        </a>
+      </li>
+    </ul>
   </section>
 </div>
 `;
@@ -427,73 +423,69 @@ exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
   </header>
    
   <section
-    class="body"
+    class="body nli-body"
   >
-    <div
-      class="nli-body"
+    <h2
+      class="nli-primary-heading"
     >
-      <h2
-        class="nli-primary-heading"
+      Where communities thrive
+    </h2>
+     
+    <br />
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
       >
-        Where communities thrive
-      </h2>
+        Join over 
+        <strong>
+          1.5M+ people
+        </strong>
+      </li>
        
-      <br />
-       
-      <ul
-        class="nli-info-block"
+      <li
+        class="nli-info-block-item"
       >
-        <li
-          class="nli-info-block-item"
-        >
-          Join over 
-          <strong>
-            1.5M+ people
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Join over 
-          <strong>
-            100K+ communities
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Free 
-          <strong>
-            without limits
-          </strong>
-        </li>
-         
-        <li
-          class="nli-info-block-item"
-        >
-          Create 
-          <strong>
-            your own community
-          </strong>
-        </li>
-      </ul>
+        Join over 
+        <strong>
+          100K+ communities
+        </strong>
+      </li>
        
-      <ul
-        class="nli-info-block"
+      <li
+        class="nli-info-block-item"
       >
-        <li
-          class="nli-info-block-item"
+        Free 
+        <strong>
+          without limits
+        </strong>
+      </li>
+       
+      <li
+        class="nli-info-block-item"
+      >
+        Create 
+        <strong>
+          your own community
+        </strong>
+      </li>
+    </ul>
+     
+    <ul
+      class="nli-info-block"
+    >
+      <li
+        class="nli-info-block-item"
+      >
+        <a
+          href="/explore"
         >
-          <a
-            href="/explore"
-          >
-            Explore more communities
-          </a>
-        </li>
-      </ul>
-    </div>
+          Explore more communities
+        </a>
+      </li>
+    </ul>
   </section>
 </div>
 `;

@@ -118,23 +118,21 @@ export default {
         </template>
       </section>
     </section>
-    <section v-else class="body">
-      <div class="nli-body">
-        <h2 class="nli-primary-heading">Where communities thrive</h2>
+    <section v-else class="body nli-body">
+      <h2 class="nli-primary-heading">Where communities thrive</h2>
 
-        <br />
+      <br />
 
-        <ul class="nli-info-block">
-          <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
-          <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
-          <li class="nli-info-block-item">Free <strong>without limits</strong></li>
-          <li class="nli-info-block-item">Create <strong>your own community</strong></li>
-        </ul>
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
+        <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
+        <li class="nli-info-block-item">Free <strong>without limits</strong></li>
+        <li class="nli-info-block-item">Create <strong>your own community</strong></li>
+      </ul>
 
-        <ul class="nli-info-block">
-          <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
-        </ul>
-      </div>
+      <ul class="nli-info-block">
+        <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
+      </ul>
     </section>
   </div>
 </template>
@@ -162,7 +160,7 @@ export default {
     box-sizing: inherit;
   }
 
-  @media (max-width: @left-menu-mobile-breakpoint) {
+  @media @mobile-screen-breakpoint {
     & {
       position: absolute;
 
@@ -185,7 +183,7 @@ export default {
 
   transition: transform 0.1s ease;
 
-  @media not all and (max-width: @left-menu-mobile-breakpoint) {
+  @media @large-screen-breakpoint {
     // .logged-in is here so the left-menu header stays in one piece regardless of pinned
     // The NLI left-menu does not have a pinned state, just mobile and not mobile
     .root:not(.pinned).logged-in & {
@@ -293,6 +291,7 @@ export default {
 
 .nli-body {
   flex: 1;
+  display: block;
   width: 34rem;
   height: 100%;
   padding: 20px;

@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 import MenuBarItem from './menu-bar-item.vue';
-import checkMobileBreakpoint from '../mixins/check-mobile-breakpoint';
+import isMobileBreakpoint from '../../../utils/is-mobile-breakpoint';
 
 export default {
   name: 'MenuBarItemToggle',
@@ -15,7 +15,7 @@ export default {
     ...mapActions(['toggleLeftMenuPinnedState', 'toggleLeftMenu']),
 
     onClick() {
-      const isMobile = checkMobileBreakpoint();
+      const isMobile = isMobileBreakpoint();
       // Always unpinned on mobile, so you can only expand/collapse
       if (isMobile) {
         this.toggleLeftMenu(!this.leftMenuExpandedState);
