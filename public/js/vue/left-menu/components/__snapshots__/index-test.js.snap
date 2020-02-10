@@ -2,7 +2,7 @@
 
 exports[`left-menu index all state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -84,7 +84,7 @@ exports[`left-menu index all state matches snapshot 1`] = `
 
 exports[`left-menu index dark-theme matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in dark-theme"
+  class="root js-left-menu-root logged-in dark-theme pinned"
 >
   <header
     class="header"
@@ -166,7 +166,7 @@ exports[`left-menu index dark-theme matches snapshot 1`] = `
 
 exports[`left-menu index mobile mobile matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root mobile logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -248,7 +248,7 @@ exports[`left-menu index mobile mobile matches snapshot 1`] = `
 
 exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root"
+  class="root js-left-menu-root pinned"
 >
   <header
     class="header"
@@ -301,7 +301,7 @@ exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
   </header>
    
   <section
-    class="nli-body"
+    class="body nli-body"
   >
     <h2
       class="nli-primary-heading"
@@ -370,7 +370,7 @@ exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
 
 exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root mobile"
+  class="root js-left-menu-root pinned"
 >
   <header
     class="header"
@@ -423,7 +423,7 @@ exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
   </header>
    
   <section
-    class="nli-body"
+    class="body nli-body"
   >
     <h2
       class="nli-primary-heading"
@@ -492,7 +492,7 @@ exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
 
 exports[`left-menu index people state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
@@ -574,7 +574,7 @@ exports[`left-menu index people state matches snapshot 1`] = `
 
 exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
 <div
-  class="root js-left-menu-root logged-in unpinned"
+  class="root js-left-menu-root logged-in"
 >
   <header
     class="header"
@@ -656,7 +656,7 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
 
 exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
 <div
-  class="root js-left-menu-root logged-in unpinned expanded"
+  class="root js-left-menu-root logged-in expanded"
 >
   <header
     class="header"
@@ -738,7 +738,7 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
 
 exports[`left-menu index search state matches snapshot 1`] = `
 <div
-  class="root js-left-menu-root logged-in"
+  class="root js-left-menu-root logged-in pinned"
 >
   <header
     class="header"
