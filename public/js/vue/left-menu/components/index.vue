@@ -19,7 +19,6 @@ export default {
   iconLogoText,
   computed: {
     ...mapState([
-      'isMobile',
       'isLoggedIn',
       'darkTheme',
       'leftMenuState',
@@ -74,10 +73,9 @@ export default {
     ref="root"
     class="root js-left-menu-root"
     :class="{
-      mobile: isMobile,
       'logged-in': isLoggedIn,
       'dark-theme': darkTheme,
-      unpinned: !isPinned,
+      pinned: isPinned,
       expanded: isExpanded
     }"
     :style="{
@@ -120,7 +118,7 @@ export default {
         </template>
       </section>
     </section>
-    <section v-else class="nli-body">
+    <section v-else class="body nli-body">
       <h2 class="nli-primary-heading">Where communities thrive</h2>
 
       <br />
@@ -162,18 +160,16 @@ export default {
     box-sizing: inherit;
   }
 
-  &:not(.logged-in).mobile {
-    display: none;
-  }
+  @media @mobile-screen-breakpoint {
+    & {
+      position: absolute;
 
-  &.unpinned.mobile {
-    position: absolute;
+      transform: translateX(-100%);
+    }
 
-    transform: translateX(-100%);
-  }
-
-  &.unpinned.expanded.mobile {
-    transform: translateX(0%);
+    &.expanded {
+      transform: translateX(0%);
+    }
   }
 }
 
@@ -187,15 +183,19 @@ export default {
 
   transition: transform 0.1s ease;
 
-  .unpinned:not(.mobile) & {
-    position: absolute;
-    left: 7.5rem;
+  @media @large-screen-breakpoint {
+    // .logged-in is here so the left-menu header stays in one piece regardless of pinned
+    // The NLI left-menu does not have a pinned state, just mobile and not mobile
+    .root:not(.pinned).logged-in & {
+      position: absolute;
+      left: 7.5rem;
 
-    transform: translateX(-100%);
-  }
+      transform: translateX(-100%);
+    }
 
-  .unpinned.expanded:not(.mobile) & {
-    transform: translateX(0%);
+    .root.expanded:not(.pinned).logged-in & {
+      transform: translateX(0%);
+    }
   }
 }
 
@@ -291,7 +291,9 @@ export default {
 
 .nli-body {
   flex: 1;
+  display: block;
   width: 34rem;
+  height: 100%;
   padding: 20px;
 
   background-color: @header-base-bg-color;
