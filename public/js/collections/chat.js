@@ -159,7 +159,13 @@ var ChatCollection = LiveCollection.extend({
   },
 
   getSnapshotExtras: function() {
-    return { lookups: ['user'] };
+    const userLookup = { lookups: ['user'] };
+    const lastChat = this.length > 0 && this.at(this.length - 1);
+    if (lastChat) {
+      return { ...userLookup, afterId: lastChat.id };
+    } else {
+      return userLookup;
+    }
   },
 
   parse: function(collection) {

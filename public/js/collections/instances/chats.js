@@ -5,7 +5,10 @@ var context = require('gitter-web-client-context');
 var unreadItemsClient = require('../../components/unread-items-client');
 var errorHandle = require('../../utils/live-collection-error-handle');
 
-var chatCollection = new chatModels.ChatCollection(null, { listen: true });
+const chats = window.troupeContext.chats
+  ? window.troupeContext.chats.map(ch => new chatModels.ChatModel(ch, { parse: true }))
+  : null;
+var chatCollection = new chatModels.ChatCollection(chats, { listen: true });
 
 chatCollection.on('error', errorHandle.bind(null, 'chat-collection'));
 

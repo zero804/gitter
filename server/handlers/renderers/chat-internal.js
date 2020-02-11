@@ -113,6 +113,7 @@ async function renderChat(req, res, next, options) {
   if (options.filterChats) {
     chatsWithBurst = options.filterChats(chatsWithBurst);
   }
+  troupeContext.chats = chatsWithBurst;
 
   /* This is less than ideal way of checking if the user is the admin */
   var isAdmin =
