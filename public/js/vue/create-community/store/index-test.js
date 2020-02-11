@@ -411,11 +411,15 @@ describe('thread message feed store', () => {
     });
 
     describe('submitCommunity', () => {
+      beforeEach(() => {
+        window.location.assign = jest.fn();
+      });
+
       it('plain old community submit', async () => {
         apiClient.post.mockResolvedValue({
           defaultRoom: {
-            name: 'community',
-            uri: 'community'
+            name: 'foo-bar-baz/community',
+            uri: 'foo-bar-baz/community'
           }
         });
 
@@ -446,21 +450,16 @@ describe('thread message feed store', () => {
           allowTweeting: true
         });
 
-        expect(appEvents.trigger.mock.calls[0]).toEqual([
-          'navigation',
-          '/community',
-          'chat',
-          'community'
-        ]);
+        expect(window.location.assign).toHaveBeenCalledWith('/foo-bar-baz/community');
 
-        expect(appEvents.trigger.mock.calls[1]).toEqual(['destroy-create-community-view']);
+        expect(appEvents.trigger.mock.calls[0]).toEqual(['destroy-create-community-view']);
       });
 
       it('GitLab group based community submit', async () => {
         apiClient.post.mockResolvedValue({
           defaultRoom: {
-            name: 'community',
-            uri: 'community'
+            name: 'foo-bar-baz/community',
+            uri: 'foo-bar-baz/community'
           }
         });
 
@@ -494,14 +493,9 @@ describe('thread message feed store', () => {
           allowTweeting: true
         });
 
-        expect(appEvents.trigger.mock.calls[0]).toEqual([
-          'navigation',
-          '/community',
-          'chat',
-          'community'
-        ]);
+        expect(window.location.assign).toHaveBeenCalledWith('/foo-bar-baz/community');
 
-        expect(appEvents.trigger.mock.calls[1]).toEqual(['destroy-create-community-view']);
+        expect(appEvents.trigger.mock.calls[0]).toEqual(['destroy-create-community-view']);
       });
 
       it('sets error when submit fails', async () => {

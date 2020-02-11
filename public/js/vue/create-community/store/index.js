@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import debugProxy from 'debug-proxy';
 import VuexApiRequest from '../../store/vuex-api-request';
 import apiClient from '../../../components/api-client';
 import log from '../../../utils/log';
@@ -12,6 +13,8 @@ import {
   CREATE_COMMUNITY_ENTITY_TYPE_TAB_ORGS_STATE,
   slugAvailabilityStatusConstants
 } from '../constants';
+
+const debug = debugProxy('app:create-community:store');
 
 // When testing, disable the debounce so we can test without any weird flakiness
 function conditionalDebounce(cb, ...args) {
@@ -269,11 +272,11 @@ export default {
           .then(res => {
             commit(communitySubmitVuexRequest.successType);
 
-            const defaultRoomName = res && res.defaultRoom && res.defaultRoom.name;
             const defaultRoomUri = res && res.defaultRoom && res.defaultRoom.uri;
 
             // Move to the default room
-            appEvents.trigger('navigation', '/' + defaultRoomUri, 'chat', defaultRoomName);
+            debug(`Moving to ${defaultRoomUri}`);
+            window.location.assign(`/${defaultRoomUri}`);
 
             // Then destroy the community create view
             appEvents.trigger('destroy-create-community-view');
