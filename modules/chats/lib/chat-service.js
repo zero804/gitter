@@ -441,8 +441,8 @@ async function findChatMessagesInRange(
     q = q.where('_id').lte(new ObjectID(beforeInclId)); // Note: less than *or equal to*
   }
   if (afterId) addAfterFilter(q, afterId);
+  // inline-threads-for-mobile-embedded
   if (!includeThreads) {
-    // inline-threads-for-mobile-embedded
     q.where('parentId').exists(false);
   }
   if (useHints) {

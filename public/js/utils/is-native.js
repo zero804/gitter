@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Tests whether the user agent contains "gitter".
+ * Tests whether the code runs in native **Desktop** app.
  */
 module.exports = userAgentString => {
   const stringToTest =
