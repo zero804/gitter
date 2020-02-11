@@ -29,7 +29,7 @@ describe('chat-snapshot-options', function() {
     assert.deepEqual(result, {
       limit: 50,
       aroundId: undefined,
-      includeThreads: undefined
+      includeThreads: false
     });
   });
 
