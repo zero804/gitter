@@ -47,7 +47,7 @@ describe('StepMain index', () => {
       wrapper.find({ ref: 'communityNameInput' }).element.value = 'hello';
       wrapper.find({ ref: 'communityNameInput' }).trigger('input');
 
-      expect(stubbedActions.createCommunity.updateCommunityName).toHaveBeenCalledWith(
+      expect(stubbedActions.createCommunity.setCommunityName).toHaveBeenCalledWith(
         expect.anything(),
         'hello',
         undefined
@@ -59,7 +59,7 @@ describe('StepMain index', () => {
       wrapper.find({ ref: 'communitySlugInput' }).element.value = 'some-slug';
       wrapper.find({ ref: 'communitySlugInput' }).trigger('input');
 
-      expect(stubbedActions.createCommunity.updateCommunitySlug).toHaveBeenCalledWith(
+      expect(stubbedActions.createCommunity.setAndValidateCommunitySlug).toHaveBeenCalledWith(
         expect.anything(),
         'some-slug',
         undefined

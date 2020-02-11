@@ -29,7 +29,7 @@ export default {
         return this.communityName;
       },
       set(newCommunityName) {
-        this.updateCommunityName(newCommunityName);
+        this.setCommunityName(newCommunityName);
       }
     },
     communitySlugModel: {
@@ -37,7 +37,7 @@ export default {
         return this.communitySlug;
       },
       set(newCommunitySlug) {
-        this.updateCommunitySlug(newCommunitySlug);
+        this.setAndValidateCommunitySlug(newCommunitySlug);
       }
     },
     allowBadgerModel: {
@@ -71,8 +71,8 @@ export default {
   methods: {
     ...mapActions({
       moveToStep: 'createCommunity/moveToStep',
-      updateCommunityName: 'createCommunity/updateCommunityName',
-      updateCommunitySlug: 'createCommunity/updateCommunitySlug',
+      setCommunityName: 'createCommunity/setCommunityName',
+      setAndValidateCommunitySlug: 'createCommunity/setAndValidateCommunitySlug',
       setAllowBadger: 'createCommunity/setAllowBadger',
       submitCommunity: 'createCommunity/submitCommunity'
     }),

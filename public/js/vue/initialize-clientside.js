@@ -3,7 +3,6 @@
 const store = require('./store/store-instance');
 const renderLeftMenu = require('./left-menu').default;
 const renderThreadMessageFeed = require('./thread-message-feed').default;
-//const renderCreateCommunityView = require('./create-community').default;
 
 const leftMenuRootEl = document.querySelector('.js-left-menu-root');
 if (leftMenuRootEl) {

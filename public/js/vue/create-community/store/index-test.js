@@ -42,10 +42,10 @@ describe('thread message feed store', () => {
       expect(state.currentStep).toEqual(CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITLAB);
     });
 
-    it('UPDATE_COMMUNITY_NAME sets community name', () => {
+    it('SET_COMMUNITY_NAME sets community name', () => {
       const state = {};
       const newName = 'foobarbaz';
-      mutations[types.UPDATE_COMMUNITY_NAME](state, newName);
+      mutations[types.SET_COMMUNITY_NAME](state, newName);
       expect(state.communityName).toEqual(newName);
     });
 
@@ -56,10 +56,10 @@ describe('thread message feed store', () => {
       expect(state.communityNameError).toEqual(errorString);
     });
 
-    it('UPDATE_COMMUNITY_SLUG sets community slug', () => {
+    it('SET_COMMUNITY_SLUG sets community slug', () => {
       const state = {};
       const newSlug = 'foo-bar-baz';
-      mutations[types.UPDATE_COMMUNITY_SLUG](state, newSlug);
+      mutations[types.SET_COMMUNITY_SLUG](state, newSlug);
       expect(state.communitySlug).toEqual(newSlug);
     });
 
@@ -169,37 +169,34 @@ describe('thread message feed store', () => {
       );
     });
 
-    describe('updateCommunityName', () => {
+    describe('setCommunityName', () => {
       it('sets new community name and auto slug', async () => {
         await testAction(
-          actions.updateCommunityName,
+          actions.setCommunityName,
           'foo bar baz',
           { communityName: '', communitySlug: '' },
-          [
-            { type: types.UPDATE_COMMUNITY_NAME, payload: 'foo bar baz' },
-            { type: types.UPDATE_COMMUNITY_SLUG, payload: 'foo-bar-baz' }
-          ],
-          [{ type: 'checkSlugAvailability' }]
+          [{ type: types.SET_COMMUNITY_NAME, payload: 'foo bar baz' }],
+          [{ type: 'setAndValidateCommunitySlug', payload: 'foo-bar-baz' }]
         );
       });
 
       it(`does not overwrite slug when it doesn't match the slugified name (user input a custom slug)`, async () => {
         await testAction(
-          actions.updateCommunityName,
+          actions.setCommunityName,
           'foo bar baz',
           { communityName: '', communitySlug: 'my-custom-slug' },
-          [{ type: types.UPDATE_COMMUNITY_NAME, payload: 'foo bar baz' }],
+          [{ type: types.SET_COMMUNITY_NAME, payload: 'foo bar baz' }],
           []
         );
       });
     });
 
-    it('updateCommunitySlug sets the slug', async () => {
+    it('setAndValidateCommunitySlug sets the slug', async () => {
       await testAction(
-        actions.updateCommunitySlug,
+        actions.setAndValidateCommunitySlug,
         'foo-bar-baz',
         {},
-        [{ type: types.UPDATE_COMMUNITY_SLUG, payload: 'foo-bar-baz' }],
+        [{ type: types.SET_COMMUNITY_SLUG, payload: 'foo-bar-baz' }],
         [{ type: 'checkSlugAvailability' }]
       );
     });
@@ -214,10 +211,9 @@ describe('thread message feed store', () => {
           {},
           [
             { type: types.SET_SELECTED_BACKING_ENTITY, payload: gitlabGroup },
-            { type: types.UPDATE_COMMUNITY_NAME, payload: 'gitlab-org' },
-            { type: types.UPDATE_COMMUNITY_SLUG, payload: 'gitlab-org' }
+            { type: types.SET_COMMUNITY_NAME, payload: 'gitlab-org' }
           ],
-          [{ type: 'checkSlugAvailability' }]
+          [{ type: 'setAndValidateCommunitySlug', payload: 'gitlab-org' }]
         );
       });
 
@@ -230,10 +226,9 @@ describe('thread message feed store', () => {
           {},
           [
             { type: types.SET_SELECTED_BACKING_ENTITY, payload: githubRepo },
-            { type: types.UPDATE_COMMUNITY_NAME, payload: 'gitter' },
-            { type: types.UPDATE_COMMUNITY_SLUG, payload: 'gitter' }
+            { type: types.SET_COMMUNITY_NAME, payload: 'gitter' }
           ],
-          [{ type: 'checkSlugAvailability' }]
+          [{ type: 'setAndValidateCommunitySlug', payload: 'gitter' }]
         );
       });
 

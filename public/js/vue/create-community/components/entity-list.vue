@@ -42,13 +42,16 @@ export default {
       moveToStep: 'createCommunity/moveToStep',
       setSelectedBackingEntity: 'createCommunity/setSelectedBackingEntity'
     }),
-    onEntityClicked(entity) {
-      // If it is already selected, deselect it
-      if (
+    isEntitySelected(entity) {
+      return (
         this.selectedBackingEntity &&
         entity.type === this.selectedBackingEntity.type &&
         entity.id === this.selectedBackingEntity.id
-      ) {
+      );
+    },
+    onEntityClicked(entity) {
+      // If it is already selected, deselect it
+      if (this.isEntitySelected(entity)) {
         this.setSelectedBackingEntity(null);
       } else {
         this.setSelectedBackingEntity(entity);
@@ -73,10 +76,7 @@ export default {
         :href="item.absoluteUri"
         class="entity-list-item-link"
         :class="{
-          active:
-            selectedBackingEntity &&
-            item.type === selectedBackingEntity.type &&
-            item.id === selectedBackingEntity.id
+          active: isEntitySelected(item)
         }"
         data-disable-routing="1"
         @click.prevent="onEntityClicked(item)"
