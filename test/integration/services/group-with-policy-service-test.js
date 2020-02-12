@@ -20,10 +20,20 @@ describe('group-with-policy-service #slow', function() {
   let group2WithPolicyService;
   let group3WithPolicyService;
 
+  fixtureLoader.ensureIntegrationEnvironment(
+    '#integrationUser1',
+    'GITTER_INTEGRATION_ORG_ID',
+    'GITTER_INTEGRATION_ORG',
+    'GITTER_INTEGRATION_REPO_ID',
+    'GITTER_INTEGRATION_REPO',
+    'GITTER_INTEGRATION_USER_ID',
+    'GITTER_INTEGRATION_USERNAME',
+    'GITTER_INTEGRATION_COMMUNITY',
+    'GITTER_INTEGRATION_ROOM'
+  );
+
   const linkPath =
     fixtureLoader.GITTER_INTEGRATION_USERNAME + '/' + fixtureLoader.GITTER_INTEGRATION_REPO;
-
-  fixtureLoader.ensureIntegrationEnvironment('#integrationUser1', 'GITTER_INTEGRATION_ORG');
 
   const fixture = fixtureLoader.setupEach({
     deleteDocuments: {
