@@ -205,9 +205,15 @@ export default {
     _checkSlugAvailabilityDebounced: conditionalDebounce(async ({ commit, state, dispatch }) => {
       let communitySlugAvailabilityStatus;
       try {
-        const res = await apiClient.priv.get('/check-group-uri', {
-          uri: state.communitySlug
-        });
+        const res = await apiClient.priv.get(
+          '/check-group-uri',
+          {
+            uri: state.communitySlug
+          },
+          {
+            global: false
+          }
+        );
 
         // Check to make sure the type matches in the response to what we are trying to create
         //

@@ -362,9 +362,15 @@ describe('thread message feed store', () => {
           [{ type: 'validateCommunity' }]
         );
 
-        expect(apiClient.priv.get).toHaveBeenCalledWith('/check-group-uri', {
-          uri: 'foo-bar-baz'
-        });
+        expect(apiClient.priv.get).toHaveBeenCalledWith(
+          '/check-group-uri',
+          {
+            uri: 'foo-bar-baz'
+          },
+          {
+            global: false
+          }
+        );
       });
 
       it('sets GITHUB_CLASH when 403 error response', async () => {
@@ -385,9 +391,15 @@ describe('thread message feed store', () => {
           [{ type: 'validateCommunity' }]
         );
 
-        expect(apiClient.priv.get).toHaveBeenCalledWith('/check-group-uri', {
-          uri: 'foo-bar-baz'
-        });
+        expect(apiClient.priv.get).toHaveBeenCalledWith(
+          '/check-group-uri',
+          {
+            uri: 'foo-bar-baz'
+          },
+          {
+            global: false
+          }
+        );
       });
     });
 
