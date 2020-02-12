@@ -10,6 +10,7 @@ Developer facing:
 
  - Clarify why `clientEnv['anonymous']` is used in `context.getAccessToken()`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1764
  - Update link for Gitter spam runbook for abuse team, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1765
+ - Ensure fixtures used in group with policy service test, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1769
 
 
 # 20.16.1 - 2020-02-07
