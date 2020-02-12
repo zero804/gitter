@@ -27,11 +27,20 @@
 
 .threaded-conversation-chat-item {
   display: none;
-}
 
-// inline-threads-for-mobile-embedded
-.mobile-embedded .threaded-conversation-chat-item {
-  display: block;
+  // inline-threads-for-mobile-embedded
+  .mobile-embedded {
+    display: block;
+  }
+
+  // If the oldest or newest message(first most or last most in the chat-container) is a child message,
+  // we want to make sure scrolling to it, still triggers the infinite scrolling.
+  // So we make it only barely visible
+  &:first-child, &:last-child {
+    display: block;
+    height: 1px;
+    opacity: 0;
+  }
 }
 
 .chat-item {

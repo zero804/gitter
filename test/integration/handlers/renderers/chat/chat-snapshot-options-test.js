@@ -28,8 +28,7 @@ describe('chat-snapshot-options', function() {
     const result = await getChatSnapshotOptions('user-id-1', 'troupe-id-1', { query: {} }, false);
     assert.deepEqual(result, {
       limit: 50,
-      aroundId: undefined,
-      includeThreads: false
+      aroundId: undefined
     });
   });
 

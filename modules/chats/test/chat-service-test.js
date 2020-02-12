@@ -410,8 +410,7 @@ describe('chatService', function() {
 
     it('should add threaded messages to the results when includeThreads is used', async () => {
       const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
-        afterId: chat3.id,
-        includeThreads: true
+        afterId: chat3.id
       });
       assert.deepEqual(chats.map(chat => chat.id), [childThreadMessage1.id]);
     });

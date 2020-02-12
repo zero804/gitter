@@ -10,7 +10,6 @@ var cocktail = require('backbone.cocktail');
 var log = require('../utils/log');
 var LiveCollection = require('gitter-realtime-client').LiveCollection;
 var realtime = require('../components/realtime');
-const isMobileEmbedded = require('../utils/is-mobile-embedded');
 var SyncMixin = require('./sync-mixin');
 var lookupParser = require('gitter-web-shared/lookup-parser');
 
@@ -156,13 +155,11 @@ var ChatCollection = LiveCollection.extend({
   },
 
   getQuery: function() {
-    // includeThreads is for inline-threads-for-mobile-embedded
-    return { lookups: ['user'], includeThreads: isMobileEmbedded() };
+    return { lookups: ['user'] };
   },
 
   getSnapshotExtras: function() {
-    // includeThreads is for inline-threads-for-mobile-embedded
-    return { lookups: ['user'], includeThreads: isMobileEmbedded() };
+    return { lookups: ['user'] };
   },
 
   parse: function(collection) {

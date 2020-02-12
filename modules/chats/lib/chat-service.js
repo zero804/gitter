@@ -421,7 +421,7 @@ async function findThreadChatMessages(troupeId, parentId, { beforeId, afterId, l
 
 async function findChatMessagesInRange(
   troupeId,
-  { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip, includeThreads } = {}
+  { beforeId, beforeInclId, afterId, sort, readPreference, limit, skip } = {}
 ) {
   const validatedSkip = skip || 0;
 
@@ -441,10 +441,7 @@ async function findChatMessagesInRange(
     q = q.where('_id').lte(new ObjectID(beforeInclId)); // Note: less than *or equal to*
   }
   if (afterId) addAfterFilter(q, afterId);
-  // inline-threads-for-mobile-embedded
-  if (!includeThreads) {
-    q.where('parentId').exists(false);
-  }
+
   if (useHints) {
     q.hint({ toTroupeId: 1, sent: -1 });
   }
@@ -486,7 +483,7 @@ async function findChatMessagesInRange(
     });
 }
 
-async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit, includeThreads }) {
+async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit }) {
   const message = await findByIdLean(markerId || aroundId);
 
   // if the message doesn't exist, just return last 50 messages in the room
@@ -501,12 +498,8 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit, i
     .where('sent')
     .lte(sentBefore(searchMessageId))
     .where('_id')
-    .lte(searchMessageId);
-  if (!includeThreads) {
-    // inline-threads-for-mobile-embedded
-    q1.where('parentId').exists(false);
-  }
-  q1.sort({ sent: 'desc' })
+    .lte(searchMessageId)
+    .sort({ sent: 'desc' })
     .lean()
     .limit(halfLimit);
 
@@ -514,12 +507,8 @@ async function findChatMessagesAroundId(troupeId, markerId, { aroundId, limit, i
     .where('sent')
     .gte(sentAfter(searchMessageId))
     .where('_id')
-    .gt(searchMessageId);
-  if (!includeThreads) {
-    // inline-threads-for-mobile-embedded
-    q2.where('parentId').exists(false);
-  }
-  q2.sort({ sent: 'asc' })
+    .gt(searchMessageId)
+    .sort({ sent: 'asc' })
     .lean()
     .limit(halfLimit);
 

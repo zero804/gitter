@@ -85,25 +85,10 @@ describe('chat-api', function() {
         'anonymous users should have all messages read'
       );
     });
-    it('GET /v1/rooms/:roomId/chatMessages - do not include chat messages', async () => {
+    it('GET /v1/rooms/:roomId/chatMessages - include thread messages by default', async () => {
       assert(fixture.message4.parentId); // child message has to exist for the test
       const response = await request(app)
-        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages?includeThreads=false')
-        .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
-        .expect(200);
-      const messages = response.body;
-      assert(Array.isArray(messages), 'response body needs to be an array of messages');
-      assert(messages.length > 0, 'API should return some messages for anonymous token');
-      assert.equal(
-        messages.find(m => m.parentId),
-        undefined,
-        'no child messages should be returned'
-      );
-    });
-    it('GET /v1/rooms/:roomId/chatMessages - include chat messages', async () => {
-      assert(fixture.message4.parentId); // child message has to exist for the test
-      const response = await request(app)
-        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages?includeThreads=true')
+        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages')
         .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
         .expect(200);
       const messages = response.body;

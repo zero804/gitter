@@ -205,7 +205,7 @@ function populateTroupe({ userId, match, snapshot = false }) {
 function populateSubTroupeCollection({
   userId,
   match,
-  snapshot: { limit, lean, lookups, beforeInclId, includeThreads } = {}
+  snapshot: { limit, lean, lookups, beforeInclId } = {}
 }) {
   var troupeId = match[1];
   var collection = match[2];
@@ -220,8 +220,7 @@ function populateSubTroupeCollection({
           limit,
           lean,
           lookups,
-          beforeInclId,
-          includeThreads
+          beforeInclId
         })
         .then(dataToSnapshot('room.chatMessages'));
 
