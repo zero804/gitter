@@ -10,25 +10,6 @@
    viewBox="0 0 12 12"
    height="12px"
    width="12px">
-  <metadata
-     id="metadata161">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>corner-down-right</dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs159" />
-  <!-- Generator: Sketch 57 (83077) - https://sketch.com -->
-  <title
-     id="title145">corner-down-right</title>
-  <desc
-     id="desc147">Created with Sketch.</desc>
   <g
      transform="matrix(0,-1,-1,0,12,12)"
      stroke-linejoin="round"
