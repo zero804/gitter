@@ -5,6 +5,7 @@
  - Add GitLab group(`GL_GROUP`) support to the permission settings view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1763
  - Add GitLab group(`GL_GROUP`) support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1751
  - Left-menu mobile styles now trigger based on device width instead of `user-agent`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1762
+ - Include child thread messages in main message feed on mobile, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1728
 
 Developer facing:
 
