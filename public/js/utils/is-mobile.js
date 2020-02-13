@@ -1,11 +1,12 @@
 'use strict';
 
-var memo;
+let bodyHasMobileClass;
 
-module.exports = function() {
-  if (typeof memo === 'undefined') {
-    memo = document.body.classList.contains('mobile');
+/** Returns true if the page is showing mobile template (.mobile CSS class on body) */
+module.exports = () => {
+  if (bodyHasMobileClass === undefined) {
+    bodyHasMobileClass = document.body.classList.contains('mobile');
   }
 
-  return memo;
+  return bodyHasMobileClass;
 };

@@ -60,6 +60,13 @@ describe('chat-api', function() {
       text: 'HELLO2',
       sent: new Date(),
       pub: 1
+    },
+    message4: {
+      user: 'user1',
+      troupe: 'troupe1',
+      text: 'hello from the child',
+      parent: 'message1',
+      pub: 1
     }
   });
 
@@ -76,6 +83,36 @@ describe('chat-api', function() {
         messages.find(m => m.unread),
         undefined,
         'anonymous users should have all messages read'
+      );
+    });
+    it('GET /v1/rooms/:roomId/chatMessages - do not include chat messages', async () => {
+      assert(fixture.message4.parentId); // child message has to exist for the test
+      const response = await request(app)
+        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages?includeThreads=false')
+        .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
+        .expect(200);
+      const messages = response.body;
+      assert(Array.isArray(messages), 'response body needs to be an array of messages');
+      assert(messages.length > 0, 'API should return some messages for anonymous token');
+      assert.equal(
+        messages.find(m => m.parentId),
+        undefined,
+        'no child messages should be returned'
+      );
+    });
+    it('GET /v1/rooms/:roomId/chatMessages - include chat messages', async () => {
+      assert(fixture.message4.parentId); // child message has to exist for the test
+      const response = await request(app)
+        .get('/v1/rooms/' + fixture.troupe1.id + '/chatMessages?includeThreads=true')
+        .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
+        .expect(200);
+      const messages = response.body;
+      assert(Array.isArray(messages), 'response body needs to be an array of messages');
+      assert(messages.length > 0, 'API should return some messages for anonymous token');
+      assert.notEqual(
+        messages.find(m => m.id === fixture.message4.id),
+        undefined,
+        'child messages should be included'
       );
     });
   });

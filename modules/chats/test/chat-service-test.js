@@ -407,6 +407,14 @@ describe('chatService', function() {
       assert.deepEqual(chats.map(chat => chat.id), [chat1.id, chat2.id, chat3.id]);
       getFirstUnreadItemStub.restore();
     });
+
+    it('should add threaded messages to the results when includeThreads is used', async () => {
+      const chats = await chatService.findChatMessagesForTroupe(fixture.troupe1.id, {
+        afterId: chat3.id,
+        includeThreads: true
+      });
+      assert.deepEqual(chats.map(chat => chat.id), [childThreadMessage1.id]);
+    });
   });
 
   describe('getRecentPublicChats #slow', function() {

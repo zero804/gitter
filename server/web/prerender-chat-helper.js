@@ -83,7 +83,7 @@ module.exports = exports = function(model, params) {
 
   var unreadClass = model.unread ? 'unread' : 'read';
   var burstClass = model.burstStart ? 'burstStart' : 'burstContinued';
-  const threadedConversationClass = model.parentId ? 'hidden-threaded-conversation-chat-item' : '';
+  const threadedConversationClass = model.parentId ? 'threaded-conversation-chat-item' : '';
 
   return chatWrapper({
     id: model.id,
