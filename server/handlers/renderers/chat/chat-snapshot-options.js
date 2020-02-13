@@ -19,7 +19,9 @@ const getChatSnapshotOptions = async (userId, troupeId, req) => {
 
   return {
     limit,
-    aroundId: getPermalinkMessageId(req)
+    aroundId: getPermalinkMessageId(req),
+    // inline-threads-for-mobile-embedded
+    includeThreads: false // the server side page rendering is never used for native mobile clients
   };
 };
 

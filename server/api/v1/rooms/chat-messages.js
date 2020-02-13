@@ -35,8 +35,9 @@ module.exports = {
     var q = req.query.q;
     var userId = req.user && req.user.id;
     var troupeId = req.params.troupeId;
-    var lean = !!req.query.lean;
+    var lean = req.query.lean === 'true';
     var lookups = parseLookups(req.query.lookups);
+    const includeThreads = req.query.includeThreads === 'true';
     var options;
 
     var query;
@@ -56,6 +57,7 @@ module.exports = {
         beforeId: (beforeId && '' + beforeId) || undefined,
         afterId: (afterId && '' + afterId) || undefined,
         aroundId: (aroundId && '' + aroundId) || undefined,
+        includeThreads,
         marker: (marker && '' + marker) || undefined,
         userId: userId
       };

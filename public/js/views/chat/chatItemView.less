@@ -25,8 +25,13 @@
   clear: both;
 }
 
-.hidden-threaded-conversation-chat-item {
+.threaded-conversation-chat-item {
   display: none;
+}
+
+// inline-threads-for-mobile-embedded
+.mobile-embedded .threaded-conversation-chat-item {
+  display: block;
 }
 
 .chat-item {
@@ -390,7 +395,7 @@ body.mobile .chat-item__icon--read {
   }
 }
 
-.chat-item__parent-message-indicator {
+.chat-item__thread-message-indicator {
   margin-top: 10px;
   margin-bottom: 10px;
   &:hover {
