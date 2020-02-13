@@ -51,7 +51,8 @@ and then starting the `webapp` and going to:
 - http://localhost:5000/?lang=sk
 - http://localhost:5000/?lang=sv
 - http://localhost:5000/?lang=tr
-- http://localhost:5000/?lang=ua
+- http://localhost:5000/?lang=uk
+- http://localhost:5000/?lang=zh-TW
 - http://localhost:5000/?lang=zh
 
 </details>
