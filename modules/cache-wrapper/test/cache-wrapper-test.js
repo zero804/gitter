@@ -13,6 +13,36 @@ function getWrapper(lookupFunc) {
 }
 
 describe('cache-wrapper', function() {
+  describe('secureWrapFunction', () => {
+    it('looks up correct key with custom cacheKeyGenerator() for function', function(done) {
+      const wrapper = getWrapper(key => {
+        assert.equal(key, 'my-module:my-custom-instance-id:my-module-function:world');
+        done();
+      });
+      const secureWrapFunction = wrapper.secureWrapFunction;
+
+      const wrapped = secureWrapFunction('my-module', module, async () => {
+        return 'my-custom-instance-id';
+      });
+      wrapped('world');
+    });
+
+    it('missing cacheKeyGenerator() throws error', function(done) {
+      const wrapper = getWrapper((/*key*/) => {
+        // noop
+      });
+      const secureWrapFunction = wrapper.secureWrapFunction;
+
+      try {
+        secureWrapFunction('my-module', module);
+        assert.fail('expected error to be thrown because cacheKeyGenerator() is missing');
+      } catch (err) {
+        assert.ok(err);
+        done();
+      }
+    });
+  });
+
   describe('wrapping single function modules', function() {
     var module = function(name) {
       return Promise.resolve('hello ' + name);
@@ -35,7 +65,7 @@ describe('cache-wrapper', function() {
       });
 
       var wrapped = wrapper('my-module', module, {
-        getInstanceId: () => {
+        getInstanceId: async () => {
           return 'my-custom-instance-id';
         }
       });
@@ -58,7 +88,7 @@ describe('cache-wrapper', function() {
           return 'something';
         },
         {
-          getInstanceId: exampleService => {
+          getInstanceId: async exampleService => {
             return `instance-id-${exampleService.myToken}`;
           }
         }
