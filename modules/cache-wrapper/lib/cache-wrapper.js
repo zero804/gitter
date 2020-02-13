@@ -59,6 +59,24 @@ function wrapFunction(cache, moduleName, func, funcName, getInstanceIdFunc) {
   };
 }
 
+// Standalone caching method for a given function. Also gurantees that cacheKeyGenerator is present (which makes it more secure)
+//
+// The normal cacheWrapper has no gurantee that the cacheKeyGenerator(getInstanceIdFunc) is present
+// so we created this to ensure we don't share data between instances if the cacheKeyGenerator is not passed in
+//
+// It's also a lot more straightforward and has one specific usage to cache functions vs the general cacheWrapper
+function secureWrapFunction(moduleName, func, cacheKeyGenerator, options) {
+  const cache = new SnappyCache({
+    prefix: 'sc:',
+    redis: getRedisCachingClient(),
+    validateRedisClient: false,
+    ttl: (options && options.ttl) || 0
+  });
+
+  assert(cacheKeyGenerator, 'You must provide a cacheKeyGenerator function');
+  return wrapFunction(cache, moduleName, func, `${moduleName}-function`, cacheKeyGenerator);
+}
+
 function wrapObject(cache, moduleName, obj, getInstanceIdFunc) {
   var wrapped = {};
 
@@ -84,7 +102,7 @@ function wrapClass(cache, moduleName, Klass, getInstanceIdFunc) {
   return Wrapped;
 }
 
-module.exports = function(moduleName, module, options = {}) {
+function cacheWrapper(moduleName, module, options = {}) {
   var cache = new SnappyCache({
     prefix: 'sc:',
     redis: getRedisCachingClient(),
@@ -111,4 +129,7 @@ module.exports = function(moduleName, module, options = {}) {
     // its a collection of functions
     return wrapObject(cache, moduleName, module);
   }
-};
+}
+
+module.exports = cacheWrapper;
+module.exports.secureWrapFunction = secureWrapFunction;
