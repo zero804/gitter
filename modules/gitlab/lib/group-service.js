@@ -2,15 +2,14 @@
 
 const debug = require('debug')('gitter:app:gitlab:group-service');
 const { Groups, GroupMembers } = require('gitlab');
-const cacheWrapper = require('gitter-web-cache-wrapper');
+const { secureWrapFunction } = require('gitter-web-cache-wrapper');
 const getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
 const getPublicTokenFromPool = require('./get-public-token-from-pool');
 
 function cacheFunction(name, obj) {
-  return cacheWrapper(`GitLabGroupService:${name}`, obj, {
-    getInstanceId: function(gitLabGroupService) {
-      return gitLabGroupService.getAccessTokenPromise;
-    }
+  return secureWrapFunction(`GitLabGroupService:${name}`, obj, async gitLabGroupService => {
+    const accessToken = await gitLabGroupService.getAccessTokenPromise;
+    return accessToken;
   });
 }
 
