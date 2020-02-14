@@ -16,6 +16,11 @@ Developer facing:
  - Ensure fixtures used in group with policy service test, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1769
 
 
+# 20.16.2 - 2020-02-13
+
+ - Fix caching on GitLab group/user services, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/53
+
+
 # 20.16.1 - 2020-02-07
 
  - Security fix related to burst messages, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/51
