@@ -8,6 +8,7 @@
  - Include child thread messages in main message feed on mobile, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1728
  - Update translations for proper Ukranian language code(`ua` -> `uk`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1772
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Vue.js create community flow and GitLab group based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1757
 
 Developer facing:
 
