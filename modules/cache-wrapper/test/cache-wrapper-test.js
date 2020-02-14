@@ -13,6 +13,36 @@ function getWrapper(lookupFunc) {
 }
 
 describe('cache-wrapper', function() {
+  describe('secureWrapFunction', () => {
+    it('looks up correct key with custom cacheKeyGenerator() for function', function(done) {
+      const wrapper = getWrapper(key => {
+        assert.equal(key, 'my-module:my-custom-instance-id:my-module-function:world');
+        done();
+      });
+      const secureWrapFunction = wrapper.secureWrapFunction;
+
+      const wrapped = secureWrapFunction('my-module', module, async () => {
+        return 'my-custom-instance-id';
+      });
+      wrapped('world');
+    });
+
+    it('missing cacheKeyGenerator() throws error', function(done) {
+      const wrapper = getWrapper((/*key*/) => {
+        // noop
+      });
+      const secureWrapFunction = wrapper.secureWrapFunction;
+
+      try {
+        secureWrapFunction('my-module', module);
+        assert.fail('expected error to be thrown because cacheKeyGenerator() is missing');
+      } catch (err) {
+        assert.ok(err);
+        done();
+      }
+    });
+  });
+
   describe('wrapping single function modules', function() {
     var module = function(name) {
       return Promise.resolve('hello ' + name);
@@ -20,7 +50,7 @@ describe('cache-wrapper', function() {
 
     it('looks up correct key', function(done) {
       var wrapper = getWrapper(function(key) {
-        assert.equal(key, 'my-module:::world');
+        assert.equal(key, 'my-module::my-module-function:world');
         done();
       });
 
@@ -28,9 +58,49 @@ describe('cache-wrapper', function() {
       wrapped('world');
     });
 
+    it('looks up correct key with custom getInstanceId() for function', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module:my-custom-instance-id:my-module-function:world');
+        done();
+      });
+
+      var wrapped = wrapper('my-module', module, {
+        getInstanceId: async () => {
+          return 'my-custom-instance-id';
+        }
+      });
+      wrapped('world');
+    });
+
+    it('looks up correct key with custom getInstanceId(this) for object prototype function', done => {
+      const wrapper = getWrapper(key => {
+        assert.equal(key, 'getSomething:instance-id-123foobarbaztoken:getSomething-function');
+        done();
+      });
+
+      function ExampleService() {
+        this.myToken = '123foobarbaztoken';
+      }
+
+      ExampleService.prototype.getSomething = wrapper(
+        'getSomething',
+        async function() {
+          return 'something';
+        },
+        {
+          getInstanceId: async exampleService => {
+            return `instance-id-${exampleService.myToken}`;
+          }
+        }
+      );
+
+      const exampleService = new ExampleService();
+      exampleService.getSomething();
+    });
+
     it('encodes colons (eww, gross!) in the key', function(done) {
       var wrapper = getWrapper(function(key) {
-        assert.equal(key, 'my-module:::look%3Aat%3Amy%3Acolons');
+        assert.equal(key, 'my-module::my-module-function:look%3Aat%3Amy%3Acolons');
         done();
       });
 
