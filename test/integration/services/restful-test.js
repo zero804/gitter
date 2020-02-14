@@ -167,17 +167,21 @@ describe('restful #slow', function() {
 
       assert.deepEqual(orgs, [
         {
+          type: 'GH_ORG',
           id: 1086321,
           name: 'gitlabhq',
           avatar_url: 'https://avatars2.githubusercontent.com/u/1086321?v=4',
           absoluteUri: 'https://github.com/',
+          uri: 'gitlabhq',
           room: null,
           premium: false
         },
         {
+          type: 'GL_GROUP',
           id: 3678287,
           name: 'EricGitLabTester-Group1',
           avatar_url: null,
+          uri: 'EricGitLabTester-Group1',
           absoluteUri: 'https://gitlab.com/groups/EricGitLabTester-Group1'
         }
       ]);

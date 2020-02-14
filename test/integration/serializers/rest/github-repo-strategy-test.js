@@ -38,9 +38,11 @@ describe('GithubRepoStrategy', function() {
     return serialize([repo], strategy).then(function(s) {
       assertUtils.assertSerializedEqual(s, [
         {
+          type: 'GH_REPO',
           id: repo.id,
           name: repo.full_name,
           description: repo.description,
+          absoluteUri: 'https://github.com/abc_/123',
           uri: repo.full_name,
           private: false,
           exists: false,
@@ -67,9 +69,11 @@ describe('GithubRepoStrategy', function() {
     return serialize([repo], strategy).then(function(s) {
       assertUtils.assertSerializedEqual(s, [
         {
+          type: 'GH_REPO',
           id: repo.id,
           name: repo.full_name,
           description: repo.description,
+          absoluteUri: `https://github.com/${repo.full_name}`,
           uri: repo.full_name,
           private: false,
           room: {

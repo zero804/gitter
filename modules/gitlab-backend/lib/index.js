@@ -1,6 +1,8 @@
 'use strict';
 
-const { GitLabGroupService } = require('gitter-web-gitlab');
+const {
+  getAdminGroupsForUser
+} = require('gitter-web-permissions/lib/admin-discovery/gitlab-group');
 
 function GitLabBackend(user, identity) {
   this.user = user;
@@ -12,8 +14,7 @@ GitLabBackend.prototype.getEmailAddress = function(/*preferStoredEmail*/) {
 };
 
 GitLabBackend.prototype.findOrgs = function() {
-  const gitlabGroupService = new GitLabGroupService(this.user);
-  return gitlabGroupService.getGroups();
+  return getAdminGroupsForUser(this.user);
 };
 
 GitLabBackend.prototype.getProfile = function() {

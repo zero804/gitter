@@ -6,6 +6,13 @@ const { GitLabGroupService } = require('gitter-web-gitlab');
 // https://docs.gitlab.com/ee/api/access_requests.html
 const MAINTAINER_ACCESS_LEVEL = 40;
 
+async function getAdminGroupsForUser(user) {
+  const gitlabGroupService = new GitLabGroupService(user);
+  const groups = await gitlabGroupService.getGroups({ min_access_level: MAINTAINER_ACCESS_LEVEL });
+
+  return groups;
+}
+
 /*
  * Finds URIs and external IDs for all GitLab groups that the user is a maintainer of
  */
@@ -15,8 +22,7 @@ async function gitlabGroupAdminDiscovery(user) {
     return;
   }
 
-  const gitlabGroupService = new GitLabGroupService(user);
-  const groups = await gitlabGroupService.getGroups({ min_access_level: MAINTAINER_ACCESS_LEVEL });
+  const groups = await getAdminGroupsForUser(user);
 
   const linkPaths = groups.map(group => group.uri);
   const externalIds = groups.map(group => group.id);
@@ -29,3 +35,4 @@ async function gitlabGroupAdminDiscovery(user) {
 }
 
 module.exports = gitlabGroupAdminDiscovery;
+module.exports.getAdminGroupsForUser = getAdminGroupsForUser;
