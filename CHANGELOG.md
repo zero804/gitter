@@ -9,6 +9,8 @@
  - Update translations for proper Ukranian language code(`ua` -> `uk`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1772
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
  - Vue.js create community flow and GitLab group based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1757
+ - Make sure we only skip web middlewares on /api/ and not on /api* routes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1771
+
 
 Developer facing:
 
