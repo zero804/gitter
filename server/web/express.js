@@ -78,12 +78,12 @@ function installBase(app) {
   app.use(require('./middlewares/i18n'));
 }
 
-// middleware wrapped in `skipForApi` is not used on API requests
+// Middleware wrapped in `skipForApi` is not used on API requests
+// This is only useful in development environment. In production we initialize API
+// route differently and the `/api/*` requests don't hit the web handler at all
+// (https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1771#note_288137539)
 const skipForApi = handler => (req, res, next) => {
-  const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl; // https://stackoverflow.com/a/10185427/606571
-  const apiBasePath = config.get('web:apiBasePath');
-
-  if (fullUrl.indexOf(apiBasePath) === 0) {
+  if (req.originalUrl.indexOf('/api/') === 0) {
     next();
   } else {
     handler(req, res, next);
