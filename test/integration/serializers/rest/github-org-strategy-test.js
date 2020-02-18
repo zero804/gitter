@@ -26,16 +26,20 @@ describe('GithubOrgStrategy', function() {
     var org = {
       id: 1,
       login: 'foo',
-      avatar_url: 'https://github.com/images/error/octocat_happy.gif'
+      avatar_url: 'https://github.com/images/error/octocat_happy.gif',
+      absoluteUri: `https://github.com/foo`
     };
 
     var strategy = new GithubOrgStrategy({});
     return serialize([org], strategy).then(function(s) {
       assertUtils.assertSerializedEqual(s, [
         {
+          type: 'GH_ORG',
           id: org.id,
           name: org.login,
           avatar_url: org.avatar_url,
+          uri: 'foo',
+          absoluteUri: org.absoluteUri,
           room: null,
           premium: false
         }
@@ -47,7 +51,8 @@ describe('GithubOrgStrategy', function() {
     var org = {
       id: 1,
       login: fixture.troupe1.uri,
-      avatar_url: 'https://github.com/images/error/octocat_happy.gif'
+      avatar_url: 'https://github.com/images/error/octocat_happy.gif',
+      absoluteUri: `https://github.com/${fixture.troupe1.uri}`
     };
 
     var t = fixture.troupe1;
@@ -56,9 +61,12 @@ describe('GithubOrgStrategy', function() {
     return serialize([org], strategy).then(function(s) {
       assertUtils.assertSerializedEqual(s, [
         {
+          type: 'GH_ORG',
           id: org.id,
           name: org.login,
           avatar_url: org.avatar_url,
+          uri: org.login,
+          absoluteUri: org.absoluteUri,
           room: {
             id: t.id,
             name: t.uri,

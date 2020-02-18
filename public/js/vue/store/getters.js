@@ -30,6 +30,11 @@ export const displayedRooms = state => {
   return resultantRooms;
 };
 
+export const isDisplayedRoomAdmin = state => {
+  const room = displayedRoom(state);
+  return room.permissions && room.permissions.admin === true;
+};
+
 export const hasAnyUnreads = state => {
   return Object.values(state.roomMap).some(room => room.unreadItems > 0);
 };

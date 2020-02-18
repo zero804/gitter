@@ -31,6 +31,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     permissionsOptionsSpinner: '.js-permissions-options-spinner',
     permissionsOptionsErrorIcon: '.js-permissions-options-error-icon',
     permissionsOptionsGithubIcon: '.js-permissions-options-github-icon',
+    permissionsOptionsGitlabIcon: '.js-permissions-options-gitlab-icon',
     permissionsOptionsGitterIcon: '.js-permissions-options-gitter-icon',
     extraAdminsNote: '.js-permissions-extra-admins-note',
     extraAdminsList: '.js-permissions-admin-list',
@@ -210,10 +211,17 @@ var PermissionsView = Marionette.LayoutView.extend({
 
     var sdWarningString = '';
     var initialSdType = this.model.get('initialSecurityDescriptorType');
-    var isInitialSdTypeGitHubBased = initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
-    if (isInitialSdTypeGitHubBased && initialSdType !== sdType) {
-      sdWarningString =
-        'Warning, switching away from GitHub-based administrators is permanent. Once you have applied these changes, you cannot go back to GitHub based administrators.';
+    var isInitialSdTypeNonReversable =
+      initialSdType === 'GL_GROUP' || initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
+    if (isInitialSdTypeNonReversable && initialSdType !== sdType) {
+      let backendString = '';
+      if (initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO') {
+        backendString = 'GitHub';
+      } else if (initialSdType === 'GL_GROUP') {
+        backendString = 'GitLab';
+      }
+
+      sdWarningString = `Warning, switching away from ${backendString}-based administrators is permanent. Once you have applied these changes, you cannot go back to ${backendString} based administrators.`;
     }
     this.ui.sdWarning.text(sdWarningString);
     toggleClass(this.ui.sdWarning[0], 'hidden', sdWarningString.length === 0);
@@ -267,6 +275,7 @@ var PermissionsView = Marionette.LayoutView.extend({
         'hidden',
         sdType !== 'GH_ORG' && sdType !== 'GH_REPO'
       );
+      toggleClass(this.ui.permissionsOptionsGitlabIcon[0], 'hidden', sdType !== 'GL_GROUP');
       toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
     }
   },
@@ -288,6 +297,12 @@ var PermissionsView = Marionette.LayoutView.extend({
         value: 'GH_REPO',
         label: 'Anyone with push access to the ' + sd.linkPath + ' repo on GitHub',
         selected: sd.type === 'GH_REPO'
+      });
+    } else if (sd && sd.type === 'GL_GROUP') {
+      permissionOpts.push({
+        value: 'GL_GROUP',
+        label: `Anyone with maintainer access to the ${sd.linkPath} project on GitLab`,
+        selected: sd.type === 'GL_GROUP'
       });
     }
 

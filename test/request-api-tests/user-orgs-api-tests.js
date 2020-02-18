@@ -51,8 +51,10 @@ describe('user-orgs #slow', () => {
       const { avatar_url, ...compareOrg } = integrationOrg;
 
       assert.deepStrictEqual(compareOrg, {
+        type: 'GH_ORG',
         id: parseInt(fixtureLoader.GITTER_INTEGRATION_ORG_ID, 10),
         name: fixtureLoader.GITTER_INTEGRATION_ORG,
+        uri: 'gitter-integration-tests-organisation',
         absoluteUri: `https://github.com/${fixtureLoader.GITTER_INTEGRATION_ORG}`,
         room: null,
         premium: false
@@ -87,8 +89,10 @@ describe('user-orgs #slow', () => {
       const { avatar_url, ...compareOrg } = integrationOrg;
 
       assert.deepStrictEqual(compareOrg, {
+        type: 'GL_GROUP',
         id: parseInt(fixtureLoader.GITLAB_GROUP1_ID, 10),
         name: fixtureLoader.GITLAB_GROUP1_URI,
+        uri: 'gitter-integration-tests-group',
         absoluteUri: `https://gitlab.com/groups/${fixtureLoader.GITLAB_GROUP1_URI}`
       });
       assert(avatar_url);

@@ -1,3 +1,34 @@
+# 20.17.0 - 2020-02-17
+
+ - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761
+ - Fix "Double-tap to edit a message on mobile not working", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1760
+ - Add GitLab group(`GL_GROUP`) support to the permission settings view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1763
+ - Add GitLab group(`GL_GROUP`) support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1751
+ - Left-menu mobile styles now trigger based on device width instead of `user-agent`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1762
+ - Include child thread messages in main message feed on mobile, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1728
+ - Update translations for proper Ukranian language code(`ua` -> `uk`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1772
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Vue.js create community flow and GitLab group based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1757
+ - Make sure we only skip web middlewares on /api/ and not on /api* routes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1771
+
+
+Developer facing:
+
+ - Clarify why `clientEnv['anonymous']` is used in `context.getAccessToken()`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1764
+ - Update link for Gitter spam runbook for abuse team, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1765
+ - Ensure fixtures used in group with policy service test, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1769
+
+
+# 20.16.2 - 2020-02-13
+
+ - Fix caching on GitLab group/user services, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/53
+
+
+# 20.16.1 - 2020-02-07
+
+ - Security fix related to burst messages, https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/51
+
+
 # 20.16.0 - 2020-01-29
 
  - Improve URI conflict error messages when creating a community, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1735

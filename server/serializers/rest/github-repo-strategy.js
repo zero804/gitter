@@ -4,6 +4,7 @@ var collections = require('gitter-web-utils/lib/collections');
 var TroupeStrategy = require('./troupe-strategy');
 var leanTroupeDao = require('../../services/daos/troupe-dao').full;
 var Lazy = require('lazy.js');
+const urlJoin = require('url-join');
 
 function GithubRepoStrategy(options) {
   var troupeStrategy = new TroupeStrategy(options);
@@ -28,9 +29,11 @@ function GithubRepoStrategy(options) {
   this.map = function(item) {
     var room = troupesIndexed[item.full_name];
     return {
+      type: 'GH_REPO',
       id: item.id,
       name: item.full_name,
       description: item.description,
+      absoluteUri: urlJoin('https://github.com', item.full_name),
       uri: item.full_name,
       private: item.private,
       room: room ? troupeStrategy.map(room) : undefined,

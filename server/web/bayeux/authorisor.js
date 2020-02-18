@@ -205,7 +205,7 @@ function populateTroupe({ userId, match, snapshot = false }) {
 function populateSubTroupeCollection({
   userId,
   match,
-  snapshot: { limit, lean, lookups, beforeInclId } = {}
+  snapshot: { limit, lean, lookups, beforeInclId, includeThreads } = {}
 }) {
   var troupeId = match[1];
   var collection = match[2];
@@ -216,7 +216,13 @@ function populateSubTroupeCollection({
         return Promise.resolve(dataToSnapshot('room.events')([]));
       }
       return restful
-        .serializeChatsForTroupe(troupeId, userId, { limit, lean, lookups, beforeInclId })
+        .serializeChatsForTroupe(troupeId, userId, {
+          limit,
+          lean,
+          lookups,
+          beforeInclId,
+          includeThreads
+        })
         .then(dataToSnapshot('room.chatMessages'));
 
     case 'users':

@@ -5,10 +5,11 @@ import * as getters from './getters';
 import mutations from './mutations';
 import state from './state';
 import threadMessageFeed from '../thread-message-feed/store';
+import createCommunity from '../create-community/store';
 
 Vue.use(Vuex);
 
-export const modules = { threadMessageFeed };
+export const modules = { threadMessageFeed, createCommunity };
 
 function createStore(overrides) {
   return new Vuex.Store({

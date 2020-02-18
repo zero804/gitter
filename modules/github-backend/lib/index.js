@@ -3,9 +3,9 @@
 var _ = require('lodash');
 const urlJoin = require('url-join');
 
-var GithubMe = require('gitter-web-github').GitHubMeService;
 var gitHubEmailAddressService = require('./github-email-address-service');
 var gitHubProfileService = require('./github-profile-service');
+const { getAdminOrgsForUser } = require('gitter-web-permissions/lib/admin-discovery/github-org');
 
 function GitHubBackend(user, identity) {
   this.user = user;
@@ -18,11 +18,8 @@ GitHubBackend.prototype.getEmailAddress = function(preferStoredEmail) {
 
 GitHubBackend.prototype.findOrgs = function() {
   var user = this.user;
-  var ghUser = new GithubMe(user);
 
-  if (!ghUser.accessToken) return [];
-
-  return ghUser.getOrgs().then(function(ghOrgs) {
+  return getAdminOrgsForUser(user).then(function(ghOrgs) {
     // TODO: change these to be in a standard internal format
     return ghOrgs.map(org => {
       return {

@@ -38,8 +38,14 @@
       {{#if threadMessageCount}}
       {{! js-parent-message-indicator class is used in chatContainerView for input box focus logic:
       when you click this element, we won't focus the main chat input box }}
-        <div class='chat-item__parent-message-indicator js-parent-message-indicator'>
+        <div class='chat-item__thread-message-indicator js-parent-message-indicator'>
           <img class="chat-item__pmi-icon" src="{{cdn 'images/svg/corner-down-right.svg'}}" /> {{threadMessageCount}} {{ pluralize threadMessageCount 'reply' 'replies' }}
+        </div>
+      {{/if}}
+      {{! inline-threads-for-mobile-embedded }}
+      {{#if parentId}}
+        <div class='chat-item__thread-message-indicator'>
+          <a href="{{permalinkUrl}}"><img class="chat-item__pmi-icon" src="{{cdn 'images/svg/corner-up-left.svg'}}" /> go to thread</a>
         </div>
       {{/if}}
     {{/if}}

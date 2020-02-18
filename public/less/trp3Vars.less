@@ -18,6 +18,20 @@ TODO --> JP 18/2/16
 // See `./archive-heatmap-utils.js->breakpointList` and `trp3Vars.less->@archive-mid`
 @archive-mid: ~'(max-width: 960px)';
 
+// Keep this in sync with the breakpoint check in public/js/utils/is-mobile-breakpoint.js
+@left-menu-mobile-breakpoint-width: 900px;
+
+/*
+ * Targets small screens that we consider as "mobile"
+ */
+@mobile-screen-breakpoint: ~'(max-width: @{left-menu-mobile-breakpoint-width})';
+/*
+ * Every screen that's not the mobile size
+ * Only way to achieve mutual exclusive media queries is using the `and` operator
+ * https://stackoverflow.com/a/13649011/796832
+ */
+@large-screen-breakpoint: ~'not all and (max-width: @{left-menu-mobile-breakpoint-width})';
+
 @mobile-header-height: 50px;
 @desktop-header-height: 65px;
 @chat-frame-desktop-header-height: 64px;

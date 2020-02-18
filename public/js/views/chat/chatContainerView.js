@@ -7,6 +7,7 @@ var ChatCollectionView = require('../chat/chatCollectionView');
 var ChatConnectionIndicatorView = require('../chat/chatConnectivityIndicatorView');
 var context = require('gitter-web-client-context');
 var unreadItemsClient = require('../../components/unread-items-client');
+const isTouch = require('../../utils/is-touch');
 
 require('../behaviors/isomorphic');
 
@@ -64,6 +65,7 @@ module.exports = Marionette.LayoutView.extend({
     var hasTextSelected = window.getSelection().toString().length > 0;
     if (
       !hasTextSelected &&
+      !isTouch() && // on touch devices we use double tapping message to edit, the focus would intervene
       e.target.tagName.toLowerCase() !== 'textarea' &&
       // we want to focus a TMF input if user opens the TMF by clicking on
       // parent message indicator

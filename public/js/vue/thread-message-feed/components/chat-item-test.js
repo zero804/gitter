@@ -7,6 +7,7 @@ const {
 const { default: ChatItem } = require('./chat-item.vue');
 
 jest.mock('../../../components/unread-items-client');
+jest.mock('../../../utils/is-mobile');
 const unreadItemsClient = require('../../../components/unread-items-client');
 
 describe('thread-message-feed chat-item', () => {
@@ -157,5 +158,20 @@ describe('thread-message-feed chat-item', () => {
     );
     wrapper.vm.onViewportEnter();
     expect(unreadItemsClient.markItemRead.mock.calls[0]).toEqual([message.id]);
+  });
+
+  it('double tap triggers edit message action on mobile', () => {
+    const { wrapper, stubbedActions } = mount(ChatItem, defaultProps, addRoomToStore);
+    const isMobile = require('../../../utils/is-mobile');
+    isMobile.mockImplementation(() => true);
+    // avoiding calling the real action so we don't have to set up the store
+    stubbedActions.threadMessageFeed.editMessage.mockImplementation(() => {});
+    wrapper.find('.chat-item').trigger('touchend');
+    wrapper.find('.chat-item').trigger('touchend');
+    expect(stubbedActions.threadMessageFeed.editMessage).toHaveBeenCalledWith(
+      expect.anything(),
+      message,
+      undefined
+    );
   });
 });

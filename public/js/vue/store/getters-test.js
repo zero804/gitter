@@ -118,6 +118,14 @@ describe('getters', () => {
     });
   });
 
+  it('isDisplayedRoomAdmin returns true if user has admin permissions to displayed room', () => {
+    const room1 = createSerializedRoomFixture('community/room1', { permissions: { admin: true } });
+    state.roomMap = {
+      [room1.id]: room1
+    };
+    state.displayedRoomId = room1.id;
+    expect(getters.isDisplayedRoomAdmin(state)).toEqual(true);
+  });
   describe('hasAnyUnreads', () => {
     it('no unreads returns false', () => {
       const room1 = createSerializedRoomFixture('community/room1');
