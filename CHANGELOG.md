@@ -1,3 +1,10 @@
+# 20.18.0 - *upcoming*
+
+Developer facing:
+
+ - Detail of webapp production setup, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1775
+
+
 # 20.17.0 - 2020-02-17
 
  - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761
