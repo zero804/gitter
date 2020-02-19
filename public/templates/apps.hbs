@@ -27,11 +27,8 @@
       <section id="apps-panel">
         <div class="wrap">
           <div class="devices">
-            <div class="laptop">
-              <img class="screenshot" src="{{cdn 'images/home/screenshot.png'}}">
-              <img class="computer" src="{{cdn 'images/home/laptop.png'}}">
-            </div>
-            <img class="phone" src="{{cdn 'images/home/phone.png'}}">
+              {{! find the raw source file at https://gitlab.com/gitlab-org/gitter/design/-/blob/master/design-assets/deliverables/frontpage/gitter-apps.xcf}}
+              <img srcset="{{cdn 'images/home/gitter-apps.png'}}, {{cdn 'images/home/gitter-apps@2x.png'}} 2x" src="{{cdn 'images/home/gitter-apps.png'}}">
           </div>
           <h1>Official apps</h1>
           {{> apps_content }}
