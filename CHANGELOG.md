@@ -1,5 +1,8 @@
 # 20.18.0 - *upcoming*
 
+ - Fix translation logic to properly credit translator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1768
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+
 Developer facing:
 
  - Detail of webapp production setup, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1775
