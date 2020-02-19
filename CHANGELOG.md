@@ -3,6 +3,8 @@
  - Fix translation logic to properly credit translator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1768
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
  - Hide parent message indicator on native mobile, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1778
+ - Update Gitter translation strings with the latest from the webapp, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1779
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
 
 Developer facing:
 
