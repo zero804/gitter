@@ -19,10 +19,10 @@
 	"Enjoy free public and private communities with unlimited people, message history and integrations.": "Ciesz się bezpłatnymi społecznościami z nieograniczoną ilością ludzi, historią rozmów i integracjami.",
 	"Simple to create": "Proste do stworzenia",
 	"Simply create your community and start talking - no need to set up any invitation services.": "Utwórz prosto swoją społeczność i zacznij rozmawiać - nie trzeba ustawiać żadnych usług zapraszających.",
-	"Markdown and KaTeX": "Markdown and KaTeX",
-	"Format your messages just like with your other favorite developer tools.": "Format your messages just like with your other favorite developer tools.",
+	"Markdown and KaTeX": "Markdown i KaTeX",
+	"Format your messages just like with your other favorite developer tools.": "Sformatuj swoje wiadomości tak, jak w przypadku innych ulubionych narzędzi programistycznych.",
 	"Out in the open": "Na zewnątrz",
-	"Complete history archives(indexed by search engines) and sharable permalinks or use <a %s>Sidecar</a> to embed Gitter directly in your own site.": "Complete history archives(indexed by search engines) and sharable permalinks or use <a %s>Sidecar</a> to embed Gitter directly in your own site.",
+	"Complete history archives(indexed by search engines) and sharable permalinks or use <a %s>Sidecar</a> to embed Gitter directly in your own site.": "Wypełniaj archiwa historii (indeksowane przez wyszukiwarki) i udostępniaj linki bezpośrednie lub użyj <a %s>Sidecar</a>, aby osadzić Gittera bezpośrednio we własnej witrynie.",
 	"Trusted by": "Zaufany przez",
 	"Some of our communities": "Niektóre z naszych społeczności",
 	"Create your own": "Utwórz własną",
@@ -65,10 +65,10 @@
 	"iPhone": "iPhone",
 	"Android": "Android",
 	"Open Source": "Open Source",
-	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.",
+	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Nasze wysiłki koncentrują się na <a %s>aplikacji internetowej</a>, która jest podstawą aplikacji mobilnych / stacjonarnych, ale głównie koncentruje się na doświadczeniach webowych. W tych klientach stacjonarnych / mobilnych występuje wiele błędów i rozprzestrzeniają się one, zespół Gitter jest zbyt niewielki, abyśmy mogli zwrócić na nie należytą uwagę. Aplikacje są typu open source, jeśli chcesz zająć się czymś szczególnie irytującym dla Ciebie.",
 	"desktop": "desktop",
 	"iOS": "iOS",
-	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.",
-	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>.",
-	"We also have a sweet little <a %s>IRC bridge</a>.": "We also have a sweet little <a %s>IRC bridge</a>."
+	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Dowiedz się więcej o <a %s>tworzeniu społeczności</a> i <a %s>tworzeniu pokoi</a>.",
+	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Użytkownicy Mac na wersji 10.9 lub niższej, <a %s>pobierz tutaj</a>.",
+	"We also have a sweet little <a %s>IRC bridge</a>.": "Posiadamy także maleńki <a %s>mostek IRC</a>."
 }
