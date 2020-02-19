@@ -40,14 +40,19 @@ router.get(
       return;
     }
 
+    // Ｔhis is code of the translation we are able to provide (e.g. en, zh-TW)
     var locale = req.i18n.getLocale();
     var requested = req.headers['accept-language'] || '';
     requested = requested.split(';')[0] || '';
     requested = requested.split(/,\s*/)[0];
-    requested = requested.split('-')[0];
+    requested = requested.toLowerCase();
 
     var requestLangCode, requestLangLocalName;
-    if (locale !== requested) {
+    // Ｗe compare the translation we provide with what user wants
+    // if we can't provide translation, we get localized name of the language so we can show  "Want this in 中文 ?" message
+    // "en" for "en-gb" is fine, so is "zh-tw" for "zh-tw"
+    const translationRequired = locale !== requested && locale !== requested.split('-')[0];
+    if (translationRequired) {
       var requestLang = langs.where('1', requested);
       if (requestLang) {
         requestLangCode = requestLang['1'];
@@ -66,7 +71,7 @@ router.get(
       cssFileName: 'styles/homepage.css',
       useOptimizely: locale === 'en',
       wordy: locale === 'ru',
-      translationRequired: locale !== requested,
+      translationRequired: translationRequired,
       requestLangCode: requestLangCode,
       requestLangLocalName: requestLangLocalName,
       translated: translatedBy,
