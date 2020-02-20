@@ -145,6 +145,27 @@ describe('left-menu index', () => {
 
       expect(stubbedActions.toggleLeftMenu).not.toHaveBeenCalled();
     });
+
+    it('swipe vertically(scrolling) then horizontally does not open the left-menu (avoid opening left-menu while scrolling)', () => {
+      const { stubbedActions } = mount(Index, {}, store => {
+        store.state.isMobile = true;
+        store.state.leftMenuPinnedState = false;
+        store.state.leftMenuExpandedState = false;
+      });
+
+      // Start the swipe in the middle of the screen
+      document.dispatchEvent(createTouchEvent('touchstart', 300, 200));
+
+      // Then move your finger in the up direction to scroll the chats
+      document.dispatchEvent(createTouchEvent('touchmove', 300, 100));
+
+      // Then move your finger in the right direction
+      document.dispatchEvent(createTouchEvent('touchmove', 500, 100));
+
+      document.dispatchEvent(createTouchEvent('touchend'));
+
+      expect(stubbedActions.toggleLeftMenu).not.toHaveBeenCalled();
+    });
   });
 
   describe('nli (not logged in)', () => {
