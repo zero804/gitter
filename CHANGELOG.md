@@ -6,6 +6,7 @@
  - Update Gitter translation strings with the latest from the webapp, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1779
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
  - Fix left-menu expanding while scrolling chats, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1766
+ - Fix URL parse problem with strange mailto link(`'@test'`) (update `gitter-markdown-processor`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1774
 
 Developer facing:
 
