@@ -108,7 +108,7 @@ fixtureLoader.setupEach = function(expected) {
   var fixture = {};
 
   beforeEach(function() {
-    return fixtureLoaderManual(fixture, _.cloneDeep(expected))();
+    return fixtureLoaderManual(fixture, _.cloneDeep(expected)).bind(this)();
   });
 
   afterEach(function() {
@@ -138,10 +138,7 @@ fixtureLoader.ensureIntegrationEnvironment = function() {
       logger.warn('Skipping this test due to missing config items', missing.join(', '));
       // Just skip these tests
       this._skipFixtureSetup = true;
-
       this.skip();
-      // Skip hack from, https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
-      this.test.parent.pending = true;
     }
   };
 
