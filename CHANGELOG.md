@@ -8,6 +8,8 @@
  - Remove mention of mobile apps and update apps image, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1776
  - Fix left-menu expanding while scrolling chats, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1766
  - Fix URL parse problem with strange mailto link(`'@test'`) (update `gitter-markdown-processor`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1774
+ - Specify background color for body of notification emails, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1782
+    - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
 
 Developer facing:
 
