@@ -14,6 +14,7 @@
 Developer facing:
 
  - Detail of webapp production setup, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1775
+ - Fix test skipping when integration fixtures are missing, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1780
 
 
 # 20.17.0 - 2020-02-17
