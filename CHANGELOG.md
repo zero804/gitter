@@ -4,6 +4,8 @@ Developer facing:
 
  - Small lerna link fix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1773
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
+     - Thanks to [@shanerice](https://gitlab.com/shanerice) for the contribution
 
 
 # 20.18.0 - 2020-02-20
