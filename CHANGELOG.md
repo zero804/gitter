@@ -1,3 +1,22 @@
+# 20.18.0 - 2020-02-20
+
+ - Fix translation logic to properly credit translator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1768
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Hide parent message indicator on native mobile, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1778
+ - Update Gitter translation strings with the latest from the webapp, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1779
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - Remove mention of mobile apps and update apps image, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1776
+ - Fix left-menu expanding while scrolling chats, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1766
+ - Fix URL parse problem with strange mailto link(`'@test'`) (update `gitter-markdown-processor`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1774
+ - Specify background color for body of notification emails, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1782
+    - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
+
+Developer facing:
+
+ - Detail of webapp production setup, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1775
+ - Fix test skipping when integration fixtures are missing, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1780
+
+
 # 20.17.0 - 2020-02-17
 
  - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761

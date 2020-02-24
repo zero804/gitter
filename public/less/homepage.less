@@ -1093,12 +1093,13 @@ section {
   margin-top: -20px;
 }
 
+@devices-panel-width: 750px;
 #apps-panel .devices {
   position: relative;
-  left: -670px;
+  left: -@devices-panel-width;
 
   float: left;
-  width: 670px;
+  width: @devices-panel-width;
   margin-left: -250px;
   margin-top: -60px;
 
@@ -1109,35 +1110,8 @@ section {
   left: 0;
 }
 
-#apps-panel .devices .laptop {
-  position: relative;
-}
-
-#apps-panel .devices .laptop .screenshot {
-  position: absolute;
-  left: 0;
-  top: 0;
-
-  opacity: 0;
-}
-
-#apps-panel.visible .devices .laptop .screenshot {
-  opacity: 1;
-}
-
-#apps-panel .devices .laptop .computer {
-  display: block;
-}
-
-#apps-panel .devices .phone {
-  position: absolute;
-  left: 430px;
-  top: 100px;
-  z-index: 10;
-}
-
-#apps-panel.visible .devices .phone {
-  left: 630px;
+.devices img {
+  max-width: 100%;
 }
 
 #apps-panel a {
