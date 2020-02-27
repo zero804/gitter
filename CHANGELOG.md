@@ -9,6 +9,7 @@ Developer facing:
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
  - Update docker image and fix `container_scanning` GitLab CI job, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1787
      - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Add GitLab project service, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1781
 
 
 # 20.18.0 - 2020-02-20
