@@ -13,24 +13,7 @@ function cacheFunction(name, obj) {
   });
 }
 
-/*
-{
-  id: 3281315,
-  web_url: 'https://gitlab.com/groups/gitter-integration-tests-group',
-  name: 'gitter-integration-tests-group',
-  path: 'gitter-integration-tests-group',
-  description: '',
-  visibility: 'public',
-  lfs_enabled: true,
-  avatar_url: null,
-  request_access_enabled: false,
-  full_name: 'gitter-integration-tests-group',
-  full_path: 'gitter-integration-tests-group',
-  parent_id: null,
-  ldap_cn: null,
-  ldap_access: null
-}
-*/
+// API reference: https://docs.gitlab.com/ee/api/groups.html
 function standardizeGroupResponse(group) {
   debug('standardizeGroupResponse', group);
   return {
@@ -41,10 +24,6 @@ function standardizeGroupResponse(group) {
     uri: group.full_path,
     absoluteUri: group.web_url
   };
-}
-
-function standardizeResponse(response) {
-  return (response || []).map(standardizeGroupResponse);
 }
 
 function GitLabGroupService(user) {
@@ -60,35 +39,21 @@ GitLabGroupService.prototype._getGitlabOpts = async function() {
   };
 };
 
-GitLabGroupService.prototype._getGroupResource = async function() {
-  if (this._groupsResource) {
-    return this._groupsResource;
-  }
-
-  const gitlabLibOpts = await this._getGitlabOpts();
-  this._groupsResource = new Groups(gitlabLibOpts);
-
-  return this._groupsResource;
-};
-
 GitLabGroupService.prototype.getGroups = cacheFunction('getGroups', async function(params) {
-  const resource = await this._getGroupResource();
+  const resource = new Groups(await this._getGitlabOpts());
   const res = await resource.all(params);
 
-  return standardizeResponse(res);
+  return (res || []).map(standardizeGroupResponse);
 });
 
 GitLabGroupService.prototype.getGroup = cacheFunction('getGroup', async function(id) {
-  const resource = await this._getGroupResource();
+  const resource = new Groups(await this._getGitlabOpts());
   const group = await resource.show(id);
 
   return standardizeGroupResponse(group);
 });
 
-GitLabGroupService.prototype._getGroupMember = cacheFunction('_getGroupMember', async function(
-  groupId,
-  gitlabUserId
-) {
+GitLabGroupService.prototype._getGroupMember = async function(groupId, gitlabUserId) {
   const gitlabLibOpts = await this._getGitlabOpts();
   const groupMembers = new GroupMembers(gitlabLibOpts);
 
@@ -106,9 +71,12 @@ GitLabGroupService.prototype._getGroupMember = cacheFunction('_getGroupMember', 
 
     throw err;
   }
-});
+};
 
-GitLabGroupService.prototype.getMembership = async function(groupId, gitlabUserId) {
+GitLabGroupService.prototype.getMembership = cacheFunction('getMembership', async function(
+  groupId,
+  gitlabUserId
+) {
   const groupMember = await this._getGroupMember(groupId, gitlabUserId);
   let accessLevel = 0;
   if (groupMember) {
@@ -122,6 +90,6 @@ GitLabGroupService.prototype.getMembership = async function(groupId, gitlabUserI
     isMaintainer: [40, 50].some(level => level === accessLevel),
     isOwner: accessLevel === 50
   };
-};
+});
 
 module.exports = GitLabGroupService;

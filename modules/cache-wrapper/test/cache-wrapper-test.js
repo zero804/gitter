@@ -119,6 +119,16 @@ describe('cache-wrapper', function() {
         done();
       });
     });
+
+    it('serializes object arguments so cache key is unique', function(done) {
+      var wrapper = getWrapper(function(key) {
+        assert.equal(key, 'my-module::my-module-function:%7B%22foo%22%3A%22bar%22%7D');
+        done();
+      });
+
+      var wrapped = wrapper('my-module', module);
+      wrapped({ foo: 'bar' });
+    });
   });
 
   describe('wrapping multi function modules', function() {

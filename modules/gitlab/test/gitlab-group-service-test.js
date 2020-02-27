@@ -1,6 +1,5 @@
 'use strict';
 
-const Promise = require('bluebird');
 const assert = require('assert');
 const proxyquireNoCallThru = require('proxyquire').noCallThru();
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
@@ -12,13 +11,7 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
   // These tests timeout at 10000 sometimes otherwise
   this.timeout(30000);
 
-  fixtureLoader.ensureIntegrationEnvironment(
-    'GITLAB_USER_USERNAME',
-    'GITLAB_USER_TOKEN',
-    'GITLAB_PUBLIC_PROJECT1_URI',
-    'GITLAB_PRIVATE_PROJECT1_URI',
-    'GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI'
-  );
+  fixtureLoader.ensureIntegrationEnvironment('GITLAB_USER_TOKEN', 'GITLAB_GROUP1_URI');
 
   const FAKE_USER = {
     username: 'FAKE_USER'
@@ -74,9 +67,9 @@ describe('gitlab-group-service #flakey #slow #gitlab', function() {
 
     it('should fetch group', async () => {
       const glGroupService = new GitLabGroupService(FAKE_USER);
-      const group = await glGroupService.getGroup('gitter-integration-tests-group');
+      const group = await glGroupService.getGroup(fixtureLoader.GITLAB_GROUP1_URI);
       assert.equal(group.backend, 'gitlab', 'group has not gone through the standardized');
-      assert.equal(group.name, 'gitter-integration-tests-group');
+      assert.equal(group.uri, fixtureLoader.GITLAB_GROUP1_URI);
     });
 
     describe('getMembership', () => {

@@ -28,8 +28,17 @@ function getRedisCachingClient() {
   return redisClient;
 }
 
-function generateKey(moduleName, instanceId, propertyName, args) {
-  var parts = [moduleName || '', instanceId || '', propertyName || ''].concat(args);
+function generateKey(moduleName, instanceId, propertyName, args = []) {
+  assert(moduleName);
+  assert(propertyName);
+
+  const serializedArgs = args.map(arg => {
+    if (typeof arg === 'object') {
+      return JSON.stringify(arg);
+    }
+    return arg;
+  });
+  var parts = [moduleName || '', instanceId || '', propertyName || ''].concat(serializedArgs);
 
   return parts.map(encodeURIComponent).join(':');
 }
