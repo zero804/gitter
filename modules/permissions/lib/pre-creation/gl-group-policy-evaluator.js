@@ -42,7 +42,10 @@ class GitlabGroupPolicyEvaluator {
 
     if (!this.user || !this.user.username) return false;
 
-    const gitLabIdentity = await identityService.getIdentityForUser(this.user, 'gitlab');
+    const gitLabIdentity = await identityService.getIdentityForUser(
+      this.user,
+      identityService.GITLAB_IDENTITY_PROVIDER
+    );
     // Non GitLab users will never be an group member
     if (!gitLabIdentity) return false;
 

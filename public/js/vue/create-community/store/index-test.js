@@ -325,7 +325,7 @@ describe('thread message feed store', () => {
         []
       );
 
-      expect(apiClient.user.get).toHaveBeenCalledWith('/repos');
+      expect(apiClient.user.get).toHaveBeenCalledWith('/repos', { type: 'admin' });
     });
 
     it('checkSlugAvailability sets pending and calls the debounced check', async () => {

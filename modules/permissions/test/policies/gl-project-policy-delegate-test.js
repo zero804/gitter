@@ -120,7 +120,8 @@ describe('gl-project-policy-delegate', () => {
           GitLabProjectService: StubGitLabProjectService
         },
         'gitter-web-identity': {
-          getIdentityForUser: stubGetIdentityForUser
+          getIdentityForUser: stubGetIdentityForUser,
+          GITLAB_IDENTITY_PROVIDER: 'gitlab'
         }
       }
     );

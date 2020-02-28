@@ -65,7 +65,10 @@ class GlGroupPolicyDelegate {
     const uri = this._securityDescriptor.linkPath;
 
     const user = await this._userLoader();
-    const gitLabIdentity = await identityService.getIdentityForUser(user, 'gitlab');
+    const gitLabIdentity = await identityService.getIdentityForUser(
+      user,
+      identityService.GITLAB_IDENTITY_PROVIDER
+    );
 
     if (!gitLabIdentity) {
       return null;

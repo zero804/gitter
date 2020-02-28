@@ -188,6 +188,150 @@ describe('restful #slow', function() {
     });
   });
 
+  describe('serializeReposForUser', () => {
+    it('serializes repos', async () => {
+      await restful.serializeReposForUser(fixture.user1);
+    });
+
+    it('serializes repos from different backends', async () => {
+      const restfulWithMocks = proxyquireNoCallThru('../../../server/services/restful', {
+        './repo-service': {
+          getReposForUser: () => {
+            return [
+              {
+                backend: 'github',
+                id: 58092100,
+                name: 'bar',
+                full_name: 'EricTroupeTester/bar',
+                private: false,
+                owner: {
+                  login: 'EricTroupeTester',
+                  id: 13482600,
+                  avatar_url: 'https://avatars3.githubusercontent.com/u/13482600?v=4',
+                  url: 'https://api.github.com/users/EricTroupeTester',
+                  type: 'User'
+                },
+                description: null,
+                url: 'https://api.github.com/repos/EricTroupeTester/bar',
+                permissions: { admin: true, push: true, pull: true }
+              },
+              {
+                backend: 'gitlab',
+                id: 2959752,
+                name: 'gitter-infrastructure',
+                description: 'Gitter infrastructure central',
+                absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
+                uri: 'gitlab-com/gl-infra/gitter-infrastructure',
+                private: true,
+                avatar_url:
+                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png'
+              }
+            ];
+          }
+        }
+      });
+
+      const repos = await restfulWithMocks.serializeReposForUser(fixture.user1.id);
+
+      assert.deepEqual(repos, [
+        {
+          type: 'GH_REPO',
+          id: 58092100,
+          name: 'EricTroupeTester/bar',
+          description: null,
+          avatar_url: 'https://avatars3.githubusercontent.com/u/13482600?v=4',
+          absoluteUri: 'https://github.com/EricTroupeTester/bar',
+          uri: 'EricTroupeTester/bar',
+          exists: false,
+          room: undefined,
+          private: false
+        },
+        {
+          type: 'GL_PROJECT',
+          id: 2959752,
+          name: 'gitter-infrastructure',
+          description: 'Gitter infrastructure central',
+          avatar_url: 'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
+          uri: 'gitlab-com/gl-infra/gitter-infrastructure',
+          absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
+          private: true
+        }
+      ]);
+    });
+  });
+
+  describe('serializeAdminReposForUser', () => {
+    it('serializes repos', async () => {
+      await restful.serializeAdminReposForUser(fixture.user1);
+    });
+
+    it('serializes repos from different backends', async () => {
+      const restfulWithMocks = proxyquireNoCallThru('../../../server/services/restful', {
+        './repo-service': {
+          getAdminReposForUser: () => {
+            return [
+              {
+                backend: 'github',
+                id: 58092100,
+                name: 'bar',
+                full_name: 'EricTroupeTester/bar',
+                private: false,
+                owner: {
+                  login: 'EricTroupeTester',
+                  id: 13482600,
+                  avatar_url: 'https://avatars3.githubusercontent.com/u/13482600?v=4',
+                  url: 'https://api.github.com/users/EricTroupeTester',
+                  type: 'User'
+                },
+                description: null,
+                url: 'https://api.github.com/repos/EricTroupeTester/bar',
+                permissions: { admin: true, push: true, pull: true }
+              },
+              {
+                backend: 'gitlab',
+                id: 2959752,
+                name: 'gitter-infrastructure',
+                description: 'Gitter infrastructure central',
+                absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
+                uri: 'gitlab-com/gl-infra/gitter-infrastructure',
+                private: true,
+                avatar_url:
+                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png'
+              }
+            ];
+          }
+        }
+      });
+
+      const repos = await restfulWithMocks.serializeAdminReposForUser(fixture.user1.id);
+
+      assert.deepEqual(repos, [
+        {
+          type: 'GH_REPO',
+          id: 58092100,
+          name: 'EricTroupeTester/bar',
+          description: null,
+          avatar_url: 'https://avatars3.githubusercontent.com/u/13482600?v=4',
+          absoluteUri: 'https://github.com/EricTroupeTester/bar',
+          uri: 'EricTroupeTester/bar',
+          exists: false,
+          room: undefined,
+          private: false
+        },
+        {
+          type: 'GL_PROJECT',
+          id: 2959752,
+          name: 'gitter-infrastructure',
+          description: 'Gitter infrastructure central',
+          avatar_url: 'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
+          uri: 'gitlab-com/gl-infra/gitter-infrastructure',
+          absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
+          private: true
+        }
+      ]);
+    });
+  });
+
   describe('serializeGroupsForUserId', function() {
     it('should do what it says on the tin', function() {
       return restful.serializeGroupsForUserId(fixture.user1.id).then(function(result) {
