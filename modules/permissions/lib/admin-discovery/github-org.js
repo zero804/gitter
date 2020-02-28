@@ -1,6 +1,5 @@
 'use strict';
 
-var Promise = require('bluebird');
 var GitHubMeService = require('gitter-web-github').GitHubMeService;
 var _ = require('lodash');
 var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
@@ -10,7 +9,7 @@ async function getAdminOrgsForUser(user) {
   return meService.getOrgs();
 }
 
-function githubOrgAdminDiscovery(user) {
+async function getGithubOrgAdminDescriptor(user) {
   if (!isGitHubUser(user)) return;
 
   return getAdminOrgsForUser(user).then(function(orgs) {
@@ -34,5 +33,7 @@ function githubOrgAdminDiscovery(user) {
   });
 }
 
-module.exports = Promise.method(githubOrgAdminDiscovery);
-module.exports.getAdminOrgsForUser = getAdminOrgsForUser;
+module.exports = {
+  getAdminOrgsForUser,
+  getGithubOrgAdminDescriptor
+};

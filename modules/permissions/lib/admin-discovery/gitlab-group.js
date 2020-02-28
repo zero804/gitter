@@ -16,7 +16,7 @@ async function getAdminGroupsForUser(user) {
 /*
  * Finds URIs and external IDs for all GitLab groups that the user is a maintainer of
  */
-async function gitlabGroupAdminDiscovery(user) {
+async function getGitLabGroupAdminDescriptor(user) {
   const gitLabIdentity = await identityService.getIdentityForUser(user, 'gitlab');
   if (!gitLabIdentity) {
     return;
@@ -34,5 +34,7 @@ async function gitlabGroupAdminDiscovery(user) {
   };
 }
 
-module.exports = gitlabGroupAdminDiscovery;
-module.exports.getAdminGroupsForUser = getAdminGroupsForUser;
+module.exports = {
+  getAdminGroupsForUser,
+  getGitLabGroupAdminDescriptor
+};

@@ -147,6 +147,7 @@ function validateAndFetchBackingInfo(user, options) {
       return validateAndFetchBackingInfoForGithub(user, options);
 
     case 'GL_GROUP':
+    case 'GL_PROJECT':
       return validateAndFetchBackingInfoForGitlab(user, options);
 
     case 'GROUP':

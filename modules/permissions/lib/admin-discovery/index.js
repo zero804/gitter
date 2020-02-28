@@ -2,8 +2,9 @@
 
 var assert = require('assert');
 var Promise = require('bluebird');
-var githubOrgAdminDiscovery = require('./github-org');
-const gitlabGroupAdminDiscovery = require('./gitlab-group');
+const { getGithubOrgAdminDescriptor } = require('./github-org');
+const { getGitLabGroupAdminDescriptor } = require('./gitlab-group');
+const { getGitLabProjectAdminDescriptor } = require('./gitlab-project');
 var Group = require('gitter-web-persistence').Group;
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var adminGroupFinder = require('../known-external-access/admin-group-finder');
@@ -46,7 +47,7 @@ function descriptorSearchAsQuery(descriptorSearch) {
  * is a GitHub org admin
  */
 function findGroupsOrRoomsWhereGithubOrgAdmin(Model, user) {
-  return githubOrgAdminDiscovery(user).then(function(descriptorSearch) {
+  return getGithubOrgAdminDescriptor(user).then(function(descriptorSearch) {
     if (!descriptorSearch) return;
 
     var query = descriptorSearchAsQuery(descriptorSearch);
@@ -61,7 +62,21 @@ function findGroupsOrRoomsWhereGithubOrgAdmin(Model, user) {
  * is a GitLab group maintainer
  */
 async function findGroupsOrRoomsWhereGitlabGroupAdmin(Model, user) {
-  const descriptorSearch = await gitlabGroupAdminDiscovery(user);
+  const descriptorSearch = await getGitLabGroupAdminDescriptor(user);
+  if (!descriptorSearch) return;
+
+  const query = descriptorSearchAsQuery(descriptorSearch);
+  return Model.find(query)
+    .lean()
+    .exec();
+}
+
+/**
+ * Find models of the supplied type for which the user
+ * is a GitLab group maintainer
+ */
+async function findGroupsOrRoomsWhereGitlabProjectAdmin(Model, user) {
+  const descriptorSearch = await getGitLabProjectAdminDescriptor(user);
   if (!descriptorSearch) return;
 
   const query = descriptorSearchAsQuery(descriptorSearch);
@@ -87,12 +102,20 @@ function discoverAdminGroups(user) {
 
   return Promise.join(
     findGroupsOrRoomsWhereGitlabGroupAdmin(Group, user),
+    findGroupsOrRoomsWhereGitlabProjectAdmin(Group, user),
     findGroupsOrRoomsWhereGithubOrgAdmin(Group, user),
     adminGroupFinder.findAdminGroupsOfTypeForUserId('GH_REPO', userId),
     findModelsForExtraAdmin(Group, userId),
-    function(gitlabGroupModels, githubOrgModels, githubRepoModels, extraAdminModels) {
+    function(
+      gitlabGroupModels,
+      gitlabProjectModels,
+      githubOrgModels,
+      githubRepoModels,
+      extraAdminModels
+    ) {
       return mongoUtils.unionModelsById([
         gitlabGroupModels,
+        gitlabProjectModels,
         githubOrgModels,
         githubRepoModels,
         extraAdminModels
