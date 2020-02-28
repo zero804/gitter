@@ -27,6 +27,7 @@ var SecurityDescriptorSchema = new Schema(
         'INVITE', // Only invited users can join (private)
         'INVITE_OR_ADMIN', // Invited users or admins
         'GL_GROUP_MEMBER', // for GL_GROUP, must be member of group
+        'GL_PROJECT_MEMBER', // for GL_PROJECT, must be member of project
         'GH_REPO_ACCESS', // for GH_REPO, must be able to see the repo
         'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER' // for GH_ORG, must be org member
@@ -38,6 +39,7 @@ var SecurityDescriptorSchema = new Schema(
         null, // For one-to-one rooms
         'MANUAL', // Only users in extraUserIds are admins
         'GL_GROUP_MAINTAINER', // for GL_GROUP, must be maintainer in group
+        'GL_PROJECT_MAINTAINER', // for GL_PROJECT, must be maintainer in project
         'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER', // for GH_ORG, must be org member
         'GH_USER_SAME', // For GH_USER, user is same

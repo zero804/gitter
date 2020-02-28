@@ -1,12 +1,12 @@
 'use strict';
 
 const assert = require('assert');
-const debug = require('debug')('gitter:app:permissions:gl-group-policy-delegate');
-const { GitLabGroupService } = require('gitter-web-gitlab');
+const debug = require('debug')('gitter:app:permissions:gl-project-policy-delegate');
+const { GitLabProjectService } = require('gitter-web-gitlab');
 const PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 const identityService = require('gitter-web-identity');
 
-class GlGroupPolicyDelegate {
+class GlProjectPolicyDelegate {
   constructor(userId, userLoader, securityDescriptor) {
     assert(userLoader, 'userLoader required');
     assert(securityDescriptor, 'securityDescriptor required');
@@ -27,10 +27,10 @@ class GlGroupPolicyDelegate {
     }
 
     switch (policyName) {
-      case 'GL_GROUP_MEMBER':
+      case 'GL_PROJECT_MEMBER':
         return membership.isMember;
 
-      case 'GL_GROUP_MAINTAINER':
+      case 'GL_PROJECT_MAINTAINER':
         return membership.isMaintainer;
 
       default:
@@ -44,7 +44,7 @@ class GlGroupPolicyDelegate {
 
     const sd = this._securityDescriptor;
     return {
-      type: 'GL_GROUP',
+      type: 'GL_PROJECT',
       linkPath: sd.linkPath,
       externalId: sd.externalId
     };
@@ -54,7 +54,7 @@ class GlGroupPolicyDelegate {
     if (!this._isValidUser()) return;
     const uri = this._securityDescriptor.linkPath;
 
-    return 'GL_GROUP:' + this._userId + ':' + uri + ':' + policyName;
+    return 'GL_PROJECT:' + this._userId + ':' + uri + ':' + policyName;
   }
 
   _isValidUser() {
@@ -72,12 +72,12 @@ class GlGroupPolicyDelegate {
     }
 
     try {
-      const glGroupService = new GitLabGroupService(user);
-      return await glGroupService.getMembership(uri, gitLabIdentity.providerKey);
+      const glProjectService = new GitLabProjectService(user);
+      return await glProjectService.getMembership(uri, gitLabIdentity.providerKey);
     } catch (err) {
       throw new PolicyDelegateTransportError(err.message);
     }
   }
 }
 
-module.exports = GlGroupPolicyDelegate;
+module.exports = GlProjectPolicyDelegate;
