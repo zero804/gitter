@@ -285,6 +285,57 @@ function validateGlGroupDescriptor(descriptor) {
   validateExtraUserIds(descriptor);
 }
 
+function validateGlProjectDescriptor(descriptor) {
+  let usesGl = false;
+  switch (descriptor.members) {
+    case 'PUBLIC':
+    case 'INVITE':
+    case 'INVITE_OR_ADMIN':
+      break;
+    case 'GL_PROJECT_MEMBER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
+  }
+
+  switch (descriptor.admins) {
+    case 'MANUAL':
+      break;
+    case 'GL_PROJECT_MAINTAINER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (!usesGl) {
+    throw new StatusError(
+      403,
+      'The members or admin attributes need to be set with some GL_XXX values when using the GL_PROJECT type'
+    );
+  }
+
+  if (descriptor.public) {
+    if (descriptor.members !== 'PUBLIC') {
+      throw new StatusError(403, 'Invalid public attribute');
+    }
+  }
+
+  if (descriptor.internalId) {
+    throw new StatusError(
+      403,
+      'internalId(for referencing Gitter internal entities) attribute is present but should not be used with a GL_PROJECT(use externalId to reference a GitLab entity): ' +
+        descriptor.internalId
+    );
+  }
+
+  if (!descriptor.linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute for GitLab project');
+  }
+  validateExtraUserIds(descriptor);
+}
+
 function validateOneToOneDescriptor(descriptor) {
   if (descriptor.members) {
     throw new StatusError(403, 'Invalid members attribute');
@@ -372,6 +423,9 @@ function validate(descriptor) {
 
     case 'GL_GROUP':
       return validateGlGroupDescriptor(descriptor);
+
+    case 'GL_PROJECT':
+      return validateGlProjectDescriptor(descriptor);
 
     case 'ONE_TO_ONE':
       return validateOneToOneDescriptor(descriptor);
