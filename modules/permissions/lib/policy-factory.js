@@ -10,7 +10,8 @@ var OneToOneContextDelegate = require('./context-delegates/one-to-one-room-conte
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor');
 var debug = require('debug')('gitter:app:permissions:policy-factory');
-const PreCreationGlGroupPolicyEvaluator = require('./pre-creation/gl-group-policy-evaluator');
+const PreCreationGitlabGroupPolicyEvaluator = require('./pre-creation/gl-group-policy-evaluator');
+const PreCreationGitlabProjectPolicyEvaluator = require('./pre-creation/gl-project-policy-evaluator');
 var PreCreationGhRepoPolicyEvaluator = require('./pre-creation/gh-repo-policy-evaluator');
 var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-evaluator');
 var PreCreationGhUserPolicyEvaluator = require('./pre-creation/gh-user-policy-evaluator');
@@ -148,7 +149,10 @@ function createPolicyForOneToOne(user, toUser) {
 function getPreCreationPolicyEvaluator(user, type, uri) {
   switch (type) {
     case 'GL_GROUP':
-      return new PreCreationGlGroupPolicyEvaluator(user, uri);
+      return new PreCreationGitlabGroupPolicyEvaluator(user, uri);
+
+    case 'GL_PROJECT':
+      return new PreCreationGitlabProjectPolicyEvaluator(user, uri);
 
     case 'GH_ORG':
       return new PreCreationGhOrgPolicyEvaluator(user, uri);
