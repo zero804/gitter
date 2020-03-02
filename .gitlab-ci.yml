@@ -311,8 +311,8 @@ deploy_prod_manual: &deploy_prod
 docker-base:
   image: docker:latest
   stage: docker_images
-  only:
-    - schedules
+#  only:
+#    - schedules
   services:
     - docker:dind
   script:
