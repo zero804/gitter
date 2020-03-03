@@ -11,6 +11,7 @@ describe('admin-discovery', () => {
     let adminDiscovery;
     let githubOrgs;
     let gitlabGroups;
+    let gitlabProjects;
     let URI = fixtureLoader.generateUri();
 
     const fixture = fixtureLoader.setup({
@@ -23,7 +24,7 @@ describe('admin-discovery', () => {
           admins: 'GH_ORG_MEMBER',
           public: true,
           linkPath: URI,
-          externalId: 'fakeExternalId3',
+          externalId: 'fakeExternalIdFor-groupGithub1',
           extraAdmins: ['userGithub1']
         }
       },
@@ -40,35 +41,60 @@ describe('admin-discovery', () => {
         provider: 'gitlab',
         providerKey: fixtureLoader.generateGithubId()
       },
-      groupGitlab1: {
+      groupBasedOnGitlabGroup1: {
         securityDescriptor: {
           type: 'GL_GROUP',
           members: 'PUBLIC',
           admins: 'GL_GROUP_MAINTAINER',
           public: true,
           linkPath: URI,
-          externalId: 'fakeExternalId3',
+          externalId: 'fakeExternalIdFor-groupBasedOnGitlabGroup1',
+          extraAdmins: ['userGitlab1']
+        }
+      },
+      groupBasedOnGitlabProject1: {
+        securityDescriptor: {
+          type: 'GL_PROJECT',
+          members: 'PUBLIC',
+          admins: 'GL_PROJECT_MAINTAINER',
+          public: true,
+          linkPath: URI,
+          externalId: 'fakeExternalIdFor-groupBasedOnGitlabProject1',
           extraAdmins: ['userGitlab1']
         }
       },
 
       deleteDocuments: {
         Group: [
-          { 'sd.type': 'GH_ORG', 'sd.externalId': 'fakeExternalId3' },
-          { 'sd.type': 'GL_GROUP', 'sd.externalId': 'fakeExternalId3' }
+          { 'sd.type': 'GH_ORG', 'sd.externalId': 'fakeExternalIdFor-groupGithub1' },
+          { 'sd.type': 'GL_GROUP', 'sd.externalId': 'fakeExternalIdFor-groupBasedOnGitlabGroup1' },
+          {
+            'sd.type': 'GL_PROJECT',
+            'sd.externalId': 'fakeExternalIdFor-groupBasedOnGitlabProject1'
+          }
         ]
       }
     });
 
     beforeEach(() => {
-      githubOrgs = null;
       gitlabGroups = null;
+      gitlabProjects = null;
+      githubOrgs = null;
       adminDiscovery = proxyquireNoCallThru('../../lib/admin-discovery/index', {
-        './gitlab-group': async () => {
-          return gitlabGroups;
+        './gitlab-group': {
+          getGitLabGroupAdminDescriptor: async () => {
+            return gitlabGroups;
+          }
         },
-        './github-org': async () => {
-          return githubOrgs;
+        './gitlab-project': {
+          getGitLabProjectAdminDescriptor: async () => {
+            return gitlabProjects;
+          }
+        },
+        './github-org': {
+          getGithubOrgAdminDescriptor: async () => {
+            return githubOrgs;
+          }
         }
       });
     });
@@ -80,32 +106,19 @@ describe('admin-discovery', () => {
           assert.deepEqual(groups, []);
         });
 
-        it('should return groups where user can admin based on GitLab group URL', async () => {
-          gitlabGroups = {
-            type: 'GL_GROUP',
-            linkPath: [URI]
-          };
-
-          const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
-          assert.strictEqual(groups.length, 1);
-          assert.strictEqual(String(groups[0]._id), String(fixture.groupGitlab1._id));
-        });
-
-        it('should return groups where user can admin based on GitLab group ID', async () => {
-          gitlabGroups = {
-            type: 'GL_GROUP',
-            externalId: 'fakeExternalId3'
-          };
-
-          const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
-          assert.strictEqual(groups.length, 1);
-          assert.strictEqual(String(groups[0]._id), String(fixture.groupGitlab1._id));
-        });
-
         it('should return rooms where the user is in extraAdmins', async () => {
           const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab1);
-          assert.strictEqual(groups.length, 1);
-          assert.strictEqual(String(groups[0]._id), String(fixture.groupGitlab1._id));
+
+          assert.strictEqual(groups.length, 2);
+          const groupIds = groups.map(group => String(group._id));
+          assert(
+            groupIds.includes(String(fixture.groupBasedOnGitlabGroup1._id)),
+            `expected groupBasedOnGitlabGroup1(${fixture.groupBasedOnGitlabGroup1._id}) to be in groups returned ${groupIds}`
+          );
+          assert(
+            groupIds.includes(String(fixture.groupBasedOnGitlabProject1._id)),
+            `expected groupBasedOnGitlabProject1(${fixture.groupBasedOnGitlabProject1._id}) to be in groups returned ${groupIds}`
+          );
         });
 
         it('should return rooms where the user is in extraAdmins and a group maintainer without dups', async () => {
@@ -115,8 +128,63 @@ describe('admin-discovery', () => {
           };
 
           const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab1);
-          assert.strictEqual(groups.length, 1);
-          assert.strictEqual(String(groups[0]._id), String(fixture.groupGitlab1._id));
+          assert.strictEqual(groups.length, 2);
+          assert.strictEqual(String(groups[0]._id), String(fixture.groupBasedOnGitlabGroup1._id));
+          assert.strictEqual(String(groups[1]._id), String(fixture.groupBasedOnGitlabProject1._id));
+        });
+
+        describe('Groups', () => {
+          it('should return groups where user can admin based on GitLab group URL', async () => {
+            gitlabGroups = {
+              type: 'GL_GROUP',
+              linkPath: [URI]
+            };
+
+            const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
+            assert.strictEqual(groups.length, 1);
+            assert.strictEqual(String(groups[0]._id), String(fixture.groupBasedOnGitlabGroup1._id));
+          });
+
+          it('should return groups where user can admin based on GitLab group ID', async () => {
+            gitlabGroups = {
+              type: 'GL_GROUP',
+              externalId: fixture.groupBasedOnGitlabGroup1.sd.externalId
+            };
+
+            const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
+            assert.strictEqual(groups.length, 1);
+            assert.strictEqual(String(groups[0]._id), String(fixture.groupBasedOnGitlabGroup1._id));
+          });
+        });
+
+        describe('Projects', () => {
+          it('should return groups where user can admin based on GitLab project URL', async () => {
+            gitlabProjects = {
+              type: 'GL_PROJECT',
+              linkPath: [URI]
+            };
+
+            const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
+            assert.strictEqual(groups.length, 1);
+            assert.strictEqual(
+              String(groups[0]._id),
+              String(fixture.groupBasedOnGitlabProject1._id)
+            );
+          });
+
+          it('should return groups where user can admin based on GitLab project ID', async () => {
+            gitlabProjects = {
+              type: 'GL_PROJECT',
+              externalId: fixture.groupBasedOnGitlabProject1.sd.externalId
+            };
+
+            const groups = await adminDiscovery.discoverAdminGroups(fixture.userGitlab2);
+            assert.strictEqual(groups.length, 1);
+            assert.strictEqual(
+              String(groups[0]._id),
+              String(fixture.groupBasedOnGitlabProject1._id)
+            );
+          });
         });
       });
 
@@ -140,7 +208,7 @@ describe('admin-discovery', () => {
         it('should return groups where user can admin based on GitHub org ID', async () => {
           githubOrgs = {
             type: 'GH_ORG',
-            externalId: 'fakeExternalId3'
+            externalId: fixture.groupGithub1.sd.externalId
           };
 
           const groups = await adminDiscovery.discoverAdminGroups(fixture.userGithub2);

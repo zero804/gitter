@@ -12,6 +12,7 @@ var SecurityDescriptorSchema = new Schema(
         null, // No association
         'ONE_TO_ONE',
         'GL_GROUP', // Associated with GitLab group
+        'GL_PROJECT', // Associated with GitLab project
         'GH_REPO', // Associated with a GitHub repo
         'GH_ORG', // Associated with a GitHub org
         'GH_USER', // Associated with a GitHub user
