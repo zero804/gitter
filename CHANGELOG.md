@@ -11,6 +11,7 @@ Developer facing:
      - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
  - Add GitLab project service, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1781
  - Add `gl-project-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1786
+ - Add admin discovery for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1789
 
 
 # 20.18.0 - 2020-02-20
