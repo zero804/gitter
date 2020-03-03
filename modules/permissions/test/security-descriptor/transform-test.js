@@ -65,13 +65,41 @@ describe('transform-test', function() {
       groupId: groupId
     },
     {
-      name: 'room switch from GitLab to group, public',
+      name: 'room switch from GitLab group to normal group, public',
       Model: persistence.Troupe,
       newType: 'GROUP',
       in: {
         type: 'GL_GROUP',
         members: 'PUBLIC',
         admins: 'GL_GROUP_MAINTAINER',
+        public: true,
+        linkPath: 'x/y',
+        internalId: null,
+        externalId: '1',
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      out: {
+        type: 'GROUP',
+        members: 'PUBLIC',
+        admins: 'GROUP_ADMIN',
+        public: true,
+        linkPath: null,
+        internalId: groupId,
+        externalId: null,
+        extraAdmins: ['a'],
+        extraMembers: ['b']
+      },
+      groupId: groupId
+    },
+    {
+      name: 'room switch from GitLab project to normal group, public',
+      Model: persistence.Troupe,
+      newType: 'GROUP',
+      in: {
+        type: 'GL_PROJECT',
+        members: 'PUBLIC',
+        admins: 'GL_PROJECT_MAINTAINER',
         public: true,
         linkPath: 'x/y',
         internalId: null,
