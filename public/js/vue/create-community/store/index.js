@@ -185,7 +185,9 @@ export default {
     fetchRepos: ({ commit }) => {
       commit(reposVuexRequest.requestType);
       return apiClient.user
-        .get(`/repos`)
+        .get(`/repos`, {
+          type: 'admin'
+        })
         .then(repos => {
           commit(reposVuexRequest.successType);
           commit(types.SET_REPOS, repos);

@@ -165,8 +165,8 @@ async function serializeOrgsForUser(user) {
     return restSerializer.serializeObject(org, strategy);
   });
 
-  const arrays = await Promise.all(serializeOrgPromises);
-  return Array.prototype.concat(...arrays);
+  const serializedOrgs = await Promise.all(serializeOrgPromises);
+  return serializedOrgs;
 }
 
 function serializeOrgsForUserId(userId, options) {
@@ -177,22 +177,32 @@ function serializeOrgsForUserId(userId, options) {
   });
 }
 
-function serializeReposForUser(user) {
-  return repoService.getReposForUser(user).then(function(repos) {
-    var strategy = new restSerializer.GithubRepoStrategy({
+async function _serializeReposForUser(user, repos) {
+  const strategyMap = {
+    gitlab: new restSerializer.GitlabProjectStrategy(),
+    github: new restSerializer.GithubRepoStrategy({
       currentUserId: user && user._id
-    });
-    return restSerializer.serialize(repos, strategy);
+    })
+  };
+
+  const serializeRepoPromises = repos.map(repo => {
+    const strategy = strategyMap[repo.backend];
+
+    return restSerializer.serializeObject(repo, strategy);
   });
+
+  const serializedRepos = await Promise.all(serializeRepoPromises);
+  return serializedRepos;
 }
 
-function serializeAdminReposForUser(user) {
-  return repoService.getAdminReposForUser(user).then(function(repos) {
-    var strategy = new restSerializer.GithubRepoStrategy({
-      currentUserId: user && user._id
-    });
-    return restSerializer.serialize(repos, strategy);
-  });
+async function serializeReposForUser(user) {
+  const repos = await repoService.getReposForUser(user);
+  return _serializeReposForUser(user, repos);
+}
+
+async function serializeAdminReposForUser(user) {
+  const repos = await repoService.getAdminReposForUser(user);
+  return _serializeReposForUser(user, repos);
 }
 
 function serializeProfileForUsername(username) {

@@ -19,7 +19,10 @@ async function getAdminProjectsForUser(user) {
  * Finds URIs and external IDs for all GitLab projects that the user is a maintainer of
  */
 async function getGitLabProjectAdminDescriptor(user) {
-  const gitLabIdentity = await identityService.getIdentityForUser(user, 'gitlab');
+  const gitLabIdentity = await identityService.getIdentityForUser(
+    user,
+    identityService.GITLAB_IDENTITY_PROVIDER
+  );
   if (!gitLabIdentity) {
     return;
   }

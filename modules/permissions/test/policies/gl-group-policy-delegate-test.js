@@ -118,7 +118,8 @@ describe('gl-group-policy-delegate', () => {
         GitLabGroupService: StubGitLabGroupService
       },
       'gitter-web-identity': {
-        getIdentityForUser: stubGetIdentityForUser
+        getIdentityForUser: stubGetIdentityForUser,
+        GITLAB_IDENTITY_PROVIDER: 'gitlab'
       }
     });
   });
