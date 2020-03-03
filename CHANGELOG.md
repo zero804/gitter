@@ -13,6 +13,7 @@ Developer facing:
  - Add `gl-project-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1786
  - Add admin discovery for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1789
  - Add pre-creation `GL_PROJECT` delegate to policy-factory, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1791
+ - Add GitLab projects to repos endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1790
 
 
 # 20.18.0 - 2020-02-20
