@@ -55,11 +55,21 @@ describe('admin-filter', function() {
             externalId: null
           }
         },
-        groupGitlab1: {
+        groupBackedByGitLabGroup1: {
           securityDescriptor: {
             type: 'GL_GROUP',
             members: 'PUBLIC',
             admins: 'GL_GROUP_MAINTAINER',
+            public: true,
+            linkPath: URI2,
+            externalId: null
+          }
+        },
+        groupBackedByGitLabProject1: {
+          securityDescriptor: {
+            type: 'GL_PROJECT',
+            members: 'PUBLIC',
+            admins: 'GL_PROJECT_MAINTAINER',
             public: true,
             linkPath: URI2,
             externalId: null
@@ -172,7 +182,36 @@ describe('admin-filter', function() {
           .handle(userGitLabId1, 'GL_GROUP', 'GL_GROUP_MAINTAINER', URI2, 'external_xx', true)
           .delay(100) // Mongodb slave wait
           .then(function() {
-            return adminFilter(fixture.groupGitlab1, [userId1, userId2, userId3, userGitLabId1]);
+            return adminFilter(fixture.groupBackedByGitLabGroup1, [
+              userId1,
+              userId2,
+              userId3,
+              userGitLabId1
+            ]);
+          })
+          .then(function(filtered) {
+            assert.deepEqual(filtered.map(String), [userGitLabId1].map(String));
+          });
+      });
+
+      it('recognizes user with GL_PROJECT_MAINTAINER access as an GL_PROJECT admin', () => {
+        const userId1 = fixture.user1._id;
+        const userId2 = fixture.user2._id;
+        const userId3 = fixture.user3._id;
+        const userGitLabId1 = fixture.userGitlab1._id;
+
+        // This also tests objects with no extraAdmins....
+
+        return recorder.testOnly
+          .handle(userGitLabId1, 'GL_PROJECT', 'GL_PROJECT_MAINTAINER', URI2, 'external_xx', true)
+          .delay(100) // Mongodb slave wait
+          .then(function() {
+            return adminFilter(fixture.groupBackedByGitLabProject1, [
+              userId1,
+              userId2,
+              userId3,
+              userGitLabId1
+            ]);
           })
           .then(function(filtered) {
             assert.deepEqual(filtered.map(String), [userGitLabId1].map(String));
