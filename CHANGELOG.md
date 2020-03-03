@@ -16,6 +16,7 @@ Developer facing:
  - Add GitLab projects to repos endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1790
  - Add `GL_PROJECT` group sd transform to normal group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1794
 -  Running webapp locally doesn't require setting up secrets, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1795
+-  Deploying to beta from the xenial branch, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1798
 
 
 # 20.18.0 - 2020-02-20
