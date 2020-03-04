@@ -132,12 +132,23 @@ function createSerializedMessageFixture(overrides) {
 function createOrgGitlabGroupFixture(uri) {
   return {
     type: 'GL_GROUP',
-    id: `1540914-${uri}`,
+    id: `123-${uri}`,
     name: uri,
     avatar_url:
       'https://assets.gitlab-static.net/uploads/-/system/group/avatar/1540914/icon_128x128.png',
     uri,
     absoluteUri: `https://gitlab.com/groups/${uri}`
+  };
+}
+
+function createRepoGitlabProjectFixture(uri) {
+  return {
+    type: 'GL_PROJECT',
+    id: `123-${uri}`,
+    name: uri,
+    absoluteUri: `https://gitlab.com/${uri}`,
+    uri,
+    avatar_url: null
   };
 }
 
@@ -174,6 +185,7 @@ module.exports = {
   createSerializedUserFixture,
 
   createOrgGitlabGroupFixture,
+  createRepoGitlabProjectFixture,
   createOrgGithubOrgFixture,
   createRepoGithubRepoFixture
 };
