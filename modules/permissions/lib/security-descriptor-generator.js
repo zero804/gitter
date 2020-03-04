@@ -123,11 +123,7 @@ function generateGhRepoSecurityDescriptor(user, options) {
   }
 }
 
-function generateGlGroupSecurityDescriptor(user, options) {
-  var externalId = options.externalId;
-  var linkPath = options.linkPath;
-  var security = options.security;
-
+function generateGlGroupSecurityDescriptor(user, { linkPath, externalId, security }) {
   assert(linkPath, 'linkPath required');
 
   switch (security || null) {
@@ -147,6 +143,36 @@ function generateGlGroupSecurityDescriptor(user, options) {
         type: 'GL_GROUP',
         members: 'GL_GROUP_MEMBER',
         admins: 'GL_GROUP_MAINTAINER',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+}
+
+function generateGlProjectSecurityDescriptor(user, { linkPath, externalId, security }) {
+  assert(linkPath, 'linkPath required');
+
+  switch (security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GL_PROJECT',
+        members: 'PUBLIC',
+        admins: 'GL_PROJECT_MAINTAINER',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GL_PROJECT',
+        members: 'GL_PROJECT_MEMBER',
+        admins: 'GL_PROJECT_MAINTAINER',
         public: false,
         linkPath: linkPath,
         externalId: externalId
@@ -249,6 +275,9 @@ function generate(user, options) {
 
     case 'GL_GROUP':
       return generateGlGroupSecurityDescriptor(user, options);
+
+    case 'GL_PROJECT':
+      return generateGlProjectSecurityDescriptor(user, options);
 
     default:
       throw new StatusError(500, 'Unknown type: ' + options.type);
