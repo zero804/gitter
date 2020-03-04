@@ -20,6 +20,7 @@ Developer facing:
  - Add `gitlab-room` stats for room creation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1797
  - Add `GL_PROJECT` admins to admin-filter, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1796
  - Add `GL_PROJECT` to `security-descriptor-generator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1792
+ - Add `GL_PROJECT` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1793
 
 
 # 20.18.0 - 2020-02-20
