@@ -38,7 +38,7 @@ describe('group-avatars', () => {
       avatarUrl:
         'https://gitter-avatars-dev.s3.amazonaws.com/groups/5d1448202711a7087b2e4fb5/original'
     },
-    groupGitlab1: {
+    groupBasedOnGitlabGroup1: {
       securityDescriptor: {
         type: 'GL_GROUP',
         linkPath: 'test-group'
@@ -46,10 +46,28 @@ describe('group-avatars', () => {
       avatarVersion: 1,
       avatarCheckedDate: daysAgo(8)
     },
-    groupGitlab2: {
+    groupBasedOnGitlabGroup2: {
       securityDescriptor: {
         type: 'GL_GROUP',
         linkPath: 'test-group'
+      },
+      avatarUrl:
+        'https://assets.gitlab-static.net/uploads/-/system/group/avatar/1540914/icon_128x128.png',
+      avatarVersion: 1,
+      avatarCheckedDate: daysAgo(6)
+    },
+    groupBasedOnGitlabProject1: {
+      securityDescriptor: {
+        type: 'GL_PROJECT',
+        linkPath: 'test-group/test-project'
+      },
+      avatarVersion: 1,
+      avatarCheckedDate: daysAgo(8)
+    },
+    groupBasedOnGitlabProject2: {
+      securityDescriptor: {
+        type: 'GL_GROUP',
+        linkPath: 'test-group/test-project'
       },
       avatarUrl:
         'https://assets.gitlab-static.net/uploads/-/system/group/avatar/1540914/icon_128x128.png',
@@ -84,39 +102,84 @@ describe('group-avatars', () => {
   });
 
   describe('GitLab', () => {
-    it('should update avatar if it has been a week since the last update', async () => {
-      const updateGroupAvatarStub = sinon.stub();
-      updateGroupAvatarStub
-        .withArgs(sinon.match.has('_id', fixtures.groupGitlab1._id))
-        .returns(Promise.resolve());
+    describe('groups', () => {
+      it('should update avatar if it has been a week since the last update', async () => {
+        const updateGroupAvatarStub = sinon.stub();
+        updateGroupAvatarStub
+          .withArgs(sinon.match.has('_id', fixtures.groupBasedOnGitlabGroup1._id))
+          .returns(Promise.resolve());
 
-      const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
-        './update-group-avatar': updateGroupAvatarStub
+        const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
+          './update-group-avatar': updateGroupAvatarStub
+        });
+
+        await groupAvatars.getAvatarUrlForGroupId(fixtures.groupBasedOnGitlabGroup1._id);
+
+        // avatar update should be triggered since it's been over a week since the last check
+        assert(updateGroupAvatarStub.calledOnce);
       });
 
-      await groupAvatars.getAvatarUrlForGroupId(fixtures.groupGitlab1._id);
+      it('should use old avatar if it has been less than a week since the last update', async () => {
+        const updateGroupAvatarStub = sinon.stub();
+        updateGroupAvatarStub.returns(Promise.resolve());
 
-      // avatar update should be triggered since it's been over a week since the last check
-      assert(updateGroupAvatarStub.calledOnce);
+        const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
+          './update-group-avatar': updateGroupAvatarStub
+        });
+
+        const avatarUrl = await groupAvatars.getAvatarUrlForGroupId(
+          fixtures.groupBasedOnGitlabGroup2._id,
+          64
+        );
+
+        assert.strictEqual(
+          avatarUrl,
+          `${fixtures.groupBasedOnGitlabGroup2.avatarUrl}?v=${fixtures.groupBasedOnGitlabGroup2.avatarVersion}&width=64`
+        );
+
+        // avatar update shouldn't be triggered since it's been less than a week since the last check
+        assert(updateGroupAvatarStub.notCalled);
+      });
     });
 
-    it('should use old avatar if it has been less than a week since the last update', async () => {
-      const updateGroupAvatarStub = sinon.stub();
-      updateGroupAvatarStub.returns(Promise.resolve());
+    describe('projects', () => {
+      it('should update avatar if it has been a week since the last update', async () => {
+        const updateGroupAvatarStub = sinon.stub();
+        updateGroupAvatarStub
+          .withArgs(sinon.match.has('_id', fixtures.groupBasedOnGitlabProject1._id))
+          .returns(Promise.resolve());
 
-      const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
-        './update-group-avatar': updateGroupAvatarStub
+        const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
+          './update-group-avatar': updateGroupAvatarStub
+        });
+
+        await groupAvatars.getAvatarUrlForGroupId(fixtures.groupBasedOnGitlabProject1._id);
+
+        // avatar update should be triggered since it's been over a week since the last check
+        assert(updateGroupAvatarStub.calledOnce);
       });
 
-      const avatarUrl = await groupAvatars.getAvatarUrlForGroupId(fixtures.groupGitlab2._id, 64);
+      it('should use old avatar if it has been less than a week since the last update', async () => {
+        const updateGroupAvatarStub = sinon.stub();
+        updateGroupAvatarStub.returns(Promise.resolve());
 
-      assert.strictEqual(
-        avatarUrl,
-        `${fixtures.groupGitlab2.avatarUrl}?v=${fixtures.groupGitlab2.avatarVersion}&width=64`
-      );
+        const groupAvatars = proxyquireNoCallThru('../lib/group-avatars', {
+          './update-group-avatar': updateGroupAvatarStub
+        });
 
-      // avatar update shouldn't be triggered since it's been less than a week since the last check
-      assert(updateGroupAvatarStub.notCalled);
+        const avatarUrl = await groupAvatars.getAvatarUrlForGroupId(
+          fixtures.groupBasedOnGitlabProject2._id,
+          64
+        );
+
+        assert.strictEqual(
+          avatarUrl,
+          `${fixtures.groupBasedOnGitlabProject2.avatarUrl}?v=${fixtures.groupBasedOnGitlabProject2.avatarVersion}&width=64`
+        );
+
+        // avatar update shouldn't be triggered since it's been less than a week since the last check
+        assert(updateGroupAvatarStub.notCalled);
+      });
     });
   });
 

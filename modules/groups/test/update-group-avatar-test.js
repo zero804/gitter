@@ -20,11 +20,18 @@ describe('updateGroupAvatar', () => {
           linkPath: 'suprememoocow'
         }
       },
-      groupGitlab1: {
+      groupBasedOnGitlabGroup1: {
         securityDescriptor: {
           type: 'GL_GROUP',
           linkPath: 'gitter-integration-tests-group',
           externalId: 3281315
+        }
+      },
+      groupBasedOnGitlabProject1: {
+        securityDescriptor: {
+          type: 'GL_PROJECT',
+          linkPath: 'gitter-integration-tests-group/public-project1',
+          externalId: 7616684
         }
       }
     });
@@ -40,16 +47,32 @@ describe('updateGroupAvatar', () => {
       assert(group1.avatarCheckedDate >= n);
     });
 
-    it('should update GitLab avatar', async () => {
+    it('should update GitLab group avatar', async () => {
       const n = Date.now();
 
-      const result = await updateGroupAvatar(fixture.groupGitlab1);
+      const result = await updateGroupAvatar(fixture.groupBasedOnGitlabGroup1);
       assert.strictEqual(result, true);
 
-      const groupGitlab1 = await Group.findById(fixture.groupGitlab1._id).exec();
-      assert(groupGitlab1.avatarUrl);
-      assert.strictEqual(groupGitlab1.avatarVersion, 1);
-      assert(groupGitlab1.avatarCheckedDate >= n);
+      const groupBasedOnGitlabGroup1 = await Group.findById(
+        fixture.groupBasedOnGitlabGroup1._id
+      ).exec();
+      assert(groupBasedOnGitlabGroup1.avatarUrl);
+      assert.strictEqual(groupBasedOnGitlabGroup1.avatarVersion, 1);
+      assert(groupBasedOnGitlabGroup1.avatarCheckedDate >= n);
+    });
+
+    it('should update GitLab project avatar', async () => {
+      const n = Date.now();
+
+      const result = await updateGroupAvatar(fixture.groupBasedOnGitlabProject1);
+      assert.strictEqual(result, true);
+
+      const groupBasedOnGitlabProject1 = await Group.findById(
+        fixture.groupBasedOnGitlabProject1._id
+      ).exec();
+      assert(groupBasedOnGitlabProject1.avatarUrl);
+      assert.strictEqual(groupBasedOnGitlabProject1.avatarVersion, 1);
+      assert(groupBasedOnGitlabProject1.avatarCheckedDate >= n);
     });
 
     it('should not perform double fetches', async () => {

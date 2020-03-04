@@ -3,12 +3,14 @@
 var env = require('gitter-web-env');
 var config = env.config;
 const debug = require('debug')('gitter:app:groups:updateGroupAvatar');
+const assert = require('assert');
 var GitHubUserService = require('gitter-web-github').GitHubUserService;
-const { GitLabGroupService } = require('gitter-web-gitlab');
+const { GitLabGroupService, GitLabProjectService } = require('gitter-web-gitlab');
 var extractGravatarVersion = require('gitter-web-avatars/server/extract-gravatar-version');
 var Group = require('gitter-web-persistence').Group;
 const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 const getGithubUsernameFromGroup = require('./get-github-username-from-group');
+const isGitlabSecurityDescriptorType = require('gitter-web-shared/is-gitlab-security-descriptor-type');
 
 var LOCK_TIMEOUT_SECONDS = 10;
 
@@ -19,7 +21,7 @@ var redisClient = env.ioredis.createClient(config.get('redis_nopersist'), {
 /**
  * Returns true if the avatar was updated
  */
-async function githubupdateGroupAvatar(group, githubUsername) {
+async function updateGitterGroupAvatarForGithub(group, githubUsername) {
   const groupId = group._id;
   const sanitizedGroupId = mongoUtils.asObjectID(groupId);
 
@@ -80,10 +82,13 @@ async function githubupdateGroupAvatar(group, githubUsername) {
 /**
  * Returns true if the avatar was updated
  */
-async function gitlabupdateGroupAvatar(group) {
+async function updateGitterGroupAvatarForGitlab(group) {
   const groupId = group._id;
+  const type = group.sd && group.sd.type;
   const externalId = group.sd && group.sd.externalId;
   const sanitizedGroupId = mongoUtils.asObjectID(groupId);
+
+  assert(isGitlabSecurityDescriptorType(type));
 
   const result = await redisClient.set(
     'group:' + sanitizedGroupId,
@@ -93,20 +98,27 @@ async function gitlabupdateGroupAvatar(group) {
     'NX'
   );
 
-  let gitlabGroup;
+  let gitlabGroupOrProject;
   if (result === 'OK') {
-    // TODO: How do we handle private groups since we aren't passing in a user with GitLab access tokens who has access?
-    const gitlabGroupService = new GitLabGroupService(/* user */);
-    gitlabGroup = await gitlabGroupService.getGroup(externalId);
+    if (type === 'GL_GROUP') {
+      // TODO: How do we handle private groups since we aren't passing in a user with GitLab access tokens who has access?
+      const gitlabGroupService = new GitLabGroupService(/* user */);
+      gitlabGroupOrProject = await gitlabGroupService.getGroup(externalId);
+    } else if (type === 'GL_PROJECT') {
+      const gitlabProjectService = new GitLabProjectService(/* user */);
+      gitlabGroupOrProject = await gitlabProjectService.getProject(externalId);
+    } else {
+      return false;
+    }
   }
 
   debug(
-    `Attempting GitLab avatar update for group=${sanitizedGroupId} gitlabGroup=${JSON.stringify(
-      gitlabGroup
+    `Attempting GitLab avatar update for group=${sanitizedGroupId} ${type}=${JSON.stringify(
+      gitlabGroupOrProject
     )}`
   );
 
-  if (!gitlabGroup) {
+  if (!gitlabGroupOrProject) {
     return false;
   }
 
@@ -117,7 +129,10 @@ async function gitlabupdateGroupAvatar(group) {
     {
       $set: {
         // As a note `gitlabGroup.avatar_url` can be `null` if an avatar has not been set yet
-        avatarUrl: gitlabGroup.avatar_url,
+        avatarUrl: gitlabGroupOrProject.avatar_url,
+        // `avatarVersion` needs to be `1` in order for the
+        // `!group.avatarVersion` logic to work in `group-avatars.js`.
+        // If it's `0`, it always updates avatar.
         avatarVersion: 1,
         avatarCheckedDate: new Date()
       }
@@ -130,13 +145,11 @@ async function gitlabupdateGroupAvatar(group) {
 }
 
 async function updateGroupAvatar(group) {
-  const type = group.sd && group.sd.type;
-
   const githubUsername = getGithubUsernameFromGroup(group);
   if (githubUsername) {
-    return githubupdateGroupAvatar(group, githubUsername);
-  } else if (type === 'GL_GROUP') {
-    return gitlabupdateGroupAvatar(group);
+    return updateGitterGroupAvatarForGithub(group, githubUsername);
+  } else if (isGitlabSecurityDescriptorType(group.sd && group.sd.type)) {
+    return updateGitterGroupAvatarForGitlab(group);
   }
 }
 
