@@ -1,6 +1,7 @@
 'use strict';
 
 const GitLabGroupService = require('./group-service');
+const GitLabProjectService = require('./project-service');
 const GitLabUserService = require('./user-service');
 const debug = require('debug')('gitter:app:github:gitlab-uri-validator');
 
@@ -50,10 +51,17 @@ async function validateGitlabUri(user, uri) {
     throwNetworkErrors(err);
   }
 
-  // TODO: GL_PROJECT
   try {
     debug('validateUri -> project: %s', uri);
-    throw new Error('validateProjectUri: GL_PROJECT not implemented yet');
+    const projectService = new GitLabProjectService(user);
+    const project = await projectService.getProject(uri);
+
+    return {
+      type: 'PROJECT',
+      uri: project.uri,
+      description: project.name,
+      externalId: parseInt(project.id, 10) || undefined
+    };
   } catch (err) {
     throwNetworkErrors(err);
   }

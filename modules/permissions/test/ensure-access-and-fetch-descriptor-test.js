@@ -12,7 +12,9 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
     '#integrationUser1',
     '#integrationGitlabUser1',
     'GITLAB_GROUP1_ID',
-    'GITLAB_GROUP1_URI'
+    'GITLAB_GROUP1_URI',
+    'GITLAB_PUBLIC_PROJECT1_ID',
+    'GITLAB_PUBLIC_PROJECT1_URI'
   );
 
   var fixture = fixtureLoader.setup({
@@ -179,6 +181,23 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
       });
     });
 
+    it('should return a descriptor for a GitLab project if the user has access', async () => {
+      const sd = await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+        type: 'GL_PROJECT',
+        linkPath: fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI,
+        security: 'PUBLIC'
+      });
+
+      assert.deepEqual(sd, {
+        type: 'GL_PROJECT',
+        members: 'PUBLIC',
+        admins: 'GL_PROJECT_MAINTAINER',
+        public: true,
+        linkPath: fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI,
+        externalId: fixtureLoader.GITLAB_PUBLIC_PROJECT1_ID
+      });
+    });
+
     it('should throw an error if the returned GitLab type does not match as expected', async () => {
       assert.rejects(
         ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
@@ -193,11 +212,25 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
       );
     });
 
-    it('should throw an error if the user does not have access', async () => {
+    it('should throw an error if the user does not have access to group', async () => {
       assert.rejects(
         ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
           type: 'GL_GROUP',
           linkPath: 'gitlab-org/gitter',
+          security: 'PUBLIC'
+        }),
+        err => {
+          assert.strictEqual(err.status, 403);
+          return true;
+        }
+      );
+    });
+
+    it('should throw an error if the user does not have access to project', async () => {
+      assert.rejects(
+        ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+          type: 'GL_PROJECT',
+          linkPath: 'gitlab-org/gitter/webapp',
           security: 'PUBLIC'
         }),
         err => {
