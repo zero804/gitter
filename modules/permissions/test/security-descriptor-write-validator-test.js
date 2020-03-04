@@ -51,6 +51,52 @@ describe('security-descriptor-write-validator', function() {
     }
   });
 
+  it('should validate GL_PROJECT correctly', function() {
+    const sd = {
+      type: 'GL_PROJECT',
+      externalId: '7616684',
+      linkPath: 'gitter-integration-tests-group/public-project1',
+      public: true,
+      admins: 'GL_PROJECT_MAINTAINER',
+      members: 'PUBLIC'
+    };
+
+    securityDescriptorWriteValidator(sd);
+  });
+
+  it('should validate sub-group GL_PROJECT correctly', function() {
+    const sd = {
+      type: 'GL_PROJECT',
+      externalId: '3601513',
+      linkPath: 'gitlab-org/gitter/webapp',
+      public: true,
+      admins: 'GL_PROJECT_MAINTAINER',
+      members: 'PUBLIC'
+    };
+
+    securityDescriptorWriteValidator(sd);
+  });
+
+  // Just a sanity check that it fails for some invalid data that could happen
+  // from some manual database tinkering
+  it('should fail for invalid GL_PROJECT', function() {
+    const sd = {
+      type: 'GL_PROJECT',
+      externalId: '7616684',
+      linkPath: 'gitter-integration-tests-group/public-project1',
+      public: true,
+      admins: 'MANUAL',
+      members: 'PUBLIC'
+    };
+
+    try {
+      securityDescriptorWriteValidator(sd);
+      assert.ok(false);
+    } catch (e) {
+      assert.strictEqual(e.status, 403);
+    }
+  });
+
   it('should validate GH_REPO correctly', function() {
     var sd = {
       type: 'GH_REPO',
