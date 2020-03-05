@@ -5,6 +5,7 @@
  - Clarify how/why we use certain GitLab OAuth scopes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1804
  - Create community frontend for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1800
  - Add header link support for GitLab project based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1803
+ - Add GL_PROJECT support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1802
 
 Developer facing:
 
