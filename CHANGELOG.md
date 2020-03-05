@@ -2,6 +2,7 @@
 
  - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
     - Thanks to [@shanerice](https://gitlab.com/shanerice) for the contribution
+ - Clarify how/why we use certain GitLab OAuth scopes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1804
 
 Developer facing:
 
