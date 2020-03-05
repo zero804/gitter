@@ -28,6 +28,7 @@ Developer facing:
  - Add `GL_PROJECT` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1793
  - Add `GL_PROJECT` as a possible type for group creation docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1807
  - Add test for creating `GL_PROJECT` based group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1799
+ - Add `GL_PROJECT` to the linkPath validation for room creation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1808
 
 
 # 20.18.0 - 2020-02-20
