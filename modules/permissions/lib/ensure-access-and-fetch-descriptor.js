@@ -69,10 +69,9 @@ function validateGitlabType(requestedType, actualGitlabType) {
       expectedGitlabType = 'GROUP';
       break;
 
-    // TODO: `GL_PROJECT`
-    //case 'GL_PROJECT':
-    //  expectedGitlabType = 'PROJECT';
-    //  break;
+    case 'GL_PROJECT':
+      expectedGitlabType = 'PROJECT';
+      break;
 
     default:
       throw new StatusError('Unknown type:' + requestedType);

@@ -43,8 +43,11 @@ var configurationMappings = {
   GITLAB_USER_TOKEN: 'integrationTests:gitlabTestUser:token',
   GITLAB_GROUP1_ID: 'integrationTests:gitlabGroup1:id',
   GITLAB_GROUP1_URI: 'integrationTests:gitlabGroup1:uri',
+  GITLAB_PUBLIC_PROJECT1_ID: 'integrationTests:gitlabPublicProject1:id',
   GITLAB_PUBLIC_PROJECT1_URI: 'integrationTests:gitlabPublicProject1:uri',
+  GITLAB_PRIVATE_PROJECT1_ID: 'integrationTests:gitlabPrivateProject1:id',
   GITLAB_PRIVATE_PROJECT1_URI: 'integrationTests:gitlabPrivateProject1:uri',
+  GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_ID: 'integrationTests:gitlabUnauthorizedPrivateProject1:id',
   GITLAB_UNAUTHORIZED_PRIVATE_PROJECT1_URI: 'integrationTests:gitlabUnauthorizedPrivateProject1:uri'
 };
 

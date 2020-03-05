@@ -13,8 +13,8 @@ describe('group-api', function() {
     '#integrationUser1',
     'GITTER_INTEGRATION_ORG',
     '#integrationGitlabUser1',
-    'GITLAB_GROUP1_ID',
     'GITLAB_GROUP1_URI',
+    'GITLAB_PUBLIC_PROJECT1_URI',
     '#oauthTokens'
   );
 
@@ -34,6 +34,7 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
         { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() },
+        { lcUri: 'group-uri-for-project-based-group' },
         { lcUri: 'repo-group' },
         { lcUri: '_repo-group' }
       ],
@@ -135,6 +136,27 @@ describe('group-api', function() {
     const group = result.body;
     assert.strictEqual(group.uri, fixtureLoader.GITLAB_GROUP1_URI);
     assert.strictEqual(group.defaultRoom.uri, `${fixtureLoader.GITLAB_GROUP1_URI}/community`);
+  });
+
+  it('POST /v1/groups (GitLab group based)', async () => {
+    const uri = 'group-uri-for-project-based-group';
+
+    const result = await request(app)
+      .post('/v1/groups')
+      .send({
+        uri,
+        name: 'Test',
+        security: {
+          type: 'GL_PROJECT',
+          linkPath: fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI
+        }
+      })
+      .set('x-access-token', fixture.userGitlab1.accessToken)
+      .expect(200);
+
+    const group = result.body;
+    assert.strictEqual(group.uri, uri);
+    assert.strictEqual(group.defaultRoom.uri, `${uri}/community`);
   });
 
   it('POST /v1/groups (github org based)', function() {
