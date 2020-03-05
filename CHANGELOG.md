@@ -8,7 +8,7 @@ Developer facing:
 
  - Small lerna link fix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1773
      - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
- - ~~Update docker image and fix `container_scanning` GitLab CI job, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1787~~
+ - ~~Update docker image and fix `container_scanning` GitLab CI job,~~ https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1787
      - -> Rollback docker image to fix CI, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1810
      - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
  - Add GitLab project service, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1781
@@ -24,6 +24,7 @@ Developer facing:
  - Add `GL_PROJECT` to `security-descriptor-generator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1792
  - Add `GL_PROJECT` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1793
  - Add `GL_PROJECT` as a possible type for group creation docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1807
+ - Add test for creating `GL_PROJECT` based group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1799
 
 
 # 20.18.0 - 2020-02-20
