@@ -55,13 +55,12 @@ export default {
       return context.hasProvider('gitlab');
     },
     isGitlabSelected() {
-      return this.selectedBackingEntity.type === 'GL_GROUP';
+      const type = this.selectedBackingEntity.type;
+      return type === 'GL_GROUP' || type === 'GL_PROJECT';
     },
     isGithubSelected() {
-      return (
-        this.selectedBackingEntity.type === 'GH_ORG' ||
-        this.selectedBackingEntity.type === 'GH_REPO'
-      );
+      const type = this.selectedBackingEntity.type;
+      return type === 'GH_ORG' || type === 'GH_REPO';
     },
     isRepoSelected() {
       return this.selectedBackingEntity.type === 'GH_REPO';
@@ -144,7 +143,7 @@ export default {
         data-disable-routing="1"
         @click.prevent="onMoveToBackingEntityGitlabStepLinkClicked"
       >
-        GitLab groups?
+        GitLab groups/projects?
       </a>
     </p>
 

@@ -25,6 +25,7 @@ export default {
     }),
     ...mapGetters({
       gitlabGroups: 'createCommunity/gitlabGroups',
+      gitlabProjects: 'createCommunity/gitlabProjects',
       githubOrgs: 'createCommunity/githubOrgs',
       githubRepos: 'createCommunity/githubRepos'
     }),
@@ -59,6 +60,8 @@ export default {
         v-if="isOnBackingEntityGitlabStep"
         org-name="groups"
         :org-list="gitlabGroups"
+        repo-name="projects"
+        :repo-list="gitlabProjects"
       />
 
       <step-backing-entity
