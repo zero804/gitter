@@ -154,6 +154,9 @@ var HeaderView = Marionette.ItemView.extend({
       case 'GL_GROUP':
         return `All GitLab ${backend.linkPath} group members can join`;
 
+      case 'GL_PROJECT':
+        return `All GitLab ${backend.linkPath} project members can join`;
+
       default:
         return 'Only invited users can join';
     }
