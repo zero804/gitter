@@ -4,6 +4,7 @@
     - Thanks to [@shanerice](https://gitlab.com/shanerice) for the contribution
  - Clarify how/why we use certain GitLab OAuth scopes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1804
  - Create community frontend for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1800
+ - Add header link support for GitLab project based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1803
 
 Developer facing:
 
