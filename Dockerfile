@@ -17,3 +17,10 @@ RUN cat package-lock.json | node filter-package-lock-json-cli.js > temp-package-
 RUN npm install
 
 RUN rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null
+
+ADD package.json package.json
+ADD package-lock.json package-lock.json
+ADD . ./
+RUN npm install
+
+ENTRYPOINT ["/usr/local/bin/npm", "start"]

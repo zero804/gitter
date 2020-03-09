@@ -132,13 +132,38 @@
   "irc": {
     "clientKey": "irc-dev"
   },
-  "redis": "redis://localhost",
-  "redis_faye": "redis://localhost?db=3",
-  "redis_nopersist": "redis://localhost?db=1",
-  "redis_caching": "redis://localhost?db=2",
+  "redis": {
+    "sentinel": {
+      "master-name": "gitter-master",
+      "hosts": ["sentinel:26379"],
+      "validateHost": "10.*.*.*"
+    },
+    "redisDb": 1
+  },
+  "redis_nopersist": {
+    "sentinel": {
+      "master-name": "gitter-nopersist-prod",
+      "hosts": ["sentinel:26379"],
+      "validateHost": "10.*.*.*"
+    }
+  },
+  "redis_faye": {
+    "sentinel": {
+      "master-name": "gitter-faye-prod",
+      "hosts": ["sentinel:26379"],
+      "validateHost": "10.*.*.*"
+    }
+  },
+  "redis_caching": {
+    "sentinel": {
+      "master-name": "gitter-caching-prod",
+      "hosts": ["sentinel:26379"],
+      "validateHost": "10.*.*.*"
+    }
+  },
   "elasticsearch": {
     "hosts": [
-      "http://localhost:9200"
+      "http://elasticsearch:9200"
     ],
     "sniffOnStart": false
   },
@@ -148,7 +173,7 @@
     "warning-period": 300
   },
   "neo4j": {
-    "endpoint": "http://localhost:7474"
+    "endpoint": "http://neo4j:7474"
   },
   "resque": {
     "queuePrefix": ""
