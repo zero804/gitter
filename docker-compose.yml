@@ -12,29 +12,23 @@ services:
       - mongo1:mongo
       - neo4j
       - elasticsearch
-  #  redis1:
-  #    image: redis:3.0.3
-  #    restart: always
-  #    ports:
-  #      - "6379:6379"
-  #    entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
-  #
+    ports:
+      - "5000:5000"
+      - "5001:5001"
   master:
     image: redis:3
   slave:
     image: redis:3
     command: redis-server --slaveof master 6379
-    links:
-      - master:master
   sentinel:
     build: sentinel
     environment:
-      - SENTINEL_DOWN_AFTER=5000
+      - SENTINEL_DOWN_AFTER=10000
       - SENTINEL_FAILOVER=5000    
     # ports:
     #   - "26379:26379"
     links:
-      - master:master
+      - master
       - slave
 
   mongo1:
@@ -70,3 +64,6 @@ services:
       - mongo1
 volumes:
   gitter-mongodb:
+
+networks:
+  main:

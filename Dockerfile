@@ -23,4 +23,4 @@ ADD package-lock.json package-lock.json
 ADD . ./
 RUN npm install
 
-ENTRYPOINT ["/usr/local/bin/npm", "start"]
+ENTRYPOINT ["/bin/bash", "-c", ". .envrc && /usr/local/bin/npm start"]
