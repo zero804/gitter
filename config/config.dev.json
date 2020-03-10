@@ -132,33 +132,40 @@
   "irc": {
     "clientKey": "irc-dev"
   },
+  "mongo": {
+    "onlyUsePrimary": true,
+    "connection": {
+      "hosts": ["mongo:27017"],
+      "database": "gitter",
+      "options": {}
+    },
+    "profileSlowQueries": true,
+    "logQueries": false,
+    "noAutoIndex": true
+  },
   "redis": {
     "sentinel": {
       "master-name": "gitter-master",
-      "hosts": ["sentinel:26379"],
-      "validateHost": "10.*.*.*"
+      "hosts": ["sentinel:26379"]
     },
     "redisDb": 1
   },
   "redis_nopersist": {
     "sentinel": {
       "master-name": "gitter-nopersist-prod",
-      "hosts": ["sentinel:26379"],
-      "validateHost": "10.*.*.*"
+      "hosts": ["sentinel:26379"]
     }
   },
   "redis_faye": {
     "sentinel": {
       "master-name": "gitter-faye-prod",
-      "hosts": ["sentinel:26379"],
-      "validateHost": "10.*.*.*"
+      "hosts": ["sentinel:26379"]
     }
   },
   "redis_caching": {
     "sentinel": {
       "master-name": "gitter-caching-prod",
-      "hosts": ["sentinel:26379"],
-      "validateHost": "10.*.*.*"
+      "hosts": ["sentinel:26379"]
     }
   },
   "elasticsearch": {

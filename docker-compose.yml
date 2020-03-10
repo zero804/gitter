@@ -23,18 +23,18 @@ services:
     image: redis:3
   slave:
     image: redis:3
-    command: redis-server --slaveof redis-master 6379
+    command: redis-server --slaveof master 6379
     links:
-      - master:redis-master
+      - master:master
   sentinel:
     build: sentinel
     environment:
       - SENTINEL_DOWN_AFTER=5000
       - SENTINEL_FAILOVER=5000    
-    ports:
-      - "26379:26379"
+    # ports:
+    #   - "26379:26379"
     links:
-      - master:redis-master
+      - master:master
       - slave
 
   mongo1:
