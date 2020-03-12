@@ -7,6 +7,7 @@
  - Add header link support for GitLab project based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1803
  - Add GL_PROJECT support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1802
  - Better clarify announcements notification setting, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1813
+     - Thanks to [@ianfixes](https://gitlab.com/ianfixes) for the contribution
 
 Developer facing:
 
