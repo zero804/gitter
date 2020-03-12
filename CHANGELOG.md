@@ -6,6 +6,7 @@
  - Create community frontend for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1800
  - Add header link support for GitLab project based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1803
  - Add GL_PROJECT support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1802
+ - Better clarify announcements notification setting, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1813
 
 Developer facing:
 
