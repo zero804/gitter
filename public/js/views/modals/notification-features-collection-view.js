@@ -20,7 +20,7 @@ var View = Marionette.CollectionView.extend({
       features.push({
         id: 6,
         text:
-          'You will also get emails for all unread messages which we know is undesirable, see #1205'
+          'You will get emails for all unread messages which we know might be undesirable, see #1205'
       });
     }
 
@@ -56,7 +56,7 @@ var View = Marionette.CollectionView.extend({
       features.push({
         id: 6,
         text:
-          'You will also get emails for all unread messages which we know is undesirable, see #1205'
+          'You will get emails for all unread messages which we know might be undesirable, see #1205'
       });
     }
 
