@@ -17,6 +17,11 @@ var View = Marionette.CollectionView.extend({
     var features = [];
     if (notificationFeaturesHash.unread) {
       features.push({ id: 1, text: 'Show unread item counts' });
+      features.push({
+        id: 6,
+        text:
+          'You will also get emails for all unread messages which we know is undesirable, see #1205'
+      });
     }
 
     if (notificationFeaturesHash.activity) {
@@ -48,6 +53,11 @@ var View = Marionette.CollectionView.extend({
     var features = [];
     if (mode === 'all' || mode === 'announcement') {
       features.push({ id: 1, text: 'Show unread item counts' });
+      features.push({
+        id: 6,
+        text:
+          'You will also get emails for all unread messages which we know is undesirable, see #1205'
+      });
     }
 
     if (mode === 'mute') {
