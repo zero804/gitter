@@ -1,4 +1,4 @@
-# 20.19.0 - *upcoming*
+# 20.19.0 - 2020-03-12
 
  - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
     - Thanks to [@shanerice](https://gitlab.com/shanerice) for the contribution
