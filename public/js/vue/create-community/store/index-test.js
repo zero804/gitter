@@ -23,6 +23,7 @@ import {
 
 const {
   createOrgGitlabGroupFixture,
+  createRepoGitlabProjectFixture,
   createOrgGithubOrgFixture,
   createRepoGithubRepoFixture
 } = require('../../__test__/fixture-helpers');
@@ -130,6 +131,21 @@ describe('thread message feed store', () => {
       };
       const result = getters.gitlabGroups(state, {});
       expect(result).toEqual([gitlabGroup1, gitlabGroup2]);
+    });
+
+    it('gitlabProjects', () => {
+      const gitlabProject1 = createRepoGitlabProjectFixture('gitlab-org/gitter/webapp');
+      const gitlabProject2 = createRepoGitlabProjectFixture('gitlab-org/gitlab');
+      const state = {
+        repos: [
+          createRepoGithubRepoFixture('gitterhq/gitter'),
+          gitlabProject1,
+          gitlabProject2,
+          createRepoGithubRepoFixture('troupe/gitter-webapp')
+        ]
+      };
+      const result = getters.gitlabProjects(state, {});
+      expect(result).toEqual([gitlabProject1, gitlabProject2]);
     });
 
     it('githubOrgs', () => {
@@ -325,7 +341,7 @@ describe('thread message feed store', () => {
         []
       );
 
-      expect(apiClient.user.get).toHaveBeenCalledWith('/repos');
+      expect(apiClient.user.get).toHaveBeenCalledWith('/repos', { type: 'admin' });
     });
 
     it('checkSlugAvailability sets pending and calls the debounced check', async () => {

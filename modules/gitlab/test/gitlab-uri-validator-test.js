@@ -12,9 +12,11 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
   let validateGitlabUri;
   let getUserByUsernameStub;
   let getGroupStub;
+  let getProjectStub;
   beforeEach(() => {
     getUserByUsernameStub = null;
     getGroupStub = null;
+    getProjectStub = null;
     validateGitlabUri = proxyquireNoCallThru('../lib/gitlab-uri-validator', {
       './user-service': function() {
         return {
@@ -24,6 +26,11 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
       './group-service': function() {
         return {
           getGroup: getGroupStub
+        };
+      },
+      './project-service': function() {
+        return {
+          getProject: getProjectStub
         };
       }
     });
@@ -47,6 +54,27 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
     assert.strictEqual(gitlabInfo.type, 'GROUP');
     assert.strictEqual(gitlabInfo.uri, 'gitlab-org/gitter');
     assert.strictEqual(gitlabInfo.externalId, 1540914);
+  });
+
+  it('validate real project', async () => {
+    getProjectStub = () => {
+      return {
+        backend: 'gitlab',
+        id: 7616684,
+        name: 'public-project1',
+        description: '',
+        absoluteUri: 'https://gitlab.com/gitter-integration-tests-group/public-project1',
+        uri: 'gitter-integration-tests-group/public-project1',
+        private: false,
+        avatar_url: null
+      };
+    };
+
+    const gitlabInfo = await validateGitlabUri(fixture.user1, 'gitlab-org/gitter/webapp');
+    assert(gitlabInfo);
+    assert.strictEqual(gitlabInfo.type, 'PROJECT');
+    assert.strictEqual(gitlabInfo.uri, 'gitter-integration-tests-group/public-project1');
+    assert.strictEqual(gitlabInfo.externalId, 7616684);
   });
 
   it('validate real user', async () => {
@@ -83,6 +111,21 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
     assert.strictEqual(gitlabInfo, null);
   });
 
+  it('validate nonexistant project does not throw', async () => {
+    getProjectStub = () => {
+      const err = new Error('Fake HTTPError: Not Found');
+      err.response = {
+        status: 404
+      };
+    };
+
+    const gitlabInfo = await validateGitlabUri(
+      fixture.user1,
+      'foo-foo-does-not-exist/bar-bar-what-up'
+    );
+    assert.strictEqual(gitlabInfo, null);
+  });
+
   it('Connection problem to GitLab will throw', async () => {
     getGroupStub = () => {
       const err = new Error('Fake HTTPError: Not Found');
@@ -106,10 +149,4 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
     const gitlabInfo = await validateGitlabUri(fixture.user1, 'foo-foo-does-not-exist');
     assert.strictEqual(gitlabInfo, null);
   });
-
-  // TODO: GL_PROJECT
-  it('validate real project');
-
-  // TODO: GL_PROJECT
-  it('validate nonexistant project');
 });

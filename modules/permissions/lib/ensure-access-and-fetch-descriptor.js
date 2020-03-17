@@ -69,10 +69,9 @@ function validateGitlabType(requestedType, actualGitlabType) {
       expectedGitlabType = 'GROUP';
       break;
 
-    // TODO: `GL_PROJECT`
-    //case 'GL_PROJECT':
-    //  expectedGitlabType = 'PROJECT';
-    //  break;
+    case 'GL_PROJECT':
+      expectedGitlabType = 'PROJECT';
+      break;
 
     default:
       throw new StatusError('Unknown type:' + requestedType);
@@ -147,6 +146,7 @@ function validateAndFetchBackingInfo(user, options) {
       return validateAndFetchBackingInfoForGithub(user, options);
 
     case 'GL_GROUP':
+    case 'GL_PROJECT':
       return validateAndFetchBackingInfoForGitlab(user, options);
 
     case 'GROUP':

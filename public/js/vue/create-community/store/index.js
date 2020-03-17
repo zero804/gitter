@@ -113,6 +113,11 @@ export default {
         return org.type === 'GL_GROUP';
       });
     },
+    gitlabProjects(state) {
+      return state.repos.filter(repo => {
+        return repo.type === 'GL_PROJECT';
+      });
+    },
     githubOrgs(state) {
       return state.orgs.filter(org => {
         return org.type === 'GH_ORG';
@@ -185,7 +190,9 @@ export default {
     fetchRepos: ({ commit }) => {
       commit(reposVuexRequest.requestType);
       return apiClient.user
-        .get(`/repos`)
+        .get(`/repos`, {
+          type: 'admin'
+        })
         .then(repos => {
           commit(reposVuexRequest.successType);
           commit(types.SET_REPOS, repos);

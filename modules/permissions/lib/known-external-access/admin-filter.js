@@ -24,7 +24,8 @@ function validateAdminsForSecurityDescriptor(securityDescriptor) {
   const validAdminMap = {
     GH_REPO: 'GH_REPO_PUSH',
     GH_ORG: 'GH_ORG_MEMBER',
-    GL_GROUP: 'GL_GROUP_MAINTAINER'
+    GL_GROUP: 'GL_GROUP_MAINTAINER',
+    GL_PROJECT: 'GL_PROJECT_MAINTAINER'
   };
   return validAdminMap[securityDescriptor.type] === securityDescriptor.admins;
 }
@@ -137,7 +138,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
         });
     }
   } else {
-    // Not a group, deal with GL_GROUP, GH_ORG, GH_REPO and null here
+    // Not a group, deal with GL_GROUP, GL_PROJECT, GH_ORG, GH_REPO and null here
     var query = getQueryForDescriptor(securityDescriptor);
 
     if (query) {

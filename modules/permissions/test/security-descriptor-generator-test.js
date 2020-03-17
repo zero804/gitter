@@ -105,6 +105,40 @@ describe('security-descriptor-generator', function() {
       }
     },
     {
+      name: 'type=GL_PROJECT, security=PUBLIC',
+      options: {
+        type: 'GL_PROJECT',
+        security: 'PUBLIC',
+        externalId: '1234',
+        linkPath: 'xxyx'
+      },
+      expected: {
+        type: 'GL_PROJECT',
+        externalId: '1234',
+        members: 'PUBLIC',
+        admins: 'GL_PROJECT_MAINTAINER',
+        public: true,
+        linkPath: 'xxyx'
+      }
+    },
+    {
+      name: 'type=GL_PROJECT, security=PRIVATE',
+      options: {
+        type: 'GL_PROJECT',
+        security: 'PRIVATE',
+        externalId: '1234',
+        linkPath: 'xxyx'
+      },
+      expected: {
+        type: 'GL_PROJECT',
+        externalId: '1234',
+        members: 'GL_PROJECT_MEMBER',
+        admins: 'GL_PROJECT_MAINTAINER',
+        public: false,
+        linkPath: 'xxyx'
+      }
+    },
+    {
       name: 'type=GROUP, security=PRIVATE',
       options: {
         type: 'GROUP',

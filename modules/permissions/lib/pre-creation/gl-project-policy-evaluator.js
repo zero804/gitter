@@ -1,11 +1,11 @@
 'use strict';
 
-const debug = require('debug')('gitter:app:permissions:pre-creation:gl-group-policy-evaluator');
+const debug = require('debug')('gitter:app:permissions:pre-creation:gl-project-policy-evaluator');
 const PolicyDelegateTransportError = require('../policies/policy-delegate-transport-error');
-const GitLabGroupService = require('gitter-web-gitlab').GitLabGroupService;
+const GitLabProjectService = require('gitter-web-gitlab').GitLabProjectService;
 const identityService = require('gitter-web-identity');
 
-class GitlabGroupPolicyEvaluator {
+class GitlabProjectPolicyEvaluator {
   constructor(user, uri) {
     this.user = user;
     this.uri = uri;
@@ -42,23 +42,20 @@ class GitlabGroupPolicyEvaluator {
 
     if (!this.user || !this.user.username) return false;
 
-    const gitLabIdentity = await identityService.getIdentityForUser(
-      this.user,
-      identityService.GITLAB_IDENTITY_PROVIDER
-    );
-    // Non GitLab users will never be an group member
+    const gitLabIdentity = await identityService.getIdentityForUser(this.user, 'gitlab');
+    // Non GitLab users will never be an project member
     if (!gitLabIdentity) return false;
 
-    const gitlabGroupService = new GitLabGroupService(this.user);
+    const gitlabProjectService = new GitLabProjectService(this.user);
     try {
-      const membership = await gitlabGroupService.getMembership(
+      const membership = await gitlabProjectService.getMembership(
         this.uri,
         gitLabIdentity.providerKey
       );
       this._canAccessResult = membership.isMaintainer;
       return this._canAccessResult;
     } catch (err) {
-      debug('Exeception while fetching group');
+      debug('Exeception while fetching project');
 
       if ((err.errno && err.syscall) || err.statusCode >= 500) {
         // GitLab call failed and may be down.
@@ -70,4 +67,4 @@ class GitlabGroupPolicyEvaluator {
   }
 }
 
-module.exports = GitlabGroupPolicyEvaluator;
+module.exports = GitlabProjectPolicyEvaluator;

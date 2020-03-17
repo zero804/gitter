@@ -62,6 +62,11 @@ Please note that if you enable Gitter for access to private repositories, you wi
 
 You can sign in via GitLab. Your username will have a `_gitlab` suffix.
 
+Currently, we ask for `api` and `read_user` scopes when you authorize the GitLab OAuth app.
+We understand you may be uncomfortable with granting access to all of your GitLab groups/projects but there isn't a way to restrict access on the GitLab side yet(see https://gitlab.com/gitlab-org/gitlab/issues/22115). We don't do any reading/writing to your repo(those are different scopes which we don't ask for). We just use the API to see whether you can access a given group/project to tell whether you can access or admin a given Gitter community or room, and to show nice green(open)/red(closed) issue decorations when you post a GitLab issue/merge request link.
+
+On the authorize screen, it says the OAuth app is "not provided by GitLab" but [Gitter is owned by GitLab](https://about.gitlab.com/blog/2017/03/15/gitter-acquisition/) and this issue is tracked by https://gitlab.com/gitlab-org/gitlab/issues/24458
+
 
 ## Twitter
 

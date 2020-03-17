@@ -49,6 +49,8 @@ exports[`CreateCommunity index backing entity GitLab matches snapshot 1`] = `
     <step-backing-entity-stub
       orglist=""
       orgname="groups"
+      repolist=""
+      reponame="projects"
     />
      
     <!---->

@@ -49,7 +49,12 @@ See [Accounts](./accounts.md#how-do-i-update-my-avatar)
 
 ## You want write access on my private repos? Are you insane?
 
-See ["Private Repositories" on the OAuth scopes page](./oauth-scopes.md#private-repositories)
+See the [GitHub **Private Repositories** section on the **OAuth scopes page**](./oauth-scopes.md#private-repositories)
+
+
+## You want access to all of my GitLab groups/projects? Are you crazy?
+
+See the [**GitLab** section on the **OAuth scopes page**](./oauth-scopes.md#gitlab)
 
 
 ## How do I change my room from public to private?

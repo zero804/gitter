@@ -3,6 +3,30 @@
 var StatusError = require('statuserror');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 
+function validatePublicAttributesConsistency(descriptor) {
+  if (descriptor.public) {
+    if (descriptor.members !== 'PUBLIC') {
+      throw new StatusError(403, 'Invalid public attribute');
+    }
+  }
+}
+
+function validateLinkPathAttributeShouldBePresent(descriptor) {
+  if (!descriptor.linkPath) {
+    throw new StatusError(403, 'Invalid empty linkPath attribute');
+  }
+}
+
+function validateInteralIdAttributeShouldNotBePresent(descriptor) {
+  if (descriptor.internalId) {
+    throw new StatusError(
+      403,
+      'internalId(for referencing Gitter internal entities) attribute is present but should not be used for this type(you probably want to use externalId): ' +
+        descriptor.internalId
+    );
+  }
+}
+
 function validateObjectIdsArray(array) {
   if (!array) return true;
   if (!Array.isArray(array)) return false;
@@ -12,10 +36,6 @@ function validateObjectIdsArray(array) {
 }
 
 function validateGhRepoLinkPath(linkPath) {
-  if (!linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for repo');
-  }
-
   var parts = linkPath.split('/');
   if (parts.length !== 2) {
     throw new StatusError(403, 'Invalid linkPath attribute for repo: ' + linkPath);
@@ -123,19 +143,13 @@ function validateGhRepoDescriptor(descriptor) {
     }
   }
 
-  if (descriptor.internalId) {
-    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
-  }
-
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
   validateGhRepoLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
 
 function validateGhOrgLinkPath(linkPath) {
-  if (!linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
-  }
-
   var parts = linkPath.split('/');
   if (parts.length !== 1) {
     throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
@@ -170,25 +184,14 @@ function validateGhOrgDescriptor(descriptor) {
     throw new StatusError(403, 'Unused reference type: GH_ORG');
   }
 
-  if (descriptor.public) {
-    if (descriptor.members !== 'PUBLIC') {
-      throw new StatusError(403, 'Invalid public attribute');
-    }
-  }
-
-  if (descriptor.internalId) {
-    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
-  }
-
+  validatePublicAttributesConsistency(descriptor);
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
   validateGhOrgLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
 
 function validateGhUserLinkPath(linkPath) {
-  if (!linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for org');
-  }
-
   var parts = linkPath.split('/');
   if (parts.length !== 1) {
     throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
@@ -220,16 +223,9 @@ function validateGhUserDescriptor(descriptor) {
     throw new StatusError(403, 'Unused reference type: GH_USER');
   }
 
-  if (descriptor.public) {
-    if (descriptor.members !== 'PUBLIC') {
-      throw new StatusError(403, 'Invalid public attribute');
-    }
-  }
-
-  if (descriptor.internalId) {
-    throw new StatusError(403, 'Invalid internalId attribute: ' + descriptor.internalId);
-  }
-
+  validatePublicAttributesConsistency(descriptor);
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
   validateGhUserLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
@@ -265,23 +261,46 @@ function validateGlGroupDescriptor(descriptor) {
     );
   }
 
-  if (descriptor.public) {
-    if (descriptor.members !== 'PUBLIC') {
-      throw new StatusError(403, 'Invalid public attribute');
-    }
+  validatePublicAttributesConsistency(descriptor);
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
+  validateExtraUserIds(descriptor);
+}
+
+function validateGlProjectDescriptor(descriptor) {
+  let usesGl = false;
+  switch (descriptor.members) {
+    case 'PUBLIC':
+    case 'INVITE':
+    case 'INVITE_OR_ADMIN':
+      break;
+    case 'GL_PROJECT_MEMBER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
   }
 
-  if (descriptor.internalId) {
+  switch (descriptor.admins) {
+    case 'MANUAL':
+      break;
+    case 'GL_PROJECT_MAINTAINER':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (!usesGl) {
     throw new StatusError(
       403,
-      'internalId(for referencing Gitter internal entities) attribute is present but should not be used with a GL_GROUP(use externalId to reference a GitLab entity): ' +
-        descriptor.internalId
+      'The members or admin attributes need to be set with some GL_XXX values when using the GL_PROJECT type'
     );
   }
 
-  if (!descriptor.linkPath) {
-    throw new StatusError(403, 'Invalid empty linkPath attribute for GitLab group');
-  }
+  validatePublicAttributesConsistency(descriptor);
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
   validateExtraUserIds(descriptor);
 }
 
@@ -372,6 +391,9 @@ function validate(descriptor) {
 
     case 'GL_GROUP':
       return validateGlGroupDescriptor(descriptor);
+
+    case 'GL_PROJECT':
+      return validateGlProjectDescriptor(descriptor);
 
     case 'ONE_TO_ONE':
       return validateOneToOneDescriptor(descriptor);

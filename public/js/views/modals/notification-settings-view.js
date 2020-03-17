@@ -10,7 +10,7 @@ var FeaturesView = require('./notification-features-collection-view');
 
 var OPTIONS = {
   all: 'All: Notify me for all messages',
-  announcement: 'Announcements: Notify me for mentions and announcements',
+  announcement: 'Announcements: Notify me for mentions/announcements (email for all messages)',
   mute: "Mute: Notify me only when I'm directly mentioned"
 };
 

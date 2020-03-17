@@ -373,15 +373,14 @@ function createGroupRoom(user, group, roomInfo, securityDescriptor, options) {
   var roomType;
   switch (type) {
     case 'GH_ORG':
-      roomType = 'github-room';
-      break;
-
     case 'GH_REPO':
-      roomType = 'github-room';
-      break;
-
     case 'GH_USER':
       roomType = 'github-room';
+      break;
+
+    case 'GL_GROUP':
+    case 'GL_PROJECT':
+      roomType = 'gitlab-room';
       break;
 
     case null:

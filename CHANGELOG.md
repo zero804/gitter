@@ -1,3 +1,38 @@
+# 20.19.0 - 2020-03-12
+
+ - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
+    - Thanks to [@shanerice](https://gitlab.com/shanerice) for the contribution
+ - Clarify how/why we use certain GitLab OAuth scopes, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1804
+ - Create community frontend for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1800
+ - Add header link support for GitLab project based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1803
+ - Add GL_PROJECT support to header view who can join tooltip, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1802
+ - Better clarify announcements notification setting, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1813
+     - Thanks to [@ianfixes](https://gitlab.com/ianfixes) for the contribution
+
+Developer facing:
+
+ - Small lerna link fix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1773
+     - Thanks to [@a2902793](https://gitlab.com/a2902793) for the contribution
+ - ~~Update docker image and fix `container_scanning` GitLab CI job,~~ https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1787
+     - -> Rollback docker image to fix CI, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1810
+     - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Add GitLab project service, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1781
+ - Add `gl-project-policy-delegate`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1786
+ - Add admin discovery for GitLab projects, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1789
+ - Add pre-creation `GL_PROJECT` delegate to policy-factory, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1791
+ - Add GitLab projects to repos endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1790
+ - Add `GL_PROJECT` group sd transform to normal group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1794
+ -  Running webapp locally doesn't require setting up secrets, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1795
+ -  Deploying to beta from the xenial branch, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1798
+ - Add `gitlab-room` stats for room creation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1797
+ - Add `GL_PROJECT` admins to admin-filter, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1796
+ - Add `GL_PROJECT` to `security-descriptor-generator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1792
+ - Add `GL_PROJECT` to `security-descriptor-validator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1793
+ - Add `GL_PROJECT` as a possible type for group creation docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1807
+ - Add test for creating `GL_PROJECT` based group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1799
+ - Add `GL_PROJECT` to the linkPath validation for room creation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1808
+
+
 # 20.18.0 - 2020-02-20
 
  - Fix translation logic to properly credit translator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1768

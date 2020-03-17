@@ -84,8 +84,8 @@ function transform(Model, sd, newType, options) {
       if (newType !== 'GROUP') break;
       return transformToGroup(sd, groupId);
 
-    // TODO: GL_PROJECT
     case 'GL_GROUP':
+    case 'GL_PROJECT':
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':

@@ -250,7 +250,9 @@ deploy_beta: &deploy_beta
   only:
     - develop
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
+    - cd $ANSIBLE_DIR
+    - git checkout xenial && git pull origin xenial
+    - ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
   environment:
     name: beta
     url: https://beta.gitter.im
@@ -266,7 +268,9 @@ deploy_beta_staging: &deploy_beta_staging
   only:
     - /^feature\/.*$/
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
+    - cd $ANSIBLE_DIR
+    - git checkout xenial && git pull origin xenial
+    - ansible-playbook -i beta --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
     name: beta_staging
     url: https://beta.gitter.im?gitter_next=true
@@ -388,6 +392,8 @@ dependency_scanning:
 container_scanning:
   stage: security
   variables:
+    DOCKERFILE_PATH: Dockerfile-app-base
+    GIT_STRATEGY: fetch
     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
