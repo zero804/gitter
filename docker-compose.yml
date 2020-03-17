@@ -22,6 +22,8 @@ services:
   slave:
     image: redis:3
     command: redis-server --slaveof master 6379
+    ports:
+      - "6378:6379"
   sentinel1:
     build: sentinel
     environment:
@@ -32,8 +34,6 @@ services:
     environment:
       - SENTINEL_DOWN_AFTER=10000
       - SENTINEL_FAILOVER=5000    
-    # ports:
-    #   - "26379:26379"
     links:
       - master
       - slave
@@ -42,8 +42,6 @@ services:
     environment:
       - SENTINEL_DOWN_AFTER=10000
       - SENTINEL_FAILOVER=5000    
-    # ports:
-    #   - "26379:26379"
     links:
       - master
       - slave
