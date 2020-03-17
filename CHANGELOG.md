@@ -1,3 +1,8 @@
+# 20.20.0 - 2020-03-16
+
+ - Make GitHub OAuth juggling docs easier to follow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1805
+
+
 # 20.19.0 - 2020-03-12
 
  - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
