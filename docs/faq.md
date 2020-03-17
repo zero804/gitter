@@ -15,7 +15,7 @@ Feel free to come discuss your idea in the [`gitterHQ/gitter`](https://gitter.im
 
 If your support inquiry doesn't need to be private, drop by the [`gitterHQ/gitter`](https://gitter.im/gitterHQ/gitter) room.
 
-Otheriwse, send a message to support@gitter.im
+Otherwise, send a message to support@gitter.im
 
 
 ## Do you have an API?
@@ -37,7 +37,7 @@ See [Accounts](./accounts.md#can-i-mergeconnect-my-accounts)
 See [Accounts](./accounts.md#can-i-change-my-username)
 
 
-### How do I remove the  `_twitter` suffix from my username
+### How do I remove the  `_twitter`/`_gitlab` suffix from my username
 
 See [Accounts](./accounts.md#how-do-i-remove-the-twitter-suffix-from-my-username)
 
@@ -64,26 +64,23 @@ See [Rooms](./rooms.md#change-room-security-after-creation)
 
 ## Why isn't my GitHub organisation or repos appearing?
 
-The first thing to check is [adding private repo access OAuth scope](./oauth-scopes.md#private-repositories) in order to see a private GitHub repo.
+The first thing to check is [adding private repo access OAuth scope](./oauth-scopes.md#grant-private-repo-access) in order to see a private GitHub repo.
 
-If it isn't a private repo, the key is to make sure your personal GitHub OAuth scopes and GitHub organisation scopes match.
-
-You can check these settings here,
+If it isn't a private repo, the key is to make sure your personal GitHub OAuth scopes and GitHub organisation scopes match(both public and private granted or just public). Check the following pages to see if they match(**Gitter Public Repo Access** and **Gitter Private Repo Access**):
 
  - [Personal OAuth application settings](https://github.com/settings/applications)
- - Organisation OAuth application settings, `https://github.com/organizations/YOURORG/settings/applications`
+ - Organisation OAuth application settings, `https://github.com/organizations/YOURORG/settings/applications`(replace `YOURORG` in the link)
 
-For example, if you have ["Gitter Private Repo Access"](./oauth-scopes.md#private-repositories)
-granted personally or on the organisation, please make sure it is also granted on the other.
+If one of them is missing you can sign out and back in to get **Gitter Public Repo Access** granted personally. And then use the [**Allow private repo access** option from the profile dropdown](./oauth-scopes.md#grant-private-repo-access) in the top-right for **Gitter Private Repo Access**
 
- 1. Go to https://github.com/settings/applications
- 1. Click on **Gitter Public Repo Access**
- 1. **Request** access for the given org  under the **Organization access** section
- 1. Back on https://github.com/settings/applications, click on **Gitter Private Repo Access**
-    - If you don't see **Gitter Private Repo Access**, see https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/oauth-scopes.md#grant-private-repo-access
- 1. **Request** access for the given org under the **Organization access** section
+Once you see the public/private OAuth scopes [listed](https://github.com/settings/applications), you can click on those OAuth apps and **Request** access under the Organization access section:
 
-You can also try making your organisation membership public, `https://github.com/orgs/YOURORG/people`
+ - **Gitter Public Repo Access**: https://github.com/settings/connections/applications/e865e74c1d0a3e66003c
+ - **Gitter Private Repo Access**: https://github.com/settings/connections/applications/a06939fa3ecb59c27f88
+
+---
+
+You can also try making your organisation membership public, `https://github.com/orgs/YOURORG/people`(replace `YOURORG` in the link)
 
 For more information see [OAuth Scopes](./oauth-scopes.md).
 
