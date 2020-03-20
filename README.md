@@ -83,6 +83,8 @@ The simplest way to run Gitter `webapp` is to start it without [OAuth configurat
 
 ### Configure OAuth and service secrets
 
+<a id="configure-service-secrets"></id>
+
 This is an optional step. If you don't want the sign in with GitLab, GitHub, Twitter features, then you can just use the test accounts that the `npm run create-seed-data` will log out (from the [step above](#running-gitter-without-oauth)).
 
 Gitter connects to third party APIs. In order to do this, you will need to generate API tokens and add them to your configuration.
