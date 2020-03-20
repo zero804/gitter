@@ -10,6 +10,7 @@ var updateGroupAvatar = require('./update-group-avatar');
 var debug = require('debug')('gitter:app:groups:group-avatars');
 const getGithubUsernameFromGroup = require('./get-github-username-from-group');
 const isGitterInternalAvatarUrl = require('./is-gitter-internal-group-avatar-url');
+const isGitlabSecurityDescriptorType = require('gitter-web-shared/is-gitlab-security-descriptor-type');
 
 /**
  * Check on avatars once a week. In future, we may bring this
@@ -71,7 +72,7 @@ function getGroupAvatarUrlForSize(group, size) {
     pathParts.push(bestSize);
     parsed.pathname = pathParts.join('/');
     return url.format(parsed);
-  } else if (group.sd.type === 'GL_GROUP') {
+  } else if (isGitlabSecurityDescriptorType(group.sd && group.sd.type)) {
     if (size) {
       // This doesn't actually work but these parameters are added in the GitLab UI
       parsed.query.width = size;
