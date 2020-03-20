@@ -4,6 +4,10 @@
  - Add avatar support for GitLab project based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1801
  - Add GitLab project based community/room support to the permissions view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1806
 
+Developer facing:
+
+ - Fix configure secrets readme reference, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1815
+
 
 # 20.19.0 - 2020-03-12
 
