@@ -1,6 +1,7 @@
-# 20.20.0 - 2020-03-16
+# 20.20.0 - *upcoming*
 
  - Make GitHub OAuth juggling docs easier to follow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1805
+ - Add avatar support for GitLab project based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1801
 
 
 # 20.19.0 - 2020-03-12
