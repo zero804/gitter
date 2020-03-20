@@ -9,6 +9,7 @@ var urlJoin = require('url-join');
 var avatars = require('gitter-web-avatars');
 var toggleClass = require('../../utils/toggle-class');
 var apiClient = require('../../components/api-client');
+const isGitlabSecurityDescriptorType = require('gitter-web-shared/is-gitlab-security-descriptor-type');
 
 var ModalView = require('./modal');
 var Typeahead = require('../controls/typeahead');
@@ -212,12 +213,15 @@ var PermissionsView = Marionette.LayoutView.extend({
     var sdWarningString = '';
     var initialSdType = this.model.get('initialSecurityDescriptorType');
     var isInitialSdTypeNonReversable =
-      initialSdType === 'GL_GROUP' || initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO';
+      initialSdType === 'GL_GROUP' ||
+      initialSdType === 'GL_PROJECT' ||
+      initialSdType === 'GH_ORG' ||
+      initialSdType === 'GH_REPO';
     if (isInitialSdTypeNonReversable && initialSdType !== sdType) {
       let backendString = '';
       if (initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO') {
         backendString = 'GitHub';
-      } else if (initialSdType === 'GL_GROUP') {
+      } else if (isGitlabSecurityDescriptorType(initialSdType)) {
         backendString = 'GitLab';
       }
 
@@ -275,7 +279,11 @@ var PermissionsView = Marionette.LayoutView.extend({
         'hidden',
         sdType !== 'GH_ORG' && sdType !== 'GH_REPO'
       );
-      toggleClass(this.ui.permissionsOptionsGitlabIcon[0], 'hidden', sdType !== 'GL_GROUP');
+      toggleClass(
+        this.ui.permissionsOptionsGitlabIcon[0],
+        'hidden',
+        sdType !== 'GL_GROUP' && sdType !== 'GL_PROJECT'
+      );
       toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
     }
   },
@@ -301,8 +309,14 @@ var PermissionsView = Marionette.LayoutView.extend({
     } else if (sd && sd.type === 'GL_GROUP') {
       permissionOpts.push({
         value: 'GL_GROUP',
-        label: `Anyone with maintainer access to the ${sd.linkPath} project on GitLab`,
+        label: `Anyone with maintainer access to the ${sd.linkPath} group on GitLab`,
         selected: sd.type === 'GL_GROUP'
+      });
+    } else if (sd && sd.type === 'GL_PROJECT') {
+      permissionOpts.push({
+        value: 'GL_PROJECT',
+        label: `Anyone with maintainer access to the ${sd.linkPath} project on GitLab`,
+        selected: sd.type === 'GL_PROJECT'
       });
     }
 
