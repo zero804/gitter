@@ -7,6 +7,9 @@
 Developer facing:
 
  - Fix configure secrets readme reference, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1815
+ - Update docker image and fix `container_scanning` GitLab CI job, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1788
+     - Fix `docker-base` and `containerize` CI jobs (get them passing again)
+     - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
 
 
 # 20.19.0 - 2020-03-12
