@@ -15,6 +15,14 @@ services:
     ports:
       - "5000:5000"
       - "5001:5001"
+    volumes:
+      - ./:/app
+    entrypoint: ["/bin/bash", "-c"]
+    command: ["source .envrc && npm start"]
+    # command: ["npm install && source .envrc && npm start"]
+    environment: 
+      - DEBUG=redis-sentinel-client*,gitter:infra:*
+      - NODE_DEBUG=redis
   master:
     image: redis:3
     ports:
@@ -29,6 +37,9 @@ services:
     environment:
       - SENTINEL_DOWN_AFTER=10000
       - SENTINEL_FAILOVER=5000
+    links:
+      - master
+      - slave
   sentinel2:
     build: sentinel
     environment:
@@ -79,6 +90,3 @@ services:
       - mongo1
 volumes:
   gitter-mongodb:
-
-networks:
-  main:
