@@ -12,6 +12,11 @@ Developer facing:
      - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
 
 
+# 20.19.1 - 2020-04-02
+
+- Revert: Running webapp locally doesn't require setting up secrets, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1795
+
+
 # 20.19.0 - 2020-03-12
 
  - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
