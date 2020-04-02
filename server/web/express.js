@@ -14,14 +14,13 @@ var methodOverride = require('method-override');
 var session = require('express-session');
 var appTag = require('./app-tag');
 
-const IS_DEV = process.env.NODE_ENV === 'dev';
 /**
  * Only serve static assets in dev mode,
  * when we don't have a CDN
  */
 function shouldServeStaticAssets() {
   if (process.env.SERVE_STATIC_ASSETS) return true;
-  if (!IS_DEV) return false;
+  if (!config.get('dev-mode')) return false;
   if (config.get('cdn:use')) return false;
 
   return true;
@@ -127,16 +126,9 @@ module.exports = {
 
     app.use(cookieParser());
 
-    let sessionSecret = config.get('web:sessionSecret');
-    if (!sessionSecret && IS_DEV) {
-      logger.warn(
-        'Missing "web__sessionSecret" environment variable. Using default value for local development.'
-      );
-      sessionSecret = 'test-secret';
-    }
     app.use(
       session({
-        secret: sessionSecret,
+        secret: config.get('web:sessionSecret'),
         key: config.get('web:cookiePrefix') + 'session',
         store: getSessionStore(),
         cookie: {
