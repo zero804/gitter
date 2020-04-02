@@ -5,10 +5,12 @@ var ClientPasswordStrategy = require('passport-oauth2-client-password').Strategy
 var BearerStrategy = require('gitter-passport-http-bearer').Strategy;
 var userService = require('gitter-web-users');
 var oauthService = require('gitter-web-oauth');
-
-const env = require('gitter-web-env');
-const config = env.config;
-const logger = env.logger;
+var githubUserStrategy = require('./strategies/github-user');
+var githubUpgradeStrategy = require('./strategies/github-upgrade');
+var gitlabStrategy = require('./strategies/gitlab');
+// var googleStrategy = require('./strategies/google');
+var twitterStrategy = require('./strategies/twitter');
+// var linkedinStrategy = require('./strategies/linkedin');
 
 function installApi() {
   /**
@@ -96,25 +98,12 @@ function install() {
   /* Install the API OAuth strategy too */
   installApi();
 
-  // generalizing based on a single config, in the future we might want to allow more granular passport initialization
-  const githubOAuthConfigured = Boolean(config.get('github:user_client_id'));
-  const isDev = process.env.NODE_ENV === 'dev';
-  // in other words we allow skipping setting up the external strategies if we are running the webapp locally and secrets are missing
-  if (isDev && !githubOAuthConfigured) {
-    logger.warn(
-      'Your OAuthSecrets are not set. Skipping OAuth setup for local development.',
-      'Follow readme instructions to set your OAuth https://gitlab.com/gitlab-org/gitter/webapp#configure-oauth-and-service-secrets'
-    );
-    return;
-  }
-  var githubUserStrategy = require('./strategies/github-user');
-  var githubUpgradeStrategy = require('./strategies/github-upgrade');
-  var gitlabStrategy = require('./strategies/gitlab');
-  var twitterStrategy = require('./strategies/twitter');
   passport.use(githubUserStrategy);
   passport.use(githubUpgradeStrategy);
   passport.use(gitlabStrategy);
+  // passport.use(googleStrategy);
   passport.use(twitterStrategy);
+  // passport.use(linkedinStrategy);
 }
 
 module.exports = {
