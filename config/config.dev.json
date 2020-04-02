@@ -147,6 +147,7 @@
   "serializer": {
     "warning-period": 300
   },
+  "dev-mode": true,
   "neo4j": {
     "endpoint": "http://localhost:7474"
   },
