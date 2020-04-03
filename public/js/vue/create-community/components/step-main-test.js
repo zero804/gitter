@@ -14,7 +14,7 @@ import {
 jest.mock('gitter-web-client-context');
 const context = require('gitter-web-client-context');
 
-describe('StepMain index', () => {
+describe('StepMain', () => {
   beforeEach(() => {
     context.hasProvider.mockReset();
   });

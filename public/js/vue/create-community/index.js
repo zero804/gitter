@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import CreateCommunityView from './components/index.vue';
 
-function renderLeftMenu(el, store) {
+function renderCreateCommunityView(el, store) {
   return new Vue({
     el,
     store,
@@ -14,4 +14,4 @@ function renderLeftMenu(el, store) {
   });
 }
 
-export default renderLeftMenu;
+export default renderCreateCommunityView;

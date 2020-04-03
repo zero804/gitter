@@ -9,4 +9,5 @@ require('./components/api-client');
 // Polyfills
 require('core-js/stable/object/assign');
 require('core-js/stable/object/values');
+require('core-js/stable/array/find');
 require('intersection-observer');

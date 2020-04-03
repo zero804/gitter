@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`left-menu index all state matches snapshot 1`] = `
+exports[`left-menu all state matches snapshot 1`] = `
 <div
   class="root js-left-menu-root logged-in pinned"
 >
@@ -82,7 +82,7 @@ exports[`left-menu index all state matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index dark-theme matches snapshot 1`] = `
+exports[`left-menu dark-theme matches snapshot 1`] = `
 <div
   class="root js-left-menu-root logged-in dark-theme pinned"
 >
@@ -164,7 +164,7 @@ exports[`left-menu index dark-theme matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index mobile mobile matches snapshot 1`] = `
+exports[`left-menu mobile mobile matches snapshot 1`] = `
 <div
   class="root js-left-menu-root logged-in pinned"
 >
@@ -246,7 +246,7 @@ exports[`left-menu index mobile mobile matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
+exports[`left-menu nli (not logged in) matches snapshot 1`] = `
 <div
   class="root js-left-menu-root pinned"
 >
@@ -368,7 +368,7 @@ exports[`left-menu index nli (not logged in) matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
+exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
 <div
   class="root js-left-menu-root pinned"
 >
@@ -490,7 +490,7 @@ exports[`left-menu index nli (not logged in) mobile matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index people state matches snapshot 1`] = `
+exports[`left-menu people state matches snapshot 1`] = `
 <div
   class="root js-left-menu-root logged-in pinned"
 >
@@ -572,7 +572,7 @@ exports[`left-menu index people state matches snapshot 1`] = `
 </div>
 `;
 
-exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
+exports[`left-menu pinning and expanding not pinned and collapse 1`] = `
 <div
   class="root js-left-menu-root logged-in"
 >
@@ -654,7 +654,7 @@ exports[`left-menu index pinning and expanding not pinned and collapse 1`] = `
 </div>
 `;
 
-exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
+exports[`left-menu pinning and expanding not pinned and expanded 1`] = `
 <div
   class="root js-left-menu-root logged-in expanded"
 >
@@ -736,7 +736,7 @@ exports[`left-menu index pinning and expanding not pinned and expanded 1`] = `
 </div>
 `;
 
-exports[`left-menu index search state matches snapshot 1`] = `
+exports[`left-menu search state matches snapshot 1`] = `
 <div
   class="root js-left-menu-root logged-in pinned"
 >

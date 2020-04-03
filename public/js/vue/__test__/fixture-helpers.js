@@ -1,3 +1,18 @@
+function createSerializedGroupFixture(uri, overrides) {
+  return {
+    id: `5e6091d591d1aa092b928bc7-${uri}`,
+    name: uri,
+    uri,
+    homeUri: `${uri}/home`,
+    backedBy: {
+      type: 'GL_GROUP',
+      linkPath: uri
+    },
+    avatarUrl: 'http://localhost:5000/api/private/avatars/group/iv/1/5e6091d591d1aa092b928bc7',
+    ...overrides
+  };
+}
+
 function createSerializedRoomFixture(uri, overrides) {
   return {
     id: `5a8739841543b98772a686a9-${uri}`,
@@ -178,6 +193,7 @@ function createRepoGithubRepoFixture(uri) {
 }
 
 module.exports = {
+  createSerializedGroupFixture,
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture,
   createSerializedMessageFixture,

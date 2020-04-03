@@ -42,7 +42,7 @@ const webpackConfig = {
         }
       },
       {
-        test: /.less$/,
+        test: /\.less$/,
         use: [
           { loader: 'vue-style-loader', options: { insertAt: 'top' } },
           { loader: 'css-loader', options: { importLoaders: 1 } },
@@ -55,7 +55,22 @@ const webpackConfig = {
         ]
       },
       {
-        test: /.css$/,
+        test: /\.scss$/,
+        use: [
+          { loader: 'vue-style-loader', options: { insertAt: 'top' } },
+          { loader: 'css-loader', options: { importLoaders: 1 } },
+          {
+            loader: 'sass-loader',
+            options: {
+              sassOptions: {
+                indentedSyntax: false
+              }
+            }
+          }
+        ]
+      },
+      {
+        test: /\.css$/,
         use: [
           { loader: 'style-loader', options: { insertAt: 'top' } },
           { loader: 'css-loader', options: { importLoaders: 1 } },

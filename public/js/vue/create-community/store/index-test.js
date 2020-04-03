@@ -28,7 +28,7 @@ const {
   createRepoGithubRepoFixture
 } = require('../../__test__/fixture-helpers');
 
-describe('thread message feed store', () => {
+describe('create community store', () => {
   beforeEach(() => {
     appEvents.trigger.mockReset();
     apiClient.user.get.mockReset();
