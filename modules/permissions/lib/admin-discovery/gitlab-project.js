@@ -9,6 +9,7 @@ const MAINTAINER_ACCESS_LEVEL = 40;
 async function getAdminProjectsForUser(user) {
   const gitlabProjectService = new GitLabProjectService(user);
   const projects = await gitlabProjectService.getProjects({
+    perPage: 100,
     min_access_level: MAINTAINER_ACCESS_LEVEL
   });
 

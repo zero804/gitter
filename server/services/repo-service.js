@@ -8,6 +8,9 @@ const {
   getAdminProjectsForUser
 } = require('gitter-web-permissions/lib/admin-discovery/gitlab-project');
 
+// https://docs.gitlab.com/ee/api/access_requests.html
+const GUEST_ACCESS_LEVEL = 10;
+
 /**
  * Gets a list of GitHub repos for a user
  * @returns The promise of a list of repos for the user
@@ -35,7 +38,10 @@ async function getReposForUser(user) {
   );
   if (gitLabIdentity) {
     const gitlabProjectService = new GitLabProjectService(user);
-    return gitlabProjectService.getProjects();
+    return gitlabProjectService.getProjects({
+      perPage: 100,
+      min_access_level: GUEST_ACCESS_LEVEL
+    });
   }
 
   return [];

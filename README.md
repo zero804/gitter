@@ -63,7 +63,21 @@ If it's at a non-standard location, specify the URL with the DOCKER_HOST environ
 
 This process will fetch Docker images from Docker Hub. You might want to make another cup of tea and have a biscuit at this point. You can also continue to the next section at this point to kill some time.
 
-### Configure service secrets
+### Running Gitter without OAuth
+
+The simplest way to run Gitter `webapp` is to start it without [OAuth configuration](#configure-oauth-and-service-secrets). To do that, make sure [the dependent services are running](#start-dependent-services) and then run `npm run create-seed-data` which will create a room and two users in the database. You can run the `create-seed-data` script as many times as you want. It will always create new room and users. After that you can start the app with `npm start` and follow the seed data links to login to the `webapp`.
+
+*Warning: This simplistic version of Gitter doesn't support signing in with GitLab, GitHub or Twitter and doesn't support integration with GitLab or GitHub.*
+
+*Warning: When you delete the containers (by running `docker-compose down` or `docker-compose up` without `--no-recreate`) you'll have to generate new seed data.*
+
+*If you are interested in improving this process, please visit https://gitlab.com/gitlab-org/gitter/webapp/issues/2463*
+
+### Configure OAuth and service secrets
+
+<a id="configure-service-secrets"></id>
+
+This is an optional step. If you don't want the sign in with GitLab, GitHub, Twitter features, then you can just use the test accounts that the `npm run create-seed-data` will log out (from the [step above](#running-gitter-without-oauth)).
 
 Gitter connects to third party APIs. In order to do this, you will need to generate API tokens and add them to your configuration.
 

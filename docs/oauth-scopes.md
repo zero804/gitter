@@ -4,6 +4,9 @@
 
 We have two levels of authentication with GitHub, one for participation and creation of chat rooms for public repositories, and one for private repositories.
 
+For a quick rundown on how to sort out your GitHub OAuth scopes to get your GitHub organization/repo to appear, [see our FAQ section on **"Why isn't my GitHub organisation or repos appearing?"**](./faq.md#why-isnt-my-github-organisation-or-repos-appearing)
+
+
 #### Public Repositories
 
 When granting Gitter access to GitHub, we request the following capabilities

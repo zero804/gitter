@@ -1,3 +1,23 @@
+# 20.20.0 - 2020-04-03
+
+ - Make GitHub OAuth juggling docs easier to follow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1805
+ - Add avatar support for GitLab project based communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1801
+ - Add GitLab project based community/room support to the permissions view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1806
+
+Developer facing:
+
+ - Fix configure secrets readme reference, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1815
+ - Update docker image and fix `container_scanning` GitLab CI job, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1788
+     - Fix `docker-base` and `containerize` CI jobs (get them passing again)
+     - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Add user repo API tests for GitLab projects (also fix user repo endpoint to not fetch all public GitLab.com projects), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1809
+
+
+# 20.19.1 - 2020-04-02
+
+- Revert: Running webapp locally doesn't require setting up secrets, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1795
+
+
 # 20.19.0 - 2020-03-12
 
  - Change footer to link to https://about.gitlab.com, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1784
