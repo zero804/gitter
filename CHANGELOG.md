@@ -10,6 +10,7 @@ Developer facing:
  - Update docker image and fix `container_scanning` GitLab CI job, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1788
      - Fix `docker-base` and `containerize` CI jobs (get them passing again)
      - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Add user repo API tests for GitLab projects (also fix user repo endpoint to not fetch all public GitLab.com projects), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1809
 
 
 # 20.19.1 - 2020-04-02
