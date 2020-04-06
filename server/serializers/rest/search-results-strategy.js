@@ -2,14 +2,17 @@
 
 function SearchResultsStrategy(options) {
   var resultItemStrategy = options.resultItemStrategy;
+  const resultsAlreadySerialized = options.resultsAlreadySerialized;
 
   this.preload = function(searchResults) {
-    var items = searchResults
-      .map(function(i) {
-        return i.results;
-      })
-      .flatten();
-    return resultItemStrategy.preload(items);
+    if (!resultsAlreadySerialized) {
+      var items = searchResults
+        .map(function(i) {
+          return i.results;
+        })
+        .flatten();
+      return resultItemStrategy.preload(items);
+    }
   };
 
   this.map = function(item) {
@@ -18,13 +21,18 @@ function SearchResultsStrategy(options) {
       results = [].concat(item);
     }
 
+    let serializedResults = results;
+    if (!resultsAlreadySerialized) {
+      serializedResults = results.map(function(i) {
+        return resultItemStrategy.map(i);
+      });
+    }
+
     return {
       hasMoreResults: item.hasMoreResults,
       limit: item.limit,
       skip: item.skip,
-      results: results.map(function(i) {
-        return resultItemStrategy.map(i);
-      })
+      results: serializedResults
     };
   };
 }

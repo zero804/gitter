@@ -107,9 +107,10 @@ GitHubRepoService.prototype.getWatchedRepos = function() {
   return tentacles.watching.listForAuthUser({ accessToken: this.accessToken });
 };
 
-GitHubRepoService.prototype.getAllReposForAuthUser = function() {
+GitHubRepoService.prototype.getAllReposForAuthUser = function(options) {
   return tentacles.repo.listForAuthUser({
-    accessToken: this.accessToken
+    accessToken: this.accessToken,
+    firstPageOnly: options && options.firstPageOnly
   });
 };
 

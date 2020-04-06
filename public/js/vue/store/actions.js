@@ -137,7 +137,7 @@ export const fetchRoomSearchResults = ({ state, commit, dispatch }) => {
       .get('/repos', {
         q: searchInputValue,
         type: 'gitter',
-        limit: 3
+        limit: 10
       })
       .then(result => {
         const repos = (result && result.results) || [];

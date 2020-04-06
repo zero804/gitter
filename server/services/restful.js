@@ -177,7 +177,7 @@ function serializeOrgsForUserId(userId, options) {
   });
 }
 
-async function _serializeReposForUser(user, repos) {
+async function serializeRepos(user, repos) {
   const strategyMap = {
     gitlab: new restSerializer.GitlabProjectStrategy(),
     github: new restSerializer.GithubRepoStrategy({
@@ -197,12 +197,12 @@ async function _serializeReposForUser(user, repos) {
 
 async function serializeReposForUser(user) {
   const repos = await repoService.getReposForUser(user);
-  return _serializeReposForUser(user, repos);
+  return serializeRepos(user, repos);
 }
 
 async function serializeAdminReposForUser(user) {
   const repos = await repoService.getAdminReposForUser(user);
-  return _serializeReposForUser(user, repos);
+  return serializeRepos(user, repos);
 }
 
 function serializeProfileForUsername(username) {
@@ -273,6 +273,7 @@ module.exports = {
   serializeEventsForTroupe: serializeEventsForTroupe,
   serializeOrgsForUser: serializeOrgsForUser,
   serializeOrgsForUserId: serializeOrgsForUserId,
+  serializeRepos,
   serializeReposForUser: serializeReposForUser,
   serializeAdminReposForUser: serializeAdminReposForUser,
   serializeProfileForUsername: serializeProfileForUsername,

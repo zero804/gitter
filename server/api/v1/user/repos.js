@@ -1,30 +1,37 @@
 'use strict';
 
 var restful = require('../../../services/restful');
-var restSerializer = require('../../../serializers/rest-serializer');
 var repoService = require('../../../services/repo-service');
-var createTextFilter = require('text-filter');
+const restSerializer = require('../../../serializers/rest-serializer');
 var StatusError = require('statuserror');
 
 function indexQuery(req) {
-  var limit = parseInt(req.query.limit, 10) || 0;
+  const limit = parseInt(req.query.limit, 10) || 0;
+  const query = (req.query.q || '').replace(/\*|\+|\$/g, '');
 
-  return repoService.getReposForUser(req.user).then(function(repos) {
-    var query = (req.query.q || '').replace(/\*|\+|\$/g, '');
-    var filteredRepos = repos.filter(createTextFilter({ query: query, fields: ['full_name'] }));
+  return repoService.searchReposForUser(req.user, query, limit).then(async repos => {
+    const serializedRepos = await restful.serializeRepos(req.user, repos);
 
-    var strategyOptions = { currentUserId: req.user.id };
-    // if (req.query.include_users) strategyOptions.mapUsers = true;
-
-    var strategy = new restSerializer.SearchResultsStrategy({
-      resultItemStrategy: new restSerializer.GithubRepoStrategy(strategyOptions)
-    });
-
+    let filteredSerializedRepos = serializedRepos;
     if (limit) {
-      filteredRepos = filteredRepos.slice(0, limit + 1);
+      // Repos with rooms are listed first
+      const sortedRepos = serializedRepos.sort((a, b) => {
+        if (a.room && !b.room) {
+          return -1;
+        } else if (!a.room && b.room) {
+          return 1;
+        }
+
+        return 0;
+      });
+
+      filteredSerializedRepos = sortedRepos.slice(0, limit + 1);
     }
 
-    return restSerializer.serializeObject({ results: filteredRepos }, strategy);
+    const searchStrategy = new restSerializer.SearchResultsStrategy({
+      resultsAlreadySerialized: true
+    });
+    return restSerializer.serializeObject({ results: filteredSerializedRepos }, searchStrategy);
   });
 }
 
