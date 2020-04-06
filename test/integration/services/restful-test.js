@@ -224,7 +224,8 @@ describe('restful #slow', function() {
                 uri: 'gitlab-com/gl-infra/gitter-infrastructure',
                 private: true,
                 avatar_url:
-                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png'
+                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
+                room: undefined
               }
             ];
           }
@@ -254,7 +255,8 @@ describe('restful #slow', function() {
           avatar_url: 'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
           uri: 'gitlab-com/gl-infra/gitter-infrastructure',
           absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
-          private: true
+          private: true,
+          room: undefined
         }
       ]);
     });
@@ -296,7 +298,8 @@ describe('restful #slow', function() {
                 uri: 'gitlab-com/gl-infra/gitter-infrastructure',
                 private: true,
                 avatar_url:
-                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png'
+                  'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
+                room: undefined
               }
             ];
           }
@@ -326,7 +329,8 @@ describe('restful #slow', function() {
           avatar_url: 'https://gitlab.com/uploads/-/system/project/avatar/2959752/squirrel.png',
           uri: 'gitlab-com/gl-infra/gitter-infrastructure',
           absoluteUri: 'https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure',
-          private: true
+          private: true,
+          room: undefined
         }
       ]);
     });
