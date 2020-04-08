@@ -46,6 +46,14 @@ Follow these instructions to setup an environment to hack on Gitter.
 
 ## Starting Gitter
 
+TLDR;
+
+```
+docker-compose up -d --no-recreate
+npm run create-seed-data
+npm start
+```
+
 ### Start dependent services
 
 Start Gitter's dependent services:
