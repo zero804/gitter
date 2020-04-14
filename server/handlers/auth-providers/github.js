@@ -4,7 +4,9 @@ var env = require('gitter-web-env');
 var identifyRoute = env.middlewares.identifyRoute;
 var config = env.config;
 
+const ensureUserIdentityByProvider = require('../../web/middlewares/ensure-user-identity-from-provider');
 var passport = require('passport');
+const identityService = require('gitter-web-identity');
 var trackLoginForProvider = require('../../web/middlewares/track-login-for-provider');
 var rememberMe = require('../../web/middlewares/rememberme-middleware');
 var ensureLoggedIn = require('../../web/middlewares/ensure-logged-in');
@@ -61,6 +63,8 @@ routes.invited = [
 routes.upgradeLandingPage = [
   ensureLoggedIn,
   identifyRoute('login-upgrade-landing-page'),
+  // Once we allow multiple identities for a single user, we should get rid of this #multiple-identity-user
+  ensureUserIdentityByProvider(identityService.GITHUB_IDENTITY_PROVIDER),
   function(req, res) {
     const newScopes = getScopesFromReq(req);
 
@@ -77,6 +81,8 @@ routes.upgradeLandingPage = [
 routes.upgrade = [
   ensureLoggedIn,
   identifyRoute('login-upgrade'),
+  // Once we allow multiple identities for a single user, we should get rid of this #multiple-identity-user
+  ensureUserIdentityByProvider(identityService.GITHUB_IDENTITY_PROVIDER),
   function(req, res, next) {
     var scopes = getScopesFromReq(req);
     var existing = req.user.githubScopes || {};
