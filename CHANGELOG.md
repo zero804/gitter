@@ -1,4 +1,4 @@
-# 20.21.0 - *upcoming*
+# 20.21.0 - 2020-04-14
 
  - Add details on why we use certain Twitter OAuth permissions, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1820
  - Fix API issue state endpoint returning 500 errors, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1824
