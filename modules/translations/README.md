@@ -1,5 +1,4 @@
-gitter-translations
-===================
+# gitter-translations
 
 Translations of Gitter to other languages. Please submit pull-requests if you would like to add or change anything!
 
@@ -8,8 +7,9 @@ Translations of Gitter to other languages. Please submit pull-requests if you wo
 ## How this works
 
 At the moment we are busy externalising all of our strings, so the only two areas that currently work are:
- 1. Timestamps in chat
- 2. Homepage
+
+1.  Timestamps in chat
+2.  Homepage
 
 ## Homepage instructions
 
@@ -20,12 +20,15 @@ The homepage strings are kept in the homepage directory
 We will continue to expand on the entire application over time. Please watch this repository for updates
 
 ## Testing
+
 It possible to visit the site with the lang query parameter, ex. https://gitter.im/?redirect=no&lang=ko.
 
-Or you can change the browser main language in Chrome in [Language Settings](chrome://settings/languages) by putting tested language [at the top of the list](https://stackoverflow.com/a/36074203/606571). 
+Or you can change the browser main language in Chrome in [Language Settings](chrome://settings/languages) by putting tested language [at the top of the list](https://stackoverflow.com/a/36074203/606571).
 
 ## Generating keys and placeholders
+
 Generation and formatting happens automatically when linking this package to `webapp`
+
 - `npm link` in this package
 - `npm link '@gitterhq/translations'` in `webapp`
 
@@ -40,6 +43,7 @@ and then starting the `webapp` and going to:
 - http://localhost:5000/?lang=de
 - http://localhost:5000/?lang=en
 - http://localhost:5000/?lang=es
+- http://localhost:5000/?lang=fr
 - http://localhost:5000/?lang=id
 - http://localhost:5000/?lang=it
 - http://localhost:5000/?lang=ja
