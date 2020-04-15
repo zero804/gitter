@@ -155,7 +155,6 @@
   "autoPullRequest": {
     "enabled": false
   },
-  "dev-mode": false,
   "elasticsearch": {
     "defaultQueryTimeout": 1000,
     "sniffOnStart": true

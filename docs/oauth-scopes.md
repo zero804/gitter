@@ -76,3 +76,7 @@ On the authorize screen, it says the OAuth app is "not provided by GitLab" but [
 You can sign in via Twitter. Your username will have a `_twitter` suffix.
 
 Please be aware you can only use Twitter to access public rooms and some rooms may have blocked access to Twitter accounts (see ["Restrict room to GitHub users"](./rooms.md#restrict-room-to-github-users)).
+
+We ask for read-only access which is the most minimal permissions possible. Please note that we don't actually read any of your tweets.
+
+We also use the email address permission. This is to notify you of new messages and rooms by email. You can easily unsubscribe to these notifications either from the emails or in Notification Settings.

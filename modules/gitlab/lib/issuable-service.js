@@ -5,6 +5,7 @@ var cacheWrapper = require('gitter-web-cache-wrapper');
 var avatars = require('gitter-web-avatars');
 var getGitlabAccessTokenFromUser = require('./get-gitlab-access-token-from-user');
 var getPublicTokenFromPool = require('./get-public-token-from-pool');
+const StatusError = require('statuserror');
 
 // eslint-disable-next-line complexity
 function standardizeResponse(response) {
@@ -62,7 +63,14 @@ GitLabIssuableService.prototype.getIssue = function(project, iid) {
 
       return resource.show(project, iid);
     })
-    .then(standardizeResponse);
+    .then(standardizeResponse)
+    .catch(err => {
+      // make sure HTTP errors get translated into StatusErrors so the rest of webapp can handle them
+      if (err.name === 'HTTPError') {
+        throw new StatusError(err.response.status, err.description);
+      }
+      throw err;
+    });
 };
 
 module.exports = cacheWrapper('GitLabIssuableService', GitLabIssuableService, {
