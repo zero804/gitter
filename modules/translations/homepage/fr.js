@@ -68,12 +68,12 @@
 	"Linux 32": "Linux 32",
 	"Linux 64": "Linux 64",
 	"iPhone": "iPhone",
-	"Android": "Android"
+	"Android": "Android",
 	"Open Source": "Open Source",
 	"Our efforts are focused on the <a %s>webapp</a> which is the backbone of the mobile/desktop apps but mainly focused on the web experience. There are a number of bugs in these desktop/mobile clients and they spread the Gitter team too thin for us to give them proper attention. The apps are open-source if you want to tackle something particularly annoying to you.": "Nous concentrons nos efforts sur l'<a %s>application web (webapps)</a> qui est le socle des applications pour téléphones portables et ordinateurs de bureau, mais principalement centrés sur l'expérience web. Il y a un certain nombre de bugs dans ces clients pour ordinateurs de bureau/téléphones portables, et l'équipe Gitter n'a pas suffisamment de ressources pour leur accorder l'attention nécessaire. Les applications sont open-source; au cas où vous souhaiteriez résoudre un problème qui vous gêne particuliérement.",
 	"desktop": "ordinateurs de bureau",
 	"iOS": "iOS",
-	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Informations supplementaires sur la <a %s>création de communautés</a> and <a %s>création d'espaces de discussion</a>.": ,
+	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Informations supplementaires sur la <a %s>création de communautés</a> and <a %s>création d'espaces de discussion</a>.",
 	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Utilisateurs de MacOS version 10.9 ou antérieure, <a %s>téléchargez ici</a>.",
 	"We also have a sweet little <a %s>IRC bridge</a>.": "Nous avons aussi un <a %s>canal IRC</a> très sympathique."
 }
