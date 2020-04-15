@@ -4,7 +4,7 @@
 		"other": "%d messages non lus"
 	},
 	"Unread messages in %%s, %%s and one other": {
-		"one": "Messages non lus dans %%s, %%s et un autre",
+		"one": "Message non lu dans %%s, %%s et un autre",
 		"other": "Messages non lus dans %%s, %%s et %d autres"
 	},
 	"Unread messages in %s": "Messages non lus dans %s",
