@@ -257,10 +257,6 @@ deploy_beta: &deploy_beta
     name: beta
     url: https://beta.gitter.im
 
-deploy_beta_manual:
-  <<: *deploy_beta
-  when: manual
-
 deploy_beta_staging: &deploy_beta_staging
   <<: *deploy_job
   dependencies:
@@ -293,10 +289,6 @@ deploy_staging: &deploy_staging
   environment:
     name: staging
     url: https://gitter.im?gitter_next=true
-
-deploy_staging_manual:
-  <<: *deploy_staging
-  when: manual
 
 deploy_prod_manual: &deploy_prod
   <<: *deploy_job
