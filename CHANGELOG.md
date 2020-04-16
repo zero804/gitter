@@ -1,8 +1,14 @@
 # 20.22.0 - *upcoming*
 
+ - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
+    - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
+    - https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1829
+ - Update OAuth scope docs to better show how we have things are configured minimally and link from login page, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1826
+
 Developer facing:
 
  - Removing manual beta and staging deployment steps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1828
+
 
 
 # 20.21.0 - 2020-04-14
