@@ -9,6 +9,8 @@ If you updated some info on GitLab/GitHub/Twitter, sign out of Gitter and sign b
 
 There isn't a way to merge accounts.
 
+We will probably introduce this capability after we add the [ability to set your own username](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1851). You can track [this issue](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1752) for linking different accounts together.
+
 
 ## Can I change my username?
 
