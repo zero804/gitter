@@ -1,0 +1,47 @@
+# Threaded conversations and GitLab based communities and rooms
+
+After months of development we are proud to introduce two new major features: Threaded conversations and GitLab based communities and rooms.
+
+## Threaded conversations
+
+Multiple conversations in a busy Gitter room can become hard to follow. Up until now the main way of keeping message context has been using [Permalinks](https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/messages.md#permalinks) and [quoting in Markdown syntax](https://daringfireball.net/projects/markdown/syntax#blockquote).
+
+Improving the way Gitter conversations can be organized became one of our first priorities last year. After careful consideration of our options (e.g. [forum style](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/741#note_171220229) conversations) we [chose to implement threaded conversations](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2143) following similar pattern as chat platforms like Slack and Twitter.
+
+### How to write threaded messages
+
+1. You can start thread for every message in the room by choosing "Start a thread" option in the message context menu.
+2. If the message already has a thread attached to it, the easiest way to open the thread is to click on the thread message indicator.
+3. The rest of the conversation happens in what we call the Thread message feed.
+
+![Thread message indicator](https://i.imgur.com/VDaA2Sc.png)
+
+### Support for threaded conversations in native apps
+
+Since none of the two Gitter developers is skilled in native app development, our Android and iOS apps are providing a very basic support for the threaded conversations.
+
+Every thread message appears in the main message feed and it is marked as being part of a thread. When clicking on the indicator, you are taken into web browser that will show you the whole thread. *The iOS app doesn't provide a way to contribute to threaded conversations.*
+
+![iOS support for threaded conversations](https://gitlab.com/gitlab-org/gitter/webapp/uploads/fa8e50053ac25a386d441da7cdbe4c03/Kapture_2020-02-03_at_14.54.46.gif)
+
+### What's not implemented yet
+
+We are confident that we are releasing threaded conversations in a state that is usable without any headaches and it provides a lot of value. That being said, threaded conversations don't support the full messaging feature set you are used to from the current normal room messaging.
+
+The main missing features are:
+
+- [Typeahead in the message input](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2344) - usernames, emojis, issues
+- [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
+- [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
+
+The full list of outstanding work can be found in our [GitLab issue tracker](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations).
+
+We are still planning on implementing these features but we decided to release threaded conversations for everyone to provide you with as much value as possible.
+
+### How to give us feedback
+
+We are grateful for both positive and constructive feedback. If you are happy with the new features and you'd like to tell us, the best channels are the [gitterHQ/gitter](https://gitter.im/gitterHQ/gitter) room and our Twitter account [@gitchat](https://twitter.com/gitchat).
+
+For constructive feedback we love to use GitLab issues where we track all outstanding work. Please first check your suggestion is not already tracked in [open threaded conversations issues](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations). Than you can create a new issue in the same view.
+
+We hope you'll enjoy better message structure in your rooms with the threaded conversations.
