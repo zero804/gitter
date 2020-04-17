@@ -6,7 +6,36 @@ stages:
   - security
 
 variables:
-  DOCKER_DRIVER: overlay2
+  DOCKER_VERSION: "19.03.0"
+
+workflow:
+  rules:
+    # For merge requests, create a pipeline.
+    - if: '$CI_MERGE_REQUEST_IID'
+    # For `develop` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
+    - if: '$CI_COMMIT_BRANCH == "develop"'
+    # For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
+    - if: '$CI_COMMIT_BRANCH == "master"'
+    # For `release/*` branch, create a pipeline.
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*/'
+    # For tags, create a pipeline.
+    - if: '$CI_COMMIT_TAG'
+
+default:
+  tags:
+    - gitlab-org
+
+.use-docker-in-docker:
+  image: docker:${DOCKER_VERSION}
+  services:
+    - docker:${DOCKER_VERSION}-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    # See https://gitlab.com/gitlab-com/www-gitlab-com/-/issues/7019 for tag descriptions
+    - gitlab-org-docker
 
 .webapp_variables: &webapp_variables
   BLUEBIRD_DEBUG: 1
@@ -26,7 +55,7 @@ variables:
     name: neo4j:2.3
     alias: neo4j
 
-.node_job: &node_job
+.node_job:
   image: registry.gitlab.com/gitlab-org/gitter/webapp
   before_script:
     - node --version
@@ -43,7 +72,7 @@ variables:
       - npm_cache/
 
 validate:
-  <<: *node_job
+  extends: .node_job
   stage: build_unit_test
   script:
     - "echo 'TODO: Skip validation for now because we have new eslint failures'"
@@ -53,8 +82,8 @@ validate:
     # to re-use the scripts that GitLab has, https://gitlab.com/gitlab-org/gitlab-ce/issues/57010
     - npm run prettier -- --check "**/*.{js,vue}"
 
-.test_job: &test_job
-  <<: *node_job
+.test_job:
+  extends: .node_job
   variables:
     <<: *webapp_variables
   stage: build_unit_test
@@ -67,27 +96,42 @@ validate:
     - make ci-test
 
 test:
-  <<: *test_job
-  except:
-    - release/*
+  extends:
+    - .test_job
+  rules:
+    - if: '$CI_COMMIT_BRANCH !~ /^release\/.*/'
   retry: 1
 
 test-all:
-  <<: *test_job
+  extends:
+    - .test_job
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*/'
   variables:
     <<: *webapp_variables
     ALLOW_FLAKEY_TESTS: 1
-  only:
-    - release/*
   retry: 2
 
-.test_e2e_job: &test_e2e_job
-  <<: *test_job
+test_e2e:
+  extends: .test_job
   variables:
     <<: *webapp_variables
     ENABLE_FIXTURE_ENDPOINTS: 1
     DISABLE_GITHUB_API: 1
     NODE_ENV: test-docker
+  tags:
+    # Run the on Gitter internal runner so our Cypress video doesn't have gaps/freezing,
+    # see https://github.com/cypress-io/cypress/issues/4722#issuecomment-526313109
+    # Maybe in the future, Cypress will detect and give a warning when this happens,
+    # see https://github.com/cypress-io/cypress/issues/5061
+    - internal
+  rules:
+    # Don't run this job for forks since it uses the 'internal' runner.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\/.*$/'
+    - when: manual
+      allow_failure: true
   script:
     # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
     - apt-get update -q -y
@@ -107,25 +151,10 @@ test-all:
       - test/e2e/screenshots
       - cypress/logs
     expire_in: 1 day
-  tags:
-    # Run the on Gitter internal runner so our Cypress video doesn't have gaps/freezing,
-    # see https://github.com/cypress-io/cypress/issues/4722#issuecomment-526313109
-    # Maybe in the future, Cypress will detect and give a warning when this happens,
-    # see https://github.com/cypress-io/cypress/issues/5061
-    - internal
   retry: 2
 
-test_e2e_manual:
-  <<: *test_e2e_job
-  when: manual
-
-test_e2e:
-  <<: *test_e2e_job
-  only:
-    - /^renovate\/.*$/
-
 package:
-  <<: *node_job
+  extends: .node_job
   stage: build_unit_test
   script:
     # While testing the deploment, you can use cached artifacts instead of packaging every time which is slow
@@ -141,10 +170,10 @@ package:
     expire_in: 1 week
 
 mobile-asset-build:
-  <<: *node_job
+  extends: .node_job
   stage: build_unit_test
-  only:
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
   variables:
     NODE_ENV: prod
     stats__cube__enabled: 'false'
@@ -158,7 +187,7 @@ mobile-asset-build:
       - output/android/www
       - output/ios/www
 
-.distribute_job: &distribute_job
+.distribute_job:
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   stage: pre_deploy
   dependencies:
@@ -167,63 +196,67 @@ mobile-asset-build:
     - make upload-to-s3
 
 distribute_beta:
-  <<: *distribute_job
-  only:
-    - develop
+  extends: .distribute_job
+  rules:
+    # Don't run this job for forks since it should only be run from the canonical project.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "develop"'
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta
 
 distribute_beta_staging:
-  <<: *distribute_job
+  extends: .distribute_job
+  rules:
+    # Don't run this job for forks since it should only be run from the canonical project.
+    - if: '$CI_PROJECT_PATH == "gitlab-org/gitter/webapp"'
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
 
 distribute_staging:
-  <<: *distribute_job
-  only:
-    - /^release\/.*$/
-    - /^hotfix\/.*$/
+  extends: .distribute_job
+  rules:
+    # Don't run this job for forks since it should only be run from the canonical project.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*$/'
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/staging
 
 distribute_prod:
-  <<: *distribute_job
-  only:
-    - tags
+  extends: .distribute_job
+  rules:
+    # Don't run this job for forks since it should only be run from the canonical project.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/prod
 
 containerize:
+  extends: .use-docker-in-docker
   stage: deploy
-  image: docker:latest
   dependencies:
     - package
   allow_failure: true
-  services:
-    - docker:dind
   script:
     - ls -la output
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
-  tags:
-    - docker
 
 deploy-build-image:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
-  services:
-    - docker:dind
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
-  tags:
-    - docker
 
-.deploy_job: &deploy_job
+.deploy_job:
   stage: deploy
   image: registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
   variables:
@@ -243,12 +276,15 @@ deploy-build-image:
   tags:
     - internal # This has to be within the Gitter network
 
-deploy_beta: &deploy_beta
-  <<: *deploy_job
+deploy_beta:
+  extends: .deploy_job
   dependencies:
     - distribute_beta
-  only:
-    - develop
+  rules:
+    # Don't run this job for forks since it uses the 'internal' runner.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "develop"'
   script:
     - cd $ANSIBLE_DIR
     - git checkout xenial && git pull origin xenial
@@ -257,12 +293,17 @@ deploy_beta: &deploy_beta
     name: beta
     url: https://beta.gitter.im
 
-deploy_beta_staging: &deploy_beta_staging
-  <<: *deploy_job
+deploy_beta_staging:
+  extends: .deploy_job
   dependencies:
     - distribute_beta_staging
-  only:
-    - /^feature\/.*$/
+  rules:
+    # Don't run this job for forks since it uses the 'internal' runner.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - when: manual
+      allow_failure: true
   script:
     - cd $ANSIBLE_DIR
     - git checkout xenial && git pull origin xenial
@@ -271,33 +312,32 @@ deploy_beta_staging: &deploy_beta_staging
     name: beta_staging
     url: https://beta.gitter.im?gitter_next=true
 
-deploy_beta_staging_manual:
-  <<: *deploy_beta_staging
-  when: manual
-  only:
-    - /.*/
-
-deploy_staging: &deploy_staging
-  <<: *deploy_job
+deploy_staging:
+  extends: .deploy_job
   dependencies:
     - distribute_staging
-  only:
-    - /^release\/.*$/
-    - /^hotfix\/.*$/
+  rules:
+    # Don't run this job for forks since it uses the 'internal' runner.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*$/'
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
     name: staging
     url: https://gitter.im?gitter_next=true
 
-deploy_prod_manual: &deploy_prod
-  <<: *deploy_job
+deploy_prod:
+  extends: .deploy_job
   dependencies:
     - distribute_prod
-  only:
-    - tags
-  # Production is only manual
-  when: manual
+  rules:
+    # Don't run this job for forks since it uses the 'internal' runner.
+    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+      when: never
+    - if: '$CI_COMMIT_TAG'
+      when: manual
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
   environment:
@@ -305,52 +345,41 @@ deploy_prod_manual: &deploy_prod
     url: https://gitter.im
 
 docker-base:
-  image: docker:latest
+  extends: .use-docker-in-docker
   stage: docker_images
-  only:
-    - schedules
-  services:
-    - docker:dind
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp:latest .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp:latest
-  tags:
-    - docker
 
 mongo-base:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
-  only:
-    - schedules
-  services:
-    - docker:dind
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest scripts/docker/mongo-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-  tags:
-    - docker
 
 elasticsearch-base:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
-  only:
-    - schedules
-  services:
-    - docker:dind
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-  tags:
-    - docker
 
 renovate:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
-  only:
-    - schedules
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+      allow_failure: true
   variables:
     # GitLab access token with api access
     #RENOVATE_GITLAB_TOKEN: xxx
@@ -360,11 +389,6 @@ renovate:
     RENOVATE_CONFIG_FILE: renovate-config.js
   script:
     - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
-  allow_failure: true
-  services:
-    - docker:dind
-  tags:
-    - docker
 #
 # Security reports
 # =========================================================
@@ -375,13 +399,13 @@ include:
   - template: Security/Container-Scanning.gitlab-ci.yml
 
 dependency_scanning:
+  extends: .use-docker-in-docker
   stage: security
   variables:
     DS_PYTHON_VERSION: 2
-  tags:
-    - docker
 
 container_scanning:
+  extends: .use-docker-in-docker
   stage: security
   variables:
     DOCKERFILE_PATH: Dockerfile-app-base
@@ -390,11 +414,13 @@ container_scanning:
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
 sast:
+  extends: .use-docker-in-docker
   stage: security
   variables:
     SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
 
 dast:
+  extends: .use-docker-in-docker
   stage: security
   dependencies:
     - containerize
