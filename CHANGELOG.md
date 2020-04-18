@@ -5,6 +5,8 @@
     - https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1829
  - Update OAuth scope docs to better show how we have things are configured minimally and link from login page, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1826
  - Add relevant issue links to our account merging docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1833
+ - Add Vue.js create room flow with GitLab project based room support, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1818
+ - Remove old create room flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1831
 
 Developer facing:
 
