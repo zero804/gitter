@@ -1,4 +1,4 @@
-# 20.22.0 - *upcoming*
+# 20.22.0 - 2020-4-17
 
  - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
     - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
