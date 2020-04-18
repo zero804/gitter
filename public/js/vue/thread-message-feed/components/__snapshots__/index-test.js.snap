@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`thread-message-feed index child messages error - matches snapshot 1`] = `
+exports[`thread-message-feed child messages error - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"
 >
@@ -47,7 +47,7 @@ exports[`thread-message-feed index child messages error - matches snapshot 1`] =
 </div>
 `;
 
-exports[`thread-message-feed index child messages loading - matches snapshot 1`] = `
+exports[`thread-message-feed child messages loading - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"
 >
@@ -94,7 +94,7 @@ exports[`thread-message-feed index child messages loading - matches snapshot 1`]
 </div>
 `;
 
-exports[`thread-message-feed index child messages opened - matches snapshot 1`] = `
+exports[`thread-message-feed child messages opened - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"
 >
@@ -144,7 +144,7 @@ exports[`thread-message-feed index child messages opened - matches snapshot 1`] 
 </div>
 `;
 
-exports[`thread-message-feed index closed - matches snapshot 1`] = `
+exports[`thread-message-feed closed - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root"
 >
@@ -152,7 +152,7 @@ exports[`thread-message-feed index closed - matches snapshot 1`] = `
 </div>
 `;
 
-exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
+exports[`thread-message-feed dark theme - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened dark-theme"
 >
@@ -193,7 +193,7 @@ exports[`thread-message-feed index dark theme - matches snapshot 1`] = `
 </div>
 `;
 
-exports[`thread-message-feed index missing parent message - matches snapshot 1`] = `
+exports[`thread-message-feed missing parent message - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"
 >
@@ -217,7 +217,7 @@ exports[`thread-message-feed index missing parent message - matches snapshot 1`]
 </div>
 `;
 
-exports[`thread-message-feed index not room member - matches snapshot 1`] = `
+exports[`thread-message-feed not room member - matches snapshot 1`] = `
 <div
   class="js-thread-message-feed-root root opened"
 >

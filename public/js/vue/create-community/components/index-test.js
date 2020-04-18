@@ -1,5 +1,5 @@
 const mount = require('../../__test__/vuex-mount');
-const { default: Index } = require('./index.vue');
+const { default: CreateCommunity } = require('./index.vue');
 const appEvents = require('../../../utils/appevents');
 
 import {
@@ -8,30 +8,30 @@ import {
   CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITHUB
 } from '../constants';
 
-describe('CreateCommunity index', () => {
+describe('CreateCommunity', () => {
   it('main step matches snapshot', () => {
-    const { wrapper } = mount(Index, {}, store => {
+    const { wrapper } = mount(CreateCommunity, {}, store => {
       store.state.createCommunity.currentStep = CREATE_COMMUNITY_STEP_MAIN;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('backing entity GitLab matches snapshot', () => {
-    const { wrapper } = mount(Index, {}, store => {
+    const { wrapper } = mount(CreateCommunity, {}, store => {
       store.state.createCommunity.currentStep = CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITLAB;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('backing entity GitHub matches snapshot', () => {
-    const { wrapper } = mount(Index, {}, store => {
+    const { wrapper } = mount(CreateCommunity, {}, store => {
       store.state.createCommunity.currentStep = CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITHUB;
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('fires off appEvents `destroy-create-community-view` event when close button is clicked', () => {
-    const { wrapper } = mount(Index);
+    const { wrapper } = mount(CreateCommunity);
 
     const destroyCreateCommunityViewEventFiredPromise = new Promise(resolve => {
       appEvents.on('destroy-create-community-view', () => {

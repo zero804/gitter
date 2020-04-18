@@ -189,17 +189,13 @@ describe('e2e tests', function() {
       cy.get('.js-left-menu-root .item-create').click();
       cy.get('.js-chat-action-create-room').click();
 
-      // Enter the community
-      cy.get('.js-create-room-group-input .js-group-select-view').click();
-      cy.get('.create-room-group-typeahead-dropdown')
-        .contains(fixtures.group1.lcUri)
-        .click();
+      // The community is automatically selected because of the current room we are visiting
 
       // Enter the room name
       cy.get('#create-room-name-input').type(NEW_ROOM_NAME);
 
       // Click the create submit button
-      cy.get('.modal button')
+      cy.get('.js-create-room-view-root .modal--default__footer button')
         .contains('Create')
         .click();
 

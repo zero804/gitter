@@ -13,7 +13,7 @@ function createTouchEvent(eventName, x, y) {
   return e;
 }
 
-describe('left-menu index', () => {
+describe('left-menu', () => {
   describe('all state', () => {
     it('matches snapshot', () => {
       const { wrapper } = mount(Index, {}, store => {

@@ -19,7 +19,7 @@ function presentCommunityCreateDialog() {
 
     const createCommunityViewRootEl = document.querySelector('.js-create-community-view-root');
     if (!createCommunityViewRootEl) {
-      throw new Error('Root lement does not exist in DOM for the create community flow');
+      throw new Error('Root element does not exist in DOM for the create community flow');
     }
 
     store.dispatch('createCommunity/fetchInitial');

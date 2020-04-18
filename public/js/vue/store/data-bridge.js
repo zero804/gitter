@@ -9,21 +9,24 @@ function setupDataBridge(store) {
   });
 
   troupeCollections.troupes.on('add change', newRoom => {
-    store.dispatch('upsertRoom', newRoom.attributes);
+    store.dispatch('upsertRoom', Object.assign({}, newRoom.attributes));
   });
 
   if (context.inTroupeContext()) {
     const chatCollection = require('../../collections/instances/chats-cached');
     chatCollection.on('sync', () => {
-      store.dispatch('addMessages', chatCollection.models.map(m => m.attributes));
+      store.dispatch(
+        'addMessages',
+        chatCollection.models.map(m => Object.assign({}, m.attributes))
+      );
     });
 
     chatCollection.on('add', message => {
-      store.dispatch('addMessages', [message.attributes]);
+      store.dispatch('addMessages', [Object.assign({}, message.attributes)]);
     });
 
     chatCollection.on('remove', message => {
-      store.dispatch('removeMessage', message.attributes);
+      store.dispatch('removeMessage', Object.assign({}, message.attributes));
     });
   }
 }

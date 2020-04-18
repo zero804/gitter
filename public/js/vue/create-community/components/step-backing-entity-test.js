@@ -14,7 +14,7 @@ const DEFAULT_PROPS = {
   repoList: []
 };
 
-describe('StepBackingEntity index', () => {
+describe('StepBackingEntity', () => {
   it('orgs tab matches snapshot', () => {
     const { wrapper } = mount(StepBackingEntity, DEFAULT_PROPS, store => {
       store.state.createCommunity.entityTypeTabState = CREATE_COMMUNITY_ENTITY_TYPE_TAB_ORGS_STATE;

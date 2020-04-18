@@ -5,7 +5,7 @@ const {
 } = require('../../__test__/fixture-helpers');
 const { default: Index } = require('./index.vue');
 
-describe('thread-message-feed index', () => {
+describe('thread-message-feed', () => {
   const addDisplayedRoom = (state, roomMember = true) => {
     const displayedRoom = createSerializedRoomFixture({ roomMember });
     state.roomMap = { [displayedRoom.id]: displayedRoom };
