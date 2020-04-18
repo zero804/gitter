@@ -2,6 +2,7 @@
 
 exports[`menu-bar-item all matches snapshot 1`] = `
 <button
+  aria-label=""
   class="item item-all active"
   type="button"
 >
@@ -10,6 +11,7 @@ exports[`menu-bar-item all matches snapshot 1`] = `
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
@@ -17,6 +19,7 @@ exports[`menu-bar-item all matches snapshot 1`] = `
 
 exports[`menu-bar-item create matches snapshot 1`] = `
 <button
+  aria-label=""
   class="item item-create"
   type="button"
 >
@@ -25,6 +28,7 @@ exports[`menu-bar-item create matches snapshot 1`] = `
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
@@ -32,14 +36,16 @@ exports[`menu-bar-item create matches snapshot 1`] = `
 
 exports[`menu-bar-item people matches snapshot 1`] = `
 <button
+  aria-label="people"
   class="item item-people"
   type="button"
 >
   <div
-    class="unread-indicator"
+    class="unread-indicator has-unreads"
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
@@ -47,6 +53,7 @@ exports[`menu-bar-item people matches snapshot 1`] = `
 
 exports[`menu-bar-item search matches snapshot 1`] = `
 <button
+  aria-label=""
   class="item item-search"
   type="button"
 >
@@ -55,6 +62,7 @@ exports[`menu-bar-item search matches snapshot 1`] = `
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
@@ -62,6 +70,7 @@ exports[`menu-bar-item search matches snapshot 1`] = `
 
 exports[`menu-bar-item toggle matches snapshot 1`] = `
 <button
+  aria-label=""
   class="item item-toggle"
   type="button"
 >
@@ -70,6 +79,7 @@ exports[`menu-bar-item toggle matches snapshot 1`] = `
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
@@ -77,14 +87,16 @@ exports[`menu-bar-item toggle matches snapshot 1`] = `
 
 exports[`menu-bar-item when all state, all item has highlight matches snapshot 1`] = `
 <button
+  aria-label="all"
   class="item item-all active"
   type="button"
 >
   <div
-    class="unread-indicator"
+    class="unread-indicator has-mentions"
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>

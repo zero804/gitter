@@ -2,6 +2,7 @@
 
 exports[`menu-bar-item-create create matches snapshot 1`] = `
 <button
+  aria-label=""
   class="item item-create"
   type="button"
 >
@@ -10,6 +11,7 @@ exports[`menu-bar-item-create create matches snapshot 1`] = `
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>

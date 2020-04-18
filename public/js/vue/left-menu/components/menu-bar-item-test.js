@@ -11,15 +11,11 @@ describe('menu-bar-item', () => {
   });
 
   it('when all state, all item has highlight matches snapshot', () => {
-    const { wrapper } = mount(
-      MenuBarItem,
-      {
-        type: leftMenuConstants.LEFT_MENU_ALL_STATE
-      },
-      store => {
-        store.state.leftMenuState = leftMenuConstants.LEFT_MENU_ALL_STATE;
-      }
-    );
+    const { wrapper } = mount(MenuBarItem, {
+      type: leftMenuConstants.LEFT_MENU_ALL_STATE,
+      label: 'all',
+      hasMentions: true
+    });
     expect(wrapper.element).toMatchSnapshot();
   });
 
@@ -32,7 +28,9 @@ describe('menu-bar-item', () => {
 
   it('people matches snapshot', () => {
     const { wrapper } = mount(MenuBarItem, {
-      type: leftMenuConstants.LEFT_MENU_PEOPLE_STATE
+      type: leftMenuConstants.LEFT_MENU_PEOPLE_STATE,
+      label: 'people',
+      hasUnreads: true
     });
     expect(wrapper.element).toMatchSnapshot();
   });

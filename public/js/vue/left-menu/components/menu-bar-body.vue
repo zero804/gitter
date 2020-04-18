@@ -1,4 +1,6 @@
 <script>
+import { mapState, mapGetters } from 'vuex';
+
 import MenuBarItem from './menu-bar-item.vue';
 import MenuBarItemCreate from './menu-bar-item-create.vue';
 import MenuBarItemToggle from './menu-bar-item-toggle.vue';
@@ -9,6 +11,35 @@ export default {
     MenuBarItem,
     MenuBarItemCreate,
     MenuBarItemToggle
+  },
+  computed: {
+    ...mapState(['leftMenuPinnedState']),
+    ...mapGetters(['hasAnyUnreads', 'hasAnyMentions', 'hasPeopleUnreads']),
+    allItemLabel() {
+      let messagesOfInterestAvailableNote = '';
+      if (this.hasAnyMentions) {
+        messagesOfInterestAvailableNote = ' (some rooms have mentions)';
+      } else if (this.hasAnyUnreads) {
+        messagesOfInterestAvailableNote = ' (some rooms have unread messages)';
+      }
+
+      return `Show all rooms panel${messagesOfInterestAvailableNote}`;
+    },
+    peopleItemLabel() {
+      let messagesOfInterestAvailableNote = '';
+      if (this.hasPeopleUnreads) {
+        messagesOfInterestAvailableNote = ' (some rooms have unread messages)';
+      }
+
+      return `Show one to one messages panel${messagesOfInterestAvailableNote}`;
+    },
+    toggleItemLabel() {
+      if (this.leftMenuPinnedState) {
+        return 'Unpin and collapse the left-menu';
+      }
+
+      return 'Pin and expand left-menu';
+    }
   }
 };
 </script>
@@ -16,7 +47,12 @@ export default {
 <template>
   <div class="menu-bar-root">
     <div class="menu-bar-top">
-      <menu-bar-item type="all">
+      <menu-bar-item
+        type="all"
+        :label="allItemLabel"
+        :hasUnreads="this.hasAnyUnreads"
+        :hasMentions="this.hasAnyMentions"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 1 49 45">
             <path
@@ -26,7 +62,10 @@ export default {
         </template>
       </menu-bar-item>
 
-      <menu-bar-item type="search">
+      <menu-bar-item
+        type="search"
+        label="Show panel for searching rooms, people, and messages in the current room"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43.7 43.5">
             <path
@@ -39,7 +78,7 @@ export default {
         </template>
       </menu-bar-item>
 
-      <menu-bar-item type="people">
+      <menu-bar-item type="people" :label="peopleItemLabel" :hasUnreads="this.hasPeopleUnreads">
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.9 42.5">
             <path
@@ -51,7 +90,7 @@ export default {
     </div>
 
     <div class="menu-bar-bottom">
-      <menu-bar-item-create type="create">
+      <menu-bar-item-create type="create" label="Create communities and rooms">
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
             <path
@@ -61,7 +100,7 @@ export default {
         </template>
       </menu-bar-item-create>
 
-      <menu-bar-item-toggle type="toggle">
+      <menu-bar-item-toggle type="toggle" :label="toggleItemLabel">
         <template v-slot:icon>
           <svg viewBox="0 0 30 34">
             <path d="M0,6 l15,0 l15,0" />
