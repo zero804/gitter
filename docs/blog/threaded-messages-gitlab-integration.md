@@ -10,17 +10,17 @@ Improving the way Gitter conversations can be organized became one of our first 
 
 ### How to write threaded messages
 
-1. You can start thread for every message in the room by choosing "Start a thread" option in the message context menu.
+1. You can start a thread for every message in the room by choosing "Start a thread" option in the message context menu.
 2. If the message already has a thread attached to it, the easiest way to open the thread is to click on the thread message indicator.
 3. The rest of the conversation happens in what we call the Thread message feed.
 
-![Thread message indicator](https://i.imgur.com/VDaA2Sc.png)
+![Threaded messages screenshot](https://i.imgur.com/VDaA2Sc.png)
 
-### Support for threaded conversations in native apps
+### Support for threaded conversations in mobile apps
 
-Since none of the two Gitter developers is skilled in native app development, our Android and iOS apps are providing a very basic support for the threaded conversations.
+Since none of the two Gitter developers is skilled in mobile app development, our Android and iOS apps are providing a very basic support for the threaded conversations.
 
-Every thread message appears in the main message feed and it is marked as being part of a thread. When clicking on the indicator, you are taken into web browser that will show you the whole thread. *The iOS app doesn't provide a way to contribute to threaded conversations.*
+Every thread message appears in the main message feed and it is marked as being part of a thread. When clicking on the indicator, you are taken into web browser that will show you the whole thread. *The iOS app doesn't provide a way to write to threaded messages.*
 
 ![iOS support for threaded conversations](https://gitlab.com/gitlab-org/gitter/webapp/uploads/fa8e50053ac25a386d441da7cdbe4c03/Kapture_2020-02-03_at_14.54.46.gif)
 
@@ -33,6 +33,7 @@ The main missing features are:
 - [Typeahead in the message input](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2344) - usernames, emojis, issues
 - [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
 - [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
+- [Composing multiline messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2338)
 
 The full list of outstanding work can be found in our [GitLab issue tracker](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations).
 
