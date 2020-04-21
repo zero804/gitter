@@ -236,7 +236,6 @@ describe('e2e tests', function() {
     // So it is disabled for now.
     // FIXME: enable the test when https://gitlab.com/gitlab-org/gitter/webapp/issues/2276 is fixed
     xit('permalinks in main message feed and thread message feed', () => {
-      cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
       cy.visitAndEnsureUser(
         urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`),
         fixtures.user1
@@ -249,7 +248,6 @@ describe('e2e tests', function() {
     });
 
     it('clicking unread thread message notification opens thread message feed', () => {
-      cy.enableThreadedConversations(fixtures.user1, fixtures.troupe1);
       cy.visitAndEnsureUser(urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri), fixtures.user1);
 
       cy.sendMessage(fixtures.user2, fixtures.troupe1, 'child message for notification', {

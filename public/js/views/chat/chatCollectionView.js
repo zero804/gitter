@@ -10,7 +10,6 @@ var isolateBurst = require('gitter-web-shared/burst/isolate-burst-bb');
 var context = require('gitter-web-client-context');
 var perfTiming = require('../../components/perf-timing');
 var debug = require('debug-proxy')('app:chat-collection-view');
-const unreadItemsClient = require('../../components/unread-items-client');
 
 require('../behaviors/infinite-scroll');
 require('../behaviors/smooth-scroll');
@@ -258,20 +257,13 @@ module.exports = (function() {
     scrollToChat: function(chat) {
       const parentId = chat.get('parentId');
       if (parentId) {
-        if (context.useThreadedConversations()) {
-          debug(
-            `scrollToChat(${chat.id}) is in threaded conversation, scrolling to ${parentId} and opening thread`
-          );
-          appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
-            id: chat.id
-          });
-          this.scrollToChatId(parentId);
-        } else {
-          debug(
-            `scrollToChat(${chat.id}) is in threaded conversation but threads are not enabled in this room, marking message as read`
-          );
-          unreadItemsClient.markItemRead(chat.id);
-        }
+        debug(
+          `scrollToChat(${chat.id}) is in threaded conversation, scrolling to ${parentId} and opening thread`
+        );
+        appEvents.trigger('dispatchVueAction', 'threadMessageFeed/focusOnMessage', {
+          id: chat.id
+        });
+        this.scrollToChatId(parentId);
       } else {
         const view = this.children.findByModel(chat);
         if (!view) {
@@ -408,7 +400,7 @@ module.exports = (function() {
 
         // if permalink points to a child message
         const parentId = model.get('parentId');
-        if (parentId && context.useThreadedConversations()) {
+        if (parentId) {
           appEvents.trigger('dispatchVueAction', 'threadMessageFeed/highlightChildMessage', {
             parentId,
             id: model.id

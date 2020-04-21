@@ -232,22 +232,12 @@ describe('room-with-policy-service', function() {
       assert.equal(welcomeMessage.text, welcomeMessageText);
     });
 
-    it('should allow you to set the threadedConversations toggle', async function() {
-      const r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
-      await r.updateRoomMeta({ threadedConversations: true });
-
-      const { threadedConversations } = await r.getMeta();
-      assert(threadedConversations);
-      assert.equal(threadedConversations, true);
-    });
-
     it('should retrieve room metadata', async () => {
       const r = new RoomWithPolicyService(fixture.troupe1, fixture.user1, isAdminPolicy);
-      await r.updateRoomMeta({ welcomeMessage: 'hello', threadedConversations: false });
+      await r.updateRoomMeta({ welcomeMessage: 'hello' });
       const result = await r.getMeta();
       assert.deepStrictEqual(result, {
-        welcomeMessage: { text: 'hello', html: 'hello' },
-        threadedConversations: false
+        welcomeMessage: { text: 'hello', html: 'hello' }
       });
     });
   });

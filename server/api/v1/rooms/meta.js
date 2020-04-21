@@ -28,8 +28,7 @@ module.exports = {
     const roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
 
     return await roomWithPolicyService.updateRoomMeta({
-      welcomeMessage: data.welcomeMessage,
-      threadedConversations: data.threadedConversations
+      welcomeMessage: data.welcomeMessage
     });
   }
 };

@@ -62,8 +62,6 @@ context.hasFeature = function() {};
 
 context.getFeatures = function() {};
 
-context.useThreadedConversations = function() {};
-
 context.getSnapshot = function() {};
 
 context.roomHasWelcomeMessage = function() {};

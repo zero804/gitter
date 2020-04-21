@@ -10,8 +10,9 @@ var TroupeMetaSchema = new Schema(
     welcomeMessage: {
       html: String,
       text: String
-    },
-    threadedConversations: { type: Boolean, default: false }
+    }
+    // threadedConversations feature toggle is no longer used (since 2020-4-17)
+    // threadedConversations: { type: Boolean, default: false }
   },
   { strict: true }
 );
