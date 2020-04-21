@@ -17,8 +17,7 @@ class TroupeMetaIdStrategy {
   map(id) {
     const meta = this.metaByTroupeId[id] || {};
     return {
-      welcomeMessage: meta.welcomeMessage,
-      threadedConversations: meta.threadedConversations
+      welcomeMessage: meta.welcomeMessage
     };
   }
 }

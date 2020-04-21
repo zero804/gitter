@@ -11,12 +11,10 @@ describe('room-meta-service #slow', function() {
     troupe3: {},
     troupeMeta2: {
       troupe: 'troupe2',
-      welcomeMessage: 'hello',
-      threadedConversations: true
+      welcomeMessage: 'hello'
     },
     troupeMeta3: {
-      troupe: 'troupe3',
-      threadedConversations: false
+      troupe: 'troupe3'
     }
   });
 
@@ -49,15 +47,11 @@ describe('room-meta-service #slow', function() {
       });
   });
 
-  it('should be able to retrieve multiple keys', async () => {
-    const result = await roomMetaService.findMetaByTroupeId(fixture.troupe2.id, [
-      'welcomeMessage',
-      'threadedConversations'
-    ]);
+  it('should be able to retrieve keys', async () => {
+    const result = await roomMetaService.findMetaByTroupeId(fixture.troupe2.id, ['welcomeMessage']);
 
     assert.deepStrictEqual(result, {
-      welcomeMessage: { text: 'hello' },
-      threadedConversations: true
+      welcomeMessage: { text: 'hello' }
     });
   });
 
@@ -73,12 +67,10 @@ describe('room-meta-service #slow', function() {
     assert.deepStrictEqual(stringIdResult, [
       {
         troupeId: fixture.troupe2.id,
-        welcomeMessage: { text: 'hello' },
-        threadedConversations: true
+        welcomeMessage: { text: 'hello' }
       },
       {
-        troupeId: fixture.troupe3.id,
-        threadedConversations: false
+        troupeId: fixture.troupe3.id
       }
     ]);
   });

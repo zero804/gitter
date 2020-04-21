@@ -291,11 +291,6 @@ context.getFeatures = function() {
   return ctx.features || [];
 };
 
-context.useThreadedConversations = function() {
-  const troupeMetadata = troupe.get('meta');
-  return troupeMetadata && troupeMetadata.threadedConversations;
-};
-
 context.getSnapshot = function(key) {
   var snapshot = snapshots[key];
 

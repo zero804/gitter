@@ -180,7 +180,6 @@ module.exports = (function() {
       }
       data.isPermalinkable = this.isPermalinkable;
       data.showItemActions = !this.isArchive();
-      data.useThreadedConversations = context.useThreadedConversations();
       return data;
     },
 
@@ -501,7 +500,7 @@ module.exports = (function() {
         chatItemView: this,
         targetElement: e.target,
         placement: 'horizontal',
-        width: context.useThreadedConversations() ? '125px' : '100px'
+        width: '125px'
       });
 
       this.listenTo(actions, 'render', function() {
@@ -520,10 +519,6 @@ module.exports = (function() {
     },
 
     mentionUser: function() {
-      // TODO: Remove mentionUser tracking after [threaded-conversations] ships
-      appEvents.trigger('stats.event', 'chatItem.actions.mentionUser');
-      appEvents.trigger('track-event', 'chatItem.actions.mentionUser');
-
       var mention = '@' + this.model.get('fromUser').username + ' ';
       appEvents.trigger('input.append', mention);
     },
@@ -678,8 +673,6 @@ module.exports = (function() {
     },
     events: {
       'click .js-chat-action-edit': 'edit',
-      // TODO: Remove reply event after [threaded-conversations] ships
-      'click .js-chat-action-reply': 'reply',
       'click .js-chat-action-threadReply': 'threadReply',
       'click .js-chat-action-quote': 'quote',
       'click .js-chat-action-delete': 'delete',
@@ -690,15 +683,6 @@ module.exports = (function() {
 
     edit: function() {
       this.chatItemView.triggerMethod('toggleEdit');
-    },
-
-    // TODO: Remove reply event handler after [threaded-conversations] ships
-    reply: function() {
-      appEvents.trigger('stats.event', 'chatItem.actions.reply');
-      appEvents.trigger('track-event', 'chatItem.actions.reply');
-
-      var mention = '@' + this.model.get('fromUser').username + ' ';
-      appEvents.trigger('input.append', mention);
     },
 
     threadReply: function() {
@@ -761,16 +745,12 @@ module.exports = (function() {
 
       const actions = [];
 
-      if (context.useThreadedConversations()) {
-        const threadMessageCount = this.model.get('threadMessageCount');
-        actions.push({
-          name: 'threadReply',
-          description: threadMessageCount ? 'Reply in thread' : 'Start a thread',
-          disabled: !isPersisted
-        });
-      } else {
-        actions.push({ name: 'reply', description: 'Reply', disabled: !isPersisted });
-      }
+      const threadMessageCount = this.model.get('threadMessageCount');
+      actions.push({
+        name: 'threadReply',
+        description: threadMessageCount ? 'Reply in thread' : 'Start a thread',
+        disabled: !isPersisted
+      });
 
       if (!deleted) {
         actions.push({ name: 'quote', description: 'Quote', disabled: !isPersisted });

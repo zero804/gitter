@@ -19,7 +19,12 @@ var TroupePermissionsStrategy = require('./troupes/troupe-permissions-strategy')
 var GroupIdStrategy = require('./group-id-strategy');
 var SecurityDescriptorStrategy = require('./security-descriptor-strategy');
 var AssociatedRepoStrategy = require('./troupes/associated-repo-strategy');
-const TroupeMetaIdStrategy = require('./troupes/troupe-meta-id-strategy');
+/*
+  room-based-feature-toggle
+  We used to use this strategy for the threadedConversations feature toggle but don't need it now that is generally available.
+  If you're introducing another room based feature toggle, uncomment all of these pieces of code (search for room-based-feature-toggle)
+*/
+// const TroupeMetaIdStrategy = require('./troupes/troupe-meta-id-strategy');
 
 function getAvatarUrlForTroupe(serializedTroupe, options) {
   if (serializedTroupe.oneToOne && options && options.user) {
@@ -134,7 +139,6 @@ function TroupeStrategy(options) {
   var groupIdStrategy;
   var securityDescriptorStrategy;
   var associatedRepoStrategy;
-  var troupeMetaIdStrategy;
 
   this.preload = function(items) {
     // eslint-disable-line max-statements
@@ -218,10 +222,9 @@ function TroupeStrategy(options) {
       strategies.push(associatedRepoStrategy.preload(items));
     }
 
-    // TODO this can be commented out/removed after [threaded conversations] ships
-    // troupe metadata
-    troupeMetaIdStrategy = new TroupeMetaIdStrategy();
-    strategies.push(troupeMetaIdStrategy.preload(troupeIds));
+    /* room-based-feature-toggle */
+    // troupeMetaIdStrategy = new TroupeMetaIdStrategy();
+    // strategies.push(troupeMetaIdStrategy.preload(troupeIds));
 
     return Promise.all(strategies);
   };
@@ -348,8 +351,8 @@ function TroupeStrategy(options) {
       backend: securityDescriptorStrategy ? securityDescriptorStrategy.map(item.sd) : undefined,
       public: isPublic,
       exists: options.includeExists ? !!id : undefined,
-      // TODO meta can be commented out/removed after [threaded conversations] ships
-      meta: troupeMetaIdStrategy.map(id) || {},
+      /* room-based-feature-toggle */
+      // meta: troupeMetaIdStrategy.map(id) || {},
       v: getVersion(item)
     };
   };

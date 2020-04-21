@@ -7,8 +7,7 @@ const debug = require('debug')('gitter:tests:test-fixtures');
 function createTroupeMeta(fixtureName, expected) {
   const doc = {
     troupeId: expected.troupeId,
-    welcomeMessage: { text: expected.welcomeMessage },
-    threadedConversations: expected.threadedConversations
+    welcomeMessage: { text: expected.welcomeMessage }
   };
   debug('Creating troupeMeta %s with %j', fixtureName, doc);
   return TroupeMeta.create(doc);

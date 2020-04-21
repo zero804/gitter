@@ -13,7 +13,6 @@ var View = Marionette.ItemView.extend({
 
   ui: {
     githubOnly: '#github-only',
-    threadedConversations: '#threaded-conversations-toggle',
     welcomeMessage: '#room-welcome-message',
     welcomeMessagePreviewButton: '#preview-welcome-message',
     welcomeMessagePreviewContainer: '#welcome-message-preview-container',
@@ -31,14 +30,12 @@ var View = Marionette.ItemView.extend({
     this.listenTo(this, 'menuItemClicked', this.menuItemClicked, this);
     apiClient.room
       .get('/meta')
-      .then(({ welcomeMessage = { text: '', html: '' }, threadedConversations = false }) => {
+      .then(({ welcomeMessage = { text: '', html: '' } }) => {
         if (welcomeMessage.text.length) {
           this.initWithMessage(welcomeMessage);
         } else {
           this.initEmptyTextArea();
         }
-
-        this.initThreadedConversations(threadedConversations);
       })
       .catch(this.showError.bind(this));
   },
@@ -71,10 +68,6 @@ var View = Marionette.ItemView.extend({
 
   initWithMessage: function(msg) {
     this.ui.welcomeMessage.val(msg.text);
-  },
-
-  initThreadedConversations: function(threadedConversations) {
-    this.ui.threadedConversations.prop('checked', threadedConversations);
   },
 
   onRender: function() {
@@ -124,14 +117,12 @@ var View = Marionette.ItemView.extend({
 
   formSubmit: function() {
     var providers = this.ui.githubOnly.is(':checked') ? ['github'] : [];
-    const threadedConversations = this.ui.threadedConversations.is(':checked');
     var welcomeMessageContent = this.getWelcomeMessageContent();
 
     Promise.all([
       apiClient.room.put('', { providers: providers }),
       apiClient.room.post('/meta', {
-        welcomeMessage: welcomeMessageContent,
-        threadedConversations
+        welcomeMessage: welcomeMessageContent
       })
     ])
       .spread(
