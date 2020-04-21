@@ -1,3 +1,8 @@
+# 20.23.0 - *upcoming*
+
+ - Add support for passing the initial room name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1839
+
+
 # 20.22.0 - 2020-4-17
 
  - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
