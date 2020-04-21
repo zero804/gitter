@@ -10,17 +10,17 @@ Improving the way Gitter conversations can be organized became one of our first 
 
 ### How to write threaded messages
 
-1. You can start a thread for every message in the room by choosing "Start a thread" option in the message context menu.
-2. If the message already has a thread attached to it, the easiest way to open the thread is to click on the thread message indicator.
-3. The rest of the conversation happens in what we call the Thread message feed.
+1. You can start a thread for every message in the room by choosing **Start a thread** option in the `...` dropdown in the top-right corner of every message.
+2. If the message already has a thread attached to it, the easiest way to open the thread is to click on the thread message indicator below the message.
+3. The rest of the conversation happens in what we call the Thread message feed where you can view and reply to the thread.
 
-![Threaded messages screenshot](https://i.imgur.com/VDaA2Sc.png)
+![Threaded messages screenshot](https://i.imgur.com/7MRkEAT.png)
 
 ### Support for threaded conversations in mobile apps
 
-Since none of the two Gitter developers is skilled in mobile app development, our Android and iOS apps are providing a very basic support for the threaded conversations.
+Threads are minimally supported in the mobile apps and the [mobile apps overall may be deprecated](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2281) in the future. Main reason for this minimal support is the Gitter team's workload and the resulting conscious prioritization of the web experience.
 
-Every thread message appears in the main message feed and it is marked as being part of a thread. When clicking on the indicator, you are taken into web browser that will show you the whole thread. *The iOS app doesn't provide a way to write to threaded messages.*
+Every thread message appears in the main message feed and it is marked as being part of a thread. When you click on the indicator, you are taken into web browser that will show you the whole thread. *The mobile apps don't provide a way to write threaded messages.*
 
 ![iOS support for threaded conversations](https://gitlab.com/gitlab-org/gitter/webapp/uploads/fa8e50053ac25a386d441da7cdbe4c03/Kapture_2020-02-03_at_14.54.46.gif)
 
@@ -34,6 +34,8 @@ The main missing features are:
 - [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
 - [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
 - [Composing multiline messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2338)
+- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2483]
+- [Thread summary overview](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2431)
 
 The full list of outstanding work can be found in our [GitLab issue tracker](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations).
 
