@@ -24,3 +24,5 @@ Both simplified to reduce the complexity and now have more clear and actionable 
 The room creation modal updates add a lot more freedom around associating a project/repo.
 Now you can associate a project/repo with any room regardless of the room name or which community it is part of.
 Previously the room name had to match the repo name and be inside a community associated with the GitHub org.
+
+![](https://i.imgur.com/b8Kty6d.png) ![](https://i.imgur.com/yOobB1g.png)
