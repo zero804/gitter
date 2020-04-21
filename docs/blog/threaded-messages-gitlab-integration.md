@@ -26,7 +26,7 @@ Every thread message appears in the main message feed and it is marked as being 
 
 ### What's not implemented yet
 
-We are confident that we are releasing threaded conversations in a state that is usable without any headaches and it provides a lot of value. That being said, threaded conversations don't support the full messaging feature set you are used to from the current normal room messaging.
+Keeping a [low-level of shame](https://about.gitlab.com/handbook/values/#low-level-of-shame), we are releasing threaded conversations in a usable state with lots of value but there are still some use cases we want to address.
 
 The main missing features are:
 
@@ -46,5 +46,7 @@ We are still planning on implementing these features but we decided to release t
 We are grateful for both positive and constructive feedback. If you are happy with the new features and you'd like to tell us, the best channels are the [gitterHQ/gitter](https://gitter.im/gitterHQ/gitter) room and our Twitter account [@gitchat](https://twitter.com/gitchat).
 
 For constructive feedback we love to use GitLab issues where we track all outstanding work. Please first check your suggestion is not already tracked in [open threaded conversations issues](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations). Than you can create a new issue in the same view.
+
+We have been [iteratively improving](https://about.gitlab.com/handbook/values/#iteration) threaded conversations behind a room feature toggle you could turn on. If you want to give us feedback earlier on in the development cycle, we announce smaller dev updates like this on the [@gitchat Twitter](https://twitter.com/gitchat), so you can stay up to date there.
 
 We hope you'll enjoy better message structure in your rooms with the threaded conversations.
