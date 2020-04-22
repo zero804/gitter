@@ -4,6 +4,7 @@
  - Add accessible labels to any backbone/marionette code that uses the Tooltip behavior, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1836
  - Remove threaded-conversations room-based toggle, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1830
  - Update room creation docs with screenshots for new flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1841
+ - Prepare documentation for full release of Threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1832
 
 
 # 20.22.0 - 2020-4-17
