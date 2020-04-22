@@ -25,6 +25,7 @@ function presentCommunityCreateDialog() {
     store.dispatch('createCommunity/fetchInitial');
     const vm = renderCreateCommunityView(createCommunityViewRootEl, store);
     debug('Rendered', vm);
+    appEvents.trigger('stats.event', 'present-create-community-flow');
 
     appEvents.once('destroy-create-community-view', () => {
       debug('destroy-create-community-view', vm);

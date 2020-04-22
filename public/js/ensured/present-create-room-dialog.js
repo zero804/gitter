@@ -23,6 +23,7 @@ function presentCreateRoomDialog({ initialRoomName }) {
     store.dispatch('createRoom/setRoomName', initialRoomName);
     const vm = renderCreateRoomView(createRoomViewRootEl, store);
     debug('Rendered', vm);
+    appEvents.trigger('stats.event', 'present-create-room-flow');
 
     appEvents.once('destroy-create-room-view', () => {
       debug('destroy-create-room-view', vm);
