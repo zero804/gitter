@@ -1,4 +1,4 @@
-# 20.23.0 - *upcoming* - Threaded conversations
+# 20.23.0 - 2020-04-22 - Threaded conversations
 
  - Add support for passing the initial room name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1839
  - Add accessible labels to any backbone/marionette code that uses the Tooltip behavior, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1836
@@ -11,7 +11,7 @@
     - Thanks to [@Nezteb](https://gitlab.com/Nezteb) for the contribution
 
 
-# 20.22.0 - 2020-4-17 - GitLab based rooms
+# 20.22.0 - 2020-04-17 - GitLab based rooms
 
  - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
     - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
