@@ -6,6 +6,7 @@
  - Update room creation docs with screenshots for new flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1841
  - Prepare documentation for full release of Threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1832
  - Adding a name to notable releases, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1842
+ - Add stats for opening the create community/room flows, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1843
 
 
 # 20.22.0 - 2020-4-17 - GitLab based rooms
