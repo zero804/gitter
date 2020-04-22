@@ -1,4 +1,4 @@
-# 20.23.0 - *upcoming*
+# 20.23.0 - *upcoming* - Threaded conversations
 
  - Add support for passing the initial room name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1839
  - Add accessible labels to any backbone/marionette code that uses the Tooltip behavior, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1836
@@ -7,7 +7,7 @@
  - Prepare documentation for full release of Threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1832
 
 
-# 20.22.0 - 2020-4-17
+# 20.22.0 - 2020-4-17 - GitLab based rooms
 
  - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
     - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
@@ -106,7 +106,7 @@ Developer facing:
  - Fix test skipping when integration fixtures are missing, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1780
 
 
-# 20.17.0 - 2020-02-17
+# 20.17.0 - 2020-02-17 - GitLab based communities
 
  - Add finger swiping to left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1761
  - Fix "Double-tap to edit a message on mobile not working", https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1760
