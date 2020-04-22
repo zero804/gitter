@@ -7,6 +7,8 @@
  - Prepare documentation for full release of Threaded messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1832
  - Adding a name to notable releases, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1842
  - Add stats for opening the create community/room flows, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1843
+ - Add download link to latest unsigned desktop macOS version, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1844
+    - Thanks to [@Nezteb](https://gitlab.com/Nezteb) for the contribution
 
 
 # 20.22.0 - 2020-4-17 - GitLab based rooms
