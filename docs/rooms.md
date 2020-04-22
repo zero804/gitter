@@ -112,13 +112,6 @@ You can set a room welcome message via **Room settings dropdown** -> **Settings*
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/06azySl.png) ![](https://i.imgur.com/Sou791K.png)
 
 
-### Enable threaded conversations **[BETA]**
-
-Threaded conversations are currently in development and have to be turned on by the room admin: **Room settings dropdown** -> **Settings** -> **Enable threaded conversations.**
-
-For usage see the [messages doc threaded conversation section](./messages.md#threaded-conversations-beta).
-
-
 ### Moderation
 
 As an admin of the room, you can delete messages from other users.
