@@ -5,7 +5,6 @@ require('./utils/initial-setup');
 require('./utils/font-setup');
 
 var debug = require('debug-proxy')('app:router-app');
-var _ = require('lodash');
 var Backbone = require('backbone');
 var moment = require('moment');
 var clientEnv = require('gitter-client-env');
@@ -22,7 +21,6 @@ var RoomCollectionTracker = require('./components/room-collection-tracker');
 var SPARoomSwitcher = require('./components/spa-room-switcher');
 var linkHandler = require('./components/link-handler');
 var troupeCollections = require('./collections/instances/troupes');
-var RoomMenuModel = require('./models/room-menu-model');
 var modalRegion = require('./components/modal-region');
 var Router = require('./routes/router');
 var notificationRoutes = require('./routes/notification-routes');
@@ -50,33 +48,10 @@ onready(function() {
   const user = context.user();
   debug(`onready:user=${user.get('username')}(${user.get('id')})`);
 
-  const roomMenuModel = new RoomMenuModel(
-    _.extend(
-      {},
-      {
-        bus: appEvents,
-        roomCollection: troupeCollections.troupes,
-        orgCollection: troupeCollections.orgs,
-        userModel: context.user(),
-        troupeModel: context.troupe(),
-        groupsCollection: troupeCollections.groups
-      }
-    )
-  );
-
   // eslint-disable-next-line no-unused-vars
   var router = new Router({
     dialogRegion: modalRegion,
-    routes: [
-      userRoutes(),
-      notificationRoutes(),
-      createRoutes({
-        rooms: troupeCollections.troupes,
-        groups: troupeCollections.groups,
-        roomMenuModel: roomMenuModel
-      }),
-      upgradeAccessRoutes()
-    ]
+    routes: [userRoutes(), notificationRoutes(), createRoutes(), upgradeAccessRoutes()]
   });
 
   Backbone.history.stop();

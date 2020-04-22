@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CreateCommunity index backing entity GitHub matches snapshot 1`] = `
+exports[`CreateCommunity backing entity GitHub matches snapshot 1`] = `
 <div
   class="root js-create-community-view-root"
 >
@@ -29,7 +29,7 @@ exports[`CreateCommunity index backing entity GitHub matches snapshot 1`] = `
 </div>
 `;
 
-exports[`CreateCommunity index backing entity GitLab matches snapshot 1`] = `
+exports[`CreateCommunity backing entity GitLab matches snapshot 1`] = `
 <div
   class="root js-create-community-view-root"
 >
@@ -58,7 +58,7 @@ exports[`CreateCommunity index backing entity GitLab matches snapshot 1`] = `
 </div>
 `;
 
-exports[`CreateCommunity index main step matches snapshot 1`] = `
+exports[`CreateCommunity main step matches snapshot 1`] = `
 <div
   class="root js-create-community-view-root"
 >

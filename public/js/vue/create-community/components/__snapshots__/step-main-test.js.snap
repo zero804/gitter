@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`StepMain index GitHub user matches snapshot 1`] = `
+exports[`StepMain GitHub user matches snapshot 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -88,7 +88,7 @@ exports[`StepMain index GitHub user matches snapshot 1`] = `
 </div>
 `;
 
-exports[`StepMain index GitLab user matches snapshot 1`] = `
+exports[`StepMain GitLab user matches snapshot 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -176,7 +176,7 @@ exports[`StepMain index GitLab user matches snapshot 1`] = `
 </div>
 `;
 
-exports[`StepMain index entity selected matches snapshot 1`] = `
+exports[`StepMain entity selected matches snapshot 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -285,7 +285,7 @@ exports[`StepMain index entity selected matches snapshot 1`] = `
 </div>
 `;
 
-exports[`StepMain index errors community name error 1`] = `
+exports[`StepMain errors community name error 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -365,7 +365,7 @@ exports[`StepMain index errors community name error 1`] = `
 </div>
 `;
 
-exports[`StepMain index errors community slug error 1`] = `
+exports[`StepMain errors community slug error 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -445,7 +445,7 @@ exports[`StepMain index errors community slug error 1`] = `
 </div>
 `;
 
-exports[`StepMain index submit button submit error user matches snapshot 1`] = `
+exports[`StepMain submit button submit error user matches snapshot 1`] = `
 <div>
   <h1
     class="primary-community-heading"
@@ -525,7 +525,7 @@ exports[`StepMain index submit button submit error user matches snapshot 1`] = `
 </div>
 `;
 
-exports[`StepMain index submit button submit loading user matches snapshot 1`] = `
+exports[`StepMain submit button submit loading user matches snapshot 1`] = `
 <div>
   <h1
     class="primary-community-heading"
