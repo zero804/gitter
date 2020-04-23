@@ -1,3 +1,8 @@
+# 20.24.0 - *upcoming*
+
+ - Add accessible labels to the left-menu menu bar buttons, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1837
+
+
 # 20.23.0 - 2020-04-22 - Threaded conversations
 
  - Add support for passing the initial room name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1839
