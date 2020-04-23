@@ -12,7 +12,7 @@ At last, we have **GitLab based communities and rooms**. This means that you can
  - :white_check_mark: Gitter communities based on [GitLab groups](https://docs.gitlab.com/ee/user/group/)
  - :white_check_mark: Gitter communities based on [GitLab projects](https://docs.gitlab.com/ee/user/project/)
  - :white_check_mark: Gitter rooms based on [GitLab projects](https://docs.gitlab.com/ee/user/project/)
- - :x: Gitter rooms based on your personal user namespace GitLab projects -> https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2397
+ - :x: GitLab projects belonging to a user as opposed to a group are not supported yet but we plan to follow up soon after -> https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2397
 
 
 ### What's not implemented yet
