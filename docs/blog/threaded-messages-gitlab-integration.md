@@ -34,7 +34,7 @@ The main missing features are:
 - [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
 - [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
 - [Composing multiline messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2338)
-- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2483]
+- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2483)
 - [Thread summary overview](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2431)
 
 The full list of outstanding work can be found in our [GitLab issue tracker](https://gitlab.com/gitlab-org/gitter/webapp/-/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=threaded-conversations).
