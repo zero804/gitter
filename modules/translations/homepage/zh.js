@@ -69,5 +69,8 @@
 	"iOS": "iOS",
 	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "了解如何 <a %s>创建社区</a> 和 <a %s>创建聊天室</a>。",
 	"Mac users on 10.9 or lower, <a %s>download here</a>.": "使用 10.9 或更低版本的 Mac 用户, <a %s>在此处下载</a>。",
-	"We also have a sweet little <a %s>IRC bridge</a>.": "我们还有一款小巧可爱的 <a %s>IRC bridge</a>。"
+	"We also have a sweet little <a %s>IRC bridge</a>.": "我们还有一款小巧可爱的 <a %s>IRC bridge</a>。",
+	"Gitter is available in all modern browsers as well as apps for desktops.": "Gitter is available in all modern browsers as well as apps for desktops.",
+	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.",
+	"The dedicated Android/iOS apps are no longer recommended and may be officially <a href='%s'>deprecated in the future</a>. For mobile, we recommend using the mobile web version in your browser.": "The dedicated Android/iOS apps are no longer recommended and may be officially <a href='%s'>deprecated in the future</a>. For mobile, we recommend using the mobile web version in your browser."
 }

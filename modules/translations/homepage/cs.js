@@ -92,5 +92,8 @@
 	"iOS": "iOS",
 	"Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.": "Learn more about <a %s>creating communities</a> and <a %s>creating rooms</a>.",
 	"Mac users on 10.9 or lower, <a %s>download here</a>.": "Mac users on 10.9 or lower, <a %s>download here</a>.",
-	"We also have a sweet little <a %s>IRC bridge</a>.": "We also have a sweet little <a %s>IRC bridge</a>."
+	"We also have a sweet little <a %s>IRC bridge</a>.": "We also have a sweet little <a %s>IRC bridge</a>.",
+	"Gitter is available in all modern browsers as well as apps for desktops.": "Gitter is available in all modern browsers as well as apps for desktops.",
+	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.",
+	"The dedicated Android/iOS apps are no longer recommended and may be officially <a href='%s'>deprecated in the future</a>. For mobile, we recommend using the mobile web version in your browser.": "The dedicated Android/iOS apps are no longer recommended and may be officially <a href='%s'>deprecated in the future</a>. For mobile, we recommend using the mobile web version in your browser."
 }
