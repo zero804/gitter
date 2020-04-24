@@ -5,3 +5,5 @@ output/**
 public/js/utils/base64.js
 config/mongo-docker/*
 modules/*/output/**
+modules/translations/homepage
+modules/translations/messages

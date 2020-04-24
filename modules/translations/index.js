@@ -8,5 +8,5 @@ module.exports = {
   },
   getHomePagePath: function() {
     return path.join(__dirname, 'homepage');
-  },
-}
+  }
+};

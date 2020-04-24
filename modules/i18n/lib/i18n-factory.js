@@ -5,7 +5,7 @@ var config = env.config;
 var I18n = require('i18n-2');
 var path = require('path');
 var fs = require('fs');
-var translations = require('@gitterhq/translations');
+var translations = require('gitter-web-translations');
 
 var devMode = config.runtimeEnvironment === 'dev';
 
