@@ -8,18 +8,51 @@ stages:
 variables:
   DOCKER_VERSION: "19.03.0"
 
+##############
+# Conditions #
+##############
+.if-merge-request: &if-merge-request
+  if: '$CI_MERGE_REQUEST_IID'
+
+.if-develop-branch: &if-develop-branch
+  if: '$CI_COMMIT_BRANCH == "develop"'
+
+.if-master-branch: &if-master-branch
+  if: '$CI_COMMIT_BRANCH == "master"'
+
+.if-feature-branch: &if-feature-branch
+  if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+
+.if-release-branch: &if-release-branch
+  if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+
+.if-hotfix-branch: &if-hotfix-branch
+  if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*$/'
+
+.if-mr-source-renovate-branch: &if-mr-source-renovate-branch
+  if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\/.*$/'
+
+.if-tag: &if-tag
+  if: '$CI_COMMIT_TAG'
+
+.if-not-canonical-project: &if-not-canonical-project
+  if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+
+.if-schedule: &if-schedule
+  if: '$CI_PIPELINE_SOURCE == "schedule"'
+
 workflow:
   rules:
     # For merge requests, create a pipeline.
-    - if: '$CI_MERGE_REQUEST_IID'
+    - <<: *if-merge-request
     # For `develop` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
-    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - <<: *if-develop-branch
     # For `master` branch, create a pipeline (this includes on schedules, pushes, merges, etc.).
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - <<: *if-master-branch
     # For `release/*` branch, create a pipeline.
-    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*/'
+    - <<: *if-release-branch
     # For tags, create a pipeline.
-    - if: '$CI_COMMIT_TAG'
+    - <<: *if-tag
 
 default:
   tags:
@@ -36,6 +69,17 @@ default:
   tags:
     # See https://gitlab.com/gitlab-com/www-gitlab-com/-/issues/7019 for tag descriptions
     - gitlab-org-docker
+
+#########
+# Rules #
+#########
+.rules:staging:
+  rules:
+    # Don't run this job for forks since it should only be run from the canonical project.
+    - <<: *if-not-canonical-project
+      when: never
+    - <<: *if-release-branch
+    - <<: *if-hotfix-branch
 
 .webapp_variables: &webapp_variables
   BLUEBIRD_DEBUG: 1
@@ -99,14 +143,15 @@ test:
   extends:
     - .test_job
   rules:
-    - if: '$CI_COMMIT_BRANCH !~ /^release\/.*/'
+    - <<: *if-release-branch
+      when: never
   retry: 1
 
 test-all:
   extends:
     - .test_job
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*/'
+    - <<: *if-release-branch
   variables:
     <<: *webapp_variables
     ALLOW_FLAKEY_TESTS: 1
@@ -127,9 +172,9 @@ test_e2e:
     - internal
   rules:
     # Don't run this job for forks since it uses the 'internal' runner.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME =~ /^renovate\/.*$/'
+    - <<: *if-mr-source-renovate-branch
     - when: manual
       allow_failure: true
   script:
@@ -173,7 +218,7 @@ mobile-asset-build:
   extends: .node_job
   stage: build_unit_test
   rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+    - <<: *if-master-branch
   variables:
     NODE_ENV: prod
     stats__cube__enabled: 'false'
@@ -199,9 +244,9 @@ distribute_beta:
   extends: .distribute_job
   rules:
     # Don't run this job for forks since it should only be run from the canonical project.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - <<: *if-develop-branch
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta
 
@@ -209,18 +254,15 @@ distribute_beta_staging:
   extends: .distribute_job
   rules:
     # Don't run this job for forks since it should only be run from the canonical project.
-    - if: '$CI_PROJECT_PATH == "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
+      when: never
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/beta-staging
 
 distribute_staging:
-  extends: .distribute_job
-  rules:
-    # Don't run this job for forks since it should only be run from the canonical project.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
-    - if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*$/'
+  extends:
+    - .distribute_job
+    - .rules:staging
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/staging
 
@@ -228,9 +270,9 @@ distribute_prod:
   extends: .distribute_job
   rules:
     # Don't run this job for forks since it should only be run from the canonical project.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_COMMIT_TAG'
+    - <<: *if-tag
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/prod
 
@@ -250,7 +292,7 @@ deploy-build-image:
   extends: .use-docker-in-docker
   stage: docker_images
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - <<: *if-schedule
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
@@ -282,9 +324,9 @@ deploy_beta:
     - distribute_beta
   rules:
     # Don't run this job for forks since it uses the 'internal' runner.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_COMMIT_BRANCH == "develop"'
+    - <<: *if-develop-branch
   script:
     - cd $ANSIBLE_DIR
     - git checkout xenial && git pull origin xenial
@@ -299,9 +341,9 @@ deploy_beta_staging:
     - distribute_beta_staging
   rules:
     # Don't run this job for forks since it uses the 'internal' runner.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - <<: *if-feature-branch
     - when: manual
       allow_failure: true
   script:
@@ -313,15 +355,11 @@ deploy_beta_staging:
     url: https://beta.gitter.im?gitter_next=true
 
 deploy_staging:
-  extends: .deploy_job
+  extends:
+    - .deploy_job
+    - .rules:staging
   dependencies:
     - distribute_staging
-  rules:
-    # Don't run this job for forks since it uses the 'internal' runner.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
-      when: never
-    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
-    - if: '$CI_COMMIT_BRANCH =~ /^hotfix\/.*$/'
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
@@ -334,9 +372,9 @@ deploy_prod:
     - distribute_prod
   rules:
     # Don't run this job for forks since it uses the 'internal' runner.
-    - if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp"'
+    - <<: *if-not-canonical-project
       when: never
-    - if: '$CI_COMMIT_TAG'
+    - <<: *if-tag
       when: manual
   script:
     - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
@@ -348,7 +386,7 @@ docker-base:
   extends: .use-docker-in-docker
   stage: docker_images
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - <<: *if-schedule
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp:latest .
@@ -358,7 +396,7 @@ mongo-base:
   extends: .use-docker-in-docker
   stage: docker_images
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - <<: *if-schedule
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest scripts/docker/mongo-image/
@@ -368,7 +406,7 @@ elasticsearch-base:
   extends: .use-docker-in-docker
   stage: docker_images
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - <<: *if-schedule
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
@@ -378,7 +416,7 @@ renovate:
   extends: .use-docker-in-docker
   stage: docker_images
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - <<: *if-schedule
       allow_failure: true
   variables:
     # GitLab access token with api access
@@ -392,40 +430,153 @@ renovate:
 #
 # Security reports
 # =========================================================
-include:
-  - template: Security/SAST.gitlab-ci.yml
-  - template: Security/DAST.gitlab-ci.yml
-  - template: Security/Dependency-Scanning.gitlab-ci.yml
-  - template: Security/Container-Scanning.gitlab-ci.yml
+# include:
+#   - template: Security/SAST.gitlab-ci.yml
+#   - template: Security/DAST.gitlab-ci.yml
+#   - template: Security/Dependency-Scanning.gitlab-ci.yml
+#   - template: Security/Container-Scanning.gitlab-ci.yml
 
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
 dependency_scanning:
   extends: .use-docker-in-docker
   stage: security
+  dependencies: []
+  allow_failure: true
   variables:
-    DS_PYTHON_VERSION: 2
+    SECURITY_SCANNER_IMAGE_PREFIX: "registry.gitlab.com/gitlab-org/security-products"
+    DS_ANALYZER_IMAGE_PREFIX: "$SECURITY_SCANNER_IMAGE_PREFIX/analyzers"
+    DS_DEFAULT_ANALYZERS: "bundler-audit, retire.js, gemnasium, gemnasium-maven, gemnasium-python"
+    DS_MAJOR_VERSION: 2
+    DS_PYTHON_VERSION: 2  # Gitter-specific
+  script:
+    - export DS_VERSION=${SP_VERSION:-$(echo "$CI_SERVER_VERSION" | sed 's/^\([0-9]*\)\.\([0-9]*\).*/\1-\2-stable/')}
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - | # this is required to avoid undesirable reset of Docker image ENV variables being set on build stage
+      function propagate_env_vars() {
+        CURRENT_ENV=$(printenv)
 
+        for VAR_NAME; do
+          echo $CURRENT_ENV | grep "${VAR_NAME}=" > /dev/null && echo "--env $VAR_NAME "
+        done
+      }
+    - |
+      docker run \
+        $(propagate_env_vars \
+          DS_ANALYZER_IMAGES \
+          DS_ANALYZER_IMAGE_PREFIX \
+          DS_ANALYZER_IMAGE_TAG \
+          DS_DEFAULT_ANALYZERS \
+          DS_EXCLUDED_PATHS \
+          DS_DOCKER_CLIENT_NEGOTIATION_TIMEOUT \
+          DS_PULL_ANALYZER_IMAGE_TIMEOUT \
+          DS_RUN_ANALYZER_TIMEOUT \
+          DS_PYTHON_VERSION \
+          DS_PIP_VERSION \
+          DS_PIP_DEPENDENCY_PATH \
+          GEMNASIUM_DB_LOCAL_PATH \
+          GEMNASIUM_DB_REMOTE_URL \
+          GEMNASIUM_DB_REF_NAME \
+          PIP_INDEX_URL \
+          PIP_EXTRA_INDEX_URL \
+          PIP_REQUIREMENTS_FILE \
+          MAVEN_CLI_OPTS \
+          BUNDLER_AUDIT_UPDATE_DISABLED \
+          BUNDLER_AUDIT_ADVISORY_DB_URL \
+          BUNDLER_AUDIT_ADVISORY_DB_REF_NAME \
+        ) \
+        --volume "$PWD:/code" \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        "registry.gitlab.com/gitlab-org/security-products/dependency-scanning:$DS_VERSION" /code
+  artifacts:
+    paths: [gl-dependency-scanning-report.json]  # Gitter-specific
+    expire_in: 1 week  # Gitter-specific
+    reports:
+      dependency_scanning: gl-dependency-scanning-report.json
+
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
 container_scanning:
   extends: .use-docker-in-docker
   stage: security
+  dependencies: []
+  allow_failure: true
+  image: registry.gitlab.com/gitlab-org/security-products/analyzers/klar:$CS_MAJOR_VERSION
+  services:
+    - docker:${DOCKER_VERSION}-dind
+    - name: $CLAIR_DB_IMAGE
+      alias: clair-vulnerabilities-db
   variables:
     DOCKERFILE_PATH: Dockerfile-app-base
     GIT_STRATEGY: fetch
     CI_APPLICATION_REPOSITORY: registry.gitlab.com/gitlab-org/gitter/webapp/app
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
+    CS_MAJOR_VERSION: 2
+    # By default, use the latest clair vulnerabilities database, however, allow it to be overridden here with a specific image
+    # to enable container scanning to run offline, or to provide a consistent list of vulnerabilities for integration testing purposes
+    CLAIR_DB_IMAGE_TAG: "latest"
+    CLAIR_DB_IMAGE: "arminc/clair-db:$CLAIR_DB_IMAGE_TAG"
+    # Override the GIT_STRATEGY variable in your `.gitlab-ci.yml` file and set it to `fetch` if you want to provide a `clair-whitelist.yml`
+    # file. See https://docs.gitlab.com/ee/user/application_security/container_scanning/index.html#overriding-the-container-scanning-template
+    # for details
+    GIT_STRATEGY: none
+  script:
+    - /analyzer run
+  artifacts:
+    paths: [gl-container-scanning-report.json]  # Gitter-specific
+    expire_in: 1 week  # Gitter-specific
+    reports:
+      container_scanning: gl-container-scanning-report.json
 
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
 sast:
   extends: .use-docker-in-docker
   stage: security
+  dependencies: []
+  allow_failure: true
   variables:
-    SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
+    SAST_ANALYZER_IMAGE_PREFIX: "registry.gitlab.com/gitlab-org/security-products/analyzers"
+    SAST_ANALYZER_IMAGE_TAG: 2
+    SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'  # Gitter-specific
+  script:
+    - |
+      if ! docker info &>/dev/null; then
+        if [ -z "$DOCKER_HOST" -a "$KUBERNETES_PORT" ]; then
+          export DOCKER_HOST='tcp://localhost:2375'
+        fi
+      fi
+    - |
+      docker run \
+        $(awk 'BEGIN{for(v in ENVIRON) print v}' | grep -v -E '^(DOCKER_|CI|GITLAB_|FF_|HOME|PWD|OLDPWD|PATH|SHLVL|HOSTNAME)' | awk '{printf " -e %s", $0}') \
+        --volume "$PWD:/code" \
+        --volume /var/run/docker.sock:/var/run/docker.sock \
+        "registry.gitlab.com/gitlab-org/security-products/sast:$SAST_ANALYZER_IMAGE_TAG" /app/bin/run /code
+  artifacts:
+    paths: [gl-sast-report.json]  # Gitter-specific
+    expire_in: 1 week  # Gitter-specific
+    reports:
+      sast: gl-sast-report.json
 
+# We need to duplicate this job's definition because it seems it's impossible to
+# override an included `only.refs`.
+# See https://gitlab.com/gitlab-org/gitlab/issues/31371.
 dast:
-  extends: .use-docker-in-docker
   stage: security
-  dependencies:
-    - containerize
+  dependencies: [containerize]
+  allow_failure: true
+  image: "registry.gitlab.com/gitlab-org/security-products/dast:$DAST_VERSION"
   variables:
     <<: *webapp_variables
+    GIT_STRATEGY: none
     NODE_ENV: test-docker
     DAST_WEBSITE: http://webapp-server:5000/
     # Pass-through webapp secrets from our project-level secret variables
@@ -448,10 +599,6 @@ dast:
     github__anonymous_app__client_id: '${github__anonymous_app__client_id}'
     github__anonymous_app__client_secret: '${github__anonymous_app__client_secret}'
     tokens__anonymousPassword: '${tokens__anonymousPassword}'
-  before_script:
-    # Used to communicate with the other services and share the other hostnames we can connect to
-    # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
-    - cp /etc/hosts "${CI_PROJECT_DIR}/"
   services:
     - name: registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
       alias: webapp-server
@@ -467,3 +614,16 @@ dast:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+  before_script:
+    # Used to communicate with the other services and share the other hostnames we can connect to
+    # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
+    - cp /etc/hosts "${CI_PROJECT_DIR}/"
+  script:
+    - export DAST_WEBSITE=${DAST_WEBSITE:-$(cat environment_url.txt)}
+    - if [ -z "$DAST_WEBSITE$DAST_API_SPECIFICATION" ]; then echo "Either DAST_WEBSITE or DAST_API_SPECIFICATION must be set. See https://docs.gitlab.com/ee/user/application_security/dast/#configuration for more details." && exit 1; fi
+    - /analyze
+  artifacts:
+    paths: [gl-dast-report.json]  # Gitter-specific
+    expire_in: 1 week  # Gitter-specific
+    reports:
+      dast: gl-dast-report.json
