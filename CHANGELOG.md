@@ -20,6 +20,14 @@ Developer facing:
     - Thanks to [@Nezteb](https://gitlab.com/Nezteb) for the contribution
 
 
+# 20.22.1 - 2020-04-27
+
+ - Security fix related to Google analytics, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2487
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/56
+ - Security fix related to GitHub only rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2328
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/55
+
+
 # 20.22.0 - 2020-04-17 - GitLab based rooms
 
  - Add French homepage translations, https://gitlab.com/gitlab-org/gitter/gitter-translations/-/merge_requests/83
