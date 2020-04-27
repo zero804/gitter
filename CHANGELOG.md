@@ -2,6 +2,10 @@
 
  - Add accessible labels to the left-menu menu bar buttons, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1837
 
+Developer facing:
+
+- Set default tags in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1847
+
 
 # 20.23.0 - 2020-04-22 - Threaded conversations
 
