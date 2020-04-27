@@ -6,7 +6,23 @@ stages:
   - security
 
 variables:
-  DOCKER_DRIVER: overlay2
+  DOCKER_VERSION: "19.03.0"
+
+default:
+  tags:
+    - gitlab-org
+
+.use-docker-in-docker:
+  image: docker:${DOCKER_VERSION}
+  services:
+    - docker:${DOCKER_VERSION}-dind
+  variables:
+    DOCKER_DRIVER: overlay2
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    # See https://gitlab.com/gitlab-com/www-gitlab-com/-/issues/7019 for tag descriptions
+    - gitlab-org-docker
 
 .webapp_variables: &webapp_variables
   BLUEBIRD_DEBUG: 1
@@ -194,34 +210,26 @@ distribute_prod:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/prod
 
 containerize:
+  extends: .use-docker-in-docker
   stage: deploy
-  image: docker:latest
   dependencies:
     - package
   allow_failure: true
-  services:
-    - docker:dind
   script:
     - ls -la output
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/app:$CI_COMMIT_REF_SLUG
-  tags:
-    - docker
 
 deploy-build-image:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
-  services:
-    - docker:dind
   only:
     - schedules
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest scripts/docker/deploy-build-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/deploy-build-image:latest
-  tags:
-    - docker
 
 .deploy_job: &deploy_job
   stage: deploy
@@ -305,50 +313,38 @@ deploy_prod_manual: &deploy_prod
     url: https://gitter.im
 
 docker-base:
-  image: docker:latest
+  extends: .use-docker-in-docker
   stage: docker_images
   only:
     - schedules
-  services:
-    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp:latest .
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp:latest
-  tags:
-    - docker
 
 mongo-base:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
   only:
     - schedules
-  services:
-    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest scripts/docker/mongo-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
-  tags:
-    - docker
 
 elasticsearch-base:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
   only:
     - schedules
-  services:
-    - docker:dind
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest scripts/docker/elasticsearch-image/
     - docker push registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
-  tags:
-    - docker
 
 renovate:
+  extends: .use-docker-in-docker
   stage: docker_images
-  image: docker:latest
   only:
     - schedules
   variables:
@@ -361,10 +357,6 @@ renovate:
   script:
     - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
   allow_failure: true
-  services:
-    - docker:dind
-  tags:
-    - docker
 #
 # Security reports
 # =========================================================
@@ -375,11 +367,10 @@ include:
   - template: Security/Container-Scanning.gitlab-ci.yml
 
 dependency_scanning:
+  extends: .use-docker-in-docker
   stage: security
   variables:
     DS_PYTHON_VERSION: 2
-  tags:
-    - docker
 
 container_scanning:
   stage: security
@@ -390,6 +381,7 @@ container_scanning:
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
 sast:
+  extends: .use-docker-in-docker
   stage: security
   variables:
     SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
