@@ -27,6 +27,7 @@ if (trackingId) {
   ga = window.ga;
 
   ga('create', trackingId, trackingDomain);
+  ga('set', 'anonymizeIp', true);
   ga('send', 'pageview');
 }
 

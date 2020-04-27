@@ -69,4 +69,42 @@ describe('login', () => {
       assert.equal(secondRequestSessionCookie.value, loggedInSessionCookie.value);
     });
   });
+
+  describe('GitHub scope upgrade', () => {
+    const fixtures = fixtureLoader.setupEach({
+      userGithub1: {
+        accessToken: 'web-internal'
+      },
+
+      userGitlab1: {
+        accessToken: 'web-internal',
+        githubId: undefined,
+        githubToken: undefined
+      },
+      identityGitlab1: {
+        user: 'userGitlab1',
+        provider: 'gitlab',
+        providerKey: fixtureLoader.generateGithubId()
+      }
+    });
+
+    it(`should allow GitHub user to upgrade their GitHub OAuth scope`, async () => {
+      const agent = request.agent(app);
+
+      await agent
+        .post('/login/upgrade?scopes=repo')
+        .set('authorization', `Bearer ${fixtures.userGithub1.accessToken}`)
+        .expect(302);
+    });
+
+    // Once we allow multiple identities for a single user, we should get rid of this #multiple-identity-user
+    it(`shouldn't allow GitLab user to upgrade their GitHub OAuth scope`, async () => {
+      const agent = request.agent(app);
+
+      await agent
+        .post('/login/upgrade?scopes=repo')
+        .set('authorization', `Bearer ${fixtures.userGitlab1.accessToken}`)
+        .expect(403);
+    });
+  });
 });
