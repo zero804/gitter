@@ -5,6 +5,7 @@
 Developer facing:
 
 - Set default tags in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1847
+- Absorb `@gitterhq/translations` npm module (including history), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1846
 
 
 # 20.23.0 - 2020-04-22 - Threaded conversations
