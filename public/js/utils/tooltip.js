@@ -279,6 +279,8 @@ module.exports = (function() {
         var $tip = this.tip(),
           title = this.getTitle();
 
+        this.$element.attr('aria-label', title);
+
         $tip.find('.tooltip-inner')[this.options.html ? 'html' : 'text'](title);
         $tip.removeClass('fade in top bottom left right');
       },

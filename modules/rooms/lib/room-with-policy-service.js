@@ -2,7 +2,6 @@
 
 var env = require('gitter-web-env');
 var logger = env.logger;
-const stats = env.stats;
 var _ = require('lodash');
 var persistence = require('gitter-web-persistence');
 var getMaxTagLength = require('gitter-web-shared/validation/validate-tag').getMaxTagLength;
@@ -282,14 +281,12 @@ RoomWithPolicyService.prototype.joinRoom = secureMethod([allowJoin], function(op
  *  GET room meta/welcome-message
  */
 RoomWithPolicyService.prototype.getMeta = secureMethod([allowJoin], async function() {
-  const { welcomeMessage, threadedConversations } = await roomMetaService.findMetaByTroupeId(
-    this.room.id,
-    ['welcomeMessage', 'threadedConversations']
-  );
+  const { welcomeMessage } = await roomMetaService.findMetaByTroupeId(this.room.id, [
+    'welcomeMessage'
+  ]);
 
   return {
-    welcomeMessage: welcomeMessage || { text: '', html: '' },
-    threadedConversations: threadedConversations || false
+    welcomeMessage: welcomeMessage || { text: '', html: '' }
   };
 });
 
@@ -297,8 +294,7 @@ RoomWithPolicyService.prototype.getMeta = secureMethod([allowJoin], async functi
  * Update the welcome message for a room
  */
 RoomWithPolicyService.prototype.updateRoomMeta = secureMethod([allowAdmin], async function({
-  welcomeMessage,
-  threadedConversations
+  welcomeMessage
 } = {}) {
   const result = {};
 
@@ -308,29 +304,6 @@ RoomWithPolicyService.prototype.updateRoomMeta = secureMethod([allowAdmin], asyn
     await roomMetaService.upsertMetaKey(this.room.id, 'welcomeMessage', resultantWelcomeMessage);
 
     result.welcomeMessage = resultantWelcomeMessage;
-  }
-
-  if (threadedConversations === true || threadedConversations === false) {
-    const resultantThreadedConversations = !!threadedConversations;
-
-    await roomMetaService.upsertMetaKey(
-      this.room.id,
-      'threadedConversations',
-      resultantThreadedConversations
-    );
-
-    const statMetadata = {
-      userId: this.user._id,
-      groupId: this.room.groupId,
-      roomId: this.room.id
-    };
-    if (threadedConversations === true) {
-      stats.event('threaded_conversations_enabled', statMetadata);
-    } else {
-      stats.event('threaded_conversations_disabled', statMetadata);
-    }
-
-    result.threadedConversations = resultantThreadedConversations;
   }
 
   return result;

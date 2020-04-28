@@ -84,24 +84,41 @@ We support a few /commands and will continue to add new ones. At the moment, you
  - `/unban @username`: Unbans a user from a conversation. Only available to owners/admins in public rooms.
 
 
+## Threaded conversations
 
-## Threaded conversations **[BETA]**
+Threaded conversations allow you to better organize your messages by discussing separate topics in threads.
 
-> This feature is currently in beta and needs to be turned on by the room admin.
-> In the future, we plan to roll this out to everyone by default
->
-> See the [rooms doc enable threaded discussion section](./rooms.md#enable-threaded-conversations-beta)
+1. You can start a thread for every message in the room by choosing **Start a thread** option in the `...` dropdown in the top-right corner of every message.
+2. If the message already has a thread attached to it, the easiest way to open the thread is to click on the thread message indicator below the message.
+3. The rest of the conversation happens in what we call the Thread message feed where you can view and reply to the thread.
 
-You can have a threaded conversation by using the **Start a thread**/**Reply in thread** option in the message `...` dropdown in the top-right of every message.
+![Threaded messages screenshot](https://i.imgur.com/7MRkEAT.png)
 
-We only support one-level of threading from the main message feed.
+### Support in mobile apps
 
-![](https://i.imgur.com/wZ2TbCV.png) ![](https://i.imgur.com/BAfwC6v.png)
+Threads are minimally supported in the mobile apps and the [mobile apps overall may be deprecated](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2281) in the future.
+
+Every thread message appears in the main message feed and it is marked as being part of a thread. When you click on the indicator, you are taken into web browser that will show you the whole thread. *The mobile apps don't provide a way to write threaded messages.*
+
+![Child message indicator on native iOS app](https://i.imgur.com/9SVvdQi.png)
+
+### Missing threaded conversation features
+
+The threaded conversations don't have feature parity with the main messages yet. The main missing features are:
+
+- [Typeahead in the message input](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2344) - usernames, emojis, issues
+- [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
+- [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
+- [Composing multiline messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2338)
+- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2483)
+- [Thread summary overview](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2431)
+
+Please see the full list of outstanding features in the [Threaded Conversations Epic](https://gitlab.com/groups/gitlab-org/-/epics/360)
 
 
 ## Edit messages
 
-You can edit your own messages within the 5 minute edit window. The **Edit** option is available in the message `...` dropdown in the top-right of every message.
+You can edit your own messages within the 5 minute edit window. The **Edit** option is available in the message `...` dropdown in the top-right corner of every message.
 
 You can quickly jump to editing your last message by using the up-arrow keyboard interaction.
 

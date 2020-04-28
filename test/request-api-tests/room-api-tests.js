@@ -168,8 +168,7 @@ describe('room-api', function() {
         .expect(200)
         .then(function(result) {
           assert.deepEqual(result.body, {
-            welcomeMessage: { text: '', html: '' },
-            threadedConversations: false
+            welcomeMessage: { text: '', html: '' }
           });
         });
     });
@@ -180,8 +179,7 @@ describe('room-api', function() {
       return request(app)
         .post(`/v1/rooms/${room.id}/meta`)
         .send({
-          welcomeMessage: 'asdf',
-          threadedConversations: true
+          welcomeMessage: 'asdf'
         })
         .set('x-access-token', fixture.user3.accessToken)
         .expect(200);

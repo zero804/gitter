@@ -3,7 +3,7 @@
 const debug = require('debug-proxy')('app:present-room-create-dialog');
 const appEvents = require('../utils/appevents');
 
-function presentCreateRoomDialog(/*options*/) {
+function presentCreateRoomDialog({ initialRoomName }) {
   debug('Starting');
 
   require.ensure(['../vue/create-room', '../vue/store/store-instance'], function(require) {
@@ -20,8 +20,10 @@ function presentCreateRoomDialog(/*options*/) {
     }
 
     store.dispatch('createRoom/fetchInitial');
+    store.dispatch('createRoom/setRoomName', initialRoomName);
     const vm = renderCreateRoomView(createRoomViewRootEl, store);
     debug('Rendered', vm);
+    appEvents.trigger('stats.event', 'present-create-room-flow');
 
     appEvents.once('destroy-create-room-view', () => {
       debug('destroy-create-room-view', vm);

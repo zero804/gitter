@@ -41,8 +41,7 @@ describe('TroupeStrategy', function() {
     },
     troupeMeta1: {
       troupe: 'troupe1',
-      welcomeMessage: 'hello',
-      threadedConversations: true
+      welcomeMessage: 'hello'
     }
   });
 
@@ -64,7 +63,6 @@ describe('TroupeStrategy', function() {
           security: 'PUBLIC',
           noindex: false,
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);
@@ -94,7 +92,6 @@ describe('TroupeStrategy', function() {
           noindex: false,
           roomMember: true,
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);
@@ -153,7 +150,6 @@ describe('TroupeStrategy', function() {
           noindex: false,
           roomMember: true,
           public: false,
-          meta: {},
           v: 1
         }
       ]);
@@ -184,7 +180,6 @@ describe('TroupeStrategy', function() {
           noindex: false,
           roomMember: true,
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);
@@ -226,7 +221,6 @@ describe('TroupeStrategy', function() {
             admin: false
           },
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);
@@ -251,7 +245,6 @@ describe('TroupeStrategy', function() {
           security: 'PUBLIC',
           noindex: false,
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);
@@ -277,7 +270,6 @@ describe('TroupeStrategy', function() {
           noindex: false,
           roomMember: true,
           public: true,
-          meta: { welcomeMessage: { text: 'hello' }, threadedConversations: true },
           v: 1
         }
       ]);

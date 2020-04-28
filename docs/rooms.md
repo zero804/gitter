@@ -58,14 +58,9 @@ Use the **+** -> **Create room** option in the bottom-left of the menu bar to st
 
 ![](https://i.imgur.com/Mt6sMOe.png)
 
-If you aren't an admin of any communities, you will be redirected to the [create community flow](./communities.md#community-creation).
+If you want to associate the room with a GitLab project or GitHub repo, just select it from the repo dropdown. If you don't see the project/repo listed in the dropdown, see the [FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing)
 
-If you want to associate the room with a GitHub repo, start typing in the the repo name,
-and you can select the repo from the typeahead dropdown list.
-If you type the full name of the repo, it will auto-associate.
-If you don't see the repo listed in the typeahead or isn't being associated, see the [FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing)
-
-![](https://i.imgur.com/8tiwwZM.png)
+![](https://i.imgur.com/yOobB1g.png)
 
 
 #### Why isn't my GitHub organisation or repos appearing?
@@ -115,13 +110,6 @@ You can also use the `/topic <some topic message>` slash command to set the room
 You can set a room welcome message via **Room settings dropdown** -> **Settings** -> **Welcome message**. This message is only shown when joining a room and the user needs to click the "I understand" button before joining the room.
 
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/06azySl.png) ![](https://i.imgur.com/Sou791K.png)
-
-
-### Enable threaded conversations **[BETA]**
-
-Threaded conversations are currently in development and have to be turned on by the room admin: **Room settings dropdown** -> **Settings** -> **Enable threaded conversations.**
-
-For usage see the [messages doc threaded conversation section](./messages.md#threaded-conversations-beta).
 
 
 ### Moderation
