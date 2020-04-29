@@ -52,18 +52,19 @@ describe('oauth-client-api', function() {
       });
   });
 
-  it('GET /v1/oauth-clients returns list of OAuth clients the user owns', function() {
-    return request(app)
+  it('GET /v1/oauth-clients returns list of OAuth clients the user owns', async function() {
+    const result = await request(app)
       .get('/v1/oauth-clients')
       .set('x-access-token', fixture.user1.accessToken)
-      .expect(200)
-      .then(function(result) {
-        const [oauthClient1] = result.body;
+      .expect(200);
+    const clients = result.body;
 
-        assert(result.body.length, 1);
+    assert.strictEqual(clients.length, 2);
 
-        assert(mongoUtils.objectIDsEqual(oauthClient1.id, fixture.oAuthClient1._id));
-      });
+    assert(clients.some(client => mongoUtils.objectIDsEqual(client.id, fixture.oAuthClient1._id)));
+    assert(
+      clients.some(client => mongoUtils.objectIDsEqual(client.id, fixture.oAuthClientToDelete1._id))
+    );
   });
 
   it('POST /v1/oauth-clients creates new OAuth client', function() {
