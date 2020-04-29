@@ -56,7 +56,7 @@ At last, we have **GitLab based communities and rooms**. This means that you can
 
 ### What's not implemented yet
 
-Gitter communities/rooms based on GitLab projects from your own personal user namespace are not supported yet but we plan to follow up soon after. You can track the [specific issue](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2397) and our [*Create GitLab based communities and rooms* epic](https://gitlab.com/groups/gitlab-org/-/epics/398).
+Gitter communities based on your personal GitLab user namespace are not supported yet but we plan to follow up soon after. You can track the [specific issue](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2397) and our [*Create GitLab based communities and rooms* epic](https://gitlab.com/groups/gitlab-org/-/epics/398).
 
 
 
