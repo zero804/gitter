@@ -6,7 +6,7 @@ stages:
   - security
 
 variables:
-  DOCKER_VERSION: "19.03.0"
+  DOCKER_VERSION: '19.03.0'
 
 default:
   tags:
@@ -19,7 +19,7 @@ default:
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_HOST: tcp://docker:2375
-    DOCKER_TLS_CERTDIR: ""
+    DOCKER_TLS_CERTDIR: ''
   tags:
     # See https://gitlab.com/gitlab-com/www-gitlab-com/-/issues/7019 for tag descriptions
     - gitlab-org-docker
@@ -106,8 +106,8 @@ test-all:
     NODE_ENV: test-docker
   script:
     # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
-    - apt-get update -q -y
-    - apt-get --yes install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+    - apk update
+    - apk add xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
     # Create `output/assets/js/vue-ssr-server-bundle.json`
     - npm run task-js
     # Start the server and wait for it to come up
