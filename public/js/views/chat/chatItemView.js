@@ -473,6 +473,8 @@ module.exports = (function() {
     showReadBy: function(e) {
       if (this.popover) return;
 
+      appEvents.trigger('stats.event', 'chat-item.show-read-by');
+
       var popover = new ReadByPopover({
         model: this.model,
         userCollection: this.userCollection,
