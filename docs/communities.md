@@ -9,7 +9,18 @@ Communities are also referred to as "groups" internally in the codebase.
 
 Use the **+** -> **Create community** option in the bottom-left of the menu bar to start the community creation process.
 
-Communities can be associated with a GitHub organisation or repo. If you don't see the GitHub org/repo listed that you want to associate, see [*Why isn't my GitHub organisation or repos appearing?* FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing]
+### Associate your community with GitLab
+
+If you sign in with GitLab, communities can be associated with a [GitLab group](https://docs.gitlab.com/ee/user/group/) or [project](https://docs.gitlab.com/ee/user/project/). Just click the link in the "do you want to start a community for one of your GitLab groups/projects?" phrase below the name and URI inputs.
+
+Gitter communities based on your personal GitLab user namespace are not supported yet but we plan to follow up soon after -> https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2397
+
+
+### Associate your community with GitHub
+
+If you sign in with GitHub, communities can be associated with a GitHub organisation or repo. Just click the link in the "do you want to start a community for one of your GitHub orgs/repos?" phrase below the name and URI inputs.
+
+If you don't see the GitHub org/repo listed that you want to associate, see [*Why isn't my GitHub organisation or repos appearing?* FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing).
 
 ![](https://i.imgur.com/2eZyyEQ.png)
 

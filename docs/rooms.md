@@ -58,7 +58,7 @@ Use the **+** -> **Create room** option in the bottom-left of the menu bar to st
 
 ![](https://i.imgur.com/Mt6sMOe.png)
 
-If you want to associate the room with a GitLab project or GitHub repo, just select it from the repo dropdown. If you don't see the project/repo listed in the dropdown, see the [FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing)
+If you want to associate the room with a GitLab project or GitHub repo, just select it from the repo dropdown (make sure you are signed in respectively with GitLab or GitHub). If you don't see a GitHub repo listed in the dropdown, see the [FAQ](./faq.md#why-isnt-my-github-organisation-or-repos-appearing)
 
 ![](https://i.imgur.com/yOobB1g.png)
 
@@ -76,9 +76,9 @@ See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
 
 **Private rooms**
 
- - A room connected to a private repo can be accessed by anyone with access to the repo.
+ - A room connected to a private project/repo can be accessed by anyone with access to the project/repo.
  - A private room with no association can only be accessed if they are manually invited to the room.
- - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with an org, anyone in the org could join for example
+ - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with an group/org, anyone in the group/org could join for example
 
 #### Change room security after creation
 
