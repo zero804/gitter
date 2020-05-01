@@ -97,7 +97,7 @@ function randomRoom() {
 
 function initEmbedPanel() {
   var rooms = [
-    { name: 'GitterHQ', uri: 'gitterHQ/gitter', language: "Let's talk about Gitter!" },
+    { name: 'Gitter', uri: 'gitter/gitter', language: "Let's talk about Gitter!" },
     roomByLocale(context.lang()),
     randomRoom(),
     randomRoom()

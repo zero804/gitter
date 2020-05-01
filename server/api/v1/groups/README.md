@@ -85,7 +85,7 @@ Try it from the CLI:
   "verb": "post",
   "resource": "{{api_url}}/v1/rooms",
   "data": {
-    "uri": "gitterhq/sandbox"
+    "uri": "gitter/sandbox"
   }
 }
 ```
@@ -140,7 +140,7 @@ Try it from the CLI:
   "verb": "post",
   "resource": "{{api_url}}/v1/groups/57542c12c43b8c601976fa66/groups",
   "data": {
-     "name": "gitterhq/sandbox"
+     "name": "gitter/sandbox"
   }
 }
 ```
