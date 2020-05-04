@@ -3,7 +3,7 @@
 exports[`menu-bar-item-toggle toggle matches snapshot 1`] = `
 <button
   aria-label=""
-  class="item item-toggle"
+  class="item"
   type="button"
 >
   <div

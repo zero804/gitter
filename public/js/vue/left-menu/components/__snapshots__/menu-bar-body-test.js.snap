@@ -8,16 +8,19 @@ exports[`menu-bar-body matches snapshot when pinned 1`] = `
     class="menu-bar-top"
   >
     <menu-bar-item-stub
+      class="item-all"
       label="Show all rooms panel"
       type="all"
     />
      
     <menu-bar-item-stub
+      class="item-search"
       label="Show panel for searching rooms, people, and messages in the current room"
       type="search"
     />
      
     <menu-bar-item-stub
+      class="item-people"
       label="Show one to one messages panel"
       type="people"
     />
@@ -47,16 +50,19 @@ exports[`menu-bar-body matches snapshot when unpinned 1`] = `
     class="menu-bar-top"
   >
     <menu-bar-item-stub
+      class="item-all"
       label="Show all rooms panel"
       type="all"
     />
      
     <menu-bar-item-stub
+      class="item-search"
       label="Show panel for searching rooms, people, and messages in the current room"
       type="search"
     />
      
     <menu-bar-item-stub
+      class="item-people"
       label="Show one to one messages panel"
       type="people"
     />
@@ -86,17 +92,20 @@ exports[`menu-bar-body unreads matches snapshot when mentions 1`] = `
     class="menu-bar-top"
   >
     <menu-bar-item-stub
+      class="item-all"
       hasmentions="true"
       label="Show all rooms panel (some rooms have mentions)"
       type="all"
     />
      
     <menu-bar-item-stub
+      class="item-search"
       label="Show panel for searching rooms, people, and messages in the current room"
       type="search"
     />
      
     <menu-bar-item-stub
+      class="item-people"
       label="Show one to one messages panel"
       type="people"
     />
@@ -126,17 +135,20 @@ exports[`menu-bar-body unreads matches snapshot when one to one unreads 1`] = `
     class="menu-bar-top"
   >
     <menu-bar-item-stub
+      class="item-all"
       hasunreads="true"
       label="Show all rooms panel (some rooms have unread messages)"
       type="all"
     />
      
     <menu-bar-item-stub
+      class="item-search"
       label="Show panel for searching rooms, people, and messages in the current room"
       type="search"
     />
      
     <menu-bar-item-stub
+      class="item-people"
       hasunreads="true"
       label="Show one to one messages panel (some rooms have unread messages)"
       type="people"
@@ -167,17 +179,20 @@ exports[`menu-bar-body unreads matches snapshot when unreads 1`] = `
     class="menu-bar-top"
   >
     <menu-bar-item-stub
+      class="item-all"
       hasunreads="true"
       label="Show all rooms panel (some rooms have unread messages)"
       type="all"
     />
      
     <menu-bar-item-stub
+      class="item-search"
       label="Show panel for searching rooms, people, and messages in the current room"
       type="search"
     />
      
     <menu-bar-item-stub
+      class="item-people"
       label="Show one to one messages panel"
       type="people"
     />

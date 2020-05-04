@@ -1,7 +1,7 @@
 <script>
 import { mapState, mapActions } from 'vuex';
 
-import * as leftMenuConstants from '../constants';
+import { VALID_LEFT_MENU_STATES } from '../constants';
 
 export default {
   name: 'MenuBarItem',
@@ -10,17 +10,7 @@ export default {
       type: String,
       required: true,
       validator: function(value) {
-        // The value must match one of these strings
-        return (
-          [
-            leftMenuConstants.LEFT_MENU_ALL_STATE,
-            leftMenuConstants.LEFT_MENU_SEARCH_STATE,
-            leftMenuConstants.LEFT_MENU_PEOPLE_STATE,
-            leftMenuConstants.LEFT_MENU_GROUP_STATE,
-            leftMenuConstants.LEFT_MENU_CREATE_STATE,
-            leftMenuConstants.LEFT_MENU_TOGGLE_STATE
-          ].indexOf(value) !== -1
-        );
+        return VALID_LEFT_MENU_STATES.includes(value);
       }
     },
     label: {
@@ -38,9 +28,6 @@ export default {
   },
   computed: {
     ...mapState(['leftMenuState', 'leftMenuExpandedState']),
-    itemTypeClass() {
-      return `item-${this.type}`;
-    },
     isActive() {
       return this.type === this.leftMenuState;
     }
@@ -69,7 +56,6 @@ export default {
     ref="root"
     class="item"
     :class="{
-      [itemTypeClass]: true,
       active: isActive
     }"
     type="button"
@@ -132,26 +118,6 @@ export default {
       background-color: currentColor;
     }
   }
-}
-
-.item-all {
-  color: @ruby;
-}
-
-.item-search {
-  color: @jaffa;
-}
-
-.item-people {
-  color: @people-bg;
-}
-
-.item-group {
-  color: @caribbean;
-}
-
-.item-create {
-  color: #7f8080;
 }
 
 .item-toggle {

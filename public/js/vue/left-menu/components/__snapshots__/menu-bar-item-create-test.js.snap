@@ -3,7 +3,7 @@
 exports[`menu-bar-item-create create matches snapshot 1`] = `
 <button
   aria-label=""
-  class="item item-create"
+  class="item"
   type="button"
 >
   <div
