@@ -9,6 +9,7 @@ Developer facing:
  - Absorb `@gitterhq/translations` npm module (including history), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1846
  - Fix assertions in OAuth clients test, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1849
  - Add utility script to delete stuck mention, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1840
+ - Small left menu improvemetns, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1853
 
 
 # 20.23.0 - 2020-04-22 - Threaded conversations
