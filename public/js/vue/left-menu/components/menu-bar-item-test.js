@@ -3,48 +3,20 @@ const leftMenuConstants = require('../constants');
 const { default: MenuBarItem } = require('./menu-bar-item.vue');
 
 describe('menu-bar-item', () => {
-  it('all matches snapshot', () => {
+  it('matches snapshot with required properties', () => {
     const { wrapper } = mount(MenuBarItem, {
-      type: 'all'
+      type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });
 
-  it('when all state, all item has highlight matches snapshot', () => {
+  it('matches snapshot with all properties', () => {
     const { wrapper } = mount(MenuBarItem, {
       type: leftMenuConstants.LEFT_MENU_ALL_STATE,
       label: 'all',
+      class: 'item-all',
+      hasUnreads: true,
       hasMentions: true
-    });
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('search matches snapshot', () => {
-    const { wrapper } = mount(MenuBarItem, {
-      type: leftMenuConstants.LEFT_MENU_SEARCH_STATE
-    });
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('people matches snapshot', () => {
-    const { wrapper } = mount(MenuBarItem, {
-      type: leftMenuConstants.LEFT_MENU_PEOPLE_STATE,
-      label: 'people',
-      hasUnreads: true
-    });
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('create matches snapshot', () => {
-    const { wrapper } = mount(MenuBarItem, {
-      type: leftMenuConstants.LEFT_MENU_CREATE_STATE
-    });
-    expect(wrapper.element).toMatchSnapshot();
-  });
-
-  it('toggle matches snapshot', () => {
-    const { wrapper } = mount(MenuBarItem, {
-      type: leftMenuConstants.LEFT_MENU_TOGGLE_STATE
     });
     expect(wrapper.element).toMatchSnapshot();
   });

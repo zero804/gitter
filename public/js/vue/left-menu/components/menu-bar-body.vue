@@ -49,6 +49,7 @@ export default {
     <div class="menu-bar-top">
       <menu-bar-item
         type="all"
+        class="item-all"
         :label="allItemLabel"
         :hasUnreads="this.hasAnyUnreads"
         :hasMentions="this.hasAnyMentions"
@@ -64,6 +65,7 @@ export default {
 
       <menu-bar-item
         type="search"
+        class="item-search"
         label="Show panel for searching rooms, people, and messages in the current room"
       >
         <template v-slot:icon>
@@ -78,7 +80,12 @@ export default {
         </template>
       </menu-bar-item>
 
-      <menu-bar-item type="people" :label="peopleItemLabel" :hasUnreads="this.hasPeopleUnreads">
+      <menu-bar-item
+        type="people"
+        class="item-people"
+        :label="peopleItemLabel"
+        :hasUnreads="this.hasPeopleUnreads"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.9 42.5">
             <path
@@ -133,9 +140,15 @@ export default {
   }
 }
 
-.menu-bar-top {
+.item-all {
+  color: @ruby;
 }
 
-.menu-bar-bottom {
+.item-search {
+  color: @jaffa;
+}
+
+.item-people {
+  color: @people-bg;
 }
 </style>
