@@ -1,5 +1,9 @@
 @embedded_footer_height: 78px;
 
+.chat-and-toolbar-wrapper.embedded {
+  padding-top: 30px;
+}
+
 .chat-embed-footer {
   flex-shrink: 0;
   box-sizing: border-box;
@@ -7,7 +11,7 @@
   /** Two worlds colliding: the new front-page + the app. Different fonts, colors, layouts etc.
     * Therefore this stylesheet is a bit of a hack, I'm sorry. WC
     */
-  font-family: proxima-nova-alt,"Proxima Nova Alt",sans-serif !important;
+  font-family: proxima-nova-alt, 'Proxima Nova Alt', sans-serif !important;
   text-shadow: none;
 
   height: @embedded_footer_height;
@@ -15,9 +19,9 @@
 
   padding: 0 28px;
 
-  background: none repeat scroll 0% 0% #FAF9F7;
+  background: none repeat scroll 0% 0% #faf9f7;
 
-  color: #B0ABA1;
+  color: #b0aba1;
 
   p {
     margin: 0;
@@ -41,11 +45,11 @@
       text-decoration: none;
       border: medium none;
       border-radius: 6px;
-      background: none repeat scroll 0% 0% #45CBA1;
-      color: #FFF !important;
+      background: none repeat scroll 0% 0% #45cba1;
+      color: #fff !important;
 
       &:hover {
-        box-shadow: inset 0 0 0 250px rgba(0,0,0,0.05);
+        box-shadow: inset 0 0 0 250px rgba(0, 0, 0, 0.05);
       }
 
       &.subdued {
@@ -57,10 +61,9 @@
     }
 
     p {
-      color: #918B80;
+      color: #918b80;
       display: inline;
       padding: 0px 10px;
     }
-
   }
 }
