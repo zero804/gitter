@@ -30,6 +30,7 @@ exports[`menu-bar-body matches snapshot when pinned 1`] = `
     class="menu-bar-bottom"
   >
     <menu-bar-item-create-stub
+      class="js-menu-bar-create-button"
       label="Create communities and rooms"
       type="create"
     />
@@ -72,6 +73,7 @@ exports[`menu-bar-body matches snapshot when unpinned 1`] = `
     class="menu-bar-bottom"
   >
     <menu-bar-item-create-stub
+      class="js-menu-bar-create-button"
       label="Create communities and rooms"
       type="create"
     />
@@ -115,6 +117,7 @@ exports[`menu-bar-body unreads matches snapshot when mentions 1`] = `
     class="menu-bar-bottom"
   >
     <menu-bar-item-create-stub
+      class="js-menu-bar-create-button"
       label="Create communities and rooms"
       type="create"
     />
@@ -159,6 +162,7 @@ exports[`menu-bar-body unreads matches snapshot when one to one unreads 1`] = `
     class="menu-bar-bottom"
   >
     <menu-bar-item-create-stub
+      class="js-menu-bar-create-button"
       label="Create communities and rooms"
       type="create"
     />
@@ -202,6 +206,7 @@ exports[`menu-bar-body unreads matches snapshot when unreads 1`] = `
     class="menu-bar-bottom"
   >
     <menu-bar-item-create-stub
+      class="js-menu-bar-create-button"
       label="Create communities and rooms"
       type="create"
     />
