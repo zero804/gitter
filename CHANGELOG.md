@@ -11,6 +11,7 @@ Developer facing:
  - Add utility script to delete stuck mention, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1840
  - Small left menu improvements, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1853
  - Add stats for when someone opens the read by popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1854
+ - Revert back to Debian/Ubuntu based image so Cypress e2e test dependencies are available, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1859
 
 
 # 20.23.0 - 2020-04-22 - Threaded conversations
