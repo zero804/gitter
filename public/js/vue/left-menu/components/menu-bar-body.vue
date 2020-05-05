@@ -97,7 +97,11 @@ export default {
     </div>
 
     <div class="menu-bar-bottom">
-      <menu-bar-item-create type="create" label="Create communities and rooms">
+      <menu-bar-item-create
+        type="create"
+        label="Create communities and rooms"
+        class="js-menu-bar-create-button"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
             <path

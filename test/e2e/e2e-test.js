@@ -186,7 +186,7 @@ describe('e2e tests', function() {
       const NEW_ROOM_NAME = 'my-new-room';
 
       // Open the create room flow
-      cy.get('.js-left-menu-root .item-create').click();
+      cy.get('.js-menu-bar-create-button').click();
       cy.get('.js-chat-action-create-room').click();
 
       // The community is automatically selected because of the current room we are visiting
