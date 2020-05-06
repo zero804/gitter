@@ -1,7 +1,14 @@
 const mount = require('../../__test__/vuex-mount');
+jest.mock('./announcements-body.vue');
+const announcementsBody = require('./announcements-body.vue');
+
 const { default: MenuBarBody } = require('./menu-bar-body.vue');
 
 describe('menu-bar-body', () => {
+  beforeAll(() => {
+    announcementsBody.isAnnouncementActive.mockImplementation(() => true);
+  });
+
   it('matches snapshot when pinned', () => {
     const { wrapper } = mount(MenuBarBody, {}, store => {
       store.state.leftMenuPinnedState = true;

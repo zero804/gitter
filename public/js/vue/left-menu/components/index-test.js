@@ -1,5 +1,11 @@
 const mount = require('../../__test__/vuex-mount');
 const { default: Index } = require('./index.vue');
+const {
+  LEFT_MENU_ALL_STATE,
+  LEFT_MENU_PEOPLE_STATE,
+  LEFT_MENU_SEARCH_STATE,
+  LEFT_MENU_ANNOUNCEMENTS_STATE
+} = require('../constants');
 
 function createTouchEvent(eventName, x, y) {
   const e = new CustomEvent(eventName);
@@ -17,7 +23,7 @@ describe('left-menu', () => {
   describe('all state', () => {
     it('matches snapshot', () => {
       const { wrapper } = mount(Index, {}, store => {
-        store.state.leftMenuState = 'all';
+        store.state.leftMenuState = LEFT_MENU_ALL_STATE;
       });
       expect(wrapper.element).toMatchSnapshot();
     });
@@ -26,7 +32,7 @@ describe('left-menu', () => {
   describe('people state', () => {
     it('matches snapshot', () => {
       const { wrapper } = mount(Index, {}, store => {
-        store.state.leftMenuState = 'people';
+        store.state.leftMenuState = LEFT_MENU_PEOPLE_STATE;
       });
       expect(wrapper.element).toMatchSnapshot();
     });
@@ -35,7 +41,16 @@ describe('left-menu', () => {
   describe('search state', () => {
     it('matches snapshot', () => {
       const { wrapper } = mount(Index, {}, store => {
-        store.state.leftMenuState = 'search';
+        store.state.leftMenuState = LEFT_MENU_SEARCH_STATE;
+      });
+      expect(wrapper.element).toMatchSnapshot();
+    });
+  });
+
+  describe('announcements state', () => {
+    it('matches snapshot', () => {
+      const { wrapper } = mount(Index, {}, store => {
+        store.state.leftMenuState = LEFT_MENU_ANNOUNCEMENTS_STATE;
       });
       expect(wrapper.element).toMatchSnapshot();
     });
