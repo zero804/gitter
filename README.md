@@ -53,7 +53,7 @@ npm run create-seed-data
 npm start
 ```
 
- * If you run into `Error: Cannot find module './build/Release/cld'`, just `npm install` again
+ * If you run into `Error: Cannot find module './build/Release/cld'`, delete the `node_modules` directory and run `npm install` again
 
 
 ### Start dependent services
