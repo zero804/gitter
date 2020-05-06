@@ -5,6 +5,7 @@ import * as leftMenuConstants from '../constants';
 import MenuBarBody from './menu-bar-body.vue';
 import SearchBody from './search-body.vue';
 import RoomList from './room-list.vue';
+import Announcements from './announcements-body.vue';
 import iconLogoText from '../../../../images/svg/gitter-logos/logo-white-lettering.svg';
 import fingerSwipeMixin from '../mixins/finger-swipe';
 
@@ -14,7 +15,8 @@ export default {
   components: {
     MenuBarBody,
     SearchBody,
-    RoomList
+    RoomList,
+    Announcements
   },
   iconLogoText,
   computed: {
@@ -40,6 +42,9 @@ export default {
     },
     isPeopleState() {
       return this.leftMenuState === leftMenuConstants.LEFT_MENU_PEOPLE_STATE;
+    },
+    isAnnouncementState() {
+      return this.leftMenuState === leftMenuConstants.LEFT_MENU_ANNOUNCEMENTS_STATE;
     }
   },
 
@@ -110,6 +115,7 @@ export default {
       </section>
       <section class="body-main-menu layout-main-menu scroller">
         <search-body v-if="isSearchState" />
+        <announcements v-if="isAnnouncementState" />
         <template v-else>
           <h2 v-if="isAllState" class="room-list-title">All conversations</h2>
           <h2 v-if="isPeopleState" class="room-list-title">People</h2>
