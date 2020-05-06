@@ -274,4 +274,4 @@ npm run test-e2e-run
 
 We use [git-flow](https://danielkummer.github.io/git-flow-cheatsheet/). Merge requests should be made against `develop` not `master`.
 
-Please join us in [gitterHQ/contributing](https://gitter.im/gitterHQ/contributing) for questions or to get in touch.
+Please join us in [gitter/contributing](https://gitter.im/gitter/contributing) for questions or to get in touch.

@@ -28,11 +28,11 @@ var NUM_SUGGESTIONS = 12;
 var MAX_SUGGESTIONS_PER_ORG = 2;
 var HIGHLIGHTED_ROOMS = [
   {
-    uri: 'gitterHQ/gitter',
+    uri: 'gitter/gitter',
     localeLanguage: 'en'
   },
   {
-    uri: 'gitterHQ/developers',
+    uri: 'gitter/developers',
     localeLanguage: 'en'
   },
   {
@@ -60,7 +60,7 @@ var HIGHLIGHTED_ROOMS = [
     localeLanguage: 'en'
   },
   {
-    uri: 'gitterHQ/nodejs',
+    uri: 'gitter/nodejs',
     localeLanguage: 'en'
   },
   {

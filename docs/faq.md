@@ -8,12 +8,12 @@ Gitter is entirely free for all public and private conversations.
 
 ## I have a suggestion, where can I suggest/discuss it?
 
-Feel free to come discuss your idea in the [`gitterHQ/gitter`](https://gitter.im/gitterHQ/gitter) room and create an issue, https://gitlab.com/gitlab-org/gitter/webapp/issues
+Feel free to come discuss your idea in the [`gitter/gitter`](https://gitter.im/gitter/gitter) room and create an issue, https://gitlab.com/gitlab-org/gitter/webapp/issues
 
 
 ## Help/Support!?!?!
 
-If your support inquiry doesn't need to be private, drop by the [`gitterHQ/gitter`](https://gitter.im/gitterHQ/gitter) room.
+If your support inquiry doesn't need to be private, drop by the [`gitter/gitter`](https://gitter.im/gitter/gitter) room.
 
 Otherwise, send a message to support@gitter.im
 
@@ -24,7 +24,7 @@ Why, we are so gladded you asked, **yes** we do.
 
 You can build apps on top of Gitter by using our REST API. You can find more information about it at [developer.gitter.im](https://developer.gitter.im/) or use our [Node.js module](https://www.npmjs.org/package/node-gitter).
 
-If you have any questions about our API, please don't hesitate to contact us or join us in our [`gitterHQ/api`](https://gitter.im/gitterHQ/api) chat room.
+If you have any questions about our API, please don't hesitate to contact us or join us in our [`gitter/api`](https://gitter.im/gitter/api) chat room.
 
 
 ## Can I merge/connect my accounts?
