@@ -46,7 +46,4 @@ onready(function() {
   });
 
   Backbone.history.start();
-
-  // Initialize Vue stuff
-  require('./vue/initialize-clientside');
 });
