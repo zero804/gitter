@@ -82,6 +82,9 @@ export default {
   a {
     color: @blue;
   }
+  .dark-theme & {
+    color: @dark-theme-left-menu-text-color;
+  }
 }
 
 .announcements-body-title {
