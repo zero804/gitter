@@ -43,7 +43,6 @@ Follow these instructions to setup an environment to hack on Gitter.
     * Go and make a cup of tea, because this will take a rather long time.
 
 
-
 ## Starting Gitter
 
 TLDR;
@@ -53,6 +52,9 @@ docker-compose up -d --no-recreate
 npm run create-seed-data
 npm start
 ```
+
+ * If you run into `Error: Cannot find module './build/Release/cld'`, just `npm install` again
+
 
 ### Start dependent services
 
