@@ -5,6 +5,7 @@
  - Update Gitter support room links in docs after rename, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1855
  - Add accessible list attributes to chat message items for easier navigation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1856
  - In App announcements, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1850
+ - Styling announcements for dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1867
 
 Developer facing:
 
