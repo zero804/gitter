@@ -1,4 +1,4 @@
-# 20.24.0 - *upcoming*
+# 20.24.0 - 2020-05-06
 
  - Add accessible labels to the left-menu menu bar buttons, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1837
  - Add documentation details on needing to be signed in with GitLab to create GitLab based community/room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1851
