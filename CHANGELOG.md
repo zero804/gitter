@@ -4,6 +4,7 @@
  - Add documentation details on needing to be signed in with GitLab to create GitLab based community/room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1851
  - Update Gitter support room links in docs after rename, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1855
  - Add accessible list attributes to chat message items for easier navigation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1856
+ - In App announcements, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1850
 
 Developer facing:
 
