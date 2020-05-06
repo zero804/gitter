@@ -157,6 +157,7 @@ export default {
         deleted: isEmpty,
         'chat-item__highlighted': message.highlighted
       }"
+      role="listitem"
       @touchstart="onTouchstart"
       @touchmove="onTouchmove"
       @touchend="onTouchend"

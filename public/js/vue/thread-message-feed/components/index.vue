@@ -46,8 +46,15 @@ export default {
   >
     <section v-if="isVisible" class="body">
       <thread-header />
-      <section v-if="parentMessage" class="content">
-        <div class="chat-messages">
+      <section
+        v-if="parentMessage"
+        class="content"
+        role="log"
+        aria-live="polite"
+        aria-atomic="false"
+        aria-relevant="additions text"
+      >
+        <div class="chat-messages" role="list">
           <chat-item :message="parentMessage" :use-compact-styles="true" />
           <div v-if="childMessagesRequest.error" class="error-text error-box">
             Error: Thread messages can't be fetched.

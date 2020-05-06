@@ -12,7 +12,7 @@ const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 
 var chatWrapper = compileTemplate.compileString(
-  '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}} {{threadedConversationClass}}">{{{inner}}}</div>'
+  '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}} {{threadedConversationClass}}" role="listitem">{{{inner}}}</div>'
 );
 
 var chatItemTemplate = compileTemplate('/js/views/chat/tmpl/chatItemView.hbs');

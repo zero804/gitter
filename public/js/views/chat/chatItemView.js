@@ -82,7 +82,8 @@ module.exports = (function() {
       }
 
       return {
-        class: classnames(classMap)
+        class: classnames(classMap),
+        role: 'listitem'
       };
     },
     ui: {
