@@ -1,6 +1,8 @@
 # 20.25.0 - *upcoming*
 
  - Fix collaborators view by listening on room id change, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1866
+ - Update notification docs with short snippet on altering desktop notification settings and sound, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1868
+    - Thanks to [@jeffcsauer](https://gitlab.com/jeffcsauer) for the contribution
 
 Developer facing:
 
