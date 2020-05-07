@@ -1,4 +1,6 @@
-# 20.24.0 - 2020-05-06
+# 20.25.0 - *upcommng*
+
+ - Fix collaborators view by listening on room id change, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1866
 
 Developer facing:
 
