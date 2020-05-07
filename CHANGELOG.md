@@ -1,4 +1,4 @@
-# 20.25.0 - *upcommng*
+# 20.25.0 - *upcoming*
 
  - Fix collaborators view by listening on room id change, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1866
 
