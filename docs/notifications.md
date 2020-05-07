@@ -38,6 +38,13 @@ You can instead use browser desktop notifications by allowing the browser permis
 ![](http://i.imgur.com/Mpttpxs.png) ![](https://i.imgur.com/YVqInos.png)
  
 
+### Desktop Notification Settings
+
+If you would like to change how you are notified on the Desktop, access the Gitter dropdown menu in the top-left corner of the application. From this menu you can change whether or not a visual notification appears on screen, as well as whether or not you would like a sound notification. For example, if you want to keep a visual notification while turning off the notification sound you could apply the following settings:
+
+![](https://i.imgur.com/q6qud9N.png)
+
+
 ## Mobile notifications
 
 ### No notifications on mobile (Android, iOS)
@@ -58,3 +65,6 @@ Emails are batched up and sent in 1 hour chunks. You can track [this issue](http
 If you are using the [IRC bridge](https://irc.gitter.im/), it will mark every message as read so you won't receive any emails.
 
 ![](http://imgur.com/uKLeHd6.gif)
+
+
+
