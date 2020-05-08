@@ -224,10 +224,13 @@ export default {
 
         // Check to make sure the type matches in the response to what we are trying to create
         //
-        // Because of the nature of repo URLs `org/repo` and we only pull off the `repo` part,
-        // we need to allow creation when nothing is at that URL
+        // If the requested check type is `null` then we don't need to worry
+        // any of the selected backing entity matching.
+        //
+        // If the requested check type is `GH_USER`, then the user is trying to
+        // create a community for their own username and we should allow that
         const type = state.selectedBackingEntity && state.selectedBackingEntity.type;
-        if (res.type === type || res.type === null) {
+        if (res.type === type || res.type === null || res.type === 'GH_USER') {
           communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.AVAILABLE;
         } else {
           communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.UNAVAILABLE;
