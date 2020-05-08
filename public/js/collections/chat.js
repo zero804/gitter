@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:chat-collection');
 var _ = require('lodash');
 var Backbone = require('backbone');
 var context = require('gitter-web-client-context');
@@ -148,6 +149,10 @@ var ChatCollection = LiveCollection.extend({
       var id = model.id;
       var existing = this.get(id);
       if (existing && existing.unread === false) {
+        debug(
+          `Ignoring update to unread since our existing model is already marked as read: existing=${existing &&
+            existing.unread} model.unread=${model.unread} `
+        );
         delete model.unread;
       }
     }

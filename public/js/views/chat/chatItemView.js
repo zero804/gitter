@@ -73,7 +73,8 @@ module.exports = (function() {
         // inline-threads-for-mobile-embedded
         // Hiding (or treating) child messages from the main message feed
         // Chosen as an easier alternative to creating a new filtered LiveCollection for chat messages
-        'threaded-conversation-chat-item': !!this.model.get('parentId')
+        'threaded-conversation-chat-item': !!this.model.get('parentId'),
+        'debug-in-viewport': this.model.get('_debugInViewport')
       };
 
       var id = this.model.get('id');
@@ -309,6 +310,10 @@ module.exports = (function() {
     },
     handleUpdateMessageStateChanges: function(changes) {
       var model = this.model;
+
+      if (!changes || '_debugInViewport' in changes) {
+        toggleClass(this.el, 'debug-in-viewport', !!model.get('_debugInViewport'));
+      }
 
       if (!changes || 'editedAt' in changes) {
         toggleClass(this.el, 'hasBeenEdited', this.hasBeenEdited());

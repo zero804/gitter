@@ -167,10 +167,15 @@ module.exports = (function() {
 
   ReadItemSender.prototype = {
     _onItemMarkedRead: function(itemId, mention, lurkMode) {
+      const troupeId = context.getTroupeId();
+
+      debug(
+        `_onItemMarkedRead troupeId=${troupeId} itemId=${itemId} mention=${mention} lurkMode=${lurkMode}`
+      );
+
       // Don't sent unread items back to the server in lurk mode unless its a mention
       if (lurkMode && !mention) return;
 
-      var troupeId = context.getTroupeId();
       var buffer = this._buffer[troupeId];
       if (!buffer) {
         buffer = this._buffer[troupeId] = {};
@@ -198,9 +203,8 @@ module.exports = (function() {
     },
 
     _sendForRoom: function(troupeId, options) {
-      debug('_sendForRoom: %s', troupeId);
-
       var items = Object.keys(this._buffer[troupeId]);
+      debug(`_sendForRoom ${troupeId}`, items);
       delete this._buffer[troupeId];
       if (!items.length) return;
 
@@ -459,6 +463,19 @@ module.exports = (function() {
       }
       /* TEMP TEMP TEMP TEMP TEMP */
 
+      // `_debugInViewport`/`.debug-in-viewport` is used to visually show what the `TroupeUnreadItemsViewportMonitor` script detects as in the viewport.
+      // Chat messages in range/view will have a slight purple background.
+      // You can enable this by setting `window.localStorage.debug = 'app:unread-items-client'`
+      // in your browser
+      //
+      // Reset everything back to false
+      // Then we will mark all of the items in range/view later
+      if (debug.enabled) {
+        models.forEach(model => {
+          model.set('_debugInViewport', false);
+        });
+      }
+
       var topIndex = _.sortedIndex(models, viewportTop, function(model) {
         if (typeof model === 'number') return model;
         var view = cv.children.findByModelCid(model.cid);
@@ -467,6 +484,13 @@ module.exports = (function() {
 
       var remainingChildren = models.slice(topIndex);
       if (viewportBottom === Number.POSITIVE_INFINITY) {
+        // Mark all the items in range/view
+        if (debug.enabled) {
+          remainingChildren.forEach(model => {
+            model.set('_debugInViewport', true);
+          });
+        }
+
         /* Thats the whole lot */
         return remainingChildren;
       }
@@ -477,7 +501,18 @@ module.exports = (function() {
         return view.el.offsetTop;
       });
 
-      return remainingChildren.slice(0, bottomIndex).filter(model => !model.get('parentId')); //ignore thread messages that are for some reason marked as visible
+      remainingChildren = remainingChildren.slice(0, bottomIndex);
+
+      const onlyMainMessageFeedMessages = remainingChildren.filter(model => !model.get('parentId')); //ignore thread messages that are for some reason marked as visible
+
+      // Mark all the items in range/view
+      if (debug.enabled) {
+        onlyMainMessageFeedMessages.forEach(model => {
+          model.set('_debugInViewport', true);
+        });
+      }
+
+      return onlyMainMessageFeedMessages;
     },
 
     _resetFoldModel: function() {
@@ -498,6 +533,7 @@ module.exports = (function() {
       });
     },
 
+    // eslint-disable-next-line max-statements
     _foldCount: function() {
       if (!this._viewReady()) {
         debug('Skipping fold count until view is ready');
@@ -579,9 +615,12 @@ module.exports = (function() {
   function CollectionSync(store, collection) {
     collection.on('add', function(model) {
       /* Prevents a race-condition when something has already been marked as deleted */
-      if (!model.id || !model.get('unread')) return;
+      if (!model.id || !model.get('unread')) {
+        return;
+      }
+
       if (store.isMarkedAsRead(model.id)) {
-        debug('item already marked as read');
+        debug('collection add: item already marked as read');
         model.set('unread', false);
       }
     });
@@ -623,6 +662,7 @@ module.exports = (function() {
         appEvents.trigger('stats.event', 'missing.chat.item');
       }
 
+      debug(`Patching ${itemId} to be unread=true and mentioned=${mention}`);
       collection.patch(itemId, { unread: true, mentioned: mention }, null, patchComplete);
     });
 

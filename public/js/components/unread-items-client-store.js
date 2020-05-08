@@ -99,6 +99,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
     // Case 0: already read
     if (this._read.contains(itemId)) {
+      debug('_unreadItemAdded(0): item already marked as read', itemId);
       if (!silent) {
         this.trigger('itemMarkedRead', itemId, mention, lurkMode);
       }
@@ -108,6 +109,7 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
     // Case 1: new item
     if (!this._items.hasOwnProperty(itemId)) {
+      debug('_unreadItemAdded(1): new item', itemId);
       this._items[itemId] = mention;
       this.length++;
 
@@ -121,11 +123,16 @@ _.extend(UnreadItemStore.prototype, Backbone.Events, {
 
     // Case 2
     if (this._items[itemId] === mention) {
+      debug(
+        '_unreadItemAdded(2): item exists and has the same mention status as before (nullop)',
+        itemId
+      );
       return false;
     }
 
     // Case 3...
     this._items[itemId] = mention;
+    debug('_unreadItemAdded(3): item exists and has a different mention status to before', itemId);
     if (!silent) {
       this.trigger('change:status', itemId, mention);
     }

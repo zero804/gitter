@@ -1,5 +1,5 @@
 {{!-- NOTE: this is wrapped by <div class='chat-item'> --}}
-<div class='chat-item__container'>
+<div class='chat-item__container {{#if _debugInViewport}}debug-in-viewport{{/if}}'>
   {{#if burstStart}}
   <div class='chat-item__aside'>
     <div class="chat-item__avatar">

@@ -172,6 +172,28 @@
       padding-bottom: @chat-spacing*2;
     }
   }
+
+  // `_debugInViewport`/`.debug-in-viewport` is used to visually show what the `TroupeUnreadItemsViewportMonitor` script detects as in the viewport.
+  // Chat messages in range/view will have a slight purple background.
+  // You can enable this by setting `window.localStorage.debug = 'app:unread-items-client'`
+  // in your browser
+  &.debug-in-viewport {
+    position: relative;
+
+    &::before {
+      content: '';
+
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+
+      background-color: rgba(200, 100, 200, 0.1);
+
+      pointer-events: none;
+    }
+  }
 }
 
 .chat-item__aside {
@@ -403,8 +425,8 @@ body.mobile .chat-item__icon--read {
   margin-top: 10px;
   margin-bottom: 10px;
   &:hover {
-    cursor:pointer;
-   }
+    cursor: pointer;
+  }
 }
 
 body.mobile .chat-item__content {

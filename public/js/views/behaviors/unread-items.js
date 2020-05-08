@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug-proxy')('app:unread-items-behavior');
 var context = require('gitter-web-client-context');
 var Marionette = require('backbone.marionette');
 var behaviourLookup = require('./lookup');
@@ -51,6 +52,7 @@ var Behavior = Marionette.Behavior.extend({
   },
 
   unreadChanged: function(model, value, options) {
+    debug(`unreadChanged ${model.get('id')} unread=${value} options=${JSON.stringify(options)}`);
     if (value) {
       // Changing to unread
       this.el.classList.add('unread');
