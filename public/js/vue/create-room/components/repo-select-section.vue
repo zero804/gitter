@@ -18,7 +18,7 @@ export default {
       reposRequest: state => state.createRoom.reposRequest
     }),
     ...mapGetters({
-      isGithubUser: 'createRoom/isGithubUser',
+      isGithubUser: 'isGithubUser',
       hasGithubPrivateRepoScope: 'createRoom/hasGithubPrivateRepoScope',
       displayedFilteredRepos: 'createRoom/displayedFilteredRepos',
       selectedRepo: 'createRoom/selectedRepo'

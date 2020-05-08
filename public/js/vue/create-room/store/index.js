@@ -167,10 +167,6 @@ export default {
     ...roomSubmitVuexRequest.mutations
   },
   getters: {
-    isGithubUser(state, getters, rootState) {
-      const user = rootState.user;
-      return !!(user && user.providers && user.providers.includes('github'));
-    },
     hasGithubPrivateRepoScope(state, getters, rootState) {
       const user = rootState.user;
       return !!(user && user.scopes && user.scopes.private_repo);

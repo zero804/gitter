@@ -14,6 +14,15 @@ import {
   slugAvailabilityStatusConstants
 } from '../constants';
 
+const {
+  PENDING,
+  AVAILABLE,
+  UNAVAILABLE,
+  GITHUB_CLASH,
+  AUTHENTICATION_FAILED,
+  INVALID
+} = slugAvailabilityStatusConstants;
+
 const debug = debugProxy('app:create-community:store');
 
 // When testing, disable the debounce so we can test without any weird flakiness
@@ -148,7 +157,26 @@ export default {
     },
     setAndValidateCommunitySlug: async ({ commit, dispatch }, newCommunitySlug) => {
       commit(types.SET_COMMUNITY_SLUG, newCommunitySlug);
+
+      dispatch('autoAssociateMatchingUser');
+
       dispatch('checkSlugAvailability');
+    },
+    // If the community slug matches the username,
+    // set the community to be associated with the user
+    autoAssociateMatchingUser: async ({ state, commit, rootState, rootGetters }) => {
+      const username = rootState.user && rootState.user.username;
+      if (state.communitySlug.toLowerCase() === username.toLowerCase()) {
+        if (rootGetters.isGithubUser) {
+          commit(types.SET_SELECTED_BACKING_ENTITY, {
+            type: 'GH_USER',
+            uri: username,
+            name: username,
+            absoluteUri: `https://github.com/${username}`
+          });
+        }
+        // TODO: GL_USER
+      }
     },
     setSelectedBackingEntity: ({ commit, dispatch }, newBackingEntity) => {
       commit(types.SET_SELECTED_BACKING_ENTITY, newBackingEntity);
@@ -204,7 +232,7 @@ export default {
     },
     checkSlugAvailability: ({ commit, dispatch }) => {
       // Set pending immediately
-      commit(types.SET_SLUG_AVAILABILITY_STATUS, slugAvailabilityStatusConstants.PENDING);
+      commit(types.SET_SLUG_AVAILABILITY_STATUS, PENDING);
 
       // Then go off and actually check
       dispatch('_checkSlugAvailabilityDebounced');
@@ -224,27 +252,26 @@ export default {
 
         // Check to make sure the type matches in the response to what we are trying to create
         //
-        // If the requested check type is `null` then we don't need to worry
-        // any of the selected backing entity matching.
+        // If the response check type is `null` then we don't need to worry about
+        // any of the selected backing entity matching because there is nothing to match or collide with
         //
-        // If the requested check type is `GH_USER`, then the user is trying to
-        // create a community for their own username and we should allow that
+        // In the future, when we #github-uri-split, then we don't have to worry about any matching
         const type = state.selectedBackingEntity && state.selectedBackingEntity.type;
-        if (res.type === type || res.type === null || res.type === 'GH_USER') {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.AVAILABLE;
+        if (res.type === type || res.type === null) {
+          communitySlugAvailabilityStatus = AVAILABLE;
         } else {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.UNAVAILABLE;
+          communitySlugAvailabilityStatus = UNAVAILABLE;
         }
       } catch (err) {
         var status = err.status;
         if (status === 409) {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.UNAVAILABLE;
+          communitySlugAvailabilityStatus = UNAVAILABLE;
         } else if (status === 403) {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.GITHUB_CLASH;
+          communitySlugAvailabilityStatus = GITHUB_CLASH;
         } else if (status === 401) {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.AUTHENTICATION_FAILED;
+          communitySlugAvailabilityStatus = AUTHENTICATION_FAILED;
         } else {
-          communitySlugAvailabilityStatus = slugAvailabilityStatusConstants.INVALID;
+          communitySlugAvailabilityStatus = INVALID;
         }
       }
 
