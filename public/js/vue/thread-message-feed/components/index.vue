@@ -75,7 +75,7 @@ export default {
             <div></div>
           </intersect>
         </div>
-        <chat-input v-if="displayedRoom.roomMember" :user="user" thread />
+        <chat-input v-if="displayedRoom && displayedRoom.roomMember" :user="user" thread />
         <join-or-sign-in-button v-else />
       </section>
       <section v-else class="content">
