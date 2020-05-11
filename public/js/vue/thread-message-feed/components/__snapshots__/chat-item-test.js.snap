@@ -4,6 +4,7 @@ exports[`thread-message-feed chat-item editing matches snapshot 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart deleted"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -69,6 +70,7 @@ exports[`thread-message-feed chat-item snapshot component flags showItemActions 
 >
   <div
     class="chat-item burstStart"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -153,6 +155,7 @@ exports[`thread-message-feed chat-item snapshot component flags useCompactStyles
 <intersect-stub>
   <div
     class="chat-item burstStart compact"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -238,6 +241,7 @@ exports[`thread-message-feed chat-item snapshot deleted (empty) message 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart deleted"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -308,6 +312,7 @@ exports[`thread-message-feed chat-item snapshot highlighted - scrolls into view 
 <intersect-stub>
   <div
     class="chat-item burstStart chat-item__highlighted"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -392,6 +397,7 @@ exports[`thread-message-feed chat-item snapshot message flags error 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart syncerror"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -476,6 +482,7 @@ exports[`thread-message-feed chat-item snapshot message flags loading 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -562,6 +569,7 @@ exports[`thread-message-feed chat-item snapshot message flags unread 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart unread"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -646,6 +654,7 @@ exports[`thread-message-feed chat-item snapshot not logged in user (no message a
 <intersect-stub>
   <div
     class="chat-item burstStart deleted"
+    role="listitem"
   >
     <div
       class="chat-item__container"
@@ -714,6 +723,7 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
 <intersect-stub>
   <div
     class="chat-item burstStart"
+    role="listitem"
   >
     <div
       class="chat-item__container"

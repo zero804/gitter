@@ -12,10 +12,10 @@ var BASE_EMAIL_PATH = config.get('email:emailBasePath');
 const TROUPE1 = {
   troupe: {
     id: '53d61acc1a1c8bd81c69ce23',
-    uri: 'gitterHQ/gitter',
+    uri: 'gitter/gitter',
     oneToOne: false,
     userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
-    url: '/gitterHQ/gitter',
+    url: '/gitter/gitter',
     urlUserMap: false,
     nameUserMap: false
   },
@@ -56,10 +56,10 @@ const TROUPE1 = {
 const TROUPE2 = {
   troupe: {
     id: '53d61acc1a1c8bd81c69ce23',
-    uri: 'gitterHQ/nibbles',
+    uri: 'gitter/nibbles',
     oneToOne: false,
     userIds: ['53ce4c02d6d7c494a3f737a9', '53cf8aa8fe44f8028eb727fb', '54059cc35bc771454170a225'],
-    url: '/gitterHQ/gitter',
+    url: '/gitter/gitter',
     urlUserMap: false,
     nameUserMap: false
   },
@@ -135,7 +135,7 @@ describe('email-notification-service', function() {
         .then(function() {
           assert.strictEqual(
             emailPayload.subject,
-            'Unread messages in gitterHQ/gitter and gitterHQ/nibbles'
+            'Unread messages in gitter/gitter and gitter/nibbles'
           );
         });
     });
@@ -147,7 +147,7 @@ describe('email-notification-service', function() {
         .then(function() {
           assert.strictEqual(
             emailPayload.subject,
-            'Ungelesene Nachrichten in gitterHQ/gitter und gitterHQ/nibbles'
+            'Ungelesene Nachrichten in gitter/gitter und gitter/nibbles'
           );
         });
     });
@@ -160,7 +160,7 @@ describe('email-notification-service', function() {
         .then(function() {
           assert.strictEqual(
             emailPayload.subject,
-            'Unread messages in gitterHQ/gitter and gitterHQ/nibbles'
+            'Unread messages in gitter/gitter and gitter/nibbles'
           );
         });
     });

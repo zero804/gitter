@@ -1,23 +1,26 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`menu-bar-item all matches snapshot 1`] = `
+exports[`menu-bar-item matches snapshot with all properties 1`] = `
 <button
-  class="item item-all active"
+  aria-label="all"
+  class="item-all"
   type="button"
 >
   <div
-    class="unread-indicator"
+    class="unread-indicator has-unreads has-mentions"
   />
    
   <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>
 `;
 
-exports[`menu-bar-item create matches snapshot 1`] = `
+exports[`menu-bar-item matches snapshot with required properties 1`] = `
 <button
-  class="item item-create"
+  aria-label=""
+  class="item"
   type="button"
 >
   <div
@@ -25,66 +28,7 @@ exports[`menu-bar-item create matches snapshot 1`] = `
   />
    
   <span
-    class="icon-wrapper"
-  />
-</button>
-`;
-
-exports[`menu-bar-item people matches snapshot 1`] = `
-<button
-  class="item item-people"
-  type="button"
->
-  <div
-    class="unread-indicator"
-  />
-   
-  <span
-    class="icon-wrapper"
-  />
-</button>
-`;
-
-exports[`menu-bar-item search matches snapshot 1`] = `
-<button
-  class="item item-search"
-  type="button"
->
-  <div
-    class="unread-indicator"
-  />
-   
-  <span
-    class="icon-wrapper"
-  />
-</button>
-`;
-
-exports[`menu-bar-item toggle matches snapshot 1`] = `
-<button
-  class="item item-toggle"
-  type="button"
->
-  <div
-    class="unread-indicator"
-  />
-   
-  <span
-    class="icon-wrapper"
-  />
-</button>
-`;
-
-exports[`menu-bar-item when all state, all item has highlight matches snapshot 1`] = `
-<button
-  class="item item-all active"
-  type="button"
->
-  <div
-    class="unread-indicator"
-  />
-   
-  <span
+    aria-hidden="true"
     class="icon-wrapper"
   />
 </button>

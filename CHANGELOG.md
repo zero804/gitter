@@ -1,3 +1,24 @@
+# 20.24.0 - 2020-05-06
+
+ - Add accessible labels to the left-menu menu bar buttons, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1837
+ - Add documentation details on needing to be signed in with GitLab to create GitLab based community/room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1851
+ - Update Gitter support room links in docs after rename, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1855
+ - Add accessible list attributes to chat message items for easier navigation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1856
+ - In App announcements, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1850
+ - Styling announcements for dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1867
+
+Developer facing:
+
+ - Set default tags in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1847
+ - Absorb `@gitterhq/translations` npm module (including history), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1846
+ - Fix assertions in OAuth clients test, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1849
+ - Add utility script to delete stuck mention, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1840
+ - Small left menu improvements, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1853
+ - Add stats for when someone opens the read by popover, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1854
+ - Revert back to Debian/Ubuntu based image so Cypress e2e test dependencies are available, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1859
+ - Fix e2e create room tests, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1861
+
+
 # 20.23.0 - 2020-04-22 - Threaded conversations
 
  - Add support for passing the initial room name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1839
@@ -9,6 +30,14 @@
  - Add stats for opening the create community/room flows, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1843
  - Add download link to latest unsigned desktop macOS version, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1844
     - Thanks to [@Nezteb](https://gitlab.com/Nezteb) for the contribution
+
+
+# 20.22.1 - 2020-04-27
+
+ - Security fix related to Google analytics, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2487
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/56
+ - Security fix related to GitHub only rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2328
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/55
 
 
 # 20.22.0 - 2020-04-17 - GitLab based rooms

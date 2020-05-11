@@ -1,7 +1,11 @@
 <script>
+import { mapState, mapGetters } from 'vuex';
+
 import MenuBarItem from './menu-bar-item.vue';
 import MenuBarItemCreate from './menu-bar-item-create.vue';
 import MenuBarItemToggle from './menu-bar-item-toggle.vue';
+
+import { isAnnouncementActive } from './announcements-body.vue';
 
 export default {
   name: 'MenuBarBody',
@@ -9,6 +13,38 @@ export default {
     MenuBarItem,
     MenuBarItemCreate,
     MenuBarItemToggle
+  },
+  data: () => ({
+    isAnnouncementActive: isAnnouncementActive()
+  }),
+  computed: {
+    ...mapState(['leftMenuPinnedState']),
+    ...mapGetters(['hasAnyUnreads', 'hasAnyMentions', 'hasPeopleUnreads']),
+    allItemLabel() {
+      let messagesOfInterestAvailableNote = '';
+      if (this.hasAnyMentions) {
+        messagesOfInterestAvailableNote = ' (some rooms have mentions)';
+      } else if (this.hasAnyUnreads) {
+        messagesOfInterestAvailableNote = ' (some rooms have unread messages)';
+      }
+
+      return `Show all rooms panel${messagesOfInterestAvailableNote}`;
+    },
+    peopleItemLabel() {
+      let messagesOfInterestAvailableNote = '';
+      if (this.hasPeopleUnreads) {
+        messagesOfInterestAvailableNote = ' (some rooms have unread messages)';
+      }
+
+      return `Show one to one messages panel${messagesOfInterestAvailableNote}`;
+    },
+    toggleItemLabel() {
+      if (this.leftMenuPinnedState) {
+        return 'Unpin and collapse the left-menu';
+      }
+
+      return 'Pin and expand left-menu';
+    }
   }
 };
 </script>
@@ -16,7 +52,13 @@ export default {
 <template>
   <div class="menu-bar-root">
     <div class="menu-bar-top">
-      <menu-bar-item type="all">
+      <menu-bar-item
+        type="all"
+        class="item-all"
+        :label="allItemLabel"
+        :hasUnreads="this.hasAnyUnreads"
+        :hasMentions="this.hasAnyMentions"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="-2 1 49 45">
             <path
@@ -26,7 +68,11 @@ export default {
         </template>
       </menu-bar-item>
 
-      <menu-bar-item type="search">
+      <menu-bar-item
+        type="search"
+        class="item-search"
+        label="Show panel for searching rooms, people, and messages in the current room"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 43.7 43.5">
             <path
@@ -39,7 +85,12 @@ export default {
         </template>
       </menu-bar-item>
 
-      <menu-bar-item type="people">
+      <menu-bar-item
+        type="people"
+        class="item-people"
+        :label="peopleItemLabel"
+        :hasUnreads="this.hasPeopleUnreads"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37.9 42.5">
             <path
@@ -51,7 +102,27 @@ export default {
     </div>
 
     <div class="menu-bar-bottom">
-      <menu-bar-item-create type="create">
+      <menu-bar-item
+        v-if="isAnnouncementActive"
+        type="announcements"
+        class="item-announcements"
+        label="View latest announcements from the Gitter team"
+      >
+        <template v-slot:icon>
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16">
+            <path
+              fill-rule="evenodd"
+              d="M16,8 C16,12.4183 12.4183,16 8,16 C3.58172,16 0,12.4183 0,8 C0,3.58172 3.58172,0 8,0 C12.4183,0 16,3.58172 16,8 Z M9,5 C9,5.55228 8.55229,6 8,6 C7.44772,6 7,5.55228 7,5 C7,4.44772 7.44772,4 8,4 C8.55229,4 9,4.44772 9,5 Z M8,7 C7.44772,7 7,7.44772 7,8 L7,11 C7,11.5523 7.44772,12 8,12 C8.55229,12 9,11.5523 9,11 L9,8 C9,7.44772 8.55229,7 8,7 Z"
+            />
+          </svg>
+        </template>
+      </menu-bar-item>
+
+      <menu-bar-item-create
+        type="create"
+        label="Create communities and rooms"
+        class="js-menu-bar-create-button"
+      >
         <template v-slot:icon>
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
             <path
@@ -61,7 +132,7 @@ export default {
         </template>
       </menu-bar-item-create>
 
-      <menu-bar-item-toggle type="toggle">
+      <menu-bar-item-toggle type="toggle" :label="toggleItemLabel">
         <template v-slot:icon>
           <svg viewBox="0 0 30 34">
             <path d="M0,6 l15,0 l15,0" />
@@ -94,9 +165,19 @@ export default {
   }
 }
 
-.menu-bar-top {
+.item-all {
+  color: @ruby;
 }
 
-.menu-bar-bottom {
+.item-search {
+  color: @jaffa;
+}
+
+.item-people {
+  color: @people-bg;
+}
+
+.item-announcements {
+  color: @trpYellow;
 }
 </style>

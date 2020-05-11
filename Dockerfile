@@ -1,4 +1,4 @@
-FROM node:10.19.0-alpine
+FROM node:10.19.0
 
 RUN mkdir -p /app
 RUN mkdir -p /npm_cache
@@ -14,15 +14,6 @@ COPY package.json package-lock.json scripts/filter-package-json-cli.js scripts/f
 RUN cat package.json | node filter-package-json-cli.js > temp-package.json && cat temp-package.json > package.json && rm temp-package.json
 RUN cat package-lock.json | node filter-package-lock-json-cli.js > temp-package-lock.json && cat temp-package-lock.json > package-lock.json && rm temp-package-lock.json
 
-# git is required to fetch some NPM packages,
-RUN apk add --no-cache git
-
-# make is required for some steps of the pipeline (see .gitlab-ci.yml and Makefile)
-RUN apk add --no-cache make
-
-# we add (and then remove) the dependencies to install node-gyp
-RUN apk add --no-cache --virtual .gyp python g++ \
-    && npm install --production \
-    && apk del .gyp python g++
+RUN npm install --production
 
 RUN rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null

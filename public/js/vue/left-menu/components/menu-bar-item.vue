@@ -1,7 +1,7 @@
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
-import * as leftMenuConstants from '../constants';
+import { VALID_LEFT_MENU_STATES } from '../constants';
 
 export default {
   name: 'MenuBarItem',
@@ -10,44 +10,26 @@ export default {
       type: String,
       required: true,
       validator: function(value) {
-        // The value must match one of these strings
-        return (
-          [
-            leftMenuConstants.LEFT_MENU_ALL_STATE,
-            leftMenuConstants.LEFT_MENU_SEARCH_STATE,
-            leftMenuConstants.LEFT_MENU_PEOPLE_STATE,
-            leftMenuConstants.LEFT_MENU_GROUP_STATE,
-            leftMenuConstants.LEFT_MENU_CREATE_STATE,
-            leftMenuConstants.LEFT_MENU_TOGGLE_STATE
-          ].indexOf(value) !== -1
-        );
+        return VALID_LEFT_MENU_STATES.includes(value);
       }
+    },
+    label: {
+      type: String,
+      default: ''
+    },
+    hasUnreads: {
+      type: Boolean,
+      default: false
+    },
+    hasMentions: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapState(['leftMenuState', 'leftMenuExpandedState']),
-    ...mapGetters(['hasAnyUnreads', 'hasAnyMentions', 'hasPeopleUnreads']),
-    itemTypeClass() {
-      return `item-${this.type}`;
-    },
     isActive() {
       return this.type === this.leftMenuState;
-    },
-    hasUnreads() {
-      if (this.type === leftMenuConstants.LEFT_MENU_ALL_STATE) {
-        return this.hasAnyUnreads;
-      } else if (this.type === leftMenuConstants.LEFT_MENU_PEOPLE_STATE) {
-        return this.hasPeopleUnreads;
-      }
-
-      return false;
-    },
-    hasMentions() {
-      if (this.type === leftMenuConstants.LEFT_MENU_ALL_STATE) {
-        return this.hasAnyMentions;
-      }
-
-      return false;
     }
   },
 
@@ -74,10 +56,10 @@ export default {
     ref="root"
     class="item"
     :class="{
-      [itemTypeClass]: true,
       active: isActive
     }"
     type="button"
+    :aria-label="label"
     @click.prevent="onClick(type)"
   >
     <div
@@ -87,7 +69,7 @@ export default {
         'has-mentions': hasMentions
       }"
     ></div>
-    <span class="icon-wrapper">
+    <span class="icon-wrapper" aria-hidden="true">
       <slot name="icon"></slot>
     </span>
   </button>
@@ -136,26 +118,6 @@ export default {
       background-color: currentColor;
     }
   }
-}
-
-.item-all {
-  color: @ruby;
-}
-
-.item-search {
-  color: @jaffa;
-}
-
-.item-people {
-  color: @people-bg;
-}
-
-.item-group {
-  color: @caribbean;
-}
-
-.item-create {
-  color: #7f8080;
 }
 
 .item-toggle {
