@@ -4,6 +4,8 @@
  - Update notification docs with short snippet on altering desktop notification settings and sound, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1868
     - Thanks to [@jeffcsauer](https://gitlab.com/jeffcsauer) for the contribution
  - Add thread support to Sidecar (embedded renderer), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1860
+ - Update French translations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1876
+    - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
 
 Developer facing:
 
