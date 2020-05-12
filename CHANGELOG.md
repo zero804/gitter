@@ -10,6 +10,7 @@
 Developer facing:
 
  - Add docs for how to solve the missing `cld` dependency problem, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1863
+ - Remove unused `DeletePit` code, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1873
 
 
 # 20.24.0 - 2020-05-06
