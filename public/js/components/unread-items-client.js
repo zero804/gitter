@@ -29,36 +29,6 @@ module.exports = (function() {
     }
   }
 
-  var DeletePit = function() {
-    this._items = {};
-    this._timer = setInterval(this._gc.bind(this), 60000);
-  };
-
-  DeletePit.prototype = {
-    add: function(itemId) {
-      this._items[itemId] = Date.now();
-    },
-
-    remove: function(itemId) {
-      delete this._items[itemId];
-    },
-
-    contains: function(itemId) {
-      return !!this._items[itemId];
-    },
-
-    _gc: function() {
-      var horizon = Date.now() - 5 * 60 * 1000; // 5 minutes
-      var items = this._items;
-
-      Object.keys(items).forEach(function(itemId) {
-        if (items[itemId] < horizon) {
-          delete items[itemId];
-        }
-      });
-    }
-  };
-
   var MILLIS_BEFORE_UPDATING_LAST_ACCESS_TIME = 1000;
 
   /**
