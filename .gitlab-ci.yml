@@ -197,7 +197,6 @@ distribute_beta_staging:
 distribute_staging:
   <<: *distribute_job
   only:
-    - /^test-deploy-to-webapp-09$/
     - /^release\/.*$/
     - /^hotfix\/.*$/
   variables:
@@ -206,6 +205,7 @@ distribute_staging:
 distribute_prod:
   <<: *distribute_job
   only:
+    - /^test-deploy-to-webapp-09$/
     - tags
   variables:
     DIST_S3_URL: s3://gitter-deployments/gitter-webapp/prod
@@ -291,13 +291,10 @@ deploy_staging: &deploy_staging
   dependencies:
     - distribute_staging
   only:
-    - /^test-deploy-to-webapp-09$/
     - /^release\/.*$/
     - /^hotfix\/.*$/
   script:
-    - cd $ANSIBLE_DIR
-    - git checkout backport-webapp && git pull origin backport-webapp
-    - ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml --limit="webapp-09.prod.gitter"
+    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
   environment:
     name: staging
     url: https://gitter.im?gitter_next=true
@@ -307,11 +304,14 @@ deploy_prod_manual: &deploy_prod
   dependencies:
     - distribute_prod
   only:
+    - /^test-deploy-to-webapp-09$/
     - tags
   # Production is only manual
   when: manual
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml
+    - cd $ANSIBLE_DIR
+    - git checkout backport-webapp && git pull origin backport-webapp
+    - ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-deploy.yml --limit="webapp-09.prod.gitter"
   environment:
     name: prod
     url: https://gitter.im
