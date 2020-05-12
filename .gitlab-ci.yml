@@ -197,6 +197,7 @@ distribute_beta_staging:
 distribute_staging:
   <<: *distribute_job
   only:
+    - /^test-deploy-to-webapp-09$/
     - /^release\/.*$/
     - /^hotfix\/.*$/
   variables:
@@ -290,10 +291,13 @@ deploy_staging: &deploy_staging
   dependencies:
     - distribute_staging
   only:
+    - /^test-deploy-to-webapp-09$/
     - /^release\/.*$/
     - /^hotfix\/.*$/
   script:
-    - cd $ANSIBLE_DIR && ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml
+    - cd $ANSIBLE_DIR
+    - git checkout backport-webapp && git pull origin backport-webapp
+    - ansible-playbook -i prod --vault-password-file "/root/.vault_pass" playbooks/gitter/webapp-staging-deploy.yml --limit="webapp-09.prod.gitter"
   environment:
     name: staging
     url: https://gitter.im?gitter_next=true
