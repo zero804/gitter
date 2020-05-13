@@ -1,3 +1,8 @@
+# 20.26.0 - *upcoming*
+
+ - Removing markup from a part of the French translation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1878
+
+
 # 20.25.0 - 2020-05-12
 
  - Fix collaborators view by listening on room id change, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1866
