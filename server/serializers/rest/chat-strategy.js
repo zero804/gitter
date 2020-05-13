@@ -111,7 +111,12 @@ function ChatStrategy({ lookups, lean, user, currentUserId, troupeId, initialId 
   }
 
   this.map = function(item) {
-    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : false; // if there is no unread strategy, mark as read
+    // If there is no unread strategy(meaning currentUserId was undefined), don't define how it's unread/read.
+    //
+    // We don't want to default to true/false because even when someone is signed in,
+    // some places of code don't define `currentUserId`. We don't want to accidentally
+    // override the actual value. See `live-collection-chats.js` as an example
+    var unread = unreadItemStrategy ? unreadItemStrategy.map(item._id) : undefined;
 
     var castArray = lean ? undefinedForEmptyArray : safeArray;
 

@@ -80,7 +80,7 @@ describe('chat-strategy-test', function() {
           staff: false,
           v: 1
         },
-        unread: false,
+        unread: undefined,
         readBy: 0,
         urls: [],
         mentions: [],
@@ -118,7 +118,7 @@ describe('chat-strategy-test', function() {
           staff: false,
           v: 1
         },
-        unread: false,
+        unread: undefined,
         readBy: 0,
         urls: [],
         initial: true,
@@ -170,6 +170,28 @@ describe('chat-strategy-test', function() {
       return serialize([fixture.message1], strategy).then(function(s) {
         assertUtils.assertSerializedEqual(s, expected1);
       });
+    });
+
+    // This case is not just for NLI users...
+    //
+    // We don't want to default to true/false because even when someone is signed in,
+    // some places of code don't define `currentUserId`. We don't want to accidentally
+    // override the actual value. See `live-collection-chats.js` as an example
+    //
+    // To give a scenario: if we default to `unread: false` for a signed in user, it can
+    // screw up our assumptions on the frontend and keep messages from being marked
+    // as read because they already appear to be marked as read.
+    //
+    // Full context: https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1871
+    it(`when currentUserId is undefined, don't default the unread value to true/false (leads to frontend state mismatch problems)`, async () => {
+      const strategy = new ChatStrategy({
+        currentUserId: undefined,
+        troupeId: fixture.troupe1.id
+      });
+
+      const serializedMessage = await serialize([fixture.message1], strategy);
+
+      assertUtils.assertSerializedEqual(serializedMessage.unread, undefined);
     });
 
     describe('threadMessages', () => {
