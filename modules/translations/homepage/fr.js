@@ -19,7 +19,7 @@
 	"Markdown and KaTeX": "Markdown et KaTeX",
 	"Format your messages just like with your other favorite developer tools.": "Formattez vos messages comme avec vos autres outils de développement.",
 	"Out in the open": "Ouvert sur le monde",
-	"Complete history archives (indexed by search engines) and sharable permalinks or use <a %s>Sidecar</a> to embed Gitter directly in your own site.": "Archives d'historique complètes (indexées par les moteurs de recherche) et permaliens partageables ; vous pouvez également utiliser <a %s>Sidecar</a> pour intégrer Gitter directement sur votre site.",
+	"Complete history archives(indexed by search engines) and sharable permalinks or use <a %s>Sidecar</a> to embed Gitter directly in your own site.": "Archives d'historique complètes (indexées par les moteurs de recherche) et permaliens partageables ; vous pouvez également utiliser <a %s>Sidecar</a> pour intégrer Gitter directement sur votre site.",
 	"Trusted by": "Plébiscité par",
 	"Some of our communities": "Quelques-unes de nos communautés",
 	"Create your own": "Créez la votre",
@@ -34,7 +34,7 @@
 	"Gitter is nothing without the people using it day in and day out.": "Gitter ne serait rien sans les personnes qui l'utilisent quotidiennement.",
 	"We asked a few people what Gitter means to them, this is what they had to say. If you love Gitter, Tweet us <a %s>%s</a> and we'll update these quotes every month.": "Nous avons demandé à quelques personnes ce qu'elles pensent de Gitter ; voici ce qu'elles nous ont répondu. Si vous aimez Gitter, envoyez-nous un <i>tweet</i> <a %s>%s</a> et nous mettrons à jour ces témoignages tous les mois.",
 	"Get Gitter now!": "Obtenez Gitter dès maintenant !",
-	"Gitter is available in all modern browsers as well as apps for desktops.": "Gitter est compatible avec tous les navigateurs récents ; des applications <i>desktop</i> sont également disponibles",
+	"Gitter is available in all modern browsers as well as apps for desktops.": "Gitter est compatible avec tous les navigateurs récents ; des applications desktop sont également disponibles",
 	"Mac": "Mac",
 	"Windows": "Windows",
 	"Linux 32": "Linux 32",
@@ -49,5 +49,6 @@
 	"Support": "Assistance",
 	"API": "API",
 	"Blog": "Blog",
-	"Twitter": "Twitter"
+	"Twitter": "Twitter",
+	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>."
 }
