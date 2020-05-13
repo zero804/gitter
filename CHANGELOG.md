@@ -6,6 +6,7 @@
  - Add thread support to Sidecar (embedded renderer), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1860
  - Update French translations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1876
     - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
+ - Fix being able to create community for your own GitHub username, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1870
 
 Developer facing:
 
