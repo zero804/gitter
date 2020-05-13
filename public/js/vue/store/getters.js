@@ -1,6 +1,11 @@
 import _ from 'lodash';
 import { pojo as sortsAndFilters } from 'gitter-realtime-client/lib/sorts-filters';
 
+export const isGithubUser = state => {
+  const user = state.user;
+  return !!(user && user.providers && user.providers.includes('github'));
+};
+
 function sortRooms(a, b) {
   if (a.favourite || b.favourite) {
     return sortsAndFilters.favourites.sort(a, b);

@@ -3,6 +3,7 @@ const createState = require('./state').default;
 const getters = require('./getters');
 
 const {
+  createSerializedUserFixture,
   createSerializedRoomFixture,
   createSerializedOneToOneRoomFixture
 } = require('../__test__/fixture-helpers');
@@ -11,6 +12,32 @@ describe('getters', () => {
   let state;
   beforeEach(() => {
     state = createState();
+  });
+
+  describe('isGithubUser', () => {
+    it('detects GitHub user', () => {
+      const state = {
+        user: createSerializedUserFixture({ providers: ['github'] })
+      };
+      const result = getters.isGithubUser(state, {});
+      expect(result).toEqual(true);
+    });
+
+    it('GitLab user does not trigger', () => {
+      const state = {
+        user: createSerializedUserFixture({ providers: ['gitlab'] })
+      };
+      const result = getters.isGithubUser(state, {});
+      expect(result).toEqual(false);
+    });
+
+    it('No providers does not trigger', () => {
+      const state = {
+        user: createSerializedUserFixture()
+      };
+      const result = getters.isGithubUser(state, {});
+      expect(result).toEqual(false);
+    });
   });
 
   describe('displayedRoom', () => {

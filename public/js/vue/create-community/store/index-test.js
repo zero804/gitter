@@ -213,8 +213,83 @@ describe('create community store', () => {
         'foo-bar-baz',
         {},
         [{ type: types.SET_COMMUNITY_SLUG, payload: 'foo-bar-baz' }],
-        [{ type: 'checkSlugAvailability' }]
+        [{ type: 'autoAssociateMatchingUser' }, { type: 'checkSlugAvailability' }]
       );
+    });
+
+    describe('autoAssociateMatchingUser', () => {
+      it('when GitHub username matches, sets backing entity', async () => {
+        await testAction(
+          actions.autoAssociateMatchingUser,
+          undefined,
+          {
+            communitySlug: 'myusername',
+
+            // rootState
+            user: {
+              username: 'myUsername',
+              providers: ['github']
+            },
+
+            // rootGetters
+            isGithubUser: true
+          },
+          [
+            {
+              type: types.SET_SELECTED_BACKING_ENTITY,
+              payload: {
+                absoluteUri: 'https://github.com/myUsername',
+                name: 'myUsername',
+                type: 'GH_USER',
+                uri: 'myUsername'
+              }
+            }
+          ],
+          []
+        );
+      });
+
+      it('when GitHub username does not match, does not set backing entity', async () => {
+        await testAction(
+          actions.autoAssociateMatchingUser,
+          undefined,
+          {
+            communitySlug: 'someotherusername',
+
+            // rootState
+            user: {
+              username: 'myUsername',
+              providers: ['github']
+            },
+
+            // rootGetters
+            isGithubUser: true
+          },
+          [],
+          []
+        );
+      });
+
+      it('when Twitter username matches, does not set backing entity', async () => {
+        await testAction(
+          actions.autoAssociateMatchingUser,
+          undefined,
+          {
+            communitySlug: 'myusername_twitter',
+
+            // rootState
+            user: {
+              username: 'myUsername_twitter',
+              providers: ['twitter']
+            },
+
+            // rootGetters
+            isGithubUser: false
+          },
+          [],
+          []
+        );
+      });
     });
 
     describe('setSelectedBackingEntity', () => {
