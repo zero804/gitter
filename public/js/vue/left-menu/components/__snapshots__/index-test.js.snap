@@ -66,8 +66,6 @@ exports[`left-menu all state matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -150,8 +148,6 @@ exports[`left-menu announcements state matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <announcements-stub />
     </section>
   </section>
@@ -224,8 +220,6 @@ exports[`left-menu dark-theme matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -308,8 +302,6 @@ exports[`left-menu mobile mobile matches snapshot 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -638,8 +630,6 @@ exports[`left-menu people state matches snapshot 1`] = `
     >
       <!---->
        
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -720,8 +710,6 @@ exports[`left-menu pinning and expanding not pinned and collapse 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -804,8 +792,6 @@ exports[`left-menu pinning and expanding not pinned and expanded 1`] = `
     <section
       class="body-main-menu layout-main-menu scroller"
     >
-      <!---->
-       
       <h2
         class="room-list-title"
       >
@@ -889,14 +875,6 @@ exports[`left-menu search state matches snapshot 1`] = `
       class="body-main-menu layout-main-menu scroller"
     >
       <search-body-stub />
-       
-      <!---->
-       
-      <!---->
-       
-      <room-list-stub
-        rooms=""
-      />
     </section>
   </section>
 </div>
