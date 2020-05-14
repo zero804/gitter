@@ -1,3 +1,21 @@
+# 20.25.0 - 2020-05-12
+
+ - Fix collaborators view by listening on room id change, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1866
+ - Update notification docs with short snippet on altering desktop notification settings and sound, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1868
+    - Thanks to [@jeffcsauer](https://gitlab.com/jeffcsauer) for the contribution
+ - Add thread support to Sidecar (embedded renderer), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1860
+ - Update French translations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1876
+    - Thanks to [@yaningo](https://gitlab.com/yaningo) for the contribution
+ - Fix being able to create community for your own GitHub username, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1870
+ - Fix stuck unread badge, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1871
+
+Developer facing:
+
+ - Add docs for how to solve the missing `cld` dependency problem, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1863
+ - Remove unused `DeletePit` code, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1873
+ - Update delete unread script to output unreads to be deleted and prompt for confirm deletion, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1872
+
+
 # 20.24.0 - 2020-05-06
 
  - Add accessible labels to the left-menu menu bar buttons, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1837

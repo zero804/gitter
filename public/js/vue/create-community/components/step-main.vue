@@ -60,7 +60,7 @@ export default {
     },
     isGithubSelected() {
       const type = this.selectedBackingEntity.type;
-      return type === 'GH_ORG' || type === 'GH_REPO';
+      return type === 'GH_ORG' || type === 'GH_REPO' || type === 'GH_USER';
     },
     isRepoSelected() {
       return this.selectedBackingEntity.type === 'GH_REPO';

@@ -1,7 +1,7 @@
 'use strict';
 
 var ChatLayout = require('./views/layouts/chat');
-var chatModels = require('./collections/chat');
+var chatCollection = require('./collections/instances/chats');
 var onready = require('./utils/onready');
 var $ = require('jquery');
 
@@ -17,11 +17,6 @@ require('./components/ping');
 
 // Preload widgets
 require('./views/widgets/avatar');
-
-var chatCollection = new chatModels.ChatCollection(null, { listen: true });
-chatCollection.on('add', function(item) {
-  setTimeout(item.set.bind(item, 'unread', false), 500);
-});
 
 onready(function() {
   var appView = new ChatLayout({ template: false, el: 'body', chatCollection: chatCollection });

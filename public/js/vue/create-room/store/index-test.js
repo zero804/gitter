@@ -122,35 +122,6 @@ describe('create room store', () => {
   });
 
   describe('getters', () => {
-    describe('isGithubUser', () => {
-      it('detects GitHub user', () => {
-        const rootState = {
-          user: createSerializedUserFixture({ providers: ['github'] })
-        };
-        const state = {};
-        const result = getters.isGithubUser(state, {}, rootState);
-        expect(result).toEqual(true);
-      });
-
-      it('GitLab user does not trigger', () => {
-        const rootState = {
-          user: createSerializedUserFixture({ providers: ['gitlab'] })
-        };
-        const state = {};
-        const result = getters.isGithubUser(state, {}, rootState);
-        expect(result).toEqual(false);
-      });
-
-      it('No providers does not trigger', () => {
-        const rootState = {
-          user: createSerializedUserFixture()
-        };
-        const state = {};
-        const result = getters.isGithubUser(state, {}, rootState);
-        expect(result).toEqual(false);
-      });
-    });
-
     describe('hasGithubPrivateRepoScope', () => {
       it('detects user with private_repo access', () => {
         const rootState = {
