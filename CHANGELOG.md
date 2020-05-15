@@ -6,6 +6,7 @@
  - Fix `/channel` slash command name regex to accept hyphenated names, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1881
       - Thanks to [@auua](https://gitlab.com/auua) for the contribution
  - Add GitLab branding to the left-menu, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1865
+ - Fix left-menu search state showing all rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1883
 
 
 # 20.25.0 - 2020-05-12
