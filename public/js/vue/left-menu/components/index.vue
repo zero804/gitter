@@ -131,7 +131,7 @@ export default {
       </section>
       <section class="body-main-menu layout-main-menu scroller">
         <search-body v-if="isSearchState" />
-        <announcements v-if="isAnnouncementState" />
+        <announcements v-else-if="isAnnouncementState" />
         <template v-else>
           <h2 v-if="isAllState" class="room-list-title">All conversations</h2>
           <h2 v-if="isPeopleState" class="room-list-title">People</h2>
