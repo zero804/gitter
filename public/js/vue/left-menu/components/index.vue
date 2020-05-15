@@ -1,12 +1,15 @@
 <script>
 import { mapState, mapGetters, mapActions } from 'vuex';
 
+import clientEnv from 'gitter-client-env';
 import * as leftMenuConstants from '../constants';
 import MenuBarBody from './menu-bar-body.vue';
 import SearchBody from './search-body.vue';
 import RoomList from './room-list.vue';
 import Announcements from './announcements-body.vue';
-import iconLogoText from '../../../../images/svg/gitter-logos/logo-white-lettering.svg';
+import GitterLogoSvg from './gitter-logo-svg.vue';
+import GitterLogoTextSvg from './gitter-logo-text-svg.vue';
+import GitlabLogoSvg from './gitlab-logo-svg.vue';
 import fingerSwipeMixin from '../mixins/finger-swipe';
 
 export default {
@@ -16,9 +19,11 @@ export default {
     MenuBarBody,
     SearchBody,
     RoomList,
-    Announcements
+    Announcements,
+    GitterLogoSvg,
+    GitterLogoTextSvg,
+    GitlabLogoSvg
   },
-  iconLogoText,
   computed: {
     ...mapState([
       'isLoggedIn',
@@ -45,6 +50,10 @@ export default {
     },
     isAnnouncementState() {
       return this.leftMenuState === leftMenuConstants.LEFT_MENU_ANNOUNCEMENTS_STATE;
+    },
+
+    gitterHomePageLink() {
+      return `${clientEnv['basePath']}/?utm_source=left-menu-logo`;
     }
   },
 
@@ -65,7 +74,10 @@ export default {
   },
 
   methods: {
-    ...mapActions(['toggleLeftMenu']),
+    ...mapActions(['toggleLeftMenu', 'trackStat']),
+    onGitlabLinkClick() {
+      this.trackStat('left-menu-gitlab-link-click');
+    },
     onMouseleave() {
       this.toggleLeftMenu(false);
     }
@@ -91,21 +103,25 @@ export default {
   >
     <header class="header">
       <section class="header-minibar layout-minibar">
-        <svg
-          class="logo-gitter-sign"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          xmlns:xlink="http://www.w3.org/1999/xlink"
-          viewBox="0 0 18 25"
-        >
-          <rect x="15" y="5" width="2" height="10" />
-          <rect x="10" y="5" width="2" height="20" />
-          <rect x="5" y="5" width="2" height="20" />
-          <rect width="2" height="15" />
-        </svg>
+        <a :href="gitterHomePageLink">
+          <gitter-logo-svg class="logo-gitter-sign" />
+        </a>
       </section>
       <section class="header-main-menu layout-main-menu">
-        <span class="logo-text" v-html="$options.iconLogoText"></span>
+        <a class="logo-text" :href="gitterHomePageLink">
+          <gitter-logo-text-svg />
+        </a>
+        <span class="provided-by-text">
+          by
+        </span>
+        <a
+          class="gitlab-logo"
+          href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
+          target="_blank"
+          @click="onGitlabLinkClick"
+        >
+          <gitlab-logo-svg />
+        </a>
       </section>
     </header>
 
@@ -211,7 +227,7 @@ export default {
   flex-shrink: 0;
   height: @desktop-header-height;
 
-  color: rgba(255, 255, 255, 0.5);
+  color: #ffffff;
 }
 
 .header-minibar {
@@ -243,15 +259,30 @@ export default {
   display: block;
   width: 18px;
 
-  fill: currentColor;
+  fill: #ffffff;
 }
 
 .logo-text {
   display: block;
   width: 7rem;
 
-  // Because there is some specific styles in the SVG itself for the legacy menu
-  opacity: 0.5;
+  &::v-deep > svg {
+    fill: #ffffff;
+  }
+}
+
+.provided-by-text {
+  margin-left: 1.3em;
+  margin-right: 0.7em;
+
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.gitlab-logo {
+  width: 42px;
+  height: 42px;
 }
 
 .body {
