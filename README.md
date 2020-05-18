@@ -150,7 +150,7 @@ Export the environment variables with (this needs to be done in any new terminal
 ```
 
 #### Remote machines
-If you've got an access to gitter beta and produciton environments, you can [follow the infrastructure instructions](https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure#configure-secrets) to set up the secrets.
+If you've got an access to gitter beta and produciton environments, you can [follow the infrastructure instructions](https://gitlab.com/gitlab-com/gl-infra/gitter-infrastructure/-/blob/master/docs/diagnostics.md#configure-secrets) to set up the secrets.
 
 ### Start Gitter services
 
