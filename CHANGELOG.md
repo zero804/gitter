@@ -1,4 +1,4 @@
-# 20.26.0 - *upcoming*
+# 20.26.0 - 2020-05-18
 
  - Removing markup from a part of the French translation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1878
  - Fix typo documentation -> documentation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1880
