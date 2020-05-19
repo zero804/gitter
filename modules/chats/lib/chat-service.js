@@ -196,7 +196,7 @@ async function newChatMessageToTroupe(troupe, user, data) {
     .catch(function(err) {
       errorReporter(
         err,
-        { operation: 'unreadItemService.createChatUnreadItems', chat: chatMessage },
+        { operation: 'recentRoomService.saveLastVisitedTroupeforUserId', chat: chatMessage },
         { module: 'chat-service' }
       );
     })
