@@ -68,7 +68,7 @@ var commandsList = [
     completion: 'channel ',
     regexp: /^\/channel/,
     action: function(text) {
-      var channelMatch = text.match(/^\s*\/channel(?:\s+(\w+))?/);
+      var channelMatch = text.match(/^\s*\/channel(?:\s+([\w-]+))?/);
       var channel = channelMatch[1];
 
       if (channel) {
