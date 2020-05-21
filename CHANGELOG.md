@@ -1,3 +1,8 @@
+# 20.26.1 - 2020-05-21
+
+ - Optimizing MongoDB query for chat archive, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1887
+
+
 # 20.26.0 - 2020-05-18
 
  - Removing markup from a part of the French translation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1878

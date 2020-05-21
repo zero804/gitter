@@ -560,9 +560,13 @@ function findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate) {
     .gte(startDate)
     .where('sent')
     .lte(endDate)
+    // limitting the results to 1,500 messages because the page becomes unusable with larger number
+    // ideally we would have infinite scrolling, but I'm not sure how would that play out with the caching
+    .limit(1500)
     .sort({ sent: 'asc' });
 
-  return q.exec();
+  // Prefer reading from a replica, since archives are not changing and they don't need realtime data
+  return q.read(mongoReadPrefs.secondaryPreferred).exec();
 }
 
 /**
