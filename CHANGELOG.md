@@ -1,3 +1,9 @@
+# 20.27.0 - *upcoming*
+
+ - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
+     - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
+
+
 # 20.26.1 - 2020-05-21
 
  - Optimizing MongoDB query for chat archive, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1887
