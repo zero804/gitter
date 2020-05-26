@@ -3,6 +3,10 @@
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
      - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
 
+Developer facing:
+
+ - Fixing README reference to infrastructure documentation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1884
+
 
 # 20.26.1 - 2020-05-21
 
