@@ -2,6 +2,7 @@
 
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
      - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
+ - Fix create room flow on userhome missing modal styles, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1892
 
 Developer facing:
 
