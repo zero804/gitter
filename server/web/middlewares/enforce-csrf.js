@@ -8,7 +8,7 @@ var StatusError = require('statuserror');
 
 var escapeRegExp = require('../../utils/escape-regexp');
 
-var WHITELIST = [
+var ALLOWLIST = [
   '/api/private/fixtures',
   '/api/private/hook/',
   '/api/private/transloadit/',
@@ -20,11 +20,11 @@ var WHITELIST = [
 ];
 
 if (env.config.get('ws:startFayeInPrimaryApp')) {
-  WHITELIST.push('/faye');
-  WHITELIST.push('/bayeux');
+  ALLOWLIST.push('/faye');
+  ALLOWLIST.push('/bayeux');
 }
 
-var WHITELIST_REGEXP = new RegExp('^(' + WHITELIST.map(escapeRegExp).join('|') + ')');
+var ALLOWLIST_REGEXP = new RegExp('^(' + ALLOWLIST.map(escapeRegExp).join('|') + ')');
 
 module.exports = function(req, res, next) {
   // ignore these methods, they shouldnt alter state
@@ -33,7 +33,7 @@ module.exports = function(req, res, next) {
   /* OAuth clients have req.authInfo. Aways let them through */
   if (req.authInfo) return next();
 
-  if (isInWhitelist(req)) {
+  if (isInAllowlist(req)) {
     debug('skipping csrf check for %s', req.path);
     return next();
   }
@@ -84,8 +84,8 @@ module.exports = function(req, res, next) {
   return next();
 };
 
-function isInWhitelist(req) {
-  return WHITELIST_REGEXP.test(req.path);
+function isInAllowlist(req) {
+  return ALLOWLIST_REGEXP.test(req.path);
 }
 
 function getClientToken(req) {
