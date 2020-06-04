@@ -9,6 +9,7 @@ Developer facing:
 
  - Fixing README reference to infrastructure documentation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1884
  - Add .nvmrc file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1893
+ - Change whitelist/blacklist to allowlist/denylist, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1895
 
 
 # 20.26.1 - 2020-05-21
