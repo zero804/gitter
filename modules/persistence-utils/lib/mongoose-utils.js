@@ -36,12 +36,12 @@ function hashList(list) {
 }
 
 function attachNotificationListenersToSchema(schema, options) {
-  var blacklistHash = hashList(options.ignoredPaths);
-  var whitelistHash = hashList(options.listenPaths);
+  var denylistHash = hashList(options.ignoredPaths);
+  var allowlistHash = hashList(options.listenPaths);
 
-  if (blacklistHash && whitelistHash) {
+  if (denylistHash && allowlistHash) {
     throw new Error(
-      'Please specify either ignoredPaths (blacklist) or listenPaths (whitelist) or neither, not both'
+      'Please specify either ignoredPaths (Denylist) or listenPaths (Allowlist) or neither, not both'
     );
   }
 
@@ -51,24 +51,24 @@ function attachNotificationListenersToSchema(schema, options) {
       return true; // No changes
     }
 
-    if (blacklistHash) {
-      var allBlacklisted = modified.every(function(path) {
-        return blacklistHash[path];
+    if (denylistHash) {
+      var allDenied = modified.every(function(path) {
+        return denylistHash[path];
       });
-      if (allBlacklisted) {
+      if (allDenied) {
         return true; // All modified paths can be ignored
       }
       return false;
     }
 
-    if (whitelistHash) {
-      var someWhitelisted = modified.some(function(path) {
-        return whitelistHash[path];
+    if (allowlistHash) {
+      var someAllowed = modified.some(function(path) {
+        return allowlistHash[path];
       });
-      if (someWhitelisted) {
-        return false; // Things on the whitelist - handle this modification
+      if (someAllowed) {
+        return false; // Things on the Allowlist - handle this modification
       } else {
-        return true; // Nothing on the whitelist, ignore
+        return true; // Nothing on the Allowlist, ignore
       }
     }
 
