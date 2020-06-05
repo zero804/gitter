@@ -76,7 +76,8 @@ async function parseAndValidateTransloadit(user, input) {
   // NOTE: This doesn't actually check that room or group uri makes sense for
   // room or group id.
 
-  if (input.room_uri && input.room_id) {
+  if (input.room_id) {
+    // Any member of the room who can write a message, can upload something to a room.
     const policy = await policyFactory.createPolicyForRoomId(user, input.room_id);
     const writeAccess = await policy.canWrite();
     if (!writeAccess) {
@@ -87,12 +88,12 @@ async function parseAndValidateTransloadit(user, input) {
     metadata.room_id = input.room_id;
 
     params.auth.max_size = 20971520; // 20MB
-    params.fields.room_uri = input.room_uri;
+    params.fields.room_id = input.room_id;
     params.steps.export_originals = {
-      path: '${fields.room_uri}/${fields.token}/${file.url_name}'
+      path: '${fields.room_id}/${fields.token}/${file.url_name}'
     };
     params.steps.export_thumbs = {
-      path: '${fields.room_uri}/${fields.token}/thumb/${file.url_name}'
+      path: '${fields.room_id}/${fields.token}/thumb/${file.url_name}'
     };
   } else if (input.type === 'avatar' && input.group_id) {
     const policy = await policyFactory.createPolicyForGroupId(user, input.group_id);
