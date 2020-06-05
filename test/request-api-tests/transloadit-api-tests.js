@@ -43,7 +43,7 @@ describe('transloadit-api-tests', function() {
         }
       },
       troupe1: {
-        security: 'PUBLIC',
+        security: 'PRIVATE',
         group: 'group1',
         users: ['userAdmin1', 'userMember1']
       }
@@ -126,7 +126,6 @@ describe('transloadit-api-tests', function() {
           .get('/private/generate-signature')
           .query({
             type: 'image',
-            room_uri: fixture.troupe1.uri,
             room_id: fixture.troupe1.id
           })
           .set('x-access-token', fixture.userAdmin1.accessToken)
@@ -142,8 +141,8 @@ describe('transloadit-api-tests', function() {
 
             // these don't change for rooms, but at least checking them means we
             // went down the right path
-            var originalPath = '${fields.room_uri}/${fields.token}/${file.url_name}';
-            var thumbsPath = '${fields.room_uri}/${fields.token}/thumb/${file.url_name}';
+            var originalPath = '${fields.room_id}/${fields.token}/${file.url_name}';
+            var thumbsPath = '${fields.room_id}/${fields.token}/thumb/${file.url_name}';
             assert.strictEqual(params.steps.export_originals.path, originalPath);
             assert.strictEqual(params.steps.export_thumbs.path, thumbsPath);
           });
@@ -154,10 +153,9 @@ describe('transloadit-api-tests', function() {
           .get('/private/generate-signature')
           .query({
             type: 'image',
-            room_uri: fixture.troupe1.uri,
             room_id: fixture.troupe1.id
           })
-          .set('x-access-token', fixture.userNormal1.accessToken)
+          .set('x-access-token', fixture.userMember1.accessToken)
           .expect(200)
           .then(function(result) {
             var params = JSON.parse(result.body.params);
@@ -170,8 +168,8 @@ describe('transloadit-api-tests', function() {
 
             // these don't change for rooms, but at least checking them means we
             // went down the right path
-            var originalPath = '${fields.room_uri}/${fields.token}/${file.url_name}';
-            var thumbsPath = '${fields.room_uri}/${fields.token}/thumb/${file.url_name}';
+            var originalPath = '${fields.room_id}/${fields.token}/${file.url_name}';
+            var thumbsPath = '${fields.room_id}/${fields.token}/thumb/${file.url_name}';
             assert.strictEqual(params.steps.export_originals.path, originalPath);
             assert.strictEqual(params.steps.export_thumbs.path, thumbsPath);
           });
@@ -182,7 +180,7 @@ describe('transloadit-api-tests', function() {
           .get('/private/generate-signature')
           .query({
             type: 'avatar',
-            group_id: fixture.group1.id
+            room_id: fixture.troupe1.id
           })
           .set('x-access-token', fixture.userNormal1.accessToken)
           .expect(403);
