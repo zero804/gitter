@@ -4,6 +4,7 @@
      - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
  - Fix create room flow on userhome missing modal styles, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1892
  - Add docs on how to add a Gitter repo readme badge for your room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1896
+ - Fix left-menu toggle icon (size and color), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1897
 
 Developer facing:
 
