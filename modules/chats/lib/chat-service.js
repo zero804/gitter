@@ -554,19 +554,36 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
   }
 }
 
+// limiting the results to 1,500 messages because the page becomes unusable with larger number
+// in the future this limiting should be solved by archive pagination
+// https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2536
+const ARCHIVE_MESSAGE_LIMIT = 1500;
+
+function logWarningForLargeArchive(troupeId, startDate, endDate) {
+  return queryResult => {
+    if (queryResult.length >= ARCHIVE_MESSAGE_LIMIT) {
+      logger.warn(
+        `Archive message display limit (${ARCHIVE_MESSAGE_LIMIT}) reached (room=${troupeId}, dateRange=${startDate} - ${endDate}). ` +
+          `We limit the number of messages because of MongoDB performance and because the frontend isn't responsive after 1000 messages.`
+      );
+    }
+    return queryResult;
+  };
+}
 function findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate) {
   var q = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
     .gte(startDate)
     .where('sent')
     .lte(endDate)
-    // limitting the results to 1,500 messages because the page becomes unusable with larger number
-    // ideally we would have infinite scrolling, but I'm not sure how would that play out with the caching
-    .limit(1500)
+    .limit(ARCHIVE_MESSAGE_LIMIT)
     .sort({ sent: 'asc' });
 
   // Prefer reading from a replica, since archives are not changing and they don't need realtime data
-  return q.read(mongoReadPrefs.secondaryPreferred).exec();
+  return q
+    .read(mongoReadPrefs.secondaryPreferred)
+    .exec()
+    .then(logWarningForLargeArchive(troupeId, startDate, endDate));
 }
 
 /**
