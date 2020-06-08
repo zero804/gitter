@@ -1,3 +1,10 @@
+# 20.28.0 - *upcoming*
+
+Developer facing:
+
+- Log warning when we hit the archive size limit, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1894
+
+
 # 20.27.0 - 2020-06-08
 
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
