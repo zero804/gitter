@@ -1,4 +1,4 @@
-# 20.27.0 - *upcoming*
+# 20.27.0 - 2020-06-08
 
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
      - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
