@@ -112,6 +112,16 @@ You can set a room welcome message via **Room settings dropdown** -> **Settings*
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/06azySl.png) ![](https://i.imgur.com/Sou791K.png)
 
 
+### Add a Gitter badge to your repo readme
+
+During room creation, if you add a repo association, you will see a checkbox option **Send PR to add the Gitter badge to your README**, that will automagically have the [Gitter Badger bot](https://github.com/gitter-badger) send a pull request to add the Gitter badge.
+
+If you missed that option during room creation, after the fact, you can go to the **Room settings dropdown** -> **Share this chat room** -> **README badge** and copy the markdown text to put in your own readme.
+If your room is associated with a GitHub repo, you can use the **Send pull request** button to have the [Gitter Badger bot](https://github.com/gitter-badger) send a pull request with the badge markdown added.
+
+![](https://i.imgur.com/LRwMqHk.png)
+
+
 ### Moderation
 
 As an admin of the room, you can delete messages from other users.

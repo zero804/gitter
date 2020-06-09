@@ -42,6 +42,9 @@ require('./components/ping');
 // Preload widgets
 require('./views/widgets/avatar');
 
+// Include modal styles
+require('@gitterhq/styleguide/css/components/modals.css');
+
 userNotifications.initUserNotifications();
 
 onready(function() {

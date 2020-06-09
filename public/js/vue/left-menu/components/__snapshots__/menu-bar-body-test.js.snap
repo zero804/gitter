@@ -42,6 +42,7 @@ exports[`menu-bar-body matches snapshot when pinned 1`] = `
     />
      
     <menu-bar-item-toggle-stub
+      class="item-toggle"
       label="Unpin and collapse the left-menu"
       type="toggle"
     />
@@ -91,6 +92,7 @@ exports[`menu-bar-body matches snapshot when unpinned 1`] = `
     />
      
     <menu-bar-item-toggle-stub
+      class="item-toggle"
       label="Pin and expand left-menu"
       type="toggle"
     />
@@ -141,6 +143,7 @@ exports[`menu-bar-body unreads matches snapshot when mentions 1`] = `
     />
      
     <menu-bar-item-toggle-stub
+      class="item-toggle"
       label="Unpin and collapse the left-menu"
       type="toggle"
     />
@@ -192,6 +195,7 @@ exports[`menu-bar-body unreads matches snapshot when one to one unreads 1`] = `
     />
      
     <menu-bar-item-toggle-stub
+      class="item-toggle"
       label="Unpin and collapse the left-menu"
       type="toggle"
     />
@@ -242,6 +246,7 @@ exports[`menu-bar-body unreads matches snapshot when unreads 1`] = `
     />
      
     <menu-bar-item-toggle-stub
+      class="item-toggle"
       label="Unpin and collapse the left-menu"
       type="toggle"
     />

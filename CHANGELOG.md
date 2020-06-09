@@ -1,3 +1,18 @@
+# 20.27.0 - 2020-06-08
+
+ - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
+     - Thanks to [@zzxoto](https://gitlab.com/zzxoto) for the contribution
+ - Fix create room flow on userhome missing modal styles, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1892
+ - Add docs on how to add a Gitter repo readme badge for your room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1896
+ - Fix left-menu toggle icon (size and color), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1897
+
+Developer facing:
+
+ - Fixing README reference to infrastructure documentation, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1884
+ - Add .nvmrc file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1893
+ - Change whitelist/blacklist to allowlist/denylist, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1895
+
+
 # 20.26.1 - 2020-05-21
 
  - Optimizing MongoDB query for chat archive, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1887

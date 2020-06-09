@@ -132,7 +132,7 @@ export default {
         </template>
       </menu-bar-item-create>
 
-      <menu-bar-item-toggle type="toggle" :label="toggleItemLabel">
+      <menu-bar-item-toggle type="toggle" :label="toggleItemLabel" class="item-toggle">
         <template v-slot:icon>
           <svg viewBox="0 0 30 34">
             <path d="M0,6 l15,0 l15,0" />
