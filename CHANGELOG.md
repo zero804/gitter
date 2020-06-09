@@ -1,5 +1,8 @@
 # 20.28.0 - *upcoming*
 
+ - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
+    - Thanks to [@SQL-MisterMagoo](https://gitlab.com/SQL-MisterMagoo) for the contribution
+
 Developer facing:
 
 - Log warning when we hit the archive size limit, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1894
