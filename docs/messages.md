@@ -161,6 +161,16 @@ Search will find rooms across Gitter and messages in the current room.
 
 You can use the `from:username` syntax to only find messages from the specified user (filter).
 
+You can use the `text:@username` syntax to find messages mentioning the specified user (filter)
+
+You can use the `sent:[2020-06-08 TO 2020-06-09]` syntax to only find messages in the specified date range (filter). 
+
+You can use the `sent:[2020-06-09T16:17-03:00 TO 2020-06-09T16:21-03:00]` syntax to get more precise time control with an ISO 8601 date/time including timezone offset. (filter)
+
+You can use logical operators `text:@(username1 OR username2)` `text:@(username1 AND username2)` (filter)
+
+You can use the `word1 -word2` syntax to find messages containing `word1` but _not_ `word2`. (filter)
+
 ![](https://i.imgur.com/LYA2Vdf.png)
 
 
