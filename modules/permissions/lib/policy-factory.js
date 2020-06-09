@@ -12,6 +12,7 @@ var securityDescriptorService = require('./security-descriptor');
 var debug = require('debug')('gitter:app:permissions:policy-factory');
 const PreCreationGitlabGroupPolicyEvaluator = require('./pre-creation/gl-group-policy-evaluator');
 const PreCreationGitlabProjectPolicyEvaluator = require('./pre-creation/gl-project-policy-evaluator');
+const PreCreationGitlabUserPolicyEvaluator = require('./pre-creation/gl-user-policy-evaluator');
 var PreCreationGhRepoPolicyEvaluator = require('./pre-creation/gh-repo-policy-evaluator');
 var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-evaluator');
 var PreCreationGhUserPolicyEvaluator = require('./pre-creation/gh-user-policy-evaluator');
@@ -153,6 +154,9 @@ function getPreCreationPolicyEvaluator(user, type, uri) {
 
     case 'GL_PROJECT':
       return new PreCreationGitlabProjectPolicyEvaluator(user, uri);
+
+    case 'GL_USER':
+      return new PreCreationGitlabUserPolicyEvaluator(user, uri);
 
     case 'GH_ORG':
       return new PreCreationGhOrgPolicyEvaluator(user, uri);
