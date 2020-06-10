@@ -5,7 +5,8 @@
 
 Developer facing:
 
-- Log warning when we hit the archive size limit, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1894
+ - Log warning when we hit the archive size limit, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1894
+ - Add pre-creation `gl-user-policy-evaluator`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1900
 
 
 # 20.27.0 - 2020-06-08
