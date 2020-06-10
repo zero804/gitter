@@ -55,7 +55,7 @@ describe('gh-repo-policy-evaluator', function() {
         return expect(GitHubRepoPolicyEvaluator, fixture.user1, uri, {
           canRead: true,
           canWrite: true,
-          canJoin: true,
+          canJoin: false,
           canAdmin: true,
           canAddUser: false
         });
@@ -65,9 +65,9 @@ describe('gh-repo-policy-evaluator', function() {
         var uri = fixtureLoader.GITTER_INTEGRATION_REPO_FULL;
 
         return expect(GitHubRepoPolicyEvaluator, fixture.user2, uri, {
-          canRead: true,
-          canWrite: true,
-          canJoin: true,
+          canRead: false,
+          canWrite: false,
+          canJoin: false,
           canAdmin: false,
           canAddUser: false
         });
