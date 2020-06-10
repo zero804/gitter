@@ -1,19 +1,14 @@
 'use strict';
 
-const assert = require('assert');
 const debug = require('debug')('gitter:app:permissions:gl-project-policy-delegate');
 const { GitLabProjectService } = require('gitter-web-gitlab');
 const PolicyDelegateTransportError = require('./policy-delegate-transport-error');
 const identityService = require('gitter-web-identity');
+const PolicyDelegateBase = require('./policy-delegate-base');
 
-class GlProjectPolicyDelegate {
-  constructor(userId, userLoader, securityDescriptor) {
-    assert(userLoader, 'userLoader required');
-    assert(securityDescriptor, 'securityDescriptor required');
-
-    this._userId = userId;
-    this._userLoader = userLoader;
-    this._securityDescriptor = securityDescriptor;
+class GlProjectPolicyDelegate extends PolicyDelegateBase {
+  get securityDescriptorType() {
+    return 'GL_PROJECT';
   }
 
   async hasPolicy(policyName) {
@@ -37,28 +32,6 @@ class GlProjectPolicyDelegate {
         debug(`Unknown permission ${policyName}, denying access`);
         return false;
     }
-  }
-
-  getAccessDetails() {
-    if (!this._isValidUser()) return;
-
-    const sd = this._securityDescriptor;
-    return {
-      type: 'GL_PROJECT',
-      linkPath: sd.linkPath,
-      externalId: sd.externalId
-    };
-  }
-
-  getPolicyRateLimitKey(policyName) {
-    if (!this._isValidUser()) return;
-    const uri = this._securityDescriptor.linkPath;
-
-    return 'GL_PROJECT:' + this._userId + ':' + uri + ':' + policyName;
-  }
-
-  _isValidUser() {
-    return !!this._userId;
   }
 
   async _checkMembership() {

@@ -10,7 +10,6 @@ describe('gh-repo-policy-delegate', function() {
   var NO_ACCESS_REPO1_USER = { _id: '3', username: 'y', githubToken: '3' };
   var NON_GITHUB_USER = { _id: '3', username: 'zz' };
   var REPO1 = 'repo1';
-  var REPO2 = 'repo2';
 
   var FIXTURES = [
     {
@@ -57,36 +56,18 @@ describe('gh-repo-policy-delegate', function() {
       policy: 'GH_REPO_PUSH',
       expectedResult: false
     },
-
     {
-      name: 'non github user can access public repo',
+      name: 'is not a GitHub user, for repo access',
       repo: REPO1,
       user: NON_GITHUB_USER,
       policy: 'GH_REPO_ACCESS',
-      expectedResult: true
-    },
-    {
-      name: 'non github user can not admin public repo',
-      repo: REPO1,
-      user: NON_GITHUB_USER,
-      policy: 'GH_REPO_PUSH',
       expectedResult: false
     },
-
     {
-      name: 'non github user can access public room',
-      repo: REPO2,
-      user: NON_GITHUB_USER,
-      policy: 'GH_REPO_ACCESS',
-      sdPublic: true,
-      expectedResult: true
-    },
-    {
-      name: 'non github user can not admin public room',
-      repo: REPO2,
+      name: 'is not a GitHub user, for push access',
+      repo: REPO1,
       user: NON_GITHUB_USER,
       policy: 'GH_REPO_PUSH',
-      sdPublic: true,
       expectedResult: false
     },
 

@@ -1,23 +1,16 @@
 'use strict';
 
-var assert = require('assert');
-var Promise = require('bluebird');
-var GitHubOrgService = require('gitter-web-github').GitHubOrgService;
-var PolicyDelegateTransportError = require('./policy-delegate-transport-error');
-var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const GitHubOrgService = require('gitter-web-github').GitHubOrgService;
+const PolicyDelegateTransportError = require('./policy-delegate-transport-error');
+const isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const PolicyDelegateBase = require('./policy-delegate-base');
 
-function GhOrgPolicyDelegate(userId, userLoader, securityDescriptor) {
-  assert(userLoader, 'userLoader required');
-  assert(securityDescriptor, 'securityDescriptor required');
+class GhOrgPolicyDelegate extends PolicyDelegateBase {
+  get securityDescriptorType() {
+    return 'GH_ORG';
+  }
 
-  this._userId = userId;
-  this._userLoader = userLoader;
-  this._securityDescriptor = securityDescriptor;
-  this._fetchPromise = null;
-}
-
-GhOrgPolicyDelegate.prototype = {
-  hasPolicy: Promise.method(function(policyName) {
+  async hasPolicy(policyName) {
     if (policyName !== 'GH_ORG_MEMBER') {
       return false;
     }
@@ -26,56 +19,28 @@ GhOrgPolicyDelegate.prototype = {
       return false;
     }
 
-    return this._fetch();
-  }),
-
-  getAccessDetails: function() {
-    if (!this._isValidUser()) return;
-
-    var sd = this._securityDescriptor;
-    return {
-      type: 'GH_ORG',
-      linkPath: sd.linkPath,
-      externalId: sd.externalId
-    };
-  },
-
-  getPolicyRateLimitKey: function(policyName) {
-    if (!this._isValidUser()) return;
-    var uri = this._securityDescriptor.linkPath;
-
-    return 'GH_ORG:' + this._userId + ':' + uri + ':' + policyName;
-  },
-
-  _isValidUser: function() {
-    return !!this._userId;
-  },
-
-  _fetch: function() {
-    if (this._fetchPromise) {
-      return this._fetchPromise;
-    }
-
-    var uri = this._securityDescriptor.linkPath;
-
-    this._fetchPromise = this._userLoader()
-      .then(function(user) {
-        if (!isGitHubUser(user)) return false;
-        var ghOrg = new GitHubOrgService(user);
-        return ghOrg.member(uri, user.username);
-      })
-      .catch(function(err) {
-        if ((err.errno && err.syscall) || err.statusCode >= 500) {
-          // GitHub call failed and may be down.
-          // We can fall back to whether the user is already in the room
-          throw new PolicyDelegateTransportError(err.message);
-        }
-
-        throw err;
-      });
-
-    return this._fetchPromise;
+    return this._checkMembership();
   }
-};
+
+  async _checkMembership() {
+    const user = await this._userLoader();
+
+    if (!isGitHubUser(user)) return false;
+
+    try {
+      const ghOrg = new GitHubOrgService(user);
+      const uri = this._securityDescriptor.linkPath;
+      return await ghOrg.member(uri, user.username);
+    } catch (err) {
+      if ((err.errno && err.syscall) || err.statusCode >= 500) {
+        // GitHub call failed and may be down.
+        // We can fall back to whether the user is already in the room
+        throw new PolicyDelegateTransportError(err.message);
+      }
+
+      throw err;
+    }
+  }
+}
 
 module.exports = GhOrgPolicyDelegate;
