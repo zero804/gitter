@@ -86,6 +86,7 @@ function transform(Model, sd, newType, options) {
 
     case 'GL_GROUP':
     case 'GL_PROJECT':
+    case 'GL_USER':
     case 'GH_ORG':
     case 'GH_REPO':
     case 'GH_USER':
