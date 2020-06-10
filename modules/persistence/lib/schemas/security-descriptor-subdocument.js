@@ -13,6 +13,7 @@ var SecurityDescriptorSchema = new Schema(
         'ONE_TO_ONE',
         'GL_GROUP', // Associated with GitLab group
         'GL_PROJECT', // Associated with GitLab project
+        'GL_USER', // Associated with GitLab user
         'GH_REPO', // Associated with a GitHub repo
         'GH_ORG', // Associated with a GitHub org
         'GH_USER', // Associated with a GitHub user
@@ -41,6 +42,7 @@ var SecurityDescriptorSchema = new Schema(
         'MANUAL', // Only users in extraUserIds are admins
         'GL_GROUP_MAINTAINER', // for GL_GROUP, must be maintainer in group
         'GL_PROJECT_MAINTAINER', // for GL_PROJECT, must be maintainer in project
+        'GL_USER_SAME', // for GL_USER, user is same
         'GH_REPO_PUSH', // for GH_REPO, must have repo push or admin
         'GH_ORG_MEMBER', // for GH_ORG, must be org member
         'GH_USER_SAME', // For GH_USER, user is same
