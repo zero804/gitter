@@ -183,6 +183,36 @@ function generateGlProjectSecurityDescriptor(user, { linkPath, externalId, secur
   }
 }
 
+function generateGlUserSecurityDescriptor(user, { linkPath, externalId, security }) {
+  assert(linkPath, 'linkPath required');
+
+  switch (security || null) {
+    case 'PUBLIC':
+    case null:
+      return {
+        type: 'GL_USER',
+        members: 'PUBLIC',
+        admins: 'GL_USER_SAME',
+        public: true,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    case 'PRIVATE':
+      return {
+        type: 'GL_USER',
+        members: 'INVITE',
+        admins: 'GL_USER_SAME',
+        public: false,
+        linkPath: linkPath,
+        externalId: externalId
+      };
+
+    default:
+      throw new StatusError(500, 'Unknown security type: ' + security);
+  }
+}
+
 function generateDefaultSecurityDescriptor(user, options) {
   var members;
   var isPublic;
@@ -278,6 +308,9 @@ function generate(user, options) {
 
     case 'GL_PROJECT':
       return generateGlProjectSecurityDescriptor(user, options);
+
+    case 'GL_USER':
+      return generateGlUserSecurityDescriptor(user, options);
 
     default:
       throw new StatusError(500, 'Unknown type: ' + options.type);
