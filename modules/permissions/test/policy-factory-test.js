@@ -279,7 +279,6 @@ describe('policy-factory', function() {
 
     // TODO
     //createPolicyForGroupIdWithUserLoader
-    //createPolicyForGroupIdWithRepoFallback
     //getPreCreationPolicyEvaluator
     //getPreCreationPolicyEvaluatorWithRepoFallback
   });
