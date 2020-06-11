@@ -124,12 +124,12 @@ Send a message to support@gitter.im with the following info. Make sure to email 
  - Link to the new room on Gitter
 
 
-## What is Gitter Next?
+## What is Gitter Next/staging?
 
-Gitter Next is where we put our up-coming release branch up for preview. Most of the time it's small changes or even under-the-hood changes you don't see. Sometimes we put pretty large changes up there too and love to hear your feedback.
+Gitter Next/staging is where we put our up-coming release branch up for preview. Most of the time it's small changes or even under-the-hood changes you don't see. Sometimes we put pretty large changes up there too and love to hear your feedback.
 Sometimes it blows up, but not very often.
 
-You can enable Gitter next in a variety of ways.
+You can enable Gitter next in a variety of ways:
 
 #### Desktop Browser
 
