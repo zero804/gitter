@@ -10,6 +10,10 @@ Developer facing:
  - Add `gl-user-policy-delegate` (permissions), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1901
  - Remove dead code `createPolicyForGroupIdWithRepoFallback`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1904
  - Document `beta`/`beta-staging` toggle cookie bookmarklet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1910
+ - Add `GL_USER` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1908
+ - Add `GL_USER` to security-descriptor-validator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1907
+ - Add `GL_USER` to security-descriptor-generator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1906
+
 
 # 20.27.0 - 2020-06-08
 
