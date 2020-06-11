@@ -2,6 +2,17 @@
 
 Frequently asked questions by developers.
 
+## Toggle between `beta`/`beta-staging`
+
+`beta-staging` lives on the same domain as `beta`, https://beta.gitter.im/
+
+Here is a bookmarklet for the `beta-staging` toggle (`beta` toggle). It just sets a staging cookie.
+
+```
+javascript:void((function(d){document.cookie='gitter_staging_beta=' + (document.cookie.indexOf('gitter_staging_beta=staged') >= 0 ? 'none' : 'staged') + ';domain=.gitter.im;path=/;expires=' + new Date(Date.now() + 31536000000).toUTCString(); location.reload();})(document));
+```
+
+
 ## How do I access Gitter over my local network?
 
 #### Update the config
