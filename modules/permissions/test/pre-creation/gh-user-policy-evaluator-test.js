@@ -48,7 +48,7 @@ describe('gh-user-policy-evaluator', function() {
         return expect(GhUserPolicyEvaluator, fixture.user1, uri, {
           canRead: true,
           canWrite: true,
-          canJoin: true,
+          canJoin: false,
           canAdmin: true,
           canAddUser: false
         });
@@ -61,7 +61,7 @@ describe('gh-user-policy-evaluator', function() {
         return expect(GhUserPolicyEvaluator, fixture.user1, uri, {
           canRead: true,
           canWrite: true,
-          canJoin: true,
+          canJoin: false,
           canAdmin: true,
           canAddUser: false
         });

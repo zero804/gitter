@@ -1,42 +1,17 @@
 'use strict';
 
-var Promise = require('bluebird');
-var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const PolicyEvaluatorBase = require('./policy-evaluator-base');
 
 function userUsernameMatchesUri(user, uri) {
   if (!user || !user.username || !uri) return false;
   return user.username.toLowerCase() === uri.toLowerCase();
 }
 
-function GitHubRepoPolicyEvaluator(user, uri) {
-  this.user = user;
-  this.uri = uri;
-
-  // TODO: currently assumes githubUsername == username
-  this._access = isGitHubUser(user) && userUsernameMatchesUri(user, uri);
+class GitHubRepoPolicyEvaluator extends PolicyEvaluatorBase {
+  async _canAccess() {
+    return isGitHubUser(this.user) && userUsernameMatchesUri(this.user, this.uri);
+  }
 }
-
-GitHubRepoPolicyEvaluator.prototype = {
-  canRead: Promise.method(function() {
-    return this._access;
-  }),
-
-  canWrite: Promise.method(function() {
-    return this._access;
-  }),
-
-  canJoin: Promise.method(function() {
-    return this._access;
-  }),
-
-  canAdmin: Promise.method(function() {
-    return this._access;
-  }),
-
-  canAddUser: Promise.method(function() {
-    // You can never add a user to a room which has not yet been created
-    return false;
-  })
-};
 
 module.exports = GitHubRepoPolicyEvaluator;
