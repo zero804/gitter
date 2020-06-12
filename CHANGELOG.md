@@ -13,6 +13,7 @@ Developer facing:
  - Add `GL_USER` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1908
  - Add `GL_USER` to security-descriptor-validator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1907
  - Add `GL_USER` to security-descriptor-generator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1906
+ - Dry out policy evaluator logic into `PolicyEvaluatorBase`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1903
 
 
 # 20.27.0 - 2020-06-08
