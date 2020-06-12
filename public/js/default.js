@@ -10,4 +10,5 @@ require('./components/api-client');
 require('core-js/stable/object/assign');
 require('core-js/stable/object/values');
 require('core-js/stable/array/find');
+require('core-js/stable/promise');
 require('intersection-observer');
