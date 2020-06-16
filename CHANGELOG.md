@@ -3,6 +3,7 @@
  - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
     - Thanks to [@SQL-MisterMagoo](https://gitlab.com/SQL-MisterMagoo) for the contribution
  - Fix `'Promise' is undefined` in IE11 when opening create community and room flows, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1911
+ - Add advanced search syntax examples below search input for easy reference, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1912
 
 Developer facing:
 
