@@ -1,4 +1,4 @@
-# 20.28.0 - *upcoming*
+# 20.28.0 - 2020-6-16
 
  - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
     - Thanks to [@SQL-MisterMagoo](https://gitlab.com/SQL-MisterMagoo) for the contribution
