@@ -178,7 +178,7 @@ test_e2e:
   script:
     # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
     - apt-get update -q -y
-    - apt-get --yes install xvfb libgtk2.0-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2
+    - apt-get --yes install libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
     # Create `output/assets/js/vue-ssr-server-bundle.json`
     - npm run task-js
     # Start the server and wait for it to come up
