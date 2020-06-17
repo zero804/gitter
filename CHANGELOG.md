@@ -19,6 +19,13 @@ Developer facing:
  - Set default, workflow, and use rules in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1898
 
 
+# 20.27.1 - 2020-06-17
+
+ - Security fix related to uploads, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2114#note_341225144
+    - Thanks to [@iframe](https://hackerone.com/iframe) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/58
+
+
 # 20.27.0 - 2020-06-08
 
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
