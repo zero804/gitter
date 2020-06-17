@@ -24,7 +24,10 @@ const webpackConfig = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: [/node_modules/]
+        exclude: {
+          test: path.resolve(__dirname, '../../node_modules'),
+          exclude: [path.resolve(__dirname, '../../node_modules/gitter-realtime-client')]
+        }
       },
       {
         test: /\.vue$/,

@@ -53,7 +53,7 @@
     "gitter-faye": "^1.2.0",
     "gitter-markdown-processor": "^18.0.0",
     "gitter-passport-http-bearer": "^1.1.2",
-    "gitter-realtime-client": "^2.1.0",
+    "gitter-realtime-client": "^2.2.0",
     "gitter-redis-scripto": "^0.2.2",
     "gitter-web-api-client": "file:modules/api-client",
     "gitter-web-appevents": "file:modules/appevents",
