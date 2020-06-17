@@ -162,6 +162,11 @@ test_e2e:
     ENABLE_FIXTURE_ENDPOINTS: 1
     DISABLE_GITHUB_API: 1
     NODE_ENV: test-docker
+    # "fake" dbus address to prevent errors
+    # https://github.com/SeleniumHQ/docker-selenium/issues/87
+    # via https://hub.docker.com/r/cypress/browsers/dockerfile
+    # #oom-chrome-cypress
+    DBUS_SESSION_BUS_ADDRESS: /dev/null
   tags:
     # Run the on Gitter internal runner so our Cypress video doesn't have gaps/freezing,
     # see https://github.com/cypress-io/cypress/issues/4722#issuecomment-526313109
@@ -176,6 +181,14 @@ test_e2e:
     - when: manual
       allow_failure: true
   script:
+    # install Chromebrowser
+    # via https://hub.docker.com/r/cypress/browsers/dockerfile
+    # We are using Chrome because of OOM issues #oom-chrome-cypress, see https://github.com/cypress-io/cypress/issues/350#issuecomment-633700002
+    - wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    - echo "deb http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google.list
+    - apt-get update -q -y
+    - apt-get install -y dbus-x11 google-chrome-stable
+    - rm -rf /var/lib/apt/lists/*
     # Cypress dependencies https://docs.cypress.io/guides/guides/continuous-integration.html#Dependencies
     - apt-get update -q -y
     - apt-get --yes install libgtk2.0-0 libgtk-3-0 libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
@@ -185,7 +198,8 @@ test_e2e:
     - mkdir -p logs
     - npm start > logs/server-output.txt 2>&1 & node test/e2e/support/wait-for-server.js http://localhost:5000
     # Run the tests
-    - npm run test-e2e-run
+    # We are using Chrome because of OOM issues #oom-chrome-cypress, see https://github.com/cypress-io/cypress/issues/350#issuecomment-633700002
+    - npm run test-e2e-run -- --browser chrome --headless
   artifacts:
     when: always
     paths:
