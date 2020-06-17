@@ -13,4 +13,13 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
-module.exports = () => {};
+module.exports = on => {
+  // #oom-chrome-cypress
+  // via https://github.com/cypress-io/cypress/issues/350#issuecomment-633700002
+  on('before:browser:launch', (browser = {}, launchOptions) => {
+    if (browser.name === 'chrome') {
+      launchOptions.args.push('--disable-dev-shm-usage');
+      return launchOptions;
+    }
+  });
+};
