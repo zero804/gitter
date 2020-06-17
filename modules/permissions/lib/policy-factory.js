@@ -9,9 +9,9 @@ var RoomContextDelegate = require('./context-delegates/room-context-delegate');
 var OneToOneContextDelegate = require('./context-delegates/one-to-one-room-context-delegate');
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor');
-var debug = require('debug')('gitter:app:permissions:policy-factory');
 const PreCreationGitlabGroupPolicyEvaluator = require('./pre-creation/gl-group-policy-evaluator');
 const PreCreationGitlabProjectPolicyEvaluator = require('./pre-creation/gl-project-policy-evaluator');
+const PreCreationGitlabUserPolicyEvaluator = require('./pre-creation/gl-user-policy-evaluator');
 var PreCreationGhRepoPolicyEvaluator = require('./pre-creation/gh-repo-policy-evaluator');
 var PreCreationGhOrgPolicyEvaluator = require('./pre-creation/gh-org-policy-evaluator');
 var PreCreationGhUserPolicyEvaluator = require('./pre-creation/gh-user-policy-evaluator');
@@ -96,31 +96,6 @@ function createPolicyForGroupIdWithUserLoader(userId, userLoader, groupId) {
     });
 }
 
-function createPolicyForGroupIdWithRepoFallback(user, groupId, repoUri) {
-  debug('Create policy factory with repo fallback: repo=%s', repoUri);
-  var userId = user && user._id;
-
-  return securityDescriptorService.group
-    .findById(groupId, userId)
-    .then(function(securityDescriptor) {
-      if (!securityDescriptor) throw new StatusError(404);
-
-      var policyDelegate = getPolicyDelegate(userId, user, securityDescriptor);
-      var contextDelegate = null; // No group context yet
-
-      var primary = createBasePolicy(
-        userId,
-        user,
-        securityDescriptor,
-        policyDelegate,
-        contextDelegate
-      );
-      var secondary = new PreCreationGhRepoPolicyEvaluator(user, repoUri);
-
-      return new FallbackPolicyEvaluator(primary, secondary);
-    });
-}
-
 function createPolicyForUserIdInRoomId(userId, roomId) {
   return securityDescriptorService.room.findById(roomId, userId).then(function(securityDescriptor) {
     if (!securityDescriptor) throw new StatusError(404);
@@ -154,6 +129,9 @@ function getPreCreationPolicyEvaluator(user, type, uri) {
     case 'GL_PROJECT':
       return new PreCreationGitlabProjectPolicyEvaluator(user, uri);
 
+    case 'GL_USER':
+      return new PreCreationGitlabUserPolicyEvaluator(user, uri);
+
     case 'GH_ORG':
       return new PreCreationGhOrgPolicyEvaluator(user, uri);
 
@@ -186,7 +164,6 @@ module.exports = {
   createPolicyForRoom: Promise.method(createPolicyForRoom),
   createPolicyForGroupId: Promise.method(createPolicyForGroupId),
   createPolicyForGroupIdWithUserLoader: Promise.method(createPolicyForGroupIdWithUserLoader),
-  createPolicyForGroupIdWithRepoFallback: Promise.method(createPolicyForGroupIdWithRepoFallback),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),

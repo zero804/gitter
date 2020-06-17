@@ -139,6 +139,40 @@ describe('security-descriptor-generator', function() {
       }
     },
     {
+      name: 'type=GL_USER, security=PUBLIC',
+      options: {
+        type: 'GL_USER',
+        security: 'PUBLIC',
+        externalId: '1234',
+        linkPath: 'xxyx'
+      },
+      expected: {
+        type: 'GL_USER',
+        externalId: '1234',
+        members: 'PUBLIC',
+        admins: 'GL_USER_SAME',
+        public: true,
+        linkPath: 'xxyx'
+      }
+    },
+    {
+      name: 'type=GL_USER, security=PRIVATE',
+      options: {
+        type: 'GL_USER',
+        security: 'PRIVATE',
+        externalId: '1234',
+        linkPath: 'xxyx'
+      },
+      expected: {
+        type: 'GL_USER',
+        externalId: '1234',
+        members: 'INVITE',
+        admins: 'GL_USER_SAME',
+        public: false,
+        linkPath: 'xxyx'
+      }
+    },
+    {
       name: 'type=GROUP, security=PRIVATE',
       options: {
         type: 'GROUP',

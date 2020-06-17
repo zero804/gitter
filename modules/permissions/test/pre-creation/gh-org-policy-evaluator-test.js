@@ -52,7 +52,7 @@ describe('legacy-group-policy-evaluator', function() {
         return expect(GithubOrgPolicyEvaluator, fixture.user1, uri, {
           canRead: true,
           canWrite: true,
-          canJoin: true,
+          canJoin: false,
           canAdmin: true,
           canAddUser: false
         });

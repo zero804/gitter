@@ -51,6 +51,9 @@ export default {
         this.debouncedFetchSearchResults();
       }
     },
+    hasSearchInputText() {
+      return this.searchInputValue && this.searchInputValue.length;
+    },
     hasRoomSearchResults() {
       return !_.isEmpty(this.displayedRoomSearchResults);
     },
@@ -99,8 +102,28 @@ export default {
       />
     </div>
 
+    <ul v-if="!hasSearchInputText" class="syntax-list">
+      <li class="syntax-list-item">
+        <code>from:username</code>
+      </li>
+      <li class="syntax-list-item">
+        <code>text:@username</code>
+      </li>
+      <li class="syntax-list-item">
+        <code>sent:[2020-06-08 TO 2020-06-09]</code>
+      </li>
+      <li class="syntax-list-item">
+        <code>sent:[2020-06-09T16:17-03:00 TO 2020-06-09T16:21-03:00]</code>
+      </li>
+      <li class="syntax-list-item">
+        <code>text:@(username1 OR username2)</code>
+        <br />
+        <code>text:@(username1 AND username2)</code>
+      </li>
+    </ul>
+
     <h2 class="search-body-title">
-      ROOMS & PEOPLE
+      Rooms & People
       <loading-spinner v-if="roomSearchLoading" />
     </h2>
 
@@ -176,6 +199,14 @@ export default {
     background-color: @dark-theme-left-menu-active-item-bg-color;
     border-color: darken(@dark-theme-left-menu-text-color, 40%);
   }
+}
+
+.syntax-list {
+  font-size: 0.9em;
+}
+
+.syntax-list-item {
+  margin-bottom: 0.6em;
 }
 
 .search-result-empty-message {

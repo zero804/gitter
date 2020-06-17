@@ -4,37 +4,9 @@ const debug = require('debug')('gitter:app:permissions:pre-creation:gl-group-pol
 const PolicyDelegateTransportError = require('../policies/policy-delegate-transport-error');
 const GitLabGroupService = require('gitter-web-gitlab').GitLabGroupService;
 const identityService = require('gitter-web-identity');
+const PolicyEvaluatorBase = require('./policy-evaluator-base');
 
-class GitlabGroupPolicyEvaluator {
-  constructor(user, uri) {
-    this.user = user;
-    this.uri = uri;
-
-    this._canAccessResult = null;
-  }
-
-  async canRead() {
-    return this._canAccess();
-  }
-
-  async canWrite() {
-    return this._canAccess();
-  }
-
-  async canJoin() {
-    // You can never join a room which has not yet been created
-    return false;
-  }
-
-  async canAdmin() {
-    return this._canAccess();
-  }
-
-  async canAddUser() {
-    // You can never add a user to a room which has not yet been created
-    return false;
-  }
-
+class GitlabGroupPolicyEvaluator extends PolicyEvaluatorBase {
   async _canAccess() {
     if (this._canAccessResult !== null) {
       return this._canAccessResult;

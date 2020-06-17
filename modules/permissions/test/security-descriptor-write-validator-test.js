@@ -97,6 +97,39 @@ describe('security-descriptor-write-validator', function() {
     }
   });
 
+  it('should validate GL_USER correctly', function() {
+    const sd = {
+      type: 'GL_USER',
+      externalId: '7616684',
+      linkPath: 'my-user',
+      public: true,
+      admins: 'GL_USER_SAME',
+      members: 'PUBLIC'
+    };
+
+    securityDescriptorWriteValidator(sd);
+  });
+
+  // Just a sanity check that it fails for some invalid data that could happen
+  // from some manual database tinkering
+  it('should fail for invalid GL_USER', function() {
+    const sd = {
+      type: 'GL_USER',
+      externalId: '7616684',
+      linkPath: 'my-user/but-some-project-this-not-right',
+      public: true,
+      admins: 'MANUAL',
+      members: 'PUBLIC'
+    };
+
+    try {
+      securityDescriptorWriteValidator(sd);
+      assert.ok(false);
+    } catch (e) {
+      assert.strictEqual(e.status, 403);
+    }
+  });
+
   it('should validate GH_REPO correctly', function() {
     var sd = {
       type: 'GH_REPO',

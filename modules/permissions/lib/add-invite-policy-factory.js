@@ -11,6 +11,7 @@ var GhOrgPolicyDelegate = require('./policies/gh-org-policy-delegate');
 var GhUserPolicyDelegate = require('./policies/gh-user-policy-delegate');
 const GlGroupPolicyDelegate = require('./policies/gl-group-policy-delegate');
 const GlProjectPolicyDelegate = require('./policies/gl-project-policy-delegate');
+const GlUserPolicyDelegate = require('./policies/gl-user-policy-delegate');
 var StatusError = require('statuserror');
 var securityDescriptorService = require('./security-descriptor');
 var userLoaderFactory = require('./user-loader-factory');
@@ -37,6 +38,9 @@ function getDelegateForSecurityDescriptor(userId, user, securityDescriptor) {
 
     case 'GL_PROJECT':
       return new GlProjectPolicyDelegate(userId, userLoader, securityDescriptor);
+
+    case 'GL_USER':
+      return new GlUserPolicyDelegate(userId, userLoader, securityDescriptor);
 
     default:
       return null;

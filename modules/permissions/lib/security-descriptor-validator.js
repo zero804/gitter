@@ -191,7 +191,8 @@ function validateGhOrgDescriptor(descriptor) {
   validateExtraUserIds(descriptor);
 }
 
-function validateGhUserLinkPath(linkPath) {
+// A linkPath for a user is only at root-level and has a single path part
+function validateUserLinkPath(linkPath) {
   var parts = linkPath.split('/');
   if (parts.length !== 1) {
     throw new StatusError(403, 'Invalid linkPath attribute for org: ' + linkPath);
@@ -226,7 +227,7 @@ function validateGhUserDescriptor(descriptor) {
   validatePublicAttributesConsistency(descriptor);
   validateInteralIdAttributeShouldNotBePresent(descriptor);
   validateLinkPathAttributeShouldBePresent(descriptor);
-  validateGhUserLinkPath(descriptor.linkPath);
+  validateUserLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
 
@@ -257,7 +258,7 @@ function validateGlGroupDescriptor(descriptor) {
   if (!usesGl) {
     throw new StatusError(
       403,
-      'The members or admin attributes need to be set with some GL_XXX values when using the GL_GROUP type'
+      'The members or admins attribute need to be set with some GL_GROUP_XXX values when using the GL_GROUP type'
     );
   }
 
@@ -294,13 +295,48 @@ function validateGlProjectDescriptor(descriptor) {
   if (!usesGl) {
     throw new StatusError(
       403,
-      'The members or admin attributes need to be set with some GL_XXX values when using the GL_PROJECT type'
+      'The members or admins attribute need to be set with some GL_PROJECT_XXX values when using the GL_PROJECT type'
     );
   }
 
   validatePublicAttributesConsistency(descriptor);
   validateInteralIdAttributeShouldNotBePresent(descriptor);
   validateLinkPathAttributeShouldBePresent(descriptor);
+  validateExtraUserIds(descriptor);
+}
+
+function validateGlUserDescriptor(descriptor) {
+  let usesGl = false;
+  switch (descriptor.members) {
+    case 'PUBLIC':
+    case 'INVITE':
+    case 'INVITE_OR_ADMIN':
+      break;
+    default:
+      throw new StatusError(403, 'Invalid members attribute: ' + descriptor.members);
+  }
+
+  switch (descriptor.admins) {
+    case 'MANUAL':
+      break;
+    case 'GL_USER_SAME':
+      usesGl = true;
+      break;
+    default:
+      throw new StatusError(403, 'Invalid admins attribute: ' + descriptor.admins);
+  }
+
+  if (!usesGl) {
+    throw new StatusError(
+      403,
+      'The admins attribute need to be set with some GL_USER_SAME values when using the GL_USER type'
+    );
+  }
+
+  validatePublicAttributesConsistency(descriptor);
+  validateInteralIdAttributeShouldNotBePresent(descriptor);
+  validateLinkPathAttributeShouldBePresent(descriptor);
+  validateUserLinkPath(descriptor.linkPath);
   validateExtraUserIds(descriptor);
 }
 
@@ -394,6 +430,9 @@ function validate(descriptor) {
 
     case 'GL_PROJECT':
       return validateGlProjectDescriptor(descriptor);
+
+    case 'GL_USER':
+      return validateGlUserDescriptor(descriptor);
 
     case 'ONE_TO_ONE':
       return validateOneToOneDescriptor(descriptor);

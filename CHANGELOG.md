@@ -1,3 +1,24 @@
+# 20.28.0 - 2020-6-16
+
+ - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
+    - Thanks to [@SQL-MisterMagoo](https://gitlab.com/SQL-MisterMagoo) for the contribution
+ - Fix `'Promise' is undefined` in IE11 when opening create community and room flows, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1911
+ - Add advanced search syntax examples below search input for easy reference, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1912
+
+Developer facing:
+
+ - Log warning when we hit the archive size limit, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1894
+ - Add pre-creation `gl-user-policy-evaluator` (permissions), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1900
+ - Add `gl-user-policy-delegate` (permissions), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1901
+ - Remove dead code `createPolicyForGroupIdWithRepoFallback`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1904
+ - Document `beta`/`beta-staging` toggle cookie bookmarklet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1910
+ - Add `GL_USER` to security-descriptor transform, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1908
+ - Add `GL_USER` to security-descriptor-validator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1907
+ - Add `GL_USER` to security-descriptor-generator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1906
+ - Dry out policy evaluator logic into `PolicyEvaluatorBase`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1903
+ - Set default, workflow, and use rules in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1898
+
+
 # 20.27.0 - 2020-06-08
 
  - Update chat-service.js; operation string parameter in error reporter updated, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1890
