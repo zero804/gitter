@@ -1,3 +1,11 @@
+
+# 20.29.0 - *upcoming*
+
+Developer facing:
+
+ - Update Cypress to v4.8.0 to fix layout shift bugs causing flakey tests, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1914
+
+
 # 20.28.0 - 2020-6-16
 
  - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
