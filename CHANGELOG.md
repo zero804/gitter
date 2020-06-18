@@ -1,6 +1,9 @@
 
 # 20.29.0 - *upcoming*
 
+ - Restyled unread email notification, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1869
+    - Thanks to [@mountainash](https://gitlab.com/mountainash) for the contribution
+
 Developer facing:
 
  - Update Cypress to v4.8.0 to fix layout shift bugs causing flakey tests, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1914
