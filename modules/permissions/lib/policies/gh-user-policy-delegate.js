@@ -1,57 +1,50 @@
 'use strict';
 
-var assert = require('assert');
-var Promise = require('bluebird');
-var isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const isGitHubUser = require('gitter-web-identity/lib/is-github-user');
+const PolicyDelegateBase = require('./policy-delegate-base');
 
-function GhUserPolicyDelegate(userId, userLoader, securityDescriptor) {
-  assert(userLoader, 'userLoader required');
-  assert(securityDescriptor, 'securityDescriptor required');
+class GhUserPolicyDelegate extends PolicyDelegateBase {
+  get securityDescriptorType() {
+    return 'GH_USER';
+  }
 
-  this._userId = userId;
-  this._userLoader = userLoader;
-  this._securityDescriptor = securityDescriptor;
-}
+  /**
+   * Returns a key used to skip checks
+   * We can skip because there is no API perf hit in this policy.
+   * All of the checks are done locally
+   */
+  getPolicyRateLimitKey() {
+    return null;
+  }
 
-GhUserPolicyDelegate.prototype = {
-  hasPolicy: Promise.method(function(policyName) {
+  async hasPolicy(policyName) {
+    if (!this._isValidUser()) {
+      return false;
+    }
+
     switch (policyName) {
       case 'GH_USER_SAME':
-        return this._usernameMatchesUri();
+        return this._checkIfusernameMatchesUri();
 
       default:
         return false;
     }
-  }),
+  }
 
-  getAccessDetails: function() {
-    return null;
-  },
-
-  /**
-   * Returns a key used to skip checks
-   */
-  getPolicyRateLimitKey: function() {
-    return null;
-  },
-
-  /* Does the username match */
-  _usernameMatchesUri: function() {
-    if (!this._userId) return false;
-
+  // Does the username match
+  async _checkIfusernameMatchesUri() {
     var linkPath = this._securityDescriptor.linkPath;
     if (!linkPath) return false;
 
-    return this._userLoader().then(function(user) {
-      if (!user) return false;
-      if (!isGitHubUser(user)) return false;
+    const user = await this._userLoader();
+    if (!user) return false;
+    if (!isGitHubUser(user)) return false;
 
-      var currentUserName = user.username;
-      if (!currentUserName) return false;
+    var currentUserName = user.username;
+    if (!currentUserName) return false;
 
-      return currentUserName.toLowerCase() === linkPath.toLowerCase();
-    });
+    return currentUserName.toLowerCase() === linkPath.toLowerCase();
   }
-};
+}
 
 module.exports = GhUserPolicyDelegate;
