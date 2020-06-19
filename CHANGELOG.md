@@ -1,3 +1,9 @@
+# 20.30.0 - *upcoming*
+
+Developer facing:
+
+ - Dry up GitLab policy delegates (`policy-delegate-base.js`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1905
+
 
 # 20.29.0 - 2020-6-18
 
