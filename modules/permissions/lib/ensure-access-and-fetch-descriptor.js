@@ -65,6 +65,10 @@ function validateGitlabType(requestedType, actualGitlabType) {
   var expectedGitlabType;
 
   switch (requestedType) {
+    case 'GL_USER':
+      expectedGitlabType = 'USER';
+      break;
+
     case 'GL_GROUP':
       expectedGitlabType = 'GROUP';
       break;
@@ -145,6 +149,7 @@ function validateAndFetchBackingInfo(user, options) {
     case 'GH_GUESS':
       return validateAndFetchBackingInfoForGithub(user, options);
 
+    case 'GL_USER':
     case 'GL_GROUP':
     case 'GL_PROJECT':
       return validateAndFetchBackingInfoForGitlab(user, options);

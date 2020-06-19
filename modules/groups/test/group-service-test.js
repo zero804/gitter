@@ -56,6 +56,33 @@ describe('group-service', function() {
         userGitlab1: '#integrationGitlabUser1'
       });
 
+      it('should create a group based on a GitLab user', async () => {
+        const groupUri = fixtureLoader.GITLAB_USER_USERNAME;
+        const user = fixture.userGitlab1;
+
+        const group = await groupService.createGroup(user, {
+          type: 'GL_USER',
+          name: 'Some GitLab user',
+          uri: groupUri,
+          linkPath: groupUri
+        });
+
+        assert.strictEqual(group.name, 'Some GitLab user');
+        assert.strictEqual(group.uri, groupUri);
+        assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+
+        const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
+
+        assert.deepEqual(securityDescriptor, {
+          admins: 'GL_USER_SAME',
+          externalId: fixtureLoader.GITLAB_USER_ID,
+          linkPath: groupUri,
+          members: 'PUBLIC',
+          public: true,
+          type: 'GL_USER'
+        });
+      });
+
       it('should create a group based on a GitLab group', async () => {
         const groupUri = fixtureLoader.GITLAB_GROUP1_URI;
         const user = fixture.userGitlab1;
