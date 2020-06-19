@@ -72,6 +72,7 @@ When you paste a link to a GitLab/GitHub issue, merge request, or pull request i
 We support a few /commands and will continue to add new ones. At the moment, you can do any of the commands listed below.
 
  - `/leave`: Leaves the chat room.
+ - `/mark-all-read`: Mark all messages in the room as read
  - `/query @username`: Go 1:1 with `@username`.
  - `/fav`: Toggles the room as a favourite.
  - `/topic <some imaginative and brilliant description>`: Set the topic of the room to "some imaginative and brilliant text".
@@ -163,7 +164,7 @@ You can use the `from:username` syntax to only find messages from the specified 
 
 You can use the `text:@username` syntax to find messages mentioning the specified user (filter)
 
-You can use the `sent:[2020-06-08 TO 2020-06-09]` syntax to only find messages in the specified date range (filter). 
+You can use the `sent:[2020-06-08 TO 2020-06-09]` syntax to only find messages in the specified date range (filter).
 
 You can use the `sent:[2020-06-09T16:17-03:00 TO 2020-06-09T16:21-03:00]` syntax to get more precise time control with an ISO 8601 date/time including timezone offset. (filter)
 
