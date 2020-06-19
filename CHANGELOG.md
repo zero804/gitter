@@ -1,5 +1,7 @@
 # 20.30.0 - *upcoming*
 
+ - Add docs for `/mark-all-unread` slash command, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1918
+
 Developer facing:
 
  - Dry up GitLab policy delegates (`policy-delegate-base.js`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1905
