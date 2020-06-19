@@ -13,7 +13,7 @@ function castUserAsGitHubIdentity(user) {
   if (isGitHubUser(user)) {
     return {
       provider: GITHUB_PROVIDER_KEY,
-      providerKey: user.githubId,
+      providerKey: `${user.githubId}`,
       username: user.username,
       displayName: user.displayName,
       email: null,
