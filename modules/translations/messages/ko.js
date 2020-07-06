@@ -1,18 +1,18 @@
 {
 	"%d unread message": {
-		"one": "%d unread message",
-		"other": "%d unread messages"
+		"one": "읽지 않은 메시지 %d개",
+		"other": "읽지 않은 메시지 %d개"
 	},
 	"Unread messages in %%s, %%s and one other": {
-		"one": "Unread messages in %%s, %%s and one other",
-		"other": "Unread messages in %%s, %%s and %d others"
+		"one": "%%s, %%s 및 나머지 하나에서 읽지 않은 메시지",
+		"other": "%%s, %%s 및 %d개에서 읽지 않은 메시지"
 	},
-	"Unread messages in %s": "Unread messages in %s",
-	"Unread messages in %s and %s": "Unread messages in %s and %s",
-	"Unread messages from %s": "Unread messages from %s",
-	"Unread messages from %s and %s": "Unread messages from %s and %s",
+	"Unread messages in %s": "%s에서 읽지 않은 메시지",
+	"Unread messages in %s and %s": "%s 및 %s에서 읽지 않은 메시지",
+	"Unread messages from %s": "%s에서 읽지 않은 메시지",
+	"Unread messages from %s and %s": "%s 및 %s에서 읽지 않은 메시지",
 	"Unread messages from %%s, %%s and one other": {
-		"one": "Unread messages from %%s, %%s and one other",
-		"other": "Unread messages from %%s, %%s and %d others"
+		"one": "%%s, %%s 및 나머지 하나에서 읽지 않은 메시지",
+		"other": "%%s, %%s 및 %d개에서 읽지 않은 메시지"
 	}
 }
