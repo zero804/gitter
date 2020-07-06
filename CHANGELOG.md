@@ -1,3 +1,15 @@
+
+# 20.29.0 - 2020-6-18
+
+ - Restyled unread email notification, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1869
+    - Thanks to [@mountainash](https://gitlab.com/mountainash) for the contribution
+
+Developer facing:
+
+ - Update Cypress to v4.8.0 to fix layout shift bugs causing flakey tests, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1914
+ - Update `gitter-realtime-client` (no removing entries on snapshot, only add/merge), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1909
+
+
 # 20.28.0 - 2020-6-16
 
  - Update search docs with more syntax examples, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1902
@@ -17,6 +29,13 @@ Developer facing:
  - Add `GL_USER` to security-descriptor-generator, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1906
  - Dry out policy evaluator logic into `PolicyEvaluatorBase`, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1903
  - Set default, workflow, and use rules in CI config, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1898
+
+
+# 20.27.1 - 2020-06-17
+
+ - Security fix related to uploads, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2114#note_341225144
+    - Thanks to [@iframe](https://hackerone.com/iframe) for [responsibly disclosing](https://about.gitlab.com/security/disclosure/) this vulnerability to us.
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/58
 
 
 # 20.27.0 - 2020-06-08
