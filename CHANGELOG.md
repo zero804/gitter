@@ -1,6 +1,8 @@
 # 20.30.0 - *upcoming*
 
  - Add docs for `/mark-all-unread` slash command, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1918
+ - Update Korean translations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1919
+    - Thanks to [@alexkoalag](https://gitlab.com/alexkoalag) for the contribution
 
 Developer facing:
 
