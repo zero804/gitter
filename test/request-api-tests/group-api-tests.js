@@ -34,6 +34,7 @@ describe('group-api', function() {
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
         { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() },
+        { lcUri: 'group-uri-for-gl-user-based-group' },
         { lcUri: 'group-uri-for-project-based-group' },
         { lcUri: 'repo-group' },
         { lcUri: '_repo-group' }
@@ -47,7 +48,9 @@ describe('group-api', function() {
         },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() + '/community' },
         { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() + '/community' },
+        { lcUri: 'group-uri-for-gl-user-based-group/community' },
         { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() + '/community' },
+        { lcUri: 'group-uri-for-project-based-group/community' },
         { lcUri: 'repo-group/community' },
         { lcUri: '_repo-group/community' }
       ]
@@ -119,6 +122,29 @@ describe('group-api', function() {
       });
   });
 
+  it('POST /v1/groups (GitLab user based)', async () => {
+    const result = await request(app)
+      .post('/v1/groups')
+      .send({
+        uri: 'group-uri-for-gl-user-based-group',
+        name: 'Test',
+        security: {
+          type: 'GL_USER',
+          linkPath: fixtureLoader.GITLAB_USER_USERNAME
+        }
+      })
+      .set('x-access-token', fixture.userGitlab1.accessToken)
+      .expect(200);
+
+    const group = result.body;
+    assert.strictEqual(group.uri, 'group-uri-for-gl-user-based-group');
+    assert.strictEqual(group.defaultRoom.uri, `group-uri-for-gl-user-based-group/community`);
+    assert.deepEqual(group.backedBy, {
+      type: 'GL_USER',
+      linkPath: fixtureLoader.GITLAB_USER_USERNAME
+    });
+  });
+
   it('POST /v1/groups (GitLab group based)', async () => {
     const result = await request(app)
       .post('/v1/groups')
@@ -136,6 +162,10 @@ describe('group-api', function() {
     const group = result.body;
     assert.strictEqual(group.uri, fixtureLoader.GITLAB_GROUP1_URI);
     assert.strictEqual(group.defaultRoom.uri, `${fixtureLoader.GITLAB_GROUP1_URI}/community`);
+    assert.deepEqual(group.backedBy, {
+      type: 'GL_GROUP',
+      linkPath: fixtureLoader.GITLAB_GROUP1_URI
+    });
   });
 
   it('POST /v1/groups (GitLab group based)', async () => {
@@ -157,6 +187,10 @@ describe('group-api', function() {
     const group = result.body;
     assert.strictEqual(group.uri, uri);
     assert.strictEqual(group.defaultRoom.uri, `${uri}/community`);
+    assert.deepEqual(group.backedBy, {
+      type: 'GL_PROJECT',
+      linkPath: fixtureLoader.GITLAB_PUBLIC_PROJECT1_URI
+    });
   });
 
   it('POST /v1/groups (github org based)', function() {
