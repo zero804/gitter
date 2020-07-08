@@ -33,6 +33,13 @@ describe('updateGroupAvatar', () => {
           linkPath: 'gitter-integration-tests-group/public-project1',
           externalId: 7616684
         }
+      },
+      groupBasedOnGitlabUser1: {
+        securityDescriptor: {
+          type: 'GL_USER',
+          linkPath: 'gitter-integration-tests',
+          externalId: 2619770
+        }
       }
     });
 
@@ -73,6 +80,20 @@ describe('updateGroupAvatar', () => {
       assert(groupBasedOnGitlabProject1.avatarUrl);
       assert.strictEqual(groupBasedOnGitlabProject1.avatarVersion, 1);
       assert(groupBasedOnGitlabProject1.avatarCheckedDate >= n);
+    });
+
+    it('should update GitLab user avatar', async () => {
+      const n = Date.now();
+
+      const result = await updateGroupAvatar(fixture.groupBasedOnGitlabUser1);
+      assert.strictEqual(result, true);
+
+      const groupBasedOnGitlabUser1 = await Group.findById(
+        fixture.groupBasedOnGitlabUser1._id
+      ).exec();
+      assert(groupBasedOnGitlabUser1.avatarUrl);
+      assert.strictEqual(groupBasedOnGitlabUser1.avatarVersion, 1);
+      assert(groupBasedOnGitlabUser1.avatarCheckedDate >= n);
     });
 
     it('should not perform double fetches', async () => {
