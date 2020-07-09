@@ -2,6 +2,8 @@
 
  - Add Niceter to list of 3rd party apps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1927
     - Thanks to [@uuttff8](https://gitlab.com/uuttff8) for the contribution
+ - Fix right-toolbar text hover color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1628
+    - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
 
 
 # 20.30.0 - 2020-7-9
