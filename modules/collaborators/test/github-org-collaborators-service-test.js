@@ -5,7 +5,7 @@ var GitHubOrgCollaboratorService = require('../lib/github-org-collaborator-servi
 var assert = require('assert');
 
 describe('gitter-org-collaborators-service-test #github', function() {
-  describe('integration #flakey #slow', function() {
+  describe('integration #slow', function() {
     fixtureLoader.ensureIntegrationEnvironment('GITTER_INTEGRATION_ORG', '#integrationUser1');
 
     var fixture = fixtureLoader.setup({
