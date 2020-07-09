@@ -149,6 +149,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
           return usersInExtraAdmins;
         }
 
+        debug(`Found admin users matching`, query, '->', adminUserIds);
         return usersInExtraAdmins.concat(lazy(adminUserIds));
       });
     } else {
