@@ -20,11 +20,12 @@ class PolicyDelegateBase {
     throw new Error('needs to be overriden in child class');
   }
 
-  getAccessDetails() {
+  getAccessDetails(policyName) {
     if (!this._isValidUser()) return;
 
-    // No need to record access to a public room
-    if (this._securityDescriptor.public) {
+    // No need to record access to a public room for a member joining because anyone can join anway
+    // We still want to record access for admins through
+    if (this._securityDescriptor.public && policyName === this._securityDescriptor.members) {
       return null;
     }
 
