@@ -22,8 +22,10 @@ function createHashFor(userIds) {
 
 function validateAdminsForSecurityDescriptor(securityDescriptor) {
   const validAdminMap = {
+    GH_USER: 'GH_USER_SAME',
     GH_REPO: 'GH_REPO_PUSH',
     GH_ORG: 'GH_ORG_MEMBER',
+    GL_USER: 'GL_USER_SAME',
     GL_GROUP: 'GL_GROUP_MAINTAINER',
     GL_PROJECT: 'GL_PROJECT_MAINTAINER'
   };
@@ -138,7 +140,7 @@ var adminFilterInternal = Promise.method(function(securityDescriptor, userIds, n
         });
     }
   } else {
-    // Not a group, deal with GL_GROUP, GL_PROJECT, GH_ORG, GH_REPO and null here
+    // Not a group, deal with GL_USER, GL_GROUP, GL_PROJECT, GH_USER, GH_ORG, GH_REPO and null here
     var query = getQueryForDescriptor(securityDescriptor);
 
     if (query) {
