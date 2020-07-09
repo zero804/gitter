@@ -4,7 +4,7 @@
     <tr>
       <td>
         <h2>{{#if troupe.oneToOne}}{{troupe.name}}{{else}}{{troupe.uri}}{{/if}}</h2>
-        <h3><a href="{{../emailBasePath}}{{troupe.url}}?utm_source=notification&amp;utm_medium=email&amp;utm_campaign=unread-notifications"><span class="unreadcount">{{__n "%d unread message" "%d unread messages" unreadCount}}</span>{{#if truncated}} <span class="truncatedcount">{{chats.length}} most recent)</span>{{/if}}</a></h3>
+        <h3><a href="{{../emailBasePath}}{{troupe.url}}?utm_source=notification&amp;utm_medium=email&amp;utm_campaign=unread-notifications"><span class="unreadcount">{{__n "%d unread message" "%d unread messages" unreadCount}}</span>{{#if truncated}} <span class="truncatedcount">({{chats.length}} most recent)</span>{{/if}}</a></h3>
       </td>
     </tr>
   </table>
