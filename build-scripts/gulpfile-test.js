@@ -65,9 +65,6 @@ var testSuite = argv['test-suite'];
 var fast = argv['test-fast'];
 var grep = argv['test-grep'];
 var criticalOnly = argv['test-critical-only'];
-const allowFlakeyTests = !!(
-  process.env.ALLOW_FLAKEY_TESTS && JSON.parse(process.env.ALLOW_FLAKEY_TESTS)
-);
 const disableGitHubTests =
   process.env.DISABLE_GITHUB_TESTS && JSON.parse(process.env.DISABLE_GITHUB_TESTS);
 
@@ -112,8 +109,7 @@ function spawnMochaProcess(moduleName, options, files) {
     BLUEBIRD_DEBUG: 1,
     NO_AUTO_INDEX: 1,
     TZ: 'UTC',
-    GITTER_TEST: 1,
-    ALLOW_FLAKEY_TESTS: allowFlakeyTests
+    GITTER_TEST: 1
   };
 
   if (generateCoverage) {
@@ -141,16 +137,9 @@ function spawnMochaProcess(moduleName, options, files) {
     env.NODE_ENV = 'test-docker';
   }
 
-  // By default, avoid running the flakey tests
-  let argGrep = '#flakey';
-  var argInvert = true;
-  if (grep) {
-    argGrep = grep;
-    argInvert = false;
-  } else if (allowFlakeyTests) {
-    argGrep = null;
-    argInvert = false;
-  } else if (fast) {
+  var argGrep = grep;
+  var argInvert = false;
+  if (fast) {
     argGrep = '#slow';
     argInvert = true;
     argBail = true;
