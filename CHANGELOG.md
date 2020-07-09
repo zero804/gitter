@@ -1,3 +1,9 @@
+# 20.31.0 - *upcoming*
+
+ - Add Niceter to list of 3rd party apps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1927
+    - Thanks to [@uuttff8](https://gitlab.com/uuttff8) for the contribution
+
+
 # 20.30.0 - 2020-7-9
 
  - Add docs for `/mark-all-unread` slash command, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1918
