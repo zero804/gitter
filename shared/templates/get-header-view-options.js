@@ -9,9 +9,11 @@ function getHeaderLinkUrl(serializedTroupe) {
   switch (backend.type) {
     case 'GL_GROUP':
     case 'GL_PROJECT':
+    case 'GL_USER':
       return 'https://gitlab.com/' + backend.linkPath;
     case 'GH_REPO':
     case 'GH_ORG':
+    case 'GH_USER':
       return 'https://github.com/' + backend.linkPath;
   }
 
