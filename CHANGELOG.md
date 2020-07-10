@@ -5,6 +5,10 @@
  - Fix right-toolbar text hover color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1628
     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
 
+Developer facing:
+
+ - Add avatar support for GL_USER backed groups/rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1922
+
 
 # 20.30.0 - 2020-7-9
 
