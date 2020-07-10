@@ -52,7 +52,7 @@ function getBestSizeFor(size) {
 function getGroupAvatarUrlForSize(group, size) {
   const avatarUrl = group.avatarUrl;
 
-  const parsed = url.parse(avatarUrl);
+  const parsed = url.parse(avatarUrl, true);
 
   // Tack on a version param otherwise the S3 url is always the same and
   // you always get the cached avatar from nginx's cache.
