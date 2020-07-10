@@ -205,6 +205,7 @@ var PermissionsView = Marionette.LayoutView.extend({
     this.initializeForEntity();
   },
 
+  // eslint-disable-next-line complexity
   onSecurityDescriptorChange: function() {
     var sd = this.model.get('securityDescriptor');
     var sdType = sd && sd.type;
@@ -215,11 +216,17 @@ var PermissionsView = Marionette.LayoutView.extend({
     var isInitialSdTypeNonReversable =
       initialSdType === 'GL_GROUP' ||
       initialSdType === 'GL_PROJECT' ||
+      initialSdType === 'GL_USER' ||
       initialSdType === 'GH_ORG' ||
-      initialSdType === 'GH_REPO';
+      initialSdType === 'GH_REPO' ||
+      initialSdType === 'GH_USER';
     if (isInitialSdTypeNonReversable && initialSdType !== sdType) {
       let backendString = '';
-      if (initialSdType === 'GH_ORG' || initialSdType === 'GH_REPO') {
+      if (
+        initialSdType === 'GH_ORG' ||
+        initialSdType === 'GH_REPO' ||
+        initialSdType === 'GH_USER'
+      ) {
         backendString = 'GitHub';
       } else if (isGitlabSecurityDescriptorType(initialSdType)) {
         backendString = 'GitLab';
@@ -277,12 +284,12 @@ var PermissionsView = Marionette.LayoutView.extend({
       toggleClass(
         this.ui.permissionsOptionsGithubIcon[0],
         'hidden',
-        sdType !== 'GH_ORG' && sdType !== 'GH_REPO'
+        sdType !== 'GH_ORG' && sdType !== 'GH_REPO' && sdType !== 'GH_USER'
       );
       toggleClass(
         this.ui.permissionsOptionsGitlabIcon[0],
         'hidden',
-        sdType !== 'GL_GROUP' && sdType !== 'GL_PROJECT'
+        !isGitlabSecurityDescriptorType(sdType)
       );
       toggleClass(this.ui.permissionsOptionsGitterIcon[0], 'hidden', sdType !== 'GROUP' && sdType);
     }
@@ -306,6 +313,12 @@ var PermissionsView = Marionette.LayoutView.extend({
         label: 'Anyone with push access to the ' + sd.linkPath + ' repo on GitHub',
         selected: sd.type === 'GH_REPO'
       });
+    } else if (sd && sd.type === 'GH_USER') {
+      permissionOpts.push({
+        value: 'GH_USER',
+        label: `The @${sd.linkPath} user on GitHub`,
+        selected: sd.type === 'GL_PROJECT'
+      });
     } else if (sd && sd.type === 'GL_GROUP') {
       permissionOpts.push({
         value: 'GL_GROUP',
@@ -316,6 +329,12 @@ var PermissionsView = Marionette.LayoutView.extend({
       permissionOpts.push({
         value: 'GL_PROJECT',
         label: `Anyone with maintainer access to the ${sd.linkPath} project on GitLab`,
+        selected: sd.type === 'GL_PROJECT'
+      });
+    } else if (sd && sd.type === 'GL_USER') {
+      permissionOpts.push({
+        value: 'GL_USER',
+        label: `The @${sd.linkPath} user on GitLab`,
         selected: sd.type === 'GL_PROJECT'
       });
     }
