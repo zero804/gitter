@@ -218,7 +218,7 @@ describe('create community store', () => {
     });
 
     describe('autoAssociateMatchingUser', () => {
-      it('when GitHub username matches, sets backing entity', async () => {
+      it('when GitHub username matches, associates user to community', async () => {
         await testAction(
           actions.autoAssociateMatchingUser,
           undefined,
@@ -229,10 +229,68 @@ describe('create community store', () => {
             user: {
               username: 'myUsername',
               providers: ['github']
+            }
+          },
+          [],
+          [{ type: 'associateUserToCommunity' }]
+        );
+      });
+
+      it('when GitHub username does not match, does nothing', async () => {
+        await testAction(
+          actions.autoAssociateMatchingUser,
+          undefined,
+          {
+            communitySlug: 'someotherusername',
+
+            // rootState
+            user: {
+              username: 'myUsername',
+              providers: ['github']
+            }
+          },
+          [],
+          []
+        );
+      });
+
+      it('when Twitter username matches, tries to associate user (but associateUserToCommunity will do nothing)', async () => {
+        await testAction(
+          actions.autoAssociateMatchingUser,
+          undefined,
+          {
+            communitySlug: 'myusername_twitter',
+
+            // rootState
+            user: {
+              username: 'myUsername_twitter',
+              providers: ['twitter']
+            }
+          },
+          [],
+          [{ type: 'associateUserToCommunity' }]
+        );
+      });
+    });
+
+    describe('associateUserToCommunity', () => {
+      it('associating GitHub user, sets backing entity', async () => {
+        await testAction(
+          actions.associateUserToCommunity,
+          undefined,
+          {
+            // rootState
+            user: {
+              username: 'myUsername',
+              providers: ['github']
             },
 
             // rootGetters
-            isGithubUser: true
+            hasProvider: provider => {
+              if (provider === 'github') {
+                return true;
+              }
+            }
           },
           [
             {
@@ -249,44 +307,35 @@ describe('create community store', () => {
         );
       });
 
-      it('when GitHub username does not match, does not set backing entity', async () => {
+      it('associating GitLab user, sets backing entity', async () => {
         await testAction(
-          actions.autoAssociateMatchingUser,
+          actions.associateUserToCommunity,
           undefined,
           {
-            communitySlug: 'someotherusername',
-
             // rootState
             user: {
-              username: 'myUsername',
-              providers: ['github']
+              username: 'myUsername_gitlab',
+              providers: ['gitlab']
             },
 
             // rootGetters
-            isGithubUser: true
+            hasProvider: provider => {
+              if (provider === 'gitlab') {
+                return true;
+              }
+            }
           },
-          [],
-          []
-        );
-      });
-
-      it('when Twitter username matches, does not set backing entity', async () => {
-        await testAction(
-          actions.autoAssociateMatchingUser,
-          undefined,
-          {
-            communitySlug: 'myusername_twitter',
-
-            // rootState
-            user: {
-              username: 'myUsername_twitter',
-              providers: ['twitter']
-            },
-
-            // rootGetters
-            isGithubUser: false
-          },
-          [],
+          [
+            {
+              type: types.SET_SELECTED_BACKING_ENTITY,
+              payload: {
+                absoluteUri: 'https://gitlab.com/myUsername',
+                name: 'myUsername',
+                type: 'GL_USER',
+                uri: 'myUsername'
+              }
+            }
+          ],
           []
         );
       });

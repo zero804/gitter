@@ -18,7 +18,7 @@ export default {
       reposRequest: state => state.createRoom.reposRequest
     }),
     ...mapGetters({
-      isGithubUser: 'isGithubUser',
+      hasProvider: 'hasProvider',
       hasGithubPrivateRepoScope: 'createRoom/hasGithubPrivateRepoScope',
       displayedFilteredRepos: 'createRoom/displayedFilteredRepos',
       selectedRepo: 'createRoom/selectedRepo'
@@ -90,7 +90,7 @@ export default {
         </template>
       </select-dropdown>
 
-      <template v-if="isGithubUser">
+      <template v-if="hasProvider('github')">
         <p v-if="hasGithubPrivateRepoScope" class="repo-select-information">
           Private repo access is granted. If you don't see your repo listed, see our documentation
           section on

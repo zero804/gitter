@@ -1,6 +1,6 @@
 <script>
-import { mapState, mapActions } from 'vuex';
-import context from 'gitter-web-client-context';
+import { mapState, mapGetters, mapActions } from 'vuex';
+import isGitlabSecurityDescriptorType from 'gitter-web-shared/is-gitlab-security-descriptor-type';
 
 import LoadingSpinner from '../../components/loading-spinner.vue';
 
@@ -23,6 +23,10 @@ export default {
       selectedBackingEntity: state => state.createCommunity.selectedBackingEntity,
       allowBadger: state => state.createCommunity.allowBadger,
       communitySubmitRequest: state => state.createCommunity.communitySubmitRequest
+    }),
+    ...mapGetters({
+      hasProvider: 'hasProvider',
+      identityUsername: 'identityUsername'
     }),
     communityNameModel: {
       get() {
@@ -48,15 +52,8 @@ export default {
         this.setAllowBadger(checked);
       }
     },
-    hasGithubProvider() {
-      return context.hasProvider('github');
-    },
-    hasGitlabProvider() {
-      return context.hasProvider('gitlab');
-    },
     isGitlabSelected() {
-      const type = this.selectedBackingEntity.type;
-      return type === 'GL_GROUP' || type === 'GL_PROJECT';
+      return isGitlabSecurityDescriptorType(this.selectedBackingEntity.type);
     },
     isGithubSelected() {
       const type = this.selectedBackingEntity.type;
@@ -72,6 +69,7 @@ export default {
       moveToStep: 'createCommunity/moveToStep',
       setCommunityName: 'createCommunity/setCommunityName',
       setAndValidateCommunitySlug: 'createCommunity/setAndValidateCommunitySlug',
+      associateUserToCommunity: 'createCommunity/associateUserToCommunity',
       setAllowBadger: 'createCommunity/setAllowBadger',
       submitCommunity: 'createCommunity/submitCommunity'
     }),
@@ -135,7 +133,7 @@ export default {
       {{ communitySlugError }}
     </div>
 
-    <p v-if="hasGitlabProvider && !selectedBackingEntity" class="backing-entity-prompt-copy">
+    <p v-if="hasProvider('gitlab') && !selectedBackingEntity" class="backing-entity-prompt-copy">
       do you want to start a community for one of your
       <a
         ref="backingEntityPromptGitlabLink"
@@ -147,7 +145,7 @@ export default {
       </a>
     </p>
 
-    <p v-if="hasGithubProvider && !selectedBackingEntity" class="backing-entity-prompt-copy">
+    <p v-if="hasProvider('github') && !selectedBackingEntity" class="backing-entity-prompt-copy">
       do you want to start a community for one of your
       <a
         ref="backingEntityPromptGithubLink"
@@ -156,6 +154,24 @@ export default {
         @click.prevent="onMoveToBackingEntityGithubStepLinkClicked"
       >
         GitHub orgs/repos?
+      </a>
+    </p>
+
+    <p v-if="(hasProvider('gitlab') || hasProvider('github')) && !selectedBackingEntity">
+      do you want to start a communtiy for your
+      <a
+        ref="backingUserPromptGithubLink"
+        href="#0"
+        data-disable-routing="1"
+        @click.prevent="associateUserToCommunity"
+      >
+        <template v-if="hasProvider('gitlab')"
+          >GitLab</template
+        >
+        <template v-else-if="hasProvider('github')"
+          >GitHub</template
+        >
+        @{{ identityUsername }} user
       </a>
     </p>
 
