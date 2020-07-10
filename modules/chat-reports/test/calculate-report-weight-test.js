@@ -68,7 +68,7 @@ describe('calculate-report-weight', function() {
     });
   });
 
-  describe('calculateReportWeight', function() {
+  describe('calculateMessageAgeWeight', function() {
     it('new messages are easily removed', function() {
       assert.strictEqual(
         reportWeight.calculateMessageAgeWeight({
