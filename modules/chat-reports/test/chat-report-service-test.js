@@ -103,6 +103,20 @@ describe('chatReportService', function() {
       message: 'messageToReportUserOldOverThreshold1',
       sent: Date.now(),
       weight: vanillaChatReportService.BAD_USER_THRESHOLD
+    },
+
+    userGood1: {},
+    messageToReportUserGood1: {
+      user: 'userGood1',
+      troupe: 'troupe1',
+      text: 'over_bad_user_threshold_message',
+      sent: new Date()
+    },
+    messageReportUserGoodOverBadThreshold1: {
+      user: 'user2',
+      message: 'messageToReportUserGood1',
+      sent: Date.now(),
+      weight: vanillaChatReportService.BAD_USER_THRESHOLD
     }
   });
 
@@ -158,7 +172,7 @@ describe('chatReportService', function() {
       });
     });
 
-    it('report own message', function() {
+    it('unable to report own message', function() {
       return chatReportService
         .newReport(fixture.userBad1, fixture.message1.id)
         .catch(function(err) {
@@ -209,6 +223,21 @@ describe('chatReportService', function() {
           assert.strictEqual(hellbanUserSpy.callCount, 1);
           assert.strictEqual(removeAllMessagesForUserIdSpy.callCount, 0);
         });
+    });
+
+    it('utilizes good user threshold for good user', function() {
+      chatReportService.GOOD_USER_IDS.push('' + fixture.userGood1._id);
+
+      return (
+        chatReportService
+          // The message already has a report that is over the BAD_USER_THRESHOLD,
+          // but when we report it again, the user is safe because it is in the good user list(GOOD_USER_IDS)
+          .newReport(fixture.user3, fixture.messageToReportUserGood1.id)
+          .then(function() {
+            assert.strictEqual(hellbanUserSpy.callCount, 0);
+            assert.strictEqual(removeAllMessagesForUserIdSpy.callCount, 0);
+          })
+      );
     });
   });
 });
