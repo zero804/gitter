@@ -11,6 +11,7 @@ Developer facing:
  - Add header link support for `GL_USER`/`GH_USER` based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1929
  - Add `GL_USER`/`GH_USER` support to the permission view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1930
  - Remove `concurrently` dependency, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1932
+ - Raise report threshold for "good" users (`@matrixbot`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1928
 
 
 # 20.30.0 - 2020-7-9
