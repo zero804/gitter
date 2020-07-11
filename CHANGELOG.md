@@ -10,6 +10,7 @@ Developer facing:
  - Add avatar support for `GL_USER` backed groups/rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1922
  - Add header link support for `GL_USER`/`GH_USER` based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1929
  - Add `GL_USER`/`GH_USER` support to the permission view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1930
+ - Remove `concurrently` dependency, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1932
 
 
 # 20.30.0 - 2020-7-9
