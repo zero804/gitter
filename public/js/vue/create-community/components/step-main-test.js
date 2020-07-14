@@ -50,7 +50,7 @@ describe('StepMain', () => {
       wrapper.find({ ref: 'communitySlugInput' }).element.value = 'some-slug';
       wrapper.find({ ref: 'communitySlugInput' }).trigger('input');
 
-      expect(stubbedActions.createCommunity.setAndValidateCommunitySlug).toHaveBeenCalledWith(
+      expect(stubbedActions.createCommunity.updateCommunitySlug).toHaveBeenCalledWith(
         expect.anything(),
         'some-slug',
         undefined
