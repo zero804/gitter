@@ -286,6 +286,14 @@ exports[`StepMain entity selected matches snapshot 1`] = `
         </span>
       </a>
        
+      <button
+        class="clear-association-button"
+      >
+        <span
+          class="clear-association-icon"
+        />
+      </button>
+       
       <!---->
     </div>
      
