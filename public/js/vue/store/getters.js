@@ -1,9 +1,26 @@
 import _ from 'lodash';
 import { pojo as sortsAndFilters } from 'gitter-realtime-client/lib/sorts-filters';
 
-export const isGithubUser = state => {
+export const hasProvider = state => provider => {
   const user = state.user;
-  return !!(user && user.providers && user.providers.includes('github'));
+  return !!(user && user.providers && user.providers.includes(provider));
+};
+
+// Get the GitLab, Twitter, GitHub username, given a user's Gitter username,
+// Since Gitter usernames are derived from the identity a user signs in with, we can derive thsi information
+// But in the futurem we should get this from the identity itself in the future
+export const identityUsername = state => {
+  const user = state.user;
+
+  if (hasProvider(state)('gitlab')) {
+    const gitlabUsername = user.username.replace(/_gitlab$/, '');
+    return gitlabUsername;
+  } else if (hasProvider(state)('twitter')) {
+    const gitlabUsername = user.username.replace(/_twitter$/, '');
+    return gitlabUsername;
+  }
+
+  return user.username;
 };
 
 function sortRooms(a, b) {

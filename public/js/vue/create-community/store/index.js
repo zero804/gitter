@@ -164,18 +164,29 @@ export default {
     },
     // If the community slug matches the username,
     // set the community to be associated with the user
-    autoAssociateMatchingUser: async ({ state, commit, rootState, rootGetters }) => {
+    autoAssociateMatchingUser: async ({ state, dispatch, rootState }) => {
       const username = rootState.user && rootState.user.username;
       if (state.communitySlug.toLowerCase() === username.toLowerCase()) {
-        if (rootGetters.isGithubUser) {
-          commit(types.SET_SELECTED_BACKING_ENTITY, {
-            type: 'GH_USER',
-            uri: username,
-            name: username,
-            absoluteUri: `https://github.com/${username}`
-          });
-        }
-        // TODO: GL_USER
+        dispatch('associateUserToCommunity');
+      }
+    },
+    associateUserToCommunity: ({ commit, rootState, rootGetters }) => {
+      const username = rootState.user && rootState.user.username;
+      if (rootGetters.hasProvider('github')) {
+        commit(types.SET_SELECTED_BACKING_ENTITY, {
+          type: 'GH_USER',
+          uri: username,
+          name: username,
+          absoluteUri: `https://github.com/${username}`
+        });
+      } else if (rootGetters.hasProvider('gitlab')) {
+        const gitlabUsername = username.replace(/_gitlab$/, '');
+        commit(types.SET_SELECTED_BACKING_ENTITY, {
+          type: 'GL_USER',
+          uri: gitlabUsername,
+          name: gitlabUsername,
+          absoluteUri: `https://gitlab.com/${gitlabUsername}`
+        });
       }
     },
     setSelectedBackingEntity: ({ commit, dispatch }, newBackingEntity) => {
