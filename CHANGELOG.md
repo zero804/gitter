@@ -1,4 +1,4 @@
-# 20.31.0 - *upcoming*
+# 20.31.0 - 2020-7-14 - GitLab user namespace communities
 
  - Add Niceter to list of 3rd party apps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1927
     - Thanks to [@uuttff8](https://gitlab.com/uuttff8) for the contribution
