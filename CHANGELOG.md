@@ -4,6 +4,7 @@
     - Thanks to [@uuttff8](https://gitlab.com/uuttff8) for the contribution
  - Fix right-toolbar text hover color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1628
     - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
+ - Add GitLab user support to the community creation flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1931
 
 Developer facing:
 
