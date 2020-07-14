@@ -1,3 +1,19 @@
+# 20.30.0 - 2020-7-9
+
+ - Add docs for `/mark-all-unread` slash command, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1918
+ - Update Korean translations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1919
+    - Thanks to [@alexkoalag](https://gitlab.com/alexkoalag) for the contribution
+ - Fix search syntax examples in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1920
+ - Add missing parenthesis to email heading recent text, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1924
+
+Developer facing:
+
+ - Dry up GitLab policy delegates (`policy-delegate-base.js`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1905
+ - Add `GH_USER` and `GL_USER` to admin group discovery, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1916
+ - Add test for creating `GL_USER` based group, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1917
+ - Fix `PolicyDelegateBase` not giving access details for admin policies, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1923
+ - Add `GL_USER`/`GH_USER` admins to admin-filter, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1921
+
 
 # 20.29.0 - 2020-6-18
 

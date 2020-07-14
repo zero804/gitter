@@ -207,6 +207,13 @@ export default {
 
 .syntax-list-item {
   margin-bottom: 0.6em;
+
+  .dark-theme & code {
+    border-color: @app-single-line-code-color;
+    background-color: @app-single-line-code-color;
+
+    color: @dark-theme-left-menu-text-color;
+  }
 }
 
 .search-result-empty-message {

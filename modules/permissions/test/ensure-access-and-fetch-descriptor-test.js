@@ -164,6 +164,23 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
   });
 
   describe('GitLab', () => {
+    it('should return a descriptor for a GitLab user if the user has access', async () => {
+      const sd = await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
+        type: 'GL_USER',
+        linkPath: fixtureLoader.GITLAB_USER_USERNAME,
+        security: 'PUBLIC'
+      });
+
+      assert.deepEqual(sd, {
+        type: 'GL_USER',
+        members: 'PUBLIC',
+        admins: 'GL_USER_SAME',
+        public: true,
+        linkPath: fixtureLoader.GITLAB_USER_USERNAME,
+        externalId: fixtureLoader.GITLAB_USER_ID
+      });
+    });
+
     it('should return a descriptor for a GitLab group if the user has access', async () => {
       const sd = await ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
         type: 'GL_GROUP',
