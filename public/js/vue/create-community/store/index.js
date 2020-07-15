@@ -203,6 +203,9 @@ export default {
         dispatch('setAndValidateCommunitySlug', slugger(selectedUri));
       }
     },
+    clearBackingEntity: ({ commit }) => {
+      commit(types.SET_SELECTED_BACKING_ENTITY, null);
+    },
     setAllowBadger: ({ commit }, allowBadger) => {
       commit(types.SET_ALLOW_BADGER, allowBadger);
     },

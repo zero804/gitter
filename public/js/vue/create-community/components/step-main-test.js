@@ -146,6 +146,22 @@ describe('StepMain', () => {
       );
     });
 
+    it('clicking clear x button clears selected backing entity', () => {
+      const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.createCommunity.selectedBackingEntity = createOrgGitlabGroupFixture(
+          'gitlab-org/gitter'
+        );
+      });
+
+      wrapper.find({ ref: 'clearAssociationButton' }).trigger('click');
+
+      expect(stubbedActions.createCommunity.clearBackingEntity).toHaveBeenCalledWith(
+        expect.anything(),
+        undefined,
+        undefined
+      );
+    });
+
     it('clicking badger checkbox changes allowBadger', () => {
       const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
         store.state.user = {

@@ -383,6 +383,25 @@ describe('create community store', () => {
       });
     });
 
+    describe('clearBackingEntity', () => {
+      it('clear', async () => {
+        await testAction(
+          actions.clearBackingEntity,
+          undefined,
+          {
+            selectedBackingEntity: { type: 'GL_GROUP' }
+          },
+          [
+            {
+              type: types.SET_SELECTED_BACKING_ENTITY,
+              payload: null
+            }
+          ],
+          []
+        );
+      });
+    });
+
     it('setAllowBadger sets allow badger', async () => {
       await testAction(
         actions.setAllowBadger,
