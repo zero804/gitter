@@ -1,11 +1,8 @@
 'use strict';
 
-var XRegExp = require('xregexp').XRegExp;
-
 function slugger(text) {
-  text = text.trim();
-  var re = XRegExp('[^\\p{L}\\d\\_]+');
-  var parts = XRegExp.split(text, re);
+  const trimmedText = text.trim();
+  const parts = trimmedText.split(/[^\p{L}\d_]+/u);
 
   return parts
     .filter(function(part) {
@@ -15,8 +12,7 @@ function slugger(text) {
 }
 
 function isValid(text) {
-  var re = XRegExp('^[\\p{L}\\d\\_\\-]+$');
-  return XRegExp.test(text, re);
+  return /^[\p{L}\d_-]+$/u.test(text);
 }
 
 module.exports = slugger;
