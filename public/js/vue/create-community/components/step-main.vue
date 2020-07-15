@@ -43,7 +43,7 @@ export default {
         return this.communitySlug;
       },
       set(newCommunitySlug) {
-        this.setAndValidateCommunitySlug(newCommunitySlug);
+        this.updateCommunitySlug(newCommunitySlug);
       }
     },
     allowBadgerModel: {
@@ -70,7 +70,7 @@ export default {
     ...mapActions({
       moveToStep: 'createCommunity/moveToStep',
       setCommunityName: 'createCommunity/setCommunityName',
-      setAndValidateCommunitySlug: 'createCommunity/setAndValidateCommunitySlug',
+      updateCommunitySlug: 'createCommunity/updateCommunitySlug',
       associateUserToCommunity: 'createCommunity/associateUserToCommunity',
       clearBackingEntity: 'createCommunity/clearBackingEntity',
       setAllowBadger: 'createCommunity/setAllowBadger',

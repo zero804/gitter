@@ -192,7 +192,7 @@ describe('create community store', () => {
           'foo bar baz',
           { communityName: '', communitySlug: '' },
           [{ type: types.SET_COMMUNITY_NAME, payload: 'foo bar baz' }],
-          [{ type: 'setAndValidateCommunitySlug', payload: 'foo-bar-baz' }]
+          [{ type: 'updateCommunitySlug', payload: 'foo-bar-baz' }]
         );
       });
 
@@ -207,20 +207,33 @@ describe('create community store', () => {
       });
     });
 
-    it('setAndValidateCommunitySlug sets the slug', async () => {
+    it('updateCommunitySlug sets the slug', async () => {
       await testAction(
-        actions.setAndValidateCommunitySlug,
+        actions.updateCommunitySlug,
         'foo-bar-baz',
         {},
-        [{ type: types.SET_COMMUNITY_SLUG, payload: 'foo-bar-baz' }],
-        [{ type: 'autoAssociateMatchingUser' }, { type: 'checkSlugAvailability' }]
+        [],
+        [
+          { type: '_setAndValidateCommunitySlug', payload: 'foo-bar-baz' },
+          { type: 'autoAssociateMatchingEntity' }
+        ]
       );
     });
 
-    describe('autoAssociateMatchingUser', () => {
+    it('_setAndValidateCommunitySlug sets the slug', async () => {
+      await testAction(
+        actions._setAndValidateCommunitySlug,
+        'foo-bar-baz',
+        {},
+        [{ type: types.SET_COMMUNITY_SLUG, payload: 'foo-bar-baz' }],
+        [{ type: 'checkSlugAvailability' }]
+      );
+    });
+
+    describe('autoAssociateMatchingEntity', () => {
       it('when GitHub username matches, associates user to community', async () => {
         await testAction(
-          actions.autoAssociateMatchingUser,
+          actions.autoAssociateMatchingEntity,
           undefined,
           {
             communitySlug: 'myusername',
@@ -238,7 +251,7 @@ describe('create community store', () => {
 
       it('when GitHub username does not match, does nothing', async () => {
         await testAction(
-          actions.autoAssociateMatchingUser,
+          actions.autoAssociateMatchingEntity,
           undefined,
           {
             communitySlug: 'someotherusername',
@@ -256,7 +269,7 @@ describe('create community store', () => {
 
       it('when Twitter username matches, tries to associate user (but associateUserToCommunity will do nothing)', async () => {
         await testAction(
-          actions.autoAssociateMatchingUser,
+          actions.autoAssociateMatchingEntity,
           undefined,
           {
             communitySlug: 'myusername_twitter',
@@ -269,6 +282,24 @@ describe('create community store', () => {
           },
           [],
           [{ type: 'associateUserToCommunity' }]
+        );
+      });
+
+      it('when GitHub org matches, associates org to community', async () => {
+        const org = {
+          uri: 'my-org'
+        };
+        await testAction(
+          actions.autoAssociateMatchingEntity,
+          undefined,
+          {
+            communitySlug: 'my-org',
+
+            // rootState
+            orgs: [org]
+          },
+          [],
+          [{ type: 'setSelectedBackingEntity', payload: org }]
         );
       });
     });
@@ -292,9 +323,10 @@ describe('create community store', () => {
               }
             }
           },
+          [],
           [
             {
-              type: types.SET_SELECTED_BACKING_ENTITY,
+              type: 'setSelectedBackingEntity',
               payload: {
                 absoluteUri: 'https://github.com/myUsername',
                 name: 'myUsername',
@@ -302,8 +334,7 @@ describe('create community store', () => {
                 uri: 'myUsername'
               }
             }
-          ],
-          []
+          ]
         );
       });
 
@@ -325,9 +356,10 @@ describe('create community store', () => {
               }
             }
           },
+          [],
           [
             {
-              type: types.SET_SELECTED_BACKING_ENTITY,
+              type: 'setSelectedBackingEntity',
               payload: {
                 absoluteUri: 'https://gitlab.com/myUsername',
                 name: 'myUsername',
@@ -335,8 +367,7 @@ describe('create community store', () => {
                 uri: 'myUsername'
               }
             }
-          ],
-          []
+          ]
         );
       });
     });
@@ -353,7 +384,7 @@ describe('create community store', () => {
             { type: types.SET_SELECTED_BACKING_ENTITY, payload: gitlabGroup },
             { type: types.SET_COMMUNITY_NAME, payload: 'gitlab-org' }
           ],
-          [{ type: 'setAndValidateCommunitySlug', payload: 'gitlab-org' }]
+          [{ type: '_setAndValidateCommunitySlug', payload: 'gitlab-org' }]
         );
       });
 
@@ -368,7 +399,7 @@ describe('create community store', () => {
             { type: types.SET_SELECTED_BACKING_ENTITY, payload: githubRepo },
             { type: types.SET_COMMUNITY_NAME, payload: 'gitter' }
           ],
-          [{ type: 'setAndValidateCommunitySlug', payload: 'gitter' }]
+          [{ type: '_setAndValidateCommunitySlug', payload: 'gitter' }]
         );
       });
 
