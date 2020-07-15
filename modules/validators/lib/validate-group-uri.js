@@ -1,7 +1,6 @@
 'use strict';
 
 var reservedNamespaceHash = require('./reserved-namespaces').hash;
-var xregexp = require('xregexp').XRegExp;
 
 function validateGroupUri(uri) {
   if (typeof uri !== 'string') return false;
@@ -12,8 +11,7 @@ function validateGroupUri(uri) {
   }
 
   // based on the room name regex
-  var matcher = xregexp('^[\\p{L}\\d\\_][\\p{L}\\d\\-\\_]{1,80}$');
-  return !!matcher.test(uri);
+  return !!/^[\p{L}\d_][\p{L}\d_-]{1,80}$/u.test(uri);
 }
 
 module.exports = validateGroupUri;
