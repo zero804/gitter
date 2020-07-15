@@ -2,6 +2,7 @@
 
  - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
  - Fix slow slugger performance so no main thread blocking in create community URI slug autofill, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1937
+ - Auto associate org with community as you type, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1936
 
 
 # 20.31.0 - 2020-7-14 - GitLab user namespace communities
