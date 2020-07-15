@@ -1,3 +1,8 @@
+# 20.32.0 - *upcoming*
+
+ - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
+
+
 # 20.31.0 - 2020-7-14 - GitLab user namespace communities
 
  - Add Niceter to list of 3rd party apps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1927
