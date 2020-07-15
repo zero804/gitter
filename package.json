@@ -3,7 +3,7 @@
   "version": "19.2.0",
   "private": true,
   "dependencies": {
-    "@babel/runtime": "^7.5.5",
+    "@babel/runtime": "^7.10.4",
     "@gitterhq/backbone-proxy-collection": "^2.3.0",
     "@gitterhq/cal-heatmap": "^3.6.1",
     "@gitterhq/env": "^0.43.0",
@@ -189,10 +189,10 @@
     "yargs": "^4.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
-    "@babel/plugin-transform-runtime": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
+    "@babel/core": "^7.10.4",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.4",
+    "@babel/plugin-transform-runtime": "^7.10.4",
+    "@babel/preset-env": "^7.10.4",
     "@gitterhq/handlebars-loader": "^1.2.0-a",
     "@vue/test-utils": "^1.0.0-beta.29",
     "autoprefixer-core": "^6.0.1",
