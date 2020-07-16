@@ -1,4 +1,4 @@
-# 20.32.0 - *upcoming*
+# 20.32.0 - 2020-7-16
 
  - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
  - Fix slow slugger performance so no main thread blocking in create community URI slug autofill, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1937
