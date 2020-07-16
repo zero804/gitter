@@ -3,6 +3,7 @@
  - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
  - Fix slow slugger performance so no main thread blocking in create community URI slug autofill, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1937
  - Auto associate org with community as you type, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1936
+ - Fix "See all (X people)" in the right-toolbar not being readable in the dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1939
 
 Developer facing:
 
