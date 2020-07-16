@@ -249,10 +249,16 @@ a {
 }
 
 // --- Chat Right Toolbar ---
-.right-toolbar-region .right-toolbar {
-  background: @chat-right-toolbar-bg-color;
-  border-color: @chat-right-toolbar-left-border-color;
-  color: @chat-right-toolbar-text-color;
+.right-toolbar-region {
+  .right-toolbar {
+    background: @chat-right-toolbar-bg-color;
+    border-color: @chat-right-toolbar-left-border-color;
+    color: @chat-right-toolbar-text-color;
+  }
+
+  .remaining-view-button-secondary-text {
+    color: @chat-right-toolbar-text-color;
+  }
 }
 
 .trpToolbarHeaderItem:hover {
@@ -295,8 +301,8 @@ a {
   }
 }
 
-.activity-item-inner>.activity-time {
-    color: rgba(200,200,200,.4);
+.activity-item-inner > .activity-time {
+  color: rgba(200, 200, 200, 0.4);
 }
 
 //Github integration stuff
