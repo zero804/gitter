@@ -1,3 +1,20 @@
+# 20.31.0 - 2020-7-14 - GitLab user namespace communities
+
+ - Add Niceter to list of 3rd party apps, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1927
+    - Thanks to [@uuttff8](https://gitlab.com/uuttff8) for the contribution
+ - Fix right-toolbar text hover color in dark theme, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1628
+    - Thanks to [@tameo](https://gitlab.com/tameo) for the contribution
+ - Add GitLab user support to the community creation flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1931
+
+Developer facing:
+
+ - Add avatar support for `GL_USER` backed groups/rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1922
+ - Add header link support for `GL_USER`/`GH_USER` based rooms, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1929
+ - Add `GL_USER`/`GH_USER` support to the permission view, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1930
+ - Remove `concurrently` dependency, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1932
+ - Raise report threshold for "good" users (`@matrixbot`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1928
+
+
 # 20.30.0 - 2020-7-9
 
  - Add docs for `/mark-all-unread` slash command, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1918

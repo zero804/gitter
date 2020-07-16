@@ -53,6 +53,8 @@
                 Variables
 ------------------------------------------- */
 
+@import 'colors';
+
 // Brand
 // --------------------------------------------
 @ruby: #ed1965;
@@ -251,6 +253,10 @@ a {
   background: @chat-right-toolbar-bg-color;
   border-color: @chat-right-toolbar-left-border-color;
   color: @chat-right-toolbar-text-color;
+}
+
+.trpToolbarHeaderItem:hover {
+  color: lighten(@menu-header-item-color, 15%);
 }
 
 //Avatars at the top of the right toolbar

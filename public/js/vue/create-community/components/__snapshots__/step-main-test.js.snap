@@ -69,6 +69,20 @@ exports[`StepMain GitHub user matches snapshot 1`] = `
     </a>
   </p>
    
+  <p>
+    
+    do you want to start a communtiy for your
+    
+    <a
+      data-disable-routing="1"
+      href="#0"
+    >
+      GitHub
+      @some-username user
+    
+    </a>
+  </p>
+   
   <!---->
    
   <div
@@ -157,6 +171,20 @@ exports[`StepMain GitLab user matches snapshot 1`] = `
    
   <!---->
    
+  <p>
+    
+    do you want to start a communtiy for your
+    
+    <a
+      data-disable-routing="1"
+      href="#0"
+    >
+      GitLab
+      @some-username user
+    
+    </a>
+  </p>
+   
   <!---->
    
   <div
@@ -224,6 +252,8 @@ exports[`StepMain entity selected matches snapshot 1`] = `
       required="required"
     />
   </div>
+   
+  <!---->
    
   <!---->
    
@@ -348,6 +378,8 @@ exports[`StepMain errors community name error 1`] = `
    
   <!---->
    
+  <!---->
+   
   <div
     class="submit-button-container"
   >
@@ -421,6 +453,8 @@ exports[`StepMain errors community slug error 1`] = `
     SOME BAD ERROR!
   
   </div>
+   
+  <!---->
    
   <!---->
    
@@ -502,6 +536,8 @@ exports[`StepMain submit button submit error user matches snapshot 1`] = `
    
   <!---->
    
+  <!---->
+   
   <div
     class="submit-button-container"
   >
@@ -573,6 +609,8 @@ exports[`StepMain submit button submit loading user matches snapshot 1`] = `
       required="required"
     />
   </div>
+   
+  <!---->
    
   <!---->
    

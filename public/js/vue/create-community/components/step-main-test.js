@@ -11,33 +11,24 @@ import {
   CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITHUB
 } from '../constants';
 
-jest.mock('gitter-web-client-context');
-const context = require('gitter-web-client-context');
-
 describe('StepMain', () => {
-  beforeEach(() => {
-    context.hasProvider.mockReset();
-  });
-
   it('GitLab user matches snapshot', () => {
-    context.hasProvider.mockImplementation(provider => {
-      if (provider === 'gitlab') {
-        return true;
-      }
+    const { wrapper } = mount(StepMain, {}, store => {
+      store.state.user = {
+        username: 'some-username_gitlab',
+        providers: ['gitlab']
+      };
     });
-
-    const { wrapper } = mount(StepMain, {});
     expect(wrapper.element).toMatchSnapshot();
   });
 
   it('GitHub user matches snapshot', () => {
-    context.hasProvider.mockImplementation(provider => {
-      if (provider === 'github') {
-        return true;
-      }
+    const { wrapper } = mount(StepMain, {}, store => {
+      store.state.user = {
+        username: 'some-username',
+        providers: ['github']
+      };
     });
-
-    const { wrapper } = mount(StepMain, {});
     expect(wrapper.element).toMatchSnapshot();
   });
 
@@ -85,13 +76,12 @@ describe('StepMain', () => {
 
   describe('prompt links', () => {
     it('clicking GitLab prompt moves to backing entity GitLab step', () => {
-      context.hasProvider.mockImplementation(provider => {
-        if (provider === 'gitlab') {
-          return true;
-        }
+      const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.user = {
+          username: 'some-username_gitlab',
+          providers: ['gitlab']
+        };
       });
-
-      const { wrapper, stubbedActions } = mount(StepMain, {});
 
       wrapper.find({ ref: 'backingEntityPromptGitlabLink' }).trigger('click');
 
@@ -103,13 +93,12 @@ describe('StepMain', () => {
     });
 
     it('clicking GitHub prompt moves to backing entity GitHub step', () => {
-      context.hasProvider.mockImplementation(provider => {
-        if (provider === 'github') {
-          return true;
-        }
+      const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.user = {
+          username: 'some-username',
+          providers: ['github']
+        };
       });
-
-      const { wrapper, stubbedActions } = mount(StepMain, {});
 
       wrapper.find({ ref: 'backingEntityPromptGithubLink' }).trigger('click');
 
@@ -123,13 +112,12 @@ describe('StepMain', () => {
 
   describe('entity selected', () => {
     it('matches snapshot', () => {
-      context.hasProvider.mockImplementation(provider => {
-        if (provider === 'gitlab') {
-          return true;
-        }
-      });
-
       const { wrapper } = mount(StepMain, {}, store => {
+        store.state.user = {
+          username: 'some-username_gitlab',
+          providers: ['gitlab']
+        };
+
         store.state.createCommunity.selectedBackingEntity = createOrgGitlabGroupFixture(
           'gitlab-org/gitter'
         );
@@ -138,13 +126,12 @@ describe('StepMain', () => {
     });
 
     it('clicking change moves back to backing entity step', () => {
-      context.hasProvider.mockImplementation(provider => {
-        if (provider === 'gitlab') {
-          return true;
-        }
-      });
-
       const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.user = {
+          username: 'some-username_gitlab',
+          providers: ['gitlab']
+        };
+
         store.state.createCommunity.selectedBackingEntity = createOrgGitlabGroupFixture(
           'gitlab-org/gitter'
         );
@@ -160,13 +147,12 @@ describe('StepMain', () => {
     });
 
     it('clicking badger checkbox changes allowBadger', () => {
-      context.hasProvider.mockImplementation(provider => {
-        if (provider === 'github') {
-          return true;
-        }
-      });
-
       const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.user = {
+          username: 'some-username',
+          providers: ['github']
+        };
+
         store.state.createCommunity.allowBadger = true;
         store.state.createCommunity.selectedBackingEntity = createRepoGithubRepoFixture(
           'gitterhq/gitter'

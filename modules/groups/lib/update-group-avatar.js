@@ -5,7 +5,11 @@ var config = env.config;
 const debug = require('debug')('gitter:app:groups:updateGroupAvatar');
 const assert = require('assert');
 var GitHubUserService = require('gitter-web-github').GitHubUserService;
-const { GitLabGroupService, GitLabProjectService } = require('gitter-web-gitlab');
+const {
+  GitLabGroupService,
+  GitLabProjectService,
+  GitLabUserService
+} = require('gitter-web-gitlab');
 var extractGravatarVersion = require('gitter-web-avatars/server/extract-gravatar-version');
 var Group = require('gitter-web-persistence').Group;
 const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
@@ -98,15 +102,18 @@ async function updateGitterGroupAvatarForGitlab(group) {
     'NX'
   );
 
-  let gitlabGroupOrProject;
+  let gitlabObject;
   if (result === 'OK') {
     if (type === 'GL_GROUP') {
       // TODO: How do we handle private groups since we aren't passing in a user with GitLab access tokens who has access?
       const gitlabGroupService = new GitLabGroupService(/* user */);
-      gitlabGroupOrProject = await gitlabGroupService.getGroup(externalId);
+      gitlabObject = await gitlabGroupService.getGroup(externalId);
     } else if (type === 'GL_PROJECT') {
       const gitlabProjectService = new GitLabProjectService(/* user */);
-      gitlabGroupOrProject = await gitlabProjectService.getProject(externalId);
+      gitlabObject = await gitlabProjectService.getProject(externalId);
+    } else if (type === 'GL_USER') {
+      const gitlabUserService = new GitLabUserService(/* user */);
+      gitlabObject = await gitlabUserService.getUserById(externalId);
     } else {
       return false;
     }
@@ -114,11 +121,11 @@ async function updateGitterGroupAvatarForGitlab(group) {
 
   debug(
     `Attempting GitLab avatar update for group=${sanitizedGroupId} ${type}=${JSON.stringify(
-      gitlabGroupOrProject
+      gitlabObject
     )}`
   );
 
-  if (!gitlabGroupOrProject) {
+  if (!gitlabObject) {
     return false;
   }
 
@@ -129,7 +136,7 @@ async function updateGitterGroupAvatarForGitlab(group) {
     {
       $set: {
         // As a note `gitlabGroup.avatar_url` can be `null` if an avatar has not been set yet
-        avatarUrl: gitlabGroupOrProject.avatar_url,
+        avatarUrl: gitlabObject.avatar_url,
         // `avatarVersion` needs to be `1` in order for the
         // `!group.avatarVersion` logic to work in `group-avatars.js`.
         // If it's `0`, it always updates avatar.

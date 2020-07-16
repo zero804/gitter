@@ -14,29 +14,72 @@ describe('getters', () => {
     state = createState();
   });
 
-  describe('isGithubUser', () => {
+  describe('hasProvider', () => {
     it('detects GitHub user', () => {
       const state = {
         user: createSerializedUserFixture({ providers: ['github'] })
       };
-      const result = getters.isGithubUser(state, {});
+      const result = getters.hasProvider(state)('github');
       expect(result).toEqual(true);
     });
 
-    it('GitLab user does not trigger', () => {
+    it('detects GitLab user', () => {
       const state = {
         user: createSerializedUserFixture({ providers: ['gitlab'] })
       };
-      const result = getters.isGithubUser(state, {});
+      const result = getters.hasProvider(state)('gitlab');
+      expect(result).toEqual(true);
+    });
+
+    it('GitLab user does not trigger when looking for GitHub', () => {
+      const state = {
+        user: createSerializedUserFixture({ providers: ['gitlab'] })
+      };
+      const result = getters.hasProvider(state)('github');
       expect(result).toEqual(false);
     });
 
-    it('No providers does not trigger', () => {
+    it('No providers does not trigger when looking for GitHub', () => {
       const state = {
         user: createSerializedUserFixture()
       };
-      const result = getters.isGithubUser(state, {});
+      const result = getters.hasProvider(state)('github');
       expect(result).toEqual(false);
+    });
+  });
+
+  describe('identityUsername', () => {
+    it('gets GitLab username', () => {
+      const state = {
+        user: createSerializedUserFixture({
+          username: 'some-gl-username_gitlab',
+          providers: ['gitlab']
+        })
+      };
+      const result = getters.identityUsername(state);
+      expect(result).toStrictEqual('some-gl-username');
+    });
+
+    it('gets GitHub username', () => {
+      const state = {
+        user: createSerializedUserFixture({
+          username: 'some-gh-username',
+          providers: ['github']
+        })
+      };
+      const result = getters.identityUsername(state);
+      expect(result).toStrictEqual('some-gh-username');
+    });
+
+    it('gets Twitter username', () => {
+      const state = {
+        user: createSerializedUserFixture({
+          username: 'some-tw-username',
+          providers: ['twitter']
+        })
+      };
+      const result = getters.identityUsername(state);
+      expect(result).toStrictEqual('some-tw-username');
     });
   });
 
