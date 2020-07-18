@@ -6,21 +6,16 @@ const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
 
 const generateExportResource = require('./generate-export-resource');
-const ForumWithPolicyService = require('../../services/forum-with-policy-service');
+const chatService = require('gitter-web-chats');
 
-const apiForumResource = require('../../api/v1/forums');
+const apiUserResource = require('../../api/v1/user');
 
 // API uses CORS
 const corsOptions = {
   origin: true,
   methods: ['GET'],
   //maxAge: 600, // 10 minutes
-  allowedHeaders: [
-    'content-type',
-    'x-access-token',
-    'authorization',
-    'accept'
-  ],
+  allowedHeaders: ['content-type', 'x-access-token', 'authorization', 'accept'],
   exposedHeaders: [
     // Rate limiting with dolph
     'X-RateLimit-Limit',
@@ -33,30 +28,22 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 
 router.use(cors(corsOptions));
 
-
-
-const forumsResource = {
-  id: 'forum',
-  load: apiForumResource.load,
+const userResource = {
+  id: 'user',
+  load: apiUserResource.load,
   subresources: {
-    'topics.ndjson': generateExportResource(
-      'topics',
-      (req) => {
-        const forumWithPolicyService = new ForumWithPolicyService(req.forum, req.user, req.userForumPolicy);
-        return forumWithPolicyService.getTopicCursor();
+    'messages.ndjson': generateExportResource(
+      'user-messages',
+      req => {
+        return chatService.getCursorByUserId(req.user.id);
       },
-      (req) => {
-        const strategy = restSerializer.TopicStrategy.nested({
-          currentUserId: req.user && req.user._id
-        });
-
-        return strategy;
+      () => {
+        return new restSerializer.ChatStrategy();
       }
     )
   }
 };
 
-router.use('/forums', resourceRoute('api-forums', forumsResource));
-
+router.use('/user', resourceRoute('api-export-user', userResource));
 
 module.exports = router;

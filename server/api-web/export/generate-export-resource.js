@@ -13,14 +13,11 @@ function generateExportSubresource(key, getCursor, getStrategy) {
       res.end();
     },
     index: function(req, res) {
-      // Assume `topics` means we are exporting a topics forum
-      if(key === 'topics') {
-        stats.event(`api.export.${key}`, { userId: req.user && req.user.id, forumId: req.forum && String(req.forum._id), forumLcUri: req.forum && req.forum.lcUri });
-      }
+      stats.event(`api.export.${key}`, { userId: req.user && req.user.id });
 
       return Promise.resolve()
         .then(() => {
-          if(req.accepts('application/x-ndjson') !== 'application/x-ndjson') {
+          if (req.accepts('application/x-ndjson') !== 'application/x-ndjson') {
             // Not Acceptable
             throw new StatusError(406);
           }
@@ -32,8 +29,8 @@ function generateExportSubresource(key, getCursor, getStrategy) {
 
           return Promise.props({
             cursor: getCursor(req),
-            strategy: getStrategy(req),
-          })
+            strategy: getStrategy(req)
+          });
         })
         .then(({ cursor, strategy }) => {
           let isRequestCanceled = false;
@@ -44,31 +41,30 @@ function generateExportSubresource(key, getCursor, getStrategy) {
           return cursor.eachAsync(function(item) {
             // Someone may have canceled their download
             // Throw an error to stop iterating in `cursor.eachAsync`
-            if(isRequestCanceled) {
+            if (isRequestCanceled) {
               const requestClosedError = new Error('User closed request');
               requestClosedError.requestClosed = true;
               return Promise.reject(requestClosedError);
             }
 
-            return restSerializer.serializeObject(item, strategy)
-              .then((serializedItem) => {
-                res.write(`${JSON.stringify(serializedItem)}\n`);
-              });
+            return restSerializer.serializeObject(item, strategy).then(serializedItem => {
+              res.write(`${JSON.stringify(serializedItem)}\n`);
+            });
           });
         })
-        .catch((err) => {
-          if(err.requestClosed) {
+        .catch(err => {
+          if (err.requestClosed) {
             // noop
           }
           // Only create a new error if it isn't aleady a StatusError
-          else if(!(err instanceof StatusError)) {
+          else if (!(err instanceof StatusError)) {
             throw new StatusError(500, err);
           }
 
           throw err;
         });
     }
-  }
+  };
 }
 
 module.exports = generateExportSubresource;

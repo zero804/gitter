@@ -125,6 +125,21 @@ function resolveMentions(troupe, user, parsedMessage) {
   });
 }
 
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const messageCursor = ChatMessage.find({
+    fromUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+}
+
 async function addToThreadMessageCount(parentId, troupeId, count) {
   const parent = await ChatMessage.findById(parentId).exec();
   if (!parent || !mongoUtils.objectIDsEqual(parent.toTroupeId, troupeId)) {
@@ -683,6 +698,7 @@ const testOnly = {
 };
 
 module.exports = {
+  getCursorByUserId,
   newChatMessageToTroupe,
   getRecentPublicChats,
   updateChatMessage,
