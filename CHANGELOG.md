@@ -1,3 +1,8 @@
+# 20.33.0 - *upcoming*
+
+ - Stop left-menu swipe when scrolling code block/snippet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1942
+
+
 # 20.32.0 - 2020-7-16
 
  - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
