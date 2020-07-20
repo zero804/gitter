@@ -7,12 +7,13 @@ const {
   LEFT_MENU_ANNOUNCEMENTS_STATE
 } = require('../constants');
 
-function createTouchEvent(eventName, x, y) {
+function createTouchEvent(eventName, x, y, target) {
   const e = new CustomEvent(eventName);
   e.touches = [
     {
       clientX: x,
-      clientY: y
+      clientY: y,
+      target
     }
   ];
 
@@ -140,7 +141,7 @@ describe('left-menu', () => {
       );
     });
 
-    it('swipe left -> right keeps left-menu expanded', () => {
+    it('swipe left then go back right keeps left-menu expanded', () => {
       const { stubbedActions } = mount(Index, {}, store => {
         store.state.isMobile = true;
         store.state.leftMenuPinnedState = false;
@@ -180,6 +181,58 @@ describe('left-menu', () => {
       document.dispatchEvent(createTouchEvent('touchend'));
 
       expect(stubbedActions.toggleLeftMenu).not.toHaveBeenCalled();
+    });
+
+    it('swiping right on scrolled code block should not expand left-menu', () => {
+      const { stubbedActions } = mount(Index, {}, store => {
+        store.state.isMobile = true;
+        store.state.leftMenuPinnedState = false;
+        store.state.leftMenuExpandedState = false;
+      });
+
+      // Start the swipe on the left-side of the screen
+      document.dispatchEvent(
+        createTouchEvent('touchstart', 100, undefined, {
+          closest: () => {
+            return {
+              scrollLeft: 250
+            };
+          }
+        })
+      );
+
+      // Then move your finger in the right direction
+      document.dispatchEvent(createTouchEvent('touchmove', 200));
+
+      document.dispatchEvent(createTouchEvent('touchend'));
+
+      expect(stubbedActions.toggleLeftMenu).not.toHaveBeenCalled();
+    });
+
+    it('swiping right on non-scrolled code block should expand left-menu', () => {
+      const { stubbedActions } = mount(Index, {}, store => {
+        store.state.isMobile = true;
+        store.state.leftMenuPinnedState = false;
+        store.state.leftMenuExpandedState = false;
+      });
+
+      // Start the swipe on the left-side of the screen
+      document.dispatchEvent(
+        createTouchEvent('touchstart', 100, undefined, {
+          closest: () => {
+            return {
+              scrollLeft: 0
+            };
+          }
+        })
+      );
+
+      // Then move your finger in the right direction
+      document.dispatchEvent(createTouchEvent('touchmove', 200));
+
+      document.dispatchEvent(createTouchEvent('touchend'));
+
+      expect(stubbedActions.toggleLeftMenu).toHaveBeenCalled();
     });
   });
 

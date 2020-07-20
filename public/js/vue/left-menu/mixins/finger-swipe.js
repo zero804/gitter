@@ -85,6 +85,14 @@ const fingerSwipeMixin = {
     },
 
     touchstartCallback(e) {
+      // Prevent the left-menu from swiping in and out as you scroll a code block horizontally.
+      // If the code block is not scrolled at all, you can still swipe open the left-menu
+      const touchTarget = e.touches[0].target;
+      const codeBlock = touchTarget && touchTarget.closest('code');
+      if (codeBlock && codeBlock.scrollLeft !== 0) {
+        this.currentTouchActionCancelled = true;
+      }
+
       this.touchStartX = e.touches[0].clientX;
       this.touchStartY = e.touches[0].clientY;
       this.directionStartX = this.touchStartX;
