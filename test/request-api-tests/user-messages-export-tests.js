@@ -19,7 +19,9 @@ describe('user-export-api', function() {
 
   var fixture = fixtureLoader.setup({
     user1: {
-      accessToken: 'web-internal'
+      accessToken: 'web-internal',
+      // TODO: This won't be necsesary in the future
+      staff: true
     },
     userNoExport1: {
       accessToken: 'web-internal'

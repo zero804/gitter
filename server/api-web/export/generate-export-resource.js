@@ -17,6 +17,11 @@ function generateExportSubresource(key, getCursor, getStrategy) {
       try {
         stats.event(`api.export.${key}`, { userId: req.user && req.user.id });
 
+        const isStaff = req.user && req.user.staff;
+        if (!isStaff) {
+          throw new StatusError(403, 'Only staff can use the export endpoint right now');
+        }
+
         if (req.accepts('application/x-ndjson') !== 'application/x-ndjson') {
           // Not Acceptable
           throw new StatusError(406);
