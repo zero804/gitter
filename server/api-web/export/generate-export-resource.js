@@ -4,10 +4,37 @@ const Promise = require('bluebird');
 const StatusError = require('statuserror');
 const env = require('gitter-web-env');
 const stats = env.stats;
-const restSerializer = require('../../serializers/rest-serializer');
+const redisClient = env.redis.getClient();
 const asyncHandler = require('express-async-handler');
+const dolph = require('dolph');
+const restSerializer = require('../../serializers/rest-serializer');
 
 function generateExportSubresource(key, getCursor, getStrategy) {
+  const rateLimiter = dolph({
+    prefix: `export:${key}:`,
+    redisClient: redisClient,
+    limit: process.env.TEST_EXPORT_RATE_LIMIT || 1,
+    // 1 hours in seconds
+    expiry: 1 * (60 * 60),
+    keyFunction: function(req) {
+      if (req.user) {
+        if (req.authInfo && req.authInfo.client) {
+          return req.user.id + ':' + req.authInfo.client.id;
+        }
+
+        return req.user.id;
+      }
+
+      // Anonymous access tokens
+      if (req.authInfo && req.authInfo.accessToken) {
+        return req.authInfo.accessToken;
+      }
+
+      // Should never get here
+      return 'anonymous';
+    }
+  });
+
   return {
     id: key,
     respond: function(req, res) {
@@ -16,6 +43,16 @@ function generateExportSubresource(key, getCursor, getStrategy) {
     index: asyncHandler(async (req, res) => {
       try {
         stats.event(`api.export.${key}`, { userId: req.user && req.user.id });
+
+        await new Promise((resolve, reject) => {
+          rateLimiter(req, res, err => {
+            if (err) {
+              reject(err);
+            }
+
+            resolve();
+          });
+        });
 
         const isStaff = req.user && req.user.staff;
         if (!isStaff) {
@@ -42,7 +79,7 @@ function generateExportSubresource(key, getCursor, getStrategy) {
           isRequestCanceled = true;
         });
 
-        return cursor.eachAsync(function(item) {
+        return await cursor.eachAsync(async item => {
           // Someone may have canceled their download
           // Throw an error to stop iterating in `cursor.eachAsync`
           if (isRequestCanceled) {
@@ -51,14 +88,15 @@ function generateExportSubresource(key, getCursor, getStrategy) {
             return Promise.reject(requestClosedError);
           }
 
-          return restSerializer.serializeObject(item, strategy).then(serializedItem => {
-            res.write(`${JSON.stringify(serializedItem)}\n`);
-          });
+          const serializedItem = await restSerializer.serializeObject(item, strategy);
+
+          res.write(`${JSON.stringify(serializedItem)}\n`);
         });
       } catch (err) {
         // Someone canceled the download in the middle of downloading
         if (err.requestClosed) {
-          // noop
+          // noop otherwise `express-error-handler` will catch it and Express will complain about "Cannot set headers after they are sent to the client"
+          return;
         }
         // Only create a new error if it isn't aleady a StatusError
         else if (!(err instanceof StatusError)) {
