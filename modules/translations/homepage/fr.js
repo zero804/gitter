@@ -50,5 +50,6 @@
 	"API": "API",
 	"Blog": "Blog",
 	"Twitter": "Twitter",
-	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>."
+	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 4.1.0 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.",
+	"The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 5.0.1 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>.": "The above Mac installer is a signed version of 1.177 (backed by Safari). For an unsigned 5.0.1 installer (backed by <a %s>NW.js</a>), <a %s>click here to download</a>."
 }
