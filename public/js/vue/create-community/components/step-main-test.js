@@ -50,7 +50,7 @@ describe('StepMain', () => {
       wrapper.find({ ref: 'communitySlugInput' }).element.value = 'some-slug';
       wrapper.find({ ref: 'communitySlugInput' }).trigger('input');
 
-      expect(stubbedActions.createCommunity.setAndValidateCommunitySlug).toHaveBeenCalledWith(
+      expect(stubbedActions.createCommunity.updateCommunitySlug).toHaveBeenCalledWith(
         expect.anything(),
         'some-slug',
         undefined
@@ -142,6 +142,22 @@ describe('StepMain', () => {
       expect(stubbedActions.createCommunity.moveToStep).toHaveBeenCalledWith(
         expect.anything(),
         CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITLAB,
+        undefined
+      );
+    });
+
+    it('clicking clear x button clears selected backing entity', () => {
+      const { wrapper, stubbedActions } = mount(StepMain, {}, store => {
+        store.state.createCommunity.selectedBackingEntity = createOrgGitlabGroupFixture(
+          'gitlab-org/gitter'
+        );
+      });
+
+      wrapper.find({ ref: 'clearAssociationButton' }).trigger('click');
+
+      expect(stubbedActions.createCommunity.clearBackingEntity).toHaveBeenCalledWith(
+        expect.anything(),
+        undefined,
         undefined
       );
     });

@@ -3,6 +3,7 @@ import { mapState, mapGetters, mapActions } from 'vuex';
 import isGitlabSecurityDescriptorType from 'gitter-web-shared/is-gitlab-security-descriptor-type';
 
 import LoadingSpinner from '../../components/loading-spinner.vue';
+import iconClose from '../../../../images/svg/close.svg';
 
 import {
   CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITLAB,
@@ -14,6 +15,7 @@ export default {
   components: {
     LoadingSpinner
   },
+  iconClose,
   computed: {
     ...mapState({
       communityName: state => state.createCommunity.communityName,
@@ -41,7 +43,7 @@ export default {
         return this.communitySlug;
       },
       set(newCommunitySlug) {
-        this.setAndValidateCommunitySlug(newCommunitySlug);
+        this.updateCommunitySlug(newCommunitySlug);
       }
     },
     allowBadgerModel: {
@@ -68,8 +70,9 @@ export default {
     ...mapActions({
       moveToStep: 'createCommunity/moveToStep',
       setCommunityName: 'createCommunity/setCommunityName',
-      setAndValidateCommunitySlug: 'createCommunity/setAndValidateCommunitySlug',
+      updateCommunitySlug: 'createCommunity/updateCommunitySlug',
       associateUserToCommunity: 'createCommunity/associateUserToCommunity',
+      clearBackingEntity: 'createCommunity/clearBackingEntity',
       setAllowBadger: 'createCommunity/setAllowBadger',
       submitCommunity: 'createCommunity/submitCommunity'
     }),
@@ -85,6 +88,9 @@ export default {
       } else if (this.isGithubSelected) {
         this.moveToStep(CREATE_COMMUNITY_STEP_BACKING_ENTITY_GITHUB);
       }
+    },
+    onClearAssociationClicked() {
+      this.clearBackingEntity();
     },
     onCommunitySubmit() {
       this.submitCommunity();
@@ -183,6 +189,13 @@ export default {
           <i v-if="isGitlabSelected" class="icon-gitlab"></i>
           <span>{{ selectedBackingEntity.uri }}</span>
         </a>
+        <button
+          ref="clearAssociationButton"
+          class="clear-association-button"
+          @click="onClearAssociationClicked"
+        >
+          <span class="clear-association-icon" v-html="$options.iconClose"></span>
+        </button>
         <p v-if="isRepoSelected">
           <input
             ref="allowBadgerCheckbox"
@@ -278,6 +291,20 @@ a {
 }
 
 .backing-entity-link {
+}
+
+.clear-association-button {
+  background: none;
+  border: 0;
+}
+
+.clear-association-icon {
+  &::v-deep > svg {
+    width: 1em;
+    height: 1em;
+
+    fill: @base-text-color;
+  }
 }
 
 .submit-button-container {
