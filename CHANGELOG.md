@@ -3,6 +3,10 @@
  - Stop left-menu swipe when scrolling code block/snippet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1942
  - Update unsigned macOS download to point to latest 5.0.1 version, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1943
 
+Developer facing:
+
+ - Update translation links to not redirect when logged in, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1944
+
 
 # 20.32.0 - 2020-7-16
 
