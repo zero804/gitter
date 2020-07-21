@@ -54,6 +54,7 @@ function generateExportSubresource(key, getCursor, getStrategy) {
           });
         });
 
+        // TODO: Remove after we look at the CPU load from doing this with so many messages #no-staff-for-export
         const isStaff = req.user && req.user.staff;
         if (!isStaff) {
           throw new StatusError(403, 'Only staff can use the export endpoint right now');
