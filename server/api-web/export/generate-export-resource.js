@@ -13,7 +13,8 @@ function generateExportSubresource(key, getCursor, getStrategy) {
   const rateLimiter = dolph({
     prefix: `export:${key}:`,
     redisClient: redisClient,
-    limit: process.env.TEST_EXPORT_RATE_LIMIT || 1,
+    // TODO: Reduce limit to 1 after we are done testing
+    limit: process.env.TEST_EXPORT_RATE_LIMIT || 100,
     // 1 hours in seconds
     expiry: 1 * (60 * 60),
     keyFunction: function(req) {
