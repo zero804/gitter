@@ -349,8 +349,8 @@ function findByIdInRoom(troupeId, id, callback) {
 /**
  * Returns a promise of chats with given ids
  */
-function findByIds(ids, callback) {
-  return mongooseUtils.findByIds(ChatMessage, ids, callback);
+function findByIds(ids) {
+  return mongooseUtils.findByIds(ChatMessage, ids);
 }
 
 /* This is much more cacheable than searching less than a date */

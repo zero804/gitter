@@ -279,8 +279,8 @@ var userService = {
       .nodeify(callback);
   },
 
-  findByIds: function(ids, callback) {
-    return mongooseUtils.findByIds(persistence.User, ids, callback);
+  findByIds: function(ids, { read } = {}) {
+    return mongooseUtils.findByIds(persistence.User, ids, { read });
   },
 
   findByIdsLean: function(ids, select) {
