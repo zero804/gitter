@@ -15,15 +15,14 @@ var opts = require('yargs')
   .help('help')
   .alias('help', 'h').argv;
 
-presenceService.listOnlineUsers(function(err, userIds) {
+presenceService.listOnlineUsers(async function(err, userIds) {
   if (opts.name) {
-    userService.findByIds(userIds, function(err, users) {
-      users.forEach(function(user) {
-        console.log(user.displayName);
-      });
-
-      shutdown.shutdownGracefully();
+    const users = await userService.findByIds(userIds);
+    users.forEach(function(user) {
+      console.log(user.displayName);
     });
+
+    shutdown.shutdownGracefully();
 
     return;
   }
