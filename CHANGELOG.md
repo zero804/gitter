@@ -7,6 +7,7 @@ Developer facing:
 
  - Update translation links to not redirect when logged in, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1944
  - Add ability to export user messages (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1941
+ - Prefer Mongo secondary for strategy lookups, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1948
 
 
 # 20.32.0 - 2020-7-16
