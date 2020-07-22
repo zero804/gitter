@@ -184,13 +184,14 @@ function upsert(schema, query, setOperation) {
 /**
  * Returns a promise of documents
  */
-function findByIds(Model, ids, callback) {
+function findByIds(Model, ids, { read } = {}) {
   return Promise.try(function() {
     if (!ids || !ids.length) return [];
 
     /* Special case for a single ID */
     if (ids.length === 1) {
       return Model.findById(ids[0])
+        .read(read)
         .exec()
         .then(function(doc) {
           if (doc) return [doc];
@@ -201,8 +202,9 @@ function findByIds(Model, ids, callback) {
     /* Usual case */
     return Model.where('_id')
       ['in'](mongoUtils.asObjectIDs(idsIn(ids)))
+      .read(read)
       .exec();
-  }).nodeify(callback);
+  });
 }
 
 /**
