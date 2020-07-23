@@ -37,27 +37,27 @@ and then starting the `webapp` and going to:
 <details>
 <summary> Generated translation links </summary>
 
-- http://localhost:5000/?lang=ar
-- http://localhost:5000/?lang=bg
-- http://localhost:5000/?lang=cs
-- http://localhost:5000/?lang=de
-- http://localhost:5000/?lang=en
-- http://localhost:5000/?lang=es
-- http://localhost:5000/?lang=fr
-- http://localhost:5000/?lang=id
-- http://localhost:5000/?lang=it
-- http://localhost:5000/?lang=ja
-- http://localhost:5000/?lang=ka
-- http://localhost:5000/?lang=ko
-- http://localhost:5000/?lang=pl
-- http://localhost:5000/?lang=pt
-- http://localhost:5000/?lang=ru
-- http://localhost:5000/?lang=sk
-- http://localhost:5000/?lang=sv
-- http://localhost:5000/?lang=tr
-- http://localhost:5000/?lang=uk
-- http://localhost:5000/?lang=zh-TW
-- http://localhost:5000/?lang=zh
+- http://localhost:5000/?&redirect=no&lang=ar
+- http://localhost:5000/?redirect=no&lang=bg
+- http://localhost:5000/?redirect=no&lang=cs
+- http://localhost:5000/?redirect=no&lang=de
+- http://localhost:5000/?redirect=no&lang=en
+- http://localhost:5000/?redirect=no&lang=es
+- http://localhost:5000/?redirect=no&lang=fr
+- http://localhost:5000/?redirect=no&lang=id
+- http://localhost:5000/?redirect=no&lang=it
+- http://localhost:5000/?redirect=no&lang=ja
+- http://localhost:5000/?redirect=no&lang=ka
+- http://localhost:5000/?redirect=no&lang=ko
+- http://localhost:5000/?redirect=no&lang=pl
+- http://localhost:5000/?redirect=no&lang=pt
+- http://localhost:5000/?redirect=no&lang=ru
+- http://localhost:5000/?redirect=no&lang=sk
+- http://localhost:5000/?redirect=no&lang=sv
+- http://localhost:5000/?redirect=no&lang=tr
+- http://localhost:5000/?redirect=no&lang=uk
+- http://localhost:5000/?redirect=no&lang=zh-TW
+- http://localhost:5000/?redirect=no&lang=zh
 
 </details>
 

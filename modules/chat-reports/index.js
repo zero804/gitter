@@ -194,8 +194,8 @@ function newReport(fromUser, messageId) {
     });
 }
 
-function findByIds(ids, callback) {
-  return mongooseUtils.findByIds(ChatMessageReport, ids, callback);
+function findByIds(ids) {
+  return mongooseUtils.findByIds(ChatMessageReport, ids);
 }
 
 function findChatMessageReports(options) {

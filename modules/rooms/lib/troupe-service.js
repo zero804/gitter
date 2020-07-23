@@ -27,8 +27,8 @@ function findByUris(uris) {
     .exec();
 }
 
-function findByIds(ids, callback) {
-  return mongooseUtils.findByIds(persistence.Troupe, ids, callback);
+function findByIds(ids) {
+  return mongooseUtils.findByIds(persistence.Troupe, ids);
 }
 
 function findByIdsLean(ids, select) {

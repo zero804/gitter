@@ -1,4 +1,15 @@
-# 20.32.0 - *upcoming*
+# 20.33.0 - 2020-7-21
+
+ - Stop left-menu swipe when scrolling code block/snippet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1942
+ - Update unsigned macOS download to point to latest 5.0.1 version, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1943
+
+Developer facing:
+
+ - Update translation links to not redirect when logged in, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1944
+ - Add ability to export user messages (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1941
+
+
+# 20.32.0 - 2020-7-16
 
  - Add clear association button to create community flow, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1935
  - Fix slow slugger performance so no main thread blocking in create community URI slug autofill, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1937
