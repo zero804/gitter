@@ -1,3 +1,8 @@
+# 20.34.0 - *upcoming*
+
+ - Use static user in user messages export for better performance, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1949
+
+
 # 20.33.0 - 2020-7-21
 
  - Stop left-menu swipe when scrolling code block/snippet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1942
