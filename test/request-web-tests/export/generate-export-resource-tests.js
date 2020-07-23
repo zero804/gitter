@@ -25,44 +25,38 @@ describe('user-messages-export-api', function() {
     },
     userNoExport1: {
       accessToken: 'web-internal'
-    },
-    troupe1: {},
-    troupe2: {},
-    message1: {
-      user: 'user1',
-      troupe: 'troupe1',
-      text: 'hello moon'
-    },
-    message2: {
-      user: 'user1',
-      troupe: 'troupe2',
-      text: 'hello sun'
-    },
-    messageNoExport1: {
-      user: 'userNoExport1',
-      troupe: 'troupe1',
-      text: 'goodbye data'
     }
   });
 
-  it('GET /api_web/export/user/:user_id/messages.ndjson as same user gets data', function() {
+  it('GET /api_web/export/user/:user_id/messages.ndjson unauthorized returns nothing', function() {
     return request(app)
       .get(`/api_web/export/user/${fixture.user1.id}/messages.ndjson`)
       .set('Accept', 'application/x-ndjson,application/json')
-      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
-      .expect(200)
+      .expect(401)
       .then(function(result) {
-        assert.strictEqual(
-          result.text.split('\n').length,
-          3,
-          'includes 2 messages (extra newline at the end)'
-        );
-        assert(result.text.includes(fixture.message1.id), 'includes message1');
-        assert(result.text.includes(fixture.message2.id), 'includes message2');
-        assert(
-          !result.text.includes(fixture.messageNoExport1.id),
-          'does not include messageNoExport1'
-        );
+        assert.deepEqual(result.body, { success: false, loginRequired: true });
+      });
+  });
+
+  it('GET /api_web/export/user/:user_id/messages.ndjson forbidden returns nothing', function() {
+    return request(app)
+      .get(`/api_web/export/user/${fixture.user1.id}/messages.ndjson`)
+      .set('Accept', 'application/x-ndjson,application/json')
+      .set('Authorization', `Bearer ${fixture.userNoExport1.accessToken}`)
+      .expect(403)
+      .then(function(result) {
+        assert.deepEqual(result.body, { error: 'Forbidden' });
+      });
+  });
+
+  it('GET /api_web/export/user/:user_id/messages.ndjson as <img> does not work', function() {
+    return request(app)
+      .get(`/api_web/export/user/${fixture.user1.id}/messages.ndjson`)
+      .set('Accept', 'image/*')
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(406)
+      .then(function(result) {
+        assert.deepEqual(result.body, {});
       });
   });
 });

@@ -28,38 +28,6 @@ describe('user-me-export-api', function() {
     }
   });
 
-  it('GET /api_web/export/user/:user_id/me.ndjson unauthorized returns nothing', function() {
-    return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/me.ndjson`)
-      .set('Accept', 'application/x-ndjson,application/json')
-      .expect(401)
-      .then(function(result) {
-        assert.deepEqual(result.body, { success: false, loginRequired: true });
-      });
-  });
-
-  it('GET /api_web/export/user/:user_id/me.ndjson forbidden returns nothing', function() {
-    return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/me.ndjson`)
-      .set('Accept', 'application/x-ndjson,application/json')
-      .set('Authorization', `Bearer ${fixture.userNoExport1.accessToken}`)
-      .expect(403)
-      .then(function(result) {
-        assert.deepEqual(result.body, { error: 'Forbidden' });
-      });
-  });
-
-  it('GET /api_web/export/user/:user_id/me.ndjson as <img> does not work', function() {
-    return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/me.ndjson`)
-      .set('Accept', 'image/*')
-      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
-      .expect(406)
-      .then(function(result) {
-        assert.deepEqual(result.body, {});
-      });
-  });
-
   it('GET /api_web/export/user/:user_id/me.ndjson as user itself gets data', function() {
     return request(app)
       .get(`/api_web/export/user/${fixture.user1.id}/me.ndjson`)
