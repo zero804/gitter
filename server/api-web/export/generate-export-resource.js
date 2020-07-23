@@ -9,7 +9,7 @@ const asyncHandler = require('express-async-handler');
 const dolph = require('dolph');
 const restSerializer = require('../../serializers/rest-serializer');
 
-function generateExportSubresource(key, getCursor, getStrategy) {
+function generateExportResource(key, getCursor, getStrategy) {
   const rateLimiter = dolph({
     prefix: `export:${key}:`,
     redisClient: redisClient,
@@ -66,10 +66,14 @@ function generateExportSubresource(key, getCursor, getStrategy) {
           throw new StatusError(406);
         }
 
+        const exportDate = new Date();
+        const dateString = `${exportDate.getUTCFullYear()}-${exportDate.getUTCMonth() +
+          1}-${exportDate.getUTCDate()}`;
+
         // https://github.com/ndjson/ndjson-spec#33-mediatype-and-file-extensions
         res.set('Content-Type', 'application/x-ndjson');
         // Force a download
-        res.set('Content-Disposition', `attachment;filename=${key}.ndjson`);
+        res.set('Content-Disposition', `attachment;filename=gitter-${key}-${dateString}.ndjson`);
 
         const { cursor, strategy } = await Promise.props({
           cursor: getCursor(req),
@@ -111,4 +115,4 @@ function generateExportSubresource(key, getCursor, getStrategy) {
   };
 }
 
-module.exports = generateExportSubresource;
+module.exports = generateExportResource;

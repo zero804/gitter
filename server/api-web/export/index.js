@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
+const persistence = require('gitter-web-persistence');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 const generateExportResource = require('./generate-export-resource');
 const chatService = require('gitter-web-chats');
@@ -32,6 +34,20 @@ const userResource = {
   id: 'user',
   load: apiUserResource.load,
   subresources: {
+    'me.ndjson': generateExportResource(
+      'user-data',
+      req => {
+        return persistence.User.find({
+          _id: req.user.id
+        })
+          .lean()
+          .read(mongoReadPrefs.secondaryPreferred)
+          .cursor();
+      },
+      () => {
+        return new restSerializer.UserStrategy();
+      }
+    ),
     'messages.ndjson': generateExportResource(
       'user-messages',
       req => {

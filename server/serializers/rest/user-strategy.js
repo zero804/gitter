@@ -86,9 +86,11 @@ function UserProvidersStrategy() {
     // to revisit this.
     var nonGitHub = [];
     users.each(function(user) {
+      const userId = user.id || user._id;
+
       if (userScopes.isGitHubUser(user)) {
         // github user so no need to look up identities at the time of writing
-        providersByUser[user.id] = ['github'];
+        providersByUser[userId] = ['github'];
       } else {
         // non-github, so we have to look up the user's identities.
         nonGitHub.push(user);
@@ -132,7 +134,8 @@ function UserStrategy(options) {
       strategies.push(
         userRoleInTroupeStrategy.preload(
           users.map(function(user) {
-            return user._id;
+            const userId = user.id || user._id;
+            return userId;
           })
         )
       );
@@ -168,16 +171,16 @@ function UserStrategy(options) {
 
     var obj;
 
+    const userId = user.id || user._id;
+
     if (lean) {
       obj = {
-        id: user.id,
+        id: userId,
         status: options.includeEmail ? user.status : undefined,
         username: user.username,
         online:
-          (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id)) || undefined,
-        role:
-          (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id)) ||
-          undefined,
+          (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(userId)) || undefined,
+        role: (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(userId)) || undefined,
         removed: user.state === 'REMOVED' || undefined, // true or undefined
         v: getVersion(user)
       };
@@ -194,7 +197,7 @@ function UserStrategy(options) {
     }
 
     obj = {
-      id: user.id,
+      id: userId,
       status: options.includeEmail ? user.status : undefined,
       username: user.username,
       displayName: displayNameForUser(user),
@@ -204,12 +207,10 @@ function UserStrategy(options) {
       avatarUrlMedium: resolveUserAvatarUrl(user, 128),
       scopes: scopes,
       online:
-        (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(user.id)) || undefined,
+        (userPresenceInTroupeStrategy && userPresenceInTroupeStrategy.map(userId)) || undefined,
       staff: user.staff,
-      role:
-        (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(user.id || user._id)) ||
-        undefined,
-      providers: (userProvidersStrategy && userProvidersStrategy.map(user.id)) || undefined,
+      role: (userRoleInTroupeStrategy && userRoleInTroupeStrategy.map(userId)) || undefined,
+      providers: (userProvidersStrategy && userProvidersStrategy.map(userId)) || undefined,
       removed: user.state === 'REMOVED' || undefined, // true or undefined
       v: getVersion(user)
     };
@@ -236,8 +237,10 @@ function SlimUserStrategy() {}
 SlimUserStrategy.prototype = {
   preload: function() {},
   map: function(user) {
+    const userId = user.id || user._id;
+
     return {
-      id: user.id,
+      id: userId,
       username: user.username,
       displayName: user.displayName,
       avatarUrl: avatars.getForUser(user)
