@@ -37,8 +37,14 @@ const userResource = {
       req => {
         return chatService.getCursorByUserId(req.user.id);
       },
-      () => {
-        return new restSerializer.ChatStrategy();
+      req => {
+        // Serialize the user once and re-use it for all of the users' messages
+        const userStrategy = new restSerializer.UserStrategy();
+        const serializedUser = restSerializer.serializeObject(req.user, userStrategy);
+
+        return new restSerializer.ChatStrategy({
+          user: serializedUser
+        });
       }
     )
   }
