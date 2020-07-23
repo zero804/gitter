@@ -1,6 +1,7 @@
 # 20.34.0 - *upcoming*
 
  - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
+ - Add web app manifest for PWA homescreen install, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1946
 
 Developer facing:
 
