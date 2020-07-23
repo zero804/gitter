@@ -1,5 +1,9 @@
 # 20.34.0 - *upcoming*
 
+ - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
+
+Developer facing:
+
  - Use static user in user messages export for better performance, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1949
 
 
