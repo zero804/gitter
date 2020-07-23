@@ -4,6 +4,8 @@ const path = require('path');
 const merge = require('webpack-merge');
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin;
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { InjectManifest } = require('workbox-webpack-plugin');
+const cdn = require('gitter-web-cdn');
 
 const baseConfig = require('./webpack.base.config.js');
 
@@ -84,6 +86,28 @@ const webpackConfig = merge(baseConfig, {
     }
   },
   plugins: [
+    new InjectManifest({
+      swSrc: require.resolve('gitter-web-service-worker/service-worker/sw.js'),
+      swDest: 'sw.js',
+      // 5mb
+      // 5 * 1024(megabyte) * 1024(kilobyte)
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      manifestTransforms: [
+        // Transform the entries to account for the CDN
+        async manifestEntries => {
+          const jsRoot = 'js';
+          const manifest = manifestEntries.map(entry => {
+            if (entry.url.startsWith('/_s/l/js/')) {
+              const asset = entry.url.replace(/^\/_s\/l\/js\//, '');
+              entry.url = cdn(`${jsRoot}/${asset}`);
+            }
+            return entry;
+          });
+          return { manifest, warnings: [] };
+        }
+      ]
+    }),
+
     new StatsWriterPlugin({
       filename: 'webpack-manifest.json',
       transform: function(data, opts) {

@@ -4,14 +4,17 @@ var path = require('path');
 var fs = require('fs');
 
 function createStatic() {
-  var staticDir = path.join(__dirname, '..', 'output', 'assets');
+  var staticDir = path.join(__dirname, '../../../output/assets/js');
   var staticFile = path.join(staticDir, 'sw.js');
 
-  if (!fs.existsSync(staticFile)) {
-    throw new Error('Cannot resolve service worker: ' + staticFile);
-  }
-
   return function(req, res, next) {
+    if (!fs.existsSync(staticFile)) {
+      throw new Error(
+        'You probably need to wait for the Gitter webpack build to finish. Cannot resolve service worker: ' +
+          staticFile
+      );
+    }
+
     var options = {
       dotfiles: 'deny',
       headers: {
@@ -26,15 +29,7 @@ function createStatic() {
 }
 
 function install(app) {
-  if (
-    process.env.NODE_ENV === 'dev' ||
-    process.env.NODE_ENV === 'test' ||
-    process.env.NODE_ENV === 'test-docker'
-  ) {
-    app.use('/', require('../dev/webpack-middleware').create());
-  } else {
-    app.get('/sw.js', createStatic());
-  }
+  app.get('/sw.js', createStatic());
 }
 
 module.exports = {

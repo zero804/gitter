@@ -19,7 +19,13 @@ exports.install = function(app) {
       writeToDisk: filePath => {
         // We use the `webpack-manifest.json` in `hbs-helpers`
         // to determine which dynamic/dependent chunks to serve
-        return /webpack-manifest\.json$/.test(filePath);
+        if (/webpack-manifest\.json$/.test(filePath)) {
+          return true;
+        }
+        // We write the service-worker to disk so we can serve it from the root (see `sw-static.js`)
+        else if (/sw\.js$/.test(filePath)) {
+          return true;
+        }
       },
       stats: {
         colors: true

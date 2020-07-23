@@ -4,5 +4,5 @@
 var gulpStaged = require('../../build-scripts/gulp-staged');
 
 gulpStaged({
-  'service-worker': require('./gulpfile-service-worker')
+  //'service-worker': require('./gulpfile-service-worker')
 });

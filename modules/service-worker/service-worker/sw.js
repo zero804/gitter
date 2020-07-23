@@ -1,5 +1,7 @@
 'use strict';
 
+const { precacheAndRoute } = require('workbox-precaching/precacheAndRoute');
+
 var handler = require('./handler');
 
 var idSeq = 0;
@@ -40,3 +42,5 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('notificationclose', function(/*event*/) {
   // Do we want to do something here?
 });
+
+precacheAndRoute(self.__WB_MANIFEST);
