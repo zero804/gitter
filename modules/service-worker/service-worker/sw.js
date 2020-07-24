@@ -40,3 +40,10 @@ self.addEventListener('notificationclick', function(event) {
 self.addEventListener('notificationclose', function(/*event*/) {
   // Do we want to do something here?
 });
+
+self.addEventListener('fetch', async () => {
+  // This is a dumb fetch listener just for the homescreen install requirements.
+  // https://web.dev/install-criteria/
+  // We don't cache anything here yet
+  return;
+});
