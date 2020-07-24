@@ -1,6 +1,8 @@
 'use strict';
 
 var path = require('path');
+const webpack = require('webpack');
+const clientEnv = require('gitter-client-env');
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'prod';
 
@@ -17,6 +19,11 @@ var config = {
     devtoolModuleFilenameTemplate: '[resource-path]',
     devtoolFallbackModuleFilenameTemplate: '[resource-path]?[hash]'
   },
+  plugins: [
+    new webpack.DefinePlugin({
+      GITTER_CLIENT_ENV: JSON.stringify(clientEnv)
+    })
+  ],
   bail: true
 };
 

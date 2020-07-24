@@ -3,6 +3,7 @@
     "serviceworker": true
   },
   "globals": {
-    "Promise": false
+    "Promise": false,
+    "GITTER_CLIENT_ENV": true
   }
 }
