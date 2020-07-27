@@ -1,4 +1,4 @@
-# 20.34.0 - *upcoming* - PWA homescreen install
+# 20.34.0 - 2020-7-27 - PWA homescreen install
 
  - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
  - Make app installable (PWA homescreen install):
