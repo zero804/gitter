@@ -109,7 +109,6 @@ var listForUser = Promise.method(function(user) {
  */
 function getCursorByUserId(userId) {
   const messageCursor = Identity.find({
-    // TODO: there might not be an index for this
     userId
   })
     .lean()
