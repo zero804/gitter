@@ -6,6 +6,7 @@
 Developer facing:
 
  - Use static user in user messages export for better performance, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1949
+ - Set CDN config to match the CLI arg we override with anyway, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1955
 
 
 # 20.33.0 - 2020-7-21
