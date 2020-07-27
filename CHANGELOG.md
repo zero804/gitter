@@ -2,6 +2,10 @@
 
  - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
 
+Developer facing:
+
+ - Add `userId` index for identities for the export endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1958
+
 
 # 20.34.0 - 2020-7-27 - PWA homescreen install
 
