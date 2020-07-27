@@ -8,6 +8,7 @@ const persistence = require('gitter-web-persistence');
 const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 const generateExportResource = require('./generate-export-resource');
+const identityService = require('gitter-web-identity');
 const chatService = require('gitter-web-chats');
 
 const apiUserResource = require('../../api/v1/user');
@@ -43,6 +44,15 @@ const userResource = {
           .lean()
           .read(mongoReadPrefs.secondaryPreferred)
           .cursor();
+      },
+      () => {
+        return new restSerializer.UserStrategy();
+      }
+    ),
+    'identities.ndjson': generateExportResource(
+      'user-identites',
+      req => {
+        return identityService.getCursorByUserId(req.user.id);
       },
       () => {
         return new restSerializer.UserStrategy();
