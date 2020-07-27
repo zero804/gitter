@@ -1,3 +1,8 @@
+# 20.35.0 - *upcoming*
+
+ - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
+
+
 # 20.34.0 - 2020-7-27 - PWA homescreen install
 
  - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
