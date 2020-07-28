@@ -21,6 +21,7 @@ RUN cat package-lock.json | node filter-package-lock-json-cli.js > temp-package-
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates git make python g++ \
     && npm install --production \
+    # via https://github.com/nodejs/docker-node/blob/1d6a051d71e817f3947612a260ddcb02e48c2f74/10/buster-slim/Dockerfile#L53
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false python g++
 
 RUN rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.node-gyp /root/.gnupg /root/.ssh 2>/dev/null
