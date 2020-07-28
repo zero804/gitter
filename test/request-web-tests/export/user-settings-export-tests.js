@@ -9,8 +9,9 @@ const assert = require('assert');
 const request = require('supertest');
 
 const app = require('../../../server/web');
+const userSettingsService = require('gitter-web-user-settings');
 
-describe('user-identities-export-api', function() {
+describe('user-settings-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
@@ -25,22 +26,15 @@ describe('user-identities-export-api', function() {
     },
     userNoExport1: {
       accessToken: 'web-internal'
-    },
-    identityGitlab1: {
-      user: 'user1',
-      provider: 'gitlab',
-      providerKey: fixtureLoader.generateGithubId()
-    },
-    identityNoExport1: {
-      user: 'userNoExport1',
-      provider: 'gitlab',
-      providerKey: fixtureLoader.generateGithubId()
     }
   });
 
-  it('GET /api_web/export/user/:user_id/identities.ndjson as same user gets data', function() {
+  it('GET /api_web/export/user/:user_id/user-settings.ndjson as same user gets data', async () => {
+    await userSettingsService.setUserSettings(fixture.user1.id, 'test', 'foobar');
+    await userSettingsService.setUserSettings(fixture.userNoExport1.id, 'test', 'noexport');
+
     return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/identities.ndjson`)
+      .get(`/api_web/export/user/${fixture.user1.id}/user-settings.ndjson`)
       .set('Accept', 'application/x-ndjson,application/json')
       .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
       .expect(200)
@@ -48,13 +42,9 @@ describe('user-identities-export-api', function() {
         assert.strictEqual(
           result.text.split('\n').length,
           2,
-          'includes 1 identity (extra newline at the end)'
+          'includes 1 setting item (extra newline at the end)'
         );
-        assert(result.text.includes(fixture.identityGitlab1.id), 'includes identityGitlab1');
-        assert(
-          !result.text.includes(fixture.identityNoExport1.id),
-          'does not include identityNoExport1'
-        );
+        assert(result.text.includes('"test":"foobar"'), 'includes test user settings');
       });
   });
 });

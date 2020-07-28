@@ -4,6 +4,22 @@ var persistence = require('gitter-web-persistence');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var assert = require('assert');
 var Promise = require('bluebird');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+
+/**
+ * For exporting things
+ */
+exports.getCursorByUserId = function(userId) {
+  const messageCursor = persistence.UserSettings.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+};
 
 exports.getUserSettings = function(userId, settingsKey) {
   /* Not sure why mongoose isn't converting these */
