@@ -16,10 +16,10 @@ function getLocales(localeDir) {
     files
       .filter(function(file) {
         var fullName = path.join(localeDir, file);
-        return fs.statSync(fullName).isFile() && path.extname(file) === '.js';
+        return fs.statSync(fullName).isFile() && path.extname(file) === '.json';
       })
       .map(function(file) {
-        return path.basename(file, '.js');
+        return path.basename(file, '.json');
       })
       .filter(function(lang) {
         return lang !== 'en';
@@ -40,6 +40,7 @@ module.exports = {
       defaultLocale: 'en',
       devMode: devMode,
       directory: messagesPath,
+      extension: '.json',
       request: req
     });
   },
@@ -54,6 +55,7 @@ module.exports = {
       defaultLocale: 'en',
       devMode: devMode,
       directory: homepagePath,
+      extension: '.json',
       request: req
     });
   }
