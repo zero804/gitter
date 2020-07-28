@@ -7,6 +7,9 @@ stages:
 
 variables:
   DOCKER_VERSION: '19.03.0'
+  # We don't use the default CI_REGISTRY_IMAGE variable because the security release process on dev.gitlab.org needs to target the gitlab.com registry.
+  # https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1952#note_386372016
+  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitlab-org/gitter/webapp
 
 ##############
 # Conditions #
@@ -84,20 +87,20 @@ default:
 
 .webapp_services:
   - &webapp_service_mongo
-    name: $CI_REGISTRY_IMAGE/mongo:latest
+    name: $GITTER_CI_REGISTRY_IMAGE/mongo:latest
     alias: mongo
   - &webapp_service_redis
     name: redis:3.0.3
     alias: redis
   - &webapp_service_elasticsearch
-    name: $CI_REGISTRY_IMAGE/elasticsearch:latest
+    name: $GITTER_CI_REGISTRY_IMAGE/elasticsearch:latest
     alias: elasticsearch
   - &webapp_service_neo4j
     name: neo4j:2.3
     alias: neo4j
 
 .node_job:
-  image: $CI_REGISTRY_IMAGE
+  image: $GITTER_CI_REGISTRY_IMAGE
   before_script:
     - node --version
     - npm --version
@@ -246,7 +249,7 @@ mobile-asset-build:
       - output/ios/www
 
 .distribute_job:
-  image: $CI_REGISTRY_IMAGE/deploy-build-image:latest
+  image: $GITTER_CI_REGISTRY_IMAGE/deploy-build-image:latest
   stage: pre_deploy
   dependencies:
     - package
@@ -298,9 +301,9 @@ containerize:
   allow_failure: true
   script:
     - ls -la output
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
-    - docker push $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t $GITTER_CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG -f Dockerfile-app-base .
+    - docker push $GITTER_CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
 
 deploy-build-image:
   extends: .use-docker-in-docker
@@ -308,13 +311,13 @@ deploy-build-image:
   rules:
     - <<: *if-schedule
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/deploy-build-image:latest scripts/docker/deploy-build-image/
-    - docker push $CI_REGISTRY_IMAGE/deploy-build-image:latest
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t $GITTER_CI_REGISTRY_IMAGE/deploy-build-image:latest scripts/docker/deploy-build-image/
+    - docker push $GITTER_CI_REGISTRY_IMAGE/deploy-build-image:latest
 
 .deploy_job:
   stage: deploy
-  image: $CI_REGISTRY_IMAGE/deploy-build-image:latest
+  image: $GITTER_CI_REGISTRY_IMAGE/deploy-build-image:latest
   variables:
     GIT_STRATEGY: none
   before_script:
@@ -401,9 +404,9 @@ docker-base:
   rules:
     - <<: *if-schedule
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t $GITTER_CI_REGISTRY_IMAGE:latest .
+    - docker push $GITTER_CI_REGISTRY_IMAGE:latest
 
 mongo-base:
   extends: .use-docker-in-docker
@@ -411,9 +414,9 @@ mongo-base:
   rules:
     - <<: *if-schedule
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/mongo:latest scripts/docker/mongo-image/
-    - docker push $CI_REGISTRY_IMAGE/mongo:latest
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t $GITTER_CI_REGISTRY_IMAGE/mongo:latest scripts/docker/mongo-image/
+    - docker push $GITTER_CI_REGISTRY_IMAGE/mongo:latest
 
 elasticsearch-base:
   extends: .use-docker-in-docker
@@ -421,9 +424,9 @@ elasticsearch-base:
   rules:
     - <<: *if-schedule
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker build -t $CI_REGISTRY_IMAGE/elasticsearch:latest scripts/docker/elasticsearch-image/
-    - docker push $CI_REGISTRY_IMAGE/elasticsearch:latest
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN registry.gitlab.com
+    - docker build -t $GITTER_CI_REGISTRY_IMAGE/elasticsearch:latest scripts/docker/elasticsearch-image/
+    - docker push $GITTER_CI_REGISTRY_IMAGE/elasticsearch:latest
 
 renovate:
   extends: .use-docker-in-docker
@@ -464,7 +467,7 @@ container_scanning:
   variables:
     DOCKERFILE_PATH: Dockerfile-app-base
     GIT_STRATEGY: fetch
-    CI_APPLICATION_REPOSITORY: $CI_REGISTRY_IMAGE/app
+    CI_APPLICATION_REPOSITORY: $GITTER_CI_REGISTRY_IMAGE/app
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
 sast:
@@ -510,7 +513,7 @@ dast:
     # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
     - cp /etc/hosts "${CI_PROJECT_DIR}/"
   services:
-    - name: $CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
+    - name: $GITTER_CI_REGISTRY_IMAGE/app:$CI_COMMIT_REF_SLUG
       alias: webapp-server
       # Used to communicate with the other services and share the other hostnames we can connect to
       # See https://gitlab.com/gitlab-org/gitlab-runner/issues/1042#note_144420147
