@@ -11,9 +11,18 @@ const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
 const chatService = require('gitter-web-chats');
 const userSettingsService = require('gitter-web-user-settings');
+const groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
 const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
 
 const apiUserResource = require('../../api/v1/user');
+
+async function* iterableFromMongooseCursor(cursor) {
+  let doc = await cursor.next();
+  do {
+    yield doc;
+    doc = await cursor.next();
+  } while (doc !== null);
+}
 
 // API uses CORS
 const corsOptions = {
@@ -37,53 +46,61 @@ const userResource = {
   id: 'user',
   load: apiUserResource.load,
   subresources: {
-    'me.ndjson': generateExportResource(
-      'user-data',
-      req => {
-        return persistence.User.find({
+    'me.ndjson': generateExportResource('user-data', {
+      getIterable: req => {
+        const cursor = persistence.User.find({
           _id: req.user.id
         })
           .lean()
           .read(mongoReadPrefs.secondaryPreferred)
           .cursor();
+
+        return iterableFromMongooseCursor(cursor);
       },
-      () => {
+      getStrategy: () => {
         return new restSerializer.UserStrategy();
       }
-    ),
-    'user-settings.ndjson': generateExportResource(
-      'user-settings',
-      req => {
-        return userSettingsService.getCursorByUserId(req.user.id);
+    }),
+    'user-settings.ndjson': generateExportResource('user-settings', {
+      getIterable: req => {
+        return iterableFromMongooseCursor(userSettingsService.getCursorByUserId(req.user.id));
       },
-      () => {
+      getStrategy: () => {
         return new restSerializer.PassthroughStrategy();
       }
-    ),
-    'user-group-favourites.ndjson': generateExportResource(
-      'user-group-favourites',
-      req => {
-        return groupFavouritesCore.getCursorByUserId(req.user.id);
+    }),
+    'identities.ndjson': generateExportResource('user-identites', {
+      getIterable: req => {
+        return iterableFromMongooseCursor(identityService.getCursorByUserId(req.user.id));
       },
-      () => {
-        return new restSerializer.PassthroughStrategy();
-      }
-    ),
-    'identities.ndjson': generateExportResource(
-      'user-identites',
-      req => {
-        return identityService.getCursorByUserId(req.user.id);
-      },
-      () => {
+      getStrategy: () => {
         return new restSerializer.UserStrategy();
       }
-    ),
-    'messages.ndjson': generateExportResource(
-      'user-messages',
-      req => {
-        return chatService.getCursorByUserId(req.user.id);
+    }),
+    'group-favourites.ndjson': generateExportResource('user-group-favourites', {
+      getIterable: req => {
+        return iterableFromMongooseCursor(groupFavouritesCore.getCursorByUserId(req.user.id));
       },
-      req => {
+      getStrategy: () => {
+        return new restSerializer.PassthroughStrategy();
+      }
+    }),
+    'admin-groups.ndjson': generateExportResource('admin-groups', {
+      getIterable: req => {
+        return groupMembershipService.findAdminGroupsForUser(req.user);
+      },
+      getStrategy: req => {
+        return new restSerializer.GroupStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user
+        });
+      }
+    }),
+    'messages.ndjson': generateExportResource('user-messages', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(chatService.getCursorByUserId(req.user.id));
+      },
+      getStrategy: req => {
         // Serialize the user once and re-use it for all of the users' messages
         const userStrategy = new restSerializer.UserStrategy();
         const serializedUser = restSerializer.serializeObject(req.user, userStrategy);
@@ -92,7 +109,7 @@ const userResource = {
           user: serializedUser
         });
       }
-    )
+    })
   }
 };
 
