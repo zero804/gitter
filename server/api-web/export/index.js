@@ -11,6 +11,7 @@ const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
 const chatService = require('gitter-web-chats');
 const userSettingsService = require('gitter-web-user-settings');
+const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -54,6 +55,15 @@ const userResource = {
       'user-settings',
       req => {
         return userSettingsService.getCursorByUserId(req.user.id);
+      },
+      () => {
+        return new restSerializer.PassthroughStrategy();
+      }
+    ),
+    'user-group-favourites.ndjson': generateExportResource(
+      'user-group-favourites',
+      req => {
+        return groupFavouritesCore.getCursorByUserId(req.user.id);
       },
       () => {
         return new restSerializer.PassthroughStrategy();
