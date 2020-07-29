@@ -1,6 +1,6 @@
 'use strict';
 
-const Promise = require('bluebird');
+const assert = require('assert');
 const StatusError = require('statuserror');
 const env = require('gitter-web-env');
 const stats = env.stats;
@@ -9,7 +9,10 @@ const asyncHandler = require('express-async-handler');
 const dolph = require('dolph');
 const restSerializer = require('../../serializers/rest-serializer');
 
-function generateExportResource(key, getCursor, getStrategy) {
+function generateExportResource(key, { getIterable, getStrategy }) {
+  assert(getIterable);
+  assert(getStrategy);
+
   const rateLimiter = dolph({
     prefix: `export:${key}:`,
     redisClient: redisClient,
@@ -75,19 +78,16 @@ function generateExportResource(key, getCursor, getStrategy) {
         // Force a download
         res.set('Content-Disposition', `attachment;filename=gitter-${key}-${dateString}.ndjson`);
 
-        const { cursor, strategy } = await Promise.props({
-          cursor: getCursor(req),
-          strategy: getStrategy(req)
-        });
+        const [iterable, strategy] = await Promise.all([getIterable(req), getStrategy(req)]);
 
         let isRequestCanceled = false;
         req.on('close', function() {
           isRequestCanceled = true;
         });
 
-        return await cursor.eachAsync(async item => {
+        for await (let item of iterable) {
           // Someone may have canceled their download
-          // Throw an error to stop iterating in `cursor.eachAsync`
+          // Throw an error and stop iterating
           if (isRequestCanceled) {
             const requestClosedError = new Error('User closed request');
             requestClosedError.requestClosed = true;
@@ -97,7 +97,7 @@ function generateExportResource(key, getCursor, getStrategy) {
           const serializedItem = await restSerializer.serializeObject(item, strategy);
 
           res.write(`${JSON.stringify(serializedItem)}\n`);
-        });
+        }
       } catch (err) {
         // Someone canceled the download in the middle of downloading
         if (err.requestClosed) {

@@ -9,9 +9,8 @@ const assert = require('assert');
 const request = require('supertest');
 
 const app = require('../../../server/web');
-const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
 
-describe('user-group-favourites-export-api', function() {
+describe('user-admin-groups-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
@@ -21,36 +20,42 @@ describe('user-group-favourites-export-api', function() {
   var fixture = fixtureLoader.setup({
     user1: {
       accessToken: 'web-internal',
+      githubId: undefined,
+      githubToken: undefined,
       // TODO: This won't be necessary in the future #no-staff-for-export
       staff: true
     },
     userNoExport1: {
       accessToken: 'web-internal'
     },
-    group1: {},
-    group2: {},
-    groupNoExport1: {}
+    group1: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
+    group2: {
+      securityDescriptor: {
+        extraAdmins: ['user1']
+      }
+    },
+    groupNoExport1: {
+      securityDescriptor: {
+        extraAdmins: ['userNoExport1']
+      }
+    }
   });
 
-  it('GET /api_web/export/user/:user_id/group-favourites.ndjson as same user gets data', async () => {
-    await groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group1.id, 1);
-    await groupFavouritesCore.updateFavourite(fixture.user1.id, fixture.group2.id, 2);
-    await groupFavouritesCore.updateFavourite(
-      fixture.userNoExport1.id,
-      fixture.groupNoExport1.id,
-      0
-    );
-
+  it('GET /api_web/export/user/:user_id/admin-groups.ndjson as same user gets data', async () => {
     return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/group-favourites.ndjson`)
+      .get(`/api_web/export/user/${fixture.user1.id}/admin-groups.ndjson`)
       .set('Accept', 'application/x-ndjson,application/json')
       .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
       .expect(200)
       .then(function(result) {
         assert.strictEqual(
           result.text.split('\n').length,
-          2,
-          'includes 1 object with `favs` map (extra newline at the end)'
+          3,
+          'includes 2 admin groups (extra newline at the end)'
         );
         assert(result.text.includes(fixture.group1.id), 'includes group1');
         assert(result.text.includes(fixture.group2.id), 'includes group2');
