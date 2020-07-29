@@ -2,7 +2,8 @@
 
  - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
  - Add export endpoint for user settings (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1959
- - Add export for user group favourites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1960
+ - Add export endpoint for user group favourites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1960
+ - Add export endpoint for user admin groups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1962
 
 Developer facing:
 
