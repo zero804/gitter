@@ -3,6 +3,22 @@
 var _ = require('lodash');
 var lazy = require('lazy.js');
 var persistence = require('gitter-web-persistence');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const messageCursor = persistence.UserGroupFavourites.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+}
 
 /**
  * Internal call
@@ -121,6 +137,7 @@ function updateFavourite(userId, groupId, favouritePosition) {
 }
 
 module.exports = {
+  getCursorByUserId,
   findFavouriteGroupsForUser: findFavouriteGroupsForUser,
   updateFavourite: updateFavourite
 };
