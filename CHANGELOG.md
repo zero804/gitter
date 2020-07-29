@@ -9,6 +9,7 @@ Developer facing:
  - Add `userId` index for identities for the export endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1958
  - Use -slim base Docker image for cleaner security dashboard, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1952
     - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Fix SAST parsing problem with our translation files, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1961
 
 
 # 20.34.0 - 2020-7-27 - PWA homescreen install
