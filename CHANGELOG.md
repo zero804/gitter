@@ -1,3 +1,16 @@
+# 20.34.0 - 2020-7-27 - PWA homescreen install
+
+ - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
+ - Make app installable (PWA homescreen install):
+    - Add web app manifest for PWA homescreen install, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1946
+    - Make app installable with ServiceWorker fetch handler, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1956
+
+Developer facing:
+
+ - Use static user in user messages export for better performance, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1949
+ - Set CDN config to match the CLI arg we override with anyway, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1955
+
+
 # 20.33.0 - 2020-7-21
 
  - Stop left-menu swipe when scrolling code block/snippet, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1942
@@ -7,6 +20,7 @@ Developer facing:
 
  - Update translation links to not redirect when logged in, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1944
  - Add ability to export user messages (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1941
+ - Prefer Mongo secondary for strategy lookups, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1948
 
 
 # 20.32.0 - 2020-7-16

@@ -109,6 +109,16 @@ router.get('/apps', identifyRoute('homepage-apps'), preventClickjackingMiddlewar
   });
 });
 
+router.get(
+  '/manifest.webmanifest',
+  identifyRoute('web-app-manifest'),
+  preventClickjackingMiddleware,
+  function(req, res) {
+    res.set('Content-Type', 'application/manifest+json');
+    res.render('manifest-webmanifest');
+  }
+);
+
 router.get('/robots.txt', identifyRoute('homepage-robots'), preventClickjackingMiddleware, function(
   req,
   res

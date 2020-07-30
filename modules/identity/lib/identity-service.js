@@ -87,7 +87,7 @@ var listForUser = Promise.method(function(user) {
   }
 
   if (user._cachedIdentityList) {
-    // This is boomaclart
+    // This is bad
     return user._cachedIdentityList;
   }
 
@@ -118,7 +118,7 @@ var listProvidersForUser = Promise.method(function(user) {
   }
 
   if (user._cachedIdentityList) {
-    // This is boomaclart
+    // This is bad
     return Object.keys(user._cachedIdentityList);
   }
 
