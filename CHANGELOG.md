@@ -1,4 +1,4 @@
-# 20.35.0 - *upcoming*
+# 20.35.0 - 2020-7-30
 
  - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
  - Add export endpoint for user settings (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1959
