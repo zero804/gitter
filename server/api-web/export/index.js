@@ -4,8 +4,6 @@ const express = require('express');
 const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
-const persistence = require('gitter-web-persistence');
-const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
@@ -48,14 +46,7 @@ const userResource = {
   subresources: {
     'me.ndjson': generateExportResource('user-data', {
       getIterable: req => {
-        const cursor = persistence.User.find({
-          _id: req.user.id
-        })
-          .lean()
-          .read(mongoReadPrefs.secondaryPreferred)
-          .cursor();
-
-        return iterableFromMongooseCursor(cursor);
+        return [req.user];
       },
       getStrategy: () => {
         return new restSerializer.UserStrategy();
