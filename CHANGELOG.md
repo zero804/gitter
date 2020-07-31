@@ -1,10 +1,20 @@
+
+
+# 20.36.0 - *upcoming*
+
+ - Stop chat input auto focus on room change when using touch device, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1964
+
+Developer facing:
+
+ - Simplify user export to no longer need snowflake(one-off) cursor, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1965
+
+
 # 20.35.0 - 2020-7-30
 
  - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
  - Add export endpoint for user settings (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1959
  - Add export endpoint for user group favourites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1960
  - Add export endpoint for user admin groups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1962
- - Stop chat input auto focus on room change when using touch device, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1964
 
 Developer facing:
 
