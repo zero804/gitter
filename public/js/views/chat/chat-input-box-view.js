@@ -12,7 +12,7 @@ var cocktail = require('backbone.cocktail');
 var KeyboardEventsMixin = require('../keyboard-events-mixin');
 var appEvents = require('../../utils/appevents');
 var context = require('gitter-web-client-context');
-var isMobile = require('../../utils/is-mobile');
+const isTouch = require('../../utils/is-touch');
 const toggleClass = require('../../utils/toggle-class');
 
 require('jquery-textcomplete'); // eslint-disable-line node/no-missing-require
@@ -66,7 +66,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.listenTo(this.composeMode, 'change:isComposeModeEnabled', this.onComposeModeChange);
     this.listenTo(appEvents, 'input.append', this.append);
     this.listenTo(appEvents, 'focus.request.chat', function() {
-      this.ui.textarea.focus();
+      this.focusTextAreaForNonTouchDevices();
     });
 
     this.listenTo(context.troupe(), 'change:id', function(model) {
@@ -79,7 +79,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
   serializeData: function() {
     return {
-      isMobile: isMobile()
+      isTouch: isTouch()
     };
   },
 
@@ -89,14 +89,14 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     this.removeTextareaExtensions();
     this.addTextareaExtensions();
 
-    if (!isMobile()) {
+    if (!isTouch()) {
       RAF(() => {
         // firefox only respects the "autofocus" attr if it is present on source html
         // also, dont show keyboard right away on mobile
         // Also, move the cursor to the end of the textarea text
 
         this.setCaretPosition();
-        this.ui.textarea.focus();
+        this.focusTextAreaForNonTouchDevices();
 
         // We add this to always be consistent with size after initialization.
         // Otherwise we are relying on the `blur` event to run this which isn't
@@ -109,7 +109,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onComposeModeChange: function(model, isComposeModeEnabled) {
     var placeholder;
 
-    if (isMobile()) {
+    if (isTouch()) {
       placeholder = PLACEHOLDER_MOBILE;
     } else {
       placeholder = isComposeModeEnabled ? PLACEHOLDER_COMPOSE_MODE : PLACEHOLDER;
@@ -121,7 +121,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   onTextInput: function($event) {
     var event = $event.originalEvent;
     var key = event.data;
-    if (isMobile() && key === '\n') {
+    if (isTouch() && key === '\n') {
       // google keyboard v4.1 on android doesnt actually send the correct
       // keyup/down events for the return key (code 13). This means that our
       // keyboardEvents dont fire, but we do have a "textInput" event that
@@ -258,6 +258,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   append: function(text, options) {
+    debug('append', text, options);
     var current = this.ui.textarea.val();
     if (!this.hasVisibleText()) {
       current = current + text;
@@ -271,10 +272,17 @@ var ChatInputBoxView = Marionette.ItemView.extend({
 
     this.setText(current);
     this.setCaretPosition();
-    this.ui.textarea.focus();
+    this.focusTextAreaForNonTouchDevices();
 
     // scroll input to bottom
     this.ui.textarea[0].scrollTop = this.ui.textarea[0].clientHeight;
+  },
+
+  focusTextAreaForNonTouchDevices() {
+    if (!isTouch()) {
+      debug('focusTextAreaForNonTouchDevices');
+      this.ui.textarea.focus();
+    }
   },
 
   createCodeBlockOnNewline: function(event) {
@@ -290,7 +298,7 @@ var ChatInputBoxView = Marionette.ItemView.extend({
     // move caret inside the new code block
     this.setCaretPosition(matches[0].length + 1);
 
-    if (!this.composeMode.get('isComposeModeEnabled') && !isMobile()) {
+    if (!this.composeMode.get('isComposeModeEnabled') && !isTouch()) {
       // switch to compose mode for the lifetime of this message
       this.composeMode.set('isComposeModeEnabled', true);
       this.listenToOnce(appEvents, 'chat.send', function() {
@@ -310,11 +318,12 @@ var ChatInputBoxView = Marionette.ItemView.extend({
   },
 
   setCaretPosition: function(position) {
+    debug('setCaretPosition', position);
     // default to end of text
     position = position || this.ui.textarea.val().length;
 
+    this.focusTextAreaForNonTouchDevices();
     var el = this.ui.textarea[0];
-    el.focus();
     el.setSelectionRange(position, position);
   },
 
