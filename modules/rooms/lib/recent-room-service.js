@@ -9,6 +9,7 @@ var appEvents = require('gitter-web-appevents');
 var moment = require('moment');
 var unreadItemsService = require('gitter-web-unread-items');
 var recentRoomCore = require('./recent-room-core');
+const roomFavouritesCore = require('./room-favourites-core');
 var debug = require('debug')('gitter:app:recent-room-service');
 
 exports.removeRecentRoomForUser = removeRecentRoomForUser;
@@ -24,7 +25,7 @@ function removeRecentRoomForUser(userId, roomId) {
   assert(mongoUtils.isLikeObjectId(roomId));
 
   return Promise.all([
-    recentRoomCore.clearFavourite(userId, roomId),
+    roomFavouritesCore.clearFavourite(userId, roomId),
     recentRoomCore.clearLastVisitedTroupeforUserId(userId, roomId),
     unreadItemsService.markAllChatsRead(userId, roomId)
   ]);

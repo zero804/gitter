@@ -7,6 +7,7 @@ var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 
 var recentRoomService = require('../lib/recent-room-service');
 var recentRoomCore = require('../lib/recent-room-core');
+const roomFavouritesCore = require('../lib/room-favourites-core');
 var persistenceService = require('gitter-web-persistence');
 
 describe('recent-room-service', function() {
@@ -24,7 +25,7 @@ describe('recent-room-service', function() {
       this.timeout(10000);
 
       function getFavs() {
-        return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+        return roomFavouritesCore.findFavouriteTroupesForUser(fixture.user1.id);
       }
 
       return recentRoomService
@@ -100,7 +101,7 @@ describe('recent-room-service', function() {
         return recentRoomService
           .updateFavourite(fixture.user1.id, fixture.troupe1.id, val)
           .then(function() {
-            return recentRoomCore.findFavouriteTroupesForUser(fixture.user1.id);
+            return roomFavouritesCore.findFavouriteTroupesForUser(fixture.user1.id);
           })
           .then(function(favs) {
             var isInTroupe = !!favs[fixture.troupe1.id];
