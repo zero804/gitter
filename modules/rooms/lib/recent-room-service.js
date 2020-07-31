@@ -93,7 +93,7 @@ function findInitialRoomUrlForUser(user) {
 }
 
 function updateFavourite(userId, troupeId, favouritePosition) {
-  return recentRoomCore
+  return roomFavouritesCore
     .updateFavourite(userId, troupeId, favouritePosition)
     .then(function(position) {
       // TODO: in future get rid of this but this collection is used by the native clients

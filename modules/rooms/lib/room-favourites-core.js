@@ -4,8 +4,24 @@ const lazy = require('lazy.js');
 const _ = require('lodash');
 const persistence = require('gitter-web-persistence');
 const calculateFavouriteUpdates = require('./calculate-favourite-updates');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 const LEGACY_FAV_POSITION = 1000;
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const messageCursor = persistence.UserTroupeFavourites.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+}
 
 function findFavouriteTroupesForUser(userId) {
   return persistence.UserTroupeFavourites.findOne({ userId: userId }, { favs: 1 }, { lean: true })
@@ -101,6 +117,7 @@ function updateFavourite(userId, troupeId, favouritePosition) {
 }
 
 module.exports = {
+  getCursorByUserId,
   updateFavourite,
   clearFavourite,
   findFavouriteTroupesForUser
