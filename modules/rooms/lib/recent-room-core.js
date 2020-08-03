@@ -1,117 +1,12 @@
 'use strict';
 
 var Promise = require('bluebird');
-var lazy = require('lazy.js');
 var persistence = require('gitter-web-persistence');
 var _ = require('lodash');
 var debug = require('debug')('gitter:app:recent-room-core');
-const calculateFavouriteUpdates = require('./calculate-favourite-updates');
-
-exports.updateFavourite = updateFavourite;
-exports.clearFavourite = clearFavourite;
-exports.findFavouriteTroupesForUser = findFavouriteTroupesForUser;
-exports.saveUserTroupeLastAccess = saveUserTroupeLastAccess;
-exports.getTroupeLastAccessTimesForUserExcludingHidden = getTroupeLastAccessTimesForUserExcludingHidden;
-exports.getTroupeLastAccessTimesForUser = getTroupeLastAccessTimesForUser;
-exports.findLastAccessTimesForUsersInRoom = findLastAccessTimesForUsersInRoom;
-exports.clearLastVisitedTroupeforUserId = clearLastVisitedTroupeforUserId;
 
 /* const */
-var LEGACY_FAV_POSITION = 1000;
 var DEFAULT_LAST_ACCESS_TIME = new Date('2015-07-01T00:00:00Z');
-
-/**
- * Internal call
- */
-function addTroupeAsFavouriteInLastPosition(userId, troupeId) {
-  return findFavouriteTroupesForUser(userId).then(function(userTroupeFavourites) {
-    var lastPosition =
-      lazy(userTroupeFavourites)
-        .values()
-        .concat(0)
-        .max() + 1;
-
-    var setOp = {};
-    setOp['favs.' + troupeId] = lastPosition;
-
-    return persistence.UserTroupeFavourites.update(
-      { userId: userId },
-      { $set: setOp },
-      { upsert: true, new: true }
-    )
-      .exec()
-      .thenReturn(lastPosition);
-  });
-}
-
-function addTroupeAsFavouriteInPosition(userId, troupeId, position) {
-  return findFavouriteTroupesForUser(userId).then(function(userTroupeFavourites) {
-    var values = lazy(userTroupeFavourites)
-      .pairs()
-      .value();
-
-    const newValues = calculateFavouriteUpdates(troupeId, position, values);
-
-    var inc = lazy(newValues)
-      .map(function(a) {
-        return ['favs.' + a[0], 1];
-      })
-      .toObject();
-
-    var set = {};
-    set['favs.' + troupeId] = position;
-
-    var update = { $set: set };
-    if (!_.isEmpty(inc)) update.$inc = inc; // Empty $inc is invalid
-
-    return persistence.UserTroupeFavourites.update({ userId: userId }, update, {
-      upsert: true,
-      new: true
-    })
-      .exec()
-      .thenReturn(position);
-  });
-}
-
-function clearFavourite(userId, troupeId) {
-  var setOp = {};
-  setOp['favs.' + troupeId] = 1;
-
-  return persistence.UserTroupeFavourites.update({ userId: userId }, { $unset: setOp }, {})
-    .exec()
-    .thenReturn(null);
-}
-
-function updateFavourite(userId, troupeId, favouritePosition) {
-  if (favouritePosition) {
-    /* Deal with legacy, or when the star button is toggled */
-    if (favouritePosition === true) {
-      return addTroupeAsFavouriteInLastPosition(userId, troupeId);
-    } else {
-      return addTroupeAsFavouriteInPosition(userId, troupeId, favouritePosition);
-    }
-  } else {
-    // Unset the favourite
-    return clearFavourite(userId, troupeId);
-  }
-}
-
-function findFavouriteTroupesForUser(userId) {
-  return persistence.UserTroupeFavourites.findOne({ userId: userId }, { favs: 1 }, { lean: true })
-    .exec()
-    .then(function(userTroupeFavourites) {
-      if (!userTroupeFavourites || !userTroupeFavourites.favs) return {};
-
-      return lazy(userTroupeFavourites.favs)
-        .pairs()
-        .map(function(a) {
-          // Replace any legacy values with 1000
-          if (a[1] === '1') a[1] = LEGACY_FAV_POSITION;
-          return a;
-        })
-        .toObject();
-    });
-}
 
 function clearLastVisitedTroupeforUserId(userId, troupeId) {
   debug('recent-rooms: Clearing last visited Troupe for user: %s to troupe %s', userId, troupeId);
@@ -233,3 +128,11 @@ function findLastAccessTimesForUsersInRoom(roomId, userIds) {
       }, {});
     });
 }
+
+module.exports = {
+  saveUserTroupeLastAccess,
+  getTroupeLastAccessTimesForUserExcludingHidden,
+  getTroupeLastAccessTimesForUser,
+  findLastAccessTimesForUsersInRoom,
+  clearLastVisitedTroupeforUserId
+};

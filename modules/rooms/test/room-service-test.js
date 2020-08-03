@@ -349,8 +349,8 @@ describe('room-service', function() {
   describe('remove and hide #slow', function() {
     var troupeService = require('../lib/troupe-service');
     var recentRoomService = require('../lib/recent-room-service');
+    var roomFavouritesCore = require('../lib/room-favourites-core');
     var roomMembershipService = require('../lib/room-membership-service');
-    var recentRoomCore = require('../lib/recent-room-core');
     var appEvents = require('gitter-web-appevents');
 
     describe('room-service #slow', function() {
@@ -387,7 +387,7 @@ describe('room-service', function() {
         var roomService = require('../lib/room-service');
 
         var getFavs = function() {
-          return recentRoomCore.findFavouriteTroupesForUser(fixture.userFavourite.id);
+          return roomFavouritesCore.findFavouriteTroupesForUser(fixture.userFavourite.id);
         };
 
         var createFav = function() {
