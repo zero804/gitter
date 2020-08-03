@@ -1,8 +1,7 @@
-
-
 # 20.36.0 - *upcoming*
 
  - Stop chat input auto focus on room change when using touch device, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1964
+ - Add export endpoint for user room favourites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1966
 
 Developer facing:
 
