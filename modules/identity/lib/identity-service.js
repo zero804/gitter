@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var Identity = require('gitter-web-persistence').Identity;
 var assert = require('assert');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 var isGitHubUser = require('./is-github-user');
 var GITHUB_PROVIDER_KEY = 'github';
 
@@ -104,11 +105,27 @@ var listForUser = Promise.method(function(user) {
 });
 
 /**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const messageCursor = Identity.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+}
+
+/**
  * Returns a list of provider keys for a user
  *
  * NOTE: right now you can only have one identity and this takes advantage
  * of that, but in future this will have to be updated so it doesn't return
  * early and instead appends them together.
+ * #github-uri-split #multiple-identity-user
  */
 var listProvidersForUser = Promise.method(function(user) {
   if (!user) return [];
@@ -172,6 +189,7 @@ var removeForUser = function(user) {
 
 module.exports = {
   getIdentityForUser: getIdentityForUser,
+  getCursorByUserId,
   listForUser: listForUser,
   listProvidersForUser: listProvidersForUser,
   findUserIdForProviderUsername: findUserIdForProviderUsername,

@@ -1,3 +1,18 @@
+# 20.35.0 - 2020-7-30
+
+ - Add export endpoint for user identity data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1951
+ - Add export endpoint for user settings (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1959
+ - Add export endpoint for user group favourites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1960
+ - Add export endpoint for user admin groups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1962
+
+Developer facing:
+
+ - Add `userId` index for identities for the export endpoint, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1958
+ - Use -slim base Docker image for cleaner security dashboard, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1952
+    - Thanks to [@dcouture](https://gitlab.com/dcouture) for the contribution
+ - Fix SAST parsing problem with our translation files, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1961
+
+
 # 20.34.0 - 2020-7-27 - PWA homescreen install
 
  - Add export endpoint for the user object itself (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1950
