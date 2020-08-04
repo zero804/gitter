@@ -1,3 +1,10 @@
+# 20.37.0 - *upcoming*
+
+Developer facing:
+
+ - Add secret detection to security scans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1968
+
+
 # 20.36.0 - 2020-8-4
 
  - Stop chat input auto focus on room change when using touch device, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1964
