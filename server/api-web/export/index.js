@@ -5,6 +5,7 @@ const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
 const LastTroupeAccessTimesForUserStrategy = require('../../serializers/rest/troupes/last-access-times-for-user-strategy');
+const RoomInviteStrategy = require('../../serializers/rest/troupes/room-invite-strategy');
 
 const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
@@ -15,15 +16,16 @@ const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core
 const roomFavouritesCore = require('gitter-web-rooms/lib/room-favourites-core');
 const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
+const invitesService = require('gitter-web-invites');
 
 const apiUserResource = require('../../api/v1/user');
 
 async function* iterableFromMongooseCursor(cursor) {
   let doc = await cursor.next();
-  do {
+  while (doc !== null) {
     yield doc;
     doc = await cursor.next();
-  } while (doc !== null);
+  }
 }
 
 // API uses CORS
@@ -80,7 +82,7 @@ const userResource = {
         return new restSerializer.PassthroughStrategy();
       }
     }),
-    'admin-groups.ndjson': generateExportResource('admin-groups', {
+    'admin-groups.ndjson': generateExportResource('user-admin-groups', {
       getIterable: req => {
         return groupMembershipService.findAdminGroupsForUser(req.user);
       },
@@ -99,7 +101,7 @@ const userResource = {
         return new restSerializer.PassthroughStrategy();
       }
     }),
-    'rooms.ndjson': generateExportResource('rooms', {
+    'rooms.ndjson': generateExportResource('user-rooms', {
       getIterable: req => {
         return roomMembershipService.findRoomIdsForUser(req.user.id);
       },
@@ -122,6 +124,22 @@ const userResource = {
         return new LastTroupeAccessTimesForUserStrategy({
           currentUserId: req.user.id
         });
+      }
+    }),
+    'room-invites.ndjson': generateExportResource('user-room-invites', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(invitesService.getInvitesCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new RoomInviteStrategy();
+      }
+    }),
+    'room-sent-invites.ndjson': generateExportResource('user-room-sent-invites', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(invitesService.getSentInvitesCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new RoomInviteStrategy();
       }
     }),
     'messages.ndjson': generateExportResource('user-messages', {

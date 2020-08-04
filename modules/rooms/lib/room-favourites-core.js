@@ -12,7 +12,7 @@ const LEGACY_FAV_POSITION = 1000;
  * For exporting things
  */
 function getCursorByUserId(userId) {
-  const messageCursor = persistence.UserTroupeFavourites.find({
+  const cursor = persistence.UserTroupeFavourites.find({
     userId
   })
     .lean()
@@ -20,7 +20,7 @@ function getCursorByUserId(userId) {
     .batchSize(100)
     .cursor();
 
-  return messageCursor;
+  return cursor;
 }
 
 function findFavouriteTroupesForUser(userId) {
