@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
+const LastTroupeAccessTimesForUserStrategy = require('../../serializers/rest/troupes/last-access-times-for-user-strategy');
 
 const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
@@ -13,6 +14,7 @@ const groupMembershipService = require('gitter-web-groups/lib/group-membership-s
 const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
 const roomFavouritesCore = require('gitter-web-rooms/lib/room-favourites-core');
 const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -107,6 +109,18 @@ const userResource = {
           currentUser: req.user,
           skipUnreadCounts: true,
           includePremium: false
+        });
+      }
+    }),
+    'room-last-access-times.ndjson': generateExportResource('user-room-last-access-times', {
+      getIterable: async req => {
+        return Object.keys(
+          await recentRoomCore.getTroupeLastAccessTimesForUserExcludingHidden(req.user.id)
+        );
+      },
+      getStrategy: req => {
+        return new LastTroupeAccessTimesForUserStrategy({
+          currentUserId: req.user.id
         });
       }
     }),
