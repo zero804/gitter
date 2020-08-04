@@ -1,5 +1,7 @@
 # 20.37.0 - *upcoming*
 
+ - Add export endpoint for room last access time (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1969
+
 Developer facing:
 
  - Add secret detection to security scans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1968
