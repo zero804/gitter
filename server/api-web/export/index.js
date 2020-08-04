@@ -12,6 +12,7 @@ const userSettingsService = require('gitter-web-user-settings');
 const groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
 const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
 const roomFavouritesCore = require('gitter-web-rooms/lib/room-favourites-core');
+const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -94,6 +95,19 @@ const userResource = {
       },
       getStrategy: () => {
         return new restSerializer.PassthroughStrategy();
+      }
+    }),
+    'rooms.ndjson': generateExportResource('rooms', {
+      getIterable: req => {
+        return roomMembershipService.findRoomIdsForUser(req.user.id);
+      },
+      getStrategy: req => {
+        return new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user,
+          skipUnreadCounts: true,
+          includePremium: false
+        });
       }
     }),
     'messages.ndjson': generateExportResource('user-messages', {
