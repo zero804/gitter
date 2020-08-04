@@ -332,7 +332,7 @@ function TroupeStrategy(options) {
       user: otherUser,
       unreadItems: unreadCounts ? unreadCounts.unreadItems : undefined,
       mentions: unreadCounts ? unreadCounts.mentions : undefined,
-      lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(id) : undefined,
+      lastAccessTime: lastAccessTimeStrategy ? lastAccessTimeStrategy.map(id).time : undefined,
       favourite: favouriteStrategy ? favouriteStrategy.map(id) : undefined,
       lurk: isLurking,
       activity: hasActivity,
