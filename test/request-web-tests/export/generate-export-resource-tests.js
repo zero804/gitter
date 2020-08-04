@@ -59,4 +59,19 @@ describe('user-messages-export-api', function() {
         assert.deepEqual(result.body, {});
       });
   });
+
+  it('GET /api_web/export/user/:user_id/messages.ndjson with no messages still works', function() {
+    return request(app)
+      .get(`/api_web/export/user/${fixture.user1.id}/messages.ndjson`)
+      .set('Accept', 'application/x-ndjson,application/json')
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(200)
+      .then(function(result) {
+        assert.strictEqual(result.text.split('\n').length, 1, 'just an extra newline at the end');
+        assert(
+          !result.text.includes(fixture.user1.id),
+          'does not include a message or even the user'
+        );
+      });
+  });
 });

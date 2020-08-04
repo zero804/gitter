@@ -10,7 +10,7 @@ const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-pref
  * For exporting things
  */
 exports.getCursorByUserId = function(userId) {
-  const messageCursor = persistence.UserSettings.find({
+  const cursor = persistence.UserSettings.find({
     userId
   })
     .lean()
@@ -18,7 +18,7 @@ exports.getCursorByUserId = function(userId) {
     .batchSize(100)
     .cursor();
 
-  return messageCursor;
+  return cursor;
 };
 
 exports.getUserSettings = function(userId, settingsKey) {

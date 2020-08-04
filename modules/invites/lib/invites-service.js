@@ -9,6 +9,7 @@ var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var GitHubUserEmailAddressService = require('gitter-web-github').GitHubUserEmailAddressService;
 var persistence = require('gitter-web-persistence');
 var identityService = require('gitter-web-identity');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -213,6 +214,36 @@ function findInvitesForReminder(timeHorizonDays) {
   ]).exec();
 }
 
+/**
+ * For exporting things
+ */
+function getInvitesCursorByUserId(userId) {
+  const cursor = TroupeInvite.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
+/**
+ * For exporting things
+ */
+function getSentInvitesCursorByUserId(userId) {
+  const cursor = TroupeInvite.find({
+    invitedByUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
 module.exports = {
   findExistingUser: findExistingUser,
   resolveEmailAddress: resolveEmailAddress,
@@ -221,5 +252,7 @@ module.exports = {
   markInviteAccepted: Promise.method(markInviteAccepted),
   markInviteRejected: Promise.method(markInviteRejected),
   findInvitesForReminder: findInvitesForReminder,
-  markInviteReminded: markInviteReminded
+  markInviteReminded: markInviteReminded,
+  getInvitesCursorByUserId,
+  getSentInvitesCursorByUserId
 };
