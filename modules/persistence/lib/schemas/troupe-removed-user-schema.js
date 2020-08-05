@@ -13,7 +13,6 @@ module.exports = {
       troupeId: { type: ObjectId },
       userId: { type: ObjectId },
       date: { type: Date },
-      removedByUserId: { type: ObjectId },
       flags: { type: Number }
     });
     TroupeRemovedUserSchema.schemaTypeName = 'TroupeRemovedUserSchema';

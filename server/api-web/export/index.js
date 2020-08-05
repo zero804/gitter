@@ -6,6 +6,7 @@ const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
 const LastTroupeAccessTimesForUserStrategy = require('../../serializers/rest/troupes/last-access-times-for-user-strategy');
 const RoomInviteStrategy = require('../../serializers/rest/troupes/room-invite-strategy');
+const RoomRemovedUserStrategy = require('../../serializers/rest/troupes/room-removed-user-strategy');
 
 const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
@@ -17,6 +18,7 @@ const roomFavouritesCore = require('gitter-web-rooms/lib/room-favourites-core');
 const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 const invitesService = require('gitter-web-invites');
+const removedUsers = require('gitter-web-rooms/lib/room-removed-user-core');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -140,6 +142,14 @@ const userResource = {
       },
       getStrategy: () => {
         return new RoomInviteStrategy();
+      }
+    }),
+    'room-removed-users.ndjson': generateExportResource('user-room-removed-users', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(removedUsers.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new RoomRemovedUserStrategy();
       }
     }),
     'messages.ndjson': generateExportResource('user-messages', {

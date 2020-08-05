@@ -4,6 +4,22 @@ var Promise = require('bluebird');
 var TroupeRemovedUser = require('gitter-web-persistence').TroupeRemovedUser;
 var debug = require('debug')('gitter:app:removed-user-core');
 var _ = require('lodash');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const cursor = TroupeRemovedUser.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
 
 function addRemovedUser(roomId, userId) {
   debug('Recording user as removed from room userId=%s, roomId=%s', userId, roomId);
@@ -25,6 +41,7 @@ function addRemovedUsers(roomId, userIds) {
 }
 
 module.exports = {
+  getCursorByUserId,
   addRemovedUser: Promise.method(addRemovedUser),
   addRemovedUsers: Promise.method(addRemovedUsers)
 };
