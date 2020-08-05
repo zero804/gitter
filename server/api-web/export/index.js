@@ -63,7 +63,7 @@ const userResource = {
         return iterableFromMongooseCursor(userSettingsService.getCursorByUserId(req.user.id));
       },
       getStrategy: () => {
-        return new restSerializer.PassthroughStrategy();
+        return new restSerializer.UserSettingsStrategy();
       }
     }),
     'identities.ndjson': generateExportResource('user-identites', {
@@ -79,7 +79,7 @@ const userResource = {
         return iterableFromMongooseCursor(groupFavouritesCore.getCursorByUserId(req.user.id));
       },
       getStrategy: () => {
-        return new restSerializer.PassthroughStrategy();
+        return new restSerializer.UserGroupFavouritesStrategy();
       }
     }),
     'admin-groups.ndjson': generateExportResource('user-admin-groups', {
@@ -98,7 +98,7 @@ const userResource = {
         return iterableFromMongooseCursor(roomFavouritesCore.getCursorByUserId(req.user.id));
       },
       getStrategy: () => {
-        return new restSerializer.PassthroughStrategy();
+        return new restSerializer.UserRoomFavouritesStrategy();
       }
     }),
     'rooms.ndjson': generateExportResource('user-rooms', {
