@@ -19,6 +19,7 @@ const roomMembershipService = require('gitter-web-rooms/lib/room-membership-serv
 const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 const invitesService = require('gitter-web-invites');
 const removedUsers = require('gitter-web-rooms/lib/room-removed-user-core');
+const pushNotificationService = require('gitter-web-push-notifications');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -164,6 +165,14 @@ const userResource = {
         return new restSerializer.ChatStrategy({
           user: serializedUser
         });
+      }
+    }),
+    'push-notification-devices.ndjson': generateExportResource('user-push-notification-devices', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(pushNotificationService.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new restSerializer.PushNotificationDeviceStrategy();
       }
     })
   }
