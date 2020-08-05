@@ -6,6 +6,7 @@
 Developer facing:
 
  - Add secret detection to security scans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1968
+ - Add serializers in place of passthrough for export, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1972
 
 
 # 20.36.0 - 2020-8-4
