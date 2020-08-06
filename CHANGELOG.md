@@ -3,6 +3,7 @@
  - Add export endpoint for room last access time (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1969
  - Add export endpoint for room invites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1971
  - Add export endpoint for room removed users (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1973
+ - Add export for push notification devices (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1974
 
 Developer facing:
 
