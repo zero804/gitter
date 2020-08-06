@@ -12,6 +12,7 @@ const StatusError = require('statuserror');
 const userService = require('gitter-web-users');
 const tokenProvider = require('./tokens/');
 const MongooseCachedLookup = require('./mongoose-cached-lookup');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var ircClientId;
 
@@ -44,6 +45,21 @@ var ircClientIdPromise = persistenceService.OAuthClient.findOne({
 
 // Fail on error
 ircClientIdPromise.done();
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const cursor = persistenceService.OAuthClient.find({
+    ownerUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
 
 function findAccessTokensByClientId(clientId) {
   return persistenceService.OAuthAccessToken.find({ clientId });
@@ -254,6 +270,7 @@ function isInternalClient(client) {
 }
 
 module.exports = {
+  getCursorByUserId,
   findClientById: findClientById,
   findClientByClientKey,
   findClientsByOwnerUserId,
