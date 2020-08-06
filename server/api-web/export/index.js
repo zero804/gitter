@@ -216,10 +216,20 @@ const userResource = {
     }),
     'oauth-clients.ndjson': generateExportResource('user-oauth-clients', {
       getIterable: async req => {
-        return iterableFromMongooseCursor(oauthService.getCursorByUserId(req.user.id));
+        return iterableFromMongooseCursor(oauthService.getOAuthClientCursorByUserId(req.user.id));
       },
       getStrategy: () => {
         return new restSerializer.OauthClientStrategy();
+      }
+    }),
+    'oauth-access-tokens.ndjson': generateExportResource('user-oauth-access-tokens', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(
+          oauthService.getOAuthAccessTokenCursorByUserId(req.user.id)
+        );
+      },
+      getStrategy: () => {
+        return new restSerializer.OauthAccessTokenStrategy();
       }
     })
   }
