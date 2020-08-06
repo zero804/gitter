@@ -20,6 +20,7 @@ const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 const invitesService = require('gitter-web-invites');
 const removedUsers = require('gitter-web-rooms/lib/room-removed-user-core');
 const pushNotificationService = require('gitter-web-push-notifications');
+const uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -173,6 +174,14 @@ const userResource = {
       },
       getStrategy: () => {
         return new restSerializer.PushNotificationDeviceStrategy();
+      }
+    }),
+    'uri-lookups.ndjson': generateExportResource('user-uri-lookups', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(uriLookupService.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new restSerializer.UriLookupStrategy();
       }
     })
   }

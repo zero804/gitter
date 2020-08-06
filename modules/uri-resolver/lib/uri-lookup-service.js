@@ -10,6 +10,22 @@ var persistence = require('gitter-web-persistence');
 var Promise = require('bluebird');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var debug = require('debug')('gitter:app:uri-lookup-service');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const cursor = persistence.UriLookup.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
 
 function discoverUserUri(uri) {
   // Double-check the troupe and user tables to find this uri
@@ -218,6 +234,7 @@ function reserveUriForGroupId(groupId, uri) {
 }
 
 module.exports = {
+  getCursorByUserId,
   reserveUriForTroupeId: reserveUriForTroupeId,
   reserveUriForGroupId: reserveUriForGroupId,
   lookupUri: lookupUri,
