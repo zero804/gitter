@@ -24,6 +24,7 @@ const uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service
 const billingService = require('../../services/billing-service');
 const knownExternalAccessService = require('gitter-web-permissions/lib/known-external-access/known-external-access-service');
 const fingerprintingService = require('gitter-web-fingerprinting/lib/fingerprinting-service');
+const oauthService = require('gitter-web-oauth');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -211,6 +212,14 @@ const userResource = {
       },
       getStrategy: () => {
         return new restSerializer.FingerprintStrategy();
+      }
+    }),
+    'oauth-clients.ndjson': generateExportResource('user-oauth-clients', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(oauthService.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new restSerializer.OauthClientStrategy();
       }
     })
   }
