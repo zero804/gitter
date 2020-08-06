@@ -22,6 +22,7 @@ const removedUsers = require('gitter-web-rooms/lib/room-removed-user-core');
 const pushNotificationService = require('gitter-web-push-notifications');
 const uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 const billingService = require('../../services/billing-service');
+const knownExternalAccessService = require('gitter-web-permissions/lib/known-external-access/known-external-access-service');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -191,6 +192,16 @@ const userResource = {
       },
       getStrategy: () => {
         return new restSerializer.SubscriptionStrategy();
+      }
+    }),
+    'known-external-access.ndjson': generateExportResource('user-known-external-access', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(
+          knownExternalAccessService.getCursorByUserId(req.user.id)
+        );
+      },
+      getStrategy: () => {
+        return new restSerializer.KnownExternalAccessStrategy();
       }
     })
   }
