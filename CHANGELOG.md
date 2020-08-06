@@ -6,6 +6,7 @@
  - Add export endpoint for push notification devices (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1974
  - Add export endpoint for URI lookups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1975
  - Add export endpoint for subscriptions (legacy billing) (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1976
+ - Add export endpoint for known external access (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1977
 
 Developer facing:
 
