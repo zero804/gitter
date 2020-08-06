@@ -5,6 +5,7 @@
  - Add export endpoint for room removed users (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1973
  - Add export endpoint for push notification devices (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1974
  - Add export endpoint for URI lookups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1975
+ - Add export endpoint for subscriptions (legacy billing) (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1976
 
 Developer facing:
 
