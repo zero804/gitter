@@ -23,6 +23,7 @@ const pushNotificationService = require('gitter-web-push-notifications');
 const uriLookupService = require('gitter-web-uri-resolver/lib/uri-lookup-service');
 const billingService = require('../../services/billing-service');
 const knownExternalAccessService = require('gitter-web-permissions/lib/known-external-access/known-external-access-service');
+const fingerprintingService = require('gitter-web-fingerprinting/lib/fingerprinting-service');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -202,6 +203,14 @@ const userResource = {
       },
       getStrategy: () => {
         return new restSerializer.KnownExternalAccessStrategy();
+      }
+    }),
+    'fingerprints.ndjson': generateExportResource('user-fingerprints', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(fingerprintingService.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new restSerializer.FingerprintStrategy();
       }
     })
   }
