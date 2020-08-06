@@ -9,7 +9,6 @@ var template = require('./profile-menu-view.hbs');
 var itemTemplate = require('./profile-menu-item-view.hbs');
 var toggleClass = require('../../utils/toggle-class');
 var logout = require('../../utils/logout');
-var isMobile = require('../../utils/is-mobile');
 var isNative = require('../../utils/is-native');
 var context = require('gitter-web-client-context');
 var toggleDarkTheme = require('../../utils/toggle-dark-theme');
@@ -23,11 +22,6 @@ function getProfileCollection() {
   var result = new Backbone.Collection([{ name: 'Home', stub: '/home' }]);
 
   var isWebApp = !isNative();
-  var isMobileApp = isMobile();
-
-  if (isWebApp && !isMobileApp) {
-    result.add({ name: 'Get Gitter Apps', stub: '/apps' });
-  }
 
   var user = context.user();
 
