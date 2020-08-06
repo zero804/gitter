@@ -8,6 +8,7 @@ var debug = require('debug')('gitter:app:push-notification-service');
 var uniqueIds = require('mongodb-unique-ids');
 var _ = require('lodash');
 var assert = require('assert');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 function buffersEqual(a, b) {
   if (!Buffer.isBuffer(a)) return undefined;
@@ -19,6 +20,21 @@ function buffersEqual(a, b) {
   }
 
   return true;
+}
+
+/**
+ * For exporting things
+ */
+function getCursorByUserId(userId) {
+  const cursor = PushNotificationDevice.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
 }
 
 function findAndRemoveDevicesWithDuplicateTokens(deviceId, deviceType, deviceToken, tokenHash) {
@@ -238,6 +254,7 @@ function findEnabledDevicesForUsers(userIds, options) {
 }
 
 module.exports = {
+  getCursorByUserId,
   registerDevice: registerDevice,
   registerAndroidDevice: registerAndroidDevice,
   registerVapidSubscription: registerVapidSubscription,
