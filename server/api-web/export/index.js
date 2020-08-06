@@ -4,8 +4,6 @@ const express = require('express');
 const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 const restSerializer = require('../../serializers/rest-serializer');
-const persistence = require('gitter-web-persistence');
-const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 const generateExportResource = require('./generate-export-resource');
 const identityService = require('gitter-web-identity');
@@ -13,6 +11,8 @@ const chatService = require('gitter-web-chats');
 const userSettingsService = require('gitter-web-user-settings');
 const groupMembershipService = require('gitter-web-groups/lib/group-membership-service');
 const groupFavouritesCore = require('gitter-web-groups/lib/group-favourites-core');
+const roomFavouritesCore = require('gitter-web-rooms/lib/room-favourites-core');
+const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 
 const apiUserResource = require('../../api/v1/user');
 
@@ -48,14 +48,7 @@ const userResource = {
   subresources: {
     'me.ndjson': generateExportResource('user-data', {
       getIterable: req => {
-        const cursor = persistence.User.find({
-          _id: req.user.id
-        })
-          .lean()
-          .read(mongoReadPrefs.secondaryPreferred)
-          .cursor();
-
-        return iterableFromMongooseCursor(cursor);
+        return [req.user];
       },
       getStrategy: () => {
         return new restSerializer.UserStrategy();
@@ -93,6 +86,27 @@ const userResource = {
         return new restSerializer.GroupStrategy({
           currentUserId: req.user.id,
           currentUser: req.user
+        });
+      }
+    }),
+    'room-favourites.ndjson': generateExportResource('user-room-favourites', {
+      getIterable: req => {
+        return iterableFromMongooseCursor(roomFavouritesCore.getCursorByUserId(req.user.id));
+      },
+      getStrategy: () => {
+        return new restSerializer.PassthroughStrategy();
+      }
+    }),
+    'rooms.ndjson': generateExportResource('rooms', {
+      getIterable: req => {
+        return roomMembershipService.findRoomIdsForUser(req.user.id);
+      },
+      getStrategy: req => {
+        return new restSerializer.TroupeIdStrategy({
+          currentUserId: req.user.id,
+          currentUser: req.user,
+          skipUnreadCounts: true,
+          includePremium: false
         });
       }
     }),
