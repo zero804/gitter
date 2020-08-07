@@ -9,6 +9,7 @@
  - Add export endpoint for known external access (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1977
  - Add export endpoint for fingerprints (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1978
  - Add export endpoint for OAuth clients (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1979
+ - Add export endpoint for OAuth access tokens (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1980
 
 Developer facing:
 
