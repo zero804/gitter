@@ -49,9 +49,24 @@ ircClientIdPromise.done();
 /**
  * For exporting things
  */
-function getCursorByUserId(userId) {
+function getOAuthClientCursorByUserId(userId) {
   const cursor = persistenceService.OAuthClient.find({
     ownerUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
+/**
+ * For exporting things
+ */
+function getOAuthAccessTokenCursorByUserId(userId) {
+  const cursor = persistenceService.OAuthAccessToken.find({
+    userId
   })
     .lean()
     .read(mongoReadPrefs.secondaryPreferred)
@@ -270,7 +285,8 @@ function isInternalClient(client) {
 }
 
 module.exports = {
-  getCursorByUserId,
+  getOAuthClientCursorByUserId,
+  getOAuthAccessTokenCursorByUserId,
   findClientById: findClientById,
   findClientByClientKey,
   findClientsByOwnerUserId,
