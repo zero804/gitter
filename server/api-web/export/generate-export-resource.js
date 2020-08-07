@@ -20,8 +20,8 @@ function generateExportResource(key, { getIterable, getStrategy }) {
     limit: process.env.hasOwnProperty('TEST_EXPORT_RATE_LIMIT')
       ? process.env.TEST_EXPORT_RATE_LIMIT
       : 100,
-    // 1 hours in seconds
-    expiry: 1 * (60 * 60),
+    // 3 hours in seconds
+    expiry: 3 * (60 * 60),
     keyFunction: function(req) {
       if (req.user) {
         if (req.authInfo && req.authInfo.client) {

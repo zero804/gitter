@@ -1,7 +1,8 @@
 'use strict';
 
-var presentCreateRoomDialog = require('../ensured/present-create-room-dialog');
-var presentCreateCommunityDialog = require('../ensured/present-create-community-dialog');
+const presentCreateRoomDialog = require('../ensured/present-create-room-dialog');
+const presentCreateCommunityDialog = require('../ensured/present-create-community-dialog');
+const presentExportUserDataDialog = require('../ensured/present-export-user-data-dialog');
 
 function createRoutes() {
   return {
@@ -13,6 +14,10 @@ function createRoutes() {
 
     createcommunity: function() {
       presentCreateCommunityDialog();
+    },
+
+    'export-user-data': function() {
+      presentExportUserDataDialog();
     }
   };
 }
