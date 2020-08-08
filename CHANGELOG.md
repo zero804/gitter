@@ -1,3 +1,8 @@
+# 20.38.0 - *upcoming*
+
+ - Remove app interstitial from profile dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1981
+
+
 # 20.37.0 - 2020-8-7
 
  - Add export endpoint for room last access time (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1969
