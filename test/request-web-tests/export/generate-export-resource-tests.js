@@ -81,6 +81,7 @@ describe('user-messages-export-api', function() {
     delete require.cache[require.resolve('../../../server/web')];
     delete require.cache[require.resolve('../../../server/api-web')];
     delete require.cache[require.resolve('../../../server/api-web/export')];
+    delete require.cache[require.resolve('../../../server/api-web/export/user-export-resource')];
     delete require.cache[
       require.resolve('../../../server/api-web/export/generate-export-resource')
     ];
