@@ -19,7 +19,7 @@ function generateExportResource(key, { getIterable, getStrategy }) {
     // TODO: Reduce limit to 1 after we are done testing
     limit: process.env.hasOwnProperty('TEST_EXPORT_RATE_LIMIT')
       ? process.env.TEST_EXPORT_RATE_LIMIT
-      : 100,
+      : 1,
     // 3 hours in seconds
     expiry: 3 * (60 * 60),
     keyFunction: function(req) {
