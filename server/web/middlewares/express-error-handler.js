@@ -84,6 +84,8 @@ module.exports = function(err, req, res, next) {
     title: message
   };
 
+  const errorIdentifer = res.locals && res.locals.errorIdentifer;
+
   res.format({
     html: function() {
       res.render(
@@ -96,6 +98,7 @@ module.exports = function(err, req, res, next) {
             user: req.user,
             userMissingPrivateRepoScope: req.user && !userScopes.hasGitHubScope(req.user, 'repo'),
             message: message,
+            errorIdentifer,
             // Only generate the stack-frames when we need to
             stack: config.get('express:showStack') && err && err.stack && linkStack(err.stack)
           },
