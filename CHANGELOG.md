@@ -4,6 +4,7 @@
  - Update styleguide to allow modal to overflow properly when height constrained, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1984
  - Fix dolph errors always bubbling up as 500's even though they have `.status` properties, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1985
  - Show error status code and message on error page, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1986
+ - Add frontend UI for exporting user data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1982
 
 
 # 20.37.0 - 2020-8-7
