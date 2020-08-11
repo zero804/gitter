@@ -107,6 +107,16 @@ function getProfileCollection() {
     target: '_blank'
   });
 
+  if (context.isStaff()) {
+    result.add({
+      name: 'Export user data',
+      onClick: e => {
+        e.preventDefault();
+        appEvents.trigger('route', 'export-user-data');
+      }
+    });
+  }
+
   result.add({
     name: 'Delete Account',
     onClick: e => {
