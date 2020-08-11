@@ -4,6 +4,9 @@
   Gitter<br>
   <input id="error-text" class="error-input" size="55"><br>
   <pre>{{status}} - {{ message }}</pre>
+  {{#if errorIdentifer}}
+    <pre style="font-size:small">Error identifier: {{ errorIdentifer }}</pre>
+  {{/if}}
   {{#if stack}}
     <pre style="font-size:small">{{{ stack }}}</pre>
   {{/if}}
