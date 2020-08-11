@@ -1,6 +1,7 @@
 # 20.38.0 - *upcoming*
 
  - Remove app interstitial from profile dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1981
+ - Update styleguide to allow modal to overflow properly when height constrained, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1984
 
 
 # 20.37.0 - 2020-8-7
