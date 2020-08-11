@@ -1,3 +1,22 @@
+# 20.37.0 - 2020-8-7
+
+ - Add export endpoint for room last access time (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1969
+ - Add export endpoint for room invites (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1971
+ - Add export endpoint for room removed users (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1973
+ - Add export endpoint for push notification devices (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1974
+ - Add export endpoint for URI lookups (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1975
+ - Add export endpoint for subscriptions (legacy billing) (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1976
+ - Add export endpoint for known external access (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1977
+ - Add export endpoint for fingerprints (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1978
+ - Add export endpoint for OAuth clients (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1979
+ - Add export endpoint for OAuth access tokens (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1980
+
+Developer facing:
+
+ - Add secret detection to security scans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1968
+ - Add serializers in place of passthrough for export, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1972
+
+
 # 20.36.0 - 2020-8-4
 
  - Stop chat input auto focus on room change when using touch device, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1964

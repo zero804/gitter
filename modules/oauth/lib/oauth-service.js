@@ -12,6 +12,7 @@ const StatusError = require('statuserror');
 const userService = require('gitter-web-users');
 const tokenProvider = require('./tokens/');
 const MongooseCachedLookup = require('./mongoose-cached-lookup');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 var ircClientId;
 
@@ -44,6 +45,36 @@ var ircClientIdPromise = persistenceService.OAuthClient.findOne({
 
 // Fail on error
 ircClientIdPromise.done();
+
+/**
+ * For exporting things
+ */
+function getOAuthClientCursorByUserId(userId) {
+  const cursor = persistenceService.OAuthClient.find({
+    ownerUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
+/**
+ * For exporting things
+ */
+function getOAuthAccessTokenCursorByUserId(userId) {
+  const cursor = persistenceService.OAuthAccessToken.find({
+    userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
 
 function findAccessTokensByClientId(clientId) {
   return persistenceService.OAuthAccessToken.find({ clientId });
@@ -254,6 +285,8 @@ function isInternalClient(client) {
 }
 
 module.exports = {
+  getOAuthClientCursorByUserId,
+  getOAuthAccessTokenCursorByUserId,
   findClientById: findClientById,
   findClientByClientKey,
   findClientsByOwnerUserId,

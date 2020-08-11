@@ -108,7 +108,7 @@ var listForUser = Promise.method(function(user) {
  * For exporting things
  */
 function getCursorByUserId(userId) {
-  const messageCursor = Identity.find({
+  const cursor = Identity.find({
     userId
   })
     .lean()
@@ -116,7 +116,7 @@ function getCursorByUserId(userId) {
     .batchSize(100)
     .cursor();
 
-  return messageCursor;
+  return cursor;
 }
 
 /**

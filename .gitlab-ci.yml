@@ -451,6 +451,7 @@ include:
   - template: Security/DAST.gitlab-ci.yml
   - template: Security/Dependency-Scanning.gitlab-ci.yml
   - template: Security/Container-Scanning.gitlab-ci.yml
+  - template: Security/Secret-Detection.gitlab-ci.yml
 
 dependency_scanning:
   extends: .use-docker-in-docker
@@ -527,3 +528,11 @@ dast:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+
+.secret-analyzer:
+  extends: .use-docker-in-docker
+  stage: security
+
+secret_detection:
+  rules:
+    - when: always

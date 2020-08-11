@@ -20,7 +20,10 @@ LastTroupeAccessTimesForUserStrategy.prototype = {
   map: function(id) {
     var time = this.timesIndexed[id];
     // No idea why, but sometimes these dates are converted to JSON as {}, hence the weirdness below
-    return time ? new Date(time.valueOf()).toISOString() : undefined;
+    return {
+      troupeId: id,
+      time: time ? new Date(time.valueOf()).toISOString() : undefined
+    };
   },
 
   name: 'LastTroupeAccessTimesForUserStrategy'
