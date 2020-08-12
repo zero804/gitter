@@ -5,6 +5,7 @@ var Backbone = require('backbone');
 var _ = require('lodash');
 var log = require('../../utils/log');
 var appEvents = require('../../utils/appevents');
+const clientEnv = require('gitter-client-env');
 var template = require('./profile-menu-view.hbs');
 var itemTemplate = require('./profile-menu-item-view.hbs');
 var toggleClass = require('../../utils/toggle-class');
@@ -107,7 +108,7 @@ function getProfileCollection() {
     target: '_blank'
   });
 
-  if (context.isStaff()) {
+  if (clientEnv.exportEnabled) {
     result.add({
       name: 'Export user data',
       onClick: e => {
