@@ -41,7 +41,15 @@ UnreadItemStrategy.prototype = {
  * Serializes chat into JSON
  * - if there is no `currentUserId`, all the messages are going to have default {unread: false}
  */
-function ChatStrategy({ lookups, lean, user, currentUserId, troupeId, initialId } = {}) {
+function ChatStrategy({
+  lookups,
+  lean,
+  user,
+  currentUserId,
+  serializeFromUserId = true,
+  troupeId,
+  initialId
+} = {}) {
   // useLookups will be set to true if there are any lookups that this strategy
   // understands. Currently it only knows about user lookups.
   var useLookups = false;
@@ -67,7 +75,7 @@ function ChatStrategy({ lookups, lean, user, currentUserId, troupeId, initialId 
     var strategies = [];
 
     // If the user is fixed in options, we don't need to look them up using a strategy...
-    if (!user) {
+    if (!user && serializeFromUserId) {
       userStrategy = new UserIdStrategy({ lean });
 
       var users = items.map(function(i) {
@@ -99,7 +107,9 @@ function ChatStrategy({ lookups, lean, user, currentUserId, troupeId, initialId 
   }
 
   function mapUser(userId) {
-    if (userLookups) {
+    if (!serializeFromUserId) {
+      return userId;
+    } else if (userLookups) {
       if (!userLookups[userId]) {
         userLookups[userId] = userStrategy.map(userId);
       }

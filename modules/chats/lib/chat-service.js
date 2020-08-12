@@ -2,6 +2,7 @@
 
 'use strict';
 
+const assert = require('assert');
 const Promise = require('bluebird');
 const _ = require('lodash');
 const StatusError = require('statuserror');
@@ -129,8 +130,27 @@ function resolveMentions(troupe, user, parsedMessage) {
  * For exporting things
  */
 function getCursorByUserId(userId) {
+  assert(mongoUtils.isLikeObjectId(userId));
+
   const messageCursor = ChatMessage.find({
     fromUserId: userId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return messageCursor;
+}
+
+/**
+ * For exporting things
+ */
+function getCursorByRoomId(roomId) {
+  assert(mongoUtils.isLikeObjectId(roomId));
+
+  const messageCursor = ChatMessage.find({
+    toTroupeId: roomId
   })
     .lean()
     .read(mongoReadPrefs.secondaryPreferred)
@@ -699,6 +719,7 @@ const testOnly = {
 
 module.exports = {
   getCursorByUserId,
+  getCursorByRoomId,
   newChatMessageToTroupe,
   getRecentPublicChats,
   updateChatMessage,
