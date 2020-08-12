@@ -321,6 +321,14 @@ function makeLastModifiedUpdater(Model) {
   };
 }
 
+async function* iterableFromMongooseCursor(cursor) {
+  let doc = await cursor.next();
+  while (doc !== null) {
+    yield doc;
+    doc = await cursor.next();
+  }
+}
+
 module.exports = {
   attachNotificationListenersToSchema: attachNotificationListenersToSchema,
   leanUpsert: leanUpsert,
@@ -333,5 +341,6 @@ module.exports = {
   cloneSchema: cloneSchema,
   getEstimatedCountForId: getEstimatedCountForId,
   getEstimatedCountForIds: getEstimatedCountForIds,
-  makeLastModifiedUpdater: makeLastModifiedUpdater
+  makeLastModifiedUpdater: makeLastModifiedUpdater,
+  iterableFromMongooseCursor
 };
