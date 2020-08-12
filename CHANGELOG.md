@@ -1,5 +1,7 @@
 # 20.39.0 - *upcoming*
 
+ - Remove staff restriction from export endpoints, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1991
+
 Developer facing:
 
  - Organize user export resource into its own file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1989
