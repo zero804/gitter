@@ -1,3 +1,10 @@
+# 20.39.0 - *upcoming*
+
+Developer facing:
+
+ - Organize user export resource into its own file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1989
+
+
 # 20.38.0 - 2020-8-11
 
  - Remove app interstitial from profile dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1981
@@ -6,10 +13,6 @@
  - Show error status code and message on error page, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1986
  - Add frontend UI for exporting user data (only staff users), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1982
  - Reduce export rate limit to once every 3 hours, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1987
- 
-Developer facing:
-
- - Organize user export resource into its own file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1989
 
 
 # 20.37.0 - 2020-8-7
