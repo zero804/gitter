@@ -21,9 +21,7 @@ describe('user-admin-groups-export-api', function() {
     user1: {
       accessToken: 'web-internal',
       githubId: undefined,
-      githubToken: undefined,
-      // TODO: This won't be necessary in the future #no-staff-for-export
-      staff: true
+      githubToken: undefined
     },
     userNoExport1: {
       accessToken: 'web-internal'

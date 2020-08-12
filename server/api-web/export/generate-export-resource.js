@@ -3,6 +3,7 @@
 const assert = require('assert');
 const StatusError = require('statuserror');
 const env = require('gitter-web-env');
+const config = env.config;
 const stats = env.stats;
 const redisClient = env.redis.getClient();
 const asyncHandler = require('express-async-handler');
@@ -60,10 +61,8 @@ function generateExportResource(key, { getIterable, getStrategy }) {
           });
         });
 
-        // TODO: Remove after we look at the CPU load from doing this with so many messages #no-staff-for-export
-        const isStaff = req.user && req.user.staff;
-        if (!isStaff) {
-          throw new StatusError(403, 'Only staff can use the export endpoint right now');
+        if (!config.get('export:enabled')) {
+          throw new StatusError(501, 'Export is disabled');
         }
 
         if (req.accepts('application/x-ndjson') !== 'application/x-ndjson') {
