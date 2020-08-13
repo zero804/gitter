@@ -134,6 +134,7 @@ module.exports = {
       );
       sessionSecret = 'test-secret';
     }
+
     app.use(
       session({
         secret: sessionSecret,
@@ -144,7 +145,8 @@ module.exports = {
           httpOnly: true,
           maxAge: 14400000,
           domain: config.get('web:cookieDomain'),
-          secure: config.get('web:secureCookies')
+          secure: config.get('web:secureCookies'),
+          sameSite: config.get('web:secureCookies') ? 'none' : 'lax'
         },
         resave: true,
         saveUninitialized: true // Passport will force a save anyway

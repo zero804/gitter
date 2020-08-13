@@ -38,7 +38,7 @@
     "express": "^4.13.1",
     "express-async-handler": "^1.1.4",
     "express-hbs": "~0.8.4",
-    "express-session": "^1.11.3",
+    "express-session": "^1.17.1",
     "fast-csv": "^0.6.0",
     "fastclick": "^1.0.6",
     "fastdom": "^1.0.1",
