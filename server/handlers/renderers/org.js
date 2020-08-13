@@ -124,9 +124,9 @@ function renderOrgPage(req, res, next) {
       contextGenerator.generateOrgContext(req),
       policy.canAdmin(),
       generateUserThemeSnapshot(req),
-      async function(roomBrowseResult, troupeContext, isOrgAdmin, userThemeSnapshot) {
+      async function(roomBrowseResult, troupeContext, isGroupAdmin, userThemeSnapshot) {
         var isStaff = req.user && req.user.staff;
-        var editAccess = isOrgAdmin || isStaff;
+        var editAccess = isGroupAdmin || isStaff;
         var orgUserCount = roomBrowseResult.totalUsers;
         var roomCount = roomBrowseResult.total;
 
@@ -169,6 +169,7 @@ function renderOrgPage(req, res, next) {
             orgDirectoryUrl: fullUrl,
             roomCount: roomCount,
             orgUserCount: orgUserCount,
+            isGroupAdmin,
             group: troupeContext.group,
             rooms: rooms,
             troupeContext: troupeContext,
