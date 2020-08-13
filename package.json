@@ -314,6 +314,7 @@
     "precommit-checks": "eslint --cache --quiet --format unix --ext .js . && gulp linter:validate:config test:test --test-fast --test-critical-only",
     "task-validate": "gulp validate",
     "task-watch": "gulp watch",
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s --config scripts/conventional-changelog-config.js && git add CHANGELOG.md",
     "build-android-assets": "gulp --gulpfile gulpfile-embedded.js --android",
     "build-ios-assets": "gulp --gulpfile gulpfile-embedded.js --ios"
   },
