@@ -178,7 +178,8 @@ function setRememberMeCookie(res, cookieValue) {
     domain: cookieDomain,
     maxAge: 1000 * 60 * 60 * 24 * timeToLiveDays,
     httpOnly: true,
-    secure: cookieSecure
+    secure: cookieSecure,
+    sameSite: cookieSecure ? 'none' : 'lax'
   });
 }
 

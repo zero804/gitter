@@ -7,6 +7,8 @@ var trackingId = clientEnv['googleTrackingId'];
 var trackingDomain = clientEnv['googleTrackingDomain'] || 'gitter.im'; // Remove this default 23/10/2014;
 var ga;
 
+var secureCookies = document.location.protocol === 'https:';
+
 if (trackingId) {
   /* eslint-disable */
   (function(i, s, o, g, r, a, m) {
@@ -26,7 +28,9 @@ if (trackingId) {
 
   ga = window.ga;
 
-  ga('create', trackingId, trackingDomain);
+  ga('create', trackingId, trackingDomain, {
+    cookieFlags: secureCookies ? 'SameSite=None; Secure' : undefined
+  });
   ga('set', 'anonymizeIp', true);
   ga('send', 'pageview');
 }
