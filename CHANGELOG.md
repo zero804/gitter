@@ -1,6 +1,7 @@
 # 20.39.0 - *upcoming*
 
  - Remove staff restriction from export endpoints, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1991
+ - Fix login when using [Sidecar](https://sidecar.gitter.im/). Fix cookies not working cross-site (`SameSite=None; Secure`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1994
 
 Developer facing:
 
