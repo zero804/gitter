@@ -74,4 +74,23 @@ describe('user-messages-export-api', function() {
         );
       });
   });
+
+  it('GET /api_web/export/user/:user_id/messages.ndjson when hits rate limit returns error', function() {
+    process.env.TEST_EXPORT_RATE_LIMIT = 0;
+
+    delete require.cache[require.resolve('../../../server/web')];
+    delete require.cache[require.resolve('../../../server/api-web')];
+    delete require.cache[require.resolve('../../../server/api-web/export')];
+    delete require.cache[
+      require.resolve('../../../server/api-web/export/generate-export-resource')
+    ];
+
+    const zeroLimitApp = require('../../../server/web');
+
+    return request(zeroLimitApp)
+      .get(`/api_web/export/user/${fixture.user1.id}/messages.ndjson`)
+      .set('Accept', 'application/x-ndjson,application/json')
+      .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
+      .expect(429);
+  });
 });

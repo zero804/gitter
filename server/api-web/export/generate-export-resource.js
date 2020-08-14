@@ -17,9 +17,11 @@ function generateExportResource(key, { getIterable, getStrategy }) {
     prefix: `export:${key}:`,
     redisClient: redisClient,
     // TODO: Reduce limit to 1 after we are done testing
-    limit: process.env.TEST_EXPORT_RATE_LIMIT || 100,
-    // 1 hours in seconds
-    expiry: 1 * (60 * 60),
+    limit: process.env.hasOwnProperty('TEST_EXPORT_RATE_LIMIT')
+      ? process.env.TEST_EXPORT_RATE_LIMIT
+      : 1,
+    // 3 hours in seconds
+    expiry: 3 * (60 * 60),
     keyFunction: function(req) {
       if (req.user) {
         if (req.authInfo && req.authInfo.client) {
@@ -51,10 +53,10 @@ function generateExportResource(key, { getIterable, getStrategy }) {
         await new Promise((resolve, reject) => {
           rateLimiter(req, res, err => {
             if (err) {
-              reject(err);
+              return reject(err);
             }
 
-            resolve();
+            return resolve();
           });
         });
 
@@ -105,7 +107,7 @@ function generateExportResource(key, { getIterable, getStrategy }) {
           return;
         }
         // Only create a new error if it isn't aleady a StatusError
-        else if (!(err instanceof StatusError)) {
+        else if (!err.status) {
           throw new StatusError(500, err);
         }
 
