@@ -5,6 +5,7 @@
 Developer facing:
 
  - Organize user export resource into its own file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1989
+ - Remove unused Optimizely dependency, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1995
 
 
 # 20.38.0 - 2020-8-11
