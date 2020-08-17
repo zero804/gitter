@@ -1,3 +1,10 @@
+# 20.40.0 - *upcoming*
+
+Developer facing:
+
+ - Remove flakey separation in GitLab CI, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1998
+
+
 # 20.39.0 - 2020-8-13
 
  - Remove staff restriction from export endpoints, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1991
