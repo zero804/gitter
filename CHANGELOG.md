@@ -1,6 +1,7 @@
 # 20.40.0 - *upcoming*
 
  - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
+ - Add export endpoint for room messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1990
 
 Developer facing:
 
