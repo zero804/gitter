@@ -1,5 +1,7 @@
 # 20.40.0 - *upcoming*
 
+ - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
+
 Developer facing:
 
  - Remove flakey separation in GitLab CI, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1998
