@@ -19,9 +19,7 @@ describe('user-messages-export-api', function() {
 
   var fixture = fixtureLoader.setup({
     user1: {
-      accessToken: 'web-internal',
-      // TODO: This won't be necessary in the future #no-staff-for-export
-      staff: true
+      accessToken: 'web-internal'
     },
     userNoExport1: {
       accessToken: 'web-internal'
@@ -81,6 +79,7 @@ describe('user-messages-export-api', function() {
     delete require.cache[require.resolve('../../../server/web')];
     delete require.cache[require.resolve('../../../server/api-web')];
     delete require.cache[require.resolve('../../../server/api-web/export')];
+    delete require.cache[require.resolve('../../../server/api-web/export/user-export-resource')];
     delete require.cache[
       require.resolve('../../../server/api-web/export/generate-export-resource')
     ];

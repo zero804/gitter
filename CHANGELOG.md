@@ -1,3 +1,14 @@
+# 20.39.0 - 2020-8-13
+
+ - Remove staff restriction from export endpoints, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1991
+ - Fix login when using [Sidecar](https://sidecar.gitter.im/). Fix cookies not working cross-site (`SameSite=None; Secure`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1994
+
+Developer facing:
+
+ - Organize user export resource into its own file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1989
+ - Remove unused Optimizely dependency, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1995
+
+
 # 20.38.0 - 2020-8-11
 
  - Remove app interstitial from profile dropdown, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1981

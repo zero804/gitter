@@ -69,7 +69,6 @@ router.get(
       slashdotEffectSurvivalMode: slashdotEffectSurvivalMode,
       bootScriptName: 'homepage',
       cssFileName: 'styles/homepage.css',
-      useOptimizely: locale === 'en',
       wordy: locale === 'ru',
       translationRequired: translationRequired,
       requestLangCode: requestLangCode,

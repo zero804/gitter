@@ -27,6 +27,7 @@ var troupeEnv = {
   cdns: cdns,
   version: appVersion.getVersion(),
   assetTag: appVersion.getAssetTag(),
+  exportEnabled: config.get('export:enabled'),
   logging: config.get('web:consoleLogging'),
   ravenUrl: config.get('errorReporting:clientRavenUrl'),
   websockets: {
