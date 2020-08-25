@@ -10,7 +10,7 @@ const request = require('supertest');
 
 const app = require('../../../server/web');
 
-describe('user-room-favourites-export-api', function() {
+describe('user-oauth-clients-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
