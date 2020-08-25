@@ -4,6 +4,7 @@
  - Add export endpoint for room messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1990
  - Add export endpoint for room members, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1999
  - Add export endpoint for room integration events, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2002
+ - Add export endpoint for room bans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2003
 
 Developer facing:
 
