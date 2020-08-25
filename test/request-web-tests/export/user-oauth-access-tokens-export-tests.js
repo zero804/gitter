@@ -39,7 +39,6 @@ describe('user-oauth-access-tokens-export-api', function() {
       .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
       .expect(200)
       .then(function(result) {
-        console.log('result.text', result.text);
         assert.strictEqual(
           result.text.split('\n').length,
           4,
