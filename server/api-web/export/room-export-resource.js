@@ -8,6 +8,7 @@ const policyFactory = require('gitter-web-permissions/lib/policy-factory');
 const generateExportResource = require('./generate-export-resource');
 const chatService = require('gitter-web-chats');
 const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
+const eventService = require('gitter-web-events');
 
 const apiRoomResource = require('../../api/v1/rooms');
 
@@ -55,6 +56,14 @@ const roomResource = {
       },
       getStrategy: () => {
         return new restSerializer.UserIdStrategy();
+      }
+    }),
+    'integration-events.ndjson': generateExportResource('room-integration-events', {
+      getIterable: async req => {
+        return iterableFromMongooseCursor(eventService.getCursorByRoomId(req.params.troupeId));
+      },
+      getStrategy: () => {
+        return new restSerializer.EventStrategy();
       }
     })
   }
