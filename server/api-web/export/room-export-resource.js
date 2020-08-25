@@ -7,8 +7,15 @@ const policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 const generateExportResource = require('./generate-export-resource');
 const chatService = require('gitter-web-chats');
+const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 
 const apiRoomResource = require('../../api/v1/rooms');
+
+async function* transformIterable(iterable, transformFunc) {
+  for await (let item of iterable) {
+    yield await transformFunc(item);
+  }
+}
 
 const roomResource = {
   id: 'troupeId',
@@ -35,6 +42,19 @@ const roomResource = {
         return new restSerializer.ChatStrategy({
           serializeFromUserId: false
         });
+      }
+    }),
+    'users.ndjson': generateExportResource('room-users', {
+      getIterable: async req => {
+        return transformIterable(
+          iterableFromMongooseCursor(roomMembershipService.getCursorByRoomId(req.params.troupeId)),
+          item => {
+            return item.userId;
+          }
+        );
+      },
+      getStrategy: () => {
+        return new restSerializer.UserIdStrategy();
       }
     })
   }
