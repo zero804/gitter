@@ -22,7 +22,7 @@ async function createSubscription(user) {
   });
 }
 
-describe('user-room-invites-export-api', function() {
+describe('user-subscriptions-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {

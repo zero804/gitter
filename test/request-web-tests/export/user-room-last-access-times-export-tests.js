@@ -11,7 +11,7 @@ const request = require('supertest');
 const app = require('../../../server/web');
 const recentRoomCore = require('gitter-web-rooms/lib/recent-room-core');
 
-describe('user-room-favourites-export-api', function() {
+describe('user-room-last-access-times-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {

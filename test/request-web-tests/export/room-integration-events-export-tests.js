@@ -11,7 +11,7 @@ const request = require('supertest');
 const app = require('../../../server/web');
 const eventService = require('gitter-web-events');
 
-describe('room-users-export-api', function() {
+describe('room-integration-events-export-api', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
