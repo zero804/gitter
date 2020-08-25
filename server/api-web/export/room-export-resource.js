@@ -9,6 +9,7 @@ const generateExportResource = require('./generate-export-resource');
 const chatService = require('gitter-web-chats');
 const roomMembershipService = require('gitter-web-rooms/lib/room-membership-service');
 const eventService = require('gitter-web-events');
+const loadTroupeFromParam = require('../../api/v1/rooms/load-troupe-param');
 
 const apiRoomResource = require('../../api/v1/rooms');
 
@@ -64,6 +65,15 @@ const roomResource = {
       },
       getStrategy: () => {
         return new restSerializer.EventStrategy();
+      }
+    }),
+    'bans.ndjson': generateExportResource('room-bans', {
+      getIterable: async req => {
+        const room = await loadTroupeFromParam(req);
+        return room.bans || [];
+      },
+      getStrategy: () => {
+        return new restSerializer.TroupeBanStrategy();
       }
     })
   }
