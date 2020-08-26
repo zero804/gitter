@@ -4,6 +4,7 @@ var Backbone = require('backbone');
 var context = require('gitter-web-client-context');
 var apiClient = require('../components/api-client');
 var presentPermissionsDialog = require('../ensured/present-permissions-dialog');
+const presentExportRoomDataDialog = require('../ensured/present-export-room-data-dialog');
 
 function showWelcomeMessage() {
   var dialogRegion = this.dialogRegion;
@@ -127,6 +128,10 @@ function createRoutes(options) {
 
         dialogRegion.show(new shareView.Modal({}));
       });
+    },
+
+    'export-room-data': () => {
+      presentExportRoomDataDialog(context.troupe());
     },
 
     delete: function() {

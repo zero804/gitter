@@ -266,6 +266,7 @@ var HeaderView = Marionette.ItemView.extend({
 
       menuBuilder.addDivider();
 
+      menuBuilder.addConditional(isAdmin, { title: 'Export room data', href: '#export-room-data' });
       menuBuilder.addConditional(isAdmin, { title: 'Delete this room', href: '#delete' });
       menuBuilder.addConditional(isRoomMember, { title: 'Leave this room', href: '#leave' });
     }

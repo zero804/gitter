@@ -1,15 +1,15 @@
 import Vue from 'vue';
-import ExportUserDataView from './components/index.vue';
+import UserExportModal from './components/user-export-modal.vue';
 
 function renderExportUserDataView(el, store) {
   return new Vue({
     el,
     store,
     components: {
-      ExportUserDataView
+      UserExportModal
     },
     render(createElement) {
-      return createElement('export-user-data-view', {});
+      return createElement('user-export-modal', {});
     }
   });
 }
