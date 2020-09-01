@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Export data modal matches snapshot 1`] = `
+<div
+  class="root modal-backdrop js-export-data-view-root"
+>
+  <div
+    class="modal--default"
+  >
+    <header
+      class="modal--default__header"
+    >
+      <h1
+        class="modal--default__header__title js-modal-title-text"
+      >
+        Export data
+      </h1>
+       
+      <span
+        class="modal--default__header__icon icon-cancel-circle"
+        data-action="close"
+      />
+    </header>
+     
+    <section
+      class="modal--default__content"
+    />
+     
+    <footer
+      class="modal--default__footer-wrapper"
+    >
+      <div
+        class="modal--default__footer"
+      />
+    </footer>
+  </div>
+</div>
+`;
