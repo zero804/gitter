@@ -1,16 +1,19 @@
-# 20.40.0 - *upcoming*
+# 20.40.0 - *upcoming* - Room data export
 
- - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
+ - Add room export modal, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2005
  - Add export endpoint for room messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1990
  - Add export endpoint for room members, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1999
  - Add export endpoint for room integration events, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2002
  - Add export endpoint for room bans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2003
+ - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
+
 
 Developer facing:
 
  - Remove flakey separation in GitLab CI, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1998
  - Use correct strategy for identity export, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2000
  - Fix export test names to match the file name, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2004
+ - Prevent extra stat calls when state is the same, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2001
 
 
 # 20.39.0 - 2020-8-13 - User data export
