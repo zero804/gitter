@@ -34,14 +34,20 @@ export const setLeftMenuState = ({ commit, dispatch }, newLeftMenuState) => {
   }
 };
 
-export const toggleLeftMenuPinnedState = ({ commit, dispatch }, toggleState) => {
+export const toggleLeftMenuPinnedState = ({ state, commit, dispatch }, toggleState) => {
+  if (state.leftMenuPinnedState !== toggleState) {
+    dispatch('trackStat', `left-menu.pinned.${toggleState}`);
+  }
+
   commit(types.TOGGLE_LEFT_MENU_PINNED_STATE, toggleState);
-  dispatch('trackStat', `left-menu.pinned.${toggleState}`);
 };
 
-export const toggleLeftMenu = ({ commit, dispatch }, toggleState) => {
+export const toggleLeftMenu = ({ state, commit, dispatch }, toggleState) => {
+  if (state.leftMenuExpandedState !== toggleState) {
+    dispatch('trackStat', `left-menu.toggle.${toggleState}`);
+  }
+
   commit(types.TOGGLE_LEFT_MENU, toggleState);
-  dispatch('trackStat', `left-menu.toggle.${toggleState}`);
 };
 
 export const updatefavouriteDraggingInProgress = ({ commit }, toggleState) =>

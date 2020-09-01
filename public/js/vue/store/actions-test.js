@@ -153,7 +153,7 @@ describe('actions', () => {
   });
 
   it('toggleLeftMenu', async () => {
-    const payload = false;
+    const payload = true;
     testAction(
       actions.toggleLeftMenu,
       payload,
