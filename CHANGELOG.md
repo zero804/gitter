@@ -1,4 +1,4 @@
-# 20.40.0 - *upcoming* - Room data export
+# 20.40.0 - 2020-9-1 - Room data export
 
  - Add room export modal, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2005
  - Add export endpoint for room messages, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1990
