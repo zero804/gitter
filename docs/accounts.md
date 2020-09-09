@@ -36,6 +36,13 @@ Sign out of Gitter and sign back in to update your avatar (or any other info).
 Currently, there is an outstanding bug where this doesn't work with GitLab/Twitter accounts, https://gitlab.com/gitlab-org/gitter/webapp/issues/1834
 
 
+## How do I export my data?
+
+You can export data associatd with your account by using the profile menu dropdown in the top-right -> **Export user data**
+
+If you're looking to export data for a room, see the [room docs on export](./rooms.md#export-room-data).
+
+
 ## How do I delete my account?
 
 You can delete your account by using the profile menu dropdown in the top-right -> **Delete Account**
