@@ -19,6 +19,23 @@ var removedUsers = require('./room-removed-user-core');
 var mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
 /**
+ * For exporting things
+ */
+function getCursorByRoomId(roomId) {
+  assert(mongoUtils.isLikeObjectId(roomId));
+
+  const cursor = TroupeUser.find({
+    troupeId: roomId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
+/**
  * Returns the rooms the user is in
  */
 function findRoomIdsForUser(userId) {
@@ -797,6 +814,7 @@ function findPrivateRoomIdsForUser(userId) {
 }
 
 /* Exports */
+exports.getCursorByRoomId = getCursorByRoomId;
 exports.findRoomIdsForUser = findRoomIdsForUser;
 exports.findRoomIdsForUserWithLurk = findRoomIdsForUserWithLurk;
 exports.findLurkingRoomIdsForUserId = findLurkingRoomIdsForUserId;

@@ -10,7 +10,7 @@ const request = require('supertest');
 
 const app = require('../../../server/web');
 
-describe('user-messages-export-api', function() {
+describe('generate-export-resource', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {

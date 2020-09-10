@@ -10,7 +10,7 @@ const request = require('supertest');
 
 const app = require('../../../server/web');
 
-describe('user-rooms-export-api', function() {
+describe('room-export-resource', function() {
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
 
   before(function() {
@@ -25,34 +25,29 @@ describe('user-rooms-export-api', function() {
       accessToken: 'web-internal'
     },
     troupe1: {
-      users: ['user1']
-    },
-    troupe2: {
-      users: ['user1']
-    },
-    troupeNoExport1: {
-      users: ['userNoExport1']
+      securityDescriptor: {
+        admins: 'MANUAL',
+        extraAdmins: ['user1']
+      }
     }
   });
 
-  it('GET /api_web/export/user/:user_id/rooms.ndjson as same user gets data', async () => {
+  it('GET /api_web/export/rooms/:room_id/messages.ndjson as admin works', function() {
     return request(app)
-      .get(`/api_web/export/user/${fixture.user1.id}/rooms.ndjson`)
+      .get(`/api_web/export/rooms/${fixture.troupe1.id}/messages.ndjson`)
       .set('Accept', 'application/x-ndjson,application/json')
       .set('Authorization', `Bearer ${fixture.user1.accessToken}`)
-      .expect(200)
+      .expect(200);
+  });
+
+  it('GET /api_web/export/rooms/:room_id/messages.ndjson as not admin is forbidden', function() {
+    return request(app)
+      .get(`/api_web/export/rooms/${fixture.troupe1.id}/messages.ndjson`)
+      .set('Accept', 'application/x-ndjson,application/json')
+      .set('Authorization', `Bearer ${fixture.userNoExport1.accessToken}`)
+      .expect(403)
       .then(function(result) {
-        assert.strictEqual(
-          result.text.split('\n').length,
-          3,
-          'includes 2 rooms (extra newline at the end)'
-        );
-        assert(result.text.includes(fixture.troupe1.id), 'includes troupe1');
-        assert(result.text.includes(fixture.troupe2.id), 'includes troupe2');
-        assert(
-          !result.text.includes(fixture.troupeNoExport1.id),
-          'does not include troupeNoExport1'
-        );
+        assert.deepEqual(result.body, { error: 'Forbidden' });
       });
   });
 });

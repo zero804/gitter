@@ -51,7 +51,7 @@ const userResource = {
         return iterableFromMongooseCursor(identityService.getCursorByUserId(req.user.id));
       },
       getStrategy: () => {
-        return new restSerializer.UserStrategy();
+        return new restSerializer.IdentityStrategy();
       }
     }),
     'group-favourites.ndjson': generateExportResource('user-group-favourites', {

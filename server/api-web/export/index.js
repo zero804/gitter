@@ -5,6 +5,7 @@ const cors = require('cors');
 const resourceRoute = require('../../web/resource-route-generator');
 
 const userResource = require('./user-export-resource');
+const roomResource = require('./room-export-resource');
 
 // API uses CORS
 const corsOptions = {
@@ -25,5 +26,6 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 router.use(cors(corsOptions));
 
 router.use('/user', resourceRoute('api-export-user', userResource));
+router.use('/rooms', resourceRoute('api-export-room', roomResource));
 
 module.exports = router;

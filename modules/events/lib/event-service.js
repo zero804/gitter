@@ -1,12 +1,32 @@
 'use strict';
 
+const assert = require('assert');
 var persistence = require('gitter-web-persistence');
 var processText = require('gitter-web-text-processor');
 var ObjectID = require('mongodb').ObjectID;
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
+const mongoReadPrefs = require('gitter-web-persistence-utils/lib/mongo-read-prefs');
 
-exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback) {
+/**
+ * For exporting things
+ */
+function getCursorByRoomId(roomId) {
+  assert(mongoUtils.isLikeObjectId(roomId));
+
+  const cursor = persistence.Event.find({
+    toTroupeId: roomId
+  })
+    .lean()
+    .read(mongoReadPrefs.secondaryPreferred)
+    .batchSize(100)
+    .cursor();
+
+  return cursor;
+}
+
+function newEventToTroupe(troupe, user, text, meta, payload, callback) {
   text = text ? '' + text : '';
 
   return Promise.try(function() {
@@ -29,9 +49,9 @@ exports.newEventToTroupe = function(troupe, user, text, meta, payload, callback)
       return event.save();
     })
     .nodeify(callback);
-};
+}
 
-exports.findEventsForTroupe = function(troupeId, options, callback) {
+function findEventsForTroupe(troupeId, options, callback) {
   var q = persistence.Event.where('toTroupeId', troupeId);
 
   if (options.startId) {
@@ -53,4 +73,10 @@ exports.findEventsForTroupe = function(troupeId, options, callback) {
       return results;
     })
     .nodeify(callback);
+}
+
+module.exports = {
+  getCursorByRoomId,
+  newEventToTroupe,
+  findEventsForTroupe
 };

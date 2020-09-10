@@ -143,20 +143,8 @@ test:
   extends:
     - .test_job
   rules:
-    - <<: *if-release-branch
-      when: never
     - when: always
   retry: 1
-
-test-all:
-  extends:
-    - .test_job
-  rules:
-    - <<: *if-release-branch
-  variables:
-    <<: *webapp_variables
-    ALLOW_FLAKEY_TESTS: 1
-  retry: 2
 
 test_e2e:
   extends: .test_job

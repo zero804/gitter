@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Room export modal matches snapshot 1`] = `
+<export-data-modal-stub
+  title="Export room data"
+>
+  <p
+    class="export-rate-limit-note"
+  >
+    
+    Each export link is rate-limited to once every 3 hours. You will see a "429 - Too many
+    requests" error once you reach the limit.
+  
+  </p>
+   
+  <ul
+    class="export-link-list"
+  >
+    <li>
+      <a
+        href="/api_web/export/rooms/123/messages.ndjson"
+        target="_blank"
+      >
+        Messages
+      </a>
+    </li>
+     
+    <li>
+      <a
+        href="/api_web/export/rooms/123/users.ndjson"
+        target="_blank"
+      >
+        Users
+      </a>
+    </li>
+     
+    <li>
+      <a
+        href="/api_web/export/rooms/123/integration-events.ndjson"
+        target="_blank"
+      >
+        Integration events
+      </a>
+    </li>
+     
+    <li>
+      <a
+        href="/api_web/export/rooms/123/bans.ndjson"
+        target="_blank"
+      >
+        Bans
+      </a>
+    </li>
+  </ul>
+</export-data-modal-stub>
+`;
