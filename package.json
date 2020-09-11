@@ -164,6 +164,7 @@
     "scriptjs": "^2.5.7",
     "sechash": "github:suprememoocow/node-sechash#10d6a9f5231c3b4ebad9e99f7a4961cfdedd446c",
     "serve-favicon": "^2.3.0",
+    "should-send-same-site-none": "^2.0.5",
     "shutdown": "^0.3.0",
     "slug": "^0.9.4",
     "snappy-cache": "^0.3.0",
