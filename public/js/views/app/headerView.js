@@ -285,17 +285,23 @@ var HeaderView = Marionette.ItemView.extend({
     });
   },
 
-  hideRoom: function() {
+  hideRoom: async function() {
     // Hide the room in the UI immediately
     this.model.set('lastAccessTime', null);
 
-    apiClient.user.delete(`/rooms/${this.model.id}`).catch(err => {
+    try {
+      await apiClient.user.delete(`/rooms/${this.model.id}`);
+
+      // Go back to the user home so it looks like something happened to the user
+      // Otherwise, the room disappears from your left-menu but you remain in the room which can be a bit confusing
+      appEvents.trigger('navigation', '/home', 'home', '');
+    } catch (err) {
       log.error('Error hiding room', { exception: err });
       appEvents.triggerParent('user_notification', {
         title: 'Error hiding room',
         text: `Check the devtools console for more details: ${err.message}`
       });
-    });
+    }
   },
 
   toggleFavourite: function() {
