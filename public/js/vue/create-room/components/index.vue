@@ -26,6 +26,11 @@ export default {
     ...mapActions({
       submitRoom: 'createRoom/submitRoom'
     }),
+    onBackdropClicked(e) {
+      if (e.target === this.$refs.root) {
+        appEvents.trigger('destroy-create-room-view');
+      }
+    },
     onCloseClicked() {
       appEvents.trigger('destroy-create-room-view');
     }
@@ -34,8 +39,8 @@ export default {
 </script>
 
 <template>
-  <div ref="root" class="root modal-backdrop js-create-room-view-root" @click="onCloseClicked">
-    <div ref="modal" class="modal--default" @click.stop>
+  <div ref="root" class="root modal-backdrop js-create-room-view-root" @click="onBackdropClicked">
+    <div ref="modal" class="modal--default">
       <header class="modal--default__header">
         <h1 class="modal--default__header__title js-modal-title-text">Create a room</h1>
         <span
@@ -94,7 +99,7 @@ export default {
             :disabled="roomSubmitRequest.loading"
             @click="submitRoom"
           >
-            <loading-spinner v-if="roomSubmitRequest.loading" /> Create
+            <loading-spinner v-if="roomSubmitRequest.loading" />Create
           </button>
         </div>
       </footer>
