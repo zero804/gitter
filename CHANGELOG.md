@@ -1,3 +1,8 @@
+# 20.41.0 - *upcoming*
+
+ - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
+
+
 # 20.40.0 - 2020-9-1 - Room data export
 
  - Add room export modal, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2005
@@ -6,7 +11,6 @@
  - Add export endpoint for room integration events, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2002
  - Add export endpoint for room bans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2003
  - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
-
 
 Developer facing:
 
