@@ -80,6 +80,13 @@ export default {
       updateDraftMessage: 'threadMessageFeed/updateDraftMessage',
       editLastMessageAction: 'threadMessageFeed/editLastMessage'
     }),
+    onEnterPressed(e) {
+      // Allow Shift + Enter to add a new line instead of sending the message
+      if (!e.shiftKey) {
+        this.sendMessage();
+        e.preventDefault();
+      }
+    },
     editLastMessage() {
       if (!this.draftMessage) this.editLastMessageAction();
     },
@@ -121,8 +128,8 @@ export default {
               autocorrect="off"
               autofocus
               maxlength="4096"
-              @keydown.enter.prevent="sendMessage()"
-              @keyup.up="editLastMessage()"
+              @keydown.enter="onEnterPressed"
+              @keyup.up="editLastMessage"
             ></textarea>
           </form>
         </div>
