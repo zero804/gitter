@@ -3,6 +3,7 @@
  - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
  - Fix select dropdowns not closing when clicking outside, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2009
  - Redirect to userhome after hiding a room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2011
+ - Add Shift + Enter multiline support to threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2012
 
 
 # 20.40.0 - 2020-9-1 - Room data export
