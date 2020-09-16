@@ -12,6 +12,7 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var methodOverride = require('method-override');
 var session = require('express-session');
+const { shouldSendSameSiteNone } = require('should-send-same-site-none');
 var appTag = require('./app-tag');
 
 const IS_DEV = process.env.NODE_ENV === 'dev';
@@ -124,6 +125,16 @@ module.exports = {
       /* Serve static content */
       require('./express-static').install(app);
     }
+
+    // Conditionally remove `SameSite=None; Secure` from cookies
+    // for platforms(user agents) that don't support them.
+    // We need to do this otherwise people won't be able to sign in (session and rememberme cookie)
+    //
+    // Incompatible platforms:
+    // - Chrome 51 - 66
+    // - iOS 12
+    // - Safari on MacOS 10.14
+    app.use(shouldSendSameSiteNone);
 
     app.use(cookieParser());
 
