@@ -1,4 +1,4 @@
-# 20.41.0 - *upcoming*
+# 20.41.0 - 2020-9-16
 
  - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
  - Fix select dropdowns not closing when clicking outside, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2009
