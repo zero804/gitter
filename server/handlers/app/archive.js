@@ -192,6 +192,7 @@ exports.chatArchive = [
   uriContextResolverMiddleware,
   preventClickjackingMiddleware,
   timezoneMiddleware,
+  // eslint-disable-next-line max-statements
   asyncHandler(async (req, res /*, next*/) => {
     const user = req.user;
     const troupe = req.uriContext.troupe;
@@ -209,7 +210,47 @@ exports.chatArchive = [
     const mm = parseInt(req.params.mm, 10);
     const dd = parseInt(req.params.dd, 10);
 
-    const startDateUTC = moment({ year: yyyy, month: mm - 1, day: dd });
+    const hourRange = req.params.hourRange;
+
+    let fromHour = 0;
+    let toHour = 0;
+    if (hourRange) {
+      const hourMatches = hourRange.match(/(\d\d?)-(\d\d?)/);
+
+      if (!hourMatches) {
+        throw new StatusError(404, 'Hour was unable to be parsed');
+      }
+
+      fromHour = parseInt(hourMatches[1], 10);
+      toHour = parseInt(hourMatches[2], 10);
+
+      if (fromHour < 0 || fromHour > 23) {
+        throw new StatusError(404, 'From hour can only be in range 0-23');
+      }
+
+      // Currently we force the range to always be 1 hour
+      // If the format isn't correct, redirect to the correct hour range
+      if (toHour !== fromHour + 1) {
+        res.redirect(
+          urlJoin(
+            clientEnv['basePath'],
+            troupe.uri,
+            'archives',
+            req.params.yyyy,
+            req.params.mm,
+            req.params.dd,
+            `${fromHour}-${fromHour + 1}`
+          )
+        );
+        return;
+      }
+    }
+
+    const startDateUTC = moment.utc({ year: yyyy, month: mm - 1, day: dd, hour: fromHour });
+    let endDateUTC = moment(startDateUTC).add(1, 'days');
+    if (hourRange) {
+      endDateUTC = moment.utc({ year: yyyy, month: mm - 1, day: dd, hour: toHour });
+    }
 
     const nextDateUTC = moment(startDateUTC).add(1, 'days');
     const previousDateUTC = moment(startDateUTC).subtract(1, 'days');
@@ -229,13 +270,30 @@ exports.chatArchive = [
       'Archive searching for messages in troupe %s in date range %s <-> %s',
       troupeId,
       startDateUTC,
-      nextDateUTC
+      endDateUTC
     );
     const chatMessages = await chatService.findChatMessagesForTroupeForDateRange(
       troupeId,
       startDateUTC,
-      nextDateUTC
+      endDateUTC
     );
+
+    // If there are too many messages to display, then redirect to only show the first hour chunk
+    if (hourRange === undefined && chatMessages.length >= chatService.ARCHIVE_MESSAGE_LIMIT) {
+      res.redirect(
+        urlJoin(
+          clientEnv['basePath'],
+          troupe.uri,
+          'archives',
+          req.params.yyyy,
+          req.params.mm,
+          req.params.dd,
+          '0-1'
+        )
+      );
+      return;
+    }
+
     // If `currentUserId` isn't specified, all chats are `unread: false` as expected
     const strategy = new restSerializer.ChatStrategy({
       troupeId: troupeId
@@ -246,7 +304,8 @@ exports.chatArchive = [
       restSerializer.serialize(chatMessages, strategy)
     ]);
     troupeContext.archive = {
-      archiveDate: startDateUTC,
+      startDate: startDateUTC,
+      endDate: endDateUTC,
       nextDate: nextDateUTC,
       previousDate: previousDateUTC,
       messages: serialized
@@ -296,7 +355,7 @@ exports.chatArchive = [
     /*
     If the we are showing archive for a finished day, we'll include caching headers
     */
-    if (today >= nextDateUTC) {
+    if (today >= endDateUTC) {
       res.setHeader('Cache-Control', 'public, max-age=' + ONE_YEAR_SECONDS);
       res.setHeader('Expires', new Date(Date.now() + ONE_YEAR_MILLISECONDS).toUTCString());
     }
@@ -324,6 +383,23 @@ exports.chatArchive = [
       previousDateLink: previousDateLink,
       nextDateLink: nextDateLink,
       monthYearFormatted: monthYearFormatted,
+      showHourPaginationControls: hourRange !== undefined,
+      fromHour,
+      toHour,
+      hourRanges: Array.from({ length: 24 }, (x, i) => ({
+        start: i,
+        end: i + 1,
+        selected: i === fromHour,
+        link: urlJoin(
+          clientEnv['basePath'],
+          troupe.uri,
+          'archives',
+          req.params.yyyy,
+          req.params.mm,
+          req.params.dd,
+          `${i}-${i + 1}`
+        )
+      })),
 
       fonts: fonts.getFonts(),
       hasCachedFonts: fonts.hasCachedFonts(req.cookies)

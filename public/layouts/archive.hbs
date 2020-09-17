@@ -49,7 +49,7 @@
             </div>
             {{#if user}}
               <div class="archive-right-toolbar-button-wrapper">
-                <a class="archive-right-toolbar-button button-caribbean" href="/{{troupeName}}">Go to live room</a>
+                <a class="archive-right-toolbar-button button-caribbean--small" href="/{{troupeName}}">Go to live room</a>
               </div>
 
               {{#if isAdmin}}
@@ -66,7 +66,7 @@
 
             {{else}}
               <div class="archive-right-toolbar-button-wrapper">
-                <a href="/login?action=login" class="archive-right-toolbar-button button-caribbean">Sign in to start talking</a>
+                <a href="/login?action=login" class="archive-right-toolbar-button button-caribbean--small">Sign in to start talking</a>
               </div>
             {{/if}}
           {{else}}
@@ -90,11 +90,11 @@
           {{#unless isHomePage}}
             {{#if user}}
             <div class="archive-right-toolbar-button-wrapper">
-              <a class="archive-right-toolbar-button button-caribbean" href="/{{troupeName}}">Go to live room</a>
+              <a class="archive-right-toolbar-button button-caribbean--small" href="/{{troupeName}}">Go to live room</a>
             </div>
             {{else}}
             <div class="archive-right-toolbar-button-wrapper">
-              <a href="/login?action=login&amp;button=archive-login" class="archive-right-toolbar-button button-caribbean">Sign in to start talking</a>
+              <a href="/login?action=login&amp;button=archive-login" class="archive-right-toolbar-button button-caribbean--small">Sign in to start talking</a>
             </div>
             {{/if}}
           {{/unless}}

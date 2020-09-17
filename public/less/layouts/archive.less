@@ -44,7 +44,7 @@
   overflow: hidden;
   flex-shrink: 0;
   width: 100%;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .gtrArchiveInfo {
@@ -89,6 +89,7 @@
 .archive-right-toolbar-button-wrapper {
   box-sizing: border-box;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 .archive-right-toolbar-button {
@@ -161,9 +162,7 @@
   }
 
 .gtrArchiveNavigationWrapper {
-  margin-bottom: 20px;
-  padding-left: 20px;
-  padding-right: 20px;
+  margin-bottom: 10px;
 
   &:empty {
     display: none;
@@ -176,6 +175,33 @@
   @media @archive-mid {
     display: flex;
     justify-content: center;
+  }
+}
+
+
+
+.archive-hour-pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+
+  margin-top: 10px;
+  margin-left: -7px;
+  margin-right: -7px;
+}
+
+.archive-hour-pagination-page {
+  display: inline-block;
+  padding: 2px 5px;
+  margin: 3px;
+
+  border: 1px solid @caribbean;
+
+  font-size: 14px;
+
+  &.selected {
+    background-color: @caribbean;
+    color: #fff;
   }
 }
 

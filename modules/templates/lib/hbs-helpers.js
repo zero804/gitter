@@ -63,13 +63,14 @@ function toLowerCase(str) {
 function pad(options) {
   var content = '' + options.fn(this);
   var width = options.hash.width || 40;
+  var padCharacter = options.hash.padCharacter || ' ';
   var directionRight = options.hash.direction ? options.hash.direction === 'right' : true;
 
   while (content.length < width) {
     if (directionRight) {
-      content += ' ';
+      content += padCharacter;
     } else {
-      content = ' ' + content;
+      content = padCharacter + content;
     }
   }
   return content;
