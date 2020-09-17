@@ -9,6 +9,7 @@ var featureToggles = require('../../web/middlewares/feature-toggles');
 var preventClickjackingMiddleware = require('../../web/middlewares/prevent-clickjacking');
 var preventClickjackingOnlyGitterEmbedMiddleware = require('../../web/middlewares/prevent-clickjacking-only-gitter-embed');
 var archive = require('./archive');
+const chatArchiveRoute = require('./archive/chat-archive');
 var identifyRoute = require('gitter-web-env').middlewares.identifyRoute;
 var redirectErrorMiddleware = require('../uri-context/redirect-error-middleware');
 var desktopRenderer = require('../renderers/desktop-renderer');
@@ -80,7 +81,7 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
   router.get(path + '/archives/all', archive.datesList);
   router.get(
     path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})/:hourRange(\\d\\d?-\\d\\d?)?',
-    archive.chatArchive
+    chatArchiveRoute
   );
 
   // Secondary view
