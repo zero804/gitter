@@ -1,3 +1,12 @@
+# 20.41.0 - 2020-9-16
+
+ - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
+ - Fix select dropdowns not closing when clicking outside, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2009
+ - Redirect to userhome after hiding a room, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2011
+ - Add Shift + Enter multiline support to threaded conversations, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2012
+ - Fix login in Chrome 51 - 66, iOS 12, and Safari on MacOS 10.14 (`SameSite=None` cookies not being incompatible in old browsers/devices), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2010
+
+
 # 20.40.0 - 2020-9-1 - Room data export
 
  - Add room export modal, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2005
@@ -6,7 +15,6 @@
  - Add export endpoint for room integration events, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2002
  - Add export endpoint for room bans, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2003
  - Add create room button to community home, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1992
-
 
 Developer facing:
 

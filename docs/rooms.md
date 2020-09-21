@@ -136,6 +136,13 @@ You can restrict a room to GitHub users via **Room settings dropdown** -> **Sett
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/oOGoEYw.png)
 
 
+### Export room data
+
+You can export data associated with your room via **Room settings dropdown** -> **Export room data**
+
+If you're looking to export data for your own user, see the [account docs on exports](./accounts.md#how-do-i-export-my-data).
+
+
 ### Rename a room
 
 If you want to rename a room because a GitHub repo was renamed/transferred, see this [FAQ section instead](./faq.md#what-happens-if-i-rename-something-on-GitHub-org-repo) instead.

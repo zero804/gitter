@@ -47,6 +47,16 @@ describe('thread-message-feed chat-input', () => {
       wrapper.find({ ref: 'chatInputTextArea' }).trigger('keydown.enter');
       expect(stubbedActions.threadMessageFeed.sendMessage).toHaveBeenCalled();
     });
+
+    it('should add new line when Shift + Enter is pressed instead of sending the message', () => {
+      const { wrapper, stubbedActions } = mount(ChatInput, defaultProps, store => {
+        store.state.user = { id: 'userId' };
+      });
+      wrapper.find({ ref: 'chatInputTextArea' }).trigger('keydown.enter', {
+        shiftKey: true
+      });
+      expect(stubbedActions.threadMessageFeed.sendMessage).not.toHaveBeenCalled();
+    });
   });
 
   it('should edit last message when key up is pressed', () => {
