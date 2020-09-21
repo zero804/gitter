@@ -24,16 +24,6 @@ exports[`menu-bar-body matches snapshot when pinned 1`] = `
       label="Show one to one messages panel"
       type="people"
     />
-  </div>
-   
-  <div
-    class="menu-bar-bottom"
-  >
-    <menu-bar-item-stub
-      class="item-announcements"
-      label="View latest announcements from the Gitter team"
-      type="announcements"
-    />
      
     <menu-bar-item-create-stub
       class="js-menu-bar-create-button"
@@ -41,10 +31,10 @@ exports[`menu-bar-body matches snapshot when pinned 1`] = `
       type="create"
     />
      
-    <menu-bar-item-toggle-stub
-      class="item-toggle"
-      label="Unpin and collapse the left-menu"
-      type="toggle"
+    <menu-bar-item-stub
+      class="item-announcements"
+      label="View latest announcements from the Gitter team"
+      type="announcements"
     />
   </div>
 </div>
@@ -74,16 +64,6 @@ exports[`menu-bar-body matches snapshot when unpinned 1`] = `
       label="Show one to one messages panel"
       type="people"
     />
-  </div>
-   
-  <div
-    class="menu-bar-bottom"
-  >
-    <menu-bar-item-stub
-      class="item-announcements"
-      label="View latest announcements from the Gitter team"
-      type="announcements"
-    />
      
     <menu-bar-item-create-stub
       class="js-menu-bar-create-button"
@@ -91,10 +71,10 @@ exports[`menu-bar-body matches snapshot when unpinned 1`] = `
       type="create"
     />
      
-    <menu-bar-item-toggle-stub
-      class="item-toggle"
-      label="Pin and expand left-menu"
-      type="toggle"
+    <menu-bar-item-stub
+      class="item-announcements"
+      label="View latest announcements from the Gitter team"
+      type="announcements"
     />
   </div>
 </div>
@@ -125,16 +105,6 @@ exports[`menu-bar-body unreads matches snapshot when mentions 1`] = `
       label="Show one to one messages panel"
       type="people"
     />
-  </div>
-   
-  <div
-    class="menu-bar-bottom"
-  >
-    <menu-bar-item-stub
-      class="item-announcements"
-      label="View latest announcements from the Gitter team"
-      type="announcements"
-    />
      
     <menu-bar-item-create-stub
       class="js-menu-bar-create-button"
@@ -142,10 +112,10 @@ exports[`menu-bar-body unreads matches snapshot when mentions 1`] = `
       type="create"
     />
      
-    <menu-bar-item-toggle-stub
-      class="item-toggle"
-      label="Unpin and collapse the left-menu"
-      type="toggle"
+    <menu-bar-item-stub
+      class="item-announcements"
+      label="View latest announcements from the Gitter team"
+      type="announcements"
     />
   </div>
 </div>
@@ -177,16 +147,6 @@ exports[`menu-bar-body unreads matches snapshot when one to one unreads 1`] = `
       label="Show one to one messages panel (some rooms have unread messages)"
       type="people"
     />
-  </div>
-   
-  <div
-    class="menu-bar-bottom"
-  >
-    <menu-bar-item-stub
-      class="item-announcements"
-      label="View latest announcements from the Gitter team"
-      type="announcements"
-    />
      
     <menu-bar-item-create-stub
       class="js-menu-bar-create-button"
@@ -194,10 +154,10 @@ exports[`menu-bar-body unreads matches snapshot when one to one unreads 1`] = `
       type="create"
     />
      
-    <menu-bar-item-toggle-stub
-      class="item-toggle"
-      label="Unpin and collapse the left-menu"
-      type="toggle"
+    <menu-bar-item-stub
+      class="item-announcements"
+      label="View latest announcements from the Gitter team"
+      type="announcements"
     />
   </div>
 </div>
@@ -228,16 +188,6 @@ exports[`menu-bar-body unreads matches snapshot when unreads 1`] = `
       label="Show one to one messages panel"
       type="people"
     />
-  </div>
-   
-  <div
-    class="menu-bar-bottom"
-  >
-    <menu-bar-item-stub
-      class="item-announcements"
-      label="View latest announcements from the Gitter team"
-      type="announcements"
-    />
      
     <menu-bar-item-create-stub
       class="js-menu-bar-create-button"
@@ -245,10 +195,10 @@ exports[`menu-bar-body unreads matches snapshot when unreads 1`] = `
       type="create"
     />
      
-    <menu-bar-item-toggle-stub
-      class="item-toggle"
-      label="Unpin and collapse the left-menu"
-      type="toggle"
+    <menu-bar-item-stub
+      class="item-announcements"
+      label="View latest announcements from the Gitter team"
+      type="announcements"
     />
   </div>
 </div>

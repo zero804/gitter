@@ -7,6 +7,9 @@ const {
   LEFT_MENU_ANNOUNCEMENTS_STATE
 } = require('../constants');
 
+jest.mock('../../../utils/is-mobile-breakpoint');
+const isMobileBreakpoint = require('../../../utils/is-mobile-breakpoint');
+
 function createTouchEvent(eventName, x, y, target) {
   const e = new CustomEvent(eventName);
   e.touches = [
@@ -74,6 +77,23 @@ describe('left-menu', () => {
       expect(wrapper.element).toMatchSnapshot();
     });
 
+    it('calls store action "toggleLeftMenuPinnedState" when clicking the top-left toggle', () => {
+      // Set as desktop
+      isMobileBreakpoint.mockImplementation(() => false);
+
+      const { wrapper, stubbedActions } = mount(Index, {}, store => {
+        store.state.leftMenuPinnedState = true;
+        store.state.leftMenuExpandedState = true;
+      });
+      wrapper.find({ ref: 'toggle' }).trigger('click');
+
+      expect(stubbedActions.toggleLeftMenuPinnedState).toHaveBeenCalledWith(
+        expect.anything(),
+        false,
+        undefined
+      );
+    });
+
     it('calls store action "toggleLeftMenu" after mouse leaves', () => {
       const { wrapper, stubbedActions } = mount(Index, {}, store => {
         store.state.leftMenuPinnedState = false;
@@ -95,6 +115,23 @@ describe('left-menu', () => {
         store.state.isMobile = true;
       });
       expect(wrapper.element).toMatchSnapshot();
+    });
+
+    it('calls store action "toggleLeftMenu" when clicking the top-left toggle when mobile', () => {
+      // Set as mobile
+      isMobileBreakpoint.mockImplementation(() => true);
+
+      const { wrapper, stubbedActions } = mount(Index, {}, store => {
+        store.state.leftMenuPinnedState = false;
+        store.state.leftMenuExpandedState = true;
+      });
+      wrapper.find({ ref: 'toggle' }).trigger('click');
+
+      expect(stubbedActions.toggleLeftMenu).toHaveBeenCalledWith(
+        expect.anything(),
+        false,
+        undefined
+      );
     });
 
     it('swipe right expands left-menu', () => {

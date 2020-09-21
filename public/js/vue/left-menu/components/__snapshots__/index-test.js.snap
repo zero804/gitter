@@ -10,13 +10,31 @@ exports[`left-menu all state matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -85,13 +103,31 @@ exports[`left-menu announcements state matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -150,13 +186,31 @@ exports[`left-menu dark-theme matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -225,13 +279,31 @@ exports[`left-menu mobile mobile matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -300,13 +372,31 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -415,13 +505,31 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -530,13 +638,31 @@ exports[`left-menu people state matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -605,13 +731,31 @@ exports[`left-menu pinning and expanding not pinned and collapse 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Pin and expand left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -680,13 +824,31 @@ exports[`left-menu pinning and expanding not pinned and expanded 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Pin and expand left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
@@ -755,13 +917,31 @@ exports[`left-menu search state matches snapshot 1`] = `
     <section
       class="header-minibar layout-minibar"
     >
-      <a
-        href="undefined/?utm_source=left-menu-logo"
+      <button
+        class="left-menu-toggle"
+        label="Unpin and collapse the left-menu"
       >
+        <svg
+          class="hamburger-icon"
+          viewBox="0 0 26 22"
+        >
+          <path
+            d="M0,2 l26,0"
+          />
+           
+          <path
+            d="M0,11 l26,0"
+          />
+           
+          <path
+            d="M0,20 l26,0"
+          />
+        </svg>
+         
         <gitter-logo-svg-stub
           class="logo-gitter-sign"
         />
-      </a>
+      </button>
     </section>
      
     <section
