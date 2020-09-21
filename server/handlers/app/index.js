@@ -78,7 +78,10 @@ var router = express.Router({ caseSensitive: true, mergeParams: true });
 ) {
   router.get(path + '/archives', archive.linksList);
   router.get(path + '/archives/all', archive.datesList);
-  router.get(path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})', archive.chatArchive);
+  router.get(
+    path + '/archives/:yyyy(\\d{4})/:mm(\\d{2})/:dd(\\d{2})/:hourRange(\\d\\d?-\\d\\d?)?',
+    archive.chatArchive
+  );
 
   // Secondary view
   router.get(path + '/~(chat|iframe)', frameMiddlewarePipeline);
