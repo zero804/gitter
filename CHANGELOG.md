@@ -1,3 +1,8 @@
+# 20.42.0 - *upcoming*
+
+ - Add hour pagination to archives, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2014
+
+
 # 20.41.0 - 2020-9-16
 
  - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
