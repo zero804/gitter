@@ -49,7 +49,7 @@ var gitlabStrategy = new GitLabStrategy(
     // https://github.com/jaredhanson/passport-oauth2/blob/master/lib/strategy.js
     state: true,
     passReqToCallback: true,
-    scope: ['read_user', 'api'],
+    scope: ['read_user', 'read_api'],
     scopeSeparator: ' '
   },
   gitlabOauthCallback
