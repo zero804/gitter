@@ -43,10 +43,12 @@ describe('group-service', function() {
       var fixture = fixtureLoader.setup({
         deleteDocuments: {
           Group: [
+            { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_ORG.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_REPO.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase() },
             { lcUri: fixtureLoader.GITTER_INTEGRATION_USERNAME.toLowerCase() },
+            { lcUri: `${fixtureLoader.GITLAB_USER_USERNAME.toLowerCase()}_gitlab` },
             { lcUri: fixtureLoader.GITLAB_GROUP1_URI.toLowerCase() },
             { lcUri: 'group-uri-for-project-based-group' },
             { lcUri: 'bob' }
@@ -57,26 +59,27 @@ describe('group-service', function() {
       });
 
       it('should create a group based on a GitLab user', async () => {
-        const groupUri = fixtureLoader.GITLAB_USER_USERNAME;
+        const groupUri = fixture.userGitlab1.username;
         const user = fixture.userGitlab1;
 
         const group = await groupService.createGroup(user, {
           type: 'GL_USER',
           name: 'Some GitLab user',
           uri: groupUri,
-          linkPath: groupUri
+          linkPath: fixtureLoader.GITLAB_USER_USERNAME
         });
 
         assert.strictEqual(group.name, 'Some GitLab user');
         assert.strictEqual(group.uri, groupUri);
         assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+        assert.strictEqual(group.lcHomeUri, `${user.username.toLowerCase()}/home`);
 
         const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
 
         assert.deepEqual(securityDescriptor, {
           admins: 'GL_USER_SAME',
           externalId: fixtureLoader.GITLAB_USER_ID,
-          linkPath: groupUri,
+          linkPath: fixtureLoader.GITLAB_USER_USERNAME,
           members: 'PUBLIC',
           public: true,
           type: 'GL_USER'
@@ -97,6 +100,7 @@ describe('group-service', function() {
         assert.strictEqual(group.name, 'Some GitLab group');
         assert.strictEqual(group.uri, groupUri);
         assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+        assert.strictEqual(group.lcHomeUri, groupUri);
 
         const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
 
@@ -125,6 +129,7 @@ describe('group-service', function() {
         assert.strictEqual(group.name, 'Some GitLab project');
         assert.strictEqual(group.uri, uri);
         assert.strictEqual(group.lcUri, uri);
+        assert.strictEqual(group.lcHomeUri, uri);
 
         const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
 
@@ -135,6 +140,33 @@ describe('group-service', function() {
           members: 'PUBLIC',
           public: true,
           type: 'GL_PROJECT'
+        });
+      });
+
+      it('should create a group based on a GitHub user', async () => {
+        const user = fixture.user1;
+
+        const group = await groupService.createGroup(user, {
+          type: 'GH_USER',
+          linkPath: user.username,
+          name: 'my-name',
+          uri: user.username
+        });
+
+        assert.strictEqual(group.name, 'my-name');
+        assert.strictEqual(group.uri, user.username);
+        assert.strictEqual(group.lcUri, user.username.toLowerCase());
+        assert.strictEqual(group.lcHomeUri, `${user.username.toLowerCase()}/home`);
+
+        const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
+
+        assert.deepEqual(securityDescriptor, {
+          admins: 'GH_USER_SAME',
+          externalId: fixtureLoader.GITTER_INTEGRATION_USER_ID,
+          linkPath: user.username,
+          members: 'PUBLIC',
+          public: true,
+          type: 'GH_USER'
         });
       });
 
@@ -152,6 +184,7 @@ describe('group-service', function() {
         assert.strictEqual(group.name, 'Bob');
         assert.strictEqual(group.uri, groupUri);
         assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+        assert.strictEqual(group.lcHomeUri, groupUri);
 
         const securityDescriptor = await securityDescriptorService.group.findById(group._id, null);
 
@@ -180,6 +213,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, groupUri);
             assert.strictEqual(group.lcUri, groupUri.toLowerCase());
+            assert.strictEqual(group.lcHomeUri, groupUri);
             return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
@@ -210,6 +244,7 @@ describe('group-service', function() {
             assert.strictEqual(group.name, 'Bob');
             assert.strictEqual(group.uri, 'Bob');
             assert.strictEqual(group.lcUri, 'bob');
+            assert.strictEqual(group.lcHomeUri, 'bob');
             return securityDescriptorService.group.findById(group._id, null);
           })
           .then(function(securityDescriptor) {
@@ -236,6 +271,10 @@ describe('group-service', function() {
             assert.strictEqual(group.uri, fixtureLoader.GITTER_INTEGRATION_COMMUNITY);
             assert.strictEqual(
               group.lcUri,
+              fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase()
+            );
+            assert.strictEqual(
+              group.lcHomeUri,
               fixtureLoader.GITTER_INTEGRATION_COMMUNITY.toLowerCase()
             );
             return securityDescriptorService.group.findById(group._id, null);
@@ -283,6 +322,7 @@ describe('group-service', function() {
           assert.strictEqual(group.name, fixture.group1.name);
           assert.strictEqual(group.uri, fixture.group1.uri);
           assert.strictEqual(group.lcUri, fixture.group1.lcUri);
+          assert.strictEqual(group.lcHomeUri, fixture.group1.lcUri);
         });
       });
     });

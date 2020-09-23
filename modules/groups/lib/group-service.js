@@ -155,7 +155,7 @@ async function ensureAccessAndFetchGroupInfo(user, options) {
     {
       name: name,
       uri: uri,
-      useHomeUriSuffix: options.useHomeUriSuffix
+      useHomeUriSuffix: uri.toLowerCase() === user.username.toLowerCase()
     },
     securityDescriptor
   ];
