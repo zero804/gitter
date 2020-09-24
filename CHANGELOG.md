@@ -1,4 +1,4 @@
-# 20.42.0 - *upcoming*
+# 20.42.0 - 2020-9-24
 
  - Add hour pagination to archives, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2014
  - Move hamburger menu toggle to top-left, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2016
