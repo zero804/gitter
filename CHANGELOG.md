@@ -1,3 +1,8 @@
+# 20.42.0 - *upcoming*
+
+ - Fix menu bar item unread/mention indicator going behind icon when unselected, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2022
+
+
 # 20.42.0 - 2020-9-24
 
  - Add hour pagination to archives, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2014
