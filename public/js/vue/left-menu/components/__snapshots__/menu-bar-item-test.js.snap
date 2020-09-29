@@ -6,13 +6,13 @@ exports[`menu-bar-item matches snapshot with all properties 1`] = `
   class="item-all"
   type="button"
 >
-  <div
-    class="unread-indicator has-unreads has-mentions"
-  />
-   
   <span
     aria-hidden="true"
     class="icon-wrapper"
+  />
+   
+  <div
+    class="unread-indicator has-unreads has-mentions"
   />
 </button>
 `;
@@ -23,13 +23,13 @@ exports[`menu-bar-item matches snapshot with required properties 1`] = `
   class="item"
   type="button"
 >
-  <div
-    class="unread-indicator"
-  />
-   
   <span
     aria-hidden="true"
     class="icon-wrapper"
+  />
+   
+  <div
+    class="unread-indicator"
   />
 </button>
 `;

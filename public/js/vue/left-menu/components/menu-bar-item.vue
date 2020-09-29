@@ -62,6 +62,9 @@ export default {
     :aria-label="label"
     @click.prevent="onClick(type)"
   >
+    <span class="icon-wrapper" aria-hidden="true">
+      <slot name="icon"></slot>
+    </span>
     <div
       class="unread-indicator"
       :class="{
@@ -69,9 +72,6 @@ export default {
         'has-mentions': hasMentions
       }"
     ></div>
-    <span class="icon-wrapper" aria-hidden="true">
-      <slot name="icon"></slot>
-    </span>
   </button>
 </template>
 
