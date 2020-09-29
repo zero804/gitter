@@ -9,7 +9,7 @@ var appEvents = require('./utils/appevents');
 var context = require('gitter-web-client-context');
 var mapMessageTemplate = require('./views/homepage/map-message.hbs');
 var roomNameTrimmer = require('gitter-web-shared/room-name-trimmer');
-var resolveUserAvatarUrl = require('gitter-web-shared/avatars/resolve-user-avatar-url');
+var resolveRoomAvatarUrl = require('gitter-web-shared/avatars/resolve-room-avatar-url');
 var apiClient = require('./components/api-client');
 var onready = require('././utils/onready');
 
@@ -97,7 +97,12 @@ function randomRoom() {
 
 function initEmbedPanel() {
   var rooms = [
-    { name: 'Gitter', uri: 'gitter/gitter', language: "Let's talk about Gitter!" },
+    {
+      groupId: '57542c12c43b8c601976fa66',
+      name: 'Gitter',
+      uri: 'gitter/gitter',
+      language: "Let's talk about Gitter!"
+    },
     roomByLocale(context.lang()),
     randomRoom(),
     randomRoom()
@@ -110,12 +115,11 @@ function initEmbedPanel() {
     var tabIndex = $this.data().tabIndex;
 
     var room = rooms[tabIndex];
-    var owner = room.uri.split('/')[0];
 
     $this.html(
       // TODO: send more than just the username
       '<img src="' +
-        resolveUserAvatarUrl({ username: owner }, 48 * 2) +
+        resolveRoomAvatarUrl({ groupId: room.groupId, uri: room.uri }, 48 * 2) +
         '" width="48" height="48">' +
         '<h3>' +
         room.name +
