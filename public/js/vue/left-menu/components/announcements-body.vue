@@ -1,5 +1,5 @@
 <script>
-export const ACTIVE_TILL = new Date('2020-05-21T00:00:00.000Z');
+export const ACTIVE_TILL = new Date('2020-10-13T00:00:00.000Z');
 
 export const isAnnouncementActive = () => new Date(Date.now()) < ACTIVE_TILL;
 
@@ -11,64 +11,48 @@ export default {
 <template>
   <div class="announcements-body-root">
     <h2 class="announcements-body-title">Announcement</h2>
+    <p>Hello,</p>
     <p>
-      This announcements tab is new! The Gitter team has been hard at work tackling these two new
-      features and thought you should get some more direct info around them:
+      We are writing to you to inform you of some changes around the processing of your personal
+      data by Gitter.
+    </p>
+    <p>
+      On the 30th of September, the Gitter web app was acquired by
+      <a href="https://element.io/" target="_blank">Element</a>
+      (a trading name of New Vector Ltd.). This means that your personal data, and all associated
+      information assets, has been transferred over to the new Controller of your data.
+    </p>
+    <p>
+      We would like to provide you with the assurance that your data will remain within the same
+      data centre and be processed in accordance with the General Data Protection Regulation. For
+      full details please see our
+      <a href="https://element.io/privacy" target="_blank">Privacy Policy</a>, which details,
+      amongst other things:
     </p>
     <ul>
-      <li>
-        <a
-          href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/messages.md#threaded-conversations"
-          target="_blank"
-          >Threaded conversations</a
-        >
-        <ul>
-          <li>A new way to organize your conversations and keep things on track in a busy room</li>
-        </ul>
-      </li>
-      <li>
-        GitLab based
-        <a
-          href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/communities.md#community-creation"
-          target="_blank"
-          >communities</a
-        >
-        and
-        <a
-          href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/rooms.md#room-creation"
-          target="_blank"
-          >rooms</a
-        >
-        <ul>
-          <li>
-            Just like our GitHub integrated rooms, create rooms based on your GitLab groups and
-            projects and inherit permissions
-          </li>
-        </ul>
-      </li>
+      <li>Our contact details;</li>
+      <li>Our Data Protection Officer’s contact details;</li>
+      <li>The purposes and legal basis of processing of your data;</li>
+      <li>Applicable categories of personal data;</li>
+      <li>Your rights in relation to your data;</li>
     </ul>
     <p>
-      For more information about these features, dive into the
+      You are in full control of your information and if you would not like Element to retain your
+      personal data please consult
       <a
-        href="https://blog.gitter.im/2020/05/04/threaded-conversations-and-gitlab-based-communities-and-rooms/"
+        href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/accounts.md#how-do-i-delete-my-account"
         target="_blank"
-        >blog post</a
+        >these instructions</a
       >
+      on how to delete your account. If you have any questions which cannot be answered by the links
+      above, please do not hesitate to get in touch via dpo@element.io
     </p>
     <p>
-      The announcements tab will disappear in a few weeks but keep an eye out for it to appear
-      again. We're going to reserve this space for bigger feature changes and announcements. You can
-      keep up to date with everything that is happening by checking the
-      <a
-        href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/CHANGELOG.md"
-        target="_blank"
-        >changelog</a
-      >
-      or following us on
-      <a href="https://twitter.com/gitchat" rel="nofollow noreferrer noopener" target="_blank"
-        >Twitter @gitchat</a
-      >.
+      For more information on Gitter joining Element, please visit
+      <a href="https://element.io/blog/" target="_blank">our blog</a>.
     </p>
+    <p>Kindest regards,</p>
+    <p>Element</p>
   </div>
 </template>
 

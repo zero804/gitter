@@ -9,7 +9,6 @@ import RoomList from './room-list.vue';
 import Announcements from './announcements-body.vue';
 import GitterLogoSvg from './gitter-logo-svg.vue';
 import GitterLogoTextSvg from './gitter-logo-text-svg.vue';
-import GitlabLogoSvg from './gitlab-logo-svg.vue';
 import fingerSwipeMixin from '../mixins/finger-swipe';
 import isMobileBreakpoint from '../../../utils/is-mobile-breakpoint';
 
@@ -22,8 +21,7 @@ export default {
     RoomList,
     Announcements,
     GitterLogoSvg,
-    GitterLogoTextSvg,
-    GitlabLogoSvg
+    GitterLogoTextSvg
   },
   computed: {
     ...mapState([
@@ -139,17 +137,6 @@ export default {
         <a class="logo-text" :href="gitterHomePageLink">
           <gitter-logo-text-svg />
         </a>
-        <span class="provided-by-text">
-          by
-        </span>
-        <a
-          class="gitlab-logo"
-          href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-          target="_blank"
-          @click="onGitlabLinkClick"
-        >
-          <gitlab-logo-svg />
-        </a>
       </section>
     </header>
 
@@ -174,14 +161,28 @@ export default {
       <br />
 
       <ul class="nli-info-block">
-        <li class="nli-info-block-item">Join over <strong>1.5M+ people</strong></li>
-        <li class="nli-info-block-item">Join over <strong>100K+ communities</strong></li>
-        <li class="nli-info-block-item">Free <strong>without limits</strong></li>
-        <li class="nli-info-block-item">Create <strong>your own community</strong></li>
+        <li class="nli-info-block-item">
+          Join over
+          <strong>1.5M+ people</strong>
+        </li>
+        <li class="nli-info-block-item">
+          Join over
+          <strong>100K+ communities</strong>
+        </li>
+        <li class="nli-info-block-item">
+          Free
+          <strong>without limits</strong>
+        </li>
+        <li class="nli-info-block-item">
+          Create
+          <strong>your own community</strong>
+        </li>
       </ul>
 
       <ul class="nli-info-block">
-        <li class="nli-info-block-item"><a href="/explore">Explore more communities</a></li>
+        <li class="nli-info-block-item">
+          <a href="/explore">Explore more communities</a>
+        </li>
       </ul>
     </section>
   </div>
@@ -335,20 +336,6 @@ export default {
   &::v-deep > svg {
     fill: #ffffff;
   }
-}
-
-.provided-by-text {
-  margin-left: 1.3em;
-  margin-right: 0.7em;
-
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-.gitlab-logo {
-  width: 42px;
-  height: 42px;
 }
 
 .body {
