@@ -605,6 +605,7 @@ function logWarningForLargeArchive(troupeId, startDate, endDate) {
     return queryResult;
   };
 }
+
 function findChatMessagesForTroupeForDateRange(troupeId, startDate, endDate) {
   var q = ChatMessage.where('toTroupeId', troupeId)
     .where('sent')
@@ -718,6 +719,7 @@ const testOnly = {
 };
 
 module.exports = {
+  ARCHIVE_MESSAGE_LIMIT,
   getCursorByUserId,
   getCursorByRoomId,
   newChatMessageToTroupe,

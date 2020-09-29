@@ -22,7 +22,7 @@ module.exports = (function() {
       const p = archiveContext.previousDate && moment(archiveContext.previousDate).utc();
       const n = archiveContext.nextDate && moment(archiveContext.nextDate).utc();
 
-      const archiveDate = moment(archiveContext.archiveDate)
+      const archiveDate = moment(archiveContext.startDate)
         .utc()
         .locale(language);
 
@@ -49,7 +49,7 @@ module.exports = (function() {
     },
 
     onRender: function() {
-      const archiveDate = this.options.archiveContext && this.options.archiveContext.archiveDate;
+      const archiveDate = this.options.archiveContext && this.options.archiveContext.startDate;
       const a = moment(archiveDate).utc();
       var range = 3;
 

@@ -3,7 +3,6 @@ import { mapState, mapGetters } from 'vuex';
 
 import MenuBarItem from './menu-bar-item.vue';
 import MenuBarItemCreate from './menu-bar-item-create.vue';
-import MenuBarItemToggle from './menu-bar-item-toggle.vue';
 
 import { isAnnouncementActive } from './announcements-body.vue';
 
@@ -11,8 +10,7 @@ export default {
   name: 'MenuBarBody',
   components: {
     MenuBarItem,
-    MenuBarItemCreate,
-    MenuBarItemToggle
+    MenuBarItemCreate
   },
   data: () => ({
     isAnnouncementActive: isAnnouncementActive()
@@ -37,13 +35,6 @@ export default {
       }
 
       return `Show one to one messages panel${messagesOfInterestAvailableNote}`;
-    },
-    toggleItemLabel() {
-      if (this.leftMenuPinnedState) {
-        return 'Unpin and collapse the left-menu';
-      }
-
-      return 'Pin and expand left-menu';
     }
   }
 };
@@ -99,9 +90,19 @@ export default {
           </svg>
         </template>
       </menu-bar-item>
-    </div>
-
-    <div class="menu-bar-bottom">
+      <menu-bar-item-create
+        type="create"
+        label="Create communities and rooms"
+        class="js-menu-bar-create-button"
+      >
+        <template v-slot:icon>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
+            <path
+              d="M2,10 L10,10 L10,2 L12,2 L12,10 L20,10 L20,12 L12,12 L12,20 L10,20 L10,12 L2,12"
+            />
+          </svg>
+        </template>
+      </menu-bar-item-create>
       <menu-bar-item
         v-if="isAnnouncementActive"
         type="announcements"
@@ -117,30 +118,6 @@ export default {
           </svg>
         </template>
       </menu-bar-item>
-
-      <menu-bar-item-create
-        type="create"
-        label="Create communities and rooms"
-        class="js-menu-bar-create-button"
-      >
-        <template v-slot:icon>
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22" style="stroke: none;">
-            <path
-              d="M2,10 L10,10 L10,2 L12,2 L12,10 L20,10 L20,12 L12,12 L12,20 L10,20 L10,12 L2,12"
-            />
-          </svg>
-        </template>
-      </menu-bar-item-create>
-
-      <menu-bar-item-toggle type="toggle" :label="toggleItemLabel" class="item-toggle">
-        <template v-slot:icon>
-          <svg viewBox="0 0 30 34">
-            <path d="M0,6 l15,0 l15,0" />
-            <path d="M0,17 l15,0 l15,0" />
-            <path d="M0,28 l15,0 l15,0" />
-          </svg>
-        </template>
-      </menu-bar-item-toggle>
     </div>
   </div>
 </template>

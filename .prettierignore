@@ -1,3 +1,5 @@
 *.md
+*.hbs
+*.less
 modules/translations/homepage
 modules/translations/messages

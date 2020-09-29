@@ -11,6 +11,7 @@ import GitterLogoSvg from './gitter-logo-svg.vue';
 import GitterLogoTextSvg from './gitter-logo-text-svg.vue';
 import GitlabLogoSvg from './gitlab-logo-svg.vue';
 import fingerSwipeMixin from '../mixins/finger-swipe';
+import isMobileBreakpoint from '../../../utils/is-mobile-breakpoint';
 
 export default {
   name: 'LeftMenu',
@@ -54,6 +55,14 @@ export default {
 
     gitterHomePageLink() {
       return `${clientEnv['basePath']}/?utm_source=left-menu-logo`;
+    },
+
+    toggleItemLabel() {
+      if (this.leftMenuPinnedState) {
+        return 'Unpin and collapse the left-menu';
+      }
+
+      return 'Pin and expand left-menu';
     }
   },
 
@@ -74,7 +83,16 @@ export default {
   },
 
   methods: {
-    ...mapActions(['toggleLeftMenu', 'trackStat']),
+    ...mapActions(['toggleLeftMenu', 'toggleLeftMenuPinnedState', 'trackStat']),
+    onToggleClick() {
+      const isMobile = isMobileBreakpoint();
+      // Always unpinned on mobile, so you can only expand/collapse
+      if (isMobile) {
+        this.toggleLeftMenu(!this.leftMenuExpandedState);
+      } else {
+        this.toggleLeftMenuPinnedState(!this.leftMenuPinnedState);
+      }
+    },
     onGitlabLinkClick() {
       this.trackStat('left-menu-gitlab-link-click');
     },
@@ -103,9 +121,19 @@ export default {
   >
     <header class="header">
       <section class="header-minibar layout-minibar">
-        <a :href="gitterHomePageLink">
+        <button
+          ref="toggle"
+          class="left-menu-toggle"
+          :label="toggleItemLabel"
+          @click="onToggleClick"
+        >
+          <svg class="hamburger-icon" viewBox="0 0 26 22">
+            <path d="M0,2 l26,0" />
+            <path d="M0,11 l26,0" />
+            <path d="M0,20 l26,0" />
+          </svg>
           <gitter-logo-svg class="logo-gitter-sign" />
-        </a>
+        </button>
       </section>
       <section class="header-main-menu layout-main-menu">
         <a class="logo-text" :href="gitterHomePageLink">
@@ -160,6 +188,7 @@ export default {
 </template>
 
 <style lang="less" scoped>
+@import (reference) 'colors';
 @import (reference) 'trp3Vars';
 @import (reference) 'base-zindex-levels';
 @import (reference) 'components/m-header-title';
@@ -253,6 +282,43 @@ export default {
   .dark-theme & {
     background-color: @dark-theme-app-header-bg-color;
   }
+}
+
+.left-menu-toggle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+
+  background-color: transparent;
+  border: 0;
+
+  transition: background-color 0.2s ease;
+
+  &:hover .hamburger-icon {
+    left: -9px;
+  }
+
+  &:focus {
+    background-color: @jaffa;
+    outline: none;
+  }
+}
+
+.hamburger-icon {
+  position: absolute;
+  left: -13px;
+
+  width: 26px;
+  stroke-width: 2px;
+  vector-effect: non-scaling-stroke;
+
+  color: rgba(255, 255, 255, 0.7);
+  stroke: rgba(255, 255, 255, 0.7);
+
+  transition: left 0.2s ease;
 }
 
 .logo-gitter-sign {

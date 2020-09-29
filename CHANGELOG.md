@@ -1,3 +1,10 @@
+# 20.42.0 - 2020-9-24
+
+ - Add hour pagination to archives, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2014
+ - Move hamburger menu toggle to top-left, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2016
+ - Add `/home` to community homeUri for personal communities, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2017
+
+
 # 20.41.0 - 2020-9-16
 
  - Add docs for how to export your user and room data, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2008
