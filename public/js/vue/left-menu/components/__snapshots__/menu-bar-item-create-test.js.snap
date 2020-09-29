@@ -6,13 +6,13 @@ exports[`menu-bar-item-create create matches snapshot 1`] = `
   class="item"
   type="button"
 >
-  <div
-    class="unread-indicator"
-  />
-   
   <span
     aria-hidden="true"
     class="icon-wrapper"
+  />
+   
+  <div
+    class="unread-indicator"
   />
 </button>
 `;
