@@ -46,22 +46,6 @@ exports[`left-menu all state matches snapshot 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -139,22 +123,6 @@ exports[`left-menu announcements state matches snapshot 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -221,22 +189,6 @@ exports[`left-menu dark-theme matches snapshot 1`] = `
         href="undefined/?utm_source=left-menu-logo"
       >
         <gitter-logo-text-svg-stub />
-      </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
       </a>
     </section>
   </header>
@@ -315,22 +267,6 @@ exports[`left-menu mobile mobile matches snapshot 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -408,22 +344,6 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -444,7 +364,9 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Join over 
+        
+        Join over
+        
         <strong>
           1.5M+ people
         </strong>
@@ -453,7 +375,9 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Join over 
+        
+        Join over
+        
         <strong>
           100K+ communities
         </strong>
@@ -462,7 +386,9 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Free 
+        
+        Free
+        
         <strong>
           without limits
         </strong>
@@ -471,7 +397,9 @@ exports[`left-menu nli (not logged in) matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Create 
+        
+        Create
+        
         <strong>
           your own community
         </strong>
@@ -541,22 +469,6 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -577,7 +489,9 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Join over 
+        
+        Join over
+        
         <strong>
           1.5M+ people
         </strong>
@@ -586,7 +500,9 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Join over 
+        
+        Join over
+        
         <strong>
           100K+ communities
         </strong>
@@ -595,7 +511,9 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Free 
+        
+        Free
+        
         <strong>
           without limits
         </strong>
@@ -604,7 +522,9 @@ exports[`left-menu nli (not logged in) mobile matches snapshot 1`] = `
       <li
         class="nli-info-block-item"
       >
-        Create 
+        
+        Create
+        
         <strong>
           your own community
         </strong>
@@ -673,22 +593,6 @@ exports[`left-menu people state matches snapshot 1`] = `
         href="undefined/?utm_source=left-menu-logo"
       >
         <gitter-logo-text-svg-stub />
-      </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
       </a>
     </section>
   </header>
@@ -767,22 +671,6 @@ exports[`left-menu pinning and expanding not pinned and collapse 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -860,22 +748,6 @@ exports[`left-menu pinning and expanding not pinned and expanded 1`] = `
       >
         <gitter-logo-text-svg-stub />
       </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
-      </a>
     </section>
   </header>
    
@@ -952,22 +824,6 @@ exports[`left-menu search state matches snapshot 1`] = `
         href="undefined/?utm_source=left-menu-logo"
       >
         <gitter-logo-text-svg-stub />
-      </a>
-       
-      <span
-        class="provided-by-text"
-      >
-        
-        by
-      
-      </span>
-       
-      <a
-        class="gitlab-logo"
-        href="https://about.gitlab.com?utm_source=gitter-left-menu-logo"
-        target="_blank"
-      >
-        <gitlab-logo-svg-stub />
       </a>
     </section>
   </header>

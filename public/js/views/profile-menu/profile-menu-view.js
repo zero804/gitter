@@ -86,7 +86,7 @@ function getProfileCollection() {
 
   result.add({
     name: 'Terms of Service',
-    stub: 'https://about.gitlab.com/terms/',
+    stub: 'https://element.io/terms-of-service',
     target: '_blank'
   });
 
