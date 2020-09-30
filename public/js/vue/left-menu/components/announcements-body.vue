@@ -49,7 +49,7 @@ export default {
     </p>
     <p>
       For more information on Gitter joining Element, please visit
-      <a href="https://element.io/blog/" target="_blank">our blog</a>.
+      <a href="https://element.io/blog/gitter-is-joining-element/" target="_blank">our blog</a>.
     </p>
     <p>Kindest regards,</p>
     <p>Element</p>
