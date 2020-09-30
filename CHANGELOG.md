@@ -1,3 +1,16 @@
+# 20.45.0 - 2020-9-30
+
+ - Link correct Gitter x Element blog posts, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2025
+
+
+# 20.44.0 - 2020-9-30 - Element acquisition
+
+ - Add homepage latest news block pointing to [Gitter blog post about the Element acquisition](https://blog.gitter.im/2020/09/30/gitter-element-acquisition/)
+ - Update privacy policy to point to [Element's privacy policy](https://element.io/privacy)
+ - Remove "Gitter by GitLab" references
+    - https://dev.gitlab.org/gitlab/gitter/webapp/-/merge_requests/60
+
+
 # 20.43.0 - 2020-9-29
 
  - Fix menu bar item unread/mention indicator going behind icon when unselected, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2022
