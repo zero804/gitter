@@ -1,3 +1,13 @@
+# 20.43.0 - 2020-9-29
+
+ - Fix menu bar item unread/mention indicator going behind icon when unselected, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2022
+ - Fix Gitter room avatar on homepage, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2023
+
+Developer facing:
+
+ - Allow deploys from security dev, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2021
+
+
 # 20.42.0 - 2020-9-24
 
  - Add hour pagination to archives, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2014
