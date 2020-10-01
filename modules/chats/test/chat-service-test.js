@@ -75,6 +75,63 @@ describe('chatService', function() {
       assert(publicMessage.pub, 'troupe1 is public and so should be the message');
       assert(!privateMessage.pub, 'troupe2 is not public and neither should be the message');
     });
+
+    it('should work when virtualUser sent', async () => {
+      const message = await chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+        text: 'bridged message',
+        virtualUser: {
+          type: 'matrix',
+          externalId: 'madlittlemods:matrix.org',
+          displayName: 'madlittlemods (Eric Eastwood)',
+          avatarUrl:
+            'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+        }
+      });
+
+      assert.strictEqual(message.virtualUser.type, 'matrix');
+      assert.strictEqual(message.virtualUser.externalId, 'madlittlemods:matrix.org');
+      assert.strictEqual(message.virtualUser.displayName, 'madlittlemods (Eric Eastwood)');
+      assert.strictEqual(
+        message.virtualUser.avatarUrl,
+        'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+      );
+    });
+
+    it('should validate virtualUser externalId does not exceed maximum length 255', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          text: 'bridged message',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'x'.repeat(500),
+            displayName: 'madlittlemods (Eric Eastwood)',
+            avatarUrl:
+              'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+          }
+        }),
+        /StatusError: Virtual user external ID exceeds maximum length/
+      );
+    });
+
+    it('should validate virtualUser displayName is a string', async () => {
+      await assert.rejects(
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          text: 'bridged message',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'madlittlemods:matrix.org',
+            // This is the validation problem we are testing for.
+            // This should be a string
+            displayName: {
+              objects: "shouldn't be here"
+            },
+            avatarUrl:
+              'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+          }
+        }),
+        /StatusError: Virtual user displayName needs to be a string/
+      );
+    });
   });
 
   describe('spam', () => {

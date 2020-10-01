@@ -48,6 +48,11 @@
   "irc": {
     "clientKey": "irc-dev"
   },
+  "bridge": {
+    "approvedClientKeyMap": {
+      "matrix-bridge-dev": "matrix"
+    }
+  },
   "redis": "redis://redis?db=1",
   "redis_nopersist": "redis://redis?db=1",
   "redis_caching": "redis://redis",

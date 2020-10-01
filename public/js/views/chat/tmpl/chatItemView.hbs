@@ -26,6 +26,15 @@
     {{/if}}
     {{#if burstStart}}
     <div class='chat-item__details'>
+      {{#if virtualUser}}
+      <a
+        class="chat-item__flair chat-item__flair--{{virtualUser.type}}"
+        {{#if virtualUser.profileUrl}}href="{{virtualUser.profileUrl}}"{{/if}}
+        target="_blank"
+      >
+        {{virtualUser.type}}
+      </a>
+      {{/if}}
       <div class='chat-item__from js-chat-item-from'>{{displayName}}</div>
       <div class='chat-item__username js-chat-item-from'>@{{username}}</div>
       <a class='chat-item__time js-chat-time' {{#if permalinkUrl}} href='{{permalinkUrl}}'{{/if}} title="{{ sentTimeFormattedFull }}">{{ sentTimeFormatted }}</a>
