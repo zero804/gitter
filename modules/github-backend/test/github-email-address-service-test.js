@@ -36,7 +36,7 @@ describe('email-address-service #github', function() {
       return service({ username: 'gittertestbot' }, { attemptDiscovery: true }).then(function(
         email
       ) {
-        assert.strictEqual(email, 'gittertestbot@datatribe.net');
+        assert.strictEqual(email, 'admin+publicgittertestbot@gitter.im');
       });
     });
 
@@ -46,7 +46,7 @@ describe('email-address-service #github', function() {
       return service({ username: 'gittertestbot' }, { attemptDiscovery: true }).then(function(
         email
       ) {
-        assert.strictEqual(email, 'gittertestbot@datatribe.net');
+        assert.strictEqual(email, 'admin+publicgittertestbot@gitter.im');
       });
     });
 
