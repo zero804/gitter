@@ -1,3 +1,10 @@
+# 20.46.0 - *upcoming*
+
+Developer facing:
+
+ - Update gittertestbot email to match in tests, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2029
+
+
 # 20.45.0 - 2020-9-30
 
  - Link correct Gitter x Element blog posts, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2025
