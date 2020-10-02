@@ -1,4 +1,6 @@
-# 20.46.0 - *upcoming*
+# 20.46.0 - 2020-10-2
+
+ - Remove attention grabbing bubble from Gitter x Element announcement, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2028
 
 Developer facing:
 
