@@ -118,6 +118,20 @@ router.get(
   }
 );
 
+if (nconf.get('matrix:wellKnownServer')) {
+  router.get(
+    '/.well-known/matrix/server',
+    identifyRoute('well-known-matrix'),
+    preventClickjackingMiddleware,
+    function(req, res) {
+      res.set('Content-Type', 'application/manifest+json');
+      res.render('wellknown-matrix', {
+        matrixWellKnownServer: nconf.get('matrix:wellKnownServer')
+      });
+    }
+  );
+}
+
 router.get('/robots.txt', identifyRoute('homepage-robots'), preventClickjackingMiddleware, function(
   req,
   res

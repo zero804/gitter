@@ -46,9 +46,12 @@
     "camoUrl": "https://user-content.gitter-static.net",
     "camoSecret": "<see Gitter secrets repo>"
   },
+  "matrix": {
+    "wellKnownServer": "gitter.ems.host:443"
+  },
   "notifications": {
     "notificationsSender": "support@gitter.im",
-    "replyToAddress":  "no-reply@gitter.im",
+    "replyToAddress": "no-reply@gitter.im",
     "filterTestValues": false,
     "emailNotificationsAfterMins": 60,
     "timeBeforeNextEmailNotificationMins": 1440
