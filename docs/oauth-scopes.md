@@ -13,7 +13,7 @@ The `api` scope is pretty far reaching and we wish we could just have [`read` ac
 
 Ideally, we could have a split OAuth scope and upgrade flow like we have for GitHub. This way users could start out with just `read_user` scope granted. But our code doesn't support upgrade flows for providers other than GitHub at the moment. The other providers are implemented in a generic way with a single token.
 
-You can see how we have we have the GitLab OAuth application settings configured:
+You can see how we have the GitLab OAuth application settings configured:
 
 ![](https://i.imgur.com/G9n4LOs.png)
 
@@ -33,7 +33,7 @@ For a quick rundown on how to sort out your GitHub OAuth scopes to get your GitH
 
 For GitHub, we split permissions to initially only include public repo information and user email for unread notification emails. This falls under the `Gitter Public Repo Access` OAuth application.
 
-For the private repos, it's a separate scope(`Gitter Private Repo Access`) you can optionally [grant after the fact](#grant-private-repo-access). The only time we ever "write" to a private repo is to add a webhook integration. We will never, ever modify your code. Ever. Just like you, we're developers and entirely respect the privacy of your code.
+For the private repos, it's a separate scope (`Gitter Private Repo Access`) you can optionally [grant after the fact](#grant-private-repo-access). The only time we ever "write" to a private repo is to add a webhook integration. We will never ever modify your code. Ever. Just like you, we're developers and entirely respect the privacy of your code.
 
 GitHub is also nice and allows you to choose on a per-org basis what you want to share ([organization access control](https://help.github.com/en/github/setting-up-and-managing-organizations-and-teams/approving-oauth-apps-for-your-organization)).
 
@@ -77,7 +77,7 @@ There are one of two things you can do:
 
 **Manually grant access**
 
-Visit your [personal application settings](https://github.com/settings/applications) and find any Gitter applications there, click on the name of application and you should see the list of organisations that allow access to the application and you can grant access here.
+Visit your [personal application settings](https://github.com/settings/applications) and find any Gitter applications there, click on the name of the application and you should see the list of organisations that allow access to the application and you can grant access here.
 
 Please note that if you enable Gitter for access to private repositories, you will need to do this for the "Gitter Private Repo Access" application as well. If you don't see "Gitter Private Repo Access" listed in your personal application settings, see the ["Private Repositories"](#private-repositories) section above.
 

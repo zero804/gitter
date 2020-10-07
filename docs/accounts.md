@@ -38,7 +38,7 @@ Currently, there is an outstanding bug where this doesn't work with GitLab/Twitt
 
 ## How do I export my data?
 
-You can export data associatd with your account by using the profile menu dropdown in the top-right -> **Export user data**
+You can export data associated with your account by using the profile menu dropdown in the top-right -> **Export user data**
 
 If you're looking to export data for a room, see the [room docs on export](./rooms.md#export-room-data).
 

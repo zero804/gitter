@@ -1,6 +1,6 @@
 # Develop a security fix
 
-Based off the [GitLab security fix process](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md). This section is aimed at other GitLabbers.
+Based on the [GitLab security fix process](https://gitlab.com/gitlab-org/release/docs/blob/master/general/security/developer.md). This section is aimed at other GitLabbers.
 
 Security fixes are made **exclusively** against https://dev.gitlab.org/gitlab/gitter/webapp
 

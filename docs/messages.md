@@ -21,14 +21,14 @@ Additionally, if you type three backticks followed by Enter, we will automagical
 
 **Normal Mode**
 
-- `Enter` - to send message
+- `Enter` - to send a message
 - `Shift + Enter` - to go to new line
 
 **Compose Mode**
 
 - `Enter` - to go to new line
 - `Shift + Enter` - to go to new line (behaves same as `Enter`)
-- `Ctrl + Enter` - to send message
+- `Ctrl + Enter` - to send a message
 
 
 ## Message syntax
@@ -37,7 +37,7 @@ Additionally, if you type three backticks followed by Enter, we will automagical
 
 This is probably one of the reasons you are here in the first place. Gitter supports markdown in chat. Yes, that's right. Markdown. In Chat. Such win.
 
-We not only support basic markdown, but also we do syntax highlighting for code and also support issue mentions and @ mentions.
+We do not only support basic markdown, but also we do syntax highlighting for code and also support issue mentions and @ mentions.
 
 For those unfamiliar with markdown, [GitLab has a nice Markdown reference doc](https://docs.gitlab.com/ee/user/markdown.html). You can access a simple guide in the Gitter application by clicking on the `M↓` icon to the right of the chat input area.
 
@@ -57,7 +57,7 @@ You can directly mention someone else using the `@username` syntax. As you type 
 
 If the person you mention has notifications enabled, they will see a notification that they have been mentioned.
 
-If you're the admin of a room, you can make announcements by using `@/all`. Each person who has notification for `@/all` announcements enabled will see a notification of that annoucement.
+If you're the admin of a room, you can make announcements by using `@/all`. Each person who has notification for `@/all` announcements enabled will see a notification of that announcement.
 
 
 ### Issuable decorations
@@ -99,7 +99,7 @@ Threaded conversations allow you to better organize your messages by discussing 
 
 Threads are minimally supported in the mobile apps and the [mobile apps overall may be deprecated](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2281) in the future.
 
-Every thread message appears in the main message feed and it is marked as being part of a thread. When you click on the indicator, you are taken into web browser that will show you the whole thread. *The mobile apps don't provide a way to write threaded messages.*
+Every thread message appears in the main message feed and it is marked as being part of a thread. When you click on the indicator, you are taken into a web browser that will show you the whole thread. *The mobile apps don't provide a way to write threaded messages.*
 
 ![Child message indicator on native iOS app](https://i.imgur.com/9SVvdQi.png)
 
@@ -119,7 +119,7 @@ Please see the full list of outstanding features in the [Threaded Conversations 
 
 ## Edit messages
 
-You can edit your own messages within the 5 minute edit window. The **Edit** option is available in the message `...` dropdown in the top-right corner of every message.
+You can edit your own messages within the 5-minute edit window. The **Edit** option is available in the message `...` dropdown in the top-right corner of every message.
 
 You can quickly jump to editing your last message by using the up-arrow keyboard interaction.
 
@@ -213,5 +213,5 @@ Some tips to improve your chances of getting a quick response and a great intera
     - Don't just say "Hello" or introduce yourself and wait for someone to respond, just ask your question
     - Don't ask if anyone is around
     - Don't ask if anyone is familiar with or knows about a specific thing that you are trying to use
- - Don't post across many rooms (cross posting). Post in the most relevant room and be patient
+ - Don't post across many rooms (cross-posting). Post in the most relevant room and be patient
  - Don't ask people to respond to you in a one to one conversation
