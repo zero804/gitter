@@ -886,7 +886,7 @@ Developer facing:
 
  - Fix `develop` branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
 
-# 20.0.0 - 2019-8-14
+# 20.0.0 - 2019-8-14 - No more old left-menu
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
  - Remove old left-menu code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1553
