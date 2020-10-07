@@ -2,6 +2,7 @@
 
  - Typo and grammar fixes in the docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2032
     - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
+ - Add Matrix `.well-known` file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2031
 
 Developer facing:
 
