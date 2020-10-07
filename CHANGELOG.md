@@ -3,6 +3,10 @@
  - Typo and grammar fixes in the docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2032
     - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
 
+Developer facing:
+
+ - Remove `client_id`/`client_secret` query parameter usage from GitHub API authentication, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2019
+
 
 # 20.46.0 - 2020-10-2
 
