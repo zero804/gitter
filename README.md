@@ -45,7 +45,7 @@ Follow these instructions to setup an environment to hack on Gitter.
 
 ## Starting Gitter
 
-TLDR;
+TL;DR
 
 ```
 docker-compose up -d --no-recreate

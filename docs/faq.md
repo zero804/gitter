@@ -11,7 +11,7 @@ Gitter is entirely free for all public and private conversations.
 Feel free to come discuss your idea in the [`gitter/gitter`](https://gitter.im/gitter/gitter) room and create an issue, https://gitlab.com/gitlab-org/gitter/webapp/issues
 
 
-## Help/Support!?!?!
+## Help! Do you have any Support?
 
 If your support inquiry doesn't need to be private, drop by the [`gitter/gitter`](https://gitter.im/gitter/gitter) room.
 
@@ -20,7 +20,7 @@ Otherwise, send a message to support@gitter.im
 
 ## Do you have an API?
 
-Why, we are so gladded you asked, **yes** we do.
+We are so glad you asked, **yes** we do!
 
 You can build apps on top of Gitter by using our REST API. You can find more information about it at [developer.gitter.im](https://developer.gitter.im/) or use our [Node.js module](https://www.npmjs.org/package/node-gitter).
 
@@ -66,7 +66,7 @@ See [Rooms](./rooms.md#change-room-security-after-creation)
 
 The first thing to check is [adding private repo access OAuth scope](./oauth-scopes.md#grant-private-repo-access) in order to see a private GitHub repo.
 
-If it isn't a private repo, the key is to make sure your personal GitHub OAuth scopes and GitHub organisation scopes match(both public and private granted or just public). Check the following pages to see if they match(**Gitter Public Repo Access** and **Gitter Private Repo Access**):
+If it isn't a private repo, the key is to make sure your personal GitHub OAuth scopes and GitHub organisation scopes match (both public and private granted or just public). Check the following pages to see if they match(**Gitter Public Repo Access** and **Gitter Private Repo Access**):
 
  - [Personal OAuth application settings](https://github.com/settings/applications)
  - Organisation OAuth application settings, `https://github.com/organizations/YOURORG/settings/applications`(replace `YOURORG` in the link)

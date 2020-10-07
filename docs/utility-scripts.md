@@ -50,7 +50,7 @@ NODE_ENV=prod ./scripts/utils/delete-messages-from-user.js --username someuserna
 
 ### `delete-room.js`
 
-Deletes a room and kicks users out. Requires a room uri.
+Deletes a room and kicks users out. Requires a room URI.
 
 e.g
 
@@ -84,7 +84,7 @@ e.g `NODE_ENV=prod ./scripts/utils/migrate-messages.js --from trevorah/oldroom -
 
 ### `mobile-notify-user.js`
 
-Sends a test push notification to all devices registered by user. Requires a username.
+Sends a test push notification to all devices registered by a user. Requires a username.
 
 e.g `NODE_ENV=prod ./scripts/utils/mobile-notify-user.js trevorah`
 
@@ -163,7 +163,7 @@ NODE_ENV=prod ./scripts/utils/feature-toggle.js fancy-new-feature --disable-brow
 # Disable all versions of IE
 NODE_ENV=prod ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser IE:all
 
-# Renable the feature for Chrome
+# Re-enable the feature for Chrome
 NODE_ENV=prod ./scripts/utils/feature-toggle.js fancy-new-feature --disable-browser-off Chrome
 ```
 

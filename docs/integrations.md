@@ -32,7 +32,7 @@ Our integrations include:
  - Sentry
  - SnapCI
  - Sprint.ly
- - The Bug Geneie
+ - The Bug Genie
  - TrackJS
  - Travis
  - Send us a Merge request to add your own, https://gitlab.com/gitlab-org/gitter/services
