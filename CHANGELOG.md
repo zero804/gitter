@@ -1,3 +1,9 @@
+# 20.47.0 - *upcoming*
+
+ - Typo and grammar fixes in the docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2032
+    - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
+
+
 # 20.46.0 - 2020-10-2
 
  - Remove attention grabbing bubble from Gitter x Element announcement, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2028
