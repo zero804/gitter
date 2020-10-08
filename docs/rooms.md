@@ -45,7 +45,7 @@ It's not possible to leave a one to one room, only hide it(see below)
 
 You can hide a room via **Room settings dropdown** -> **Hide this room**
 
-Hiding a room with keep it from appearing in your left-menu room list. If you receive a notification for the room again, it will reappear. If you no longer wish to receive notifications from that room, you should either leave that room (`/leave` slash command) or change notifications to mentions only. You cannot leave a one to one room.
+Hiding a room will keep it from appearing in your left-menu room list. If you receive a notification for the room again, it will reappear. If you no longer wish to receive notifications from that room, you should either leave that room (`/leave` slash command) or change notifications to mentions only. You cannot leave a one-to-one room.
 
 ![](https://i.imgur.com/ceIVTNd.png)
 
@@ -78,7 +78,7 @@ See the [FAQ](./faq.md#why-isn-t-my-github-organisation-or-repos-appearing).
 
  - A room connected to a private project/repo can be accessed by anyone with access to the project/repo.
  - A private room with no association can only be accessed if they are manually invited to the room.
- - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with an group/org, anyone in the group/org could join for example
+ - A private room can also be associated with the community and anyone in the community can join the room. If the community was associated with a group/org, anyone in the group/org could join for example.
 
 #### Change room security after creation
 
@@ -126,19 +126,19 @@ If your room is associated with a GitHub repo, you can use the **Send pull reque
 
 As an admin of the room, you can delete messages from other users.
 
-You can add new admins for a room via **Room settings dropdown** -> **Permissions** modal
+You can add new admins for a room via **Room settings dropdown** -> **Permissions** modal.
 
 
 ### Restrict room to GitHub users
 
-You can restrict a room to GitHub users via **Room settings dropdown** -> **Settings** -> **Only GitHub users are allowed to join this room.** checkbox
+You can restrict a room to GitHub users via **Room settings dropdown** -> **Settings** -> **Only GitHub users are allowed to join this room.** checkbox.
 
 ![](https://i.imgur.com/ujd8kHE.png) ![](https://i.imgur.com/oOGoEYw.png)
 
 
 ### Export room data
 
-You can export data associated with your room via **Room settings dropdown** -> **Export room data**
+You can export data associated with your room via **Room settings dropdown** -> **Export room data**.
 
 If you're looking to export data for your own user, see the [account docs on exports](./accounts.md#how-do-i-export-my-data).
 
@@ -155,6 +155,6 @@ Currently, there isn't a way to rename a room in the UI. But you can send a mess
 
 ### Delete a room
 
-If you are a room admin, you can delete a room via **Room settings dropdown** -> **Delete this room**
+If you are a room admin, you can delete a room via **Room settings dropdown** -> **Delete this room**.
 
 ![](https://i.imgur.com/FqxWgsM.png)

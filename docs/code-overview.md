@@ -28,7 +28,7 @@ These modules will initially be kept in the same repo as the monolith, but since
 
 ## Persistence
 
-Gitter uses a number of backend peristence services:
+Gitter uses a number of backend persistence services:
  - **mongodb**: MongoDB is our main database technology. We use [Mongoose](http://mongoosejs.com/) as an ORM.
  - **redis**: We are heavy Redis users. We have four main Redis clusters. These are for:
     - **redis-persist**: Persistent Redis instant. If the cluster went down, ideally we should not lose any data.
