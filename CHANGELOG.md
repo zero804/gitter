@@ -1,5 +1,12 @@
 # 21.0.0 - 2020-10-7 - Enter the Matrix
 
+Developer facing:
+
+ - Update security disclosure links to point to Element/Matrix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2034
+
+
+# 21.0.0 - 2020-10-7 - Enter the Matrix
+
  - Typo and grammar fixes in the docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2032
     - Thanks to [@luciash](https://gitlab.com/luciash) for the contribution
  - Add Matrix `.well-known` file, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2031
