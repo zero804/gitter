@@ -12,7 +12,7 @@ If you are just interested in the Gitter API, see https://developer.gitter.im/
  - Security issue boards
     - https://gitlab.com/groups/gitlab-org/gitter/-/boards/1084052
     - https://gitlab.com/groups/gitlab-com/-/boards/1084045
-    - [Responsible disclosure](https://about.gitlab.com/security/disclosure/)
+    - [Responsible disclosure](https://matrix.org/security-disclosure-policy/)
 
 ![](https://i.imgur.com/wT0bSy2.png)
 
