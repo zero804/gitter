@@ -1,8 +1,9 @@
-# 21.0.0 - 2020-10-7 - Enter the Matrix
+# 21.1.0 - 2020-10-14
 
 Developer facing:
 
  - Update security disclosure links to point to Element/Matrix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2034
+ - Migrate to the Element/Matrix Sentry instance for error tracking, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2602
 
 
 # 21.0.0 - 2020-10-7 - Enter the Matrix
