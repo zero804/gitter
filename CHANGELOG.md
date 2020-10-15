@@ -1,3 +1,11 @@
+# 21.1.0 - 2020-10-14
+
+Developer facing:
+
+ - Update security disclosure links to point to Element/Matrix, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2034
+ - Migrate to the Element/Matrix Sentry instance for error tracking, https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2602
+
+
 # 21.0.0 - 2020-10-7 - Enter the Matrix
 
  - Typo and grammar fixes in the docs, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2032
@@ -886,7 +894,7 @@ Developer facing:
 
  - Fix `develop` branch failing with missing dependencies, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1566
 
-# 20.0.0 - 2019-8-14
+# 20.0.0 - 2019-8-14 - No more old left-menu
 
  - Loading child messages when opening the TMF, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1545
  - Remove old left-menu code, https://gitlab.com/gitlab-org/gitter/webapp/merge_requests/1553
