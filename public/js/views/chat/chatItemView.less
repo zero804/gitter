@@ -236,6 +236,24 @@ body.mobile .chat-item__username {
   display: none;
 }
 
+.chat-item__flair {
+  display: inline-block;
+  padding: 1px 8px;
+
+  background-color: fade(@chat-item__action-item__color, 70%);
+  border-radius: 4px;
+
+  color: #ffffff;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+.chat-item__flair--matrix {
+  color: #ffffff;
+  background-color: #000000;
+}
+
 .chat-item__time {
   vertical-align: middle;
   display: inline;

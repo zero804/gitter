@@ -5,6 +5,7 @@ import LoadingSpinner from '../../components/loading-spinner.vue';
 const timeFormat = require('gitter-web-shared/time/time-format');
 const fullTimeFormat = require('gitter-web-shared/time/full-time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
+const getProfileUrlFromVirtualUser = require('gitter-web-shared/get-profile-url-from-virtual-user');
 const pushState = require('../../../utils/browser/pushState');
 const linkDecorator = require('../../../views/chat/decorators/linkDecorator');
 const emojiDecorator = require('../../../views/chat/decorators/emojiDecorator');
@@ -61,6 +62,9 @@ export default {
     },
     isBeingEdited: function() {
       return this.message.id === this.messageEditState.id;
+    },
+    virtualUserProfileUrl: function() {
+      return getProfileUrlFromVirtualUser(this.message.virtualUser);
     }
   },
   watch: {
@@ -175,6 +179,14 @@ export default {
         />
         <div class="chat-item__content">
           <div class="chat-item__details">
+            <a
+              v-if="message.virtualUser"
+              :class="`chat-item__flair chat-item__flair--${message.virtualUser.type}`"
+              :href="virtualUserProfileUrl"
+              target="_blank"
+            >
+              {{ message.virtualUser.type }}
+            </a>
             <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
             <div class="chat-item__username">@{{ message.fromUser.username }}</div>
             <a
@@ -221,6 +233,7 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  align-items: baseline;
   // inspired by https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
   margin-left: -@item-detail-margin;
   margin-right: -@item-detail-margin;

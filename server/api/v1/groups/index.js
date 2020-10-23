@@ -8,7 +8,7 @@ var groupCreationService = require('../../../services/group-creation-service');
 var inviteValidation = require('gitter-web-invites/lib/invite-validation');
 var restful = require('../../../services/restful');
 var restSerializer = require('../../../serializers/rest-serializer');
-var internalClientAccessOnly = require('../../../web/middlewares/internal-client-access-only');
+var internalClientAccessOnly = require('gitter-web-oauth/lib/internal-client-access-only');
 
 var MAX_BATCHED_INVITES = 100;
 

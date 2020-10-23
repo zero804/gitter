@@ -97,6 +97,27 @@ describe('thread-message-feed chat-item', () => {
       );
       expect(wrapper.element).toMatchSnapshot();
     });
+
+    it('virtual user', () => {
+      const { wrapper } = mount(
+        ChatItem,
+        {
+          ...defaultProps,
+          message: {
+            ...message,
+            virtualUser: {
+              type: 'matrix',
+              externalId: 'madlittlemods:matrix.org',
+              displayName: 'madlittlemods (Eric Eastwood)',
+              avatarUrl:
+                'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+            }
+          }
+        },
+        addRoomToStore
+      );
+      expect(wrapper.element).toMatchSnapshot();
+    });
   });
   describe('editing', () => {
     let wrapper, stubbedActions;

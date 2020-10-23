@@ -23,6 +23,7 @@ const DoubleTapper = require('../../utils/double-tapper');
 const LoadingCollectionMixin = require('../loading-mixin');
 const FastAttachMixin = require('../fast-attach-mixin');
 const chatModels = require('../../collections/chat');
+const getProfileUrlFromVirtualUser = require('gitter-web-shared/get-profile-url-from-virtual-user');
 
 const AvatarView = require('../widgets/avatar');
 const Popover = require('../popover');
@@ -164,6 +165,10 @@ module.exports = (function() {
       if (data.fromUser) {
         data.username = data.fromUser.username;
         data.displayName = data.fromUser.displayName;
+      }
+
+      if (data.virtualUser) {
+        data.virtualUser.profileUrl = getProfileUrlFromVirtualUser(data.virtualUser);
       }
 
       // No sent time, use the current time as the message has just been sent

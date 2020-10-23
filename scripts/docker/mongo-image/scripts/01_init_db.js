@@ -190,6 +190,21 @@ function generatePassword() {
     tag: 'billing-prod',
     registeredRedirectUri: 'https://billing.gitter.im/login/callback',
     canSkipAuthorization: true
+  },
+  {
+    clientKey: 'matrix-bridge-dev',
+    name: 'Matrix bridge OAuth app for the AS to bridge in messages (dev)',
+    tag: 'matrix-bridge-dev'
+  },
+  {
+    clientKey: 'matrix-bridge-beta',
+    name: 'Matrix bridge OAuth app for the AS to bridge in messages (beta)',
+    tag: 'matrix-bridge-beta'
+  },
+  {
+    clientKey: 'matrix-bridge-prod',
+    name: 'Matrix bridge OAuth app for the AS to bridge in messages (prod)',
+    tag: 'matrix-bridge-prod'
   }
 ].forEach(function(d) {
   printjson({ clientKey: d.clientKey });

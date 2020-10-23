@@ -8,6 +8,7 @@ function createMessage(f) {
 
   return ChatMessage.create({
     fromUserId: f.fromUserId,
+    virtualUser: f.virtualUser,
     toTroupeId: f.toTroupeId,
     parentId: f.parentId,
     threadMessageCount: f.threadMessageCount,

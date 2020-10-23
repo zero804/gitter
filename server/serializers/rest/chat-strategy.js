@@ -8,6 +8,10 @@ var getVersion = require('gitter-web-serialization/lib/get-model-version');
 var UserIdStrategy = require('./user-id-strategy');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var Promise = require('bluebird');
+const {
+  getMockIdFromVirtualUser,
+  transformVirtualUserIntoMockedFromUser
+} = require('gitter-web-users/lib/virtual-user-service');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -120,6 +124,21 @@ function ChatStrategy({
     }
   }
 
+  function mapVirtualUser(virtualUser) {
+    if (!serializeFromUserId) {
+      return undefined;
+    } else if (userLookups) {
+      const mockUserId = getMockIdFromVirtualUser(virtualUser);
+      if (!userLookups[mockUserId]) {
+        userLookups[mockUserId] = transformVirtualUserIntoMockedFromUser(virtualUser);
+      }
+
+      return mockUserId;
+    } else {
+      return transformVirtualUserIntoMockedFromUser(virtualUser);
+    }
+  }
+
   this.map = function(item) {
     // If there is no unread strategy(meaning currentUserId was undefined), don't define how it's unread/read.
     //
@@ -135,14 +154,13 @@ function ChatStrategy({
       initial = mongoUtils.objectIDsEqual(item._id, initialId);
     }
 
-    return {
+    const serializedData = {
       id: item._id,
       text: item.text,
       status: item.status,
       html: item.html,
       sent: formatDate(item.sent),
       editedAt: item.editedAt ? formatDate(item.editedAt) : undefined,
-      fromUser: user ? user : mapUser(item.fromUserId),
       parentId: item.parentId,
       threadMessageCount: item.threadMessageCount,
       unread: unread,
@@ -166,6 +184,22 @@ function ChatStrategy({
       highlights: item.highlights,
       v: getVersion(item)
     };
+
+    if (item.virtualUser) {
+      serializedData.virtualUser = {
+        type: item.virtualUser.type,
+        externalId: item.virtualUser.externalId,
+        displayName: item.virtualUser.displayName,
+        avatarUrl: item.virtualUser.avatarUrl
+      };
+
+      // Mock the fromUser at a basic level for legacy apps (Android and iOS)
+      serializedData.fromUser = mapVirtualUser(item.virtualUser);
+    } else {
+      serializedData.fromUser = user ? user : mapUser(item.fromUserId);
+    }
+
+    return serializedData;
   };
 
   this.postProcess = function(serialized) {
