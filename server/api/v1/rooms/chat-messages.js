@@ -3,6 +3,7 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
 var StatusError = require('statuserror');
+const asyncHandler = require('express-async-handler');
 var chatService = require('gitter-web-chats');
 var restSerializer = require('../../../serializers/rest-serializer');
 var userAgentTagger = require('../../../web/user-agent-tagger');
@@ -20,6 +21,18 @@ function parseLookups(lookups) {
     return lookups;
   }
   return lookups.split(',');
+}
+
+function ensureRequestIsAllowedToUseVirtualUser(req, virtualUser) {
+  if (
+    virtualUser &&
+    !approvedBridgeClientAccessOnly.isRequestFromApprovedBridgeClient(req, virtualUser)
+  ) {
+    throw new StatusError(
+      403,
+      `Only approved bridge OAuth clients can use virtualUser (type=${virtualUser.type})`
+    );
+  }
 }
 
 module.exports = {
@@ -79,33 +92,23 @@ module.exports = {
     });
   },
 
-  create: function(req) {
-    return loadTroupeFromParam(req)
-      .then(function(troupe) {
-        var data = _.clone(req.body);
-        data.stats = userAgentTagger(req);
+  create: asyncHandler(async function(req) {
+    const troupe = await loadTroupeFromParam(req);
+    var data = _.clone(req.body);
+    data.stats = userAgentTagger(req);
 
-        // message.virtualUser usage is for approved bridge clients only
-        if (
-          data.virtualUser &&
-          !approvedBridgeClientAccessOnly.isRequestFromApprovedBridgeClient(req, data.virtualUser)
-        ) {
-          throw new StatusError(
-            403,
-            `Only approved bridge OAuth clients can use virtualUser (type=${data.virtualUser.type})`
-          );
-        }
+    // message.virtualUser usage is for approved bridge clients only
+    ensureRequestIsAllowedToUseVirtualUser(req, data.virtualUser);
 
-        return chatService.newChatMessageToTroupe(troupe, req.user, data);
-      })
-      .then(function(chatMessage) {
-        var strategy = new restSerializer.ChatStrategy({
-          currentUserId: req.user.id,
-          troupeId: req.params.troupeId
-        });
-        return restSerializer.serializeObject(chatMessage, strategy);
-      });
-  },
+    const roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+    const chatMessage = await roomWithPolicyService.sendMessage(data);
+
+    var strategy = new restSerializer.ChatStrategy({
+      currentUserId: req.user.id,
+      troupeId: req.params.troupeId
+    });
+    return restSerializer.serializeObject(chatMessage, strategy);
+  }),
 
   show: function(req) {
     return chatService.findById(req.params.chatMessageId).then(function(chatMessage) {
@@ -128,16 +131,12 @@ module.exports = {
     ]);
 
     if (!chatMessage) throw new StatusError(404);
-    if (!mongoUtils.objectIDsEqual(chatMessage.toTroupeId, req.params.troupeId))
-      throw new StatusError(404);
-    if (!mongoUtils.objectIDsEqual(chatMessage.fromUserId, req.user.id)) throw new StatusError(403);
 
-    const updatedMessage = await chatService.updateChatMessage(
-      troupe,
-      chatMessage,
-      req.user,
-      req.body.text
-    );
+    // message.virtualUser usage is for approved bridge clients only
+    ensureRequestIsAllowedToUseVirtualUser(req, chatMessage.virtualUser);
+
+    const roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+    const updatedMessage = await roomWithPolicyService.editMessage(chatMessage, req.body.text);
 
     var strategy = new restSerializer.ChatStrategy({
       currentUserId: req.user.id,

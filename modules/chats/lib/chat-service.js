@@ -30,39 +30,17 @@ const unreadItemService = require('gitter-web-unread-items');
 const recentRoomService = require('gitter-web-rooms/lib/recent-room-service');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const markdownMajorVersion = require('gitter-markdown-processor').version.split('.')[0];
+const {
+  validateVirtualUserType,
+  validateVirtualUserExternalId,
+  validateVirtualUserDisplayName,
+  validateVirtualUserAvatarUrl
+} = require('gitter-web-users/lib/virtual-user-service');
 
 var useHints = true;
 
 const validateChatMessageLength = m => {
   if (m.length > 4096) throw new StatusError(400, 'Message exceeds maximum size');
-};
-
-const validateVirtualUserType = type => {
-  if (typeof type !== 'string')
-    throw new StatusError(400, 'Virtual user type needs to be a string');
-  else if (type.length > 255)
-    throw new StatusError(400, 'Virtual user external type exceeds maximum length');
-};
-
-const validateVirtualUserExternalId = externalId => {
-  if (typeof externalId !== 'string')
-    throw new StatusError(400, 'Virtual user externalId needs to be a string');
-  else if (externalId.length > 255)
-    throw new StatusError(400, 'Virtual user external ID exceeds maximum length');
-};
-
-const validateVirtualUserDisplayName = displayName => {
-  if (typeof displayName !== 'string')
-    throw new StatusError(400, 'Virtual user displayName needs to be a string');
-  else if (displayName.length > 255)
-    throw new StatusError(400, 'Virtual user display name exceeds maximum length');
-};
-
-const validateVirtualUserAvatarUrl = avatarUrl => {
-  if (typeof avatarUrl !== 'string')
-    throw new StatusError(400, 'Virtual user avatarUrl needs to be a string');
-  else if (avatarUrl.length > 2000)
-    throw new StatusError(400, 'Virtual user avatarUrl exceeds maximum length');
 };
 
 var CURRENT_META_DATA_VERSION = markdownMajorVersion;
@@ -748,14 +726,36 @@ async function removeAllMessagesForUserId(userId) {
   }
 }
 
-function removeAllMessagesForUserIdInRoomId(userId, roomId) {
-  return Promise.props({
-    room: troupeService.findById(roomId),
-    messages: ChatMessage.find({ toTroupeId: roomId, fromUserId: userId }).exec()
-  }).then(function({ room, messages }) {
-    return Promise.map(messages, message => deleteMessageFromRoom(room, message), {
-      concurrency: 1
-    });
+async function removeAllMessagesForUserIdInRoomId(userId, roomId) {
+  const room = await troupeService.findById(roomId);
+  const messages = await ChatMessage.find({ toTroupeId: roomId, fromUserId: userId }).exec();
+
+  logger.info(
+    `removeAllMessagesForUserIdInRoomId(${userId}, ${roomId}): Removing ${messages.length} messages`
+  );
+
+  return Promise.map(messages, message => deleteMessageFromRoom(room, message), {
+    concurrency: 1
+  });
+}
+
+async function removeAllMessagesForVirtualUserInRoomId(virtualUser, roomId) {
+  const room = await troupeService.findById(roomId);
+
+  const messages = await ChatMessage.find({
+    toTroupeId: roomId,
+    'virtualUser.type': virtualUser.type,
+    'virtualUser.externalId': virtualUser.externalId
+  }).exec();
+
+  logger.info(
+    `removeAllMessagesForUserIdInRoomId(${JSON.stringify(virtualUser)}, ${roomId}): Removing ${
+      messages.length
+    } messages`
+  );
+
+  return Promise.map(messages, message => deleteMessageFromRoom(room, message), {
+    concurrency: 1
   });
 }
 
@@ -783,6 +783,7 @@ module.exports = {
   searchChatMessagesForRoom,
   removeAllMessagesForUserId,
   removeAllMessagesForUserIdInRoomId,
+  removeAllMessagesForVirtualUserInRoomId,
   deleteMessageFromRoom,
   testOnly
 };

@@ -17,16 +17,26 @@ function TroupeBanStrategy(options) {
   };
 
   this.map = function(troupeBan) {
-    var user = userIdStategy.map(troupeBan.userId);
     var bannedBy = userIdStategy.map(troupeBan.bannedBy);
 
-    if (!user) return null;
-
-    return {
-      user: user,
+    const serializedData = {
       bannedBy: bannedBy,
       dateBanned: troupeBan.dateBanned
     };
+
+    if (troupeBan.userId) {
+      const user = userIdStategy.map(troupeBan.userId);
+      serializedData.user = user;
+    }
+
+    if (troupeBan.virtualUser) {
+      serializedData.virtualUser = {
+        type: troupeBan.virtualUser.type,
+        externalId: troupeBan.virtualUser.externalId
+      };
+    }
+
+    return serializedData;
   };
 }
 TroupeBanStrategy.prototype = {

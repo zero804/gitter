@@ -17,7 +17,7 @@ var SUCCESS_RESULT_CACHE_TIME = 5 * 60; // 5 minutes in seconds
 
 function bansIncludesUserId(bans, userId) {
   return _.some(bans, function(ban) {
-    return mongoUtils.objectIDsEqual(userId, ban.userId);
+    return ban.userId && mongoUtils.objectIDsEqual(userId, ban.userId);
   });
 }
 
