@@ -2,6 +2,11 @@
 
  - Add support for `virtualUsers` (Matrix), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2027
 
+Developer facing:
+
+ - Update `@gitter/env@0.44.0` for AWS SES email support, https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2037
+    - https://gitlab.com/gitlab-org/gitter/env/-/merge_requests/27
+
 
 # 21.1.0 - 2020-10-14
 
