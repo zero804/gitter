@@ -1,4 +1,4 @@
-# 21.2.0 - *upcoming* - Virtual Users
+# 21.2.0 - 2020-10-26 - Virtual Users
 
  - Add support for `virtualUsers` (Matrix), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2027
 
