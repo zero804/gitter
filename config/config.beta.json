@@ -49,6 +49,9 @@
     "camoUrl": "https://user-content.gitter-static.net",
     "camoSecret": "<see Gitter secrets repo>"
   },
+  "matrix": {
+    "wellKnownServer": "gitter-beta.ems.host:443"
+  },
   "logging": {
     "logToFile": true,
     "level": "verbose",
