@@ -14,7 +14,7 @@ describe('chat-api', function() {
     if (this._skipFixtureSetup) return;
 
     request = require('supertest');
-    app = require('../../server/api');
+    app = require('../../../server/api');
   });
 
   var fixture = fixtureLoader.setup({

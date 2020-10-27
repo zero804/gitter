@@ -9,6 +9,7 @@ var userAgentTagger = require('../../../web/user-agent-tagger');
 var loadTroupeFromParam = require('./load-troupe-param');
 var mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
+const approvedBridgeClientAccessOnly = require('gitter-web-oauth/lib/approved-bridge-client-access-only');
 
 function parseLookups(lookups) {
   // string of comma-delimited attributes passed in via req.query
@@ -83,6 +84,17 @@ module.exports = {
       .then(function(troupe) {
         var data = _.clone(req.body);
         data.stats = userAgentTagger(req);
+
+        // message.virtualUser usage is for approved bridge clients only
+        if (
+          data.virtualUser &&
+          !approvedBridgeClientAccessOnly.isRequestFromApprovedBridgeClient(req, data.virtualUser)
+        ) {
+          throw new StatusError(
+            403,
+            `Only approved bridge OAuth clients can use virtualUser (type=${data.virtualUser.type})`
+          );
+        }
 
         return chatService.newChatMessageToTroupe(troupe, req.user, data);
       })

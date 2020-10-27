@@ -185,6 +185,11 @@
       "https://avatars-05.gitter.im"
     ]
   },
+  "bridge": {
+    "approvedClientKeyMap": {
+      "matrix-bridge-prod": "matrix"
+    }
+  },
   "revokedUserAgents": [
     "Gitter/3.1.0",
     "Gitter/3.0.3",

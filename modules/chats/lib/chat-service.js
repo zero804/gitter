@@ -37,6 +37,34 @@ const validateChatMessageLength = m => {
   if (m.length > 4096) throw new StatusError(400, 'Message exceeds maximum size');
 };
 
+const validateVirtualUserType = type => {
+  if (typeof type !== 'string')
+    throw new StatusError(400, 'Virtual user type needs to be a string');
+  else if (type.length > 255)
+    throw new StatusError(400, 'Virtual user external type exceeds maximum length');
+};
+
+const validateVirtualUserExternalId = externalId => {
+  if (typeof externalId !== 'string')
+    throw new StatusError(400, 'Virtual user externalId needs to be a string');
+  else if (externalId.length > 255)
+    throw new StatusError(400, 'Virtual user external ID exceeds maximum length');
+};
+
+const validateVirtualUserDisplayName = displayName => {
+  if (typeof displayName !== 'string')
+    throw new StatusError(400, 'Virtual user displayName needs to be a string');
+  else if (displayName.length > 255)
+    throw new StatusError(400, 'Virtual user display name exceeds maximum length');
+};
+
+const validateVirtualUserAvatarUrl = avatarUrl => {
+  if (typeof avatarUrl !== 'string')
+    throw new StatusError(400, 'Virtual user avatarUrl needs to be a string');
+  else if (avatarUrl.length > 2000)
+    throw new StatusError(400, 'Virtual user avatarUrl exceeds maximum length');
+};
+
 var CURRENT_META_DATA_VERSION = markdownMajorVersion;
 
 // If you edit this, you need to update the client too.
@@ -176,6 +204,7 @@ async function addToThreadMessageCount(parentId, troupeId, count) {
  * NB: it is the callers responsibility to ensure that the user has permission
  * to chat in the room
  */
+// eslint-disable-next-line max-statements
 async function newChatMessageToTroupe(troupe, user, data) {
   // Keep this up here, set sent time asap to ensure order
   const sentAt = new Date();
@@ -196,7 +225,7 @@ async function newChatMessageToTroupe(troupe, user, data) {
 
   const isPublic = securityDescriptorUtils.isPublic(troupe);
 
-  const chatMessage = new ChatMessage({
+  const messageData = {
     fromUserId: user.id,
     toTroupeId: troupe.id,
     parentId: data.parentId,
@@ -212,7 +241,25 @@ async function newChatMessageToTroupe(troupe, user, data) {
     _md: parsedMessage.markdownProcessingFailed
       ? -CURRENT_META_DATA_VERSION
       : CURRENT_META_DATA_VERSION
-  });
+  };
+
+  // If the `virtualUser` was passed in while creating a message,
+  // validate and put the message in the database just below
+  if (data.virtualUser) {
+    validateVirtualUserType(data.virtualUser.type);
+    validateVirtualUserExternalId(data.virtualUser.externalId);
+    validateVirtualUserDisplayName(data.virtualUser.displayName);
+    validateVirtualUserAvatarUrl(data.virtualUser.avatarUrl);
+
+    messageData.virtualUser = {
+      type: data.virtualUser.type,
+      externalId: data.virtualUser.externalId,
+      displayName: data.virtualUser.displayName,
+      avatarUrl: data.virtualUser.avatarUrl
+    };
+  }
+
+  const chatMessage = new ChatMessage(messageData);
 
   // hellban for users
   // dont write message to db, just fake it for the troll / asshole

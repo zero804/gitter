@@ -4,8 +4,9 @@ process.env.DISABLE_API_LISTEN = '1';
 
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var assert = require('assert');
+const approvedBridgeClientAccessOnly = require('gitter-web-oauth/lib/approved-bridge-client-access-only');
 
-describe('chat-api', function() {
+describe('chat-messages-api', function() {
   var app, request;
 
   fixtureLoader.ensureIntegrationEnvironment('#oauthTokens');
@@ -131,6 +132,7 @@ describe('chat-api', function() {
           assert.strictEqual(body.text, 'Hello there');
         });
     });
+
     it('POST /v1/rooms/:roomId/chatMessages should get denied for anonymous token', async () => {
       await request(app)
         .post('/v1/rooms/' + fixture.troupe1.id + '/chatMessages')
@@ -139,6 +141,60 @@ describe('chat-api', function() {
         })
         .set('x-access-token', fixture.oAuthAccessTokenAnonymous)
         .expect(401);
+    });
+
+    describe('virtualUsers', () => {
+      const virtualUserFixtures = fixtureLoader.setup({
+        oAuthClientApproved1: {
+          clientKey: 'matrix-bridge-test'
+        },
+        oAuthAccessTokenApproved: { client: 'oAuthClientApproved1', user: 'user1' },
+        user1: {
+          accessToken: 'web-internal'
+        },
+        deleteDocuments: {
+          OAuthClient: [{ clientKey: 'matrix-bridge-test' }]
+        }
+      });
+
+      const virtualUserFixture = {
+        type: 'matrix',
+        externalId: 'madlittlemods:matrix.org',
+        displayName: 'madlittlemods (Eric Eastwood)',
+        avatarUrl:
+          'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+      };
+
+      before(() => {
+        approvedBridgeClientAccessOnly.testOnly.approvedClientKeyMap['matrix-bridge-test'] =
+          'matrix';
+      });
+
+      it('Approved bridge can use virtualUser', function() {
+        return request(app)
+          .post(`/v1/rooms/${fixture.troupe1.id}/chatMessages`)
+          .send({
+            text: 'Hello there',
+            virtualUser: virtualUserFixture
+          })
+          .set('x-access-token', virtualUserFixtures.oAuthAccessTokenApproved.token)
+          .expect(200)
+          .then(function(result) {
+            const body = result.body;
+            assert.strictEqual(body.text, 'Hello there');
+          });
+      });
+
+      it('Normal user can not use virtualUser (not approved)', function() {
+        return request(app)
+          .post(`/v1/rooms/${fixture.troupe1.id}/chatMessages`)
+          .send({
+            text: 'Hello there',
+            virtualUser: virtualUserFixture
+          })
+          .set('x-access-token', fixture.user1.accessToken)
+          .expect(403);
+      });
     });
   });
 

@@ -32,12 +32,13 @@ var webClientPromise = persistenceService.OAuthClient.findOne({
   });
 webClientPromise.done();
 
+const ircClientKey = nconf.get('irc:clientKey');
 var ircClientIdPromise = persistenceService.OAuthClient.findOne({
-  clientKey: nconf.get('irc:clientKey')
+  clientKey: ircClientKey
 })
   .exec()
   .then(function(oauthClient) {
-    if (!oauthClient) throw new Error('Unable to load IRC client id.');
+    if (!oauthClient) throw new Error(`Unable to load IRC client id (${ircClientKey}).`);
 
     ircClientId = oauthClient._id;
     return ircClientId;
@@ -247,43 +248,6 @@ function findOrGenerateIRCToken(userId, callback) {
     .nodeify(callback);
 }
 
-// eslint-disable-next-line complexity
-function clientKeyIsInternal(clientKey) {
-  switch (clientKey) {
-    case 'web-internal': // The webapp
-    case '1': // old OSX app
-    case '2': // old Beta OSX app
-    case '4': // old Troupe Notifier OSX app
-    case '5': // old Troupe Notifier Beta OSX app
-    case 'osx-desktop-prod':
-    case 'windows-desktop-prod':
-    case 'linux-desktop-prod':
-    case 'osx-desktop-prod-v4':
-    case 'windows-desktop-prod-v4':
-    case 'linux-desktop-prod-v4':
-    case 'android-prod':
-    case 'ios-beta':
-    case 'ios-beta-dev':
-    case 'ios-prod':
-    case 'ios-prod-dev':
-      return true;
-  }
-
-  return false;
-}
-
-/**
- * In future we should add scopes to our client schema, rather than
- * doing this, which is horrible
- */
-function isInternalClient(client) {
-  if (!client) return false;
-  if (!client.clientKey) return false;
-  if (client.canSkipAuthorization) return true;
-
-  return clientKeyIsInternal(client.clientKey);
-}
-
 module.exports = {
   getOAuthClientCursorByUserId,
   getOAuthAccessTokenCursorByUserId,
@@ -302,7 +266,6 @@ module.exports = {
   findOrGenerateIRCToken: findOrGenerateIRCToken,
   deleteToken: deleteToken,
   deleteOauthClient,
-  isInternalClient: isInternalClient,
   testOnly: {
     invalidateCache: function() {
       return tokenProvider.testOnly.invalidateCache();

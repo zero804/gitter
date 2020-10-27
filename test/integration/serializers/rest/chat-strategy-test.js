@@ -43,6 +43,13 @@ describe('chat-strategy-test', function() {
         id: fixture.message1.id,
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
+        unread: false,
+        readBy: 0,
+        urls: [],
+        mentions: [],
+        issues: [],
+        meta: [],
+        v: 1,
         fromUser: {
           id: fixture.user1.id,
           username: fixture.user1.username,
@@ -53,14 +60,7 @@ describe('chat-strategy-test', function() {
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,
           v: 1
-        },
-        unread: false,
-        readBy: 0,
-        urls: [],
-        mentions: [],
-        issues: [],
-        meta: [],
-        v: 1
+        }
       }
     ];
 
@@ -69,6 +69,13 @@ describe('chat-strategy-test', function() {
         id: fixture.message1.id,
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
+        unread: undefined,
+        readBy: 0,
+        urls: [],
+        mentions: [],
+        issues: [],
+        meta: [],
+        v: 1,
         fromUser: {
           id: fixture.user1.id,
           username: fixture.user1.username,
@@ -79,14 +86,7 @@ describe('chat-strategy-test', function() {
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,
           v: 1
-        },
-        unread: undefined,
-        readBy: 0,
-        urls: [],
-        mentions: [],
-        issues: [],
-        meta: [],
-        v: 1
+        }
       }
     ];
 
@@ -95,10 +95,10 @@ describe('chat-strategy-test', function() {
         id: fixture.message1.id,
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
-        fromUser: { id: fixture.user1.id, username: fixture.user1.username, v: 1 },
         unread: false,
         readBy: 0,
-        v: 1
+        v: 1,
+        fromUser: { id: fixture.user1.id, username: fixture.user1.username, v: 1 }
       }
     ];
 
@@ -107,6 +107,14 @@ describe('chat-strategy-test', function() {
         id: fixture.message1.id,
         text: 'old_message',
         sent: '2014-01-01T00:00:00.000Z',
+        unread: undefined,
+        readBy: 0,
+        urls: [],
+        initial: true,
+        mentions: [],
+        issues: [],
+        meta: [],
+        v: 1,
         fromUser: {
           id: fixture.user1.id,
           username: fixture.user1.username,
@@ -117,15 +125,7 @@ describe('chat-strategy-test', function() {
           avatarUrlMedium: '/api/private/user-avatar/' + fixture.user1.username + '?s=128',
           staff: false,
           v: 1
-        },
-        unread: undefined,
-        readBy: 0,
-        urls: [],
-        initial: true,
-        mentions: [],
-        issues: [],
-        meta: [],
-        v: 1
+        }
       }
     ];
 
@@ -135,14 +135,14 @@ describe('chat-strategy-test', function() {
           id: fixture.message1.id,
           text: 'old_message',
           sent: '2014-01-01T00:00:00.000Z',
-          fromUser: fixture.user1.id,
           unread: false,
           readBy: 0,
           urls: [],
           mentions: [],
           issues: [],
           meta: [],
-          v: 1
+          v: 1,
+          fromUser: fixture.user1.id
         }
       ],
       lookups: {
@@ -223,6 +223,55 @@ describe('chat-strategy-test', function() {
         const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
         const serialized = await serialize([message2], strategy);
         assert.equal(serialized[0].parentId, message1.id);
+      });
+    });
+
+    describe('virtualUser', () => {
+      const virtualUserFixtures = fixtureLoader.setupEach({
+        userBot: {},
+        troupe1: { users: ['userBot'] },
+        message1: {
+          user: 'userBot',
+          troupe: 'troupe1',
+          text: 'A',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'madlittlemods:matrix.org',
+            displayName: 'madlittlemods (Eric Eastwood)',
+            avatarUrl:
+              'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+          }
+        }
+      });
+
+      it('should propagate virtualUser attribute', async () => {
+        const { message1, troupe1 } = virtualUserFixtures;
+        const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
+        const serialized = await serialize([message1], strategy);
+        assert.deepEqual(serialized[0].virtualUser, {
+          type: 'matrix',
+          externalId: 'madlittlemods:matrix.org',
+          displayName: 'madlittlemods (Eric Eastwood)',
+          avatarUrl:
+            'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+        });
+      });
+
+      it('should propagate mocked fromUser attribute', async () => {
+        const { message1, troupe1 } = virtualUserFixtures;
+        const strategy = new ChatStrategy({ currentUserId: null, troupeId: troupe1.id });
+        const serialized = await serialize([message1], strategy);
+        assert.deepEqual(serialized[0].fromUser, {
+          id: 'matrix-madlittlemods:matrix.org',
+          username: 'madlittlemods:matrix.org',
+          displayName: 'madlittlemods (Eric Eastwood)',
+          avatarUrl:
+            'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop',
+          avatarUrlSmall:
+            'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop',
+          avatarUrlMedium:
+            'https://matrix-client.matrix.org/_matrix/media/r0/thumbnail/matrix.org/xxx?width=30&height=30&method=crop'
+        });
       });
     });
 

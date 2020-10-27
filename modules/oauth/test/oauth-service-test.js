@@ -193,43 +193,6 @@ describe('oauth-service', function() {
     });
   });
 
-  describe('isInternalClient', function() {
-    var FIXTURES = [
-      {
-        name: 'null is not an internal client',
-        client: null,
-        result: false
-      },
-      {
-        name: 'invalid client is not an internal client',
-        client: {},
-        result: false
-      },
-      {
-        name: 'an arbitrary client is not internal client',
-        client: { clientKey: 'bob', canSkipAuthorization: false },
-        result: false
-      },
-      {
-        name: 'clients who canSkipAuthorization are internal',
-        client: { clientKey: 'bob', canSkipAuthorization: true },
-        result: true
-      },
-      {
-        name: 'web-internal is internal',
-        client: { clientKey: 'web-internal' },
-        result: true
-      }
-    ];
-
-    FIXTURES.forEach(function(meta) {
-      it(meta.name, function() {
-        var result = oauthService.isInternalClient(meta.client);
-        assert.strictEqual(result, meta.result);
-      });
-    });
-  });
-
   it('deleteOauthClient', async () => {
     // Ensure there are some tokens to delete
     const tokensBefore = await oauthService.findAccessTokensByClientId(
