@@ -122,10 +122,12 @@ SET web__messageSecret=xxx
 SET email__unsubscribeNotificationsSecret=xxx
 SET integrations__secret=xxx
 SET github__statePassphrase=xxx
+
 REM Visit https://developer.twitter.com/en/apps/create, name: Gitter Twitter YOURTWITTERUSERNAME, callback url: http://localhost:5000/login/twitter/callback
 REM After creation, click "keys and tokens" to get your Consumer API Keys
 SET twitteroauth__consumer_key=xxx
 SET twitteroauth__consumer_secret=xxx
+
 REM Visit https://gitlab.com/profile/applications, name: Gitter User Dev, redirect URI: http://localhost:5000/login/gitlab/callback, scopes: api, read_user
 SET gitlaboauth__client_id=xxx
 SET gitlaboauth__client_secret=xxx
@@ -137,10 +139,17 @@ SET github__user_client_id=xxx
 SET github__user_client_secret=xxx
 REM Same as github__user_client_id
 SET github__anonymous_app__client_id=xxx
+
 REM Same as github__user_client_secret
 SET github__anonymous_app__client_secret=xxx
+
 REM This can be some random string
 SET tokens__anonymousPassword=xxx
+
+REM These can be some random string
+SET matrix__bridge__id=xxx
+SET matrix__bridge__hsToken=xxx
+SET matrix__bridge__asToken=xxx
 ```
 
 Export the environment variables with (this needs to be done in any new terminal session):

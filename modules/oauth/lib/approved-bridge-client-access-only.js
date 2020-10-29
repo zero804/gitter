@@ -7,7 +7,7 @@ var config = env.config;
 const { validateVirtualUserType } = require('gitter-web-users/lib/virtual-user-service');
 
 // OAuth client key to virtual user type map
-const approvedClientKeyMap = config.get('bridge:approvedClientKeyMap') || {};
+const approvedClientKeyMap = config.get('virtualUsers:approvedClientKeyMap') || {};
 
 // Approved OAuth client apps that can bridge messages into Gitter and use `message.virtualUser`
 /**
