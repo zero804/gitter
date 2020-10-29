@@ -101,6 +101,9 @@ default:
   - &webapp_service_neo4j
     name: neo4j:2.3
     alias: neo4j
+  - &webapp_service_synapse
+    name: matrixdotorg/synapse:v1.20.1
+    alias: synapse
 
 .node_job:
   image: $GITTER_CI_REGISTRY_IMAGE
@@ -139,6 +142,7 @@ validate:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+    - *webapp_service_synapse
   script:
     - make ci-test
 
@@ -519,6 +523,7 @@ dast:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+    - *webapp_service_synapse
 
 .secret-analyzer:
   extends: .use-docker-in-docker
