@@ -27,14 +27,17 @@ describe('chat-messages-api', function() {
     user2: {
       accessToken: 'web-internal'
     },
-    user3: {
+    userBridge1: {
+      accessToken: 'web-internal'
+    },
+    userAdmin1: {
       accessToken: 'web-internal'
     },
     troupe1: {
       security: 'PUBLIC',
       users: ['user1'],
       securityDescriptor: {
-        extraAdmins: ['user3']
+        extraAdmins: ['userAdmin1']
       }
     },
     troupe2: {
@@ -56,7 +59,7 @@ describe('chat-messages-api', function() {
       pub: 1
     },
     message3: {
-      user: 'user3',
+      user: 'userAdmin1',
       troupe: 'troupe1',
       text: 'HELLO2',
       sent: new Date(),
@@ -68,6 +71,16 @@ describe('chat-messages-api', function() {
       text: 'hello from the child',
       parent: 'message1',
       pub: 1
+    },
+    messageFromVirtualUser1: {
+      user: 'userBridge1',
+      virtualUser: {
+        type: 'matrix',
+        externalId: 'test-person:matrix.org',
+        displayName: 'Tessa'
+      },
+      troupe: 'troupe1',
+      text: 'my message'
     }
   });
 
@@ -231,8 +244,68 @@ describe('chat-messages-api', function() {
         .send({
           text: 'x'
         })
-        .set('x-access-token', fixture.user3.accessToken)
+        .set('x-access-token', fixture.userAdmin1.accessToken)
         .expect(404);
+    });
+
+    describe('virtualUsers', () => {
+      const virtualUserFixtures = fixtureLoader.setup({
+        oAuthClientApproved1: {
+          clientKey: 'matrix-bridge-test'
+        },
+        oAuthAccessTokenApproved: { client: 'oAuthClientApproved1', user: 'userBridge1' },
+        user1: {
+          accessToken: 'web-internal'
+        },
+        userBridge1: {},
+        troupe1: {},
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my message'
+        },
+        deleteDocuments: {
+          OAuthClient: [{ clientKey: 'matrix-bridge-test' }]
+        }
+      });
+
+      before(() => {
+        approvedBridgeClientAccessOnly.testOnly.approvedClientKeyMap['matrix-bridge-test'] =
+          'matrix';
+      });
+
+      it('Approved bridge can edit message sent from virtualUser', function() {
+        return request(app)
+          .put(
+            `/v1/rooms/${virtualUserFixtures.troupe1.id}/chatMessages/${virtualUserFixtures.messageFromVirtualUser1.id}`
+          )
+          .send({
+            text: 'my message edit'
+          })
+          .set('x-access-token', virtualUserFixtures.oAuthAccessTokenApproved.token)
+          .expect(200)
+          .then(function(result) {
+            const body = result.body;
+            assert.strictEqual(body.text, 'my message edit');
+          });
+      });
+
+      it('Normal user can not edit message from virtualUser (not approved and not the author of the message)', function() {
+        return request(app)
+          .put(
+            `/v1/rooms/${virtualUserFixtures.troupe1.id}/chatMessages/${virtualUserFixtures.messageFromVirtualUser1.id}`
+          )
+          .send({
+            text: 'Hello there'
+          })
+          .set('x-access-token', virtualUserFixtures.user1.accessToken)
+          .expect(403);
+      });
     });
   });
 
@@ -254,8 +327,53 @@ describe('chat-messages-api', function() {
     it('DELETE /v1/rooms/:roomId/chatMessages/:chatMessageId - as admin', function() {
       return request(app)
         .del('/v1/rooms/' + fixture.troupe1.id + '/chatMessages/' + fixture.message2.id)
-        .set('x-access-token', fixture.user3.accessToken)
+        .set('x-access-token', fixture.userAdmin1.accessToken)
         .expect(204);
+    });
+
+    it('DELETE /v1/rooms/:roomId/chatMessages/:chatMessageId - admin is able to delete message from virtualUser', function() {
+      return request(app)
+        .del(`/v1/rooms/${fixture.troupe1.id}/chatMessages/${fixture.messageFromVirtualUser1.id}`)
+        .set('x-access-token', fixture.userAdmin1.accessToken)
+        .expect(204);
+    });
+
+    describe('virtualUsers', () => {
+      const virtualUserFixtures = fixtureLoader.setup({
+        userBridge1: {},
+        userAdmin1: {
+          accessToken: 'web-internal'
+        },
+        troupe1: {
+          security: 'PUBLIC',
+          users: ['user1'],
+          securityDescriptor: {
+            extraAdmins: ['userAdmin1']
+          }
+        },
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my message'
+        }
+      });
+
+      it('admin can delete message from virtualUser', () => {
+        return request(app)
+          .del(
+            '/v1/rooms/' +
+              virtualUserFixtures.troupe1.id +
+              '/chatMessages/' +
+              virtualUserFixtures.messageFromVirtualUser1.id
+          )
+          .set('x-access-token', virtualUserFixtures.userAdmin1.accessToken)
+          .expect(204);
+      });
     });
   });
 });

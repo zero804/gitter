@@ -5,6 +5,7 @@ const createBasePolicy = require('./policies/create-base-policy');
 var StaticPolicyEvaluator = require('./policies/static-policy-evaluator');
 var OneToOnePolicyEvaluator = require('./policies/one-to-one-policy-evaluator');
 var OneToOneUnconnectionPolicyEvalator = require('./policies/one-to-one-unconnected-policy-evaluator');
+const VirtualUserPolicyEvaluator = require('./policies/virtual-user-policy-evaluator');
 var RoomContextDelegate = require('./context-delegates/room-context-delegate');
 var OneToOneContextDelegate = require('./context-delegates/one-to-one-room-context-delegate');
 var StatusError = require('statuserror');
@@ -114,6 +115,13 @@ function createPolicyForUserIdInRoom(userId, room) {
   });
 }
 
+async function createPolicyForVirtualUserInRoomId(virtualUser, roomId) {
+  const securityDescriptor = await securityDescriptorService.room.findByIdAll(roomId);
+  if (!securityDescriptor) throw new StatusError(404);
+
+  return new VirtualUserPolicyEvaluator(virtualUser, securityDescriptor);
+}
+
 function createPolicyForOneToOne(user, toUser) {
   return new OneToOneUnconnectionPolicyEvalator(user, toUser);
 }
@@ -166,6 +174,7 @@ module.exports = {
   createPolicyForGroupIdWithUserLoader: Promise.method(createPolicyForGroupIdWithUserLoader),
   createPolicyForUserIdInRoomId: Promise.method(createPolicyForUserIdInRoomId),
   createPolicyForUserIdInRoom: Promise.method(createPolicyForUserIdInRoom),
+  createPolicyForVirtualUserInRoomId: Promise.method(createPolicyForVirtualUserInRoomId),
   createPolicyForOneToOne: Promise.method(createPolicyForOneToOne),
 
   // For things that have not yet been created

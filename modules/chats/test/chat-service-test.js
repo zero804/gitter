@@ -538,8 +538,8 @@ describe('chatService', function() {
   });
 
   describe('removeAllMessagesForUserIdInRoomId', () => {
-    it('should delete all messages for user in specific room', function() {
-      return Promise.all([
+    it('should delete all messages for user in specific room', async () => {
+      await Promise.all([
         chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
           text: 'happy goat',
           status: true
@@ -548,32 +548,79 @@ describe('chatService', function() {
           text: 'sad goat',
           status: true
         })
-      ])
-        .then(chatMessages => {
-          assert.strictEqual(chatMessages.length, 2);
+      ]);
+
+      const beforeMessages = await ChatMessage.find({
+        toTroupeId: fixture.troupe1._id,
+        fromUserId: fixture.user1._id
+      });
+      assert.strictEqual(beforeMessages.length, 2);
+
+      await chatService.removeAllMessagesForUserIdInRoomId(fixture.user1._id, fixture.troupe1._id);
+
+      const messages = await ChatMessage.find({
+        toTroupeId: fixture.troupe1._id,
+        fromUserId: fixture.user1._id
+      });
+      const messageBackups = await ChatMessageBackup.find({
+        toTroupeId: fixture.troupe1._id,
+        fromUserId: fixture.user1._id
+      });
+
+      assert.strictEqual(messages.length, 0);
+      assert.strictEqual(messageBackups.length, 2);
+    });
+  });
+
+  describe('removeAllMessagesForVirtualUserInRoomId', () => {
+    it('should delete all messages for virtualUser in specific room', async () => {
+      const virtualUser = {
+        type: 'matrix',
+        externalId: 'test-person:matrix.org',
+        displayName: 'Tessa'
+      };
+
+      await Promise.all([
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          virtualUser,
+          text: 'happy goat',
+          status: true
+        }),
+        chatService.newChatMessageToTroupe(fixture.troupe1, fixture.user1, {
+          virtualUser,
+          text: 'sad goat',
+          status: true
         })
-        .then(() => {
-          return chatService.removeAllMessagesForUserIdInRoomId(
-            fixture.user1._id,
-            fixture.troupe1._id
-          );
-        })
-        .then(() => {
-          return Promise.props({
-            messages: ChatMessage.find({
-              toTroupeId: fixture.troupe1._id,
-              fromUserId: fixture.user1._id
-            }),
-            messageBackups: ChatMessageBackup.find({
-              toTroupeId: fixture.troupe1._id,
-              fromUserId: fixture.user1._id
-            })
-          });
-        })
-        .then(({ messages, messageBackups }) => {
-          assert.strictEqual(messages.length, 0);
-          assert.strictEqual(messageBackups.length, 2);
-        });
+      ]);
+
+      const beforeMessages = await ChatMessage.find({
+        toTroupeId: fixture.troupe1._id,
+        'virtualUser.type': 'matrix',
+        'virtualUser.externalId': 'test-person:matrix.org'
+      });
+      assert.strictEqual(beforeMessages.length, 2);
+
+      await chatService.removeAllMessagesForVirtualUserInRoomId(
+        {
+          type: 'matrix',
+          externalId: 'test-person:matrix.org'
+        },
+        fixture.troupe1._id
+      );
+
+      const messages = await ChatMessage.find({
+        toTroupeId: fixture.troupe1._id,
+        'virtualUser.type': 'matrix',
+        'virtualUser.externalId': 'test-person:matrix.org'
+      });
+      const messageBackups = await ChatMessageBackup.find({
+        toTroupeId: fixture.troupe1._id,
+        'virtualUser.type': 'matrix',
+        'virtualUser.externalId': 'test-person:matrix.org'
+      });
+
+      assert.strictEqual(messages.length, 0);
+      assert.strictEqual(messageBackups.length, 2);
     });
   });
 

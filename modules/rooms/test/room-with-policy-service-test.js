@@ -2,11 +2,16 @@
 
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var assert = require('assert');
+const sinon = require('sinon');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var StatusError = require('statuserror');
 var persistence = require('gitter-web-persistence');
 var RoomWithPolicyService = require('../lib/room-with-policy-service');
+const roomService = require('../lib/room-service');
+const troupeService = require('gitter-web-rooms/lib/troupe-service');
+const policyFactory = require('gitter-web-permissions/lib/policy-factory');
 
 describe('room-with-policy-service', function() {
   var fixture = fixtureLoader.setup({
@@ -47,6 +52,12 @@ describe('room-with-policy-service', function() {
   var notAdminPolicy = {
     canAdmin: function() {
       return Promise.resolve(false);
+    }
+  };
+
+  const canWritePolicy = {
+    canWrite: async () => {
+      return true;
     }
   };
 
@@ -123,7 +134,6 @@ describe('room-with-policy-service', function() {
 
   describe('bans #slow', function() {
     it('should ban users from rooms #slow', function() {
-      var roomService = require('../lib/room-service');
       var roomMembershipService = require('../lib/room-membership-service');
 
       var r = new RoomWithPolicyService(fixture.troupeBan, fixture.userBanAdmin, isAdminPolicy);
@@ -220,6 +230,186 @@ describe('room-with-policy-service', function() {
     });
   });
 
+  describe('virtualUser bans #slow', () => {
+    describe('banVirtualUserFromRoom', () => {
+      const virtualUserBanfixtures = fixtureLoader.setup({
+        user1: {},
+        userBanAdmin: {},
+        troupe1: {},
+        troupeWithBannedVirtualUsers1: {
+          bans: [
+            {
+              virtualUser: {
+                type: 'matrix',
+                externalId: 'banned-user:matrix.org'
+              },
+              dateBanned: new Date('1995-12-17T03:24:00+00:00'),
+              bannedBy: 'userBanAdmin'
+            }
+          ]
+        }
+      });
+
+      it('should not allow non-admins to ban', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupe1,
+          virtualUserBanfixtures.user1,
+          notAdminPolicy
+        );
+
+        try {
+          await roomWithPolicyService.banVirtualUserFromRoom({
+            type: 'matrix',
+            externalId: 'bad-guy:matrix.org'
+          });
+          assert(false, 'Expected to fail');
+        } catch (err) {
+          assert.equal(err.status, 403);
+        }
+      });
+
+      it('bans virtualUser', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupe1,
+          virtualUserBanfixtures.userBanAdmin,
+          isAdminPolicy
+        );
+
+        const ban = await roomWithPolicyService.banVirtualUserFromRoom({
+          type: 'matrix',
+          externalId: 'bad-guy:matrix.org'
+        });
+
+        assert.strictEqual(ban.userId, undefined);
+        assert.strictEqual(ban.virtualUser.type, 'matrix');
+        assert.strictEqual(ban.virtualUser.externalId, 'bad-guy:matrix.org');
+        assert.strictEqual(
+          mongoUtils.objectIDsEqual(ban.bannedBy, virtualUserBanfixtures.userBanAdmin._id),
+          true
+        );
+      });
+
+      it('unable to ban virtualUser with invalid properties', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupe1,
+          virtualUserBanfixtures.userBanAdmin,
+          isAdminPolicy
+        );
+
+        try {
+          await roomWithPolicyService.banVirtualUserFromRoom({
+            type: 'matrix',
+            // This is invalid because the max length is 255
+            externalId: 'x'.repeat(1000)
+          });
+          assert(false, 'Expected to fail');
+        } catch (err) {
+          assert.equal(err.status, 400);
+        }
+      });
+
+      it('returns existing ban', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupeWithBannedVirtualUsers1,
+          virtualUserBanfixtures.userBanAdmin,
+          isAdminPolicy
+        );
+
+        const ban = await roomWithPolicyService.banVirtualUserFromRoom({
+          type: 'matrix',
+          externalId: 'banned-user:matrix.org'
+        });
+
+        assert.strictEqual(ban.dateBanned.toISOString(), '1995-12-17T03:24:00.000Z');
+      });
+
+      it('removes messages when option passed', async () => {
+        const removeAllMessagesForVirtualUserInRoomIdStub = sinon.stub();
+        const stubbedRoomWithPolicyService = proxyquireNoCallThru(
+          '../lib/room-with-policy-service',
+          {
+            'gitter-web-chats': {
+              removeAllMessagesForVirtualUserInRoomId: removeAllMessagesForVirtualUserInRoomIdStub
+            }
+          }
+        );
+
+        const roomWithPolicyService = new stubbedRoomWithPolicyService(
+          virtualUserBanfixtures.troupe1,
+          virtualUserBanfixtures.userBanAdmin,
+          isAdminPolicy
+        );
+
+        await roomWithPolicyService.banVirtualUserFromRoom(
+          {
+            type: 'matrix',
+            externalId: 'spammer:matrix.org'
+          },
+          {
+            removeMessages: true
+          }
+        );
+
+        assert(removeAllMessagesForVirtualUserInRoomIdStub.calledOnce);
+      });
+    });
+
+    describe('unbanVirtualUserFromRoom', () => {
+      const virtualUserBanfixtures = fixtureLoader.setup({
+        user1: {},
+        userBanAdmin: {},
+        troupeWithBannedVirtualUsers1: {
+          bans: [
+            {
+              virtualUser: {
+                type: 'matrix',
+                externalId: 'banned-user:matrix.org'
+              },
+              dateBanned: new Date('1995-12-17T03:24:00+00:00'),
+              bannedBy: 'userBanAdmin'
+            }
+          ]
+        }
+      });
+
+      it('should not allow non-admins to unban', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupeWithBannedVirtualUsers1,
+          virtualUserBanfixtures.user1,
+          notAdminPolicy
+        );
+
+        try {
+          await roomWithPolicyService.unbanVirtualUserFromRoom({
+            type: 'matrix',
+            externalId: 'banned-user:matrix.org'
+          });
+          assert(false, 'Expected to fail');
+        } catch (err) {
+          assert.equal(err.status, 403);
+        }
+      });
+
+      it('unbans user', async () => {
+        const roomWithPolicyService = new RoomWithPolicyService(
+          virtualUserBanfixtures.troupeWithBannedVirtualUsers1,
+          virtualUserBanfixtures.userBanAdmin,
+          isAdminPolicy
+        );
+
+        await roomWithPolicyService.unbanVirtualUserFromRoom({
+          type: 'matrix',
+          externalId: 'banned-user:matrix.org'
+        });
+
+        const updatedRoom = await troupeService.findById(
+          virtualUserBanfixtures.troupeWithBannedVirtualUsers1._id
+        );
+        assert.strictEqual(updatedRoom.bans.length, 0);
+      });
+    });
+  });
+
   describe('meta', function() {
     it('should allow you to set a welcome message', async function() {
       const welcomeMessageText = 'this is a test';
@@ -257,6 +447,324 @@ describe('room-with-policy-service', function() {
       return r.deleteRoom().catch(StatusError, function(err) {
         assert.equal(err.status, 403);
       });
+    });
+  });
+
+  describe('sendMessage', () => {
+    const banFixtures = fixtureLoader.setup({
+      userAdmin1: {},
+      userBridge1: {},
+      userBanned1: {},
+      troupeWithBannedUsers1: {
+        bans: [
+          {
+            user: 'userBanned1',
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      },
+      troupeWithBannedVirtualUsers1: {
+        bans: [
+          {
+            virtualUser: {
+              type: 'matrix',
+              externalId: 'banned-user:matrix.org'
+            },
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      }
+    });
+
+    it('normal user can send message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        fixture.troupe1,
+        fixture.user1,
+        canWritePolicy
+      );
+
+      const chatMessage = await roomWithPolicyService.sendMessage({ text: 'heya' });
+
+      assert(chatMessage);
+    });
+
+    it('virtualUser can send message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        fixture.troupe1,
+        fixture.user1,
+        canWritePolicy
+      );
+
+      const chatMessage = await roomWithPolicyService.sendMessage({
+        text: 'heya',
+        virtualUser: {
+          type: 'matrix',
+          externalId: 'test-person:matrix.org',
+          displayName: 'Tessa'
+        }
+      });
+
+      assert(chatMessage);
+      assert(chatMessage.virtualUser);
+    });
+
+    it('banned user can not send message', async () => {
+      const policy = await policyFactory.createPolicyForRoomId(
+        banFixtures.userBanned1,
+        banFixtures.troupeWithBannedUsers1._id
+      );
+
+      const roomWithPolicyService = new RoomWithPolicyService(
+        banFixtures.troupeWithBannedUsers1,
+        banFixtures.userBanned1,
+        policy
+      );
+
+      try {
+        await roomWithPolicyService.sendMessage({
+          text: 'heya'
+        });
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 403);
+      }
+    });
+
+    it('banned virtualUser can not send message', async () => {
+      const policy = await policyFactory.createPolicyForRoomId(
+        banFixtures.userBanned1,
+        banFixtures.troupeWithBannedVirtualUsers1._id
+      );
+
+      const roomWithPolicyService = new RoomWithPolicyService(
+        banFixtures.troupeWithBannedVirtualUsers1,
+        banFixtures.userBridge1,
+        policy
+      );
+
+      try {
+        await roomWithPolicyService.sendMessage({
+          text: 'heya',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'banned-user:matrix.org'
+          }
+        });
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 403);
+      }
+    });
+  });
+
+  describe('editMessage', () => {
+    const editFixtures = fixtureLoader.setup({
+      user1: {},
+      userAdmin1: {},
+      userBridge1: {},
+      userBanned1: {},
+      troupe1: {},
+      troupeWithBannedUsers1: {
+        bans: [
+          {
+            user: 'userBanned1',
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      },
+      troupeWithBannedVirtualUsers1: {
+        bans: [
+          {
+            virtualUser: {
+              type: 'matrix',
+              externalId: 'banned-user:matrix.org'
+            },
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      },
+      message1: {
+        user: 'user1',
+        troupe: 'troupe1',
+        text: 'my message'
+      },
+      messageFromVirtualUser1: {
+        user: 'userBridge1',
+        virtualUser: {
+          type: 'matrix',
+          externalId: 'test-person:matrix.org',
+          displayName: 'Tessa'
+        },
+        troupe: 'troupe1',
+        text: 'my message'
+      },
+      messageFromBannedUser1: {
+        user: 'userBanned1',
+        troupe: 'troupeWithBannedUsers1',
+        text: 'my message'
+      },
+      messageFromBannedVirtualUser1: {
+        user: 'userBridge1',
+        virtualUser: {
+          type: 'matrix',
+          externalId: 'banned-user:matrix.org',
+          displayName: 'bad-person'
+        },
+        troupe: 'troupeWithBannedVirtualUsers1',
+        text: 'my message'
+      }
+    });
+
+    it('normal user can edit message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        editFixtures.troupe1,
+        editFixtures.user1,
+        canWritePolicy
+      );
+
+      const chatMessage = await roomWithPolicyService.editMessage(editFixtures.message1, 'heya');
+
+      assert(chatMessage);
+      assert.strictEqual(chatMessage.text, 'heya');
+    });
+
+    it('admin user not allowed edit another users message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        editFixtures.troupe1,
+        editFixtures.userAdmin1,
+        canWritePolicy
+      );
+
+      try {
+        await roomWithPolicyService.editMessage(editFixtures.message1, 'heya');
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 403);
+      }
+    });
+
+    it('virtualUser can edit message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        editFixtures.troupe1,
+        editFixtures.userBridge1,
+        canWritePolicy
+      );
+
+      const chatMessage = await roomWithPolicyService.editMessage(
+        editFixtures.messageFromVirtualUser1,
+        'aliens'
+      );
+
+      assert(chatMessage);
+      assert(chatMessage.virtualUser);
+      assert.strictEqual(chatMessage.text, 'aliens');
+    });
+
+    it('banned user can not edit message', async () => {
+      const policy = await policyFactory.createPolicyForRoomId(
+        editFixtures.userBanned1,
+        editFixtures.troupeWithBannedUsers1._id
+      );
+
+      const roomWithPolicyService = new RoomWithPolicyService(
+        editFixtures.troupeWithBannedUsers1,
+        editFixtures.userBanned1,
+        policy
+      );
+
+      try {
+        await roomWithPolicyService.editMessage(editFixtures.messageFromBannedUser1, 'heya');
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 403);
+      }
+    });
+
+    it('banned virtualUser can not edit message', async () => {
+      const policy = await policyFactory.createPolicyForRoomId(
+        editFixtures.userBanned1,
+        editFixtures.troupeWithBannedVirtualUsers1._id
+      );
+
+      const roomWithPolicyService = new RoomWithPolicyService(
+        editFixtures.troupeWithBannedVirtualUsers1,
+        editFixtures.userBridge1,
+        policy
+      );
+
+      try {
+        await roomWithPolicyService.editMessage(editFixtures.messageFromBannedVirtualUser1, 'heya');
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 403);
+      }
+    });
+  });
+
+  describe('deleteMessageFromRoom', () => {
+    const deleteFixtures = fixtureLoader.setup({
+      user1: {},
+      userAdmin1: {},
+      troupe1: {},
+      troupe2: {},
+      message1: {
+        user: 'user1',
+        troupe: 'troupe1',
+        text: 'my message'
+      },
+      message2: {
+        user: 'user1',
+        troupe: 'troupe1',
+        text: 'my message'
+      },
+      messageInAnotherRoom1: {
+        user: 'user1',
+        troupe: 'troupe2',
+        text: 'another rooms message'
+      }
+    });
+
+    it('sender can delete message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        deleteFixtures.troupe1,
+        deleteFixtures.user1,
+        notAdminPolicy
+      );
+
+      await roomWithPolicyService.deleteMessageFromRoom(deleteFixtures.message1);
+
+      assert(true);
+    });
+
+    it('admin can delete message', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        deleteFixtures.troupe1,
+        deleteFixtures.userAdmin1,
+        isAdminPolicy
+      );
+
+      await roomWithPolicyService.deleteMessageFromRoom(deleteFixtures.message2);
+
+      assert(true);
+    });
+
+    it('room admin can not delete message from another room', async () => {
+      const roomWithPolicyService = new RoomWithPolicyService(
+        deleteFixtures.troupe1,
+        deleteFixtures.userAdmin1,
+        isAdminPolicy
+      );
+
+      try {
+        await roomWithPolicyService.deleteMessageFromRoom(deleteFixtures.messageInAnotherRoom1);
+        assert(false, 'Expected to fail');
+      } catch (err) {
+        assert.equal(err.status, 404);
+      }
     });
   });
 });

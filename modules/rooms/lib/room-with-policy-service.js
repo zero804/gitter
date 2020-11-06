@@ -19,6 +19,10 @@ var roomRepoService = require('./room-repo-service');
 var assert = require('assert');
 var roomMetaService = require('./room-meta-service');
 var processText = require('gitter-web-text-processor');
+const {
+  validateVirtualUserType,
+  validateVirtualUserExternalId
+} = require('gitter-web-users/lib/virtual-user-service');
 
 var roomInviteService = require('./room-invite-service');
 var securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
@@ -138,6 +142,26 @@ RoomWithPolicyService.prototype.toggleSearchIndexing = secureMethod(allowAdmin, 
   return room.save();
 });
 
+function createBanEvent(room, executingUser, bannedUsername) {
+  return eventService
+    .newEventToTroupe(
+      room,
+      executingUser,
+      `@${executingUser.username} banned @${bannedUsername}`,
+      {
+        service: 'bans',
+        event: 'banned',
+        bannedUser: bannedUsername,
+        prerendered: true,
+        performingUser: executingUser.username
+      },
+      {}
+    )
+    .catch(function(err) {
+      logger.error('Unable to create an event in troupe: ' + err, { exception: err });
+    });
+}
+
 /**
  * Ban a user from the room. Caller should ensure admin permissions
  */
@@ -165,8 +189,8 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
         return mongoUtils.objectIDsEqual(ban.userId, bannedUser._id);
       });
 
-      // If there is already a ban or the room
-      // type doesn't make sense for a ban, just remove the user
+      // If there is already a ban in the room,
+      // doesn't make sense to add another ban, just remove the user
       // TODO: re-address this in https://github.com/troupe/gitter-webapp/pull/1679
       // Just ensure that the user is removed from the room
       if (existingBan) {
@@ -201,27 +225,76 @@ RoomWithPolicyService.prototype.banUserFromRoom = secureMethod([allowStaff, allo
             return chatService.removeAllMessagesForUserIdInRoomId(bannedUser._id, room._id);
           }
         })
-        .tap(function() {
-          return eventService
-            .newEventToTroupe(
-              room,
-              currentUser,
-              '@' + currentUser.username + ' banned @' + bannedUser.username,
-              {
-                service: 'bans',
-                event: 'banned',
-                bannedUser: bannedUser.username,
-                prerendered: true,
-                performingUser: currentUser.username
-              },
-              {}
-            )
-            .catch(function(err) {
-              logger.error('Unable to create an event in troupe: ' + err, { exception: err });
-            });
-        });
+        .tap(createBanEvent(room, currentUser, bannedUser.username));
     });
 });
+
+RoomWithPolicyService.prototype.banVirtualUserFromRoom = secureMethod(
+  [allowStaff, allowAdmin],
+  async function(virtualUser, options) {
+    assert(virtualUser);
+    validateVirtualUserType(virtualUser.type);
+    validateVirtualUserExternalId(virtualUser.externalId);
+
+    const currentUser = this.user;
+    const room = this.room;
+
+    const existingBan = _.find(room.bans, function(ban) {
+      return (
+        ban.virtualUser &&
+        ban.virtualUser.type === virtualUser.type &&
+        ban.virtualUser.externalId === virtualUser.externalId
+      );
+    });
+
+    // If there is already a ban in the room,
+    // doesn't make sense to add another ban
+    if (existingBan) {
+      return existingBan;
+    }
+
+    const ban = room.addUserBan({
+      virtualUser: {
+        type: virtualUser.type,
+        externalId: virtualUser.externalId
+      },
+      bannedBy: currentUser._id
+    });
+
+    try {
+      await room.save();
+      await createBanEvent(room, currentUser, virtualUser.externalId);
+
+      if (options && options.removeMessages) {
+        await chatService.removeAllMessagesForVirtualUserInRoomId(virtualUser, room._id);
+      }
+
+      return ban;
+    } catch (err) {
+      throw err;
+    }
+  }
+);
+
+function createUnBanEvent(room, executingUser, bannedUsername) {
+  return eventService
+    .newEventToTroupe(
+      room,
+      executingUser,
+      `User @${executingUser.username} unbanned @${bannedUsername}`,
+      {
+        service: 'bans',
+        event: 'unbanned',
+        bannedUser: bannedUsername,
+        prerendered: true,
+        performingUser: executingUser.username
+      },
+      {}
+    )
+    .catch(function(err) {
+      logger.error('Unable to create an event in troupe: ' + err, { exception: err });
+    });
+}
 
 RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, allowAdmin], function(
   bannedUserId
@@ -248,27 +321,37 @@ RoomWithPolicyService.prototype.unbanUserFromRoom = secureMethod([allowStaff, al
       }
     )
       .exec()
-      .tap(function() {
-        return eventService
-          .newEventToTroupe(
-            room,
-            currentUser,
-            'User @' + currentUser.username + ' unbanned @' + bannedUser.username,
-            {
-              service: 'bans',
-              event: 'unbanned',
-              bannedUser: bannedUser.username,
-              prerendered: true,
-              performingUser: currentUser.username
-            },
-            {}
-          )
-          .catch(function(err) {
-            logger.error('Unable to create an event in troupe: ' + err, { exception: err });
-          });
-      });
+      .tap(createUnBanEvent(room, currentUser, bannedUser.username));
   });
 });
+
+RoomWithPolicyService.prototype.unbanVirtualUserFromRoom = secureMethod(
+  [allowStaff, allowAdmin],
+  async function(virtualUser) {
+    assert(virtualUser);
+    validateVirtualUserType(virtualUser.type);
+    validateVirtualUserExternalId(virtualUser.externalId);
+
+    const currentUser = this.user;
+    const room = this.room;
+
+    await persistence.Troupe.update(
+      {
+        _id: mongoUtils.asObjectID(room._id)
+      },
+      {
+        $pull: {
+          bans: {
+            'virtualUser.type': virtualUser.type,
+            'virtualUser.externalId': virtualUser.externalId
+          }
+        }
+      }
+    ).exec();
+
+    await createUnBanEvent(room, currentUser, virtualUser.externalId);
+  }
+);
 
 /**
  * User join room
@@ -439,11 +522,49 @@ RoomWithPolicyService.prototype.autoConfigureHooks = secureMethod([allowAdmin], 
     });
 });
 
-function deleteMessageFromRoomEnsureRoomMatch(chatMessage) {
+// Can do message things like sending or editing a message
+async function canDoMessage(chatMessageOptions) {
+  // The `this.policy` that comes with `roomWithPolicyService` is from the bridging user (matrixbot, gitter-badger),
+  // and the policy is created before we know that the request body data is using a virtualUser we need to act against.
+  let policy = this.policy;
+  // If the message is coming from a virtualUser, we need to make a new policy
+  // based on that virtualUser to check if they can still do things.
+  if (chatMessageOptions && chatMessageOptions.virtualUser) {
+    policy = await policyFactory.createPolicyForVirtualUserInRoomId(
+      chatMessageOptions.virtualUser,
+      this.room._id
+    );
+  }
+
+  return policy.canWrite();
+}
+
+RoomWithPolicyService.prototype.sendMessage = secureMethod([canDoMessage], function(options) {
+  return chatService.newChatMessageToTroupe(this.room, this.user, options);
+});
+
+function ensureRoomMatchForMessageActions(chatMessage) {
   if (!chatMessage || !mongoUtils.objectIDsEqual(chatMessage.toTroupeId, this.room._id)) {
     throw new StatusError(404);
   }
 }
+
+function ensureSendersMatch(chatMessage) {
+  if (
+    !this.user ||
+    !chatMessage ||
+    !mongoUtils.objectIDsEqual(chatMessage.fromUserId, this.user._id)
+  ) {
+    throw new StatusError(403, 'You can only edit your own messages');
+  }
+}
+
+RoomWithPolicyService.prototype.editMessage = secureMethod(
+  [ensureRoomMatchForMessageActions, ensureSendersMatch, canDoMessage],
+  function(chatMessage, newText) {
+    return chatService.updateChatMessage(this.room, chatMessage, this.user, newText);
+  }
+);
 
 function deleteMessageFromRoomAllowSender(chatMessage) {
   if (!this.user || !chatMessage) return false;
@@ -454,7 +575,7 @@ function deleteMessageFromRoomAllowSender(chatMessage) {
  * Delete a message, if it's your own or you're a room admin
  */
 RoomWithPolicyService.prototype.deleteMessageFromRoom = secureMethod(
-  [deleteMessageFromRoomEnsureRoomMatch, allowAdmin, deleteMessageFromRoomAllowSender],
+  [ensureRoomMatchForMessageActions, allowAdmin, deleteMessageFromRoomAllowSender],
   function(chatMessage) {
     return chatService.deleteMessageFromRoom(this.room, chatMessage);
   }

@@ -26,6 +26,7 @@ const VirtualUserSchema = new Schema({
   }
 });
 VirtualUserSchema.schemaTypeName = 'VirtualUserSchema';
+VirtualUserSchema.index({ type: 1, externalId: 1 }, { background: true });
 
 var ChatMessageSchema = new Schema({
   fromUserId: {

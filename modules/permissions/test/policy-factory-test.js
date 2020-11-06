@@ -277,6 +277,58 @@ describe('policy-factory', function() {
       });
     });
 
+    describe('createPolicyForVirtualUserInRoomId', () => {
+      const virtualUserFixtures = fixtureLoader.setup({
+        userAdmin1: {},
+        troupe1: {},
+        troupeWithBannedUsers1: {
+          bans: [
+            {
+              virtualUser: {
+                type: 'matrix',
+                externalId: 'banned-user:matrix.org'
+              },
+              dateBanned: Date.now(),
+              bannedBy: 'userAdmin1'
+            }
+          ]
+        }
+      });
+
+      // This is just the opposite test case so we can ensure the bans
+      // in the next test actually work. The comprehensive tests for
+      // this policy are in `virtual-user-policy-evaluator-test.js`
+      it('policy dummy test', async () => {
+        const virtualUser = {
+          type: 'matrix',
+          externalId: 'some-user:matrix.org'
+        };
+
+        const policy = await policyFactory.createPolicyForVirtualUserInRoomId(
+          virtualUser,
+          virtualUserFixtures.troupe1
+        );
+
+        const canWriteResult = await policy.canWrite();
+        assert.strictEqual(canWriteResult, true);
+      });
+
+      it('includes bans on security descriptor', async () => {
+        const virtualUser = {
+          type: 'matrix',
+          externalId: 'banned-user:matrix.org'
+        };
+
+        const policy = await policyFactory.createPolicyForVirtualUserInRoomId(
+          virtualUser,
+          virtualUserFixtures.troupeWithBannedUsers1
+        );
+
+        const canWriteResult = await policy.canWrite();
+        assert.strictEqual(canWriteResult, false);
+      });
+    });
+
     // TODO
     //createPolicyForGroupIdWithUserLoader
     //getPreCreationPolicyEvaluator

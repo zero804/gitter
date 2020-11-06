@@ -144,6 +144,7 @@ function createTroupe(fixtureName, f, fixture) {
     githubType: githubType,
     dateDeleted: f.dateDeleted,
     userCount: (f.users && f.users.length) || f.userCount,
+    bans: f.bans,
     tags: f.tags,
     providers: f.providers
   };
@@ -195,6 +196,19 @@ function createTroupes(expected, fixture) {
           expectedSecurityDescriptor.extraAdmins.map(function(user) {
             return fixture[user]._id;
           });
+      }
+
+      const expectedBans = expectedTroupe && expectedTroupe.bans;
+      if (expectedBans) {
+        expectedBans.map(ban => {
+          if (ban.user) {
+            ban.userId = fixture[ban.user]._id;
+          }
+
+          ban.bannedBy = fixture[ban.bannedBy]._id;
+
+          return ban;
+        });
       }
 
       return createTroupe(key, expectedTroupe, fixture).then(function(troupe) {

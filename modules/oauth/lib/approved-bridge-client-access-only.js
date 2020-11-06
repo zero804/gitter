@@ -4,6 +4,7 @@ var env = require('gitter-web-env');
 var logger = env.logger;
 var stats = env.stats;
 var config = env.config;
+const { validateVirtualUserType } = require('gitter-web-users/lib/virtual-user-service');
 
 // OAuth client key to virtual user type map
 const approvedClientKeyMap = config.get('bridge:approvedClientKeyMap') || {};
@@ -45,6 +46,8 @@ function logAccessDenied(user, client, originalUrl) {
 }
 
 function isRequestFromApprovedBridgeClient(req, virtualUser) {
+  validateVirtualUserType(virtualUser.type);
+
   if (!isApprovedBridgeClientForVirtualUserType(req, virtualUser.type)) {
     logAccessDenied(req.user, req.client, req.originalUrl);
     return false;
