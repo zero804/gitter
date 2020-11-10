@@ -73,10 +73,13 @@ davisable.sh
 scripts/graphs/membership.csv
 scripts/graphs/one-to-ones.csv
 scripts/graphs/rooms.csv
-data
+/data/
 scripts/graphs/users.csv
 scripts/utils/output.txt
 scripts/utils/run.txt
+scripts/docker/matrix/synapse/data/media_store/
+scripts/docker/matrix/synapse/data/gitter-matrix-as-registration.yaml
+scripts/docker/matrix/synapse/data/homeserver.db
 hostaliases
 config/redis-docker
 config/mongo-docker
