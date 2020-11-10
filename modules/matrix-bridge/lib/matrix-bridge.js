@@ -30,19 +30,22 @@ const registrationConfig = AppServiceRegistration.fromObject({
     users: [
       {
         exclusive: true,
+        // Reserve these MXID's (usernames)
         regex: `@.*-[0-9a-f]+:${serverName}`
       }
     ],
     aliases: [
       {
         exclusive: true,
-        regex: '#.*:gitter.im'
+        // Reserve these room aliases
+        regex: `#.*:${serverName}`
       }
     ],
     rooms: [
       {
         exclusive: true,
-        // We only want the bridge to be able to create rooms
+        // This regex is used to define which rooms we listen to with the bridge.
+        // This does not reserve the rooms like the other namespaces.
         regex: '.*'
       }
     ]
