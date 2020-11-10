@@ -1,3 +1,8 @@
+# 21.3.0 - *upcoming*
+
+ - Introduce `matrix-appservice-bridge` (Matrix application service), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2041
+
+
 # 21.2.0 - 2020-10-26 - Virtual Users
 
  - Add support for `virtualUsers` (Matrix), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2027
