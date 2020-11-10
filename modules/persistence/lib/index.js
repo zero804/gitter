@@ -89,7 +89,12 @@ var schemas = {
   TroupeRemovedUser: require('./schemas/troupe-removed-user-schema'),
   TroupeInvite: require('./schemas/troupe-invite-schema'),
   KnownExternalAccess: require('./schemas/known-external-access-schema'),
-  Fingerprint: require('./schemas/fingerprint-schema')
+  Fingerprint: require('./schemas/fingerprint-schema'),
+
+  // Matrix bridge schemas
+  MatrixBridgedRoom: require('./schemas/matrix-bridged-room-schema'),
+  MatrixBridgedUser: require('./schemas/matrix-bridged-user-schema'),
+  MatrixBridgedChatMessage: require('./schemas/matrix-bridged-chat-message-schema')
 };
 
 module.exports = createExports(schemas);

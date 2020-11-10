@@ -10,7 +10,7 @@ function checkForMatrixUsername(username) {
 // This is used for lookUps when chat messages are serialized
 // Just trying to make things compatible with the old `message.fromUser` world
 function getMockIdFromVirtualUser(virtualUser) {
-  return `${virtualUser.type}->${virtualUser.externalId}`;
+  return `${virtualUser.type}-${virtualUser.externalId}`;
 }
 
 // Because we have other apps that we don't want to update to support virtualUsers directly

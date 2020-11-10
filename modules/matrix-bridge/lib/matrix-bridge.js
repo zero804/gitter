@@ -78,8 +78,8 @@ const matrixBridge = new Bridge({
   controller: {
     onEvent: async (request /*, context*/) => {
       try {
-        const event = request.getData();
-        eventHandler.onEvent(event);
+        const data = request.getData();
+        eventHandler.onEventData(data);
         stats.eventHF('matrix-bridge.event.success');
       } catch (err) {
         logger.error('Error occured while processing Matrix bridge event', err);
