@@ -1,6 +1,9 @@
 # 21.3.0 - *upcoming*
 
+Developer facing:
+
  - Introduce `matrix-appservice-bridge` (Matrix application service), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2041
+ - Fix failing CI pipelines from Security jobs (`sast`, `dependency_scanning`), https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/2044
 
 
 # 21.2.0 - 2020-10-26 - Virtual Users
