@@ -449,10 +449,7 @@ include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
 dependency_scanning:
-  extends: .use-docker-in-docker
   stage: security
-  rules:
-    - when: always
   variables:
     DS_PYTHON_VERSION: 2
 
@@ -467,12 +464,10 @@ container_scanning:
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
 sast:
-  extends: .use-docker-in-docker
   stage: security
-  rules:
-    - when: always
   variables:
     SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
+    SEARCH_MAX_DEPTH: 4
 
 dast:
   stage: security
