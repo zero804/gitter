@@ -52,7 +52,6 @@
       "homeserverUrl": "https://gitter.ems.host",
       "serverName": "gitter.im",
       "applicationServiceUrl": "https://matrix.gitter.im",
-      "applicationServicePort": 9000,
       "senderLocalpart": "matrixbot"
     }
   },
