@@ -13,7 +13,7 @@ const assert = require('assert');
 async function regeneratePassportSession(req) {
   const passportSession = req.session.passport;
   // parameter used for returning to URL user visited before authentication
-  // used for OAuth login flow (https://gitlab.com/gitlab-org/gitter/webapp/issues/2283)
+  // used for OAuth login flow (https://gitlab.com/gitterHQ/webapp/issues/2283)
   const { returnTo } = req.session;
   return new Promise((resolve, reject) =>
     req.session.regenerate(function(err) {

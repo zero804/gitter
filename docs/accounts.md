@@ -9,7 +9,7 @@ If you updated some info on GitLab/GitHub/Twitter, sign out of Gitter and sign b
 
 There isn't a way to merge accounts.
 
-We will probably introduce this capability after we add the [ability to set your own username](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1851). You can track [this issue](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1752) for linking different accounts together.
+We will probably introduce this capability after we add the [ability to set your own username](https://gitlab.com/gitterHQ/webapp/-/issues/1851). You can track [this issue](https://gitlab.com/gitterHQ/webapp/-/issues/1752) for linking different accounts together.
 
 
 ## Can I change my username?
@@ -26,14 +26,14 @@ See above, you can't change your username.
 We add the `_gitlab`/`_twitter` suffix to avoid name collisions with GitHub.
 If you don't want the suffix added, sign in with GitHub.
 
-You can track [#1851](https://gitlab.com/gitlab-org/gitter/webapp/issues/1851)
+You can track [#1851](https://gitlab.com/gitterHQ/webapp/issues/1851)
 for the ability to customize your username in the future and remove the suffix.
 
 ## How do I update my avatar?
 
 Sign out of Gitter and sign back in to update your avatar (or any other info).
 
-Currently, there is an outstanding bug where this doesn't work with GitLab/Twitter accounts, https://gitlab.com/gitlab-org/gitter/webapp/issues/1834
+Currently, there is an outstanding bug where this doesn't work with GitLab/Twitter accounts, https://gitlab.com/gitterHQ/webapp/issues/1834
 
 
 ## How do I export my data?

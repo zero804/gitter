@@ -247,7 +247,7 @@ describe('ensure-access-and-fetch-descriptor #slow', function() {
       assert.rejects(
         ensureAccessAndFetchDescriptor(fixture.userGitlab1, {
           type: 'GL_PROJECT',
-          linkPath: 'gitlab-org/gitter/webapp',
+          linkPath: 'gitterHQ/webapp',
           security: 'PUBLIC'
         }),
         err => {

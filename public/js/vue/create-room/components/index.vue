@@ -53,14 +53,12 @@ export default {
 
       <section class="modal--default__content">
         <p class="create-room-intro-text">
-          <a
-            href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/rooms.md"
-            target="_blank"
+          <a href="https://gitlab.com/gitterHQ/webapp/-/blob/develop/docs/rooms.md" target="_blank"
             >Gitter rooms</a
           >
           exist inside of
           <a
-            href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/communities.md"
+            href="https://gitlab.com/gitterHQ/webapp/-/blob/develop/docs/communities.md"
             target="_blank"
             >communities</a
           >. For example, if you want to end up with the URI:

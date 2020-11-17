@@ -103,7 +103,7 @@ function install() {
   if (isDev && !githubOAuthConfigured) {
     logger.warn(
       'Your OAuthSecrets are not set. Skipping OAuth setup for local development.',
-      'Follow readme instructions to set your OAuth https://gitlab.com/gitlab-org/gitter/webapp#configure-oauth-and-service-secrets'
+      'Follow readme instructions to set your OAuth https://gitlab.com/gitterHQ/webapp#configure-oauth-and-service-secrets'
     );
     return;
   }

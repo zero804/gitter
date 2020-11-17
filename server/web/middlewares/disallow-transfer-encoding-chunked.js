@@ -2,7 +2,7 @@
 
 const StatusError = require('statuserror');
 
-// For more context, see https://gitlab.com/gitlab-org/gitter/webapp/issues/2291#filtering-out-requests-with-transfer-encoding-chunked-and-content-length
+// For more context, see https://gitlab.com/gitterHQ/webapp/issues/2291#filtering-out-requests-with-transfer-encoding-chunked-and-content-length
 module.exports = function(req, res, next) {
   if (req.headers['transfer-encoding'] === 'chunked') {
     return next(

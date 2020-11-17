@@ -24,7 +24,7 @@ services:
       ]
 
   mongo1:
-    image: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+    image: registry.gitlab.com/gitterhq/webapp/mongo:latest
     restart: always
     volumes:
       - gitter-mongodb:/data/db2
@@ -48,7 +48,7 @@ services:
   # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
   # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
   elasticsearch:
-    image: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+    image: registry.gitlab.com/gitterhq/webapp/elasticsearch:latest
     ports:
       - '9200:9200'
       - '9300:9300'
