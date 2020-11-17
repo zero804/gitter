@@ -74,7 +74,7 @@ class MatrixUtils {
         name: `${room.uri}`,
         //invite: recipients,
         visibility: 'public',
-        room_alias: gitterRoomId,
+        room_alias_name: gitterRoomId,
         preset: 'public_chat'
         //initial_state: extraContent
       }
