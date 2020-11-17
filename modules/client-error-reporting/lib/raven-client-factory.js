@@ -48,7 +48,7 @@ function ravenClientFactory(options) {
       // Halley spam, see https://github.com/troupe/gitter-webapp/issues/1056
       'TransportError',
       'BayeuxError',
-      // Elasticsearch, see https://gitlab.com/gitlab-org/gitter/webapp/issues/1950
+      // Elasticsearch, see https://gitlab.com/gitterHQ/webapp/issues/1950
       'NoConnections',
       // Random plugins/extensions
       'top.GLOBALS',

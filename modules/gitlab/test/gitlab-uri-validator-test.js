@@ -70,7 +70,7 @@ describe('gitlab-uri-validator #slow #gitlab', function() {
       };
     };
 
-    const gitlabInfo = await validateGitlabUri(fixture.user1, 'gitlab-org/gitter/webapp');
+    const gitlabInfo = await validateGitlabUri(fixture.user1, 'gitterHQ/webapp');
     assert(gitlabInfo);
     assert.strictEqual(gitlabInfo.type, 'PROJECT');
     assert.strictEqual(gitlabInfo.uri, 'gitter-integration-tests-group/public-project1');

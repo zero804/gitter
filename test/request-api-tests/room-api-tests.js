@@ -187,7 +187,7 @@ describe('room-api', function() {
   });
 
   it("POST /v1/rooms/:roomId/invites with a user doesn't leak email", function() {
-    // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+    // See https://gitlab.com/gitterHQ/webapp/issues/2153
     // This test is under a conditional instead of skipped
     // so we don't accidentaly forget to unskip it in the future
     if (!config.get('email:limitInviteEmails')) {

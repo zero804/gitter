@@ -91,7 +91,7 @@ Send a message to support@gitter.im with the following info. Make sure to email 
  - New desired public/private security or repo/org association
  - Some context behind the change
 
-You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/676 for progress on this issue.
+You can track https://gitlab.com/gitterHQ/webapp/issues/676 for progress on this issue.
 
 
 

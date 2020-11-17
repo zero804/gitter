@@ -41,7 +41,7 @@ describe('gl-project-policy-evaluator #slow #gitlab', function() {
   });
 
   it('non-project members should not have access ', function() {
-    return expect(fixture.userGitlab1, 'gitlab-org/gitter/webapp', {
+    return expect(fixture.userGitlab1, 'gitterHQ/webapp', {
       canRead: false,
       canWrite: false,
       canJoin: false,

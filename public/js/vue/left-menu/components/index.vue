@@ -68,7 +68,7 @@ export default {
     isPinned: function() {
       // Hack for Safari so the absolutely positioned room list goes in and out
       // of the document flow properly. Otherwise it was leaving a big blank space
-      // Context: https://gitlab.com/gitlab-org/gitter/webapp/issues/2226
+      // Context: https://gitlab.com/gitterHQ/webapp/issues/2226
       //
       // Force a layout
       // https://gist.github.com/paulirish/5d52fb081b3570c81e3a

@@ -44,7 +44,7 @@ function getBranch() {
 }
 
 function getGitlabLink() {
-  if (commit) return 'https://gitlab.com/gitlab-org/gitter/webapp/commit/' + commit;
+  if (commit) return 'https://gitlab.com/gitterHQ/webapp/commit/' + commit;
 
   return '';
 }

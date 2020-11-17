@@ -38,7 +38,7 @@ Follow these instructions to setup an environment to hack on Gitter.
     * If you are on Windows, you can use [nvm-windows](https://github.com/coreybutler/nvm-windows)
  1. Install **npm 6.x**
     * Node **10.x** already comes with **npm 6.x**. Otherwise, you can install manually with `npm install npm@^6.x -g`
- 1. Clone this repo: `git clone https://gitlab.com/gitlab-org/gitter/webapp.git`
+ 1. Clone this repo: `git clone https://gitlab.com/gitterHQ/webapp.git`
  1. Run `npm install`
     * Go and make a cup of tea, because this will take a rather long time.
 
@@ -81,7 +81,7 @@ The simplest way to run Gitter `webapp` is to start it without [OAuth configurat
 
 *Warning: When you delete the containers (by running `docker-compose down` or `docker-compose up` without `--no-recreate`) you'll have to generate new seed data.*
 
-*If you are interested in improving this process, please visit https://gitlab.com/gitlab-org/gitter/webapp/issues/2463*
+*If you are interested in improving this process, please visit https://gitlab.com/gitterHQ/webapp/issues/2463*
 
 ### Configure OAuth and service secrets
 
@@ -93,7 +93,7 @@ Gitter connects to third party APIs. In order to do this, you will need to gener
 
 You only need to collect the secrets once. But you need to export the environment variables in any new terminal session.
 
-In the future, we hope to streamline this process and skip OAuth providers. You can track https://gitlab.com/gitlab-org/gitter/webapp/issues/1973
+In the future, we hope to streamline this process and skip OAuth providers. You can track https://gitlab.com/gitterHQ/webapp/issues/1973
 
 #### Mac
 
@@ -212,7 +212,7 @@ docker-compose rm -f
 
 ### Going further
 
-We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/code-overview.md)
+We also have some other docs which give a [overview/walkthrough of the codebase](https://gitlab.com/gitterHQ/webapp/blob/develop/docs/code-overview.md)
 and [some notes on touching production](https://gitlab.com/gl-infra/gitter-infrastructure/blob/master/README.md).
 
 
@@ -240,7 +240,7 @@ Just add all of the variables from your `.env` file to your forked projects [**S
 
 After adding the variables, just retry the pipeline.
 
-You can look at the [issues labeled with ~"test"](https://gitlab.com/gitlab-org/gitter/webapp/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=test) for any known problems.
+You can look at the [issues labeled with ~"test"](https://gitlab.com/gitterHQ/webapp/issues?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=test) for any known problems.
 
 
 ### Testing

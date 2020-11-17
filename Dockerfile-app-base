@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/gitlab-org/gitter/webapp:latest
+FROM registry.gitlab.com/gitterhq/webapp:latest
 
 WORKDIR /app
 

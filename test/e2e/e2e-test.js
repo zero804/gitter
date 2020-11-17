@@ -228,9 +228,9 @@ describe('e2e tests', function() {
       cy.url().should('eq', urlJoin(gitterBaseUrl, '/'));
     });
 
-    // This test is very flaky thanks to https://gitlab.com/gitlab-org/gitter/webapp/issues/2276
+    // This test is very flaky thanks to https://gitlab.com/gitterHQ/webapp/issues/2276
     // So it is disabled for now.
-    // FIXME: enable the test when https://gitlab.com/gitlab-org/gitter/webapp/issues/2276 is fixed
+    // FIXME: enable the test when https://gitlab.com/gitterHQ/webapp/issues/2276 is fixed
     xit('permalinks in main message feed and thread message feed', () => {
       cy.visitAndEnsureUser(
         urlJoin(gitterBaseUrl, fixtures.troupe1.lcUri, `?at=${fixtures.message2._id}`),

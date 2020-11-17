@@ -5,7 +5,7 @@ These are scripts that can help you answer questions like "What's this user's ey
 
 ## :wrench: Before you can run a script :wrench:
 1. [SSH into a box](https://gitlab.com/gl-infra/gitter-infrastructure#ssh-to-boxes) if you are running the script in beta or prod
-1. [Setup secrets](https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets)
+1. [Setup secrets](https://gitlab.com/gitterHQ/webapp#configure-service-secrets)
 1.  **IMPORTANT:** Adjust the `NODE_ENV=prod` environment variable to the desired environment, `prod`, `beta`, `dev`
 
 

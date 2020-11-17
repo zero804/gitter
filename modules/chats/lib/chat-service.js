@@ -616,7 +616,7 @@ async function findChatMessagesForTroupe(troupeId, options = {}) {
 
 // limiting the results to 1,500 messages because the page becomes unusable with larger number
 // in the future this limiting should be solved by archive pagination
-// https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2536
+// https://gitlab.com/gitterHQ/webapp/-/issues/2536
 const ARCHIVE_MESSAGE_LIMIT = 1500;
 
 function logWarningForLargeArchive(troupeId, startDate, endDate) {

@@ -338,12 +338,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/gitlab-org/gitter/webapp.git"
+    "url": "git+https://gitlab.com/gitterHQ/webapp.git"
   },
   "author": "Andrew Newdigate <andrew@gitlab.com> (http://about.me/andrewnewdigate)",
   "license": "MIT",
   "bugs": {
-    "url": "https://gitlab.com/gitlab-org/gitter/webapp/issues"
+    "url": "https://gitlab.com/gitterHQ/webapp/issues"
   },
-  "homepage": "https://gitlab.com/gitlab-org/gitter/webapp#readme"
+  "homepage": "https://gitlab.com/gitterHQ/webapp#readme"
 }
