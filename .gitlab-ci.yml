@@ -8,8 +8,8 @@ stages:
 variables:
   DOCKER_VERSION: '19.03.0'
   # We don't use the default CI_REGISTRY_IMAGE variable because the security release process on dev.gitlab.org needs to target the gitlab.com registry.
-  # https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1952#note_386372016
-  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitlab-org/gitter/webapp
+  # https://gitlab.com/gitterHQ/webapp/-/merge_requests/1952#note_386372016
+  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitterHQ/webapp
 
 ##############
 # Conditions #
@@ -37,9 +37,9 @@ variables:
 
 .if-not-canonical-project: &if-not-canonical-project
   # Allow for use on:
-  #  - https://gitlab.com/gitlab-org/gitter/webapp
+  #  - https://gitlab.com/gitterHQ/webapp
   #  - https://dev.gitlab.org/gitlab/gitter/webapp
-  if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp" && $CI_PROJECT_PATH != "gitlab/gitter/webapp"'
+  if: '$CI_PROJECT_PATH != "gitterHQ/webapp" && $CI_PROJECT_PATH != "gitlab/gitter/webapp"'
 
 .if-schedule: &if-schedule
   if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -214,7 +214,7 @@ package:
   stage: build_unit_test
   script:
     # While testing the deploment, you can use cached artifacts instead of packaging every time which is slow
-    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
+    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitterHQ/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
     - make package
   artifacts:
     paths:
@@ -437,7 +437,7 @@ renovate:
     #RENOVATE_GITHUB_TOKEN: xxx
     RENOVATE_CONFIG_FILE: renovate-config.js
   script:
-    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
+    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitterHQ/webapp
 #
 # Security reports
 # =========================================================
