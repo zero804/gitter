@@ -2,6 +2,7 @@
 
  - Pass virtualUser avatars through the content proxy (camoproxy), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2047
  - Bridge messages between Matrix and Gitter (initial iteration), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2042
+ - Fix `dataChange2` events not reaching Matrix bridge in production-like setup, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2054
 
 Developer facing:
 
