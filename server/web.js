@@ -13,7 +13,6 @@ var http = require('http');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
 const installBridge = require('gitter-web-matrix-bridge');
-const obfuscateToken = require('gitter-web-github').obfuscateToken;
 
 var app = express();
 
@@ -57,18 +56,6 @@ if (!process.env.DISABLE_API_WEB_LISTEN) {
 }
 
 // Install the Gitter <-> Matrix bridge
-const bridgePort = nconf.get('matrix:bridge:applicationServicePort');
-const bridgeId = nconf.get('matrix:bridge:id');
-const hsToken = nconf.get('matrix:bridge:hsToken');
-const asToken = nconf.get('matrix:bridge:asToken');
-if (bridgePort && bridgeId && hsToken && asToken) {
-  installBridge(bridgePort);
-} else {
-  winston.info(
-    `No (bridgePort=${bridgePort}, bridgeId=${bridgeId}, hsToken=${obfuscateToken(
-      hsToken
-    )}, asToken=${obfuscateToken(asToken)}) specified for Matrix bridge so we won't start it up`
-  );
-}
+installBridge();
 
 module.exports = server;
