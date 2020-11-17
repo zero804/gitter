@@ -1,5 +1,8 @@
 # 21.3.0 - *upcoming*
 
+ - Pass virtualUser avatars through the content proxy (camoproxy), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2047
+ - Bridge messages between Matrix and Gitter (initial iteration), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2042
+
 Developer facing:
 
  - Introduce `matrix-appservice-bridge` (Matrix application service), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2041
