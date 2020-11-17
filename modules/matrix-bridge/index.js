@@ -8,7 +8,7 @@ const obfuscateToken = require('gitter-web-github').obfuscateToken;
 const matrixBridge = require('./lib/matrix-bridge');
 const GitterBridge = require('./lib/gitter-bridge');
 
-const bridgePort = config.get('matrix:bridge:bridgePort');
+const bridgePort = config.get('matrix:bridge:applicationServicePort');
 const hsToken = config.get('matrix:bridge:hsToken');
 const asToken = config.get('matrix:bridge:asToken');
 
