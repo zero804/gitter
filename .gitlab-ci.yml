@@ -9,7 +9,7 @@ variables:
   DOCKER_VERSION: '19.03.0'
   # We don't use the default CI_REGISTRY_IMAGE variable because the security release process on dev.gitlab.org needs to target the gitlab.com registry.
   # https://gitlab.com/gitterHQ/webapp/-/merge_requests/1952#note_386372016
-  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitterHQ/webapp
+  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitterhq/webapp
 
 ##############
 # Conditions #
