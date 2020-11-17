@@ -12,6 +12,7 @@ const {
   getMockIdFromVirtualUser,
   transformVirtualUserIntoMockedFromUser
 } = require('gitter-web-users/lib/virtual-user-service');
+const generateProxyUrl = require('gitter-web-text-processor/lib/generate-proxy-url');
 
 function formatDate(d) {
   return d ? d.toISOString() : null;
@@ -191,6 +192,8 @@ function ChatStrategy({
         externalId: item.virtualUser.externalId,
         displayName: item.virtualUser.displayName,
         avatarUrl: item.virtualUser.avatarUrl
+          ? generateProxyUrl(item.virtualUser.avatarUrl)
+          : undefined
       };
 
       // Mock the fromUser at a basic level for legacy apps (Android and iOS)

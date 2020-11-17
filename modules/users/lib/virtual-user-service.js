@@ -1,6 +1,7 @@
 'use strict';
 
 const StatusError = require('statuserror');
+const generateProxyUrl = require('gitter-web-text-processor/lib/generate-proxy-url');
 
 // We assume any username with a colon `:` in it, is a virtualUser from Matrix
 function checkForMatrixUsername(username) {
@@ -17,13 +18,18 @@ function getMockIdFromVirtualUser(virtualUser) {
 // (like the iOS/Android apps),
 // we want to just mock/stub `message.fromUser` so everything continues to look and function normally
 function transformVirtualUserIntoMockedFromUser(virtualUser) {
+  let proxiedAvatarUrl;
+  if (virtualUser.avatarUrl) {
+    proxiedAvatarUrl = generateProxyUrl(virtualUser.avatarUrl);
+  }
+
   return {
     id: getMockIdFromVirtualUser(virtualUser),
     username: virtualUser.externalId,
     displayName: virtualUser.displayName,
-    avatarUrl: virtualUser.avatarUrl,
-    avatarUrlSmall: virtualUser.avatarUrl,
-    avatarUrlMedium: virtualUser.avatarUrl
+    avatarUrl: proxiedAvatarUrl,
+    avatarUrlSmall: proxiedAvatarUrl,
+    avatarUrlMedium: proxiedAvatarUrl
   };
 }
 
