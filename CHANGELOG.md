@@ -4,6 +4,7 @@
  - Bridge messages between Matrix and Gitter (initial iteration), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2042
  - Fix `dataChange2` events not reaching Matrix bridge in production-like setup, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2054
  - Use correct `room_alias_name` option when creating the room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2053
+ - Show virtualUser in unread email notifications, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2052
 
 Developer facing:
 
