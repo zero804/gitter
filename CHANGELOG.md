@@ -1,4 +1,4 @@
-# 21.3.0 - *upcoming*
+# 21.3.0 - 2020-11-18 - The beginning of the Matrix bridge
 
  - Pass virtualUser avatars through the content proxy (camoproxy), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2047
  - Bridge messages between Matrix and Gitter (initial iteration), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2042
