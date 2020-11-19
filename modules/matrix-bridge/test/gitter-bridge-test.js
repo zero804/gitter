@@ -185,6 +185,16 @@ describe('gitter-bridge', () => {
           troupe: 'troupe1',
           text: 'my gitter message'
         },
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my virtualUser message'
+        },
         messagePrivate1: {
           user: 'user1',
           troupe: 'troupePrivate1',
@@ -230,8 +240,8 @@ describe('gitter-bridge', () => {
         const strategy = new restSerializer.ChatStrategy();
         const serializedMessage = await restSerializer.serializeObject(fixture.message1, strategy);
 
-        // We purposely do not associate bridged message. We are testing that the
-        // edit is ignored if no association in the database.
+        // We purposely do not associate the bridged message. We are testing that the
+        // edit is ignored if there is no association in the database.
         //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
@@ -243,6 +253,27 @@ describe('gitter-bridge', () => {
         // Message edit is ignored if there isn't an associated bridge message
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
       });
+
+      it('message edit from virtualUser is suppressed (no echo back and forth)', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedVirtualUserMessage = await restSerializer.serializeObject(
+          fixture.messageFromVirtualUser1,
+          strategy
+        );
+
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'update',
+          model: serializedVirtualUserMessage
+        });
+
+        // No message sent
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
+
       it('private room is not bridged', async () => {
         const strategy = new restSerializer.ChatStrategy();
         const serializedMessage = await restSerializer.serializeObject(
