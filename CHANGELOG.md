@@ -6,6 +6,7 @@
  - Use correct `room_alias_name` option when creating the room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2053
  - Show virtualUser in unread email notifications, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2052
  - Add support for Gitter message edits to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2056
+ - Only bridge public rooms to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2059
 
 Developer facing:
 
