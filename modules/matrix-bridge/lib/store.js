@@ -33,6 +33,15 @@ async function getMatrixUserIdByGitterUserId(gitterUserId) {
   }
 }
 
+async function getMatrixEventIdByGitterMessageId(gitterMessageId) {
+  const bridgedMessageEntry = await persistence.MatrixBridgedChatMessage.findOne({
+    gitterMessageId
+  }).exec();
+  if (bridgedMessageEntry) {
+    return bridgedMessageEntry.matrixEventId;
+  }
+}
+
 async function storeBridgedRoom(gitterRoomId, matrixRoomId) {
   return persistence.MatrixBridgedRoom.create({
     troupeId: gitterRoomId,
@@ -65,5 +74,6 @@ module.exports = {
   storeBridgedUser,
 
   // Messages
+  getMatrixEventIdByGitterMessageId,
   storeBridgedMessage
 };

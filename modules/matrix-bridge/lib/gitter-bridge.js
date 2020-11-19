@@ -1,11 +1,14 @@
 'use strict';
 
+const debug = require('debug')('gitter:app:matrix-bridge:gitter-bridge');
 const assert = require('assert');
 const StatusError = require('statuserror');
 const appEvents = require('gitter-web-appevents');
 const env = require('gitter-web-env');
 const logger = env.logger;
 const config = env.config;
+const stats = env.stats;
+const errorReporter = env.errorReporter;
 
 const store = require('./store');
 const MatrixUtils = require('./matrix-utils');
@@ -41,31 +44,44 @@ class GitterBridge {
   }
 
   async onDataChange(data) {
-    // Ignore data without a URL or model
-    if (!data.url || !data.model) {
-      throw new StatusError(
-        400,
-        'Gitter data from onDataChange2(data) did not include URL or model'
+    try {
+      debug('onDataChange', data);
+      // Ignore data without a URL or model
+      if (!data.url || !data.model) {
+        throw new StatusError(
+          400,
+          'Gitter data from onDataChange2(data) did not include URL or model'
+        );
+      }
+
+      const [, gitterRoomId] = data.url.match(/\/rooms\/([a-f0-9]+)\/chatMessages/) || [];
+      if (gitterRoomId && data.operation === 'create') {
+        return this.handleChatMessageCreateEvent(gitterRoomId, data.model);
+      } else if (gitterRoomId && data.operation === 'update') {
+        return this.handleChatMessageEditEvent(gitterRoomId, data.model);
+      }
+
+      // TODO: Handle user data change and update Matrix user
+    } catch (err) {
+      logger.error(err);
+      errorReporter(
+        err,
+        { operation: 'gitterBridge.onDataChange', data: data },
+        { module: 'gitter-to-matrix-bridge' }
       );
     }
 
-    const [, gitterRoomId] = data.url.match(/\/rooms\/([a-f0-9]+)\/chatMessages/) || [];
-    if (gitterRoomId && data.operation === 'create') {
-      await this.handleChatMessageCreateEvent(gitterRoomId, data.model);
-    }
-    // TODO: Handle message edit
-
-    // TODO: Handle user data change and update Matrix user
+    return null;
   }
 
   async handleChatMessageCreateEvent(gitterRoomId, model) {
     if (!isRoomAllowedToBridge(gitterRoomId)) {
-      return;
+      return null;
     }
 
     // Supress any echo that comes from Matrix bridge itself creating new messages
     if (model.virtualUser && model.virtualUser.type === 'matrix') {
-      return;
+      return null;
     }
 
     const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
@@ -80,16 +96,62 @@ class GitterBridge {
       `Sending message to Matrix room (Gitter gitterRoomId=${gitterRoomId} -> Matrix gitterRoomId=${matrixRoomId}) (via user mxid=${matrixId})`
     );
     const intent = this.matrixBridge.getIntent(matrixId);
-    const content = {
+    const matrixContent = {
       body: model.text,
       format: 'org.matrix.custom.html',
       formatted_body: model.html,
       msgtype: 'm.text'
     };
-    const { event_id } = await intent.sendMessage(matrixRoomId, content);
+    const { event_id } = await intent.sendMessage(matrixRoomId, matrixContent);
 
     // Store the message so we can reference it in edits and threads/replies
     await store.storeBridgedMessage(model.id, event_id);
+
+    return null;
+  }
+
+  async handleChatMessageEditEvent(gitterRoomId, model) {
+    if (!isRoomAllowedToBridge(gitterRoomId)) {
+      return null;
+    }
+
+    const matrixEventId = await store.getMatrixEventIdByGitterMessageId(model.id);
+
+    // No matching message on the Matrix side. Let's just ignore the edit as this is some edge case.
+    if (!matrixEventId) {
+      debug(
+        `Ignoring message edit for id=${model.id} from Gitter because there is no associated Matrix event ID`
+      );
+      stats.event('matrix_bridge.missing_matrix_event_id_for_message_edit', {
+        gitterMessageId: model.id
+      });
+      return null;
+    }
+
+    const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
+
+    const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
+    const intent = this.matrixBridge.getIntent(matrixId);
+
+    const matrixContent = {
+      body: `* ${model.text}`,
+      format: 'org.matrix.custom.html',
+      formatted_body: `* ${model.html}`,
+      msgtype: 'm.text',
+      'm.new_content': {
+        body: model.text,
+        format: 'org.matrix.custom.html',
+        formatted_body: model.html,
+        msgtype: 'm.text'
+      },
+      'm.relates_to': {
+        event_id: matrixEventId,
+        rel_type: 'm.replace'
+      }
+    };
+    await intent.sendMessage(matrixRoomId, matrixContent);
+
+    return null;
   }
 }
 

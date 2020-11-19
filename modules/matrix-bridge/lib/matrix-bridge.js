@@ -85,6 +85,8 @@ const matrixBridge = new Bridge({
         logger.error('Error occured while processing Matrix bridge event', err);
         stats.eventHF('matrix-bridge.event.fail');
       }
+
+      return null;
     }
   }
 });
