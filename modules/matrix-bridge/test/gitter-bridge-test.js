@@ -36,6 +36,14 @@ describe('gitter-bridge', () => {
         user1: {},
         userBridge1: {},
         troupe1: {},
+        troupePrivate1: {
+          users: ['user1'],
+          securityDescriptor: {
+            members: 'INVITE',
+            admins: 'MANUAL',
+            public: false
+          }
+        },
         message1: {
           user: 'user1',
           troupe: 'troupe1',
@@ -55,6 +63,11 @@ describe('gitter-bridge', () => {
           },
           troupe: 'troupe1',
           text: 'my virtualUser message'
+        },
+        messagePrivate1: {
+          user: 'user1',
+          troupe: 'troupePrivate1',
+          text: 'my private gitter message'
         }
       });
 
@@ -133,6 +146,25 @@ describe('gitter-bridge', () => {
         // No message sent
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
       });
+
+      it('private room is not bridged', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedMessage = await restSerializer.serializeObject(
+          fixture.messagePrivate1,
+          strategy
+        );
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
+          operation: 'create',
+          model: serializedMessage
+        });
+
+        // No room creation
+        assert.strictEqual(matrixBridge.getIntent().createRoom.callCount, 0);
+        // No message sent
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
     });
 
     describe('handleChatMessageEditEvent', () => {
@@ -140,10 +172,23 @@ describe('gitter-bridge', () => {
         user1: {},
         userBridge1: {},
         troupe1: {},
+        troupePrivate1: {
+          users: ['user1'],
+          securityDescriptor: {
+            members: 'INVITE',
+            admins: 'MANUAL',
+            public: false
+          }
+        },
         message1: {
           user: 'user1',
           troupe: 'troupe1',
           text: 'my gitter message'
+        },
+        messagePrivate1: {
+          user: 'user1',
+          troupe: 'troupePrivate1',
+          text: 'my private gitter message'
         }
       });
 
@@ -196,6 +241,25 @@ describe('gitter-bridge', () => {
         });
 
         // Message edit is ignored if there isn't an associated bridge message
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
+      it('private room is not bridged', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedMessage = await restSerializer.serializeObject(
+          fixture.messagePrivate1,
+          strategy
+        );
+
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.messagePrivate1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
+          operation: 'update',
+          model: serializedMessage
+        });
+
+        // No message sent
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
       });
     });
