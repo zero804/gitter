@@ -68,6 +68,8 @@ class GitterBridge {
         return this.handleChatMessageCreateEvent(gitterRoomId, data.model);
       } else if (gitterRoomId && data.operation === 'update') {
         return this.handleChatMessageEditEvent(gitterRoomId, data.model);
+      } else if (gitterRoomId && data.operation === 'remove') {
+        return await this.handleChatMessageRemoveEvent(gitterRoomId, data.model);
       }
 
       // TODO: Handle user data change and update Matrix user
@@ -166,6 +168,50 @@ class GitterBridge {
       }
     };
     await intent.sendMessage(matrixRoomId, matrixContent);
+
+    return null;
+  }
+
+  async handleChatMessageRemoveEvent(gitterRoomId, model) {
+    const allowedToBridge = await isRoomAllowedToBridge(gitterRoomId);
+    if (!allowedToBridge) {
+      return null;
+    }
+
+    // Supress any echo that comes from Matrix bridge itself creating new messages
+    if (model.virtualUser && model.virtualUser.type === 'matrix') {
+      return null;
+    }
+
+    const matrixEventId = await store.getMatrixEventIdByGitterMessageId(model.id);
+
+    // No matching message on the Matrix side. Let's just ignore the remove as this is some edge case.
+    if (!matrixEventId) {
+      debug(
+        `Ignoring message removal for id=${model.id} from Gitter because there is no associated Matrix event ID`
+      );
+      stats.event('matrix_bridge.ignored_gitter_message_remove', {
+        gitterMessageId: model.id
+      });
+      return null;
+    }
+
+    const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
+
+    const intent = this.matrixBridge.getIntent();
+    let senderIntent;
+    try {
+      const event = await intent.getEvent(matrixRoomId, matrixEventId);
+      senderIntent = this.matrixBridge.getIntent(event.sender);
+    } catch (err) {
+      logger.info(
+        `handleChatMessageRemoveEvent(): Using bridging user intent because Matrix API call failed, intent.getEvent(${matrixRoomId}, ${matrixEventId})`
+      );
+      // We'll just use the bridge intent if we can't use their own user
+      senderIntent = intent;
+    }
+
+    await senderIntent.getClient().redactEvent(matrixRoomId, matrixEventId);
 
     return null;
   }
