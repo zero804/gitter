@@ -68,7 +68,7 @@ describe('security-descriptor-write-validator', function() {
     const sd = {
       type: 'GL_PROJECT',
       externalId: '3601513',
-      linkPath: 'gitlab-org/gitter/webapp',
+      linkPath: 'gitterHQ/webapp',
       public: true,
       admins: 'GL_PROJECT_MAINTAINER',
       members: 'PUBLIC'

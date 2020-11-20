@@ -3,7 +3,7 @@
 
   "platform": "gitlab",
   "endpoint": "https://gitlab.com/api/v4/",
-  "repositories": ["gitlab-org/gitter/webapp"],
+  "repositories": ["gitterHQ/webapp"],
 
   "logLevel": "info",
 

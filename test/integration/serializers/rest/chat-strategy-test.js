@@ -182,7 +182,7 @@ describe('chat-strategy-test', function() {
     // screw up our assumptions on the frontend and keep messages from being marked
     // as read because they already appear to be marked as read.
     //
-    // Full context: https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1871
+    // Full context: https://gitlab.com/gitterHQ/webapp/-/merge_requests/1871
     it(`when currentUserId is undefined, don't default the unread value to true/false (leads to frontend state mismatch problems)`, async () => {
       const strategy = new ChatStrategy({
         currentUserId: undefined,

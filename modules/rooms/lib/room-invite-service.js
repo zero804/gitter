@@ -102,7 +102,7 @@ async function createInvite(room, invitingUser, options) {
       };
     });
   } else {
-    // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+    // See https://gitlab.com/gitterHQ/webapp/issues/2153
     if (config.get('email:limitInviteEmails')) {
       const count = await roomInviteRateLimiter(invitingUser.id, ROOM_INVITE_RATE_LIMIT_EXPIRY);
       if (count > ROOM_INVITE_RATE_LIMIT_THRESHOLD) {

@@ -22,7 +22,7 @@ switch (nconf.get('NODE_ENV')) {
     break;
   case 'dev':
     stagingText = 'DEV';
-    stagingLink = 'https://gitlab.com/gitlab-org/gitter/webapp';
+    stagingLink = 'https://gitlab.com/gitterHQ/webapp';
     break;
 }
 

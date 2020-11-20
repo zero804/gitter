@@ -76,7 +76,7 @@ export default {
             If you are missing some orgs, you will need to manually grant access on a per-org basis.
             See
             <a
-              href="https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
+              href="https://gitlab.com/gitterHQ/webapp/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
               target="_blank"
               >this article</a
             >

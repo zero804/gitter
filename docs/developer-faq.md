@@ -65,7 +65,7 @@ Alternatively to copying the whole `config/config.dev.json` over you can just us
 The OAuth callbacks you created initially have a `localhost:5000` redirect URI
 which will just 404 on a separate device when you try to sign in.
 
-Recreate your secrets using your local network IP, see https://gitlab.com/gitlab-org/gitter/webapp#configure-service-secrets
+Recreate your secrets using your local network IP, see https://gitlab.com/gitterHQ/webapp#configure-service-secrets
 
 Restart the server. You should now be able to access Gitter over your local IP from other devices
 

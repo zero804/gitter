@@ -97,7 +97,7 @@ Threaded conversations allow you to better organize your messages by discussing 
 
 ### Support in mobile apps
 
-Threads are minimally supported in the mobile apps and the [mobile apps overall may be deprecated](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2281) in the future.
+Threads are minimally supported in the mobile apps and the [mobile apps overall may be deprecated](https://gitlab.com/gitterHQ/webapp/-/issues/2281) in the future.
 
 Every thread message appears in the main message feed and it is marked as being part of a thread. When you click on the indicator, you are taken into a web browser that will show you the whole thread. *The mobile apps don't provide a way to write threaded messages.*
 
@@ -107,12 +107,12 @@ Every thread message appears in the main message feed and it is marked as being 
 
 The threaded conversations don't have feature parity with the main messages yet. The main missing features are:
 
-- [Typeahead in the message input](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2344) - usernames, emojis, issues
-- [Decorating messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2340) - user profile popover, issue states
-- [Replying workflows](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2341) - clicking @username populating the message input with the handle
-- [Composing multiline messages](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2338)
-- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2483)
-- [Thread summary overview](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2431)
+- [Typeahead in the message input](https://gitlab.com/gitterHQ/webapp/-/issues/2344) - usernames, emojis, issues
+- [Decorating messages](https://gitlab.com/gitterHQ/webapp/-/issues/2340) - user profile popover, issue states
+- [Replying workflows](https://gitlab.com/gitterHQ/webapp/-/issues/2341) - clicking @username populating the message input with the handle
+- [Composing multiline messages](https://gitlab.com/gitterHQ/webapp/-/issues/2338)
+- [Threaded conversation notifications - Unfollow thread](https://gitlab.com/gitterHQ/webapp/-/issues/2483)
+- [Thread summary overview](https://gitlab.com/gitterHQ/webapp/-/issues/2431)
 
 Please see the full list of outstanding features in the [Threaded Conversations Epic](https://gitlab.com/groups/gitlab-org/-/epics/360)
 
@@ -179,7 +179,7 @@ You can use the `word1 -word2` syntax to find messages containing `word1` but _n
 
 You can access a rooms message archive via the **Room settings dropdown** -> **Archives**.
 
-The archive heatmap currently only shows a year but you can manually navigate by changing the URL. You can [track this issue for increasing the heatmap size](https://gitlab.com/gitlab-org/gitter/webapp/issues/785)
+The archive heatmap currently only shows a year but you can manually navigate by changing the URL. You can [track this issue for increasing the heatmap size](https://gitlab.com/gitterHQ/webapp/issues/785)
 
 ![](https://i.imgur.com/L8VrjAn.png)
 

@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 #
 # Redis
 #
@@ -7,39 +7,63 @@ services:
     image: redis:3.0.3
     restart: always
     ports:
-      - "6379:6379"
-    entrypoint: [ "/usr/local/bin/redis-server", "--bind", "0.0.0.0", "--port", "6379", "--maxclients", "200", "--dir", "/tmp", "--save", ""]
+      - '6379:6379'
+    entrypoint:
+      [
+        '/usr/local/bin/redis-server',
+        '--bind',
+        '0.0.0.0',
+        '--port',
+        '6379',
+        '--maxclients',
+        '200',
+        '--dir',
+        '/tmp',
+        '--save',
+        '',
+      ]
 
   mongo1:
-    image: registry.gitlab.com/gitlab-org/gitter/webapp/mongo:latest
+    image: registry.gitlab.com/gitterhq/webapp/mongo:latest
     restart: always
     volumes:
       - gitter-mongodb:/data/db2
     ports:
-      - "27017:27017"
+      - '27017:27017'
   mongo-express:
     image: mongo-express
     links:
       - mongo1:mongo
     ports:
-      - "8081:8081"
+      - '8081:8081'
 
   neo4j:
     image: neo4j:2.3
     restart: always
     ports:
-      - "7474:7474"
+      - '7474:7474'
     environment:
       NEO4J_AUTH: none
 
   # The official elasticsearch:1.4.2 image with mapper-attachments and river-mongodb plugins
   # https://github.com/soldotno/elasticsearch-river-mongodb/blob/master/Dockerfile
   elasticsearch:
-    image: registry.gitlab.com/gitlab-org/gitter/webapp/elasticsearch:latest
+    image: registry.gitlab.com/gitterhq/webapp/elasticsearch:latest
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - '9200:9200'
+      - '9300:9300'
     links:
       - mongo1
+
+  synapse:
+    container_name: 'synapse'
+    image: 'matrixdotorg/synapse:v1.20.1'
+    restart: always
+    ports:
+      - '18008:8008'
+      - '18448:8448'
+    volumes:
+      - './scripts/docker/matrix/synapse/data/:/data/'
+
 volumes:
   gitter-mongodb:

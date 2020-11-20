@@ -8,7 +8,7 @@ Gitter is entirely free for all public and private conversations.
 
 ## I have a suggestion, where can I suggest/discuss it?
 
-Feel free to come discuss your idea in the [`gitter/gitter`](https://gitter.im/gitter/gitter) room and create an issue, https://gitlab.com/gitlab-org/gitter/webapp/issues
+Feel free to come discuss your idea in the [`gitter/gitter`](https://gitter.im/gitter/gitter) room and create an issue, https://gitlab.com/gitterHQ/webapp/issues
 
 
 ## Help! Do you have any Support?

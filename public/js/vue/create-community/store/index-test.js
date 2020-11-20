@@ -134,7 +134,7 @@ describe('create community store', () => {
     });
 
     it('gitlabProjects', () => {
-      const gitlabProject1 = createRepoGitlabProjectFixture('gitlab-org/gitter/webapp');
+      const gitlabProject1 = createRepoGitlabProjectFixture('gitterHQ/webapp');
       const gitlabProject2 = createRepoGitlabProjectFixture('gitlab-org/gitlab');
       const state = {
         repos: [

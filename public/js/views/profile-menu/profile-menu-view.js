@@ -92,19 +92,19 @@ function getProfileCollection() {
 
   result.add({
     name: 'Contribute to Gitter',
-    stub: 'https://gitlab.com/gitlab-org/gitter/webapp',
+    stub: 'https://gitlab.com/gitterHQ/webapp',
     target: '_blank'
   });
 
   result.add({
     name: 'Help (Documentation)',
-    stub: 'https://gitlab.com/gitlab-org/gitter/webapp/tree/develop/docs#documentation',
+    stub: 'https://gitlab.com/gitterHQ/webapp/tree/develop/docs#documentation',
     target: '_blank'
   });
 
   result.add({
     name: "What's new?",
-    stub: 'https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/CHANGELOG.md',
+    stub: 'https://gitlab.com/gitterHQ/webapp/blob/develop/CHANGELOG.md',
     target: '_blank'
   });
 

@@ -8,11 +8,28 @@ var securityDescriptor = require('./security-descriptor-subdocument');
 
 module.exports = {
   install: function(mongooseConnection) {
+    // The bans.virtualUser field allows us to ban users coming from outside bots/bridges
+    const VirtualUserSchema = new Schema({
+      type: {
+        type: String,
+        require: true
+      },
+      externalId: {
+        type: String,
+        require: true
+      }
+    });
+    VirtualUserSchema.schemaTypeName = 'VirtualUserSchema';
+
     //
     // Banned from the room
     //
     var TroupeBannedUserSchema = new Schema({
       userId: { type: ObjectId },
+      virtualUser: {
+        type: VirtualUserSchema,
+        required: false
+      },
       dateBanned: { type: Date, default: Date.now },
       bannedBy: { type: ObjectId }
     });

@@ -16,6 +16,15 @@
         <img src="{{fromUser.avatarUrlSmall}}" alt="avatar" height="30" width="30" align="right" />
       </td>
       <td class="username">
+        {{#if virtualUser}}
+          <a
+            class="chat-item__flair chat-item__flair--{{virtualUser.type}}"
+            {{#if virtualUser.profileUrl}}href="{{virtualUser.profileUrl}}"{{/if}}
+            target="_blank"
+          >
+            {{virtualUser.type}}
+          </a>
+        {{/if}}
         <strong>{{fromUser.username}}</strong>
       </td>
     </tr>

@@ -8,8 +8,8 @@ stages:
 variables:
   DOCKER_VERSION: '19.03.0'
   # We don't use the default CI_REGISTRY_IMAGE variable because the security release process on dev.gitlab.org needs to target the gitlab.com registry.
-  # https://gitlab.com/gitlab-org/gitter/webapp/-/merge_requests/1952#note_386372016
-  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitlab-org/gitter/webapp
+  # https://gitlab.com/gitterHQ/webapp/-/merge_requests/1952#note_386372016
+  GITTER_CI_REGISTRY_IMAGE: registry.gitlab.com/gitterhq/webapp
 
 ##############
 # Conditions #
@@ -37,9 +37,9 @@ variables:
 
 .if-not-canonical-project: &if-not-canonical-project
   # Allow for use on:
-  #  - https://gitlab.com/gitlab-org/gitter/webapp
+  #  - https://gitlab.com/gitterHQ/webapp
   #  - https://dev.gitlab.org/gitlab/gitter/webapp
-  if: '$CI_PROJECT_PATH != "gitlab-org/gitter/webapp" && $CI_PROJECT_PATH != "gitlab/gitter/webapp"'
+  if: '$CI_PROJECT_PATH != "gitterHQ/webapp" && $CI_PROJECT_PATH != "gitlab/gitter/webapp"'
 
 .if-schedule: &if-schedule
   if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -101,6 +101,9 @@ default:
   - &webapp_service_neo4j
     name: neo4j:2.3
     alias: neo4j
+  - &webapp_service_synapse
+    name: matrixdotorg/synapse:v1.20.1
+    alias: synapse
 
 .node_job:
   image: $GITTER_CI_REGISTRY_IMAGE
@@ -139,6 +142,7 @@ validate:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+    - *webapp_service_synapse
   script:
     - make ci-test
 
@@ -210,7 +214,7 @@ package:
   stage: build_unit_test
   script:
     # While testing the deploment, you can use cached artifacts instead of packaging every time which is slow
-    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitlab-org/gitter/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
+    #- (apt-get update && apt-get install unzip && curl -Ls https://gitlab.com/gitterHQ/webapp/-/jobs/60049410/artifacts/download -o previous-artifacts.zip && unzip previous-artifacts.zip) || (make package)
     - make package
   artifacts:
     paths:
@@ -433,7 +437,7 @@ renovate:
     #RENOVATE_GITHUB_TOKEN: xxx
     RENOVATE_CONFIG_FILE: renovate-config.js
   script:
-    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitlab-org/gitter/webapp
+    - docker run -e GITLAB_TOKEN="$RENOVATE_GITLAB_TOKEN" -e GITHUB_COM_TOKEN="$RENOVATE_GITHUB_TOKEN" -v $PWD/renovate.json:/usr/src/app/renovate.json -v $PWD/renovate-config.js:/usr/src/app/config.js renovate/renovate:13 gitterHQ/webapp
 #
 # Security reports
 # =========================================================
@@ -445,10 +449,7 @@ include:
   - template: Security/Secret-Detection.gitlab-ci.yml
 
 dependency_scanning:
-  extends: .use-docker-in-docker
   stage: security
-  rules:
-    - when: always
   variables:
     DS_PYTHON_VERSION: 2
 
@@ -463,12 +464,10 @@ container_scanning:
     CI_APPLICATION_TAG: $CI_COMMIT_REF_SLUG
 
 sast:
-  extends: .use-docker-in-docker
   stage: security
-  rules:
-    - when: always
   variables:
     SAST_EXCLUDED_PATHS: '/test/**,**/*-test.js,/scripts,/build-scripts'
+    SEARCH_MAX_DEPTH: 4
 
 dast:
   stage: security
@@ -519,6 +518,7 @@ dast:
     - *webapp_service_redis
     - *webapp_service_elasticsearch
     - *webapp_service_neo4j
+    - *webapp_service_synapse
 
 .secret-analyzer:
   extends: .use-docker-in-docker

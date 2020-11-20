@@ -12,6 +12,7 @@ var express = require('express');
 var http = require('http');
 var serverStats = require('./utils/server-stats');
 var onMongoConnect = require('gitter-web-persistence-utils/lib/on-mongo-connect');
+const installBridge = require('gitter-web-matrix-bridge');
 
 var app = express();
 
@@ -53,5 +54,8 @@ if (!process.env.DISABLE_API_WEB_LISTEN) {
     });
   });
 }
+
+// Install the Gitter <-> Matrix bridge
+installBridge();
 
 module.exports = server;

@@ -12,6 +12,7 @@ const userService = require('gitter-web-users');
 const policyFactory = require('gitter-web-permissions/lib/policy-factory');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
+const { checkForMatrixUsername } = require('gitter-web-users/lib/virtual-user-service');
 
 var opts = require('yargs')
   .option('admin-username', {
@@ -47,21 +48,40 @@ async function banUser() {
   const adminUser = await userService.findByUsername(opts.adminUsername);
   assert(adminUser);
 
-  const targetUser = await userService.findByUsername(opts.targetUsername);
-  assert(targetUser);
-
   const troupe = await troupeService.findByUri(opts.roomUri);
   assert(troupe);
 
   const policy = await policyFactory.createPolicyForRoomId(adminUser, troupe.id);
   const roomWithPolicyService = new RoomWithPolicyService(troupe, adminUser, policy);
 
+  let targetUser;
+  let virtualUser;
+  if (checkForMatrixUsername(opts.targetUsername)) {
+    virtualUser = {
+      type: 'matrix',
+      externalId: opts.targetUsername
+    };
+  } else {
+    targetUser = await userService.findByUsername(opts.targetUsername);
+    assert(targetUser);
+  }
+
   if (opts.unban) {
     console.log('Unbanning user...');
-    await roomWithPolicyService.unbanUserFromRoom(targetUser.id);
+    if (virtualUser) {
+      return roomWithPolicyService.unbanVirtualUserFromRoom(virtualUser);
+    }
+
+    return roomWithPolicyService.unbanUserFromRoom(targetUser.id);
   } else {
     console.log('Banning user...');
-    await roomWithPolicyService.banUserFromRoom(targetUser.username, {
+    if (virtualUser) {
+      return roomWithPolicyService.banVirtualUserFromRoom(virtualUser, {
+        removeMessages: opts.removeMessages
+      });
+    }
+
+    return roomWithPolicyService.banUserFromRoom(targetUser.username, {
       removeMessages: opts.removeMessages
     });
   }

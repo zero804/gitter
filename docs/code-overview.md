@@ -60,8 +60,8 @@ Gitter uses a number of backend persistence services:
 
 The ELB balances the load between 8 webapp EC2 instances. Each webapp instance runs:
 
-- 2 web express servers started from the [`server/web.js`](https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/server/web.js)
-- 2 API express servers started from [`server/api.js`](https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/server/api.js)
+- 2 web express servers started from the [`server/web.js`](https://gitlab.com/gitterHQ/webapp/-/blob/develop/server/web.js)
+- 2 API express servers started from [`server/api.js`](https://gitlab.com/gitterHQ/webapp/-/blob/develop/server/api.js)
 
 And users Nginx as a reverse proxy to route the incoming traffic based on the request path.
 

@@ -2,6 +2,7 @@
 
 var proxyquireNoCallThru = require('proxyquire').noCallThru();
 var assert = require('assert');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 var fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 var Promise = require('bluebird');
 var ObjectID = require('mongodb').ObjectID;
@@ -555,6 +556,73 @@ describe('room-service', function() {
             });
         });
       });
+    });
+  });
+
+  describe('findBanByUsername', () => {
+    const roomService = require('../lib/room-service');
+
+    const banFixtures = fixtureLoader.setup({
+      userAdmin1: {},
+      userBanned1: {},
+      troupeWithBannedUsers1: {
+        bans: [
+          {
+            user: 'userBanned1',
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      },
+      troupeWithBannedVirtualUsers1: {
+        bans: [
+          {
+            virtualUser: {
+              type: 'matrix',
+              externalId: 'banned-user:matrix.org'
+            },
+            dateBanned: Date.now(),
+            bannedBy: 'userAdmin1'
+          }
+        ]
+      }
+    });
+
+    it('finds ban for normal user', async () => {
+      const ban = await roomService.findBanByUsername(
+        banFixtures.troupeWithBannedUsers1._id,
+        banFixtures.userBanned1.username
+      );
+
+      assert.strictEqual(mongoUtils.objectIDsEqual(ban.userId, banFixtures.userBanned1._id), true);
+    });
+
+    it('finds ban for virtual user', async () => {
+      const ban = await roomService.findBanByUsername(
+        banFixtures.troupeWithBannedVirtualUsers1._id,
+        'banned-user:matrix.org'
+      );
+
+      assert.strictEqual(ban.virtualUser.type, 'matrix', true);
+      assert.strictEqual(ban.virtualUser.externalId, 'banned-user:matrix.org', true);
+    });
+
+    it('does not find ban when no matching user', async () => {
+      const ban = await roomService.findBanByUsername(
+        banFixtures.troupeWithBannedUsers1._id,
+        'does-not-exist'
+      );
+
+      assert.strictEqual(ban, undefined);
+    });
+
+    it('does not find ban when virtualUser.externalId does not match', async () => {
+      const ban = await roomService.findBanByUsername(
+        banFixtures.troupeWithBannedVirtualUsers1._id,
+        'some-other-user:matrix.org'
+      );
+
+      assert.strictEqual(ban, undefined);
     });
   });
 

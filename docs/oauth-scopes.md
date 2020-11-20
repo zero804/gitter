@@ -2,7 +2,7 @@
 
 ## GitLab
 
-You can sign in via GitLab. Your username will have a `_gitlab` suffix. You can track [this issue for getting rid of the suffix and being able to change your username](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1851).
+You can sign in via GitLab. Your username will have a `_gitlab` suffix. You can track [this issue for getting rid of the suffix and being able to change your username](https://gitlab.com/gitterHQ/webapp/-/issues/1851).
 
 We request following GitLab OAuth scopes:
 
@@ -20,7 +20,7 @@ You can see how we have the GitLab OAuth application settings configured:
 
 ### Twitter
 
-You can sign in via Twitter. Your username will have a `_twitter` suffix. You can track [this issue for getting rid of the suffix and being able to change your username](https://gitlab.com/gitlab-org/gitter/webapp/-/issues/1851).
+You can sign in via Twitter. Your username will have a `_twitter` suffix. You can track [this issue for getting rid of the suffix and being able to change your username](https://gitlab.com/gitterHQ/webapp/-/issues/1851).
 
 For Twitter, we are requesting the bare minimum `Read-only` permissions. We add the email permission so we can send unread notification emails. You can see how we have permissions configured in our Twitter developer dashboard:
 

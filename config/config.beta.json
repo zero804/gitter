@@ -49,6 +49,20 @@
     "camoUrl": "https://user-content.gitter-static.net",
     "camoSecret": "<see Gitter secrets repo>"
   },
+  "matrix": {
+    "wellKnownServer": "gitter-beta.ems.host:443",
+    "bridge": {
+      "homeserverUrl": "https://gitter-beta.ems.host",
+      "serverName": "beta.gitter.im",
+      "applicationServiceUrl": "https://matrix-beta.gitter.im",
+      "senderLocalpart": "matrixbot"
+    }
+  },
+  "virtualUsers": {
+    "approvedClientKeyMap": {
+      "matrix-bridge-beta": "matrix"
+    }
+  },
   "logging": {
     "logToFile": true,
     "level": "verbose",
@@ -173,11 +187,6 @@
       "https://avatars-beta-04.gitter.im",
       "https://avatars-beta-05.gitter.im"
     ]
-  },
-  "bridge": {
-    "approvedClientKeyMap": {
-      "matrix-bridge-beta": "matrix"
-    }
   },
   "revokedUserAgents": [
     "Gitter/3.1.0",

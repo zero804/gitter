@@ -4,6 +4,7 @@ var roomService = require('gitter-web-rooms');
 var restSerializer = require('../../../serializers/rest-serializer');
 var loadTroupeFromParam = require('./load-troupe-param');
 var RoomWithPolicyService = require('gitter-web-rooms/lib/room-with-policy-service');
+const { checkForMatrixUsername } = require('gitter-web-users/lib/virtual-user-service');
 
 module.exports = {
   id: 'troupeBan',
@@ -20,9 +21,24 @@ module.exports = {
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
 
-        var username = req.body.username;
-        var removeMessages = !!req.body.removeMessages;
-        return roomWithPolicyService.banUserFromRoom(username, { removeMessages: removeMessages });
+        const username = req.body.username;
+        let virtualUser = req.body.virtualUser;
+        const removeMessages = !!req.body.removeMessages;
+
+        if (username && checkForMatrixUsername(username)) {
+          virtualUser = {
+            type: 'matrix',
+            externalId: username
+          };
+        }
+
+        if (virtualUser) {
+          return roomWithPolicyService.banVirtualUserFromRoom(virtualUser);
+        }
+
+        return roomWithPolicyService.banUserFromRoom(username, {
+          removeMessages: removeMessages
+        });
       })
       .then(function(ban) {
         if (!ban) {
@@ -46,6 +62,11 @@ module.exports = {
     return loadTroupeFromParam(req)
       .then(function(troupe) {
         var roomWithPolicyService = new RoomWithPolicyService(troupe, req.user, req.userRoomPolicy);
+
+        if (req.troupeBan.virtualUser) {
+          return roomWithPolicyService.unbanVirtualUserFromRoom(req.troupeBan.virtualUser);
+        }
+
         return roomWithPolicyService.unbanUserFromRoom(req.troupeBan.userId);
       })
       .then(function() {

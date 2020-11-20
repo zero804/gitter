@@ -95,7 +95,7 @@ export default {
           Private repo access is granted. If you don't see your repo listed, see our documentation
           section on
           <a
-            href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
+            href="https://gitlab.com/gitterHQ/webapp/-/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
             target="_blank"
             >"Why isn't my GitHub organisation or repos appearing?"</a
           >.
@@ -105,7 +105,7 @@ export default {
           <a href="/login/upgrade?scopes=repo">allowing private repo access</a>. Also see our
           documentation section on
           <a
-            href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
+            href="https://gitlab.com/gitterHQ/webapp/-/blob/develop/docs/faq.md#why-isnt-my-github-organisation-or-repos-appearing"
             target="_blank"
             >"Why isn't my GitHub organisation or repos appearing?"</a
           >.

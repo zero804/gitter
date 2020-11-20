@@ -15,7 +15,7 @@ function updateNotifications(mode) {
   });
 }
 
-const mentionRegexp = `@([\\w\\-.]+)`;
+const mentionRegexp = `@([\\w\\-.:\\[\\]]+)`;
 
 var commandsList = [
   {
@@ -29,7 +29,7 @@ var commandsList = [
     completion: 'ban @',
     regexp: /^\/ban/,
     action: function(text) {
-      const userMatch = text.match(new RegExp(`\\/ban ${mentionRegexp}(\\s+(removemsgs))?`));
+      const userMatch = text.match(new RegExp(`\\/ban ${mentionRegexp}(\\s+(removemsgs))?\\s*$`));
       if (!userMatch) return;
       var user = userMatch[1];
       var removeMessages = !!userMatch[3];
@@ -117,7 +117,7 @@ var commandsList = [
     completion: 'query @',
     regexp: /^\/query/,
     action: function(text) {
-      const userMatch = text.match(new RegExp(`\\/query ${mentionRegexp}`));
+      const userMatch = text.match(new RegExp(`\\/query ${mentionRegexp}\\s*$`));
       if (!userMatch) return;
       var user = userMatch[1];
 
@@ -137,7 +137,7 @@ var commandsList = [
     completion: 'remove @',
     regexp: /^\/remove/,
     action: function(text) {
-      const userMatch = text.match(new RegExp(`\\/remove ${mentionRegexp}`));
+      const userMatch = text.match(new RegExp(`\\/remove ${mentionRegexp}\\s*$`));
       if (!userMatch) return;
       var user = userMatch[1];
       appEvents.trigger('command.room.remove', user);
@@ -190,7 +190,7 @@ var commandsList = [
     completion: 'unban @',
     regexp: /^\/unban/,
     action: function(text) {
-      const userMatch = text.match(new RegExp(`\\/unban ${mentionRegexp}`));
+      const userMatch = text.match(new RegExp(`\\/unban ${mentionRegexp}\\s*$`));
       if (!userMatch) return;
       var user = userMatch[1];
 

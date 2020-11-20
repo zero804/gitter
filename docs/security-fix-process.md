@@ -50,19 +50,19 @@ pushing to any remote besides `dev.gitlab.org`, in order to prevent accidental d
 
 
 ## Backport the change
-Backport the change to the [public `webapp` project](https://gitlab.com/gitlab-org/gitter/webapp)
+Backport the change to the [public `webapp` project](https://gitlab.com/gitterHQ/webapp)
 ```
 git push origin master
 git push origin developer
 git push --tags origin
 ```
-You can cancel the hotfix tag pipeline in https://gitlab.com/gitlab-org/gitter/webapp
+You can cancel the hotfix tag pipeline in https://gitlab.com/gitterHQ/webapp
 
-Add the hotfix to the [changelog](https://gitlab.com/gitlab-org/gitter/webapp/blob/develop/CHANGELOG.md). Link the confidential issue for all the details that will be public at a later time. Description *ideally* shouldn't explain how to reproduce the issue (e.g. `Fix integration activity XSS` instead of `Stored XSS via Wiki links`). Link the HackerOne profile of the person disclosing the issue (`https://hackerone.com/{user name}`).
+Add the hotfix to the [changelog](https://gitlab.com/gitterHQ/webapp/blob/develop/CHANGELOG.md). Link the confidential issue for all the details that will be public at a later time. Description *ideally* shouldn't explain how to reproduce the issue (e.g. `Fix integration activity XSS` instead of `Stored XSS via Wiki links`). Link the HackerOne profile of the person disclosing the issue (`https://hackerone.com/{user name}`).
 
 Example:
 ```markdown
- - Fix integration activity XSS, https://gitlab.com/gitlab-org/gitter/webapp/issues/2068
+ - Fix integration activity XSS, https://gitlab.com/gitterHQ/webapp/issues/2068
      - Thanks to [@mishre](https://hackerone.com/mishre) for [responsibly disclosing](https://matrix.org/security-disclosure-policy/) this vulnerability to us.
      - https://dev.gitlab.org/gitlab/gitter/webapp/merge_requests/1
 ```

@@ -285,7 +285,7 @@ function bindAnchorToIssue(view, issueElement, type, provider, repo, issueNumber
 /*
   This is temporary workaround for incorrectly parsed repo attributes (fixes decoration of messages already in DB).
   Removing the `/-` from the end of parsed repo.
-  https://gitlab.com/gitlab-org/gitter/webapp/-/issues/2453#temporary-ui-fix-for-malformed-repo-urls
+  https://gitlab.com/gitterHQ/webapp/-/issues/2453#temporary-ui-fix-for-malformed-repo-urls
 
   We can remove this workaround in about 6 months. The assumption is that 6 months old messages are going to be hidden in history
   and failing decoration is no longer a big issue. Benefit of less complexity will outweigh a small bug.

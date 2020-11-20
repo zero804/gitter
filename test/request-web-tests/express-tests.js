@@ -27,7 +27,7 @@ describe('login', () => {
       }
     });
 
-    // tests  regression for https://gitlab.com/gitlab-org/gitter/webapp/issues/2444
+    // tests  regression for https://gitlab.com/gitterHQ/webapp/issues/2444
     // can be removed if we no longer use skipForApi() in express.js
     it('does not trigger skipForApi wrapper on room uri beginning with api*', async () => {
       //  one of such skipped middlewares is authenticateBearer that is processing the authorisation header

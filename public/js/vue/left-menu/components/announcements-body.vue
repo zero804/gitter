@@ -40,7 +40,7 @@ export default {
       You are in full control of your information and if you would not like Element to retain your
       personal data please consult
       <a
-        href="https://gitlab.com/gitlab-org/gitter/webapp/-/blob/develop/docs/accounts.md#how-do-i-delete-my-account"
+        href="https://gitlab.com/gitterHQ/webapp/-/blob/develop/docs/accounts.md#how-do-i-delete-my-account"
         target="_blank"
         >these instructions</a
       >

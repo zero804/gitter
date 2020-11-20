@@ -47,7 +47,22 @@
     "camoSecret": "<see Gitter secrets repo>"
   },
   "matrix": {
-    "wellKnownServer": "gitter.ems.host:443"
+    "wellKnownServer": "gitter.ems.host:443",
+    "bridge": {
+      "homeserverUrl": "https://gitter.ems.host",
+      "serverName": "gitter.im",
+      "applicationServiceUrl": "https://matrix.gitter.im",
+      "senderLocalpart": "matrixbot",
+      "gitterRoomAllowList": [
+        "5faa0809d73408ce4ff3ad8e",
+        "5faa0a0ed73408ce4ff3ada9"
+      ]
+    }
+  },
+  "virtualUsers": {
+    "approvedClientKeyMap": {
+      "matrix-bridge-prod": "matrix"
+    }
   },
   "notifications": {
     "notificationsSender": "support@gitter.im",
@@ -184,11 +199,6 @@
       "https://avatars-04.gitter.im",
       "https://avatars-05.gitter.im"
     ]
-  },
-  "bridge": {
-    "approvedClientKeyMap": {
-      "matrix-bridge-prod": "matrix"
-    }
   },
   "revokedUserAgents": [
     "Gitter/3.1.0",

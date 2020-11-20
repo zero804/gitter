@@ -29,6 +29,7 @@ var recentRoomService = require('./recent-room-service');
 var getOrgNameFromTroupeName = require('gitter-web-shared/get-org-name-from-troupe-name');
 var liveCollections = require('gitter-web-live-collection-events');
 var roomRepoService = require('./room-repo-service');
+const { checkForMatrixUsername } = require('gitter-web-users/lib/virtual-user-service');
 
 /**
  * sendJoinStats() sends stats about a join_room event
@@ -87,7 +88,7 @@ async function notifyInvitedUser(fromUser, invitedUser, room) {
     return;
   }
 
-  // See https://gitlab.com/gitlab-org/gitter/webapp/issues/2153
+  // See https://gitlab.com/gitterHQ/webapp/issues/2153
   if (!config.get('email:limitInviteEmails')) {
     await emailNotificationService
       .addedToRoomNotification(fromUser, invitedUser, room)
@@ -275,25 +276,28 @@ function hideRoomFromUser(room, userId) {
 /**
  * If the ban is found, returns troupeBan else returns null
  */
-function findBanByUsername(troupeId, bannedUsername) {
-  return userService.findByUsername(bannedUsername).then(function(user) {
+async function findBanByUsername(troupeId, bannedUsername) {
+  const query = {
+    _id: mongoUtils.asObjectID(troupeId)
+  };
+
+  if (checkForMatrixUsername(bannedUsername)) {
+    query['bans.virtualUser.type'] = 'matrix';
+    query['bans.virtualUser.externalId'] = bannedUsername;
+  } else {
+    const user = await userService.findByUsername(bannedUsername);
     if (!user) return;
 
-    return persistence.Troupe.findOne(
-      {
-        _id: mongoUtils.asObjectID(troupeId),
-        'bans.userId': user._id
-      },
-      { _id: 0, 'bans.$': 1 },
-      { lean: true }
-    )
-      .exec()
-      .then(function(troupe) {
-        if (!troupe || !troupe.bans || !troupe.bans.length) return;
+    query['bans.userId'] = user._id;
+  }
 
-        return troupe.bans[0];
-      });
-  });
+  return persistence.Troupe.findOne(query, { _id: 0, 'bans.$': 1 }, { lean: true })
+    .exec()
+    .then(function(troupe) {
+      if (!troupe || !troupe.bans || !troupe.bans.length) return;
+
+      return troupe.bans[0];
+    });
 }
 
 function searchRooms(userId, queryText, options) {
