@@ -31,6 +31,10 @@ function validateEventForMessageEditEvent(event) {
   );
 }
 
+function validateEventForMessageDeleteEvent(event) {
+  return !event.state_key && event.sender && event.redacts;
+}
+
 class MatrixEventHandler {
   constructor(matrixBridge, gitterBridgeUsername) {
     assert(matrixBridge, 'Matrix bridge required');
@@ -51,11 +55,15 @@ class MatrixEventHandler {
         event.content['m.relates_to'] &&
         event.content['m.relates_to'].rel_type === 'm.replace'
       ) {
-        return this.handleChatMessageEditEvent(event);
+        return await this.handleChatMessageEditEvent(event);
       }
 
       if (event.type === 'm.room.message') {
-        return this.handleChatMessageCreateEvent(event);
+        return await this.handleChatMessageCreateEvent(event);
+      }
+
+      if (event.type === 'm.room.redaction') {
+        return await this.handleChatMessageDeleteEvent(event);
       }
     } catch (err) {
       logger.error(err);
@@ -161,6 +169,36 @@ class MatrixEventHandler {
 
     // Store the message so we can reference it in edits and threads/replies
     await store.storeBridgedMessage(newChatMessage._id, event.event_id);
+
+    return null;
+  }
+
+  async handleChatMessageDeleteEvent(event) {
+    // If someone is passing us mangled events, just ignore them.
+    if (!validateEventForMessageDeleteEvent(event)) {
+      return null;
+    }
+
+    const matrixEventId = event.redacts;
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+    assert(
+      gitterMessageId,
+      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to delete message`
+    );
+
+    const chatMessage = await chatService.findById(gitterMessageId);
+    assert(
+      chatMessage,
+      `Gitter chatMessage(id=${gitterMessageId}) not found while trying to delete message`
+    );
+
+    const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
+    assert(
+      chatMessage,
+      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to delete message`
+    );
+
+    await chatService.deleteMessageFromRoom(gitterRoom, chatMessage);
 
     return null;
   }
