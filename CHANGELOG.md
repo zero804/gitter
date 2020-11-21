@@ -1,3 +1,8 @@
+# 21.4.0 - *upcoming*
+
+ - Add support for Matrix message edits to Gitter, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2058
+
+
 # 21.3.0 - 2020-11-18 - The beginning of the Matrix bridge
 
  - Pass virtualUser avatars through the content proxy (camoproxy), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2047
