@@ -1,10 +1,35 @@
 'use strict';
 
+const debug = require('debug')('gitter:app:matrix-bridge:matrix-event-handler');
 const assert = require('assert');
 const chatService = require('gitter-web-chats');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const userService = require('gitter-web-users');
 const store = require('./store');
+const env = require('gitter-web-env');
+const stats = env.stats;
+const logger = env.logger;
+const errorReporter = env.errorReporter;
+
+function validateEventForMessageCreateEvent(event) {
+  return !event.state_key && event.sender && event.content && event.content.body;
+}
+
+function validateEventForMessageEditEvent(event) {
+  return (
+    !event.state_key &&
+    event.sender &&
+    event.content &&
+    event.content['m.relates_to'] &&
+    event.content['m.relates_to'].rel_type === 'm.replace' &&
+    event.content['m.new_content'] &&
+    event.content['m.new_content'].body &&
+    // Only text edits please
+    event.content['m.new_content'].msgtype === 'm.text' &&
+    event.content['m.relates_to'] &&
+    event.content['m.relates_to'].event_id
+  );
+}
 
 class MatrixEventHandler {
   constructor(matrixBridge, gitterBridgeUsername) {
@@ -18,14 +43,78 @@ class MatrixEventHandler {
   }
 
   async onEventData(event) {
-    if (event.type === 'm.room.message') {
-      return this.handleChatMessageCreateEvent(event);
+    try {
+      debug('onEventData', event);
+      if (
+        event.type === 'm.room.message' &&
+        event.content &&
+        event.content['m.relates_to'] &&
+        event.content['m.relates_to'].rel_type === 'm.replace'
+      ) {
+        return this.handleChatMessageEditEvent(event);
+      }
+
+      if (event.type === 'm.room.message') {
+        return this.handleChatMessageCreateEvent(event);
+      }
+    } catch (err) {
+      logger.error(err);
+      errorReporter(
+        err,
+        { operation: 'matrixEventHandler.onDataChange', data: event },
+        { module: 'matrix-to-gitter-bridge' }
+      );
     }
+  }
+
+  async handleChatMessageEditEvent(event) {
+    // If someone is passing us mangled events, just ignore them.
+    if (!validateEventForMessageEditEvent(event)) {
+      return;
+    }
+
+    const matrixEventId = event.content['m.relates_to'].event_id;
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+
+    // No matching message on the Gitter side. Let's just ignore the edit as this is some edge case.
+    if (!gitterMessageId) {
+      debug(
+        `Ignoring message edit from Matrix side(matrixEventId=${matrixEventId}) because there is no associated Gitter message`
+      );
+      stats.event('matrix_bridge.ignored_matrix_message_edit', {
+        matrixEventId
+      });
+      return null;
+    }
+
+    const chatMessage = await chatService.findById(gitterMessageId);
+
+    const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
+    if (!gitterRoom) {
+      debug(
+        `Ignoring message edit from Matrix side(matrixEventId=${matrixEventId}) because the Gitter room was not found`
+      );
+      stats.event('matrix_bridge.ignored_matrix_message_edit', {
+        matrixEventId
+      });
+      return null;
+    }
+
+    const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
+    assert(
+      gitterBridgeUser,
+      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername}`
+    );
+
+    const newText = event.content['m.new_content'].body;
+    await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
+
+    return null;
   }
 
   async handleChatMessageCreateEvent(event) {
     // If someone is passing us mangled events, just ignore them.
-    if (event.state_key || !event.sender || !event.content || !event.content.body) {
+    if (!validateEventForMessageCreateEvent(event)) {
       return;
     }
 
@@ -58,7 +147,7 @@ class MatrixEventHandler {
       displayName = splitMxid[0];
     }
 
-    await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
+    const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
       virtualUser: {
         type: 'matrix',
         externalId,
@@ -70,7 +159,10 @@ class MatrixEventHandler {
       text: event.content.body
     });
 
-    return;
+    // Store the message so we can reference it in edits and threads/replies
+    await store.storeBridgedMessage(newChatMessage._id, event.event_id);
+
+    return null;
   }
 }
 

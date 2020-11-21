@@ -126,14 +126,19 @@ class GitterBridge {
       return null;
     }
 
+    // Supress any echo that comes from Matrix bridge itself creating new messages
+    if (model.virtualUser && model.virtualUser.type === 'matrix') {
+      return null;
+    }
+
     const matrixEventId = await store.getMatrixEventIdByGitterMessageId(model.id);
 
     // No matching message on the Matrix side. Let's just ignore the edit as this is some edge case.
     if (!matrixEventId) {
       debug(
-        `Ignoring message edit for id=${model.id} from Gitter because there is no associated Matrix event ID`
+        `Ignoring message edit from Gitter side(id=${model.id}) because there is no associated Matrix event ID`
       );
-      stats.event('matrix_bridge.missing_matrix_event_id_for_message_edit', {
+      stats.event('matrix_bridge.ignored_gitter_message_edit', {
         gitterMessageId: model.id
       });
       return null;
