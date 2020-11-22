@@ -61,26 +61,40 @@ class MatrixUtils {
     }
 
     // Create the Matrix room if it doesn't already exist
-    const room = await troupeService.findById(gitterRoomId);
+    const gitterRoom = await troupeService.findById(gitterRoomId);
 
     logger.info(
-      `Existing Matrix room not found, creating new Matrix room for room.uri=${room.uri} roomId=${gitterRoomId}`
+      `Existing Matrix room not found, creating new Matrix room for room.uri=${gitterRoom.uri} roomId=${gitterRoomId}`
     );
+
+    const roomAlias = gitterRoom.uri.replace('/', '_');
 
     const bridgeIntent = this.matrixBridge.getIntent();
     const newRoom = await bridgeIntent.createRoom({
       createAsClient: true,
       options: {
-        name: `${room.uri}`,
+        name: `${gitterRoom.uri}`,
         //invite: recipients,
         visibility: 'public',
-        room_alias_name: gitterRoomId,
+        room_alias_name: roomAlias,
         preset: 'public_chat'
         //initial_state: extraContent
       }
     });
-
+    // Store the bridged room right away!
+    // If we created a bridged room, we want to make sure we store it 100% of the time
+    logger.info(
+      `Storing bridged room (Gitter room id=${gitterRoomId} -> Matrix room_id=${newRoom.room_id})`
+    );
     await store.storeBridgedRoom(gitterRoomId, newRoom.room_id);
+
+    // Add another alias for the room ID
+    await bridgeIntent.createAlias(`#${gitterRoomId}:${serverName}`, newRoom.room_id);
+
+    // Add a lowercase alias if necessary
+    if (roomAlias.toLowerCase() !== roomAlias) {
+      await bridgeIntent.createAlias(`#${roomAlias.toLowerCase()}:${serverName}`, newRoom.room_id);
+    }
 
     return newRoom.room_id;
   }
@@ -119,6 +133,7 @@ class MatrixUtils {
       );
     }
 
+    logger.info(`Storing bridged user (Gitter user id=${gitterUser.id} -> Matrix mxid=${mxid})`);
     await store.storeBridgedUser(gitterUser.id, mxid);
 
     return mxid;
