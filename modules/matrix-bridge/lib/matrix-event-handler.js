@@ -10,6 +10,7 @@ const env = require('gitter-web-env');
 const stats = env.stats;
 const logger = env.logger;
 const errorReporter = env.errorReporter;
+const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 
 function validateEventForMessageCreateEvent(event) {
   return !event.state_key && event.sender && event.content && event.content.body;
@@ -106,7 +107,9 @@ class MatrixEventHandler {
       `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername}`
     );
 
-    const newText = event.content['m.new_content'].body;
+    const newText = await transformMatrixEventContentIntoGitterMessage(
+      event.content['m.new_content']
+    );
     await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
 
     return null;
@@ -147,6 +150,8 @@ class MatrixEventHandler {
       displayName = splitMxid[0];
     }
 
+    const newText = await transformMatrixEventContentIntoGitterMessage(event.content);
+
     const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
       virtualUser: {
         type: 'matrix',
@@ -156,7 +161,7 @@ class MatrixEventHandler {
           ? intent.getClient().mxcUrlToHttp(profile.avatar_url)
           : undefined
       },
-      text: event.content.body
+      text: newText
     });
 
     // Store the message so we can reference it in edits and threads/replies
