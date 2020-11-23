@@ -7,7 +7,6 @@ const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const userService = require('gitter-web-users');
 const store = require('./store');
 const env = require('gitter-web-env');
-const stats = env.stats;
 const logger = env.logger;
 const errorReporter = env.errorReporter;
 
@@ -66,7 +65,9 @@ class MatrixEventHandler {
         return await this.handleChatMessageDeleteEvent(event);
       }
     } catch (err) {
-      logger.error(err);
+      logger.error(`Error while processing Matrix event: ${err}`, {
+        exception: err
+      });
       errorReporter(
         err,
         { operation: 'matrixEventHandler.onDataChange', data: event },
@@ -78,40 +79,28 @@ class MatrixEventHandler {
   async handleChatMessageEditEvent(event) {
     // If someone is passing us mangled events, just ignore them.
     if (!validateEventForMessageEditEvent(event)) {
-      return;
+      return null;
     }
 
     const matrixEventId = event.content['m.relates_to'].event_id;
     const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
-
-    // No matching message on the Gitter side. Let's just ignore the edit as this is some edge case.
-    if (!gitterMessageId) {
-      debug(
-        `Ignoring message edit from Matrix side(matrixEventId=${matrixEventId}) because there is no associated Gitter message`
-      );
-      stats.event('matrix_bridge.ignored_matrix_message_edit', {
-        matrixEventId
-      });
-      return null;
-    }
+    assert(
+      gitterMessageId,
+      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to edit message`
+    );
 
     const chatMessage = await chatService.findById(gitterMessageId);
 
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
-    if (!gitterRoom) {
-      debug(
-        `Ignoring message edit from Matrix side(matrixEventId=${matrixEventId}) because the Gitter room was not found`
-      );
-      stats.event('matrix_bridge.ignored_matrix_message_edit', {
-        matrixEventId
-      });
-      return null;
-    }
+    assert(
+      chatMessage,
+      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to edit message`
+    );
 
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
     assert(
       gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername}`
+      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to edit message`
     );
 
     const newText = event.content['m.new_content'].body;
@@ -123,17 +112,20 @@ class MatrixEventHandler {
   async handleChatMessageCreateEvent(event) {
     // If someone is passing us mangled events, just ignore them.
     if (!validateEventForMessageCreateEvent(event)) {
-      return;
+      return null;
     }
 
     const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(event.room_id);
-    assert(gitterRoomId, `Unable to find gitterRoomId for Matrix room(${event.room_id})`);
+    assert(
+      gitterRoomId,
+      `Unable to find gitterRoomId for Matrix room(${event.room_id}) while trying to create message`
+    );
     const gitterRoom = await troupeService.findById(gitterRoomId);
-    assert(gitterRoom, `Gitter room not found (id=${gitterRoomId}`);
+    assert(gitterRoom, `Gitter room not found (id=${gitterRoomId} while trying to create message`);
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
     assert(
       gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername}`
+      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to create message`
     );
 
     const intent = this.matrixBridge.getIntent();
