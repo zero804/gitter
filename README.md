@@ -6,13 +6,10 @@ This codebase even covers a lot of the mobile and desktop applications which emb
 
 If you are just interested in the Gitter API, see https://developer.gitter.im/
 
- - Roadmap/plan (dates not accurate),
-    - [Epics roadmap](https://gitlab.com/groups/gitlab-org/-/roadmap?scope=all&utf8=%E2%9C%93&state=opened&label_name%5B%5D=group%3A%3Agitter&layout=QUARTERS)
-    - [Epics list](https://gitlab.com/groups/gitlab-org/-/epics?scope=all&utf8=%E2%9C%93&state=opened&label_name[]=group%3A%3Agitter)
  - Security issue boards
-    - https://gitlab.com/groups/gitlab-org/gitter/-/boards/1084052
-    - https://gitlab.com/groups/gitlab-com/-/boards/1084045
+    - https://gitlab.com/groups/gitterHQ/-/boards/1084052?&label_name[]=security
     - [Responsible disclosure](https://matrix.org/security-disclosure-policy/)
+ - [Epics list](https://gitlab.com/groups/gitterHQ/-/epics)
 
 ![](https://i.imgur.com/wT0bSy2.png)
 
