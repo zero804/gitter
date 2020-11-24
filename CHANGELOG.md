@@ -5,6 +5,10 @@
  - Add Gitter message delete support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2060
  - Add Matrix message delete/redact support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2061
 
+Developer facing:
+
+ - Consistent error handling while processing Matrix events, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2063
+
 
 # 21.3.0 - 2020-11-18 - The beginning of the Matrix bridge
 
