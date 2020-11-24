@@ -11,7 +11,16 @@ describe('gitter-bridge', () => {
   let gitterBridge;
   let matrixBridge;
   beforeEach(() => {
+    const clientSpies = {
+      redactEvent: sinon.spy()
+    };
+
     const intentSpies = {
+      getClient: () => clientSpies,
+      getEvent: sinon.spy(() => ({
+        event_id: `$${fixtureLoader.generateGithubId()}:localhost`,
+        sender: '@alice:localhost'
+      })),
       sendMessage: sinon.spy(() => ({
         event_id: `$${fixtureLoader.generateGithubId()}:localhost`
       })),
@@ -292,6 +301,108 @@ describe('gitter-bridge', () => {
 
         // No message sent
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
+    });
+
+    describe('handleChatMessageRemoveEvent', () => {
+      const fixture = fixtureLoader.setupEach({
+        user1: {},
+        userBridge1: {},
+        troupe1: {},
+        troupePrivate1: {
+          users: ['user1'],
+          securityDescriptor: {
+            members: 'INVITE',
+            admins: 'MANUAL',
+            public: false
+          }
+        },
+        message1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: 'my gitter message'
+        },
+        messagePrivate1: {
+          user: 'user1',
+          troupe: 'troupePrivate1',
+          text: 'my private gitter message'
+        }
+      });
+
+      it('remove message gets sent off to Matrix', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is sent off to Matrix
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 1);
+        assert.deepEqual(
+          matrixBridge
+            .getIntent()
+            .getClient()
+            .redactEvent.getCall(0).args[1],
+          matrixMessageEventId
+        );
+      });
+
+      it('non-bridged message that gets removed is ignored', async () => {
+        // We purposely do not associate bridged message. We are testing that the
+        // remove is ignored if no association in the database.
+        //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is ignored if there isn't an associated bridge message
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 0);
+      });
+
+      it('private room is not bridged', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.messagePrivate1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is ignored in private rooms
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 0);
+      });
+
+      it('when the Matrix API call to lookup the message author fails(`intent.getEvent()`), still deletes the message (using bridge user)', async () => {
+        // Make the event lookup Matrix API call fail
+        matrixBridge.getIntent().getEvent = () => {
+          throw new Error('Fake error and failed to fetch event');
+        };
+
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is sent off to Matrix
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 1);
+        assert.deepEqual(
+          matrixBridge
+            .getIntent()
+            .getClient()
+            .redactEvent.getCall(0).args[1],
+          matrixMessageEventId
+        );
       });
     });
   });
