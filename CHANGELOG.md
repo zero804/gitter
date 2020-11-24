@@ -4,6 +4,7 @@
  - Update roadmap and security dashboard links, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2065
  - Add Gitter message delete support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2060
  - Add Matrix message delete/redact support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2061
+ - Relate messages on Matrix for Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2066
 
 Developer facing:
 
