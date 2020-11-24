@@ -66,15 +66,13 @@ describe('matrix-event-handler', () => {
             }
           }
         });
-        // We purposely do not associate the bridged message. We are testing that the
-        // edit is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);
-        assert.strictEqual(messages[0].text, 'my original message from matrix');
+        assert.strictEqual(messages[0].text, 'my edited message from matrix');
       });
 
       it('Ignore message edit from Matrix when there is no matching message', async () => {
@@ -90,13 +88,15 @@ describe('matrix-event-handler', () => {
             }
           }
         });
-        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        // We purposely do not associate the bridged message. We are testing that the
+        // edit is ignored if there is no association in the database.
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);
-        assert.strictEqual(messages[0].text, 'my edited message from matrix');
+        assert.strictEqual(messages[0].text, 'my original message from matrix');
       });
     });
 
@@ -178,6 +178,61 @@ describe('matrix-event-handler', () => {
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 0);
+      });
+    });
+
+    describe('handleChatMessageDeleteEvent', () => {
+      const fixture = fixtureLoader.setupEach({
+        userBridge1: {},
+        troupe1: {},
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my original message from matrix'
+        }
+      });
+
+      beforeEach(() => {
+        matrixEventHandler = new MatrixEventHandler(matrixBridge, fixture.userBridge1.username);
+      });
+
+      it('When we receive Matrix message redaction/deletion, deletes Gitter message in Gitter room', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.redaction',
+          redacts: matrixMessageEventId
+        });
+        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+
+        const messagesBefore = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messagesBefore.length, 1);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messagesAfter = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messagesAfter.length, 0);
+      });
+
+      it('Ignore message edit from Matrix when there is no matching message', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.redaction',
+          redacts: matrixMessageEventId
+        });
+        // We purposely do not associate the bridged message. We are testing that the
+        // deletion is ignored if there is no association in the database.
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messages.length, 1);
+        assert.strictEqual(messages[0].text, 'my original message from matrix');
       });
     });
   });
