@@ -100,6 +100,12 @@ class GitterBridge {
       throw new StatusError(400, 'message.fromUser does not exist');
     }
 
+    // Handle threaded conversations
+    let parentMatrixEventId;
+    if (model.parentId) {
+      parentMatrixEventId = await store.getMatrixEventIdByGitterMessageId(model.parentId);
+    }
+
     // Send the message to the Matrix room
     const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
     logger.info(
@@ -112,6 +118,16 @@ class GitterBridge {
       formatted_body: model.html,
       msgtype: 'm.text'
     };
+
+    // Handle threaded conversations
+    if (parentMatrixEventId) {
+      matrixContent['m.relates_to'] = {
+        'm.in_reply_to': {
+          event_id: parentMatrixEventId
+        }
+      };
+    }
+
     const { event_id } = await intent.sendMessage(matrixRoomId, matrixContent);
 
     // Store the message so we can reference it in edits and threads/replies
