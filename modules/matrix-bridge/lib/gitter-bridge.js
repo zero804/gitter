@@ -65,16 +65,18 @@ class GitterBridge {
 
       const [, gitterRoomId] = data.url.match(/\/rooms\/([a-f0-9]+)\/chatMessages/) || [];
       if (gitterRoomId && data.operation === 'create') {
-        return this.handleChatMessageCreateEvent(gitterRoomId, data.model);
+        return await this.handleChatMessageCreateEvent(gitterRoomId, data.model);
       } else if (gitterRoomId && data.operation === 'update') {
-        return this.handleChatMessageEditEvent(gitterRoomId, data.model);
+        return await this.handleChatMessageEditEvent(gitterRoomId, data.model);
       } else if (gitterRoomId && data.operation === 'remove') {
         return await this.handleChatMessageRemoveEvent(gitterRoomId, data.model);
       }
 
       // TODO: Handle user data change and update Matrix user
     } catch (err) {
-      logger.error(err);
+      logger.error(`Error while processing Gitter event: ${err}`, {
+        exception: err
+      });
       errorReporter(
         err,
         { operation: 'gitterBridge.onDataChange', data: data },
