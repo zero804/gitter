@@ -1,4 +1,4 @@
-# 21.4.0 - *upcoming*
+# 21.4.0 - 2020-11-25
 
  - Add support for Matrix message edits to Gitter, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2058
  - Update roadmap and security dashboard links, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2065
