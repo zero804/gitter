@@ -83,8 +83,12 @@ class MatrixEventHandler {
       return null;
     }
 
+    const matrixRoomId = event.room_id;
     const matrixEventId = event.content['m.relates_to'].event_id;
-    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+      matrixRoomId,
+      matrixEventId
+    );
     assert(
       gitterMessageId,
       `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to edit message`
@@ -165,7 +169,7 @@ class MatrixEventHandler {
     });
 
     // Store the message so we can reference it in edits and threads/replies
-    await store.storeBridgedMessage(newChatMessage._id, event.event_id);
+    await store.storeBridgedMessage(newChatMessage._id, event.room_id, event.event_id);
 
     return null;
   }
@@ -176,8 +180,12 @@ class MatrixEventHandler {
       return null;
     }
 
+    const matrixRoomId = event.room_id;
     const matrixEventId = event.redacts;
-    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+      matrixRoomId,
+      matrixEventId
+    );
     assert(
       gitterMessageId,
       `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to delete message`

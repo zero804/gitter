@@ -66,7 +66,11 @@ describe('matrix-event-handler', () => {
             }
           }
         });
-        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(
+          fixture.messageFromVirtualUser1.id,
+          eventData.room_id,
+          matrixMessageEventId
+        );
 
         await matrixEventHandler.onEventData(eventData);
 
@@ -90,7 +94,7 @@ describe('matrix-event-handler', () => {
         });
         // We purposely do not associate the bridged message. We are testing that the
         // edit is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, eventData.room_id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 
@@ -207,7 +211,11 @@ describe('matrix-event-handler', () => {
           type: 'm.room.redaction',
           redacts: matrixMessageEventId
         });
-        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(
+          fixture.messageFromVirtualUser1.id,
+          eventData.room_id,
+          matrixMessageEventId
+        );
 
         const messagesBefore = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messagesBefore.length, 1);
@@ -226,7 +234,7 @@ describe('matrix-event-handler', () => {
         });
         // We purposely do not associate the bridged message. We are testing that the
         // deletion is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, eventData.room_id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 
