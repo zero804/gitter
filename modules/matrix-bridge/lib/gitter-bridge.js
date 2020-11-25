@@ -135,6 +135,9 @@ class GitterBridge {
     const { event_id } = await intent.sendMessage(matrixRoomId, matrixContent);
 
     // Store the message so we can reference it in edits and threads/replies
+    logger.info(
+      `Storing bridged message (Gitter message id=${model.id} -> Matrix event_id=${event_id})`
+    );
     await store.storeBridgedMessage(model.id, event_id);
 
     return null;
