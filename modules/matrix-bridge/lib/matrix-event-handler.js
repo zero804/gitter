@@ -173,7 +173,7 @@ class MatrixEventHandler {
     });
 
     // Store the message so we can reference it in edits and threads/replies
-    await store.storeBridgedMessage(newChatMessage._id, event.room_id, event.event_id);
+    await store.storeBridgedMessage(newChatMessage, event.room_id, event.event_id);
 
     return null;
   }

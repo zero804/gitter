@@ -34,10 +34,15 @@ async function getMatrixUserIdByGitterUserId(gitterUserId) {
   }
 }
 
-async function getMatrixEventIdByGitterMessageId(gitterMessageId) {
+async function getBridgedMessageEntryByGitterMessageId(gitterMessageId) {
   const bridgedMessageEntry = await persistence.MatrixBridgedChatMessage.findOne({
     gitterMessageId
   }).exec();
+  return bridgedMessageEntry;
+}
+
+async function getMatrixEventIdByGitterMessageId(gitterMessageId) {
+  const bridgedMessageEntry = await getBridgedMessageEntryByGitterMessageId(gitterMessageId);
   if (bridgedMessageEntry) {
     return bridgedMessageEntry.matrixEventId;
   }
@@ -67,14 +72,25 @@ async function storeBridgedUser(gitterUserId, matrixId) {
   });
 }
 
-async function storeBridgedMessage(gitterMessageId, matrixRoomId, matrixEventId) {
-  assert(gitterMessageId);
+async function storeBridgedMessage(gitterMessage, matrixRoomId, matrixEventId) {
+  assert(gitterMessage);
   assert(matrixRoomId);
   assert(matrixEventId);
   return persistence.MatrixBridgedChatMessage.create({
-    gitterMessageId,
+    gitterMessageId: gitterMessage.id || gitterMessage._id,
     matrixRoomId,
-    matrixEventId
+    matrixEventId,
+    sent: gitterMessage.sent,
+    editedAt: gitterMessage.editedAt
+  });
+}
+
+async function storeUpdatedBridgedGitterMessage(gitterMessage) {
+  return persistence.MatrixBridgedChatMessage.update({
+    $set: {
+      sent: gitterMessage.sent,
+      editedAt: gitterMessage.editedAt
+    }
   });
 }
 
@@ -89,7 +105,9 @@ module.exports = {
   storeBridgedUser,
 
   // Messages
+  getBridgedMessageEntryByGitterMessageId,
   getGitterMessageIdByMatrixEventId,
   getMatrixEventIdByGitterMessageId,
-  storeBridgedMessage
+  storeBridgedMessage,
+  storeUpdatedBridgedGitterMessage
 };

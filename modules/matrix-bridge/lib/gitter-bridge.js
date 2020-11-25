@@ -15,6 +15,7 @@ const errorReporter = env.errorReporter;
 const store = require('./store');
 const MatrixUtils = require('./matrix-utils');
 const transformGitterTextIntoMatrixMessage = require('./transform-gitter-text-into-matrix-message');
+const checkIfDatesSame = require('./check-if-dates-same');
 
 const gitterRoomAllowList = config.get('matrix:bridge:gitterRoomAllowList');
 
@@ -143,7 +144,7 @@ class GitterBridge {
     logger.info(
       `Storing bridged message (Gitter message id=${model.id} -> Matrix matrixRoomId=${matrixRoomId} event_id=${event_id})`
     );
-    await store.storeBridgedMessage(model.id, matrixRoomId, event_id);
+    await store.storeBridgedMessage(model, matrixRoomId, event_id);
 
     return null;
   }
@@ -159,16 +160,27 @@ class GitterBridge {
       return null;
     }
 
-    const matrixEventId = await store.getMatrixEventIdByGitterMessageId(model.id);
+    const bridgedMessageEntry = await store.getBridgedMessageEntryByGitterMessageId(model.id);
 
     // No matching message on the Matrix side. Let's just ignore the edit as this is some edge case.
-    if (!matrixEventId) {
+    if (!bridgedMessageEntry || !bridgedMessageEntry.matrixEventId) {
       debug(
         `Ignoring message edit from Gitter side(id=${model.id}) because there is no associated Matrix event ID`
       );
       stats.event('matrix_bridge.ignored_gitter_message_edit', {
         gitterMessageId: model.id
       });
+      return null;
+    }
+
+    // Check if the message was actually updated.
+    // If there was an `update` data2 event and there was no timestamp change here,
+    // it is probably just an update to `threadMessageCount`, etc which we don't need to propogate
+    //
+    // We use this special date comparison function because:
+    //  - `bridgedMessageEntry.editedAt` from the database is a `Date` object{} or `null`
+    //  - `model.editedAt` from the event is a `string` or `undefined`
+    if (checkIfDatesSame(bridgedMessageEntry.editedAt, model.editedAt)) {
       return null;
     }
 
@@ -189,11 +201,14 @@ class GitterBridge {
         msgtype: 'm.text'
       },
       'm.relates_to': {
-        event_id: matrixEventId,
+        event_id: bridgedMessageEntry.matrixEventId,
         rel_type: 'm.replace'
       }
     };
     await intent.sendMessage(matrixRoomId, matrixContent);
+
+    // Update the timestamps to compare again next time
+    await store.storeUpdatedBridgedGitterMessage(model);
 
     return null;
   }
