@@ -29,6 +29,7 @@ describe('matrix-utils', () => {
         room_id: `!${fixtureLoader.generateGithubId()}:localhost`
       })),
       createAlias: sinon.spy(),
+      setRoomAvatar: sinon.spy(),
       setDisplayName: sinon.spy(),
       uploadContent: sinon.spy(() => 'mxc://12345'),
       setAvatarUrl: sinon.spy()
