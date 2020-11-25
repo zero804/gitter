@@ -2,6 +2,7 @@
 
 // Some reference: https://github.com/matrix-org/matrix-bifrost/blob/develop/src/store/Store.ts
 
+const assert = require('assert');
 const persistence = require('gitter-web-persistence');
 
 async function getGitterRoomIdByMatrixRoomId(matrixRoomId) {
@@ -42,8 +43,9 @@ async function getMatrixEventIdByGitterMessageId(gitterMessageId) {
   }
 }
 
-async function getGitterMessageIdByMatrixEventId(matrixEventId) {
+async function getGitterMessageIdByMatrixEventId(matrixRoomId, matrixEventId) {
   const bridgedMessageEntry = await persistence.MatrixBridgedChatMessage.findOne({
+    matrixRoomId,
     matrixEventId
   }).exec();
   if (bridgedMessageEntry) {
@@ -65,9 +67,13 @@ async function storeBridgedUser(gitterUserId, matrixId) {
   });
 }
 
-async function storeBridgedMessage(gitterMessageId, matrixEventId) {
+async function storeBridgedMessage(gitterMessageId, matrixRoomId, matrixEventId) {
+  assert(gitterMessageId);
+  assert(matrixRoomId);
+  assert(matrixEventId);
   return persistence.MatrixBridgedChatMessage.create({
     gitterMessageId,
+    matrixRoomId,
     matrixEventId
   });
 }

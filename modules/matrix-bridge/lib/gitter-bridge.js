@@ -136,9 +136,9 @@ class GitterBridge {
 
     // Store the message so we can reference it in edits and threads/replies
     logger.info(
-      `Storing bridged message (Gitter message id=${model.id} -> Matrix event_id=${event_id})`
+      `Storing bridged message (Gitter message id=${model.id} -> Matrix matrixRoomId=${matrixRoomId} event_id=${event_id})`
     );
-    await store.storeBridgedMessage(model.id, event_id);
+    await store.storeBridgedMessage(model.id, matrixRoomId, event_id);
 
     return null;
   }

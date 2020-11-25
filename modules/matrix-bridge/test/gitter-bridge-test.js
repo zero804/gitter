@@ -146,12 +146,10 @@ describe('gitter-bridge', () => {
           strategy
         );
 
-        await store.storeBridgedRoom(
-          fixture.troupe1.id,
-          `!${fixtureLoader.generateGithubId()}:localhost`
-        );
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+        await store.storeBridgedRoom(fixture.troupe1.id, matrixRoomId);
         const parentMessageEventId = `$${fixtureLoader.generateGithubId()}:localhost`;
-        await store.storeBridgedMessage(fixture.message1.id, parentMessageEventId);
+        await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, parentMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -184,14 +182,12 @@ describe('gitter-bridge', () => {
           strategy
         );
 
-        await store.storeBridgedRoom(
-          fixture.troupe1.id,
-          `!${fixtureLoader.generateGithubId()}:localhost`
-        );
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+        await store.storeBridgedRoom(fixture.troupe1.id, matrixRoomId);
         // We purposely do not associate the bridged message. We are testing that the
         // message is ignored if the parent message event is not in the database.
         //const parentMessageEventId = `$${fixtureLoader.generateGithubId()}:localhost`;
-        //await store.storeBridgedMessage(fixture.message1.id, parentMessageEventId);
+        //await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, parentMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -287,8 +283,9 @@ describe('gitter-bridge', () => {
         const strategy = new restSerializer.ChatStrategy();
         const serializedMessage = await restSerializer.serializeObject(fixture.message1, strategy);
 
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -323,7 +320,8 @@ describe('gitter-bridge', () => {
 
         // We purposely do not associate the bridged message. We are testing that the
         // edit is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+        //const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+        //await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -342,8 +340,13 @@ describe('gitter-bridge', () => {
           strategy
         );
 
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(
+          fixture.messageFromVirtualUser1.id,
+          matrixRoomId,
+          matrixMessageEventId
+        );
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -362,8 +365,13 @@ describe('gitter-bridge', () => {
           strategy
         );
 
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.messagePrivate1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(
+          fixture.messagePrivate1.id,
+          matrixRoomId,
+          matrixMessageEventId
+        );
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
@@ -402,8 +410,9 @@ describe('gitter-bridge', () => {
       });
 
       it('remove message gets sent off to Matrix', async () => {
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -425,7 +434,8 @@ describe('gitter-bridge', () => {
       it('non-bridged message that gets removed is ignored', async () => {
         // We purposely do not associate bridged message. We are testing that the
         // remove is ignored if no association in the database.
-        //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+        //const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+        //await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
@@ -438,8 +448,13 @@ describe('gitter-bridge', () => {
       });
 
       it('private room is not bridged', async () => {
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.messagePrivate1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(
+          fixture.messagePrivate1.id,
+          matrixRoomId,
+          matrixMessageEventId
+        );
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
@@ -457,8 +472,9 @@ describe('gitter-bridge', () => {
           throw new Error('Fake error and failed to fetch event');
         };
 
+        const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
-        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+        await store.storeBridgedMessage(fixture.message1.id, matrixRoomId, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
           url: `/rooms/${fixture.troupe1.id}/chatMessages`,
