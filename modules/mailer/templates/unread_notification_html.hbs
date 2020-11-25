@@ -16,16 +16,21 @@
         <img src="{{fromUser.avatarUrlSmall}}" alt="avatar" height="30" width="30" align="right" />
       </td>
       <td class="username">
+        <strong>{{fromUser.username}}</strong>
         {{#if virtualUser}}
           <a
             class="chat-item__flair chat-item__flair--{{virtualUser.type}}"
             {{#if virtualUser.profileUrl}}href="{{virtualUser.profileUrl}}"{{/if}}
             target="_blank"
+            title="This user is being bridged from Matrix"
           >
-            {{virtualUser.type}}
+            {{#if virtualUser.isMatrix}}
+              [m]
+            {{else}}
+              {{virtualUser.type}}
+            {{/if}}
           </a>
         {{/if}}
-        <strong>{{fromUser.username}}</strong>
       </td>
     </tr>
     <tr>

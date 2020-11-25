@@ -32,8 +32,6 @@ exports[`thread-message-feed chat-item editing matches snapshot 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -45,6 +43,8 @@ exports[`thread-message-feed chat-item editing matches snapshot 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -100,8 +100,6 @@ exports[`thread-message-feed chat-item snapshot component flags showItemActions 
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -113,6 +111,8 @@ exports[`thread-message-feed chat-item snapshot component flags showItemActions 
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -188,8 +188,6 @@ exports[`thread-message-feed chat-item snapshot component flags useCompactStyles
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -201,6 +199,8 @@ exports[`thread-message-feed chat-item snapshot component flags useCompactStyles
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -275,8 +275,6 @@ exports[`thread-message-feed chat-item snapshot deleted (empty) message 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -288,6 +286,8 @@ exports[`thread-message-feed chat-item snapshot deleted (empty) message 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -348,8 +348,6 @@ exports[`thread-message-feed chat-item snapshot highlighted - scrolls into view 
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -361,6 +359,8 @@ exports[`thread-message-feed chat-item snapshot highlighted - scrolls into view 
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -435,8 +435,6 @@ exports[`thread-message-feed chat-item snapshot message flags error 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -448,6 +446,8 @@ exports[`thread-message-feed chat-item snapshot message flags error 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -522,8 +522,6 @@ exports[`thread-message-feed chat-item snapshot message flags loading 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -535,6 +533,8 @@ exports[`thread-message-feed chat-item snapshot message flags loading 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -611,8 +611,6 @@ exports[`thread-message-feed chat-item snapshot message flags unread 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -624,6 +622,8 @@ exports[`thread-message-feed chat-item snapshot message flags unread 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -696,8 +696,6 @@ exports[`thread-message-feed chat-item snapshot not logged in user (no message a
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -709,6 +707,8 @@ exports[`thread-message-feed chat-item snapshot not logged in user (no message a
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"
@@ -769,16 +769,6 @@ exports[`thread-message-feed chat-item snapshot virtual user 1`] = `
         <div
           class="chat-item__details"
         >
-          <a
-            class="chat-item__flair chat-item__flair--matrix"
-            href="https://matrix.to/#/@madlittlemods:matrix.org"
-            target="_blank"
-          >
-            
-            matrix
-          
-          </a>
-           
           <div
             class="chat-item__from"
           >
@@ -790,6 +780,17 @@ exports[`thread-message-feed chat-item snapshot virtual user 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <a
+            class="chat-item__flair chat-item__flair--matrix"
+            href="https://matrix.to/#/@madlittlemods:matrix.org"
+            target="_blank"
+            title="This user is being bridged from Matrix"
+          >
+            
+              [m]
+            
+          </a>
            
           <a
             class="chat-item__time"
@@ -864,8 +865,6 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
         <div
           class="chat-item__details"
         >
-          <!---->
-           
           <div
             class="chat-item__from"
           >
@@ -877,6 +876,8 @@ exports[`thread-message-feed chat-item snapshot with default props 1`] = `
           >
             @viktomas_gitlab
           </div>
+           
+          <!---->
            
           <a
             class="chat-item__time"

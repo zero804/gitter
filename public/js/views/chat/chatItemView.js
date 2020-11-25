@@ -168,6 +168,7 @@ module.exports = (function() {
       }
 
       if (data.virtualUser) {
+        data.virtualUser.isMatrix = data.virtualUser.type === 'matrix';
         data.virtualUser.profileUrl = getProfileUrlFromVirtualUser(data.virtualUser);
       }
 

@@ -34,6 +34,9 @@ function ChatStrategy(options) {
         externalId: item.virtualUser.externalId,
         displayName: item.virtualUser.displayName,
         avatarUrl: item.virtualUser.avatarUrl,
+
+        // Used for the templates
+        isMatrix: item.virtualUser.type === 'matrix',
         profileUrl: getProfileUrlFromVirtualUser(item.virtualUser)
       };
 
