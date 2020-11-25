@@ -1,6 +1,7 @@
 # 21.5.0 - *upcoming*
 
  - Add human readable Matrix room alias based off of the Gitter room URI, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2062
+ - Transform Gitter MXID from Matrix into a Gitter mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2064
 
 
 # 21.4.0 - 2020-11-25
