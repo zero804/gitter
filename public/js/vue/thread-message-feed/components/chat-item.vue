@@ -179,16 +179,22 @@ export default {
         />
         <div class="chat-item__content">
           <div class="chat-item__details">
+            <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
+            <div class="chat-item__username">@{{ message.fromUser.username }}</div>
             <a
               v-if="message.virtualUser"
               :class="`chat-item__flair chat-item__flair--${message.virtualUser.type}`"
               :href="virtualUserProfileUrl"
               target="_blank"
+              title="This user is being bridged from Matrix"
             >
-              {{ message.virtualUser.type }}
+              <template v-if="message.virtualUser.type === 'matrix'">
+                [m]
+              </template>
+              <template v-else>
+                {{ message.virtualUser.type }}
+              </template>
             </a>
-            <div class="chat-item__from">{{ message.fromUser.displayName }}</div>
-            <div class="chat-item__username">@{{ message.fromUser.username }}</div>
             <a
               class="chat-item__time"
               :href="permalinkUrl"
@@ -233,7 +239,7 @@ export default {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   // inspired by https://stackoverflow.com/questions/20626685/better-way-to-set-distance-between-flexbox-items
   margin-left: -@item-detail-margin;
   margin-right: -@item-detail-margin;
@@ -246,6 +252,10 @@ export default {
   text-overflow: ellipsis;
   margin-left: @item-detail-margin;
   margin-right: @item-detail-margin;
+}
+
+.chat-item__time {
+  margin-left: 8px;
 }
 
 .compact .chat-item__container {
