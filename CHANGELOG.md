@@ -1,3 +1,16 @@
+# 21.4.0 - 2020-11-25
+
+ - Add support for Matrix message edits to Gitter, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2058
+ - Update roadmap and security dashboard links, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2065
+ - Add Gitter message delete support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2060
+ - Add Matrix message delete/redact support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2061
+ - Relate messages on Matrix for Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2066
+
+Developer facing:
+
+ - Consistent error handling while processing Matrix events, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2063
+
+
 # 21.3.0 - 2020-11-18 - The beginning of the Matrix bridge
 
  - Pass virtualUser avatars through the content proxy (camoproxy), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2047
@@ -6,6 +19,7 @@
  - Use correct `room_alias_name` option when creating the room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2053
  - Show virtualUser in unread email notifications, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2052
  - Add support for Gitter message edits to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2056
+ - Only bridge public rooms to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2059
 
 Developer facing:
 

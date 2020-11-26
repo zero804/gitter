@@ -11,7 +11,16 @@ describe('gitter-bridge', () => {
   let gitterBridge;
   let matrixBridge;
   beforeEach(() => {
+    const clientSpies = {
+      redactEvent: sinon.spy()
+    };
+
     const intentSpies = {
+      getClient: () => clientSpies,
+      getEvent: sinon.spy(() => ({
+        event_id: `$${fixtureLoader.generateGithubId()}:localhost`,
+        sender: '@alice:localhost'
+      })),
       sendMessage: sinon.spy(() => ({
         event_id: `$${fixtureLoader.generateGithubId()}:localhost`
       })),
@@ -54,6 +63,12 @@ describe('gitter-bridge', () => {
           troupe: 'troupe1',
           text: 'my gitter message2'
         },
+        messageThreaded1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: 'my gitter threaded message1',
+          parent: 'message1'
+        },
         messageFromVirtualUser1: {
           user: 'userBridge1',
           virtualUser: {
@@ -86,17 +101,12 @@ describe('gitter-bridge', () => {
 
         // Message is sent to the new room
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 1);
-        assert(
-          matrixBridge.getIntent().sendMessage.calledWith(
-            sinon.match.any,
-            sinon.match({
-              body: fixture.message1.text,
-              format: 'org.matrix.custom.html',
-              formatted_body: fixture.message1.html,
-              msgtype: 'm.text'
-            })
-          )
-        );
+        assert.deepEqual(matrixBridge.getIntent().sendMessage.getCall(0).args[1], {
+          body: fixture.message1.text,
+          format: 'org.matrix.custom.html',
+          formatted_body: fixture.message1.html,
+          msgtype: 'm.text'
+        });
       });
 
       it('subsequent multiple messages go to the same room', async () => {
@@ -126,6 +136,76 @@ describe('gitter-bridge', () => {
         const sendMessageCall2 = matrixBridge.getIntent().sendMessage.getCall(1);
         // Make sure the messages were sent to the same room
         assert.strictEqual(sendMessageCall1.args[0], sendMessageCall2.args[0]);
+      });
+
+      it('threaded conversation reply gets sent off to Matrix', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedMessage = await restSerializer.serializeObject(
+          fixture.messageThreaded1,
+          strategy
+        );
+
+        await store.storeBridgedRoom(
+          fixture.troupe1.id,
+          `!${fixtureLoader.generateGithubId()}:localhost`
+        );
+        const parentMessageEventId = `$${fixtureLoader.generateGithubId()}:localhost`;
+        await store.storeBridgedMessage(fixture.message1.id, parentMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'create',
+          model: serializedMessage
+        });
+
+        // Message is sent to the new room
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 1);
+        assert.deepEqual(matrixBridge.getIntent().sendMessage.getCall(0).args[1], {
+          body: fixture.messageThreaded1.text,
+          format: 'org.matrix.custom.html',
+          formatted_body: fixture.messageThreaded1.html,
+          msgtype: 'm.text',
+          'm.relates_to': {
+            'm.in_reply_to': {
+              event_id: parentMessageEventId
+            }
+          }
+        });
+      });
+
+      // This is a edge case in the transition between no Matrix bridge and Matrix.
+      // I don't think we need to worry too much about what happens. Just want a test to know
+      // something happens.
+      it('threaded conversation reply where the parent does not exist on Matrix still gets sent', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedMessage = await restSerializer.serializeObject(
+          fixture.messageThreaded1,
+          strategy
+        );
+
+        await store.storeBridgedRoom(
+          fixture.troupe1.id,
+          `!${fixtureLoader.generateGithubId()}:localhost`
+        );
+        // We purposely do not associate the bridged message. We are testing that the
+        // message is ignored if the parent message event is not in the database.
+        //const parentMessageEventId = `$${fixtureLoader.generateGithubId()}:localhost`;
+        //await store.storeBridgedMessage(fixture.message1.id, parentMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'create',
+          model: serializedMessage
+        });
+
+        // Message is sent to the new room
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 1);
+        assert.deepEqual(matrixBridge.getIntent().sendMessage.getCall(0).args[1], {
+          body: fixture.messageThreaded1.text,
+          format: 'org.matrix.custom.html',
+          formatted_body: fixture.messageThreaded1.html,
+          msgtype: 'm.text'
+        });
       });
 
       it('new message from virtualUser is suppressed (no echo back and forth)', async () => {
@@ -185,6 +265,16 @@ describe('gitter-bridge', () => {
           troupe: 'troupe1',
           text: 'my gitter message'
         },
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my virtualUser message'
+        },
         messagePrivate1: {
           user: 'user1',
           troupe: 'troupePrivate1',
@@ -230,8 +320,8 @@ describe('gitter-bridge', () => {
         const strategy = new restSerializer.ChatStrategy();
         const serializedMessage = await restSerializer.serializeObject(fixture.message1, strategy);
 
-        // We purposely do not associate bridged message. We are testing that the
-        // edit is ignored if no association in the database.
+        // We purposely do not associate the bridged message. We are testing that the
+        // edit is ignored if there is no association in the database.
         //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
 
         await gitterBridge.onDataChange({
@@ -243,6 +333,27 @@ describe('gitter-bridge', () => {
         // Message edit is ignored if there isn't an associated bridge message
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
       });
+
+      it('message edit from virtualUser is suppressed (no echo back and forth)', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedVirtualUserMessage = await restSerializer.serializeObject(
+          fixture.messageFromVirtualUser1,
+          strategy
+        );
+
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'update',
+          model: serializedVirtualUserMessage
+        });
+
+        // No message sent
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
+
       it('private room is not bridged', async () => {
         const strategy = new restSerializer.ChatStrategy();
         const serializedMessage = await restSerializer.serializeObject(
@@ -261,6 +372,108 @@ describe('gitter-bridge', () => {
 
         // No message sent
         assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 0);
+      });
+    });
+
+    describe('handleChatMessageRemoveEvent', () => {
+      const fixture = fixtureLoader.setupEach({
+        user1: {},
+        userBridge1: {},
+        troupe1: {},
+        troupePrivate1: {
+          users: ['user1'],
+          securityDescriptor: {
+            members: 'INVITE',
+            admins: 'MANUAL',
+            public: false
+          }
+        },
+        message1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: 'my gitter message'
+        },
+        messagePrivate1: {
+          user: 'user1',
+          troupe: 'troupePrivate1',
+          text: 'my private gitter message'
+        }
+      });
+
+      it('remove message gets sent off to Matrix', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is sent off to Matrix
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 1);
+        assert.deepEqual(
+          matrixBridge
+            .getIntent()
+            .getClient()
+            .redactEvent.getCall(0).args[1],
+          matrixMessageEventId
+        );
+      });
+
+      it('non-bridged message that gets removed is ignored', async () => {
+        // We purposely do not associate bridged message. We are testing that the
+        // remove is ignored if no association in the database.
+        //await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is ignored if there isn't an associated bridge message
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 0);
+      });
+
+      it('private room is not bridged', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.messagePrivate1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupePrivate1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is ignored in private rooms
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 0);
+      });
+
+      it('when the Matrix API call to lookup the message author fails(`intent.getEvent()`), still deletes the message (using bridge user)', async () => {
+        // Make the event lookup Matrix API call fail
+        matrixBridge.getIntent().getEvent = () => {
+          throw new Error('Fake error and failed to fetch event');
+        };
+
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        await store.storeBridgedMessage(fixture.message1.id, matrixMessageEventId);
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'remove',
+          model: { id: fixture.message1.id }
+        });
+
+        // Message remove is sent off to Matrix
+        assert.strictEqual(matrixBridge.getIntent().getClient().redactEvent.callCount, 1);
+        assert.deepEqual(
+          matrixBridge
+            .getIntent()
+            .getClient()
+            .redactEvent.getCall(0).args[1],
+          matrixMessageEventId
+        );
       });
     });
   });
