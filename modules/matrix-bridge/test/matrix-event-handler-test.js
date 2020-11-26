@@ -210,6 +210,37 @@ describe('matrix-event-handler', () => {
         assert(mongoUtils.isLikeObjectId(messages[2].parentId, fixture.messageParent1.id));
       });
 
+      it('When we receive Matrix image upload, creates Gitter message linking the image in Gitter room', async () => {
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my-image.jpeg',
+            info: {
+              h: 807,
+              mimetype: 'image/jpeg',
+              size: 176995,
+              thumbnail_info: [Object],
+              thumbnail_url: 'mxc://my.matrix.host/DSVnwDtcZeNoBEjUnsFxdelN',
+              w: 1217
+            },
+            msgtype: 'm.image',
+            url: 'mxc://my.matrix.host/yjyeYJIBdJGkYvYoLuvPfBuS'
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupe1.id, eventData.room_id);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messages.length, 1);
+        assert.strictEqual(
+          messages[0].text,
+          '[my-image.jpeg](http://localhost:18008/_matrix/media/v1/download/my.matrix.host/yjyeYJIBdJGkYvYoLuvPfBuS)\n[![my-image.jpeg](http://localhost:18008/_matrix/media/v1/download/my.matrix.host/DSVnwDtcZeNoBEjUnsFxdelN)](http://localhost:18008/_matrix/media/v1/download/my.matrix.host/yjyeYJIBdJGkYvYoLuvPfBuS)'
+        );
+        assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
+        assert.strictEqual(messages[0].virtualUser.displayName, 'Alice');
+      });
+
       it('When profile API request fails, still sends message', async () => {
         const failingMatrixBridge = {
           getIntent: (/*userId*/) => ({
