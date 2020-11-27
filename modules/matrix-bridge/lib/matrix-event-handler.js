@@ -89,24 +89,10 @@ class MatrixEventHandler {
       matrixRoomId,
       matrixEventId
     );
-    assert(
-      gitterMessageId,
-      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to edit message`
-    );
 
     const chatMessage = await chatService.findById(gitterMessageId);
-
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
-    assert(
-      chatMessage,
-      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to edit message`
-    );
-
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
-    assert(
-      gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to edit message`
-    );
 
     const newText = await transformMatrixEventContentIntoGitterMessage(
       event.content['m.new_content']
@@ -123,17 +109,8 @@ class MatrixEventHandler {
     }
 
     const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(event.room_id);
-    assert(
-      gitterRoomId,
-      `Unable to find gitterRoomId for Matrix room(${event.room_id}) while trying to create message`
-    );
     const gitterRoom = await troupeService.findById(gitterRoomId);
-    assert(gitterRoom, `Gitter room not found (id=${gitterRoomId} while trying to create message`);
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
-    assert(
-      gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to create message`
-    );
 
     const intent = this.matrixBridge.getIntent();
     // TODO: Use room membership events instead of profile and cache things
@@ -186,22 +163,9 @@ class MatrixEventHandler {
       matrixRoomId,
       matrixEventId
     );
-    assert(
-      gitterMessageId,
-      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to delete message`
-    );
 
     const chatMessage = await chatService.findById(gitterMessageId);
-    assert(
-      chatMessage,
-      `Gitter chatMessage(id=${gitterMessageId}) not found while trying to delete message`
-    );
-
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
-    assert(
-      chatMessage,
-      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to delete message`
-    );
 
     await chatService.deleteMessageFromRoom(gitterRoom, chatMessage);
 

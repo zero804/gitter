@@ -188,6 +188,7 @@ async function newChatMessageToTroupe(troupe, user, data) {
   const sentAt = new Date();
 
   if (!troupe) throw new StatusError(404, 'Unknown room');
+  if (!user) throw new StatusError(404, 'Unknown user');
 
   /* You have to have text */
   if (!data.text) throw new StatusError(400, 'Text is required');
@@ -327,6 +328,9 @@ function getRecentPublicChats() {
  * NB: It is the callers responsibility to ensure that the user has access to the room!
  */
 async function updateChatMessage(troupe, chatMessage, user, newText = '') {
+  if (!troupe) throw new StatusError(404, 'Unknown room');
+  if (!chatMessage) throw new StatusError(404, 'Unknown chatMessage');
+  if (!user) throw new StatusError(404, 'Unknown user');
   validateChatMessageLength(newText);
 
   const age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
@@ -374,6 +378,11 @@ async function updateChatMessage(troupe, chatMessage, user, newText = '') {
 }
 
 function findById(id, callback) {
+  assert(
+    mongoUtils.isLikeObjectId(id),
+    `Expected \`id\` to look like an ObjectId but you passed id=${id}`
+  );
+
   return ChatMessage.findById(id)
     .exec()
     .nodeify(callback);
