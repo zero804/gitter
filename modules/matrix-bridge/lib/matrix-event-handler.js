@@ -9,6 +9,7 @@ const store = require('./store');
 const env = require('gitter-web-env');
 const logger = env.logger;
 const errorReporter = env.errorReporter;
+const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 
 function validateEventForMessageCreateEvent(event) {
   return !event.state_key && event.sender && event.content && event.content.body;
@@ -82,8 +83,12 @@ class MatrixEventHandler {
       return null;
     }
 
+    const matrixRoomId = event.room_id;
     const matrixEventId = event.content['m.relates_to'].event_id;
-    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+      matrixRoomId,
+      matrixEventId
+    );
     assert(
       gitterMessageId,
       `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to edit message`
@@ -103,7 +108,9 @@ class MatrixEventHandler {
       `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to edit message`
     );
 
-    const newText = event.content['m.new_content'].body;
+    const newText = await transformMatrixEventContentIntoGitterMessage(
+      event.content['m.new_content']
+    );
     await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
 
     return null;
@@ -147,6 +154,8 @@ class MatrixEventHandler {
       displayName = splitMxid[0];
     }
 
+    const newText = await transformMatrixEventContentIntoGitterMessage(event.content);
+
     const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
       virtualUser: {
         type: 'matrix',
@@ -156,11 +165,11 @@ class MatrixEventHandler {
           ? intent.getClient().mxcUrlToHttp(profile.avatar_url)
           : undefined
       },
-      text: event.content.body
+      text: newText
     });
 
     // Store the message so we can reference it in edits and threads/replies
-    await store.storeBridgedMessage(newChatMessage._id, event.event_id);
+    await store.storeBridgedMessage(newChatMessage._id, event.room_id, event.event_id);
 
     return null;
   }
@@ -171,8 +180,12 @@ class MatrixEventHandler {
       return null;
     }
 
+    const matrixRoomId = event.room_id;
     const matrixEventId = event.redacts;
-    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(matrixEventId);
+    const gitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+      matrixRoomId,
+      matrixEventId
+    );
     assert(
       gitterMessageId,
       `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to delete message`

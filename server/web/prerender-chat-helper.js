@@ -10,6 +10,7 @@ var compileTemplate = require('./compile-web-template');
 var timeFormat = require('gitter-web-shared/time/time-format');
 const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 // var fullTimeFormat = require('gitter-web-shared/time/full-time-format');
+const getProfileUrlFromVirtualUser = require('gitter-web-shared/get-profile-url-from-virtual-user');
 
 var chatWrapper = compileTemplate.compileString(
   '<div class="chat-item model-id-{{id}} {{burstClass}} {{unreadClass}} {{deletedClass}} {{threadedConversationClass}}" role="listitem">{{{inner}}}</div>'
@@ -72,6 +73,11 @@ module.exports = exports = function(model, params) {
     permalinkUrl: generatePermalink(troupeName, model.id, model.sent, isArchive),
     showItemActions: !isArchive
   });
+
+  if (m.virtualUser) {
+    m.virtualUser.isMatrix = m.virtualUser.type === 'matrix';
+    m.virtualUser.profileUrl = getProfileUrlFromVirtualUser(m.virtualUser);
+  }
 
   var result;
 

@@ -6,6 +6,7 @@ const Schema = mongoose.Schema;
 const MatrixBridgedChatMessageSchema = new Schema(
   {
     gitterMessageId: { type: Schema.ObjectId, required: true },
+    matrixRoomId: { type: String, required: true },
     matrixEventId: { type: String, required: true }
   },
   { strict: 'throw' }
@@ -13,7 +14,10 @@ const MatrixBridgedChatMessageSchema = new Schema(
 
 MatrixBridgedChatMessageSchema.schemaTypeName = 'MatrixBridgedChatMessageSchema';
 MatrixBridgedChatMessageSchema.index({ gitterMessageId: 1 }, { unique: true, sparse: true });
-MatrixBridgedChatMessageSchema.index({ matrixEventId: 1 }, { unique: true, sparse: true });
+MatrixBridgedChatMessageSchema.index(
+  { matrixRoomId: 1, matrixEventId: 1 },
+  { unique: true, sparse: true }
+);
 
 module.exports = {
   install: function(mongooseConnection) {

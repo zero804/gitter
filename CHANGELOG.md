@@ -1,3 +1,14 @@
+# 21.5.0 - 2020-11-26
+
+ - Add human readable Matrix room alias based off of the Gitter room URI, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2062
+ - Transform Gitter MXID from Matrix into a Gitter mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2064
+ - Improve Matrix flair design for virtualUser's, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2072
+
+Developer facing:
+
+ - Make Matrix eventId's unique per room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2069
+
+
 # 21.4.0 - 2020-11-25
 
  - Add support for Matrix message edits to Gitter, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2058
