@@ -43,7 +43,9 @@ if (!process.env.DISABLE_API_LISTEN) {
   });
 }
 
-// Install the Gitter <-> Matrix bridge
-installBridge();
+if (!process.env.DISABLE_MATRIX_BRIDGE) {
+  // Install the Gitter <-> Matrix bridge
+  installBridge();
+}
 
 module.exports = server;
