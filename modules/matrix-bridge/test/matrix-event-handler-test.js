@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
+const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 const MatrixEventHandler = require('../lib/matrix-event-handler');
 const store = require('../lib/store');
 const chatService = require('gitter-web-chats');
@@ -107,7 +108,20 @@ describe('matrix-event-handler', () => {
     describe('handleChatMessageCreateEvent', () => {
       const fixture = fixtureLoader.setupEach({
         userBridge1: {},
-        troupe1: {}
+        user1: {},
+        troupe1: {},
+        troupeWithThreads1: {},
+        messageParent1: {
+          user: 'user1',
+          troupe: 'troupeWithThreads1',
+          text: 'some parent message'
+        },
+        messageThread1: {
+          parent: 'messageParent1',
+          user: 'user1',
+          troupe: 'troupeWithThreads1',
+          text: 'some parent message'
+        }
       });
 
       beforeEach(() => {
@@ -130,6 +144,70 @@ describe('matrix-event-handler', () => {
         assert.strictEqual(messages[0].text, 'my matrix message');
         assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
         assert.strictEqual(messages[0].virtualUser.displayName, 'Alice');
+      });
+
+      it('reply to message starts threaded conversation', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix reply',
+            'm.relates_to': {
+              'm.in_reply_to': {
+                event_id: matrixMessageEventId
+              }
+            }
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupeWithThreads1.id, eventData.room_id);
+        // Replying to a parent message
+        await store.storeBridgedMessage(
+          fixture.messageParent1.id,
+          eventData.room_id,
+          matrixMessageEventId
+        );
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(
+          fixture.troupeWithThreads1.id,
+          { includeThreads: true }
+        );
+        assert.strictEqual(messages.length, 3);
+        assert.strictEqual(messages[2].text, 'my matrix reply');
+        assert(mongoUtils.isLikeObjectId(messages[2].parentId, fixture.messageParent1.id));
+      });
+
+      it("reply to message in thread that isn't the parent puts it in the thread correctly", async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix reply',
+            'm.relates_to': {
+              'm.in_reply_to': {
+                event_id: matrixMessageEventId
+              }
+            }
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupeWithThreads1.id, eventData.room_id);
+        // Replying to a message in the thread
+        await store.storeBridgedMessage(
+          fixture.messageThread1.id,
+          eventData.room_id,
+          matrixMessageEventId
+        );
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(
+          fixture.troupeWithThreads1.id,
+          { includeThreads: true }
+        );
+        assert.strictEqual(messages.length, 3);
+        assert.strictEqual(messages[2].text, 'my matrix reply');
+        assert(mongoUtils.isLikeObjectId(messages[2].parentId, fixture.messageParent1.id));
       });
 
       it('When profile API request fails, still sends message', async () => {
