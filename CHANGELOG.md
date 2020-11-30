@@ -4,6 +4,7 @@
  - Transform Gitter MXID from Matrix into a Gitter mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2064
  - Improve Matrix flair design for virtualUser's, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2072
  - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
+ - Add replies from Matrix to Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2067
 
 Developer facing:
 
