@@ -107,7 +107,7 @@ class MatrixUtils {
 
     const gitterUser = await userService.findById(gitterUserId);
 
-    const mxid = `@${gitterUser.username}-${gitterUser.id}:${serverName}`;
+    const mxid = `@${gitterUser.username.toLowerCase()}-${gitterUser.id}:${serverName}`;
 
     const intent = this.matrixBridge.getIntent(mxid);
     await intent.setDisplayName(`${gitterUser.username} (${gitterUser.displayName})`);

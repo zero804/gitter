@@ -15,6 +15,9 @@ describe('matrix-utils', () => {
       gravatarImageUrl:
         'https://secure.gravatar.com/avatar/6042a9152ada74d9fb6a0cdce895337e?s=60&d=identicon'
     },
+    userWithCapitalUsername1: {
+      username: `MyTestUser${fixtureLoader.generateGithubId()}`
+    },
     troupe1: {}
   });
 
@@ -94,6 +97,14 @@ describe('matrix-utils', () => {
       assert(mxid1);
       assert(mxid2);
       assert.strictEqual(mxid1, mxid2);
+    });
+
+    it('lowercases Gitter username for MXID', async () => {
+      const mxid = await matrixUtils.getOrCreateMatrixUserByGitterUserId(
+        fixture.userWithCapitalUsername1.id
+      );
+
+      assert.strictEqual(mxid, mxid.toLowerCase());
     });
   });
 });
