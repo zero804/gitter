@@ -73,7 +73,8 @@ class MatrixUtils {
     const newRoom = await bridgeIntent.createRoom({
       createAsClient: true,
       options: {
-        name: `${gitterRoom.uri}`,
+        name: gitterRoom.uri,
+        topic: gitterRoom.topic,
         //invite: recipients,
         visibility: 'public',
         room_alias_name: roomAlias,
