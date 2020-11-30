@@ -36,7 +36,10 @@ function findByIdsLean(ids, select) {
 }
 
 function findById(id, callback) {
-  assert(mongoUtils.isLikeObjectId(id));
+  assert(
+    mongoUtils.isLikeObjectId(id),
+    `Expected \`id\` to look like an ObjectId but you passed id=${id}`
+  );
 
   return persistence.Troupe.findById(id)
     .exec()
