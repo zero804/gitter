@@ -6,6 +6,7 @@
  - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
  - Add replies from Matrix to Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2067
  - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
+ - Propagate the room topic to the bridged Matrix room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2080
 
 Developer facing:
 
