@@ -5,6 +5,7 @@ const userService = require('gitter-web-users');
 const env = require('gitter-web-env');
 const config = env.config;
 
+const homeserverUrl = config.get('matrix:bridge:homeserverUrl');
 const configuredServerName = config.get('matrix:bridge:serverName');
 
 const PILL_REGEX = /<a href="https:\/\/matrix\.to\/#\/(#|@|\+)([^"]+)">([^<]+)<\/a>/g;
@@ -38,12 +39,7 @@ function getPillMapFromHtml(htmlBody) {
   return ret;
 }
 
-// Transform Matrix message event into text we can use on Gitter
-async function transformMatrixEventContentIntoGitterMessage(content) {
-  if (content.format !== 'org.matrix.custom.html') {
-    return content.body;
-  }
-
+async function replacePills(content) {
   const pillMap = getPillMapFromHtml(content.formatted_body);
   let resultantBody = content.body;
   for (const user of pillMap.users) {
@@ -89,6 +85,47 @@ async function transformMatrixEventContentIntoGitterMessage(content) {
   }
 
   // TODO: Replace aliases and communities with matrix.to links as well
+
+  return resultantBody;
+}
+
+// Based off of https://github.com/matrix-org/matrix-bifrost/blob/c7161dd998c4fe968dba4d5da668dc914248f260/src/MessageFormatter.ts#L45-L60
+function mxcUrlToHttp(mxcUrl) {
+  const uriBits = mxcUrl.substr('mxc://'.length).split('/');
+  const url = homeserverUrl.replace(/\/$/, '');
+  return `${url}/_matrix/media/v1/download/${uriBits[0]}/${uriBits[1]}`;
+}
+
+function handleFileUpload(content) {
+  const mediaUrl = mxcUrlToHttp(content.url);
+  let thumbnailMarkdown = '';
+  if (content.info && content.info.thumbnail_url) {
+    const thumbnailUrl = mxcUrlToHttp(content.info.thumbnail_url);
+    thumbnailMarkdown = `\n[![${content.body}](${thumbnailUrl})](${mediaUrl})`;
+  }
+
+  const resultantBody = `[${content.body}](${mediaUrl})${thumbnailMarkdown}`;
+  return resultantBody;
+}
+
+// Transform Matrix message event into text we can use on Gitter
+async function transformMatrixEventContentIntoGitterMessage(content) {
+  // Handile file uploads
+  if (['m.file', 'm.image', 'm.video', 'm.audio'].includes(content.msgtype) && content.url) {
+    return handleFileUpload(content);
+  }
+
+  // If it's not an HTML text message, we probably don't know how to parse the format
+  // and won't do any transformations
+  if (content.format !== 'org.matrix.custom.html') {
+    return content.body;
+  }
+
+  // Handle normal messages
+  let resultantBody = content.body;
+  if (content.body && content.formatted_body) {
+    resultantBody = await replacePills(content);
+  }
 
   return resultantBody;
 }
