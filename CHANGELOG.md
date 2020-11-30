@@ -5,6 +5,7 @@
  - Improve Matrix flair design for virtualUser's, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2072
  - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
  - Add replies from Matrix to Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2067
+ - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
 
 Developer facing:
 
