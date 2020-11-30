@@ -12,6 +12,7 @@ Developer facing:
 
  - Make Matrix eventId's unique per room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2069
  - Disable Matrix bridge in supertests, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2078
+ - Remove asserts from code we expect to work, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2076
 
 
 # 21.4.0 - 2020-11-25
