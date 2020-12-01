@@ -783,7 +783,7 @@ exports[`thread-message-feed chat-item snapshot virtual user 1`] = `
            
           <a
             class="chat-item__flair chat-item__flair--matrix"
-            href="https://matrix.to/#/@madlittlemods:matrix.org"
+            href="https://matrix.to/#/@madlittlemods:matrix.org?utm_source=gitter"
             target="_blank"
             title="This user is being bridged from Matrix"
           >
