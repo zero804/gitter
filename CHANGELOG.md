@@ -5,6 +5,7 @@
  - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
  - Propagate the room topic to the bridged Matrix room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2080
  - Transform Gitter emoji syntax to Unicode for Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2077
+ - Fix emoji transform to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2083
 
 Developer facing:
 
