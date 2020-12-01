@@ -68,7 +68,7 @@ describe('matrix-event-handler', () => {
           }
         });
         await store.storeBridgedMessage(
-          fixture.messageFromVirtualUser1.id,
+          fixture.messageFromVirtualUser1,
           eventData.room_id,
           matrixMessageEventId
         );
@@ -95,7 +95,7 @@ describe('matrix-event-handler', () => {
         });
         // We purposely do not associate the bridged message. We are testing that the
         // edit is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, eventData.room_id, matrixMessageEventId);
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1, eventData.room_id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 
@@ -162,7 +162,7 @@ describe('matrix-event-handler', () => {
         await store.storeBridgedRoom(fixture.troupeWithThreads1.id, eventData.room_id);
         // Replying to a parent message
         await store.storeBridgedMessage(
-          fixture.messageParent1.id,
+          fixture.messageParent1,
           eventData.room_id,
           matrixMessageEventId
         );
@@ -194,7 +194,7 @@ describe('matrix-event-handler', () => {
         await store.storeBridgedRoom(fixture.troupeWithThreads1.id, eventData.room_id);
         // Replying to a message in the thread
         await store.storeBridgedMessage(
-          fixture.messageThread1.id,
+          fixture.messageThread1,
           eventData.room_id,
           matrixMessageEventId
         );
@@ -321,7 +321,7 @@ describe('matrix-event-handler', () => {
           redacts: matrixMessageEventId
         });
         await store.storeBridgedMessage(
-          fixture.messageFromVirtualUser1.id,
+          fixture.messageFromVirtualUser1,
           eventData.room_id,
           matrixMessageEventId
         );
@@ -343,7 +343,7 @@ describe('matrix-event-handler', () => {
         });
         // We purposely do not associate the bridged message. We are testing that the
         // deletion is ignored if there is no association in the database.
-        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1.id, eventData.room_id, matrixMessageEventId);
+        //await store.storeBridgedMessage(fixture.messageFromVirtualUser1, eventData.room_id, matrixMessageEventId);
 
         await matrixEventHandler.onEventData(eventData);
 

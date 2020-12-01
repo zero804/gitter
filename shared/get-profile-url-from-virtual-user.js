@@ -2,7 +2,7 @@
 
 function getProfileUrlFromVirtualUser(virtualUser) {
   if (virtualUser.type === 'matrix') {
-    return `https://matrix.to/#/@${virtualUser.externalId}`;
+    return `https://matrix.to/#/@${virtualUser.externalId}?utm_source=gitter`;
   }
 
   return null;

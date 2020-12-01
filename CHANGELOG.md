@@ -1,3 +1,14 @@
+# 21.7.0 - 2020-12-1 - Matrix for all
+
+ - Remove room restriction on production Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2085
+ - Fix parentMessage in threaded conversation getting marked as edited on Matrix when threaded reply is sent, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2073
+
+Developer facing:
+
+ - Add utm tracking to Matrix flairs, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2084
+ - Add stats/metrics to Gitter <-> Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2086
+
+
 # 21.6.0 - 2020-11-30
 
  - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
@@ -5,6 +16,7 @@
  - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
  - Propagate the room topic to the bridged Matrix room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2080
  - Transform Gitter emoji syntax to Unicode for Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2077
+ - Fix emoji transform to Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2083
 
 Developer facing:
 

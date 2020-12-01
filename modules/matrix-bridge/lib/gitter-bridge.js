@@ -15,6 +15,7 @@ const errorReporter = env.errorReporter;
 const store = require('./store');
 const MatrixUtils = require('./matrix-utils');
 const transformGitterTextIntoMatrixMessage = require('./transform-gitter-text-into-matrix-message');
+const checkIfDatesSame = require('./check-if-dates-same');
 
 const gitterRoomAllowList = config.get('matrix:bridge:gitterRoomAllowList');
 
@@ -56,6 +57,7 @@ class GitterBridge {
   async onDataChange(data) {
     try {
       debug('onDataChange', data);
+      stats.eventHF('gitter_bridge.event_received');
       // Ignore data without a URL or model
       if (!data.url || !data.model) {
         throw new StatusError(
@@ -113,10 +115,16 @@ class GitterBridge {
 
     // Send the message to the Matrix room
     const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
+    const intent = this.matrixBridge.getIntent(matrixId);
     logger.info(
       `Sending message to Matrix room (Gitter gitterRoomId=${gitterRoomId} -> Matrix gitterRoomId=${matrixRoomId}) (via user mxid=${matrixId})`
     );
-    const intent = this.matrixBridge.getIntent(matrixId);
+    stats.event('gitter_bridge.chat_create', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId,
+      mxid: matrixId
+    });
 
     const matrixCompatibleText = transformGitterTextIntoMatrixMessage(model.text);
     const matrixCompatibleHtml = transformGitterTextIntoMatrixMessage(model.html);
@@ -143,7 +151,7 @@ class GitterBridge {
     logger.info(
       `Storing bridged message (Gitter message id=${model.id} -> Matrix matrixRoomId=${matrixRoomId} event_id=${event_id})`
     );
-    await store.storeBridgedMessage(model.id, matrixRoomId, event_id);
+    await store.storeBridgedMessage(model, matrixRoomId, event_id);
 
     return null;
   }
@@ -159,10 +167,10 @@ class GitterBridge {
       return null;
     }
 
-    const matrixEventId = await store.getMatrixEventIdByGitterMessageId(model.id);
+    const bridgedMessageEntry = await store.getBridgedMessageEntryByGitterMessageId(model.id);
 
     // No matching message on the Matrix side. Let's just ignore the edit as this is some edge case.
-    if (!matrixEventId) {
+    if (!bridgedMessageEntry || !bridgedMessageEntry.matrixEventId) {
       debug(
         `Ignoring message edit from Gitter side(id=${model.id}) because there is no associated Matrix event ID`
       );
@@ -172,10 +180,27 @@ class GitterBridge {
       return null;
     }
 
+    // Check if the message was actually updated.
+    // If there was an `update` data2 event and there was no timestamp change here,
+    // it is probably just an update to `threadMessageCount`, etc which we don't need to propogate
+    //
+    // We use this special date comparison function because:
+    //  - `bridgedMessageEntry.editedAt` from the database is a `Date` object{} or `null`
+    //  - `model.editedAt` from the event is a `string` or `undefined`
+    if (checkIfDatesSame(bridgedMessageEntry.editedAt, model.editedAt)) {
+      return null;
+    }
+
     const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
 
     const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
     const intent = this.matrixBridge.getIntent(matrixId);
+    stats.event('gitter_bridge.chat_edit', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId,
+      mxid: matrixId
+    });
 
     const matrixContent = {
       body: `* ${model.text}`,
@@ -189,11 +214,14 @@ class GitterBridge {
         msgtype: 'm.text'
       },
       'm.relates_to': {
-        event_id: matrixEventId,
+        event_id: bridgedMessageEntry.matrixEventId,
         rel_type: 'm.replace'
       }
     };
     await intent.sendMessage(matrixRoomId, matrixContent);
+
+    // Update the timestamps to compare again next time
+    await store.storeUpdatedBridgedGitterMessage(model);
 
     return null;
   }
@@ -223,6 +251,11 @@ class GitterBridge {
     }
 
     const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
+    stats.event('gitter_bridge.chat_delete', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId
+    });
 
     const intent = this.matrixBridge.getIntent();
     let senderIntent;

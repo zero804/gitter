@@ -9,6 +9,7 @@ const store = require('./store');
 const env = require('gitter-web-env');
 const logger = env.logger;
 const errorReporter = env.errorReporter;
+const stats = env.stats;
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 
 function validateEventForMessageCreateEvent(event) {
@@ -49,6 +50,7 @@ class MatrixEventHandler {
   async onEventData(event) {
     try {
       debug('onEventData', event);
+      stats.eventHF('matrix_bridge.event_received');
       if (
         event.type === 'm.room.message' &&
         event.content &&
@@ -94,6 +96,13 @@ class MatrixEventHandler {
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
 
+    stats.event('matrix_bridge.chat_edit', {
+      gitterRoomId: chatMessage.toTroupeId,
+      chatMessage: chatMessage.id || chatMessage._id,
+      matrixRoomId,
+      matrixEventId: matrixEventId
+    });
+
     const newText = await transformMatrixEventContentIntoGitterMessage(
       event.content['m.new_content']
     );
@@ -108,9 +117,18 @@ class MatrixEventHandler {
       return null;
     }
 
-    const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(event.room_id);
+    const matrixEventId = event.event_id;
+    const matrixRoomId = event.room_id;
+
+    const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(matrixRoomId);
     const gitterRoom = await troupeService.findById(gitterRoomId);
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
+
+    stats.event('matrix_bridge.chat_create', {
+      gitterRoomId,
+      matrixRoomId,
+      matrixEventId
+    });
 
     const intent = this.matrixBridge.getIntent();
     // TODO: Use room membership events instead of profile and cache things
@@ -173,7 +191,7 @@ class MatrixEventHandler {
     });
 
     // Store the message so we can reference it in edits and threads/replies
-    await store.storeBridgedMessage(newChatMessage._id, event.room_id, event.event_id);
+    await store.storeBridgedMessage(newChatMessage, matrixRoomId, matrixEventId);
 
     return null;
   }
@@ -193,6 +211,13 @@ class MatrixEventHandler {
 
     const chatMessage = await chatService.findById(gitterMessageId);
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
+
+    stats.event('matrix_bridge.chat_delete', {
+      gitterRoomId: chatMessage.toTroupeId,
+      chatMessage: chatMessage.id || chatMessage._id,
+      matrixRoomId,
+      matrixEventId: matrixEventId
+    });
 
     await chatService.deleteMessageFromRoom(gitterRoom, chatMessage);
 
