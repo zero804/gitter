@@ -57,6 +57,7 @@ class GitterBridge {
   async onDataChange(data) {
     try {
       debug('onDataChange', data);
+      stats.eventHF('gitter_bridge.event_received');
       // Ignore data without a URL or model
       if (!data.url || !data.model) {
         throw new StatusError(
@@ -114,10 +115,16 @@ class GitterBridge {
 
     // Send the message to the Matrix room
     const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
+    const intent = this.matrixBridge.getIntent(matrixId);
     logger.info(
       `Sending message to Matrix room (Gitter gitterRoomId=${gitterRoomId} -> Matrix gitterRoomId=${matrixRoomId}) (via user mxid=${matrixId})`
     );
-    const intent = this.matrixBridge.getIntent(matrixId);
+    stats.event('gitter_bridge.chat_create', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId,
+      mxid: matrixId
+    });
 
     const matrixCompatibleText = transformGitterTextIntoMatrixMessage(model.text);
     const matrixCompatibleHtml = transformGitterTextIntoMatrixMessage(model.html);
@@ -188,6 +195,12 @@ class GitterBridge {
 
     const matrixId = await this.matrixUtils.getOrCreateMatrixUserByGitterUserId(model.fromUser.id);
     const intent = this.matrixBridge.getIntent(matrixId);
+    stats.event('gitter_bridge.chat_edit', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId,
+      mxid: matrixId
+    });
 
     const matrixContent = {
       body: `* ${model.text}`,
@@ -238,6 +251,11 @@ class GitterBridge {
     }
 
     const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoomId);
+    stats.event('gitter_bridge.chat_delete', {
+      gitterRoomId,
+      gitterChatId: model.id,
+      matrixRoomId
+    });
 
     const intent = this.matrixBridge.getIntent();
     let senderIntent;
