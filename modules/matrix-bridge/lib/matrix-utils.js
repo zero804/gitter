@@ -73,7 +73,8 @@ class MatrixUtils {
     const newRoom = await bridgeIntent.createRoom({
       createAsClient: true,
       options: {
-        name: `${gitterRoom.uri}`,
+        name: gitterRoom.uri,
+        topic: gitterRoom.topic,
         //invite: recipients,
         visibility: 'public',
         room_alias_name: roomAlias,
@@ -96,6 +97,29 @@ class MatrixUtils {
       await bridgeIntent.createAlias(`#${roomAlias.toLowerCase()}:${serverName}`, newRoom.room_id);
     }
 
+    const gitterAvatarUrl = avatars.getForGroupId(gitterRoom.groupId);
+    try {
+      if (gitterAvatarUrl) {
+        const data = await downloadFileToBuffer(gitterAvatarUrl);
+        const mxcUrl = await bridgeIntent.uploadContent(data.buffer, {
+          onlyContentUri: true,
+          rawResponse: false,
+          name: path.basename(gitterAvatarUrl),
+          type: data.mimeType
+        });
+        await bridgeIntent.setRoomAvatar(newRoom.room_id, mxcUrl);
+      }
+    } catch (err) {
+      // Just log an error and noop if the user avatar fails to download.
+      // It's more important that we just send their message without the avatar.
+      logger.error(
+        `Failed to download avatar for Gitter group(room.groupId=${gitterRoom.groupId}, gitterAvatarUrl=${gitterAvatarUrl}) which we were going to use for the bridged Matrix room`,
+        {
+          exception: err
+        }
+      );
+    }
+
     return newRoom.room_id;
   }
 
@@ -107,13 +131,13 @@ class MatrixUtils {
 
     const gitterUser = await userService.findById(gitterUserId);
 
-    const mxid = `@${gitterUser.username}-${gitterUser.id}:${serverName}`;
+    const mxid = `@${gitterUser.username.toLowerCase()}-${gitterUser.id}:${serverName}`;
 
     const intent = this.matrixBridge.getIntent(mxid);
     await intent.setDisplayName(`${gitterUser.username} (${gitterUser.displayName})`);
 
+    const gitterAvatarUrl = avatars.getForUser(gitterUser);
     try {
-      const gitterAvatarUrl = avatars.getForUser(gitterUser);
       if (gitterAvatarUrl) {
         const data = await downloadFileToBuffer(gitterAvatarUrl);
         const mxcUrl = await intent.uploadContent(data.buffer, {
@@ -128,8 +152,10 @@ class MatrixUtils {
       // Just log an error and noop if the user avatar fails to download.
       // It's more important that we just send their message without the avatar.
       logger.error(
-        `Failed to download avatar from Gitter user(gitterUserId=${gitterUserId}) which we were going to use for their bridged Matrix user`,
-        err
+        `Failed to download avatar from Gitter user(gitterUserId=${gitterUserId}, gitterAvatarUrl=${gitterAvatarUrl}) which we were going to use for their bridged Matrix user`,
+        {
+          exception: err
+        }
       );
     }
 

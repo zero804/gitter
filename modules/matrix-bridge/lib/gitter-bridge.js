@@ -14,6 +14,7 @@ const errorReporter = env.errorReporter;
 
 const store = require('./store');
 const MatrixUtils = require('./matrix-utils');
+const transformGitterTextIntoMatrixMessage = require('./transform-gitter-text-into-matrix-message');
 
 const gitterRoomAllowList = config.get('matrix:bridge:gitterRoomAllowList');
 
@@ -116,10 +117,14 @@ class GitterBridge {
       `Sending message to Matrix room (Gitter gitterRoomId=${gitterRoomId} -> Matrix gitterRoomId=${matrixRoomId}) (via user mxid=${matrixId})`
     );
     const intent = this.matrixBridge.getIntent(matrixId);
+
+    const matrixCompatibleText = transformGitterTextIntoMatrixMessage(model.text);
+    const matrixCompatibleHtml = transformGitterTextIntoMatrixMessage(model.html);
+
     const matrixContent = {
-      body: model.text,
+      body: matrixCompatibleText,
       format: 'org.matrix.custom.html',
-      formatted_body: model.html,
+      formatted_body: matrixCompatibleHtml,
       msgtype: 'm.text'
     };
 

@@ -256,13 +256,15 @@ exports.chatArchive = [
     const previousDateUTC = moment(startDateUTC).subtract(1, 'days');
 
     const aroundId = fixMongoIdQueryParam(req.query.at);
-    const chatMessage = await chatService.findById(aroundId);
-    if (chatMessage) {
-      const sentDateTime = moment(chatMessage.sent);
-      const permalink = generatePermalink(troupe.uri, aroundId, sentDateTime, true);
-      if (urlJoin(clientEnv['basePath'], req.url) !== permalink) {
-        res.redirect(permalink);
-        return;
+    if (aroundId) {
+      const chatMessage = await chatService.findById(aroundId);
+      if (chatMessage) {
+        const sentDateTime = moment(chatMessage.sent);
+        const permalink = generatePermalink(troupe.uri, aroundId, sentDateTime, true);
+        if (urlJoin(clientEnv['basePath'], req.url) !== permalink) {
+          res.redirect(permalink);
+          return;
+        }
       }
     }
 

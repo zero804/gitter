@@ -89,24 +89,10 @@ class MatrixEventHandler {
       matrixRoomId,
       matrixEventId
     );
-    assert(
-      gitterMessageId,
-      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to edit message`
-    );
 
     const chatMessage = await chatService.findById(gitterMessageId);
-
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
-    assert(
-      chatMessage,
-      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to edit message`
-    );
-
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
-    assert(
-      gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to edit message`
-    );
 
     const newText = await transformMatrixEventContentIntoGitterMessage(
       event.content['m.new_content']
@@ -123,17 +109,8 @@ class MatrixEventHandler {
     }
 
     const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(event.room_id);
-    assert(
-      gitterRoomId,
-      `Unable to find gitterRoomId for Matrix room(${event.room_id}) while trying to create message`
-    );
     const gitterRoom = await troupeService.findById(gitterRoomId);
-    assert(gitterRoom, `Gitter room not found (id=${gitterRoomId} while trying to create message`);
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
-    assert(
-      gitterBridgeUser,
-      `Unable to find bridge user in Gitter database username=${this._gitterBridgeUsername} while trying to create message`
-    );
 
     const intent = this.matrixBridge.getIntent();
     // TODO: Use room membership events instead of profile and cache things
@@ -154,9 +131,36 @@ class MatrixEventHandler {
       displayName = splitMxid[0];
     }
 
+    // Handle replies from Matrix and translate into Gitter threaded conversations
+    let parentId;
+    if (
+      event.content['m.relates_to'] &&
+      event.content['m.relates_to']['m.in_reply_to'] &&
+      event.content['m.relates_to']['m.in_reply_to'].event_id
+    ) {
+      const inReplyToGitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+        event.room_id,
+        event.content['m.relates_to']['m.in_reply_to'].event_id
+      );
+      const chatMessage = await chatService.findById(inReplyToGitterMessageId);
+      if (!chatMessage) {
+        return null;
+      }
+
+      // If you replied to a message that is already in a thread, put the reply in the thread under the parent instead
+      if (chatMessage.parentId) {
+        parentId = chatMessage.parentId;
+      }
+      // Otherwise, you are already replying to a top-level message which is good in our book
+      else {
+        parentId = inReplyToGitterMessageId;
+      }
+    }
+
     const newText = await transformMatrixEventContentIntoGitterMessage(event.content);
 
     const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
+      parentId,
       virtualUser: {
         type: 'matrix',
         externalId,
@@ -186,22 +190,9 @@ class MatrixEventHandler {
       matrixRoomId,
       matrixEventId
     );
-    assert(
-      gitterMessageId,
-      `Unable to find bridged Gitter message in Gitter database matrixEventId=${matrixEventId} while trying to delete message`
-    );
 
     const chatMessage = await chatService.findById(gitterMessageId);
-    assert(
-      chatMessage,
-      `Gitter chatMessage(id=${gitterMessageId}) not found while trying to delete message`
-    );
-
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
-    assert(
-      chatMessage,
-      `Gitter room(id=${chatMessage.toTroupeId}) not found while trying to delete message`
-    );
 
     await chatService.deleteMessageFromRoom(gitterRoom, chatMessage);
 

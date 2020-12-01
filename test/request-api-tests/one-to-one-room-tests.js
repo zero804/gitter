@@ -1,5 +1,6 @@
 'use strict';
 
+process.env.DISABLE_MATRIX_BRIDGE = '1';
 process.env.DISABLE_API_LISTEN = '1';
 
 var Promise = require('bluebird');

@@ -28,6 +28,7 @@ describe('gitter-bridge', () => {
         room_id: `!${fixtureLoader.generateGithubId()}:localhost`
       })),
       createAlias: sinon.spy(),
+      setRoomAvatar: sinon.spy(),
       setDisplayName: sinon.spy(),
       uploadContent: sinon.spy(),
       setAvatarUrl: sinon.spy()

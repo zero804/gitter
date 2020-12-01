@@ -1,5 +1,6 @@
 'use strict';
 
+process.env.DISABLE_MATRIX_BRIDGE = '1';
 process.env.DISABLE_API_LISTEN = '1';
 process.env.DISABLE_API_WEB_LISTEN = '1';
 process.env.TEST_EXPORT_RATE_LIMIT = 100;

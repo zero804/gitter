@@ -1,3 +1,17 @@
+# 21.6.0 - 2020-11-30
+
+ - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
+ - Add replies from Matrix to Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2067
+ - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
+ - Propagate the room topic to the bridged Matrix room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2080
+ - Transform Gitter emoji syntax to Unicode for Matrix, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2077
+
+Developer facing:
+
+ - Disable Matrix bridge in supertests, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2078
+ - Remove asserts from code we expect to work, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2076
+
+
 # 21.5.0 - 2020-11-26
 
  - Add human readable Matrix room alias based off of the Gitter room URI, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2062

@@ -1,5 +1,5 @@
 'use strict';
-const emojify = require('../../repo/emojify/emojify');
+const emojify = require('gitter-web-shared/emojify/emojify');
 var cdn = require('gitter-web-cdn');
 
 module.exports = (function() {

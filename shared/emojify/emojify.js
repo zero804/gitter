@@ -1,3 +1,6 @@
+// From our Gitter fork: https://github.com/gitterHQ/emojify.js
+/* eslint-disable */
+
 (function(root, factory) {
   'use strict';
 
