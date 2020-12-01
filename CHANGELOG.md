@@ -1,10 +1,12 @@
-# 21.7.0 - 2020-12-1
+# 21.7.0 - 2020-12-1 - Matrix for all
 
+ - Remove room restriction on production Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2085
  - Fix parentMessage in threaded conversation getting marked as edited on Matrix when threaded reply is sent, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2073
 
 Developer facing:
 
  - Add utm tracking to Matrix flairs, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2084
+ - Add stats/metrics to Gitter <-> Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2086
 
 
 # 21.6.0 - 2020-11-30
