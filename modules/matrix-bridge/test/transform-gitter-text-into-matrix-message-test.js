@@ -21,6 +21,16 @@ describe('transform-gitter-text-into-matrix-message', () => {
       expectedText: `My emoji 😄 and 🐐`
     },
     {
+      name: 'Transforms :emoji: next to text (first/last character)',
+      text: `:smile:prefix both:eyes:sides suffix:goat:`,
+      expectedText: `😄prefix both:eyes:sides suffix🐐`
+    },
+    {
+      name: 'Transforms :emoji: next to text',
+      text: `first :smile:prefix both:eyes:sides suffix:goat: last`,
+      expectedText: `first 😄prefix both:eyes:sides suffix:goat: last`
+    },
+    {
       name: 'Leaves unknown :emoji: syntax alone',
       text: `My unknown emoji :feelsgood:`,
       expectedText: `My unknown emoji :feelsgood:`
