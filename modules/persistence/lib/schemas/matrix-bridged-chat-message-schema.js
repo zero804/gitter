@@ -7,7 +7,15 @@ const MatrixBridgedChatMessageSchema = new Schema(
   {
     gitterMessageId: { type: Schema.ObjectId, required: true },
     matrixRoomId: { type: String, required: true },
-    matrixEventId: { type: String, required: true }
+    matrixEventId: { type: String, required: true },
+    // We use this to figure out if we should actually send an edit out.
+    //
+    // If there is a mismatch between these dates and the actual Gitter chatMessage,
+    // we can assume there was actually an edit we need to propogate through.
+    //
+    // If there was no change, the `update` data2 event is probably just an update to `threadMessageCount`, etc
+    sent: { type: Date, default: Date.now },
+    editedAt: { type: Date, default: null }
   },
   { strict: 'throw' }
 );
