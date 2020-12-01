@@ -37,6 +37,21 @@
       return memo;
     }, {});
 
+    var defaultConfig = {
+      emojify_tag_type: null,
+      only_crawl_id: null,
+      img_dir: 'images/emoji',
+      ignore_emoticons: false,
+      ignored_tags: {
+        SCRIPT: 1,
+        TEXTAREA: 1,
+        A: 1,
+        PRE: 1,
+        CODE: 1,
+        MATH: 1
+      }
+    };
+
     var emoticonsProcessed;
     var emojiMegaRe;
 
@@ -77,6 +92,8 @@
       });
     }
 
+    emoticonsProcessed = initEmoticonsProcessed();
+
     function initMegaRe() {
       /* The source for our mega-regex */
       var mega = emoticonsProcessed
@@ -91,21 +108,6 @@
       /* The regex used to find emoji */
       return new RegExp(mega, 'gi');
     }
-
-    var defaultConfig = {
-      emojify_tag_type: null,
-      only_crawl_id: null,
-      img_dir: 'images/emoji',
-      ignore_emoticons: false,
-      ignored_tags: {
-        SCRIPT: 1,
-        TEXTAREA: 1,
-        A: 1,
-        PRE: 1,
-        CODE: 1,
-        MATH: 1
-      }
-    };
 
     /* Returns true if the given char is whitespace */
     function isWhitespace(s) {
@@ -347,6 +349,7 @@
       // Sane defaults
       defaultConfig: defaultConfig,
       emojiNames: namedEmoji,
+      emojiNameRegex: initMegaRe(),
       setConfig: function(newConfig) {
         Object.keys(defaultConfig).forEach(function(f) {
           if (f in newConfig) {
