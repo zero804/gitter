@@ -11,6 +11,7 @@ const logger = env.logger;
 const errorReporter = env.errorReporter;
 const stats = env.stats;
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
+const MatrixUtils = require('./matrix-utils');
 
 function validateEventForMessageCreateEvent(event) {
   return !event.state_key && event.sender && event.content && event.content.body;
@@ -36,6 +37,38 @@ function validateEventForMessageDeleteEvent(event) {
   return !event.state_key && event.sender && event.redacts;
 }
 
+// Because the Gitter community or room name can have underscores in it
+// and we replace forward slashes with underscores in room aliases,
+// it's ambiguous where we need to put the forward slash back in.
+//
+// This function will replace each spot where an underscore is with
+// a forward slash and check if it exists on Gitter. If it exists, return that room.
+async function findGitterRoomFromAliasLocalPart(aliasLocalpart) {
+  // Find all the places where an underscore exists
+  const underscoreIndexList = [];
+  aliasLocalpart.replace(/_/g, (match, offset) => {
+    underscoreIndexList.push(offset);
+  });
+
+  // Loop through each place where an underscore is, replace it with a forward slash,
+  // and check if that room exists on Gitter
+  for (const underscoreIndex of underscoreIndexList) {
+    const uri = `${aliasLocalpart.substring(0, underscoreIndex)}/${aliasLocalpart.substring(
+      underscoreIndex + 1,
+      aliasLocalpart.length
+    )}`;
+
+    debug(`findGitterRoomFromAliasLocalPart() checking if uri=${uri} exists`);
+    const gitterRoom = await troupeService.findByUri(uri);
+    if (!gitterRoom) {
+      continue;
+    }
+
+    debug(`findGitterRoomFromAliasLocalPart() found gitterRoom=${gitterRoom.uri}`);
+    return gitterRoom;
+  }
+}
+
 class MatrixEventHandler {
   constructor(matrixBridge, gitterBridgeUsername) {
     assert(matrixBridge, 'Matrix bridge required');
@@ -45,6 +78,22 @@ class MatrixEventHandler {
     );
     this.matrixBridge = matrixBridge;
     this._gitterBridgeUsername = gitterBridgeUsername;
+    this.matrixUtils = new MatrixUtils(matrixBridge);
+  }
+
+  async onAliasQuery(alias, aliasLocalpart) {
+    debug('onAliasQuery', alias, aliasLocalpart);
+
+    const gitterRoom = await findGitterRoomFromAliasLocalPart(aliasLocalpart);
+    if (!gitterRoom) {
+      return null;
+    }
+
+    const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoom._id);
+
+    return {
+      roomId: matrixRoomId
+    };
   }
 
   async onEventData(event) {

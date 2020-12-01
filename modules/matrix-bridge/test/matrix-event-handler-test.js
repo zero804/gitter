@@ -23,6 +23,10 @@ describe('matrix-event-handler', () => {
   let matrixEventHandler;
   const matrixBridge = {
     getIntent: (/*userId*/) => ({
+      createRoom: () => ({
+        room_id: `!${fixtureLoader.generateGithubId()}:localhost`
+      }),
+      createAlias: () => {},
       getProfileInfo: () => ({
         displayname: 'Alice',
         avatar_url: 'mxc://abcedf1234'
@@ -32,6 +36,70 @@ describe('matrix-event-handler', () => {
       })
     })
   };
+
+  describe('onAliasQuery', () => {
+    const fixture = fixtureLoader.setupEach({
+      userBridge1: {},
+      troupe1: {
+        uri: 'matrixbridgealiasqueryoneunderscore/test'
+      },
+      troupeWithUnderscore1: {
+        uri: 'matrixbridgealiasquery_withunderscore/test'
+      },
+      deleteDocuments: {
+        Troupe: [
+          {
+            lcUri: 'matrixbridgealiasqueryoneunderscore/test'
+          },
+          {
+            lcUri: 'matrixbridgealiasquery_withunderscore/test'
+          }
+        ]
+      }
+    });
+
+    beforeEach(() => {
+      matrixEventHandler = new MatrixEventHandler(matrixBridge, fixture.userBridge1.username);
+    });
+
+    it('Normal room is found (#foo_bar:gitter.im)', async () => {
+      const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+      await store.storeBridgedRoom(fixture.troupe1.id, matrixRoomId);
+
+      const result = await matrixEventHandler.onAliasQuery(
+        '#matrixbridgealiasqueryoneunderscore_test:gitter.im',
+        'matrixbridgealiasqueryoneunderscore_test'
+      );
+
+      assert.deepEqual(result, {
+        roomId: matrixRoomId
+      });
+    });
+
+    it('Room with underscore in name is still found (#foo_bar_baz:gitter.im)', async () => {
+      const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+      await store.storeBridgedRoom(fixture.troupeWithUnderscore1.id, matrixRoomId);
+
+      const result = await matrixEventHandler.onAliasQuery(
+        '#matrixbridgealiasquery_withunderscore_test:gitter.im',
+        'matrixbridgealiasquery_withunderscore_test'
+      );
+
+      assert.deepEqual(result, {
+        roomId: matrixRoomId
+      });
+    });
+
+    it('non-existant room (#foo_bar:gitter.im)', async () => {
+      const result = await matrixEventHandler.onAliasQuery('#dne_room:gitter.im', 'dne_room');
+      assert.strictEqual(result, null);
+    });
+
+    it('Alias without an underscore means no slash in URI so a room will not be found (#foo:gitter.im)', async () => {
+      const result = await matrixEventHandler.onAliasQuery('#foo:gitter.im', 'foo');
+      assert.strictEqual(result, null);
+    });
+  });
 
   describe('onEventData', () => {
     describe('handleChatMessageEditEvent', () => {
