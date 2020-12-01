@@ -1,8 +1,5 @@
-# 21.5.0 - 2020-11-26
+# 21.6.0 - 2020-11-30
 
- - Add human readable Matrix room alias based off of the Gitter room URI, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2062
- - Transform Gitter MXID from Matrix into a Gitter mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2064
- - Improve Matrix flair design for virtualUser's, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2072
  - Set Matrix room avatar on creation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2070
  - Add replies from Matrix to Gitter threaded conversations, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2067
  - Support Matrix uploads (images, etc), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2075
@@ -11,9 +8,19 @@
 
 Developer facing:
 
- - Make Matrix eventId's unique per room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2069
  - Disable Matrix bridge in supertests, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2078
  - Remove asserts from code we expect to work, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2076
+
+
+# 21.5.0 - 2020-11-26
+
+ - Add human readable Matrix room alias based off of the Gitter room URI, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2062
+ - Transform Gitter MXID from Matrix into a Gitter mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2064
+ - Improve Matrix flair design for virtualUser's, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2072
+
+Developer facing:
+
+ - Make Matrix eventId's unique per room, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2069
 
 
 # 21.4.0 - 2020-11-25
