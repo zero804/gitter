@@ -7,8 +7,6 @@ const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const userService = require('gitter-web-users');
 const store = require('./store');
 const env = require('gitter-web-env');
-const logger = env.logger;
-const errorReporter = env.errorReporter;
 const stats = env.stats;
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 const MatrixUtils = require('./matrix-utils');
@@ -97,34 +95,22 @@ class MatrixEventHandler {
   }
 
   async onEventData(event) {
-    try {
-      debug('onEventData', event);
-      stats.eventHF('matrix_bridge.event_received');
-      if (
-        event.type === 'm.room.message' &&
-        event.content &&
-        event.content['m.relates_to'] &&
-        event.content['m.relates_to'].rel_type === 'm.replace'
-      ) {
-        return await this.handleChatMessageEditEvent(event);
-      }
+    debug('onEventData', event);
+    if (
+      event.type === 'm.room.message' &&
+      event.content &&
+      event.content['m.relates_to'] &&
+      event.content['m.relates_to'].rel_type === 'm.replace'
+    ) {
+      return await this.handleChatMessageEditEvent(event);
+    }
 
-      if (event.type === 'm.room.message') {
-        return await this.handleChatMessageCreateEvent(event);
-      }
+    if (event.type === 'm.room.message') {
+      return await this.handleChatMessageCreateEvent(event);
+    }
 
-      if (event.type === 'm.room.redaction') {
-        return await this.handleChatMessageDeleteEvent(event);
-      }
-    } catch (err) {
-      logger.error(`Error while processing Matrix event: ${err}`, {
-        exception: err
-      });
-      errorReporter(
-        err,
-        { operation: 'matrixEventHandler.onDataChange', data: event },
-        { module: 'matrix-to-gitter-bridge' }
-      );
+    if (event.type === 'm.room.redaction') {
+      return await this.handleChatMessageDeleteEvent(event);
     }
   }
 
