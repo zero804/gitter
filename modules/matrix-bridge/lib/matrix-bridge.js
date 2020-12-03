@@ -76,6 +76,9 @@ const matrixBridge = new Bridge({
   registration: registrationConfig,
   disableStores: true,
   controller: {
+    onAliasQuery: (alias, matrixRoomId) => {
+      return eventHandler.onAliasQuery(alias, matrixRoomId);
+    },
     onEvent: async (request /*, context*/) => {
       try {
         const data = request.getData();
