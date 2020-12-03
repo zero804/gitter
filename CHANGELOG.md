@@ -1,3 +1,8 @@
+# 21.8.0 - 2020-12-2
+
+ - Add `onAliasQuery` support to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2088
+
+
 # 21.7.0 - 2020-12-1 - Matrix for all
 
  - Remove room restriction on production Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2085
