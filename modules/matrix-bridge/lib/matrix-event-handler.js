@@ -37,6 +37,44 @@ function validateEventForMessageDeleteEvent(event) {
   return !event.state_key && event.sender && event.redacts;
 }
 
+// If the matrix event is replying to someone else's message,
+// find the associated bridged Gitter message and add it to the correct
+// threaded conversation.
+async function findGitterThreadParentIdForMatrixEvent(event) {
+  let parentId = undefined;
+  if (
+    event.content['m.relates_to'] &&
+    event.content['m.relates_to']['m.in_reply_to'] &&
+    event.content['m.relates_to']['m.in_reply_to'].event_id
+  ) {
+    const inReplyToMatrixEventId = event.content['m.relates_to']['m.in_reply_to'].event_id;
+    const inReplyToGitterMessageId = await store.getGitterMessageIdByMatrixEventId(
+      event.room_id,
+      inReplyToMatrixEventId
+    );
+
+    if (!inReplyToGitterMessageId) {
+      return undefined;
+    }
+
+    const chatMessage = await chatService.findById(inReplyToGitterMessageId);
+
+    if (!chatMessage) {
+      return undefined;
+    }
+    // If you replied to a message that is already in a thread, put the reply in the thread under the parent instead
+    else if (chatMessage.parentId) {
+      parentId = chatMessage.parentId;
+    }
+    // Otherwise, you are already replying to a top-level message which is good in our book
+    else {
+      parentId = inReplyToGitterMessageId;
+    }
+  }
+
+  return parentId;
+}
+
 // Because the Gitter community or room name can have underscores in it
 // and we replace forward slashes with underscores in room aliases,
 // it's ambiguous where we need to put the forward slash back in.
@@ -198,33 +236,24 @@ class MatrixEventHandler {
       displayName = splitMxid[0];
     }
 
-    // Handle replies from Matrix and translate into Gitter threaded conversations
-    let parentId;
-    if (
+    const inReplyToMatrixEventId =
       event.content['m.relates_to'] &&
       event.content['m.relates_to']['m.in_reply_to'] &&
-      event.content['m.relates_to']['m.in_reply_to'].event_id
-    ) {
-      const inReplyToGitterMessageId = await store.getGitterMessageIdByMatrixEventId(
-        event.room_id,
-        event.content['m.relates_to']['m.in_reply_to'].event_id
-      );
-      const chatMessage = await chatService.findById(inReplyToGitterMessageId);
-      if (!chatMessage) {
-        return null;
-      }
+      event.content['m.relates_to']['m.in_reply_to'].event_id;
 
-      // If you replied to a message that is already in a thread, put the reply in the thread under the parent instead
-      if (chatMessage.parentId) {
-        parentId = chatMessage.parentId;
-      }
-      // Otherwise, you are already replying to a top-level message which is good in our book
-      else {
-        parentId = inReplyToGitterMessageId;
-      }
+    // Handle replies from Matrix and translate into Gitter threaded conversations
+    const parentId = await findGitterThreadParentIdForMatrixEvent(event);
+
+    // If we can't find the bridged Gitter chat message,
+    // we are unable to put it in the appropriate threaded conversation.
+    // Let's just put their message in the MMF and add a warning note about the problem.
+    let fallbackReplyContent = '';
+    if (inReplyToMatrixEventId && !parentId) {
+      fallbackReplyContent = `> This message is replying to a [Matrix event](https://matrix.to/#/${matrixRoomId}/${inReplyToMatrixEventId}) but we were unable to find associated bridged Gitter message to put it in the appropriate threaded conversation.\n\n`;
     }
 
     const newText = await transformMatrixEventContentIntoGitterMessage(event.content);
+    const resultantText = `${fallbackReplyContent}${newText}`;
 
     const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
       parentId,
@@ -236,7 +265,7 @@ class MatrixEventHandler {
           ? intent.getClient().mxcUrlToHttp(profile.avatar_url)
           : undefined
       },
-      text: newText
+      text: resultantText
     });
 
     // Store the message so we can reference it in edits and threads/replies
