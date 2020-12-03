@@ -2,6 +2,10 @@
 
  - Fallback and send reply message in MMF if we are unable to find the threaded conversation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2091
 
+Developer facing:
+
+ - Better error logging for the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2089
+
 
 # 21.8.0 - 2020-12-2
 
