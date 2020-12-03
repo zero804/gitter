@@ -165,7 +165,11 @@ describe('matrix-event-handler', () => {
         // edit is ignored if there is no association in the database.
         //await store.storeBridgedMessage(fixture.messageFromVirtualUser1, eventData.room_id, matrixMessageEventId);
 
-        await matrixEventHandler.onEventData(eventData);
+        try {
+          await matrixEventHandler.onEventData(eventData);
+        } catch (err) {
+          // we expect an error and not process the event
+        }
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);
@@ -446,7 +450,11 @@ describe('matrix-event-handler', () => {
         // deletion is ignored if there is no association in the database.
         //await store.storeBridgedMessage(fixture.messageFromVirtualUser1, eventData.room_id, matrixMessageEventId);
 
-        await matrixEventHandler.onEventData(eventData);
+        try {
+          await matrixEventHandler.onEventData(eventData);
+        } catch (err) {
+          // we expect an error and not process the event
+        }
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);

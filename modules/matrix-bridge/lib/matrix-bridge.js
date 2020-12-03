@@ -7,6 +7,7 @@ const env = require('gitter-web-env');
 const config = env.config;
 const logger = env.logger;
 const stats = env.stats;
+const errorReporter = env.errorReporter;
 
 const MatrixEventHandler = require('./matrix-event-handler');
 
@@ -80,13 +81,27 @@ const matrixBridge = new Bridge({
       return eventHandler.onAliasQuery(alias, matrixRoomId);
     },
     onEvent: async (request /*, context*/) => {
+      stats.eventHF('matrix_bridge.event_received');
+
+      let data;
       try {
-        const data = request.getData();
+        data = request.getData();
         eventHandler.onEventData(data);
         stats.eventHF('matrix-bridge.event.success');
       } catch (err) {
-        logger.error('Error occured while processing Matrix bridge event', err);
+        logger.error(
+          `Error while processing Matrix bridge event=(${data && data.event_id}): ${err}`,
+          {
+            exception: err,
+            event: data
+          }
+        );
         stats.eventHF('matrix-bridge.event.fail');
+        errorReporter(
+          err,
+          { operation: 'matrixBridge.onEvent', data },
+          { module: 'matrix-to-gitter-bridge' }
+        );
       }
 
       return null;
