@@ -188,7 +188,7 @@ describe('matrix-event-handler', () => {
           parent: 'messageParent1',
           user: 'user1',
           troupe: 'troupeWithThreads1',
-          text: 'some parent message'
+          text: 'some child message'
         }
       });
 
@@ -276,6 +276,39 @@ describe('matrix-event-handler', () => {
         assert.strictEqual(messages.length, 3);
         assert.strictEqual(messages[2].text, 'my matrix reply');
         assert(mongoUtils.isLikeObjectId(messages[2].parentId, fixture.messageParent1.id));
+      });
+
+      it(`reply to message where we can't find the associated bridged Gitter message falls back to message in MMF with warning note`, async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix reply',
+            'm.relates_to': {
+              'm.in_reply_to': {
+                event_id: matrixMessageEventId
+              }
+            }
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupeWithThreads1.id, eventData.room_id);
+
+        // We purposely do not associate the bridged message. We are testing that the
+        // fallback to a MMF message with a warning note if there is no association in the database.
+        //await store.storeBridgedMessage(fixture.messageParent1,eventData.room_id, matrixMessageEventId);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(
+          fixture.troupeWithThreads1.id,
+          { includeThreads: true }
+        );
+        assert.strictEqual(messages.length, 3);
+        assert.strictEqual(
+          messages[2].text,
+          `> This message is replying to a [Matrix event](https://matrix.to/#/${eventData.room_id}/${matrixMessageEventId}) but we were unable to find associated bridged Gitter message to put it in the appropriate threaded conversation.\n\nmy matrix reply`
+        );
+        assert.strictEqual(messages[2].parentId, undefined);
       });
 
       it('When we receive Matrix image upload, creates Gitter message linking the image in Gitter room', async () => {
