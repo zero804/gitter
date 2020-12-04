@@ -54,6 +54,7 @@ class GitterBridge {
     appEvents.onDataChange2(this.onDataChange.bind(this));
   }
 
+  // eslint-disable-next-line complexity
   async onDataChange(data) {
     try {
       debug('onDataChange', data);
@@ -68,18 +69,27 @@ class GitterBridge {
 
       const [, gitterRoomId] = data.url.match(/\/rooms\/([a-f0-9]+)\/chatMessages/) || [];
       if (gitterRoomId && data.operation === 'create') {
-        return await this.handleChatMessageCreateEvent(gitterRoomId, data.model);
+        await this.handleChatMessageCreateEvent(gitterRoomId, data.model);
       } else if (gitterRoomId && data.operation === 'update') {
-        return await this.handleChatMessageEditEvent(gitterRoomId, data.model);
+        await this.handleChatMessageEditEvent(gitterRoomId, data.model);
       } else if (gitterRoomId && data.operation === 'remove') {
-        return await this.handleChatMessageRemoveEvent(gitterRoomId, data.model);
+        await this.handleChatMessageRemoveEvent(gitterRoomId, data.model);
       }
 
       // TODO: Handle user data change and update Matrix user
+
+      stats.eventHF('gitter_bridge.event.success');
     } catch (err) {
-      logger.error(`Error while processing Gitter event: ${err}`, {
-        exception: err
-      });
+      logger.error(
+        `Error while processing Gitter bridge event (url=${data && data.url}, id=${data &&
+          data.model &&
+          data.model.id}): ${err}`,
+        {
+          exception: err,
+          data
+        }
+      );
+      stats.eventHF('gitter_bridge.event.fail');
       errorReporter(
         err,
         { operation: 'gitterBridge.onDataChange', data: data },
