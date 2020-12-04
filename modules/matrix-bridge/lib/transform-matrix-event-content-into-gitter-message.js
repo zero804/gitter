@@ -1,5 +1,6 @@
 'use strict';
 
+const assert = require('assert');
 const escapeStringRegexp = require('escape-string-regexp');
 const userService = require('gitter-web-users');
 const env = require('gitter-web-env');
@@ -89,6 +90,22 @@ async function replacePills(content) {
   return resultantBody;
 }
 
+async function transformMxidMentions(content) {
+  let resultantBody = content.body;
+  // If it's not an HTML text message, we probably don't know how to parse the format
+  // of the pills/mentions and won't do any transformations
+  if (content.format !== 'org.matrix.custom.html') {
+    return resultantBody;
+  }
+
+  // Handle normal messages
+  if (content.body && content.formatted_body) {
+    resultantBody = await replacePills(content);
+  }
+
+  return resultantBody;
+}
+
 // Based off of https://github.com/matrix-org/matrix-bifrost/blob/c7161dd998c4fe968dba4d5da668dc914248f260/src/MessageFormatter.ts#L45-L60
 function mxcUrlToHttp(mxcUrl) {
   const uriBits = mxcUrl.substr('mxc://'.length).split('/');
@@ -109,22 +126,20 @@ function handleFileUpload(content) {
 }
 
 // Transform Matrix message event into text we can use on Gitter
-async function transformMatrixEventContentIntoGitterMessage(content) {
+async function transformMatrixEventContentIntoGitterMessage(content, event) {
+  assert(content);
+  assert(event);
+
   // Handile file uploads
   if (['m.file', 'm.image', 'm.video', 'm.audio'].includes(content.msgtype) && content.url) {
     return handleFileUpload(content);
   }
 
-  // If it's not an HTML text message, we probably don't know how to parse the format
-  // and won't do any transformations
-  if (content.format !== 'org.matrix.custom.html') {
-    return content.body;
-  }
+  let resultantBody = await transformMxidMentions(content);
 
-  // Handle normal messages
-  let resultantBody = content.body;
-  if (content.body && content.formatted_body) {
-    resultantBody = await replacePills(content);
+  const isStatusMessage = content.msgtype === 'm.emote';
+  if (isStatusMessage) {
+    resultantBody = `${event.sender} ${resultantBody}`;
   }
 
   return resultantBody;

@@ -138,6 +138,17 @@ describe('matrix-event-handler', () => {
           },
           troupe: 'troupe1',
           text: 'my original message from matrix'
+        },
+        messageStatusFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my original emote/status message from matrix',
+          status: true
         }
       });
 
@@ -167,8 +178,44 @@ describe('matrix-event-handler', () => {
         await matrixEventHandler.onEventData(eventData);
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
-        assert.strictEqual(messages.length, 1);
-        assert.strictEqual(messages[0].text, 'my edited message from matrix');
+        const targetMessage = messages.find(m => m.id === fixture.messageFromVirtualUser1.id);
+        assert.strictEqual(messages.length, 2);
+        assert.strictEqual(targetMessage.text, 'my edited message from matrix');
+      });
+
+      it('When we receive emote/status message edit from Matrix, update the Gitter message in Gitter room', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: '* my edited emote/status message from matrix',
+            msgtype: 'm.emote',
+            'm.new_content': {
+              body: 'my edited emote/status message from matrix',
+              msgtype: 'm.emote'
+            },
+            'm.relates_to': {
+              event_id: matrixMessageEventId,
+              rel_type: 'm.replace'
+            }
+          }
+        });
+        await store.storeBridgedMessage(
+          fixture.messageStatusFromVirtualUser1,
+          eventData.room_id,
+          matrixMessageEventId
+        );
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messages.length, 2);
+        const targetMessage = messages.find(m => m.id === fixture.messageStatusFromVirtualUser1.id);
+        assert.strictEqual(
+          targetMessage.text,
+          '@alice:localhost my edited emote/status message from matrix'
+        );
+        assert.strictEqual(targetMessage.status, true);
       });
 
       it('Ignore message edit from Matrix when there is no matching message', async () => {
@@ -195,8 +242,9 @@ describe('matrix-event-handler', () => {
         }
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
-        assert.strictEqual(messages.length, 1);
-        assert.strictEqual(messages[0].text, 'my original message from matrix');
+        const targetMessage = messages.find(m => m.id === fixture.messageFromVirtualUser1.id);
+        assert.strictEqual(messages.length, 2);
+        assert.strictEqual(targetMessage.text, 'my original message from matrix');
       });
     });
 
@@ -244,6 +292,26 @@ describe('matrix-event-handler', () => {
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);
         assert.strictEqual(messages[0].text, 'my matrix message');
+        assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
+        assert.strictEqual(messages[0].virtualUser.displayName, 'Alice');
+      });
+
+      it('When we receive Matrix emote/status (/me) message, creates Gitter message in Gitter room', async () => {
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix emote/status message',
+            msgtype: 'm.emote'
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupe1.id, eventData.room_id);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messages.length, 1);
+        assert.strictEqual(messages[0].text, '@alice:localhost my matrix emote/status message');
+        assert.strictEqual(messages[0].status, true);
         assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
         assert.strictEqual(messages[0].virtualUser.displayName, 'Alice');
       });
@@ -501,7 +569,7 @@ describe('matrix-event-handler', () => {
         assert.strictEqual(messagesAfter.length, 0);
       });
 
-      it('Ignore message edit from Matrix when there is no matching message', async () => {
+      it('Ignore message delete/redaction from Matrix when there is no matching message', async () => {
         const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
         const eventData = createEventData({
           type: 'm.room.redaction',
