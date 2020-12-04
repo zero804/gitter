@@ -65,6 +65,14 @@ describe('gitter-bridge', () => {
           troupe: 'troupe1',
           text: 'my gitter message2'
         },
+        messageStatus1: {
+          user: 'user1',
+          troupe: 'troupe1',
+          text: '@user1 my gitter status(/me) message',
+          html:
+            '<span data-link-type="mention" data-screen-name="user1" class="mention">@user1</span> my gitter status(/me) message',
+          status: true
+        },
         messageThreaded1: {
           user: 'user1',
           troupe: 'troupe1',
@@ -108,6 +116,32 @@ describe('gitter-bridge', () => {
           format: 'org.matrix.custom.html',
           formatted_body: fixture.message1.html,
           msgtype: 'm.text'
+        });
+      });
+
+      it('new status(/me) message gets sent off to Matrix', async () => {
+        const strategy = new restSerializer.ChatStrategy();
+        const serializedMessage = await restSerializer.serializeObject(
+          fixture.messageStatus1,
+          strategy
+        );
+
+        await gitterBridge.onDataChange({
+          url: `/rooms/${fixture.troupe1.id}/chatMessages`,
+          operation: 'create',
+          model: serializedMessage
+        });
+
+        // Room is created for something that hasn't been bridged before
+        assert.strictEqual(matrixBridge.getIntent().createRoom.callCount, 1);
+
+        // Message is sent to the new room
+        assert.strictEqual(matrixBridge.getIntent().sendMessage.callCount, 1);
+        assert.deepEqual(matrixBridge.getIntent().sendMessage.getCall(0).args[1], {
+          body: 'my gitter status(/me) message',
+          format: 'org.matrix.custom.html',
+          formatted_body: 'my gitter status(/me) message',
+          msgtype: 'm.emote'
         });
       });
 

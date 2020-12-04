@@ -136,14 +136,20 @@ class GitterBridge {
       mxid: matrixId
     });
 
-    const matrixCompatibleText = transformGitterTextIntoMatrixMessage(model.text);
-    const matrixCompatibleHtml = transformGitterTextIntoMatrixMessage(model.html);
+    const matrixCompatibleText = transformGitterTextIntoMatrixMessage(model.text, model);
+    const matrixCompatibleHtml = transformGitterTextIntoMatrixMessage(model.html, model);
+
+    let msgtype = 'm.text';
+    // Check whether it's a `/me` status message
+    if (model.status) {
+      msgtype = 'm.emote';
+    }
 
     const matrixContent = {
       body: matrixCompatibleText,
       format: 'org.matrix.custom.html',
       formatted_body: matrixCompatibleHtml,
-      msgtype: 'm.text'
+      msgtype
     };
 
     // Handle threaded conversations
