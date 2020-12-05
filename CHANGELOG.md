@@ -1,5 +1,6 @@
 # 21.10.0 - *upcoming*
 
+ - Ignore old Matrix events, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2095
  - Add more robust archive hour parsing, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2082
 
 
