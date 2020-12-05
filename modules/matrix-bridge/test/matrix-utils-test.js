@@ -24,7 +24,17 @@ describe('matrix-utils', () => {
   let matrixUtils;
   let matrixBridge;
   beforeEach(() => {
+    const clientSpies = {
+      getRoomIdForAlias: sinon.spy(),
+      deleteAlias: sinon.spy(),
+      getRoomDirectoryVisibility: sinon.spy(),
+      setRoomDirectoryVisibility: sinon.spy()
+    };
+
     const intentSpies = {
+      getClient: () => clientSpies,
+      getStateEvent: sinon.spy(),
+      sendStateEvent: sinon.spy(),
       sendMessage: sinon.spy(() => ({
         event_id: `$${fixtureLoader.generateGithubId()}:localhost`
       })),
@@ -35,7 +45,9 @@ describe('matrix-utils', () => {
       setRoomAvatar: sinon.spy(),
       setDisplayName: sinon.spy(),
       uploadContent: sinon.spy(() => 'mxc://12345'),
-      setAvatarUrl: sinon.spy()
+      setAvatarUrl: sinon.spy(),
+      getRoomDirectoryVisibility: sinon.spy(),
+      setRoomDirectoryVisibility: sinon.spy()
     };
 
     matrixBridge = {
