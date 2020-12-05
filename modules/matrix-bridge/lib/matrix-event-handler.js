@@ -11,6 +11,9 @@ const stats = env.stats;
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 const MatrixUtils = require('./matrix-utils');
 
+// 30 minutes in milliseconds
+const MAX_EVENT_ACCEPTANCE_WINDOW = 1000 * 60 * 30;
+
 function validateEventForMessageCreateEvent(event) {
   return !event.state_key && event.sender && event.content && event.content.body;
 }
@@ -134,6 +137,12 @@ class MatrixEventHandler {
 
   async onEventData(event) {
     debug('onEventData', event);
+
+    // Reject any events that are too old
+    if (Date.now() - event.origin_server_ts > MAX_EVENT_ACCEPTANCE_WINDOW) {
+      return null;
+    }
+
     if (
       event.type === 'm.room.message' &&
       event.content &&
