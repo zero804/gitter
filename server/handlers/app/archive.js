@@ -215,7 +215,7 @@ exports.chatArchive = [
     let fromHour = 0;
     let toHour = 0;
     if (hourRange) {
-      const hourMatches = hourRange.match(/(\d\d?)-(\d\d?)/);
+      const hourMatches = hourRange.match(/^(\d\d?)-(\d\d?)$/);
 
       if (!hourMatches) {
         throw new StatusError(404, 'Hour was unable to be parsed');
@@ -224,7 +224,7 @@ exports.chatArchive = [
       fromHour = parseInt(hourMatches[1], 10);
       toHour = parseInt(hourMatches[2], 10);
 
-      if (fromHour < 0 || fromHour > 23) {
+      if (Number.isNaN(fromHour) || fromHour < 0 || fromHour > 23) {
         throw new StatusError(404, 'From hour can only be in range 0-23');
       }
 

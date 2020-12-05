@@ -325,7 +325,7 @@ function getRecentPublicChats() {
 }
 
 /**
- * NB: It is the callers responsibility to ensure that the user has access to the room!
+ * NB: It is the caller's responsibility to ensure that the user has access to the room!
  */
 async function updateChatMessage(troupe, chatMessage, user, newText = '') {
   if (!troupe) throw new StatusError(404, 'Unknown room');

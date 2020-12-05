@@ -1,3 +1,9 @@
+# 21.10.0 - 2020-12-4
+
+ - Ignore old Matrix events, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2095
+ - Add more robust archive hour parsing, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2082
+
+
 # 21.9.0 - 2020-12-3
 
  - Fallback and send reply message in MMF if we are unable to find the threaded conversation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2091

@@ -13,7 +13,7 @@ function createEventData(extraEventData) {
     event_id: `$${fixtureLoader.generateGithubId()}:localhost`,
     sender: '@alice:localhost',
     type: 'm.room.message',
-    origin_server_ts: 0,
+    origin_server_ts: Date.now(),
     content: {},
     ...extraEventData
   };
@@ -375,6 +375,22 @@ describe('matrix-event-handler', () => {
         assert.strictEqual(messages[0].text, 'my matrix message');
         assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
         assert.strictEqual(messages[0].virtualUser.displayName, 'alice');
+      });
+
+      it('ignore old events', async () => {
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix message'
+          },
+          origin_server_ts: Date.now() - 1000 * 60 * 31
+        });
+        await store.storeBridgedRoom(fixture.troupe1.id, eventData.room_id);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        assert.strictEqual(messages.length, 0);
       });
 
       it('mangled event does not get processed', async () => {
