@@ -46,6 +46,14 @@ describe('matrix-event-handler', () => {
       troupeWithUnderscore1: {
         uri: 'matrixbridgealiasquery_withunderscore/test'
       },
+      troupePrivate1: {
+        uri: 'matrixbridgeprivate/private-test',
+        securityDescriptor: {
+          members: 'INVITE',
+          admins: 'MANUAL',
+          public: false
+        }
+      },
       deleteDocuments: {
         Troupe: [
           {
@@ -53,6 +61,9 @@ describe('matrix-event-handler', () => {
           },
           {
             lcUri: 'matrixbridgealiasquery_withunderscore/test'
+          },
+          {
+            lcUri: 'matrixbridgeprivate/private-test'
           }
         ]
       }
@@ -88,6 +99,18 @@ describe('matrix-event-handler', () => {
       assert.deepEqual(result, {
         roomId: matrixRoomId
       });
+    });
+
+    it('Private room is not found', async () => {
+      const matrixRoomId = `!${fixtureLoader.generateGithubId()}:localhost`;
+      await store.storeBridgedRoom(fixture.troupePrivate1.id, matrixRoomId);
+
+      const result = await matrixEventHandler.onAliasQuery(
+        '#matrixbridgeprivate_private-test:gitter.im',
+        'matrixbridgeprivate_private-test'
+      );
+
+      assert.strictEqual(result, null);
     });
 
     it('non-existant room (#foo_bar:gitter.im)', async () => {
@@ -183,6 +206,13 @@ describe('matrix-event-handler', () => {
         user1: {},
         troupe1: {},
         troupeWithThreads1: {},
+        troupePrivate1: {
+          securityDescriptor: {
+            members: 'INVITE',
+            admins: 'MANUAL',
+            public: false
+          }
+        },
         messageParent1: {
           user: 'user1',
           troupe: 'troupeWithThreads1',
@@ -375,6 +405,21 @@ describe('matrix-event-handler', () => {
         assert.strictEqual(messages[0].text, 'my matrix message');
         assert.strictEqual(messages[0].virtualUser.externalId, 'alice:localhost');
         assert.strictEqual(messages[0].virtualUser.displayName, 'alice');
+      });
+
+      it('does not create messages in private rooms', async () => {
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: 'my matrix message'
+          }
+        });
+        await store.storeBridgedRoom(fixture.troupePrivate1.id, eventData.room_id);
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupePrivate1.id);
+        assert.strictEqual(messages.length, 0);
       });
 
       it('ignore old events', async () => {

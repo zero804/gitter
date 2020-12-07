@@ -1,3 +1,8 @@
+# 21.11.0 - 2020-12-7
+
+ - Stop Matrix people from querying for and sending messages to private rooms, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2098
+
+
 # 21.10.0 - 2020-12-4
 
  - Ignore old Matrix events, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2095

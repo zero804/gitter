@@ -4,11 +4,8 @@ const debug = require('debug')('gitter:app:matrix-bridge:gitter-bridge');
 const assert = require('assert');
 const StatusError = require('statuserror');
 const appEvents = require('gitter-web-appevents');
-const troupeService = require('gitter-web-rooms/lib/troupe-service');
-const securityDescriptorUtils = require('gitter-web-permissions/lib/security-descriptor-utils');
 const env = require('gitter-web-env');
 const logger = env.logger;
-const config = env.config;
 const stats = env.stats;
 const errorReporter = env.errorReporter;
 
@@ -16,34 +13,7 @@ const store = require('./store');
 const MatrixUtils = require('./matrix-utils');
 const transformGitterTextIntoMatrixMessage = require('./transform-gitter-text-into-matrix-message');
 const checkIfDatesSame = require('./check-if-dates-same');
-
-const gitterRoomAllowList = config.get('matrix:bridge:gitterRoomAllowList');
-
-let allowedRoomMap;
-if (gitterRoomAllowList) {
-  allowedRoomMap = gitterRoomAllowList.reduce((map, allowedRoomId) => {
-    map[allowedRoomId] = true;
-    return map;
-  }, {});
-}
-
-async function isRoomAllowedToBridge(gitterRoomId) {
-  // Only public rooms can bridge messages
-  const gitterRoom = await troupeService.findById(gitterRoomId);
-  const isPublic = securityDescriptorUtils.isPublic(gitterRoom);
-  if (!isPublic) {
-    return false;
-  }
-
-  // If no allowlist was configured, then allow any room to bridge (useful to wildcard all testing in dev/beta).
-  if (!allowedRoomMap) {
-    return true;
-  }
-
-  // In production, we limit the rooms that are bridged in our initial testing phase
-  // to limit any bad side-effects that may occur.
-  return !!allowedRoomMap[gitterRoomId];
-}
+const { isGitterRoomIdAllowedToBridge } = require('./gitter-utils');
 
 class GitterBridge {
   constructor(matrixBridge) {
@@ -101,7 +71,7 @@ class GitterBridge {
   }
 
   async handleChatMessageCreateEvent(gitterRoomId, model) {
-    const allowedToBridge = await isRoomAllowedToBridge(gitterRoomId);
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoomId);
     if (!allowedToBridge) {
       return null;
     }
@@ -167,7 +137,7 @@ class GitterBridge {
   }
 
   async handleChatMessageEditEvent(gitterRoomId, model) {
-    const allowedToBridge = await isRoomAllowedToBridge(gitterRoomId);
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoomId);
     if (!allowedToBridge) {
       return null;
     }
@@ -237,7 +207,7 @@ class GitterBridge {
   }
 
   async handleChatMessageRemoveEvent(gitterRoomId, model) {
-    const allowedToBridge = await isRoomAllowedToBridge(gitterRoomId);
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoomId);
     if (!allowedToBridge) {
       return null;
     }
