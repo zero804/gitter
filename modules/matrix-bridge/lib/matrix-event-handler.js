@@ -10,6 +10,7 @@ const env = require('gitter-web-env');
 const stats = env.stats;
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 const MatrixUtils = require('./matrix-utils');
+const { isGitterRoomIdAllowedToBridge } = require('./gitter-utils');
 
 // 30 minutes in milliseconds
 const MAX_EVENT_ACCEPTANCE_WINDOW = 1000 * 60 * 30;
@@ -128,6 +129,11 @@ class MatrixEventHandler {
       return null;
     }
 
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoom.id || gitterRoom._id);
+    if (!allowedToBridge) {
+      return null;
+    }
+
     const matrixRoomId = await this.matrixUtils.getOrCreateMatrixRoomByGitterRoomId(gitterRoom._id);
 
     return {
@@ -176,6 +182,12 @@ class MatrixEventHandler {
 
     const chatMessage = await chatService.findById(gitterMessageId);
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
+
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(chatMessage.toTroupeId);
+    if (!allowedToBridge) {
+      return null;
+    }
+
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
 
     stats.event('matrix_bridge.chat_edit', {
@@ -204,6 +216,12 @@ class MatrixEventHandler {
 
     const gitterRoomId = await store.getGitterRoomIdByMatrixRoomId(matrixRoomId);
     const gitterRoom = await troupeService.findById(gitterRoomId);
+
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoom.id || gitterRoom._id);
+    if (!allowedToBridge) {
+      return null;
+    }
+
     const gitterBridgeUser = await userService.findByUsername(this._gitterBridgeUsername);
 
     stats.event('matrix_bridge.chat_create', {
@@ -284,6 +302,11 @@ class MatrixEventHandler {
 
     const chatMessage = await chatService.findById(gitterMessageId);
     const gitterRoom = await troupeService.findById(chatMessage.toTroupeId);
+
+    const allowedToBridge = await isGitterRoomIdAllowedToBridge(gitterRoom.id || gitterRoom._id);
+    if (!allowedToBridge) {
+      return null;
+    }
 
     stats.event('matrix_bridge.chat_delete', {
       gitterRoomId: chatMessage.toTroupeId,
