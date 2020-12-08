@@ -1,6 +1,7 @@
 # 21.12.0 - *upcoming*
 
- - Add support for Gitter /me status messages to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2094
+ - Add support for Gitter `/me` status messages to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2094
+ - Add Matrix `m.emote` (`/me`) message support, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2093
 
 
 # 21.11.0 - 2020-12-7
