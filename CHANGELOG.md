@@ -1,3 +1,10 @@
+# 21.12.0 - 2020-12-8
+
+ - Add support for Gitter `/me` status messages to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2094
+ - Add Matrix `m.emote` (`/me`) message support, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2093
+ - Mark Gitter Android/iOS apps as deprecated and point to the Matrix clients, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2100
+
+
 # 21.11.0 - 2020-12-7
 
  - Stop Matrix people from querying for and sending messages to private rooms, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2098

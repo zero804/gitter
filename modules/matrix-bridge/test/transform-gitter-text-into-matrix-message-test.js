@@ -34,10 +34,47 @@ describe('transform-gitter-text-into-matrix-message', () => {
       name: 'Leaves unknown :emoji: syntax alone',
       text: `My unknown emoji :feelsgood:`,
       expectedText: `My unknown emoji :feelsgood:`
+    },
+    {
+      name: 'Strips mention off of status(/me) message (text)',
+      text: `@MadLittleMods hi`,
+      expectedText: `hi`,
+      messageOverrides: {
+        status: true
+      }
+    },
+    {
+      name: 'Strips mention off of status(/me) message (html)',
+      text: `<span data-link-type="mention" data-screen-name="MadLittleMods" class="mention">@MadLittleMods</span> hi`,
+      expectedText: `hi`,
+      messageOverrides: {
+        status: true
+      }
+    },
+    {
+      name:
+        'Make sure replacement is not greedy and only strips the first mention off of status(/me) message (text)',
+      text: `@MadLittleMods says hi to @bob`,
+      expectedText: `says hi to @bob`,
+      messageOverrides: {
+        status: true
+      }
+    },
+    {
+      name:
+        'Make sure replacement is not greedyand only strips the first mention off of status(/me) message (html)',
+      text: `<span data-link-type="mention" data-screen-name="MadLittleMods" class="mention">@MadLittleMods</span> says hi to <span data-link-type="mention" data-screen-name="bob" class="mention">@bob</span>`,
+      expectedText: `says hi to <span data-link-type="mention" data-screen-name="bob" class="mention">@bob</span>`,
+      messageOverrides: {
+        status: true
+      }
     }
   ].forEach(meta => {
     it(meta.name, async () => {
-      const newText = await transformGitterTextIntoMatrixMessage(meta.text);
+      let message = {
+        ...(meta.messageOverrides || {})
+      };
+      const newText = await transformGitterTextIntoMatrixMessage(meta.text, message);
 
       assert.strictEqual(newText, meta.expectedText);
     });
