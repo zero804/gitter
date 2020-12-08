@@ -1,3 +1,8 @@
+# 21.12.0 - *upcoming*
+
+ - Add support for Gitter /me status messages to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2094
+
+
 # 21.11.0 - 2020-12-7
 
  - Stop Matrix people from querying for and sending messages to private rooms, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2098
