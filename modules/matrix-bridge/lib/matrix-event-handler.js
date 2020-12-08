@@ -29,7 +29,8 @@ function validateEventForMessageEditEvent(event) {
     event.content['m.new_content'] &&
     event.content['m.new_content'].body &&
     // Only text edits please
-    event.content['m.new_content'].msgtype === 'm.text' &&
+    (event.content['m.new_content'].msgtype === 'm.text' ||
+      event.content['m.new_content'].msgtype === 'm.emote') &&
     event.content['m.relates_to'] &&
     event.content['m.relates_to'].event_id
   );
@@ -198,7 +199,8 @@ class MatrixEventHandler {
     });
 
     const newText = await transformMatrixEventContentIntoGitterMessage(
-      event.content['m.new_content']
+      event.content['m.new_content'],
+      event
     );
     await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
 
@@ -265,7 +267,9 @@ class MatrixEventHandler {
       fallbackReplyContent = `> This message is replying to a [Matrix event](https://matrix.to/#/${matrixRoomId}/${inReplyToMatrixEventId}) but we were unable to find associated bridged Gitter message to put it in the appropriate threaded conversation.\n\n`;
     }
 
-    const newText = await transformMatrixEventContentIntoGitterMessage(event.content);
+    const isStatusMessage = event.content.msgtype === 'm.emote';
+
+    const newText = await transformMatrixEventContentIntoGitterMessage(event.content, event);
     const resultantText = `${fallbackReplyContent}${newText}`;
 
     const newChatMessage = await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
@@ -278,7 +282,8 @@ class MatrixEventHandler {
           ? intent.getClient().mxcUrlToHttp(profile.avatar_url)
           : undefined
       },
-      text: resultantText
+      text: resultantText,
+      status: isStatusMessage
     });
 
     // Store the message so we can reference it in edits and threads/replies
