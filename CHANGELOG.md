@@ -1,3 +1,8 @@
+# 21.13.0 - *upcoming*
+
+ - Fix browser notifications for virtualUsers, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2102
+
+
 # 21.12.0 - 2020-12-8
 
  - Add support for Gitter `/me` status messages to the Matrix bridge, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2094
