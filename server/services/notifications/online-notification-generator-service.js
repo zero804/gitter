@@ -11,7 +11,7 @@ var debug = require('debug')('gitter:app:online-notification-generator');
 
 function generateChatMessageNotification(troupeId, chatId) {
   return Promise.all([
-    chatService.findByIdLean(chatId, { fromUserId: 1, text: 1 }),
+    chatService.findByIdLean(chatId, { fromUserId: 1, virtualUser: 1, text: 1 }),
     troupeDao.findByIdRequired(troupeId, { uri: 1, oneToOne: true })
   ])
     .spread(function(chat, troupe) {
@@ -32,19 +32,29 @@ function generateChatMessageNotification(troupeId, chatId) {
       var oneToOne = troupe.oneToOne;
       if (!fromUser) throw new Error('User not found');
 
+      let displayName = fromUser.displayName;
+      if (chat.virtualUser) {
+        displayName = chat.virtualUser.displayName;
+      }
+
+      let avatarUrl = resolveUserAvatarUrl(fromUser, 128);
+      if (chat.virtualUser) {
+        avatarUrl = chat.virtualUser.avatarUrl;
+      }
+
       if (oneToOne) {
         return {
           text: chat.text,
-          title: fromUser.displayName,
+          title: displayName,
           link: '/' + fromUser.username,
-          icon: resolveUserAvatarUrl(fromUser, 128)
+          icon: avatarUrl
         };
       } else {
         return {
           text: chat.text,
-          title: fromUser.displayName + ' 💬 ' + troupe.uri,
+          title: displayName + ' 💬 ' + troupe.uri,
           link: '/' + troupe.uri,
-          icon: resolveUserAvatarUrl(fromUser, 128)
+          icon: avatarUrl
         };
       }
     });
