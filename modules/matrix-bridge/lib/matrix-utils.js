@@ -12,6 +12,8 @@ const logger = env.logger;
 const store = require('./store');
 
 const serverName = config.get('matrix:bridge:serverName');
+// The bridge user we are using to interact with everything on the Matrix side
+const matrixBridgeMxidLocalpart = config.get('matrix:bridge:matrixBridgeMxidLocalpart');
 
 /**
  * downloadFile - This function will take a URL and store the resulting data into
@@ -123,18 +125,22 @@ class MatrixUtils {
     return newRoom.room_id;
   }
 
-  async getOrCreateMatrixUserByGitterUserId(gitterUserId) {
-    const existingMatrixUserId = await store.getMatrixUserIdByGitterUserId(gitterUserId);
-    if (existingMatrixUserId) {
-      return existingMatrixUserId;
-    }
-
+  async ensureCorrectMxidProfile(mxid, gitterUserId) {
     const gitterUser = await userService.findById(gitterUserId);
 
-    const mxid = `@${gitterUser.username.toLowerCase()}-${gitterUser.id}:${serverName}`;
-
     const intent = this.matrixBridge.getIntent(mxid);
-    await intent.setDisplayName(`${gitterUser.username} (${gitterUser.displayName})`);
+
+    let currentProfile = {};
+    try {
+      currentProfile = await intent.getProfileInfo(mxid, null);
+    } catch (err) {
+      // no-op
+    }
+
+    const desiredDisplayName = `${gitterUser.username} (${gitterUser.displayName})`;
+    if (desiredDisplayName !== currentProfile.displayname) {
+      await intent.setDisplayName(desiredDisplayName);
+    }
 
     const gitterAvatarUrl = avatars.getForUser(gitterUser);
     try {
@@ -146,7 +152,10 @@ class MatrixUtils {
           name: path.basename(gitterAvatarUrl),
           type: data.mimeType
         });
-        await intent.setAvatarUrl(mxcUrl);
+
+        if (mxcUrl !== currentProfile.avatar_url) {
+          await intent.setAvatarUrl(mxcUrl);
+        }
       }
     } catch (err) {
       // Just log an error and noop if the user avatar fails to download.
@@ -158,11 +167,40 @@ class MatrixUtils {
         }
       );
     }
+  }
+
+  getMxidForGitterUser(gitterUser) {
+    const mxid = `@${gitterUser.username.toLowerCase()}-${gitterUser.id}:${serverName}`;
+    return mxid;
+  }
+
+  async getOrCreateMatrixUserByGitterUserId(gitterUserId) {
+    const existingMatrixUserId = await store.getMatrixUserIdByGitterUserId(gitterUserId);
+    if (existingMatrixUserId) {
+      return existingMatrixUserId;
+    }
+
+    const gitterUser = await userService.findById(gitterUserId);
+    const mxid = this.getMxidForGitterUser(gitterUser);
+    await this.ensureCorrectMxidProfile(mxid, gitterUserId);
 
     logger.info(`Storing bridged user (Gitter user id=${gitterUser.id} -> Matrix mxid=${mxid})`);
     await store.storeBridgedUser(gitterUser.id, mxid);
 
     return mxid;
+  }
+
+  // Ensures the bridge bot user is registered and updates its profile info.
+  async ensureCorrectMatrixBridgeUserProfile() {
+    const mxid = `@${matrixBridgeMxidLocalpart}:${serverName}`;
+    logger.info(`Ensuring profile info is up-to-date for the Matrix bridge user mxid=${mxid}`);
+
+    const bridgeIntent = this.matrixBridge.getIntent();
+
+    await bridgeIntent.ensureRegistered(true);
+
+    const gitterUser = await userService.findByUsername(matrixBridgeMxidLocalpart);
+    await this.ensureCorrectMxidProfile(mxid, gitterUser.id);
   }
 }
 

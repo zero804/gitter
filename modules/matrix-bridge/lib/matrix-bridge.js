@@ -21,7 +21,10 @@ const bridgeUrl = config.get('matrix:bridge:applicationServiceUrl');
 const bridgeId = config.get('matrix:bridge:id');
 const hsToken = config.get('matrix:bridge:hsToken');
 const asToken = config.get('matrix:bridge:asToken');
-const senderLocalpart = config.get('matrix:bridge:senderLocalpart');
+// The bridge user we are using to interact with everything on the Matrix side
+const matrixBridgeMxidLocalpart = config.get('matrix:bridge:matrixBridgeMxidLocalpart');
+// The backing user we are sending messages with on the Gitter side
+const gitterBridgeUsername = config.get('matrix:bridge:gitterBridgeUsername');
 
 const registrationConfig = AppServiceRegistration.fromObject({
   id: bridgeId,
@@ -52,7 +55,7 @@ const registrationConfig = AppServiceRegistration.fromObject({
     ]
   },
   url: bridgeUrl,
-  sender_localpart: senderLocalpart,
+  sender_localpart: matrixBridgeMxidLocalpart,
   rate_limited: true,
   protocols: null
 });
@@ -109,6 +112,6 @@ const matrixBridge = new Bridge({
   }
 });
 
-eventHandler = new MatrixEventHandler(matrixBridge, senderLocalpart);
+eventHandler = new MatrixEventHandler(matrixBridge, gitterBridgeUsername);
 
 module.exports = matrixBridge;

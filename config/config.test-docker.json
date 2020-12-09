@@ -38,7 +38,8 @@
       "serverName": "my.matrix.host",
       "applicationServiceUrl": "http://localhost:9000",
       "applicationServicePort": 9000,
-      "senderLocalpart": "gitter-badger"
+      "matrixBridgeMxidLocalpart": "gitter-badger",
+      "gitterBridgeUsername": "gitter-badger"
     }
   },
   "virtualUsers": {
