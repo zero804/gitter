@@ -12,11 +12,17 @@ describe('gitter-bridge', () => {
   let matrixBridge;
   beforeEach(() => {
     const clientSpies = {
-      redactEvent: sinon.spy()
+      redactEvent: sinon.spy(),
+      getRoomIdForAlias: sinon.spy(),
+      deleteAlias: sinon.spy(),
+      getRoomDirectoryVisibility: sinon.spy(),
+      setRoomDirectoryVisibility: sinon.spy()
     };
 
     const intentSpies = {
       getClient: () => clientSpies,
+      getStateEvent: sinon.spy(),
+      sendStateEvent: sinon.spy(),
       getEvent: sinon.spy(() => ({
         event_id: `$${fixtureLoader.generateGithubId()}:localhost`,
         sender: '@alice:localhost'
@@ -31,7 +37,9 @@ describe('gitter-bridge', () => {
       setRoomAvatar: sinon.spy(),
       setDisplayName: sinon.spy(),
       uploadContent: sinon.spy(),
-      setAvatarUrl: sinon.spy()
+      setAvatarUrl: sinon.spy(),
+      getRoomDirectoryVisibility: sinon.spy(),
+      setRoomDirectoryVisibility: sinon.spy()
     };
 
     matrixBridge = {

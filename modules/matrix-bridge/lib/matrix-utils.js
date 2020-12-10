@@ -1,5 +1,6 @@
 'use strict';
 
+const debug = require('debug')('gitter:app:matrix-bridge:matrix-utils');
 const request = require('request');
 const path = require('path');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -10,6 +11,7 @@ const config = env.config;
 const logger = env.logger;
 
 const store = require('./store');
+const { assert } = require('sinon');
 
 const serverName = config.get('matrix:bridge:serverName');
 
@@ -54,32 +56,26 @@ class MatrixUtils {
     this.matrixBridge = matrixBridge;
   }
 
-  async getOrCreateMatrixRoomByGitterRoomId(gitterRoomId) {
-    const existingMatrixRoomId = await store.getMatrixRoomIdByGitterRoomId(gitterRoomId);
-    if (existingMatrixRoomId) {
-      return existingMatrixRoomId;
-    }
+  getCanonicalAliasForGitterRoomUri(uri) {
+    return uri.replace('/', '_');
+  }
 
-    // Create the Matrix room if it doesn't already exist
+  async createMatrixRoomByGitterRoomId(gitterRoomId) {
     const gitterRoom = await troupeService.findById(gitterRoomId);
-
-    logger.info(
-      `Existing Matrix room not found, creating new Matrix room for room.uri=${gitterRoom.uri} roomId=${gitterRoomId}`
-    );
-
-    const roomAlias = gitterRoom.uri.replace('/', '_');
+    const roomAlias = this.getCanonicalAliasForGitterRoomUri(gitterRoom.uri);
 
     const bridgeIntent = this.matrixBridge.getIntent();
+
     const newRoom = await bridgeIntent.createRoom({
       createAsClient: true,
       options: {
         name: gitterRoom.uri,
-        topic: gitterRoom.topic,
-        //invite: recipients,
         visibility: 'public',
-        room_alias_name: roomAlias,
-        preset: 'public_chat'
-        //initial_state: extraContent
+        preset: 'public_chat',
+        // We use this as a locking mechanism.
+        // The bridge will return an error: `M_ROOM_IN_USE: Room alias already taken`
+        // if another process is already in the working on creating the room
+        room_alias_name: roomAlias
       }
     });
     // Store the bridged room right away!
@@ -89,14 +85,101 @@ class MatrixUtils {
     );
     await store.storeBridgedRoom(gitterRoomId, newRoom.room_id);
 
-    // Add another alias for the room ID
-    await bridgeIntent.createAlias(`#${gitterRoomId}:${serverName}`, newRoom.room_id);
+    // Propagate all of the room details over to Matrix like the room topic and avatar
+    await this.ensureCorrectRoomState(newRoom.room_id, gitterRoomId);
 
-    // Add a lowercase alias if necessary
-    if (roomAlias.toLowerCase() !== roomAlias) {
-      await bridgeIntent.createAlias(`#${roomAlias.toLowerCase()}:${serverName}`, newRoom.room_id);
+    return newRoom.room_id;
+  }
+
+  async ensureStateEvent(matrixRoomId, eventType, newContent) {
+    const bridgeIntent = this.matrixBridge.getIntent();
+
+    let currentContent;
+    try {
+      currentContent = await bridgeIntent.getStateEvent(matrixRoomId, eventType);
+    } catch (err) {
+      // no-op
     }
 
+    let isContentSame = false;
+    try {
+      assert.deepEqual(newContent, currentContent);
+      isContentSame = true;
+    } catch (err) {
+      // no-op
+    }
+
+    debug(
+      `ensureStateEvent(${matrixRoomId}, ${eventType}): isContentSame=${isContentSame} currentContent`,
+      currentContent,
+      'newContent',
+      newContent
+    );
+    if (!isContentSame) {
+      await bridgeIntent.sendStateEvent(matrixRoomId, eventType, '', newContent);
+    }
+  }
+
+  async ensureRoomAlias(matrixRoomId, alias) {
+    const bridgeIntent = this.matrixBridge.getIntent();
+
+    let isAliasAlreadySet = false;
+    let currentAliasedRoom;
+    try {
+      currentAliasedRoom = await bridgeIntent.getClient().getRoomIdForAlias(alias);
+    } catch (err) {
+      // no-op
+    }
+
+    if (currentAliasedRoom && currentAliasedRoom.room_id === matrixRoomId) {
+      isAliasAlreadySet = true;
+    } else if (currentAliasedRoom) {
+      // Delete the alias from the other room
+      await bridgeIntent.getClient().deleteAlias(alias);
+    }
+
+    debug(`ensureRoomAlias(${matrixRoomId}, ${alias}) isAliasAlreadySet=${isAliasAlreadySet}`);
+    if (!isAliasAlreadySet) {
+      await bridgeIntent.createAlias(alias, matrixRoomId);
+    }
+  }
+
+  async ensureCorrectRoomState(matrixRoomId, gitterRoomId) {
+    const gitterRoom = await troupeService.findById(gitterRoomId);
+
+    const bridgeIntent = this.matrixBridge.getIntent();
+
+    await this.ensureStateEvent(matrixRoomId, 'm.room.name', {
+      name: gitterRoom.uri
+    });
+    await this.ensureStateEvent(matrixRoomId, 'm.room.topic', {
+      topic: gitterRoom.topic
+    });
+
+    const roomDirectoryVisibility = await bridgeIntent
+      .getClient()
+      .getRoomDirectoryVisibility(matrixRoomId);
+    if (roomDirectoryVisibility !== 'public') {
+      await bridgeIntent.getClient().setRoomDirectoryVisibility(matrixRoomId, 'public');
+    }
+    await this.ensureStateEvent(matrixRoomId, 'm.room.history_visibility', {
+      history_visibility: 'world_readable'
+    });
+    await this.ensureStateEvent(matrixRoomId, 'm.room.join_rules', {
+      join_rule: 'public'
+    });
+
+    // Set the human-readable room aliases
+    const roomAlias = this.getCanonicalAliasForGitterRoomUri(gitterRoom.uri);
+    await this.ensureRoomAlias(matrixRoomId, `#${roomAlias}:${serverName}`);
+    // Add another alias for the room ID
+    await this.ensureRoomAlias(matrixRoomId, `#${gitterRoomId}:${serverName}`);
+    // Add a lowercase alias if necessary
+    if (roomAlias.toLowerCase() !== roomAlias) {
+      await this.ensureRoomAlias(matrixRoomId, `#${roomAlias.toLowerCase()}:${serverName}`);
+    }
+
+    // Set the room avatar
     const gitterAvatarUrl = avatars.getForGroupId(gitterRoom.groupId);
     try {
       if (gitterAvatarUrl) {
@@ -107,7 +190,9 @@ class MatrixUtils {
           name: path.basename(gitterAvatarUrl),
           type: data.mimeType
         });
-        await bridgeIntent.setRoomAvatar(newRoom.room_id, mxcUrl);
+        await this.ensureStateEvent(matrixRoomId, 'm.room.avatar', {
+          url: mxcUrl
+        });
       }
     } catch (err) {
       // Just log an error and noop if the user avatar fails to download.
@@ -119,8 +204,23 @@ class MatrixUtils {
         }
       );
     }
+  }
 
-    return newRoom.room_id;
+  async getOrCreateMatrixRoomByGitterRoomId(gitterRoomId) {
+    // Find the cached existing bridged room
+    const existingMatrixRoomId = await store.getMatrixRoomIdByGitterRoomId(gitterRoomId);
+    if (existingMatrixRoomId) {
+      return existingMatrixRoomId;
+    }
+
+    // Create the Matrix room if it doesn't already exist
+    logger.info(
+      `Existing Matrix room not found, creating new Matrix room for roomId=${gitterRoomId}`
+    );
+
+    const matrixRoomId = await this.createMatrixRoomByGitterRoomId(gitterRoomId);
+
+    return matrixRoomId;
   }
 
   async getOrCreateMatrixUserByGitterUserId(gitterUserId) {
