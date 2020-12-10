@@ -9,6 +9,7 @@ var appEvents = require('../../utils/appevents');
 var context = require('gitter-web-client-context');
 var SyncMixin = require('../../collections/sync-mixin');
 var avatars = require('gitter-web-avatars');
+const checkForMatrixUsername = require('gitter-web-users/lib/virtual-users/check-for-matrix-username');
 
 module.exports = (function() {
   var UserView = Marionette.ItemView.extend({
@@ -19,7 +20,7 @@ module.exports = (function() {
     serializeData: function() {
       var data = this.model.toJSON();
       data.inactive = data.removed;
-      data.avatarUrl = avatars.getForUser(data);
+      data.avatarUrl = data.avatarUrl || avatars.getForUser(data);
       return data;
     }
   });
@@ -52,7 +53,14 @@ module.exports = (function() {
       var inactive = data.removed;
       var chatPrivately = data.has_gitter_login && isntSelf && !inactive;
       var mentionable = isntSelf;
-      var removable = isntSelf && context.isTroupeAdmin();
+
+      const removable =
+        // Can't remove yourself
+        isntSelf &&
+        // You can't remove Matrix users
+        !checkForMatrixUsername(data.username) &&
+        // Need to be an admin to remove someone
+        context.isTroupeAdmin();
 
       // Special case
       if (context.inOneToOneTroupeContext()) {
@@ -61,7 +69,7 @@ module.exports = (function() {
         }
       }
 
-      data.avatarUrl = avatars.getForUser(data);
+      data.avatarUrl = data.avatarUrl || avatars.getForUser(data);
       data.inactive = data.removed;
       data.chatPrivately = chatPrivately;
       data.mentionable = mentionable;
