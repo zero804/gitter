@@ -1,4 +1,4 @@
-# 21.13.0 - *upcoming*
+# 21.13.0 - 2020-12-10
 
  - Fix browser notifications for `virtualUsers`, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2102
  - Add `displayName` and `avatar` to bridging bot user on Matrix (`@gitter-badger:gitter.im`), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2103
