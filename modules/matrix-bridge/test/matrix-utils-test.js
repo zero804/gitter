@@ -18,7 +18,10 @@ describe('matrix-utils', () => {
     userWithCapitalUsername1: {
       username: `MyTestUser${fixtureLoader.generateGithubId()}`
     },
-    troupe1: {}
+    group1: {},
+    troupe1: {
+      group: 'group1'
+    }
   });
 
   let matrixUtils;
@@ -93,7 +96,7 @@ describe('matrix-utils', () => {
 
       assert(mxid);
 
-      assert.strictEqual(matrixBridge.getIntent.callCount, 1);
+      assert.strictEqual(matrixBridge.getIntent.callCount, 2);
       assert.deepEqual(matrixBridge.getIntent.getCall(0).args, [
         `@${fixture.user1.username}-${fixture.user1.id}:${serverName}`
       ]);
