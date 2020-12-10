@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('assert');
+const sinon = require('sinon');
 const fixtureLoader = require('gitter-web-test-utils/lib/test-fixtures');
 const mongoUtils = require('gitter-web-persistence-utils/lib/mongo-utils');
 const MatrixEventHandler = require('../lib/matrix-event-handler');
@@ -21,12 +22,14 @@ function createEventData(extraEventData) {
 
 describe('matrix-event-handler', () => {
   let matrixEventHandler;
-  const matrixBridge = {
-    getIntent: (/*userId*/) => ({
+  let matrixBridge;
+  beforeEach(() => {
+    const intentSpies = {
       createRoom: () => ({
         room_id: `!${fixtureLoader.generateGithubId()}:localhost`
       }),
       createAlias: () => {},
+      join: sinon.spy(),
       getProfileInfo: () => ({
         displayname: 'Alice',
         avatar_url: 'mxc://abcedf1234'
@@ -34,8 +37,12 @@ describe('matrix-event-handler', () => {
       getClient: (/*avatarUrl*/) => ({
         mxcUrlToHttp: () => 'myavatar.png'
       })
-    })
-  };
+    };
+
+    matrixBridge = {
+      getIntent: (/*userId*/) => intentSpies
+    };
+  });
 
   describe('onAliasQuery', () => {
     const fixture = fixtureLoader.setupEach({
@@ -588,6 +595,51 @@ describe('matrix-event-handler', () => {
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         assert.strictEqual(messages.length, 1);
         assert.strictEqual(messages[0].text, 'my original message from matrix');
+      });
+    });
+
+    describe('handleBotInvitationEvent', () => {
+      const fixture = fixtureLoader.setupEach({
+        userBridge1: {},
+        troupe1: {},
+        messageFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my original message from matrix'
+        }
+      });
+
+      beforeEach(() => {
+        matrixEventHandler = new MatrixEventHandler(matrixBridge, fixture.userBridge1.username);
+      });
+
+      it('When we receive a Matrix invite, the bridge bot user joins the room', async () => {
+        const eventData = createEventData({
+          type: 'm.room.member',
+          state_key: '@gitter-badger:my.matrix.host'
+        });
+
+        await matrixEventHandler.onEventData(eventData);
+
+        // Room is created for something that hasn't been bridged before
+        assert.strictEqual(matrixBridge.getIntent().join.callCount, 1);
+      });
+
+      it('When we receive a Matrix invite for another user, does not cause our bot to try to join the room', async () => {
+        const eventData = createEventData({
+          type: 'm.room.member',
+          state_key: '@some-random-user:my.matrix.host'
+        });
+
+        await matrixEventHandler.onEventData(eventData);
+
+        // Room is created for something that hasn't been bridged before
+        assert.strictEqual(matrixBridge.getIntent().join.callCount, 0);
       });
     });
   });
