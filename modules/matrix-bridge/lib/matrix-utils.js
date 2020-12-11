@@ -290,9 +290,14 @@ class MatrixUtils {
     return mxid;
   }
 
+  getMxidForMatrixBridgeUser() {
+    const mxid = `@${matrixBridgeMxidLocalpart}:${serverName}`;
+    return mxid;
+  }
+
   // Ensures the bridge bot user is registered and updates its profile info.
   async ensureCorrectMatrixBridgeUserProfile() {
-    const mxid = `@${matrixBridgeMxidLocalpart}:${serverName}`;
+    const mxid = this.getMxidForMatrixBridgeUser();
     logger.info(`Ensuring profile info is up-to-date for the Matrix bridge user mxid=${mxid}`);
 
     const bridgeIntent = this.matrixBridge.getIntent();
