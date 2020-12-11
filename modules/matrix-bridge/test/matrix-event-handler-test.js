@@ -146,6 +146,17 @@ describe('matrix-event-handler', () => {
           troupe: 'troupe1',
           text: 'my original message from matrix'
         },
+        messageOldFromVirtualUser1: {
+          user: 'userBridge1',
+          virtualUser: {
+            type: 'matrix',
+            externalId: 'test-person:matrix.org',
+            displayName: 'Tessa'
+          },
+          troupe: 'troupe1',
+          text: 'my original old message from matrix',
+          sent: new Date('2020-12-01T00:00:00.000Z')
+        },
         messageStatusFromVirtualUser1: {
           user: 'userBridge1',
           virtualUser: {
@@ -186,7 +197,7 @@ describe('matrix-event-handler', () => {
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         const targetMessage = messages.find(m => m.id === fixture.messageFromVirtualUser1.id);
-        assert.strictEqual(messages.length, 2);
+        assert.strictEqual(messages.length, 3);
         assert.strictEqual(targetMessage.text, 'my edited message from matrix');
       });
 
@@ -216,13 +227,42 @@ describe('matrix-event-handler', () => {
         await matrixEventHandler.onEventData(eventData);
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
-        assert.strictEqual(messages.length, 2);
+        assert.strictEqual(messages.length, 3);
         const targetMessage = messages.find(m => m.id === fixture.messageStatusFromVirtualUser1.id);
         assert.strictEqual(
           targetMessage.text,
           '@alice:localhost my edited emote/status message from matrix'
         );
         assert.strictEqual(targetMessage.status, true);
+      });
+
+      it('When we receive message edit from Matrix outside of the Gitter edit time window, send a new Gitter message with reference to original message the Gitter room', async () => {
+        const matrixMessageEventId = `$${fixtureLoader.generateGithubId()}`;
+        const eventData = createEventData({
+          type: 'm.room.message',
+          content: {
+            body: '* my edited message from matrix',
+            'm.new_content': { body: 'my edited message from matrix', msgtype: 'm.text' },
+            'm.relates_to': {
+              event_id: matrixMessageEventId,
+              rel_type: 'm.replace'
+            }
+          }
+        });
+        await store.storeBridgedMessage(
+          fixture.messageOldFromVirtualUser1,
+          eventData.room_id,
+          matrixMessageEventId
+        );
+
+        await matrixEventHandler.onEventData(eventData);
+
+        const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
+        const targetMessage = messages.find(m => m.id === fixture.messageOldFromVirtualUser1.id);
+        const newMessage = messages[3];
+        assert.strictEqual(messages.length, 4);
+        assert.strictEqual(targetMessage.text, 'my original old message from matrix');
+        assert.strictEqual(newMessage.text.split('): ')[1], 'my edited message from matrix');
       });
 
       it('Ignore message edit from Matrix when there is no matching message', async () => {
@@ -250,7 +290,7 @@ describe('matrix-event-handler', () => {
 
         const messages = await chatService.findChatMessagesForTroupe(fixture.troupe1.id);
         const targetMessage = messages.find(m => m.id === fixture.messageFromVirtualUser1.id);
-        assert.strictEqual(messages.length, 2);
+        assert.strictEqual(messages.length, 3);
         assert.strictEqual(targetMessage.text, 'my original message from matrix');
       });
     });

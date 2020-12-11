@@ -5,10 +5,12 @@ const assert = require('assert');
 const chatService = require('gitter-web-chats');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const userService = require('gitter-web-users');
-const store = require('./store');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const env = require('gitter-web-env');
 const stats = env.stats;
 const logger = env.logger;
+
+const store = require('./store');
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 const MatrixUtils = require('./matrix-utils');
 const { isGitterRoomIdAllowedToBridge } = require('./gitter-utils');
@@ -211,6 +213,23 @@ class MatrixEventHandler {
       event.content['m.new_content'],
       event
     );
+
+    // Create a new message for any events that are outside the Gitter edit window
+    if (chatService.checkIfTimeIsOutsideEditWindow(chatMessage.sent)) {
+      logger.info(
+        `Matrix edit is too old to apply to original bridged Gitter message so we're sending a new message (event_id=${event.event_id} old_matrix_event_we_are_replacing=${matrixEventId} old_gitter_chat_id=${chatMessage.id})`
+      );
+
+      await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
+        parentId: chatMessage.parentId,
+        virtualUser: chatMessage.virtualUser,
+        text: `:point_up: [Edit](${generatePermalink(gitterRoom.uri, chatMessage.id)}): ${newText}`,
+        status: chatMessage.status
+      });
+
+      return null;
+    }
+
     await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
 
     return null;
