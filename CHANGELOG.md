@@ -1,3 +1,8 @@
+# 21.14.0 - *upcoming*
+
+ - Accept invites on Matrix when invited, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2104
+ 
+
 # 21.13.0 - 2020-12-10
 
  - Fix browser notifications for `virtualUsers`, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2102
