@@ -1,6 +1,7 @@
 'use strict';
 
 const debug = require('debug')('gitter:app:matrix-bridge:matrix-utils');
+const assert = require('assert');
 const request = require('request');
 const path = require('path');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
@@ -11,7 +12,6 @@ const config = env.config;
 const logger = env.logger;
 
 const store = require('./store');
-const { assert } = require('sinon');
 
 const serverName = config.get('matrix:bridge:serverName');
 // The bridge user we are using to interact with everything on the Matrix side
