@@ -54,8 +54,12 @@ describe('gitter-bridge', () => {
       const fixture = fixtureLoader.setupEach({
         user1: {},
         userBridge1: {},
-        troupe1: {},
+        group1: {},
+        troupe1: {
+          group: 'group1'
+        },
         troupePrivate1: {
+          group: 'group1',
           users: ['user1'],
           securityDescriptor: {
             members: 'INVITE',
@@ -291,8 +295,12 @@ describe('gitter-bridge', () => {
       const fixture = fixtureLoader.setupEach({
         user1: {},
         userBridge1: {},
-        troupe1: {},
+        group1: {},
+        troupe1: {
+          group: 'group1'
+        },
         troupePrivate1: {
+          group: 'group1',
           users: ['user1'],
           securityDescriptor: {
             members: 'INVITE',
@@ -452,8 +460,12 @@ describe('gitter-bridge', () => {
       const fixture = fixtureLoader.setupEach({
         user1: {},
         userBridge1: {},
-        troupe1: {},
+        group1: {},
+        troupe1: {
+          group: 'group1'
+        },
         troupePrivate1: {
+          group: 'group1',
           users: ['user1'],
           securityDescriptor: {
             members: 'INVITE',

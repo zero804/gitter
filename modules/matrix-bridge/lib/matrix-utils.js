@@ -4,9 +4,12 @@ const debug = require('debug')('gitter:app:matrix-bridge:matrix-utils');
 const assert = require('assert');
 const request = require('request');
 const path = require('path');
+const urlJoin = require('url-join');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
+const groupService = require('gitter-web-groups');
 const userService = require('gitter-web-users');
 const avatars = require('gitter-web-avatars');
+const getRoomNameFromTroupeName = require('gitter-web-shared/get-room-name-from-troupe-name');
 const env = require('gitter-web-env');
 const config = env.config;
 const logger = env.logger;
@@ -16,6 +19,7 @@ const store = require('./store');
 const serverName = config.get('matrix:bridge:serverName');
 // The bridge user we are using to interact with everything on the Matrix side
 const matrixBridgeMxidLocalpart = config.get('matrix:bridge:matrixBridgeMxidLocalpart');
+const gitterLogoMxc = config.get('matrix:bridge:gitterLogoMxc');
 
 /**
  * downloadFile - This function will take a URL and store the resulting data into
@@ -146,8 +150,37 @@ class MatrixUtils {
     }
   }
 
+  async uploadAvatarUrlToMatrix(avatarUrl) {
+    const bridgeIntent = this.matrixBridge.getIntent();
+
+    let mxcUrl;
+    try {
+      if (avatarUrl) {
+        const data = await downloadFileToBuffer(avatarUrl);
+        mxcUrl = await bridgeIntent.uploadContent(data.buffer, {
+          onlyContentUri: true,
+          rawResponse: false,
+          name: path.basename(avatarUrl),
+          type: data.mimeType
+        });
+      }
+    } catch (err) {
+      // Just log an error and noop if the user avatar fails to download.
+      // It's more important that we just send their message without the avatar.
+      logger.error(
+        `Failed to download avatar (avatarUrl=${avatarUrl}) which we were going to use for bridging something in Matrix`,
+        {
+          exception: err
+        }
+      );
+    }
+
+    return mxcUrl;
+  }
+
   async ensureCorrectRoomState(matrixRoomId, gitterRoomId) {
     const gitterRoom = await troupeService.findById(gitterRoomId);
+    const gitterGroup = await groupService.findById(gitterRoom.groupId);
 
     const bridgeIntent = this.matrixBridge.getIntent();
 
@@ -182,30 +215,30 @@ class MatrixUtils {
     }
 
     // Set the room avatar
-    const gitterAvatarUrl = avatars.getForGroupId(gitterRoom.groupId);
-    try {
-      if (gitterAvatarUrl) {
-        const data = await downloadFileToBuffer(gitterAvatarUrl);
-        const mxcUrl = await bridgeIntent.uploadContent(data.buffer, {
-          onlyContentUri: true,
-          rawResponse: false,
-          name: path.basename(gitterAvatarUrl),
-          type: data.mimeType
-        });
-        await this.ensureStateEvent(matrixRoomId, 'm.room.avatar', {
-          url: mxcUrl
-        });
-      }
-    } catch (err) {
-      // Just log an error and noop if the user avatar fails to download.
-      // It's more important that we just send their message without the avatar.
-      logger.error(
-        `Failed to download avatar for Gitter group(room.groupId=${gitterRoom.groupId}, gitterAvatarUrl=${gitterAvatarUrl}) which we were going to use for the bridged Matrix room`,
-        {
-          exception: err
-        }
-      );
+    const roomAvatarUrl = avatars.getForGroupId(gitterRoom.groupId);
+    const roomMxcUrl = await this.uploadAvatarUrlToMatrix(roomAvatarUrl);
+    if (roomMxcUrl) {
+      await this.ensureStateEvent(matrixRoomId, 'm.room.avatar', {
+        url: roomMxcUrl
+      });
     }
+
+    // Add some meta info to cross-link and show that the Matrix room is bridged over to Gitter
+    await this.ensureStateEvent(matrixRoomId, 'uk.half-shot.bridge', {
+      bridgebot: this.getMxidForMatrixBridgeUser(),
+      protocol: {
+        id: 'gitter',
+        displayname: 'Gitter',
+        avatar_url: gitterLogoMxc,
+        external_url: 'https://gitter.im/'
+      },
+      channel: {
+        id: gitterRoom.id,
+        displayname: `${gitterGroup.name}/${getRoomNameFromTroupeName(gitterRoom.uri)}`,
+        avatar_url: roomMxcUrl,
+        external_url: urlJoin(config.get('web:basepath'), gitterRoom.uri)
+      }
+    });
   }
 
   async getOrCreateMatrixRoomByGitterRoomId(gitterRoomId) {
@@ -243,29 +276,9 @@ class MatrixUtils {
     }
 
     const gitterAvatarUrl = avatars.getForUser(gitterUser);
-    try {
-      if (gitterAvatarUrl) {
-        const data = await downloadFileToBuffer(gitterAvatarUrl);
-        const mxcUrl = await intent.uploadContent(data.buffer, {
-          onlyContentUri: true,
-          rawResponse: false,
-          name: path.basename(gitterAvatarUrl),
-          type: data.mimeType
-        });
-
-        if (mxcUrl !== currentProfile.avatar_url) {
-          await intent.setAvatarUrl(mxcUrl);
-        }
-      }
-    } catch (err) {
-      // Just log an error and noop if the user avatar fails to download.
-      // It's more important that we just send their message without the avatar.
-      logger.error(
-        `Failed to download avatar from Gitter user(gitterUserId=${gitterUserId}, gitterAvatarUrl=${gitterAvatarUrl}) which we were going to use for their bridged Matrix user`,
-        {
-          exception: err
-        }
-      );
+    const mxcUrl = await this.uploadAvatarUrlToMatrix(gitterAvatarUrl);
+    if (mxcUrl !== currentProfile.avatar_url) {
+      await intent.setAvatarUrl(mxcUrl);
     }
   }
 
