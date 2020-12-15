@@ -2,6 +2,7 @@
 
 'use strict';
 
+const debug = require('debug')('gitter:app:chat-service');
 const assert = require('assert');
 const Promise = require('bluebird');
 const _ = require('lodash');
@@ -324,6 +325,12 @@ function getRecentPublicChats() {
     .exec();
 }
 
+function checkIfTimeIsOutsideEditWindow(sent) {
+  const age = (Date.now() - new Date(sent).valueOf()) / 1000;
+  debug(`checkIfTimeIsOutsideEditWindow(${sent}) ${age} > ${MAX_CHAT_EDIT_AGE_SECONDS}`);
+  return age > MAX_CHAT_EDIT_AGE_SECONDS;
+}
+
 /**
  * NB: It is the caller's responsibility to ensure that the user has access to the room!
  */
@@ -333,8 +340,7 @@ async function updateChatMessage(troupe, chatMessage, user, newText = '') {
   if (!user) throw new StatusError(404, 'Unknown user');
   validateChatMessageLength(newText);
 
-  const age = (Date.now() - chatMessage.sent.valueOf()) / 1000;
-  if (age > MAX_CHAT_EDIT_AGE_SECONDS) {
+  if (checkIfTimeIsOutsideEditWindow(chatMessage.sent)) {
     throw new StatusError(400, 'You can no longer edit this message');
   }
 
@@ -780,6 +786,7 @@ module.exports = {
   getCursorByRoomId,
   newChatMessageToTroupe,
   getRecentPublicChats,
+  checkIfTimeIsOutsideEditWindow,
   updateChatMessage,
   findById,
   findByIdLean,
