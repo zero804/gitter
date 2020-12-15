@@ -3,10 +3,7 @@
 const StatusError = require('statuserror');
 const generateProxyUrl = require('gitter-web-text-processor/lib/generate-proxy-url');
 
-// We assume any username with a colon `:` in it, is a virtualUser from Matrix
-function checkForMatrixUsername(username) {
-  return username.indexOf(':') >= 0;
-}
+const checkForMatrixUsername = require('./virtual-users/check-for-matrix-username');
 
 // This is used for lookUps when chat messages are serialized
 // Just trying to make things compatible with the old `message.fromUser` world

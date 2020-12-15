@@ -7,6 +7,7 @@ const obfuscateToken = require('gitter-web-github').obfuscateToken;
 
 const matrixBridge = require('./lib/matrix-bridge');
 const GitterBridge = require('./lib/gitter-bridge');
+const MatrixUtils = require('./lib/matrix-utils');
 
 const bridgePort = config.get('matrix:bridge:applicationServicePort');
 const hsToken = config.get('matrix:bridge:hsToken');
@@ -29,6 +30,10 @@ async function install() {
   logger.info(`Matrix bridge listening on port ${bridgePort}`);
 
   new GitterBridge(matrixBridge);
+
+  // Ensures the bridge bot user is registered and updates its profile info.
+  const matrixUtils = new MatrixUtils(matrixBridge);
+  await matrixUtils.ensureCorrectMatrixBridgeUserProfile();
 }
 
 module.exports = install;
