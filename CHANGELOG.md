@@ -1,4 +1,4 @@
-# 21.14.0 - *upcoming*
+# 21.14.0 - 2020-12-15
 
  - Accept invites on Matrix when invited, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2104
  - Cross-link Matrix room to Gitter with special state event, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2079
