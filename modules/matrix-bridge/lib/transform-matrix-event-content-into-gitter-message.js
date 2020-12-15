@@ -106,6 +106,26 @@ async function transformMxidMentions(content) {
   return resultantBody;
 }
 
+function stripReplyQuote(content) {
+  let resultantBody = content.body;
+
+  const splitLines = resultantBody.split(/\r?\n/);
+
+  // Find which line the quote ends on
+  let splitLineIndex = 0;
+  for (const line of splitLines) {
+    if (line[0] !== '>') {
+      break;
+    }
+    splitLineIndex += 1;
+  }
+
+  return splitLines
+    .splice(splitLineIndex)
+    .join('\n')
+    .trim();
+}
+
 // Based off of https://github.com/matrix-org/matrix-bifrost/blob/c7161dd998c4fe968dba4d5da668dc914248f260/src/MessageFormatter.ts#L45-L60
 function mxcUrlToHttp(mxcUrl) {
   const uriBits = mxcUrl.substr('mxc://'.length).split('/');
@@ -140,6 +160,18 @@ async function transformMatrixEventContentIntoGitterMessage(content, event) {
   const isStatusMessage = content.msgtype === 'm.emote';
   if (isStatusMessage) {
     resultantBody = `${event.sender} ${resultantBody}`;
+  }
+
+  // If it's a reply message, strip the quote before putting it in the Gitter thread
+  const inReplyToMatrixEventId =
+    event.content['m.relates_to'] &&
+    event.content['m.relates_to']['m.in_reply_to'] &&
+    event.content['m.relates_to']['m.in_reply_to'].event_id;
+  if (inReplyToMatrixEventId) {
+    resultantBody = stripReplyQuote({
+      ...content,
+      body: resultantBody
+    });
   }
 
   return resultantBody;
