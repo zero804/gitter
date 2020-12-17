@@ -56,7 +56,7 @@ const registrationConfig = AppServiceRegistration.fromObject({
   },
   url: bridgeUrl,
   sender_localpart: matrixBridgeMxidLocalpart,
-  rate_limited: true,
+  rate_limited: false,
   protocols: null
 });
 
