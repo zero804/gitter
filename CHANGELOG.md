@@ -1,6 +1,7 @@
 # 21.15.0 - *upcoming*
 
  - Fix colon next to @mention mangling mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2111
+ - Strip Matrix reply quote when it goes into Gitter threaded conversation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2110
 
 Developer facing:
 
