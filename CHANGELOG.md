@@ -2,6 +2,9 @@
 
  - Fix colon next to @mention mangling mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2111
 
+Developer facing:
+
+ - Add utility script to ensure existing Matrix bridge rooms updated, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2113
 
 
 # 21.14.0 - 2020-12-15
