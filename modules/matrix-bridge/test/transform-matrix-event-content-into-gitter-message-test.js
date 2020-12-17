@@ -106,6 +106,31 @@ describe('transform-matrix-event-content-into-gitter-message', () => {
             formatted_body: `says hi to <a href="https://matrix.to/#/@${fixture.user1.username}-${fixture.user1.id}:${configuredServerName}">${fixture.user1.username} (${fixture.user1.displayName})</a> and waves`
           },
           expectedText: `@terry:localhost says hi to @${fixture.user1.username} and waves`
+        },
+        {
+          name: 'Strip reply quote',
+          content: {
+            msgtype: 'm.text',
+            format: 'org.matrix.custom.html',
+            body: `> <@root:my.matrix.host> dogs and foxes\n> love jellies\n\nNot as much as meat`,
+            formatted_body: `<mx-reply><blockquote><a href="https://matrix.to/#/!seyNEQRDccKBWPkzCc:my.matrix.host/$VGkNVughq4tGGZY76iGkHqEYReiueApMVsqQOy9YoXg?via=my.matrix.host">In reply to</a> <a href="https://matrix.to/#/@root:my.matrix.host">@root:my.matrix.host</a><br>dogs and foxes<br/>love jellies</blockquote></mx-reply>Not as much as meat`,
+            'm.relates_to': {
+              'm.in_reply_to': {
+                event_id: '12345:localhost'
+              }
+            }
+          },
+          expectedText: `Not as much as meat`
+        },
+        {
+          name: 'Does not strip quote in normal message',
+          content: {
+            msgtype: 'm.text',
+            format: 'org.matrix.custom.html',
+            body: `> hey doggy\n\noh hi mark`,
+            formatted_body: `<blockquote>\n<p>hey doggy</p>\n</blockquote>\n<p>oh hi mark</p>\n`
+          },
+          expectedText: `> hey doggy\n\noh hi mark`
         }
       ].forEach(meta => {
         it(meta.name, async () => {

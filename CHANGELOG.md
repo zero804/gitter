@@ -1,3 +1,13 @@
+# 21.15.0 - *upcoming*
+
+ - Fix colon next to @mention mangling mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2111
+ - Strip Matrix reply quote when it goes into Gitter threaded conversation, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2110
+
+Developer facing:
+
+ - Add utility script to ensure existing Matrix bridge rooms updated, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2113
+
+
 # 21.14.0 - 2020-12-15
 
  - Accept invites on Matrix when invited, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2104
