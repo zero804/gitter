@@ -1,3 +1,10 @@
+# 21.14.0 - 2020-12-15
+
+ - Accept invites on Matrix when invited, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2104
+ - Cross-link Matrix room to Gitter with special state event, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2079
+ - Handle Matrix edit outside of Gitter edit window (send new message), https://gitlab.com/gitterHQ/webapp/-/merge_requests/2107
+
+
 # 21.13.0 - 2020-12-10
 
  - Fix browser notifications for `virtualUsers`, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2102

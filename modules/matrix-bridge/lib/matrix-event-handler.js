@@ -5,9 +5,12 @@ const assert = require('assert');
 const chatService = require('gitter-web-chats');
 const troupeService = require('gitter-web-rooms/lib/troupe-service');
 const userService = require('gitter-web-users');
-const store = require('./store');
+const generatePermalink = require('gitter-web-shared/chat/generate-permalink');
 const env = require('gitter-web-env');
 const stats = env.stats;
+const logger = env.logger;
+
+const store = require('./store');
 const transformMatrixEventContentIntoGitterMessage = require('./transform-matrix-event-content-into-gitter-message');
 const MatrixUtils = require('./matrix-utils');
 const { isGitterRoomIdAllowedToBridge } = require('./gitter-utils');
@@ -115,8 +118,9 @@ class MatrixEventHandler {
     assert(matrixBridge, 'Matrix bridge required');
     assert(
       gitterBridgeUsername,
-      'Gitter bridge username required (the bot user that bridges messages like gitter-badger or matrixbot)'
+      'gitterBridgeUsername required (the bot user on the Gitter side that bridges messages like gitter-badger or matrixbot)'
     );
+
     this.matrixBridge = matrixBridge;
     this._gitterBridgeUsername = gitterBridgeUsername;
     this.matrixUtils = new MatrixUtils(matrixBridge);
@@ -166,6 +170,13 @@ class MatrixEventHandler {
     if (event.type === 'm.room.redaction') {
       return await this.handleChatMessageDeleteEvent(event);
     }
+
+    if (
+      event.type === 'm.room.member' &&
+      event.state_key === this.matrixUtils.getMxidForMatrixBridgeUser()
+    ) {
+      return await this.handleBotInvitationEvent(event);
+    }
   }
 
   async handleChatMessageEditEvent(event) {
@@ -202,11 +213,29 @@ class MatrixEventHandler {
       event.content['m.new_content'],
       event
     );
+
+    // Create a new message for any events that are outside the Gitter edit window
+    if (chatService.checkIfTimeIsOutsideEditWindow(chatMessage.sent)) {
+      logger.info(
+        `Matrix edit is too old to apply to original bridged Gitter message so we're sending a new message (event_id=${event.event_id} old_matrix_event_we_are_replacing=${matrixEventId} old_gitter_chat_id=${chatMessage.id})`
+      );
+
+      await chatService.newChatMessageToTroupe(gitterRoom, gitterBridgeUser, {
+        parentId: chatMessage.parentId,
+        virtualUser: chatMessage.virtualUser,
+        text: `:point_up: [Edit](${generatePermalink(gitterRoom.uri, chatMessage.id)}): ${newText}`,
+        status: chatMessage.status
+      });
+
+      return null;
+    }
+
     await chatService.updateChatMessage(gitterRoom, chatMessage, gitterBridgeUser, newText);
 
     return null;
   }
 
+  // eslint-disable-next-line max-statements
   async handleChatMessageCreateEvent(event) {
     // If someone is passing us mangled events, just ignore them.
     if (!validateEventForMessageCreateEvent(event)) {
@@ -323,6 +352,14 @@ class MatrixEventHandler {
     await chatService.deleteMessageFromRoom(gitterRoom, chatMessage);
 
     return null;
+  }
+
+  async handleBotInvitationEvent(event) {
+    logger.info(
+      `Our Matrix bridge bot user was invited to a room, let's join it (room_id=${event.room_id})`
+    );
+    const intent = this.matrixBridge.getIntent();
+    await intent.join(event.room_id);
   }
 }
 
