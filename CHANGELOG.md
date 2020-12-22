@@ -1,3 +1,11 @@
+# 21.16.0 - *upcoming*
+
+
+Developer facing:
+
+ - Make bridged Matrix room batch processing size smaller to avoid cursor timeout, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2115 
+
+
 # 21.15.0 - 2020-12-17
 
  - Fix colon next to @mention mangling mention, https://gitlab.com/gitterHQ/webapp/-/merge_requests/2111
